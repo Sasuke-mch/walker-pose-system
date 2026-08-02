@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+configs/local.private.json
+sequence_results/
+*.log
+.pytest_cache/
