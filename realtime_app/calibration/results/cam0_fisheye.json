@@ -1,0 +1,67 @@
+﻿{
+    "camera_name":  "cam0",
+    "model":  "opencv_fisheye",
+    "opencv_version":  "4.13.0",
+    "image_size":  [
+                       1920,
+                       1080
+                   ],
+    "board":  {
+                  "type":  "ChArUco",
+                  "dictionary":  "DICT_4X4_50",
+                  "squares_x":  8,
+                  "squares_y":  6,
+                  "square_mm":  30.0,
+                  "marker_mm":  22.0
+              },
+    "dataset":  {
+                    "usable_views":  73,
+                    "train_views":  58,
+                    "validation_views":  15,
+                    "min_corners":  12,
+                    "seed":  20260819
+                },
+    "calibration_rms_px":  0.2723394954500862,
+    "K":  [
+              [
+                  755.5721333515272,
+                  0.0,
+                  995.9446644121314
+              ],
+              [
+                  0.0,
+                  755.132226469427,
+                  537.0915590087372
+              ],
+              [
+                  0.0,
+                  0.0,
+                  1.0
+              ]
+          ],
+    "D":  [
+              -0.016635373037049376,
+              -0.010626903834433418,
+              0.005399771605657706,
+              -0.0015048843954588353
+          ],
+    "validation_metrics":  {
+                               "point_mean_px":  0.23554564729395827,
+                               "point_median_px":  0.2136757406637459,
+                               "point_p95_px":  0.47821548217806664,
+                               "point_max_px":  0.9262924523855967,
+                               "view_rmse_mean_px":  0.27221140847872516,
+                               "view_rmse_median_px":  0.2750765309467672,
+                               "view_rmse_p95_px":  0.3323697787473591,
+                               "view_rmse_max_px":  0.3519214586409911
+                           },
+    "raw_fov":  {
+                    "HFOV_deg":  152.9612782317882,
+                    "VFOV_deg":  82.77302835556483,
+                    "left_half_deg":  79.85680481857152,
+                    "right_half_deg":  73.10447341321667,
+                    "top_half_deg":  41.19692155591575,
+                    "bottom_half_deg":  41.57610679964908,
+                    "note":  "Model-derived raw-image centerline FOV. For extreme \u003e180-degree diagonal coverage, do not infer diagonal FOV from this rectilinear ray representation."
+                }
+}
