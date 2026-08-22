@@ -1,0 +1,70 @@
+﻿{
+    "camera_name":  "cam1",
+    "model":  "opencv_fisheye",
+    "opencv_version":  "4.13.0",
+    "image_size":  [
+                       1920,
+                       1080
+                   ],
+    "board":  {
+                  "type":  "ChArUco",
+                  "dictionary":  "DICT_4X4_50",
+                  "squares_x":  8,
+                  "squares_y":  6,
+                  "square_mm":  30.0,
+                  "marker_mm":  22.0
+              },
+    "dataset":  {
+                    "usable_views":  66,
+                    "train_views":  51,
+                    "validation_views":  15,
+                    "min_corners":  12,
+                    "seed":  20260819
+                },
+    "calibration_rms_px":  0.2725919699137473,
+    "K":  [
+              [
+                  762.7327659437377,
+                  0.0,
+                  972.9626840992721
+              ],
+              [
+                  0.0,
+                  762.0325101509444,
+                  495.8971484224165
+              ],
+              [
+                  0.0,
+                  0.0,
+                  1.0
+              ]
+          ],
+    "D":  [
+              -0.026326251876287197,
+              -0.00479360238212584,
+              0.0025517511939939677,
+              -0.0012032694326123802
+          ],
+    "validation_metrics":  {
+                               "point_mean_px":  0.258440572563165,
+                               "point_median_px":  0.21379190604282072,
+                               "point_p95_px":  0.6453979963139789,
+                               "point_max_px":  1.4901179386593404,
+                               "view_rmse_mean_px":  0.29020715236938377,
+                               "view_rmse_median_px":  0.25993273383135834,
+                               "view_rmse_p95_px":  0.50396434852266,
+                               "view_rmse_max_px":  0.7216807044628188
+                           },
+    "raw_fov":  {
+                    "HFOV_deg":  153.42886491440615,
+                    "VFOV_deg":  82.35969274280582,
+                    "left_half_deg":  78.02401670505499,
+                    "right_half_deg":  75.40484820935112,
+                    "top_half_deg":  37.744610653175606,
+                    "bottom_half_deg":  44.61508208963021,
+                    "note":  "Model-derived raw-image centerline FOV. For extreme \u003e180-degree diagonal coverage, do not infer diagonal FOV from this rectilinear ray representation."
+                },
+    "excluded_views":  [
+                           "charuco_raw_20260819_221355_013.png"
+                       ]
+}

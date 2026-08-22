@@ -1,0 +1,12 @@
+{
+  "input_predictions_after_oks_nms": 25769,
+  "final_pose_score_threshold": 0.3,
+  "retained_predictions": 6134,
+  "removed_by_final_score_threshold": 19635,
+  "images_with_predictions": 2446,
+  "zero_prediction_images": 54,
+  "max_predictions_per_image": 14,
+  "score_formula": "bbox_score_from_yolo26x * mean(keypoint_scores where keypoint_scores > 0.20)",
+  "oks_nms_threshold": 0.9,
+  "detector_confidence_threshold": 0.05
+}

@@ -1,0 +1,12 @@
+image,yolo26x_pose,pmpose,bboxmaskpose
+input1,12,14,13
+input10,1,0,0
+input2,3,3,3
+input3,1,1,1
+input4,18,19,16
+input5,18,17,17
+input6,3,3,3
+input7,16,14,12
+input8,10,13,10
+input9,2,2,2
+TOTAL,84,86,77

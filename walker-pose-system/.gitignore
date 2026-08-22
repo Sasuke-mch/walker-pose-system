@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local configuration
+config.json
+config.local.json
+**/configs/local.json
+*.local.json
+.env
+
+# Temporary and backup files
+*.bak
+*.tmp
+*_backup_*/
+diagnostics/static_check_summary.json
+_environment_checks/
+_pmpose_smoke_test/
+
+# Datasets and model files
+datasets/
+data/
+weights/
+external_models/
+model_cache/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.engine
+
+# Runtime outputs
+outputs/
+runs/
+logs/
+*.log
+*.jsonl
+raw_predictions.json
+*_predictions.json
+
+# Large media
+*.mp4
+*.avi
+
+# Allow selected public examples
+!benchmarks/qualitative/*.jpg
+!benchmarks/qualitative/*.png
+!examples/demo_short.mp4
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+
+# IDE and OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+*.bak*

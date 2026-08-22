@@ -1,0 +1,64 @@
+# .gitignore for walker_pose_system
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+.claude/
+*.swp
+*.swo
+
+# 操作系统
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# 模型权重（太大，不进 git）
+models/
+*.pth
+*.pt
+*.onnx
+*.engine
+
+# 第三方源码（不重新分发）
+third_party/
+
+# 运行产物
+outputs/
+realtime_app/outputs/
+
+# 标定原始数据（只保留 results/ 下的最终参数）
+realtime_app/calibration/captures/
+realtime_app/calibration/reports/
+
+# 临时文件
+*.bak
+*.bak_*
+*.tmp
+*.log
+
+# 资料（非代码）
+资料/
+
+# 大文件
+*.zip
+*.avi
+*.mp4
+*.mov
+
+# 配置（含本地路径）
+config.json
+local.json

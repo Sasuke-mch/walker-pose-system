@@ -1,0 +1,59 @@
+{
+  "project_root": "..",
+  "docker": {
+    "image": "yolo26-realtime:latest",
+    "host_port": 18080,
+    "container_port": 18080,
+    "startup_timeout_sec": 600,
+    "request_timeout_sec": 180,
+    "shm_size": "4g",
+    "use_gpu": true
+  },
+  "model": {
+    "repo": "../YOLO26-test",
+    "weight": "../external_models/YOLO26x-pose/yolo26x-pose.pt",
+    "device": "0",
+    "imgsz": 1280,
+    "candidate_conf": 0.01,
+    "iou": 0.7,
+    "max_det": 300,
+    "keypoint_score_threshold": 0.2,
+    "pose_threshold": 0.4
+  },
+  "detector": {
+    "image": "yolo26-realtime:latest",
+    "repo": "../YOLO26-test",
+    "weight": "../YOLO26-test/yolo26x.pt",
+    "host_port": 18081,
+    "container_port": 18081,
+    "device": "0",
+    "imgsz": 1280,
+    "conf": 0.05,
+    "iou": 0.7,
+    "max_det": 300
+  },
+  "pmpose": {
+    "image": "bboxmaskpose:latest",
+    "repo": "../BBoxMaskPose",
+    "cache": "../models",
+    "host_port": 18082,
+    "container_port": 18082,
+    "device": "cuda:0",
+    "variant": "PMPose-b",
+    "keypoint_score_threshold": 0.2,
+    "pose_threshold": 0.3,
+    "mask_mode": "bbox"
+  },
+  "output": {
+    "root": "outputs",
+    "jpeg_quality": 90,
+    "realtime_output_fps": 10.0,
+    "draw_keypoint_threshold": 0.2
+  },
+  "camera": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "backend": "msmf"
+  }
+}

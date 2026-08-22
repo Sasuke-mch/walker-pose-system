@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Common pose sequence",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "model",
+    "sequence",
+    "frames"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "model": {
+      "type": "object"
+    },
+    "sequence": {
+      "type": "object"
+    },
+    "frames": {
+      "type": "array"
+    }
+  }
+}
