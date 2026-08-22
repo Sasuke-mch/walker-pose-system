@@ -62,10 +62,3 @@ Thumbs.db
 Desktop.ini
 
 *.bak*
-
-# Camera calibration raw/intermediate data
-realtime_app/calibration/captures/
-realtime_app/calibration/reports/
-realtime_app/calibration/results/cam0_model_compare/
-realtime_app/calibration/results/cam1_model_compare/
-realtime_app/calibration/results/stereo_work/
