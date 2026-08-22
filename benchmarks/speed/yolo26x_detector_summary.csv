@@ -1,0 +1,2 @@
+﻿method,num_images,repeat,mean_detector_ms,median_detector_ms,p95_detector_ms,min_detector_ms,max_detector_ms,detector_fps,total_person_detections_last_run,mean_person_per_image,peak_cuda_allocated_mb,output_json
+YOLO26x_detector,10,20,33.905383,27.949018,59.139250,18.532101,85.799827,29.493841,86,8.600000,385.699,/workspace/pose_speed_outputs/yolo26x_detections.json

@@ -1,0 +1,351 @@
+{
+  "schema_version": "2.0",
+  "defaults": {
+    "device": "0",
+    "imgsz": 1280,
+    "det_conf": 0.05,
+    "pose_conf": 0.05,
+    "det_iou": 0.7,
+    "probpose_score_thr": 0.2,
+    "sapiens_batch_size": 2,
+    "sapiens_kpt_thr": 0.3,
+    "docker_shm_size": "8g"
+  },
+  "model_order": [
+    "yolo26x_pose",
+    "pmpose",
+    "probpose",
+    "bboxmaskpose",
+    "sapiens2"
+  ],
+  "models": {
+    "yolo26_detector": {
+      "display_name": "YOLO26x detector",
+      "enabled": true,
+      "kind": "detector",
+      "pipeline_type": "detector",
+      "requires_detector": false,
+      "docker_image": "yolo26-test-fixed:latest",
+      "workdir": "/workspace/pipeline",
+      "environment": {
+        "YOLO_CONFIG_DIR": "/tmp/Ultralytics"
+      },
+      "repo": null,
+      "weight": {
+        "required": true,
+        "host_path": "YOLO26-test/weights/yolo26x.pt",
+        "container_dir": "/workspace/model_weights",
+        "container_file_name": null,
+        "supports_arbitrary_name": true
+      },
+      "mounts": [],
+      "required_paths": [],
+      "command": [
+        "python",
+        "/workspace/pipeline/container_tasks/yolo26_detector.py",
+        "--input-dir",
+        "/workspace/input",
+        "--weights",
+        "{weight_container}",
+        "--output-json",
+        "/workspace/output/detections/yolo26x_detections.json",
+        "--device",
+        "{device}",
+        "--imgsz",
+        "{imgsz}",
+        "--conf",
+        "{det_conf}",
+        "--iou",
+        "{det_iou}"
+      ],
+      "expected_outputs": [
+        "detections/yolo26x_detections.json"
+      ]
+    },
+    "yolo26x_pose": {
+      "display_name": "YOLO26x-pose",
+      "enabled": true,
+      "kind": "pose",
+      "pipeline_type": "end_to_end",
+      "requires_detector": false,
+      "docker_image": "yolo26-test-fixed:latest",
+      "workdir": "/workspace/pipeline",
+      "environment": {
+        "YOLO_CONFIG_DIR": "/tmp/Ultralytics"
+      },
+      "repo": null,
+      "weight": {
+        "required": true,
+        "host_path": "external_models/YOLO26x-pose/yolo26x-pose.pt",
+        "container_dir": "/workspace/model_weights",
+        "container_file_name": null,
+        "supports_arbitrary_name": true
+      },
+      "mounts": [],
+      "required_paths": [],
+      "command": [
+        "python",
+        "/workspace/pipeline/container_tasks/yolo26x_pose_sequence.py",
+        "--input-dir",
+        "/workspace/input",
+        "--weights",
+        "{weight_container}",
+        "--raw-output",
+        "/workspace/output/yolo26x_pose/raw_predictions.json",
+        "--common-output",
+        "/workspace/output/yolo26x_pose/common_predictions.json",
+        "--vis-dir",
+        "/workspace/output/yolo26x_pose/visualizations",
+        "--device",
+        "{device}",
+        "--imgsz",
+        "{imgsz}",
+        "--conf",
+        "{pose_conf}",
+        "--iou",
+        "{det_iou}",
+        {
+          "flag": "--save-vis",
+          "when": "save_vis"
+        }
+      ],
+      "expected_outputs": [
+        "yolo26x_pose/raw_predictions.json",
+        "yolo26x_pose/common_predictions.json"
+      ]
+    },
+    "pmpose": {
+      "display_name": "PMPose-b",
+      "enabled": true,
+      "kind": "pose",
+      "pipeline_type": "top_down",
+      "requires_detector": true,
+      "docker_image": "bboxmaskpose:latest",
+      "workdir": "/workspace/BBoxMaskPose",
+      "environment": {},
+      "repo": {
+        "host_path": "BBoxMaskPose",
+        "container_path": "/workspace/BBoxMaskPose",
+        "mode": "rw"
+      },
+      "weight": {
+        "required": false,
+        "host_path": "",
+        "container_dir": "/workspace/model_weights",
+        "container_file_name": null,
+        "supports_arbitrary_name": true,
+        "note": "If omitted, PMPose may download the checkpoint through its own API."
+      },
+      "mounts": [],
+      "required_paths": [
+        {
+          "path": "BBoxMaskPose/tools/benchmark_from_yolo26_bboxes.py",
+          "type": "file"
+        }
+      ],
+      "command": [
+        "python",
+        "tools/benchmark_from_yolo26_bboxes.py",
+        "--det-json",
+        "/workspace/output/detections/yolo26x_detections.json",
+        "--method",
+        "pmpose",
+        "--output-csv",
+        "/workspace/output/pmpose/internal_single_pass.csv",
+        "--summary-csv",
+        "/workspace/output/pmpose/internal_single_pass_summary.csv",
+        "--save-pred-json",
+        "/workspace/output/pmpose/raw_predictions.json",
+        "--device",
+        "cuda:0",
+        "--pose-variant",
+        "PMPose-b",
+        "--warmup",
+        "0",
+        "--repeat",
+        "1",
+        {
+          "flag": "--pose-checkpoint",
+          "value": "{weight_container}",
+          "when": "weight_exists"
+        }
+      ],
+      "expected_outputs": [
+        "pmpose/raw_predictions.json"
+      ]
+    },
+    "probpose": {
+      "display_name": "ProbPose-s",
+      "enabled": true,
+      "kind": "pose",
+      "pipeline_type": "top_down",
+      "requires_detector": true,
+      "docker_image": "bboxmaskpose:latest",
+      "workdir": "/workspace/ProbPose_code",
+      "environment": {
+        "PYTHONPATH": "/workspace/ProbPose_code",
+        "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1"
+      },
+      "repo": {
+        "host_path": "external_models/ProbPose_code",
+        "container_path": "/workspace/ProbPose_code",
+        "mode": "rw"
+      },
+      "weight": {
+        "required": true,
+        "host_path": "external_models/ProbPose/checkpoints/ProbPose-s/ProbPose-s.pth",
+        "container_dir": "/workspace/ProbPose-s",
+        "container_file_name": "ProbPose-s.pth",
+        "supports_arbitrary_name": false
+      },
+      "mounts": [],
+      "required_paths": [
+        {
+          "path": "external_models/ProbPose_code/tools/run_probpose_from_yolo26_bboxes.py",
+          "type": "file"
+        }
+      ],
+      "command": [
+        "python",
+        "tools/run_probpose_from_yolo26_bboxes.py",
+        "--det-json",
+        "/workspace/output/detections/yolo26x_detections.json",
+        "--output-json",
+        "/workspace/output/probpose/raw_predictions.json",
+        "--vis-dir",
+        "/workspace/output/probpose/visualizations",
+        "--device",
+        "cuda:0",
+        "--score-thr",
+        "{probpose_score_thr}",
+        {
+          "flag": "--no-vis",
+          "when": "not_save_vis",
+          "optional_unsupported": true
+        }
+      ],
+      "expected_outputs": [
+        "probpose/raw_predictions.json"
+      ]
+    },
+    "bboxmaskpose": {
+      "display_name": "BBoxMaskPose",
+      "enabled": true,
+      "kind": "pose",
+      "pipeline_type": "top_down",
+      "requires_detector": true,
+      "docker_image": "bboxmaskpose:latest",
+      "workdir": "/workspace/BBoxMaskPose",
+      "environment": {},
+      "repo": {
+        "host_path": "BBoxMaskPose",
+        "container_path": "/workspace/BBoxMaskPose",
+        "mode": "rw"
+      },
+      "weight": {
+        "required": false,
+        "host_path": "",
+        "container_dir": "/workspace/model_weights",
+        "container_file_name": null,
+        "supports_arbitrary_name": true,
+        "note": "Optional PMPose backbone checkpoint. SAM checkpoint is controlled by the BBoxMaskPose config."
+      },
+      "mounts": [],
+      "required_paths": [
+        {
+          "path": "BBoxMaskPose/tools/benchmark_from_yolo26_bboxes.py",
+          "type": "file"
+        },
+        {
+          "path": "BBoxMaskPose/bboxmaskpose/configs/bmp_v2.yaml",
+          "type": "file",
+          "warning_only": true
+        }
+      ],
+      "command": [
+        "python",
+        "tools/benchmark_from_yolo26_bboxes.py",
+        "--det-json",
+        "/workspace/output/detections/yolo26x_detections.json",
+        "--method",
+        "bboxmaskpose",
+        "--output-csv",
+        "/workspace/output/bboxmaskpose/internal_single_pass.csv",
+        "--summary-csv",
+        "/workspace/output/bboxmaskpose/internal_single_pass_summary.csv",
+        "--save-pred-json",
+        "/workspace/output/bboxmaskpose/raw_predictions.json",
+        "--device",
+        "cuda:0",
+        "--pose-variant",
+        "PMPose-b",
+        "--bmp-config",
+        "bmp_v2",
+        "--bmp-iters",
+        "1",
+        "--mask-mode",
+        "bbox",
+        "--warmup",
+        "0",
+        "--repeat",
+        "1",
+        {
+          "flag": "--pose-checkpoint",
+          "value": "{weight_container}",
+          "when": "weight_exists"
+        }
+      ],
+      "expected_outputs": [
+        "bboxmaskpose/raw_predictions.json"
+      ]
+    },
+    "sapiens2": {
+      "display_name": "Sapiens2-0.4B",
+      "enabled": true,
+      "kind": "pose",
+      "pipeline_type": "top_down",
+      "requires_detector": true,
+      "docker_image": "sapiens2:latest",
+      "workdir": "/workspace/sapiens2/sapiens/pose",
+      "environment": {},
+      "repo": {
+        "host_path": "external_models/sapiens2_repo",
+        "container_path": "/workspace/sapiens2",
+        "mode": "rw"
+      },
+      "weight": {
+        "required": true,
+        "host_path": "external_models/Sapiens2/checkpoints/sapiens2-pose-0.4b/sapiens2_0.4b_pose.safetensors",
+        "container_dir": "/workspace/sapiens2_weights",
+        "container_file_name": "sapiens2_0.4b_pose.safetensors",
+        "supports_arbitrary_name": false
+      },
+      "mounts": [],
+      "required_paths": [
+        {
+          "path": "external_models/sapiens2_repo/sapiens/pose/tools/vis/run_sapiens2_from_yolo26_bboxes.py",
+          "type": "file"
+        }
+      ],
+      "command": [
+        "python",
+        "tools/vis/run_sapiens2_from_yolo26_bboxes.py",
+        "--det-json",
+        "/workspace/output/detections/yolo26x_detections.json",
+        "--output-json",
+        "/workspace/output/sapiens2/raw_predictions.json",
+        "--vis-dir",
+        "/workspace/output/sapiens2/visualizations",
+        "--device",
+        "cuda:0",
+        "--batch-size",
+        "{sapiens_batch_size}",
+        "--kpt-thr",
+        "{sapiens_kpt_thr}"
+      ],
+      "expected_outputs": [
+        "sapiens2/raw_predictions.json"
+      ]
+    }
+  }
+}

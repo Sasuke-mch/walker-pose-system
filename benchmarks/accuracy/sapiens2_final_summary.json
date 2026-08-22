@@ -1,0 +1,60 @@
+{
+  "method": "YOLO26x + Sapiens2-0.4B",
+  "dataset": "OCHuman-Pose val2500",
+  "detector_confidence_threshold": 0.05,
+  "flip_test": false,
+  "micro_batch_size": 2,
+  "keypoint_score_threshold_for_instance_score": 0.2,
+  "oks_nms_threshold": 0.9,
+  "final_pose_score_threshold": 0.37,
+  "predictions_before_final_filter": 26469,
+  "predictions_after_final_filter": 6017,
+  "images_with_final_predictions": 2442,
+  "standard_coco_metrics": {
+    "AP": 0.5971301894955348,
+    "AP50": 0.786228798937457,
+    "AP75": 0.6780477342642998,
+    "APM": 0.20189542945840866,
+    "APL": 0.6188160300654699,
+    "AR": 0.7412196240256763,
+    "AR50": 0.9182332263487697,
+    "AR75": 0.8176677365123032,
+    "ARM": 0.8629629629629629,
+    "ARL": 0.7407151626764886
+  },
+  "final_working_points": {
+    "0.50": {
+      "retained_predictions": 6017,
+      "tp": 4938,
+      "fp": 1079,
+      "fn": 1604,
+      "precision": 0.8206747548612265,
+      "recall": 0.7548150412717823,
+      "f1": 0.7863683414284576,
+      "fp_per_image": 0.4316
+    },
+    "0.75": {
+      "retained_predictions": 6017,
+      "tp": 4514,
+      "fp": 1503,
+      "fn": 2028,
+      "precision": 0.750207744723284,
+      "recall": 0.6900030571690614,
+      "f1": 0.7188470419619397,
+      "fp_per_image": 0.6012
+    }
+  },
+  "speed": {
+    "measured_images": 2495,
+    "measured_input_boxes": 28526,
+    "mean_ms_per_image": 10360.151020476544,
+    "median_ms_per_image": 4559.314989000995,
+    "p95_ms_per_image": 40772.74314609983,
+    "pose_stage_fps": 0.09652368947359247,
+    "mean_ms_per_person": 906.1409519767572
+  },
+  "files": {
+    "source_predictions": "../../../experiments/sequence_results/ochuman_val2500_sapiens2_conf005_noflip_b2_full/sapiens2_coco_predictions.json",
+    "final_predictions": "../../../experiments/sequence_results/ochuman_val2500_sapiens2_conf005_noflip_b2_full/sapiens2_coco_predictions_final_thr037.json"
+  }
+}
