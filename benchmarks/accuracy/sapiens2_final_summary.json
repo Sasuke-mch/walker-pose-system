@@ -54,7 +54,7 @@
     "mean_ms_per_person": 906.1409519767572
   },
   "files": {
-    "source_predictions": "D:\\my_works\\基于鱼眼双目的助步器人体骨骼三维估计与步态分析系统及方法\\sequence_results\\ochuman_val2500_sapiens2_conf005_noflip_b2_full\\sapiens2_coco_predictions.json",
-    "final_predictions": "D:\\my_works\\基于鱼眼双目的助步器人体骨骼三维估计与步态分析系统及方法\\sequence_results\\ochuman_val2500_sapiens2_conf005_noflip_b2_full\\sapiens2_coco_predictions_final_thr037.json"
+    "source_predictions": "../../../experiments/sequence_results/ochuman_val2500_sapiens2_conf005_noflip_b2_full/sapiens2_coco_predictions.json",
+    "final_predictions": "../../../experiments/sequence_results/ochuman_val2500_sapiens2_conf005_noflip_b2_full/sapiens2_coco_predictions_final_thr037.json"
   }
 }

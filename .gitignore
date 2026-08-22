@@ -1,15 +1,12 @@
-# .gitignore for walker_pose_system
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
 *.egg-info/
 dist/
 build/
 *.egg
-
-# 虚拟环境
 .venv/
 venv/
 env/
@@ -21,44 +18,71 @@ env/
 *.swp
 *.swo
 
-# 操作系统
+# OS
 Thumbs.db
 Desktop.ini
 .DS_Store
 
-# 模型权重（太大，不进 git）
+# Local configuration
+config.json
+config.local.json
+**/configs/local.json
+*.local.json
+.env
+
+# Model weights (too large for git)
 models/
-*.pth
 *.pt
+*.pth
+*.ckpt
 *.onnx
 *.engine
 
-# 第三方源码（不重新分发）
+# Third-party source (not redistributed)
 third_party/
 
-# 运行产物
+# Runtime outputs
 outputs/
 realtime_app/outputs/
+runs/
+logs/
+*.log
+*.jsonl
+raw_predictions.json
+*_predictions.json
 
-# 标定原始数据（只保留 results/ 下的最终参数）
+# Calibration raw data (only keep results/*.json)
 realtime_app/calibration/captures/
 realtime_app/calibration/reports/
 
-# 临时文件
+# Temporary and backup
 *.bak
 *.bak_*
 *.tmp
-*.log
+*_backup_*/
+diagnostics/static_check_summary.json
+_environment_checks/
+_pmpose_smoke_test/
 
-# 资料（非代码）
+# 资料 (non-code assets)
 资料/
 
-# 大文件
+# Large files
 *.zip
+*.tar
+*.tar.gz
 *.avi
 *.mp4
 *.mov
 
-# 配置（含本地路径）
-config.json
-local.json
+# Allow selected public examples
+!benchmarks/qualitative/*.jpg
+!benchmarks/qualitative/*.png
+!examples/demo_short.mp4
+
+# Datasets
+datasets/
+data/
+weights/
+external_models/
+model_cache/
