@@ -17,7 +17,7 @@
                   "candidate_conf":  0.01,
                   "iou":  0.7,
                   "max_det":  300,
-                  "keypoint_score_threshold":  0.2,
+                  "keypoint_score_threshold":  0.25,
                   "pose_threshold":  0.4
               },
     "detector":  {
@@ -48,7 +48,7 @@
                    "root":  "outputs",
                    "jpeg_quality":  90,
                    "realtime_output_fps":  10.0,
-                   "draw_keypoint_threshold":  0.2
+                   "draw_keypoint_threshold":  0.25
                },
     "camera":  {
                    "width":  1920,

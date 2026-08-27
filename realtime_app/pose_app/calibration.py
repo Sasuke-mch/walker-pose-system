@@ -85,36 +85,108 @@ class StereoCalibration:
     def load(cls, path: str | Path) -> "StereoCalibration":
         file_path = Path(path).resolve()
         if not file_path.is_file():
-            raise FileNotFoundError(f"双目标定文件不存在：{file_path}")
+            raise FileNotFoundError(f"Stereo calibration file does not exist: {file_path}")
+
         raw = json.loads(file_path.read_text(encoding="utf-8-sig"))
         if not isinstance(raw, dict):
-            raise ValueError("双目标定文件根节点必须是JSON对象。")
-        model = str(raw.get("camera_model", "pinhole")).lower()
-        if model not in _VALID_MODELS:
-            raise ValueError(f"camera_model只支持{sorted(_VALID_MODELS)}，实际为{model!r}。")
+            raise ValueError("Stereo calibration root must be a JSON object.")
 
         left = raw.get("left")
         right = raw.get("right")
         stereo = raw.get("stereo")
-        if not isinstance(left, dict) or not isinstance(right, dict) or not isinstance(stereo, dict):
-            raise ValueError("标定文件必须包含left、right和stereo三个对象。")
+
+        if isinstance(left, dict) and isinstance(right, dict) and isinstance(stereo, dict):
+            normalized = raw
+        elif all(
+            key in raw
+            for key in (
+                "cam0_intrinsics",
+                "cam1_intrinsics",
+                "R_cam0_to_cam1",
+                "T_cam0_to_cam1_mm",
+            )
+        ):
+            left_reference = raw["cam0_intrinsics"]
+            right_reference = raw["cam1_intrinsics"]
+            if not isinstance(left_reference, str) or not isinstance(right_reference, str):
+                raise ValueError("New-format intrinsic references must be strings.")
+
+            def load_camera_reference(reference: str, name: str) -> dict[str, Any]:
+                reference_path = Path(reference)
+                candidates: list[Path] = []
+                if reference_path.is_absolute():
+                    candidates.append(reference_path)
+                else:
+                    candidates.extend(
+                        [
+                            file_path.parent / reference_path,
+                            Path.cwd() / reference_path,
+                        ]
+                    )
+                    candidates.extend(
+                        parent / reference_path for parent in file_path.parents
+                    )
+
+                seen: set[Path] = set()
+                for candidate in candidates:
+                    candidate = candidate.resolve()
+                    if candidate in seen:
+                        continue
+                    seen.add(candidate)
+                    if candidate.is_file():
+                        data = json.loads(candidate.read_text(encoding="utf-8-sig"))
+                        if not isinstance(data, dict):
+                            raise ValueError(f"{name} calibration must be a JSON object: {candidate}")
+                        return data
+
+                tried = ", ".join(str(candidate) for candidate in seen)
+                raise FileNotFoundError(
+                    f"Could not resolve {name} calibration reference {reference!r}. "
+                    f"Tried: {tried}"
+                )
+
+            normalized = {
+                "camera_model": "fisheye",
+                "length_unit": raw.get("board_units", "mm"),
+                "left": load_camera_reference(left_reference, "cam0"),
+                "right": load_camera_reference(right_reference, "cam1"),
+                "stereo": {
+                    "R": raw["R_cam0_to_cam1"],
+                    "T": raw["T_cam0_to_cam1_mm"],
+                },
+            }
+        else:
+            raise ValueError(
+                "Calibration must be either the legacy left/right/stereo format "
+                "or the current fisheye stereo format."
+            )
+
+        model = str(normalized.get("camera_model", "pinhole")).lower()
+        if model not in _VALID_MODELS:
+            raise ValueError(
+                f"camera_model must be one of {sorted(_VALID_MODELS)}, got {model!r}."
+            )
+
+        left = normalized["left"]
+        right = normalized["right"]
+        stereo = normalized["stereo"]
 
         left_size = tuple(int(v) for v in left.get("image_size", []))
         right_size = tuple(int(v) for v in right.get("image_size", []))
         if len(left_size) != 2 or min(left_size) <= 0:
-            raise ValueError("left.image_size应为[width, height]。")
+            raise ValueError("left.image_size must be [width, height].")
         if len(right_size) != 2 or min(right_size) <= 0:
-            raise ValueError("right.image_size应为[width, height]。")
+            raise ValueError("right.image_size must be [width, height].")
 
         R = _matrix(stereo.get("R"), (3, 3), "stereo.R")
         T = np.asarray(stereo.get("T"), dtype=np.float64).reshape(-1)
         if T.shape != (3,) or not np.all(np.isfinite(T)):
-            raise ValueError("stereo.T应为包含3个有限数值的向量。")
+            raise ValueError("stereo.T must contain three finite values.")
         if float(np.linalg.norm(T)) <= 0:
-            raise ValueError("stereo.T不能为零向量。")
+            raise ValueError("stereo.T must not be the zero vector.")
         det = float(np.linalg.det(R))
         if not np.isclose(det, 1.0, atol=1e-2):
-            raise ValueError(f"stereo.R不像有效旋转矩阵，det(R)={det:.6f}。")
+            raise ValueError(f"stereo.R is not a valid rotation matrix: det(R)={det:.6f}.")
 
         return cls(
             camera_model=model,
@@ -126,7 +198,7 @@ class StereoCalibration:
             right_D=_distortion(right.get("D"), model, "right.D"),
             R=R,
             T=T,
-            length_unit=str(raw.get("length_unit", "meter")),
+            length_unit=str(normalized.get("length_unit", "meter")),
         )
 
     def for_runtime_sizes(

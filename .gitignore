@@ -51,6 +51,35 @@ logs/
 raw_predictions.json
 *_predictions.json
 
+# Derived benchmark assets and model exchanges.  Keep their small manifests in
+# the research registry instead of committing duplicated frames/predictions.
+benchmarks/inputs/
+benchmarks/exchange/
+benchmarks/preflight/
+
+# Local research archive.  Raw captures, rendered videos, JSONL outputs, code
+# snapshots, audits, and retired/debug material remain local.  Git tracks only
+# the archive guide, templates, and compact registry metadata.
+research_records/*
+!research_records/README.md
+!research_records/registry/
+!research_records/registry/**
+!research_records/templates/
+!research_records/templates/**
+
+# Historical patches and calibration source sessions; the maintained source is
+# in realtime_app/pose_app and calibration/results/stereo_fisheye.json.
+migration_backups/
+realtime_app/_virtual_camera_patch/
+realtime_app/backups/
+realtime_app/raw_pair_recording_patch_20260823/
+realtime_app/undistort_model_input_patch_20260823/
+realtime_app/calibration/iterations/
+realtime_app/calibration/results/*_before_*.json
+
+# Local handoff notes, not project documentation.
+to_gpt/
+
 # Calibration raw data (only keep results/*.json)
 realtime_app/calibration/captures/
 realtime_app/calibration/reports/

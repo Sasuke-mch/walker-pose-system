@@ -15,21 +15,19 @@
 - YOLO26x-pose、PMPose、ProbPose、BBoxMaskPose、Sapiens2 的速度与精度实验
 - OCHuman 和 MOT17 场景测试
 
-### 进行中
+### 已完成的双目基线与实验管理
 
-- ProbPose、BBoxMaskPose、Sapiens2 接入实时程序
-- 长序列稳定性测试
-- 推理线程与显示线程进一步解耦
-- 双目输入、主机时间近邻配对与左右视图人体关联基线
-- 基于真实标定参数的COCO17关键点三角化基线
+- 双鱼眼相机 ChArUco 标定、相机身份注册和真实采集配对回放
+- 基于真实 CSV 配对关系的双目人体关联、鱼眼三角化和重投影检查
+- B0 正式基线，以及局部虚拟视角和模型输入去畸变两项消融
+- 原始采集、正式实验、筛选实验、工程验证和退役资产的本地归档
 
-### 尚未完成或尚未实机验证
+### 当前研究边界
 
-- 真实双摄像头的鱼眼双目标定采集与参数验证
-- 双目三角化在真实助步器、真实相机和不同步条件下的误差验证
-- 三维骨骼重建
-- 步态周期、步频、关节角度和对称性分析
-- 助步器端实际部署
+- B0 是当前正式基线；局部虚拟视角的收益极小且显著降速，模型输入去畸变为负结果。
+- 当前 COCO-17 输出仅含脚踝，不含脚尖或脚跟；完整脚部关键点与步态指标尚未建立。
+- 尚未建立严格的真实 3D 真值精度评估；有效 3D 点数不能直接表述为精度提升。
+- 步态周期、步频、关节角度、对称性分析和助步器端部署仍待后续验证。
 
 ## 仓库结构
 
@@ -134,10 +132,10 @@ python .\run.py --model pmpose --images "D:\path\to\images" --source-fps 14 --si
 python .\run.py --model yolo26x_pose --camera 0
 ```
 
-双摄像头三角化（需要真实双目标定文件）：
+双摄像头三角化（使用已验证的鱼眼标定文件）：
 
 ```powershell
-python .\run_stereo.py --model yolo26x_pose --left-camera 0 --right-camera 1 --calibration "D:\path\to\stereo_calibration.json"
+python .\run_stereo.py --model yolo26x_pose --camera-registry .\camera_registry.json --calibration .\calibration\results\stereo_fisheye.json
 ```
 
 详细说明：`realtime_app/docs/STEREO_TRIANGULATION.md`。
@@ -166,7 +164,7 @@ docker_logs/
 - 当前实时程序只接入 YOLO26x-pose 和 YOLO26x + PMPose。
 - PMPose 当前使用由检测框生成的矩形 mask，不等同于真实人体分割 mask。
 - MOT17 没有人体关键点真值，只用于连续多人场景、稳定性和速度测试。
-- 原单路程序仍只输出二维姿态；新增双目入口可输出三角化基线结果，但尚未完成真实相机标定和实机误差验证。
+- 原单路程序只输出二维姿态；双目入口已输出真实采集回放上的三角化基线，但尚未完成严格的真实 3D 精度验证。
 - 模型权重、数据集和 Docker 镜像需要用户自行准备。
 
 ## 第三方项目与引用

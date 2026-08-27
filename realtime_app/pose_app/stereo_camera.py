@@ -94,6 +94,15 @@ class StereoCameraStats:
     right_captured: int
     stereo_pairs: int
 
+    # Count only frames whose decoded array has been checked to be the exact
+    # requested uint8 BGR raster.  This is deliberately separate from
+    # captured_count: a backend format/resolution change must fail closed
+    # rather than silently entering calibration/triangulation.
+    left_validated_frames: int
+    right_validated_frames: int
+    left_last_decoded_shape: tuple[int, int, int] | None
+    right_last_decoded_shape: tuple[int, int, int] | None
+
     left_read_failures: int
     right_read_failures: int
 
@@ -195,6 +204,47 @@ def _capture_span_and_fps(
     return span_sec, measured_fps
 
 
+def validate_camera_frame_image(
+    image: object,
+    *,
+    side: str,
+    expected_width: int,
+    expected_height: int,
+) -> np.ndarray:
+    """Fail closed when OpenCV returns anything but the calibrated BGR raster.
+
+    ``VideoCapture`` is requested to produce a particular resolution in
+    :meth:`_CameraReader.open`, but a device/backend can still change its
+    decoded output later.  The stereo calibration and model-coordinate
+    restoration are valid only for the exact raw-camera pixel grid.  Never
+    resize, crop, or coerce a returned frame here: report the fault instead.
+    """
+
+    if not isinstance(image, np.ndarray):
+        raise RuntimeError(
+            f"{side} camera returned a non-array frame: {type(image).__name__}."
+        )
+    if image.ndim != 3 or image.shape[2] != 3:
+        raise RuntimeError(
+            f"{side} camera returned an unexpected decoded layout: "
+            f"shape={tuple(image.shape)!r}; expected HxWx3 BGR."
+        )
+    height, width, channels = (int(value) for value in image.shape)
+    if (width, height) != (expected_width, expected_height):
+        raise RuntimeError(
+            f"{side} camera decoded frame resolution changed: "
+            f"got={width}x{height}x{channels}, "
+            f"expected={expected_width}x{expected_height}x3. "
+            "Refusing to resize or crop a calibrated frame."
+        )
+    if image.dtype != np.uint8:
+        raise RuntimeError(
+            f"{side} camera decoded frame dtype changed: got={image.dtype}, "
+            "expected=uint8 BGR."
+        )
+    return image
+
+
 class _CameraReader:
     def __init__(
         self,
@@ -220,6 +270,8 @@ class _CameraReader:
         self.thread_error: BaseException | None = None
 
         self.captured_count = 0
+        self.validated_frame_count = 0
+        self.last_decoded_shape: tuple[int, int, int] | None = None
         self.read_failure_count = 0
         self.overflow_drop_count = 0
         self.match_drop_count = 0
@@ -302,6 +354,15 @@ class _CameraReader:
                 if not ok or image is None:
                     self.read_failure_count += 1
                     continue
+
+                image = validate_camera_frame_image(
+                    image,
+                    side=self.side,
+                    expected_width=self.config.width,
+                    expected_height=self.config.height,
+                )
+                self.validated_frame_count += 1
+                self.last_decoded_shape = tuple(int(value) for value in image.shape)
 
                 if self.last_timestamp_ns is not None and read_return_ns <= self.last_timestamp_ns:
                     raise RuntimeError(
@@ -557,6 +618,10 @@ class StereoCameraSource:
             left_captured=self._left.captured_count,
             right_captured=self._right.captured_count,
             stereo_pairs=self._pair_id,
+            left_validated_frames=self._left.validated_frame_count,
+            right_validated_frames=self._right.validated_frame_count,
+            left_last_decoded_shape=self._left.last_decoded_shape,
+            right_last_decoded_shape=self._right.last_decoded_shape,
             left_read_failures=self._left.read_failure_count,
             right_read_failures=self._right.read_failure_count,
             left_match_drops=self._left.match_drop_count,

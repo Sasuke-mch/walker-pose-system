@@ -154,7 +154,18 @@ def associate_persons(
     calibration: StereoCalibration,
     keypoint_threshold: float,
     max_association_cost: float,
+    max_matches: int | None = None,
 ) -> list[PersonMatch]:
+    """Associate geometrically compatible people across the two views.
+
+    ``max_matches=1`` is the correct mode for the current walker experiment:
+    one physical user may yield several heavily-overlapping 2D detections in a
+    fisheye image.  Keeping every one-to-one pairing would otherwise turn one
+    person into several 3D skeletons and contaminate downstream metrics.
+    """
+
+    if max_matches is not None and max_matches <= 0:
+        raise ValueError("max_matches must be positive when provided")
     if not left_persons or not right_persons:
         return []
     candidates: list[PersonMatch] = []
@@ -167,12 +178,12 @@ def associate_persons(
                 PersonMatch(left_index, right_index, cost, common)
             )
 
-    # In the intended walker experiment there is normally one target person.
-    # Do not discard that only pair merely because motion between unsynchronised
-    # frames raises the epipolar residual; retain the measured cost for analysis.
-    if len(left_persons) == 1 and len(right_persons) == 1:
-        return candidates
-
+    # A single 2D person in each image is not proof of a valid stereo
+    # correspondence. In particular, a non-overlapping view, a bad pose, or
+    # left/right semantic confusion can produce a large epipolar residual.
+    # Apply the same geometric gate in the one-person case as in the
+    # multi-person case. The original 2D detections remain in the JSONL
+    # output even when no 3D association is emitted.
     candidates.sort(key=lambda item: item.association_cost)
     used_left: set[int] = set()
     used_right: set[int] = set()
@@ -185,6 +196,8 @@ def associate_persons(
         used_left.add(candidate.left_index)
         used_right.add(candidate.right_index)
         matches.append(candidate)
+        if max_matches is not None and len(matches) >= max_matches:
+            break
     return matches
 
 
@@ -348,6 +361,7 @@ def triangulate_matches(
     keypoint_threshold: float = 0.25,
     max_association_cost: float = 0.05,
     max_reprojection_error_px: float = 10.0,
+    max_matches: int | None = None,
 ) -> list[TriangulatedPerson]:
     matches = associate_persons(
         left_persons,
@@ -355,6 +369,7 @@ def triangulate_matches(
         calibration,
         keypoint_threshold,
         max_association_cost,
+        max_matches=max_matches,
     )
     return [
         triangulate_person(

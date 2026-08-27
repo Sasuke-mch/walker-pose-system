@@ -10,18 +10,13 @@
 双目几何（标定参数、人物关联、三角化、重投影检查）
 ```
 
-## 当前硬件默认值
+## 当前硬件约定
 
-针对已经实测的两台 HF868：
+已标定物理相机的逻辑身份为 `cam0 / LEFT` 和 `cam1 / RIGHT`。Windows
+OpenCV 索引会随 USB 枚举改变，因此运行时应优先使用
+`camera_registry.json` 按 PnP 设备身份解析，不能硬编码索引。
 
-```text
-LEFT camera id  = 1
-RIGHT camera id = 0
-1920 × 1080 @ 30 FPS
-Windows backend = MSMF
-```
-
-不要把 DirectShow (`dshow`) 作为这两台 HF868 的默认后端。此前实测中，DSHOW 在 1080P 下只有约 5 FPS，而 MSMF 可达到约 30 FPS。
+两台 HF868 的 1920 × 1080 采集优先使用 MSMF；DirectShow 仅作回退。
 
 ## 目录
 
@@ -83,14 +78,8 @@ python .\run_tests.py
 python .\tools\camera_probe.py
 ```
 
-当前已确认：
-
-```text
-LEFT=1
-RIGHT=0
-```
-
-如果换 USB 接口、换电脑或 Windows 重新枚举设备，应重新确认编号。
+如果换 USB 接口、换电脑或 Windows 重新枚举设备，应重新确认 Camera
+Registry 所解析的物理设备；不要把一次探测到的索引写入代码或实验命令。
 
 ## 正式双摄采集
 
@@ -134,15 +123,14 @@ python .\run.py --model yolo26x_pose --camera 1
 
 ## 双目 3D
 
-只有真实标定完成后才能运行：
+使用 Camera Registry 的实时双目运行：
 
 ```powershell
 python .\run_stereo.py `
   --model yolo26x_pose `
-  --left-camera 1 `
-  --right-camera 0 `
+  --camera-registry .\camera_registry.json `
   --max-pair-delta-ms 25 `
-  --calibration "D:\path\to\real_stereo_calibration.json"
+  --calibration .\calibration\results\stereo_fisheye.json
 ```
 
 `calibration.example.json` 只是数据结构示例，禁止直接用于真实三角化。
@@ -162,4 +150,5 @@ python .\run_stereo.py `
 
 它不负责 YOLO/PMPose、标定或三角化。这样以后更换 2D 模型不会改摄像头层，更换配对或相机也不会改 Pose 模型。
 
-下一阶段应完成真实 A4 ChArUco 标定采集、K1/D1/K2/D2、R/T 计算与独立验证，再进行真实人体 3D。
+当前标定和真实 CSV 配对回放已具备。下一阶段是建立下肢/脚部的可解释
+质量评估，以及脚尖、脚跟等非 COCO-17 关键点的专项模型与数据。

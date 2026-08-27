@@ -1,13 +1,13 @@
-{
-  "project_root": "D:/your_project_root",
-  "overrides": {
-    "models": {
-      "yolo26x_pose": {
-        "docker_image": "yolo26-test-fixed:latest",
-        "weight": {
-          "host_path": "external_models/YOLO26x-pose/yolo26x-pose.pt"
-        }
-      }
-    }
-  }
+﻿{
+    "project_root":  "D:/your_project_root",
+    "overrides":  {
+                      "models":  {
+                                     "yolo26x_pose":  {
+                                                          "docker_image":  "yolo26-test-fixed:latest",
+                                                          "weight":  {
+                                                                         "host_path":  "models/yolo26/yolo26x-pose.pt"
+                                                                     }
+                                                      }
+                                 }
+                  }
 }

@@ -33,7 +33,7 @@
       "repo": null,
       "weight": {
         "required": true,
-        "host_path": "YOLO26-test/weights/yolo26x.pt",
+        "host_path": "models/yolo26/yolo26x.pt",
         "container_dir": "/workspace/model_weights",
         "container_file_name": null,
         "supports_arbitrary_name": true
@@ -76,7 +76,7 @@
       "repo": null,
       "weight": {
         "required": true,
-        "host_path": "external_models/YOLO26x-pose/yolo26x-pose.pt",
+        "host_path": "models/yolo26/yolo26x-pose.pt",
         "container_dir": "/workspace/model_weights",
         "container_file_name": null,
         "supports_arbitrary_name": true
@@ -122,15 +122,17 @@
       "requires_detector": true,
       "docker_image": "bboxmaskpose:latest",
       "workdir": "/workspace/BBoxMaskPose",
-      "environment": {},
+      "environment": {
+        "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1"
+      },
       "repo": {
-        "host_path": "BBoxMaskPose",
+        "host_path": "third_party/bboxmaskpose",
         "container_path": "/workspace/BBoxMaskPose",
         "mode": "rw"
       },
       "weight": {
         "required": false,
-        "host_path": "",
+        "host_path": "models/pmpose/PMPose-b-1.0.0.pth",
         "container_dir": "/workspace/model_weights",
         "container_file_name": null,
         "supports_arbitrary_name": true,
@@ -139,7 +141,7 @@
       "mounts": [],
       "required_paths": [
         {
-          "path": "BBoxMaskPose/tools/benchmark_from_yolo26_bboxes.py",
+          "path": "third_party/bboxmaskpose/tools/benchmark_from_yolo26_bboxes.py",
           "type": "file"
         }
       ],
@@ -187,13 +189,13 @@
         "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1"
       },
       "repo": {
-        "host_path": "external_models/ProbPose_code",
+        "host_path": "third_party/probpose/repo",
         "container_path": "/workspace/ProbPose_code",
         "mode": "rw"
       },
       "weight": {
         "required": true,
-        "host_path": "external_models/ProbPose/checkpoints/ProbPose-s/ProbPose-s.pth",
+        "host_path": "models\\probpose\\ProbPose-s\\ProbPose-s.pth",
         "container_dir": "/workspace/ProbPose-s",
         "container_file_name": "ProbPose-s.pth",
         "supports_arbitrary_name": false
@@ -201,7 +203,7 @@
       "mounts": [],
       "required_paths": [
         {
-          "path": "external_models/ProbPose_code/tools/run_probpose_from_yolo26_bboxes.py",
+          "path": "third_party/probpose/repo/tools/run_probpose_from_yolo26_bboxes.py",
           "type": "file"
         }
       ],
@@ -236,28 +238,36 @@
       "requires_detector": true,
       "docker_image": "bboxmaskpose:latest",
       "workdir": "/workspace/BBoxMaskPose",
-      "environment": {},
+      "environment": {
+        "TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD": "1"
+      },
       "repo": {
-        "host_path": "BBoxMaskPose",
+        "host_path": "third_party/bboxmaskpose",
         "container_path": "/workspace/BBoxMaskPose",
         "mode": "rw"
       },
       "weight": {
         "required": false,
-        "host_path": "",
+        "host_path": "models/pmpose/PMPose-b-1.0.0.pth",
         "container_dir": "/workspace/model_weights",
         "container_file_name": null,
         "supports_arbitrary_name": true,
         "note": "Optional PMPose backbone checkpoint. SAM checkpoint is controlled by the BBoxMaskPose config."
       },
-      "mounts": [],
+      "mounts": [
+        {
+          "host_path": "models/bboxmaskpose",
+          "container_path": "/root/.cache/torch/hub/checkpoints",
+          "mode": "ro"
+        }
+      ],
       "required_paths": [
         {
-          "path": "BBoxMaskPose/tools/benchmark_from_yolo26_bboxes.py",
+          "path": "third_party/bboxmaskpose/tools/benchmark_from_yolo26_bboxes.py",
           "type": "file"
         },
         {
-          "path": "BBoxMaskPose/bboxmaskpose/configs/bmp_v2.yaml",
+          "path": "third_party/bboxmaskpose/bboxmaskpose/configs/bmp_v2.yaml",
           "type": "file",
           "warning_only": true
         }
@@ -309,13 +319,13 @@
       "workdir": "/workspace/sapiens2/sapiens/pose",
       "environment": {},
       "repo": {
-        "host_path": "external_models/sapiens2_repo",
+        "host_path": "third_party/sapiens2/repo",
         "container_path": "/workspace/sapiens2",
         "mode": "rw"
       },
       "weight": {
         "required": true,
-        "host_path": "external_models/Sapiens2/checkpoints/sapiens2-pose-0.4b/sapiens2_0.4b_pose.safetensors",
+        "host_path": "models/sapiens2/pose-0.4b/sapiens2_0.4b_pose.safetensors",
         "container_dir": "/workspace/sapiens2_weights",
         "container_file_name": "sapiens2_0.4b_pose.safetensors",
         "supports_arbitrary_name": false
@@ -323,7 +333,7 @@
       "mounts": [],
       "required_paths": [
         {
-          "path": "external_models/sapiens2_repo/sapiens/pose/tools/vis/run_sapiens2_from_yolo26_bboxes.py",
+          "path": "third_party/sapiens2/repo/sapiens/pose/tools/vis/run_sapiens2_from_yolo26_bboxes.py",
           "type": "file"
         }
       ],
