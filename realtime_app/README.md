@@ -27,6 +27,7 @@ realtime_app/
 ├─ run_tests.py                 全部单元测试 + 编译检查
 ├─ check_environment.py         Docker/模型/路径检查
 ├─ config.example.json          配置模板
+├─ camera_registry.example.json 物理相机身份模板（本机注册表不提交）
 ├─ calibration.example.json     双目标定 JSON 结构示例，不能直接用于实验
 ├─ pose_app/
 │  ├─ stereo_camera.py          正式双摄采集与在线一对一时间配对（唯一底层实现）
@@ -54,9 +55,11 @@ cd D:\my_works\walker_pose_system\realtime_app
 
 ```powershell
 Copy-Item .\config.example.json .\config.json
+Copy-Item .\camera_registry.example.json .\camera_registry.json
 ```
 
-然后根据你电脑上的模型工程和权重位置修改 `config.json`。
+然后根据你电脑上的模型工程和权重位置修改 `config.json`，并将已标定相机的
+完整 PnP `instance_id` 写入 `camera_registry.json`。
 
 安装主机 Python 依赖：
 

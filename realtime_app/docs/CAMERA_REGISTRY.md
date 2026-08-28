@@ -19,14 +19,10 @@ cam1 = RIGHT = 使用 cam1_fisheye.json
 X_cam1 = R_cam0_to_cam1 * X_cam0 + T_cam0_to_cam1
 ```
 
-当前登记的硬件身份为：
-
-| 相机 | 角色 | instance_id 末段 | 接口 |
-| --- | --- | --- | --- |
-| cam0 | left | `6&3405B72D&0&0000` | USB(3) / HS03 |
-| cam1 | right | `6&214C0688&0&0000` | USB(2) / HS02 |
-
-`friendly_name` 不用于身份判断，因为两台相机的名称相同。
+真实硬件身份是机器相关配置，不能公开或写死在代码中。先复制
+`camera_registry.example.json` 为 `camera_registry.json`，再把本机已标定相机的
+完整 PnP `instance_id` 填入其中。`friendly_name` 不用于身份判断，因为同型号
+相机的名称可能相同。
 
 ## 安装一次依赖
 
@@ -39,8 +35,13 @@ OpenCV 采集画面。
 
 ## 放置注册表
 
-将已有的 `camera_registry.json` 放在 `realtime_app` 根目录。可以把
-`role` 从 `null` 改为下列值以提高可读性；补丁也兼容旧的 `null`：
+在 `realtime_app` 根目录创建本机专用的 `camera_registry.json`：
+
+```powershell
+Copy-Item .\camera_registry.example.json .\camera_registry.json
+```
+
+必须为两个条目设置以下角色：
 
 ```json
 "cam0": { "role": "left" },
@@ -60,7 +61,7 @@ python .\run_stereo.py `
   --log-level DEBUG
 ```
 
-`auto` 的顺序为 `dshow -> msmf`。只有同一后端同时完成：
+`auto` 的顺序为 `msmf -> dshow`。只有同一后端同时完成：
 
 1. 以完整 `instance_id` 找到 cam0 与 cam1；
 2. 打开两台相机；

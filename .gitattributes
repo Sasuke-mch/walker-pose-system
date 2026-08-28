@@ -1,0 +1,9 @@
+# Keep source and configuration diffs stable across Windows and CI runners.
+* text=auto eol=lf
+
+# Generated binary artifacts may be retained only when explicitly allowed.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.mp4 binary
+*.avi binary

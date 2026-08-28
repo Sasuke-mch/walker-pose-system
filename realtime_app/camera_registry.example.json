@@ -1,0 +1,22 @@
+{
+  "cam0": {
+    "calibration": "calibration/results/cam0_fisheye.json",
+    "role": "left",
+    "device": {
+      "friendly_name": "HD USB Camera",
+      "instance_id": "REPLACE_WITH_CALIBRATED_LEFT_CAMERA_PNP_INSTANCE_ID",
+      "usb_location": "OPTIONAL",
+      "acpi_port": "OPTIONAL"
+    }
+  },
+  "cam1": {
+    "calibration": "calibration/results/cam1_fisheye.json",
+    "role": "right",
+    "device": {
+      "friendly_name": "HD USB Camera",
+      "instance_id": "REPLACE_WITH_CALIBRATED_RIGHT_CAMERA_PNP_INSTANCE_ID",
+      "usb_location": "OPTIONAL",
+      "acpi_port": "OPTIONAL"
+    }
+  }
+}

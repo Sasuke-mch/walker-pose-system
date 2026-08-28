@@ -38,8 +38,10 @@ models/
 *.onnx
 *.engine
 
-# Third-party source (not redistributed)
-third_party/
+# Third-party source (not redistributed).  Track only the dependency and
+# licensing notice needed to reproduce the environment.
+third_party/*
+!third_party/README.md
 
 # Runtime outputs
 outputs/
@@ -79,6 +81,9 @@ realtime_app/calibration/results/*_before_*.json
 
 # Local handoff notes, not project documentation.
 to_gpt/
+
+# Physical device bindings are machine-specific.  Publish the template only.
+realtime_app/camera_registry.json
 
 # Calibration raw data (only keep results/*.json)
 realtime_app/calibration/captures/

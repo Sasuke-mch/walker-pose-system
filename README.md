@@ -39,7 +39,7 @@ walker-pose-system/
 │  ├─ speed/              速度汇总
 │  ├─ accuracy/           精度汇总
 │  └─ qualitative/        少量定性结果
-├─ docs/                  项目说明
+├─ docs/                  项目状态与工程说明
 ├─ third_party/           第三方依赖说明
 └─ .gitignore
 ```
@@ -95,9 +95,11 @@ third_party/README.md
 
 ```powershell
 Copy-Item .\realtime_app\config.example.json .\realtime_app\config.json
+Copy-Item .\realtime_app\camera_registry.example.json .\realtime_app\camera_registry.json
 ```
 
-然后修改 `config.json` 中的本地路径。`config.json` 已被 `.gitignore` 排除，不会提交到 GitHub。
+然后修改 `config.json` 中的本地路径，并在 `camera_registry.json` 填入已标定
+相机的 Windows PnP `instance_id`。两个文件均已被 `.gitignore` 排除，不会提交到 GitHub。
 
 ## 环境检查
 
