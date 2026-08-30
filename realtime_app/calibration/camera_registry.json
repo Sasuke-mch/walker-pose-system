@@ -1,7 +1,7 @@
 ﻿{
   "cam0": {
     "calibration": "calibration/results/cam0_fisheye.json",
-    "role": null,
+    "role": "left",
     "device": {
       "friendly_name": "HD USB Camera",
       "instance_id": "USB\\VID_05A3&PID_9230&MI_00\\6&3405B72D&0&0000",
@@ -11,7 +11,7 @@
   },
   "cam1": {
     "calibration": "calibration/results/cam1_fisheye.json",
-    "role": null,
+    "role": "right",
     "device": {
       "friendly_name": "HD USB Camera",
       "instance_id": "USB\\VID_05A3&PID_9230&MI_00\\6&214C0688&0&0000",

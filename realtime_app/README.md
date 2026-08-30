@@ -89,8 +89,23 @@ Registry 所解析的物理设备；不要把一次探测到的索引写入代�
 推荐先做无预览 30 秒完整性测试：
 
 ```powershell
-python .\tools\capture_stereo.py --duration 30 --no-preview
+python .\tools\capture_stereo.py `
+  --camera-registry .\camera_registry.json `
+  --backend auto `
+  --warmup-seconds 3 `
+  --start-countdown 5 `
+  --duration 30 `
+  --no-preview
 ```
+
+采集工具的默认模式同样会读取根目录的 `camera_registry.json`。推荐在命令中
+显式写出该路径，便于记录复现实验。它会固定 `cam0 = LEFT`、`cam1 = RIGHT`，
+并在本次启动时再解析各自对应的 OpenCV 索引。`--left-camera`/`--right-camera`
+仅保留作诊断用途，不能作为正式采集命令或长期相机约定。
+
+相机打开后工具会先显示 `CAMERA PRE-FLIGHT COMPLETE`，完成预热和倒计时；
+只有看到 `START RECORDING NOW` 才开始写入正式 AVI、逐帧 CSV 和双目配对记录。
+准备阶段的帧不会混入正式采集。
 
 默认输出：
 

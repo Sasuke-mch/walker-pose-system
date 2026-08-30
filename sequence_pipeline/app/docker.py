@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shlex
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -30,10 +31,25 @@ def printable(cmd: list[str]) -> str:
     return subprocess.list2cmdline(cmd)
 
 
+def _console_line(value: str, *, end: str = "\n") -> None:
+    """Relay UTF-8 container logs without crashing legacy Windows consoles.
+
+    The log file retains the original UTF-8 text.  A GBK stdout may not encode
+    a Unicode symbol emitted by a third-party container; rendering an escaped
+    fallback is preferable to aborting the entire model run.
+    """
+    try:
+        print(value, end=end)
+    except UnicodeEncodeError:
+        encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+        fallback = value.encode(encoding, errors="backslashreplace").decode(encoding)
+        print(fallback, end=end)
+
+
 def run_streaming(cmd: list[str], log_path: Path, dry_run: bool = False) -> int:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     shown = printable(cmd)
-    print(shown)
+    _console_line(shown)
     if dry_run:
         log_path.write_text(shown + "\n", encoding="utf-8")
         return 0
@@ -49,6 +65,6 @@ def run_streaming(cmd: list[str], log_path: Path, dry_run: bool = False) -> int:
         )
         assert process.stdout is not None
         for line in process.stdout:
-            print(line, end="")
+            _console_line(line, end="")
             log.write(line)
         return process.wait()

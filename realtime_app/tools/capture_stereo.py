@@ -19,6 +19,7 @@ REALTIME_APP_DIR = Path(__file__).resolve().parents[1]
 if str(REALTIME_APP_DIR) not in sys.path:
     sys.path.insert(0, str(REALTIME_APP_DIR))
 
+from pose_app.camera_registry import ResolvedStereoCameras, resolve_stereo_cameras
 from pose_app.stereo_camera import CameraFrame, StereoCameraConfig, StereoCameraSource
 
 
@@ -73,11 +74,13 @@ class FrameRecorder:
         if self.error is not None:
             raise RuntimeError(f"{self.side} frame recorder failed to start.") from self.error
 
-    def submit(self, frame: CameraFrame) -> None:
+    def submit(self, frame: CameraFrame) -> bool:
         try:
             self.queue.put_nowait(frame)
+            return True
         except queue.Full:
             self.queue_drops += 1
+            return False
 
     def _loop(self) -> None:
         writer = cv2.VideoWriter(
@@ -151,29 +154,81 @@ class RecorderHub:
     def __init__(self, left: FrameRecorder, right: FrameRecorder) -> None:
         self.left = left
         self.right = right
+        self._enabled = threading.Event()
+        self._lock = threading.Lock()
+        self._submitted = {"LEFT": 0, "RIGHT": 0}
+        self._accepted = {"LEFT": 0, "RIGHT": 0}
+
+    def enable_recording(self) -> None:
+        """Open the gate after warm-up/countdown; earlier frames are discarded."""
+
+        self._enabled.set()
+
+    def delivery_counts(self) -> dict[str, int]:
+        with self._lock:
+            return {
+                "left_submitted": self._submitted["LEFT"],
+                "right_submitted": self._submitted["RIGHT"],
+                "left_accepted": self._accepted["LEFT"],
+                "right_accepted": self._accepted["RIGHT"],
+            }
 
     def listener(self, side: str, frame: CameraFrame) -> None:
+        if not self._enabled.is_set():
+            return
         if side == "LEFT":
-            self.left.submit(frame)
+            accepted = self.left.submit(frame)
         elif side == "RIGHT":
-            self.right.submit(frame)
+            accepted = self.right.submit(frame)
         else:
             raise ValueError(f"Unknown camera side: {side!r}")
+        with self._lock:
+            self._submitted[side] += 1
+            if accepted:
+                self._accepted[side] += 1
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Capture dual HF868 streams and timestamp-matched stereo pairs."
     )
-    parser.add_argument("--left-camera", type=int, default=1)
-    parser.add_argument("--right-camera", type=int, default=0)
+    parser.add_argument(
+        "--camera-registry",
+        type=Path,
+        help=(
+            "Physical-camera registry. This is the normal mode: cam0 is always LEFT "
+            "and cam1 is always RIGHT; their current OpenCV indices are resolved at runtime."
+        ),
+    )
+    parser.add_argument(
+        "--left-camera",
+        type=int,
+        help="Unsafe manual OpenCV index for calibrated cam0/LEFT. Supply both manual indices only for diagnosis.",
+    )
+    parser.add_argument(
+        "--right-camera",
+        type=int,
+        help="Unsafe manual OpenCV index for calibrated cam1/RIGHT. Supply both manual indices only for diagnosis.",
+    )
     parser.add_argument("--width", type=int, default=1920)
     parser.add_argument("--height", type=int, default=1080)
     parser.add_argument("--fps", type=float, default=30.0)
-    parser.add_argument("--backend", choices=["msmf", "dshow", "auto"], default="msmf")
+    parser.add_argument("--backend", choices=["msmf", "dshow", "auto"], default="auto")
     parser.add_argument("--max-pair-delta-ms", type=float, default=25.0)
     parser.add_argument("--camera-queue-size", type=int, default=8)
     parser.add_argument("--recorder-queue-size", type=int, default=12)
+    parser.add_argument(
+        "--warmup-seconds",
+        type=float,
+        default=3.0,
+        help="Camera-only warm-up before the visible start countdown; no formal frames are written.",
+    )
+    parser.add_argument(
+        "--start-countdown",
+        type=int,
+        default=5,
+        help="Visible countdown after warm-up. Formal recording begins only at START RECORDING NOW.",
+    )
     parser.add_argument(
         "--duration",
         type=float,
@@ -206,22 +261,56 @@ def _safe_ratio(numerator: float, denominator: float) -> float | None:
     return numerator / denominator
 
 
+def resolve_camera_selection(
+    args: argparse.Namespace,
+) -> tuple[int, int, str, ResolvedStereoCameras | None, str]:
+    """Return the calibrated left/right indices without treating them as identity."""
+
+    indexed_mode = args.left_camera is not None or args.right_camera is not None
+    if indexed_mode:
+        if args.camera_registry is not None:
+            raise ValueError("--camera-registry cannot be combined with --left-camera/--right-camera.")
+        if args.left_camera is None or args.right_camera is None:
+            raise ValueError("Manual camera mode requires both --left-camera and --right-camera.")
+        if args.left_camera == args.right_camera:
+            raise ValueError("LEFT and RIGHT camera indices must be different.")
+        return args.left_camera, args.right_camera, args.backend, None, "manual_index"
+
+    registry_path = args.camera_registry or (REALTIME_APP_DIR / "camera_registry.json")
+    resolved = resolve_stereo_cameras(registry_path, backend=args.backend)
+    return (
+        resolved.left.index,
+        resolved.right.index,
+        resolved.backend,
+        resolved,
+        "physical_registry",
+    )
+
+
 def main() -> int:
     args = parse_args()
     if args.duration < 0:
         raise ValueError("--duration must be >= 0")
+    if args.warmup_seconds < 0:
+        raise ValueError("--warmup-seconds must be >= 0")
+    if args.start_countdown < 0:
+        raise ValueError("--start-countdown must be >= 0")
+
+    left_camera, right_camera, selected_backend, resolved_cameras, selection_mode = (
+        resolve_camera_selection(args)
+    )
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
     run_dir = args.output_root.resolve() / stamp
     run_dir.mkdir(parents=True, exist_ok=False)
 
     config = StereoCameraConfig(
-        left_id=args.left_camera,
-        right_id=args.right_camera,
+        left_id=left_camera,
+        right_id=right_camera,
         width=args.width,
         height=args.height,
         fps=args.fps,
-        backend=args.backend,
+        backend=selected_backend,
         max_pair_delta_ms=args.max_pair_delta_ms,
         queue_size=args.camera_queue_size,
     )
@@ -269,9 +358,34 @@ def main() -> int:
             recorders_started = True
 
         # Camera open/configuration can take several seconds under MSMF. The
-        # acquisition duration MUST NOT start before this returns.
+        # acquisition duration MUST NOT start before the explicit start gate.
         source.start()
         source_started = True
+
+        print("\n=== CAMERA PRE-FLIGHT COMPLETE ===")
+        print(
+            f"LEFT=cam0=index {config.left_id}, RIGHT=cam1=index {config.right_id}, "
+            f"{args.width}x{args.height}@{args.fps:g}, backend={config.backend}, "
+            f"selection={selection_mode}"
+        )
+        print("Cameras are live, but formal recording has NOT started.")
+        if args.warmup_seconds > 0:
+            print(f"Warming up for {args.warmup_seconds:g} s; position the walker at the start mark.")
+            time.sleep(args.warmup_seconds)
+        if args.start_countdown > 0:
+            print("Prepare to walk only when the START RECORDING message appears.")
+            for remaining in range(args.start_countdown, 0, -1):
+                print(f"Recording starts in {remaining}...")
+                time.sleep(1)
+
+        # No writer receives pre-flight frames. Discard all pre-roll pair
+        # candidates, then open the recording gate and clear once more so the
+        # first formal pair can only be formed after the start signal.
+        source.discard_pending_frames()
+        if not args.no_video:
+            recorder_hub.enable_recording()
+        source.discard_pending_frames()
+        print("\n=== START RECORDING NOW — begin the planned walk ===")
 
         capture_started_perf = time.perf_counter()
         capture_started_wall = time.time()
@@ -280,6 +394,19 @@ def main() -> int:
         metadata = {
             "created_local": datetime.now().isoformat(timespec="seconds"),
             "camera_config": asdict(config),
+            "calibration_camera_mapping": {
+                "left": {"logical_camera": "cam0", "opencv_index": config.left_id},
+                "right": {"logical_camera": "cam1", "opencv_index": config.right_id},
+                "selection_mode": selection_mode,
+                "camera_registry_resolution": (
+                    resolved_cameras.to_dict() if resolved_cameras is not None else None
+                ),
+                "manual_index_warning": (
+                    "Manual indices are runtime enumeration values and were not physically verified."
+                    if selection_mode == "manual_index"
+                    else None
+                ),
+            },
             "timestamp_type": StereoCameraSource.TIMESTAMP_TYPE,
             "timestamp_warning": (
                 "host_return_timestamp_ns is recorded after VideoCapture.read() returns; "
@@ -287,8 +414,15 @@ def main() -> int:
             ),
             "pairing": "online one-to-one nearest-time with one-frame lookahead",
             "duration_definition": (
-                "--duration starts after both cameras have been opened/configured and capture threads started."
+                "--duration starts only after camera warm-up, countdown, pre-roll discard, "
+                "and the explicit START RECORDING NOW message."
             ),
+            "capture_start_control": {
+                "warmup_seconds": args.warmup_seconds,
+                "start_countdown_seconds": args.start_countdown,
+                "formal_start_signal": "START RECORDING NOW",
+                "pre_roll_recorded": False,
+            },
             "left_camera_info": asdict(source.left_info),
             "right_camera_info": asdict(source.right_info),
             "frame_recording": {
@@ -322,13 +456,9 @@ def main() -> int:
             )
 
             print(f"Output: {run_dir}")
-            print(
-                f"LEFT={args.left_camera}, RIGHT={args.right_camera}, "
-                f"{args.width}x{args.height}@{args.fps:g}, backend={args.backend}"
-            )
             print(f"max_pair_delta_ms={args.max_pair_delta_ms:g}")
             if args.duration > 0:
-                print(f"capture duration={args.duration:g}s (camera startup is NOT included)")
+                print(f"formal capture duration={args.duration:g}s (pre-flight is NOT included)")
             print("Press Q/ESC to stop. Ctrl+C also works.")
 
             while True:
@@ -456,6 +586,7 @@ def main() -> int:
 
     recording_complete = None
     recording_issues: list[str] = []
+    frame_delivery = recorder_hub.delivery_counts()
     if not args.no_video:
         if left_recorder.queue_drops:
             recording_issues.append(
@@ -473,13 +604,15 @@ def main() -> int:
             recording_issues.append(
                 f"RIGHT capture listener failed {stats.right_listener_drops} time(s)"
             )
-        if left_recorder.written != stats.left_captured:
+        if left_recorder.written != frame_delivery["left_accepted"]:
             recording_issues.append(
-                f"LEFT written/captured mismatch: {left_recorder.written}/{stats.left_captured}"
+                "LEFT written/accepted mismatch: "
+                f"{left_recorder.written}/{frame_delivery['left_accepted']}"
             )
-        if right_recorder.written != stats.right_captured:
+        if right_recorder.written != frame_delivery["right_accepted"]:
             recording_issues.append(
-                f"RIGHT written/captured mismatch: {right_recorder.written}/{stats.right_captured}"
+                "RIGHT written/accepted mismatch: "
+                f"{right_recorder.written}/{frame_delivery['right_accepted']}"
             )
         recording_complete = not recording_issues
 
@@ -501,6 +634,10 @@ def main() -> int:
         ),
         "pair_utilization_fraction": pair_utilization,
         "source_stats": stats.to_dict(),
+        "source_stats_note": (
+            "Source statistics include camera warm-up frames; formal frame-recording integrity "
+            "is evaluated against frame_delivery_during_recording instead."
+        ),
         "pair_delta_ms": {
             "median": float(np.median(abs_values)) if abs_values.size else None,
             "mean": float(np.mean(abs_values)) if abs_values.size else None,
@@ -517,6 +654,7 @@ def main() -> int:
             "left_error": repr(left_recorder.error) if left_recorder.error else None,
             "right_error": repr(right_recorder.error) if right_recorder.error else None,
         },
+        "frame_delivery_during_recording": frame_delivery,
         "recording_integrity": {
             "complete": recording_complete,
             "issues": recording_issues,

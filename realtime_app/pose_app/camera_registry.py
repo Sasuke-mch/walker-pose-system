@@ -91,8 +91,8 @@ def load_camera_registry(path: str | Path) -> tuple[RegisteredCamera, Registered
     """Load and validate the two calibrated physical camera identities.
 
     ``cam0`` is the calibrated left camera and ``cam1`` is the calibrated
-    right camera.  Older registry files with ``role: null`` remain accepted;
-    the key provides the unambiguous legacy convention.
+    right camera.  The explicit role field is required so a copied or edited
+    registry cannot silently inherit a legacy convention.
     """
 
     registry_path = Path(path).resolve()
@@ -109,7 +109,7 @@ def load_camera_registry(path: str | Path) -> tuple[RegisteredCamera, Registered
         if not isinstance(entry, dict):
             raise CameraRegistryError(f"Camera registry must contain object {key!r}.")
 
-        role = entry.get("role") or expected_role
+        role = entry.get("role")
         if role != expected_role:
             raise CameraRegistryError(
                 f"{key}.role must be {expected_role!r}; got {role!r}. "

@@ -19,6 +19,14 @@ cam1 = RIGHT = 使用 cam1_fisheye.json
 X_cam1 = R_cam0_to_cam1 * X_cam0 + T_cam0_to_cam1
 ```
 
+这里的 `0/1` 只能指逻辑相机名 `cam0/cam1`，**不能**指 `VideoCapture(0/1)`。
+最终外参训练会话
+`calibration/iterations/iter_20260823_rigid_board/train/session_20260823_133052`
+的原始元数据记录为：`cam0/LEFT = OpenCV index 1`、
+`cam1/RIGHT = OpenCV index 0`。其拟合结果就是当前的
+`stereo_fisheye.json`（`X_cam1 = R * X_cam0 + T`、基线 430.469 mm）。这是该次
+训练时的枚举快照，不是以后应写死的编号。
+
 真实硬件身份是机器相关配置，不能公开或写死在代码中。先复制
 `camera_registry.example.json` 为 `camera_registry.json`，再把本机已标定相机的
 完整 PnP `instance_id` 填入其中。`friendly_name` 不用于身份判断，因为同型号
@@ -82,6 +90,30 @@ python .\run_stereo.py `
   --model yolo26x_pose `
   --max-pairs 100
 ```
+
+## 正式原始数据采集与外参采集
+
+`tools/capture_stereo.py` 和 `tools/capture_stereo_charuco.py` 默认均以本机
+`camera_registry.json` 解析物理身份；它们会把本次解析结果写入 `metadata.json`。
+推荐命令如下：
+
+```powershell
+# 原始双目数据
+python .\tools\capture_stereo.py `
+  --camera-registry .\camera_registry.json `
+  --backend auto `
+  --duration 30 `
+  --no-preview
+
+# 若相机安装位置改变、需要重新采集 ChArUco 外参样本
+python .\tools\capture_stereo_charuco.py `
+  --camera-registry .\camera_registry.json `
+  --backend auto
+```
+
+两个工具不再为 OpenCV 索引设置默认值。`--left-camera` 与
+`--right-camera` 是成对出现的人工诊断入口，且会在元数据中标成
+`manual_index` 警告；不得用于正式实验或外参训练。
 
 ## 重要区别
 

@@ -15,6 +15,7 @@ REALTIME_APP_DIR = Path(__file__).resolve().parents[1]
 if str(REALTIME_APP_DIR) not in sys.path:
     sys.path.insert(0, str(REALTIME_APP_DIR))
 
+from pose_app.camera_registry import ResolvedStereoCameras, resolve_stereo_cameras
 from pose_app.stereo_camera import StereoCameraConfig, StereoCameraSource
 
 
@@ -93,13 +94,55 @@ def put_text(image, text, y, color):
     )
 
 
+def resolve_camera_selection(
+    args: argparse.Namespace,
+) -> tuple[int, int, str, ResolvedStereoCameras | None, str]:
+    """Resolve calibrated cam0/LEFT and cam1/RIGHT before opening devices."""
+
+    indexed_mode = args.left_camera is not None or args.right_camera is not None
+    if indexed_mode:
+        if args.camera_registry is not None:
+            raise ValueError("--camera-registry cannot be combined with --left-camera/--right-camera.")
+        if args.left_camera is None or args.right_camera is None:
+            raise ValueError("Manual camera mode requires both --left-camera and --right-camera.")
+        if args.left_camera == args.right_camera:
+            raise ValueError("LEFT and RIGHT camera indices must be different.")
+        return args.left_camera, args.right_camera, args.backend, None, "manual_index"
+
+    registry_path = args.camera_registry or (REALTIME_APP_DIR / "camera_registry.json")
+    resolved = resolve_stereo_cameras(registry_path, backend=args.backend)
+    return (
+        resolved.left.index,
+        resolved.right.index,
+        resolved.backend,
+        resolved,
+        "physical_registry",
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Capture paired stereo ChArUco images for fisheye extrinsic calibration."
     )
 
-    parser.add_argument("--left-camera", type=int, default=1)
-    parser.add_argument("--right-camera", type=int, default=0)
+    parser.add_argument(
+        "--camera-registry",
+        type=Path,
+        help=(
+            "Physical-camera registry. Normal calibration capture resolves cam0/LEFT "
+            "and cam1/RIGHT by PnP device identity."
+        ),
+    )
+    parser.add_argument(
+        "--left-camera",
+        type=int,
+        help="Unsafe manual OpenCV index for calibrated cam0/LEFT. Supply both only for diagnosis.",
+    )
+    parser.add_argument(
+        "--right-camera",
+        type=int,
+        help="Unsafe manual OpenCV index for calibrated cam1/RIGHT. Supply both only for diagnosis.",
+    )
 
     parser.add_argument("--width", type=int, default=1920)
     parser.add_argument("--height", type=int, default=1080)
@@ -108,7 +151,7 @@ def main():
     parser.add_argument(
         "--backend",
         choices=["msmf", "dshow", "auto"],
-        default="msmf",
+        default="auto",
     )
 
     parser.add_argument(
@@ -135,8 +178,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.left_camera == args.right_camera:
-        raise ValueError("LEFT and RIGHT camera indices must be different.")
+    left_camera, right_camera, selected_backend, resolved_cameras, selection_mode = (
+        resolve_camera_selection(args)
+    )
 
     board, detector = make_board()
 
@@ -154,12 +198,12 @@ def main():
         "mapping": {
             "left": {
                 "logical_camera": "cam0",
-                "opencv_index": args.left_camera,
+                "opencv_index": left_camera,
                 "calibration": "calibration/results/cam0_fisheye.json",
             },
             "right": {
                 "logical_camera": "cam1",
-                "opencv_index": args.right_camera,
+                "opencv_index": right_camera,
                 "calibration": "calibration/results/cam1_fisheye.json",
             },
         },
@@ -167,8 +211,19 @@ def main():
             "width": args.width,
             "height": args.height,
             "fps": args.fps,
-            "backend": args.backend,
+            "backend": selected_backend,
             "max_pair_delta_ms": args.max_pair_delta_ms,
+        },
+        "camera_identity_resolution": {
+            "selection_mode": selection_mode,
+            "camera_registry_resolution": (
+                resolved_cameras.to_dict() if resolved_cameras is not None else None
+            ),
+            "manual_index_warning": (
+                "Manual indices are runtime enumeration values and were not physically verified."
+                if selection_mode == "manual_index"
+                else None
+            ),
         },
         "board": {
             "type": "ChArUco",
@@ -190,12 +245,12 @@ def main():
     )
 
     config = StereoCameraConfig(
-        left_id=args.left_camera,
-        right_id=args.right_camera,
+        left_id=left_camera,
+        right_id=right_camera,
         width=args.width,
         height=args.height,
         fps=args.fps,
-        backend=args.backend,
+        backend=selected_backend,
         max_pair_delta_ms=args.max_pair_delta_ms,
         queue_size=8,
     )
@@ -208,8 +263,9 @@ def main():
 
     print("")
     print("=== Stereo ChArUco Capture ===")
-    print(f"LEFT  = CAM0 = OpenCV index {args.left_camera}")
-    print(f"RIGHT = CAM1 = OpenCV index {args.right_camera}")
+    print(f"LEFT  = CAM0 = OpenCV index {left_camera}")
+    print(f"RIGHT = CAM1 = OpenCV index {right_camera}")
+    print(f"Selection = {selection_mode}; backend = {selected_backend}")
     print(f"Output: {session_dir}")
     print("")
     print("S = save one stereo pair")
@@ -305,7 +361,7 @@ def main():
 
                 put_text(
                     vis0,
-                    f"LEFT = CAM0 = index {args.left_camera}",
+                    f"LEFT = CAM0 = index {left_camera}",
                     30,
                     green,
                 )
@@ -319,7 +375,7 @@ def main():
 
                 put_text(
                     vis1,
-                    f"RIGHT = CAM1 = index {args.right_camera}",
+                    f"RIGHT = CAM1 = index {right_camera}",
                     30,
                     green,
                 )

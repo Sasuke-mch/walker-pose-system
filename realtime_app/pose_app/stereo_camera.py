@@ -16,16 +16,24 @@ FrameListener = Callable[[str, "CameraFrame"], None]
 
 @dataclass(frozen=True)
 class StereoCameraConfig:
-    left_id: int = 1
-    right_id: int = 0
+    # OpenCV indices are runtime enumeration results, not stable physical
+    # identities.  Every live caller must supply the two resolved indices
+    # explicitly (normally via pose_app.camera_registry).
+    left_id: int | None = None
+    right_id: int | None = None
     width: int = 1920
     height: int = 1080
     fps: float = 30.0
-    backend: BackendName = "msmf"
+    backend: BackendName = "auto"
     max_pair_delta_ms: float = 25.0
     queue_size: int = 8
 
     def validate(self) -> None:
+        if self.left_id is None or self.right_id is None:
+            raise ValueError(
+                "left_id and right_id must be supplied explicitly; resolve calibrated "
+                "physical cameras through camera_registry instead of relying on defaults."
+            )
         if self.left_id == self.right_id:
             raise ValueError("left_id and right_id must be different camera indices.")
         if self.width <= 0 or self.height <= 0:
@@ -458,10 +466,10 @@ class StereoCameraSource:
 
         self._condition = threading.Condition()
         self._left = _CameraReader(
-            "LEFT", self.config.left_id, self.config, self._condition, frame_listener
+            "LEFT", int(self.config.left_id), self.config, self._condition, frame_listener
         )
         self._right = _CameraReader(
-            "RIGHT", self.config.right_id, self.config, self._condition, frame_listener
+            "RIGHT", int(self.config.right_id), self.config, self._condition, frame_listener
         )
         self._started = False
         self._closed = False
@@ -479,6 +487,20 @@ class StereoCameraSource:
         if self._right.info is None:
             raise RuntimeError("StereoCameraSource has not been started.")
         return self._right.info
+
+    def discard_pending_frames(self) -> None:
+        """Drop pre-roll frames so a formal recording starts from a clean pair queue.
+
+        This does not stop either camera or reset their physical frame counters.
+        It is intended for a capture protocol that opens and warms the cameras
+        before explicitly declaring the beginning of a recorded trial.
+        """
+
+        with self._left.lock:
+            self._left.queue.clear()
+        with self._right.lock:
+            self._right.queue.clear()
+        self._last_abs_host_delta_ms = None
 
     def start(self) -> None:
         if self._started:

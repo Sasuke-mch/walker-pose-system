@@ -6,7 +6,11 @@ from tempfile import TemporaryDirectory
 import unittest
 from types import SimpleNamespace
 
-from pose_app.camera_registry import CameraRegistryError, resolve_stereo_cameras
+from pose_app.camera_registry import (
+    CameraRegistryError,
+    load_camera_registry,
+    resolve_stereo_cameras,
+)
 
 
 def _registry_payload() -> dict:
@@ -87,6 +91,15 @@ class CameraRegistryTests(unittest.TestCase):
                     backend="dshow",
                     enumerate_devices=lambda _backend: devices,
                 )
+
+    def test_rejects_legacy_registry_without_explicit_roles(self) -> None:
+        with TemporaryDirectory() as temp:
+            payload = _registry_payload()
+            payload["cam0"]["role"] = None
+            registry = Path(temp) / "camera_registry.json"
+            registry.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaises(CameraRegistryError):
+                load_camera_registry(registry)
 
 
 if __name__ == "__main__":
