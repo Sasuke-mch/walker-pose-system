@@ -90,6 +90,8 @@ realtime_app/calibration/captures/
 realtime_app/calibration/reports/
 
 # Temporary and backup
+tmp/
+dispatch/
 *.bak
 *.bak_*
 *.tmp

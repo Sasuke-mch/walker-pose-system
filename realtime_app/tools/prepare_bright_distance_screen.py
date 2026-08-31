@@ -33,6 +33,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-pair-delta-ms", type=float, default=15.0)
     parser.add_argument("--left-rotation", choices=ROTATIONS, default="cw90")
     parser.add_argument("--right-rotation", choices=ROTATIONS, default="ccw90")
+    parser.add_argument(
+        "--exclude-selection-manifest", type=Path, action="append", default=[],
+        help="Prior manifest to withhold; may be supplied more than once.",
+    )
+    parser.add_argument(
+        "--exclude-pair-id-radius", type=int, default=0,
+        help="Exclude source pair IDs within this inclusive radius of prior selections.",
+    )
     return parser.parse_args()
 
 
@@ -105,11 +113,23 @@ def main() -> int:
         raise ValueError("--pairs-per-condition must be positive.")
     if args.max_pair_delta_ms <= 0:
         raise ValueError("--max-pair-delta-ms must be positive.")
+    if args.exclude_pair_id_radius < 0:
+        raise ValueError("--exclude-pair-id-radius must be non-negative.")
     if args.output_dir.exists():
         raise FileExistsError(f"Output directory already exists: {args.output_dir}")
 
     conditions = ("far_3m", "mid_2m", "near_1p3m")
     sessions = {name: find_session(args.capture_root / name) for name in conditions}
+    excluded_pair_ids: dict[Path, set[int]] = {}
+    for manifest_path in args.exclude_selection_manifest:
+        with manifest_path.resolve().open("r", encoding="utf-8-sig", newline="") as handle:
+            prior_rows = list(csv.DictReader(handle))
+        required = {"source_session_dir", "source_pair_id"}
+        if not prior_rows or not required.issubset(prior_rows[0]):
+            raise RuntimeError("Exclude manifest must contain source_session_dir and source_pair_id.")
+        for row in prior_rows:
+            session = Path(row["source_session_dir"]).resolve()
+            excluded_pair_ids.setdefault(session, set()).add(int(row["source_pair_id"]))
 
     raw_left_dir = args.output_dir / "raw_fisheye" / "left"
     raw_right_dir = args.output_dir / "raw_fisheye" / "right"
@@ -130,8 +150,13 @@ def main() -> int:
             "r", encoding="utf-8-sig", newline=""
         ) as handle:
             rows = list(csv.DictReader(handle))
-        eligible = [
+        eligible_before_exclusion = [
             row for row in rows if float(row["abs_host_delta_ms"]) <= args.max_pair_delta_ms
+        ]
+        prior_ids = excluded_pair_ids.get(session.resolve(), set())
+        eligible = [
+            row for row in eligible_before_exclusion
+            if all(abs(int(row["pair_id"]) - prior_id) > args.exclude_pair_id_radius for prior_id in prior_ids)
         ]
         selected = choose_evenly(eligible, args.pairs_per_condition)
         left_positions = load_video_frame_positions(session, "left")
@@ -198,7 +223,9 @@ def main() -> int:
         source_summary[condition] = {
             "session_dir": str(session),
             "recorded_pairs": len(rows),
-            "eligible_pairs": len(eligible),
+            "eligible_before_exclusion": len(eligible_before_exclusion),
+            "eligible_after_exclusion": len(eligible),
+            "excluded_prior_pair_ids": len(prior_ids),
             "selected_pairs": len(selected),
         }
 
@@ -214,6 +241,8 @@ def main() -> int:
         "conditions": source_summary,
         "total_selected_pairs": len(manifest),
         "max_pair_delta_ms": args.max_pair_delta_ms,
+        "exclude_selection_manifests": [str(path.resolve()) for path in args.exclude_selection_manifest],
+        "exclude_pair_id_radius": args.exclude_pair_id_radius,
         "raw_input": {
             "left_dir": str(raw_left_dir),
             "right_dir": str(raw_right_dir),

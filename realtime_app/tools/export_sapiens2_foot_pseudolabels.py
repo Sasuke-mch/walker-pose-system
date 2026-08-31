@@ -161,8 +161,11 @@ def main() -> int:
         raise FileExistsError(f"Refusing to overwrite existing output: {output}")
     selection = args.input_selection.resolve()
     manifest = read_csv(selection / "selection_manifest.csv")
-    if len(manifest) != 60:
-        raise RuntimeError(f"Expected 60 selected pairs, found {len(manifest)}")
+    if not manifest:
+        raise RuntimeError("Selection manifest is empty.")
+    required_manifest_fields = {"file_name", "condition"}
+    if not required_manifest_fields.issubset(manifest[0]):
+        raise RuntimeError(f"Selection manifest must contain {sorted(required_manifest_fields)}.")
     condition_by_name = {row["file_name"]: row["condition"] for row in manifest}
     target_review = {row["image_id"]: row for row in read_csv(args.target_review_csv.resolve())}
     sources = {
@@ -171,7 +174,7 @@ def main() -> int:
     }
     for side, (records, _, _) in sources.items():
         if set(records) != set(condition_by_name):
-            raise RuntimeError(f"{side}: prediction names do not match the 60-pair selection")
+            raise RuntimeError(f"{side}: prediction names do not match the selected-pair manifest")
 
     output.mkdir(parents=True)
     overlay_dir = output / "all_120_upright_overlays"
@@ -274,14 +277,17 @@ def main() -> int:
     usable_counts = defaultdict(int)
     for row in point_rows:
         usable_counts[(row["condition"], row["side"], row["joint_subject_anatomy"])] += row["reference_usable"] == "true"
+    image_counts = defaultdict(int)
+    for row in image_rows:
+        image_counts[(row["condition"], row["side"])] += 1
     summary_rows = [
-        {"condition": key[0], "side": key[1], "joint": key[2], "usable_count": value, "image_count": 20, "usable_rate": value / 20}
+        {"condition": key[0], "side": key[1], "joint": key[2], "usable_count": value, "image_count": image_counts[(key[0], key[1])], "usable_rate": value / image_counts[(key[0], key[1])]}
         for key, value in sorted(usable_counts.items())
     ]
     write_csv(output / "foot_point_availability_summary.csv", summary_rows)
     metadata = {
         "experiment_id": "E20260829-A6_Sapiens2_308_foot_pseudolabel_export",
-        "images": 120,
+        "images": len(image_rows),
         "points_per_image": len(POINTS),
         "prediction_input_rotation": {"left": args.left_prediction_rotation, "right": args.right_prediction_rotation},
         "display_rotation": {"left": args.left_display_rotation, "right": args.right_display_rotation},

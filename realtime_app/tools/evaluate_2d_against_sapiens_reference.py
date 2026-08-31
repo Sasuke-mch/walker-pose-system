@@ -65,8 +65,8 @@ def load_reference(path: Path) -> tuple[dict, dict]:
             image_id = row["image_id"]
             image_metadata[image_id] = {key: row[key] for key in ("file_name", "side", "condition")}
             by_image[image_id][row["joint_subject_anatomy"]] = row
-    if len(by_image) != 120:
-        raise RuntimeError(f"Expected 120 reference images, found {len(by_image)}")
+    if not by_image:
+        raise RuntimeError("Reference CSV contains no images")
     return by_image, image_metadata
 
 

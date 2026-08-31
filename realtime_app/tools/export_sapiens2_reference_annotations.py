@@ -80,8 +80,10 @@ def main() -> int:
         raise FileExistsError(f"Refusing to overwrite existing output: {output}")
     with (selection / "selection_manifest.csv").open("r", encoding="utf-8", newline="") as handle:
         manifest = list(csv.DictReader(handle))
-    if len(manifest) != 60:
-        raise RuntimeError("Expected the fixed 60-pair selection")
+    if not manifest:
+        raise RuntimeError("Selection manifest is empty")
+    if not {"file_name", "condition"}.issubset(manifest[0]):
+        raise RuntimeError("Selection manifest must contain file_name and condition")
     condition_by_name = {row["file_name"]: row["condition"] for row in manifest}
     paths = {
         "left": (args.left_predictions.resolve(), args.left_rotation),
@@ -93,7 +95,7 @@ def main() -> int:
     confidence: dict[str, list[float]] = defaultdict(list)
     for side, (path, rotation) in paths.items():
         records = _records(path, "sapiens2", "raw_keypoint")
-        if len(records) != 60 or {record["name"] for record in records} != set(condition_by_name):
+        if len(records) != len(manifest) or {record["name"] for record in records} != set(condition_by_name):
             raise RuntimeError(f"{side}: Sapiens2 prediction names do not match the selection")
         for record in records:
             target, ambiguous, method = select_target(record["persons"])
@@ -163,7 +165,7 @@ def main() -> int:
         "input_orientation": {"left": args.left_rotation, "right": args.right_rotation},
         "reference_source": args.reference_source,
         "coordinate_space": "original 1920x1080 raw fisheye pixels after inverse rotation",
-        "images": 120,
+        "images": len(manifest) * len(paths),
         "reference_joints": list(JOINTS.values()),
         "target_selection": "highest detector bbox score; rows marked needs_manual_target_review=true require later review",
         "confidence_thresholds": {"usable": args.usable_score, "high": args.high_score},

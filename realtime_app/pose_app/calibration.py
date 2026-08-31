@@ -112,7 +112,11 @@ class StereoCalibration:
                 raise ValueError("New-format intrinsic references must be strings.")
 
             def load_camera_reference(reference: str, name: str) -> dict[str, Any]:
-                reference_path = Path(reference)
+                # Calibration bundles are created on Windows and therefore may
+                # carry backslash-separated relative references.  Normalize
+                # before Path() so the same bundle can be replayed in Linux
+                # inference containers without changing its JSON content.
+                reference_path = Path(reference.replace("\\", "/"))
                 candidates: list[Path] = []
                 if reference_path.is_absolute():
                     candidates.append(reference_path)
