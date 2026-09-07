@@ -11,6 +11,14 @@
 
 ## 日志
 
+### 2026-09-07 11:03（北京时间）— GitHub Actions 跨平台依赖修复（已完成；CI validation）
+
+- 验证目标：复核提交 `488cd82` 在 GitHub Actions 的 Python 3.11/3.12 双任务失败；只检查测试依赖与运行环境，不修改姿态、标定、人物关联、三角化、运动学或步态逻辑。
+- 复现与原因：Windows 本机按仓库入口运行 78 项测试通过，但干净 Linux Python 3.11/3.12 环境暴露两项依赖缺口：测试导入的连续性分析工具需要 `matplotlib`，原 `requirements.txt` 未声明；Linux 无界面环境安装 GUI 版 `opencv-python` 时还可能因缺少 `libxcb.so.1` 在导入阶段失败。
+- 唯一修改：`realtime_app/requirements.txt` 新增 `matplotlib>=3.8,<4`；Windows 保持 `opencv-python`，非 Windows 改用 `opencv-python-headless`，Windows 专用相机枚举依赖保持不变。
+- 验证结果：官方 `python:3.11-slim` 与 `python:3.12-slim` 容器均从空环境安装更新后的依赖，并各自完成 `python realtime_app/run_tests.py`，结果均为 `78 passed`；Windows 本机从 `realtime_app` 运行完整测试同样为 `78 passed`。
+- 结论边界：本阶段只修复 CI 与无界面 Linux 的依赖可安装性，不构成模型、二维/三维精度、现场实时性能或物理坐标验证。
+
 ### 2026-09-06（北京时间）— people_1 及其 near 数据高帧率 (30 FPS) 采集与转正处理（已完成；engineering capture & handoff）
 
 - 背景与进展：
