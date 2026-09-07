@@ -8,6 +8,8 @@ from typing import Any
 import cv2
 import numpy as np
 
+from .geometry_input import require_raw_image_points_in_bounds
+
 
 _VALID_MODELS = {"pinhole", "fisheye"}
 
@@ -243,7 +245,10 @@ class StereoCalibration:
     def undistort_normalized(
         self, points: np.ndarray, side: str
     ) -> np.ndarray:
-        points = np.asarray(points, dtype=np.float64).reshape(-1, 1, 2)
+        image_size = self.left_image_size if side == "left" else self.right_image_size
+        points = np.asarray(points, dtype=np.float64).reshape(-1, 2)
+        require_raw_image_points_in_bounds(points, image_size, side)
+        points = points.reshape(-1, 1, 2)
         if side == "left":
             K, D = self.left_K, self.left_D
         elif side == "right":

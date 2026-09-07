@@ -48,6 +48,7 @@ class StereoOutputWriter:
         self.left_model_ms: list[float] = []
         self.right_model_ms: list[float] = []
         self.valid_3d_counts: list[int] = []
+        self.out_of_raw_bounds_keypoints = {"left": 0, "right": 0}
         self.timestamp_types: set[str] = set()
 
     def _make_writer(self, path: Path, size: tuple[int, int]) -> cv2.VideoWriter:
@@ -79,24 +80,17 @@ class StereoOutputWriter:
         self.temporary_video_path = temporary
         self.writer = writer
 
-    def write(
+    def build_payload(
         self,
-        frame: np.ndarray,
         pair: StereoFramePair,
         left_result: InferenceResult,
         right_result: InferenceResult,
         persons_3d: list[TriangulatedPerson],
-    ) -> None:
-        if self.save_video:
-            if self.writer is None:
-                self._open_video(frame)
-            assert self.size is not None and self.writer is not None
-            height, width = frame.shape[:2]
-            if (width, height) != self.size:
-                frame = cv2.resize(frame, self.size)
-            self.writer.write(frame)
+        geometry_rejected_out_of_raw_bounds_keypoints: dict[str, int] | None = None,
+    ) -> dict:
+        """Build the one immutable result record shared by file and live consumers."""
 
-        payload = {
+        return {
             "pair_id": pair.pair_id,
             "pair_timestamp_sec": pair.timestamp_sec,
             "left_frame_id": pair.left.frame_id,
@@ -114,10 +108,52 @@ class StereoOutputWriter:
             "dropped_right": pair.dropped_right,
             "coordinate_frame": "left_camera",
             "length_unit": self.calibration.length_unit,
+            "out_of_raw_image_bounds_policy": "reject",
+            "geometry_rejected_out_of_raw_bounds_keypoints": {
+                "left": int(
+                    (geometry_rejected_out_of_raw_bounds_keypoints or {}).get(
+                        "left", 0
+                    )
+                ),
+                "right": int(
+                    (geometry_rejected_out_of_raw_bounds_keypoints or {}).get(
+                        "right", 0
+                    )
+                ),
+            },
             "left": left_result.to_dict(),
             "right": right_result.to_dict(),
             "persons_3d": [person.to_dict() for person in persons_3d],
         }
+
+    def write(
+        self,
+        frame: np.ndarray,
+        pair: StereoFramePair,
+        left_result: InferenceResult,
+        right_result: InferenceResult,
+        persons_3d: list[TriangulatedPerson],
+        geometry_rejected_out_of_raw_bounds_keypoints: dict[str, int] | None = None,
+        payload: dict | None = None,
+    ) -> dict:
+        if self.save_video:
+            if self.writer is None:
+                self._open_video(frame)
+            assert self.size is not None and self.writer is not None
+            height, width = frame.shape[:2]
+            if (width, height) != self.size:
+                frame = cv2.resize(frame, self.size)
+            self.writer.write(frame)
+
+        payload = payload or self.build_payload(
+            pair,
+            left_result,
+            right_result,
+            persons_3d,
+            geometry_rejected_out_of_raw_bounds_keypoints,
+        )
+        if payload.get("pair_id") != pair.pair_id:
+            raise ValueError("stereo output payload pair_id does not match its frame pair")
         if self.json_file is not None:
             self.json_file.write(
                 json.dumps(payload, ensure_ascii=False, allow_nan=False) + "\n"
@@ -130,7 +166,14 @@ class StereoOutputWriter:
         self.valid_3d_counts.append(
             sum(person.valid_keypoints for person in persons_3d)
         )
+        self.out_of_raw_bounds_keypoints["left"] += payload[
+            "geometry_rejected_out_of_raw_bounds_keypoints"
+        ]["left"]
+        self.out_of_raw_bounds_keypoints["right"] += payload[
+            "geometry_rejected_out_of_raw_bounds_keypoints"
+        ]["right"]
         self.timestamp_types.add(pair.timestamp_type)
+        return payload
 
     def close(self) -> dict:
         if self.writer is not None:
@@ -167,6 +210,8 @@ class StereoOutputWriter:
             "baseline": self.calibration.baseline,
             "length_unit": self.calibration.length_unit,
             "coordinate_frame": "left_camera",
+            "out_of_raw_image_bounds_policy": "reject",
+            "geometry_rejected_out_of_raw_bounds_keypoints": self.out_of_raw_bounds_keypoints,
             "timestamp_type": (
                 next(iter(self.timestamp_types))
                 if len(self.timestamp_types) == 1

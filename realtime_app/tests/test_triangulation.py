@@ -10,6 +10,7 @@ import numpy as np
 
 from pose_app.calibration import StereoCalibration
 from pose_app.schema import PersonPose
+from pose_app.geometry_input import RawImageBoundsError
 from pose_app.triangulation import triangulate_matches
 
 
@@ -133,6 +134,40 @@ class TriangulationTests(unittest.TestCase):
         )
         self.assertLess(float(np.max(np.abs(reconstructed - xyz))), 1e-4)
 
+    def test_ungated_mode_retains_finite_high_reprojection_points(self):
+        calibration = self.calibration()
+        xyz = np.asarray(
+            [[0.01 * (index - 8), 0.0, 2.0] for index in range(17)],
+            dtype=np.float64,
+        )
+        left_pixels = calibration.project_left(xyz)
+        right_pixels = calibration.project_right(xyz)
+        # Still associable at the 0.05 normalized-distance threshold, but not
+        # geometrically self-consistent at the strict 1e-3 px gate.
+        right_pixels[:, 1] += 10.0
+        left = PersonPose(
+            0, [100.0, 50.0, 500.0, 470.0], 0.95, 0.90,
+            [[float(x), float(y), 0.9] for x, y in left_pixels],
+        )
+        right = PersonPose(
+            0, [80.0, 50.0, 480.0, 470.0], 0.94, 0.89,
+            [[float(x), float(y), 0.9] for x, y in right_pixels],
+        )
+        strict = triangulate_matches(
+            [left], [right], calibration, keypoint_threshold=0.25,
+            max_association_cost=0.05, max_reprojection_error_px=1e-3,
+        )
+        ungated = triangulate_matches(
+            [left], [right], calibration, keypoint_threshold=0.25,
+            max_association_cost=0.05, max_reprojection_error_px=1e-3,
+            accept_all_finite_triangulations=True,
+        )
+        self.assertEqual(strict[0].valid_keypoints, 0)
+        self.assertEqual(ungated[0].valid_keypoints, 17)
+        self.assertIn(
+            "high_reprojection_error", ungated[0].keypoints_3d[0]["quality_flags"]
+        )
+
     def test_single_target_respects_association_threshold(self):
         calibration = self.calibration()
         xyz = np.asarray(
@@ -170,6 +205,90 @@ class TriangulationTests(unittest.TestCase):
             max_reprojection_error_px=1000.0,
         )
         self.assertEqual(persons, [])
+
+    def test_max_matches_caps_overlapping_multi_person_candidates(self):
+        calibration = self.calibration()
+        xyz = np.asarray(
+            [
+                [0.01 * (index - 8), 0.015 * ((index % 5) - 2), 2.0 + 0.02 * index]
+                for index in range(17)
+            ],
+            dtype=np.float64,
+        )
+        left_pixels = calibration.project_left(xyz)
+        right_pixels = calibration.project_right(xyz)
+
+        def person(person_id, pixels):
+            return PersonPose(
+                person_id,
+                [100.0, 50.0, 500.0, 470.0],
+                0.95,
+                0.90,
+                [[float(x), float(y), 0.9] for x, y in pixels],
+            )
+
+        persons = triangulate_matches(
+            [person(0, left_pixels), person(1, left_pixels)],
+            [person(0, right_pixels), person(1, right_pixels)],
+            calibration,
+            keypoint_threshold=0.25,
+            max_association_cost=0.05,
+            max_reprojection_error_px=1e-3,
+            max_matches=1,
+        )
+        self.assertEqual(len(persons), 1)
+
+    def test_out_of_raw_image_bounds_is_excluded_and_not_relabelled_low_score(self):
+        calibration = self.calibration()
+        xyz = np.asarray(
+            [
+                [0.01 * (index - 8), 0.015 * ((index % 5) - 2), 2.0 + 0.02 * index]
+                for index in range(17)
+            ],
+            dtype=np.float64,
+        )
+        left_pixels = calibration.project_left(xyz)
+        right_pixels = calibration.project_right(xyz)
+        left_keypoints = [[float(x), float(y), 0.9] for x, y in left_pixels]
+        right_keypoints = [[float(x), float(y), 0.9] for x, y in right_pixels]
+        left_keypoints[0] = [-0.5, float(left_pixels[0, 1]), 0.1]
+        left = PersonPose(0, [100.0, 50.0, 500.0, 470.0], 0.95, 0.90, left_keypoints)
+        right = PersonPose(0, [80.0, 50.0, 480.0, 470.0], 0.94, 0.89, right_keypoints)
+
+        persons = triangulate_matches(
+            [left],
+            [right],
+            calibration,
+            keypoint_threshold=0.25,
+            max_reprojection_error_px=1e-3,
+        )
+
+        self.assertEqual(len(persons), 1)
+        self.assertEqual(persons[0].valid_keypoints, 16)
+        self.assertEqual(persons[0].common_keypoints, 16)
+        self.assertEqual(
+            persons[0].keypoints_3d[0]["reason"], "out_of_raw_image_bounds"
+        )
+        with self.assertRaises(RawImageBoundsError):
+            calibration.undistort_normalized(
+                np.asarray([[-0.5, 1.0]], dtype=np.float64), "left"
+            )
+
+    def test_out_of_bounds_bbox_center_cannot_be_used_for_association_fallback(self):
+        calibration = self.calibration()
+        keypoints = [[100.0, 100.0, 0.0] for _ in range(17)]
+        left = PersonPose(0, [-100.0, 50.0, -10.0, 470.0], 0.95, 0.90, keypoints)
+        right = PersonPose(0, [80.0, 50.0, 480.0, 470.0], 0.94, 0.89, keypoints)
+        self.assertEqual(
+            triangulate_matches(
+                [left],
+                [right],
+                calibration,
+                keypoint_threshold=0.25,
+                max_reprojection_error_px=1.0,
+            ),
+            [],
+        )
 
     def test_load_and_scale(self):
         raw = {

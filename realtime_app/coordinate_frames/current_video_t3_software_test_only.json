@@ -1,0 +1,19 @@
+{
+  "status": "test_only",
+  "transform_id": "current_video_t3_software_path_test",
+  "source_coordinate_frame": "left_camera",
+  "target_coordinate_frame": "test_walker_ground",
+  "length_unit": "millimeter",
+  "target_axis_definition": {
+    "x": "synthetic target forward axis for software testing only",
+    "y": "synthetic target left axis for software testing only",
+    "z": "synthetic target upward axis for software testing only"
+  },
+  "rotation_target_from_source": [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
+  "translation_target_from_source_mm": [250.0, -125.0, 80.0],
+  "reference_definition": {
+    "method": "deliberately non-identity analytic rigid transform",
+    "physical_reference": "none; current-video software-path test only",
+    "capture_session": "V20260901 C3 saved replay"
+  }
+}

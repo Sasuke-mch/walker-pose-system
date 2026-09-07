@@ -242,6 +242,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--no-preview", action="store_true")
     parser.add_argument(
+        "--preview-only",
+        action="store_true",
+        help=(
+            "Show the complete left/right raw camera fields of view without creating "
+            "an output directory or writing video, CSV, metadata, or summary files."
+        ),
+    )
+    parser.add_argument(
         "--no-video",
         "--no-raw-video",
         dest="no_video",
@@ -287,6 +295,84 @@ def resolve_camera_selection(
     )
 
 
+def _show_raw_preview(pair, panel_width: int = 900) -> int:
+    """Render both complete raw camera frames without cropping either image."""
+
+    left_height = max(1, round(pair.left.image.shape[0] * panel_width / pair.left.image.shape[1]))
+    right_height = max(1, round(pair.right.image.shape[0] * panel_width / pair.right.image.shape[1]))
+    left_show = cv2.resize(pair.left.image, (panel_width, left_height), interpolation=cv2.INTER_AREA)
+    right_show = cv2.resize(pair.right.image, (panel_width, right_height), interpolation=cv2.INTER_AREA)
+
+    canvas_height = max(left_height, right_height)
+    combined = np.zeros((canvas_height, panel_width * 2, 3), dtype=np.uint8)
+    combined[:left_height, :panel_width] = left_show
+    combined[:right_height, panel_width:] = right_show
+    cv2.putText(
+        combined,
+        "LEFT / cam0 (complete raw field of view)",
+        (16, 34),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.65,
+        (0, 255, 0),
+        2,
+    )
+    cv2.putText(
+        combined,
+        "RIGHT / cam1 (complete raw field of view)",
+        (panel_width + 16, 34),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.65,
+        (0, 255, 0),
+        2,
+    )
+    cv2.putText(
+        combined,
+        "PREVIEW ONLY -- no files are saved -- Q / ESC to close",
+        (16, canvas_height - 16),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.55,
+        (0, 255, 255),
+        2,
+    )
+    cv2.imshow("Stereo Raw Preview (no save)", combined)
+    return cv2.waitKey(1) & 0xFF
+
+
+def run_preview_only(
+    config: StereoCameraConfig,
+    *,
+    selection_mode: str,
+) -> int:
+    """Open verified physical cameras for live framing without any disk output."""
+
+    source = StereoCameraSource(config)
+    try:
+        source.start()
+        print("\n=== RAW STEREO PREVIEW ===")
+        print(
+            f"LEFT=cam0=index {config.left_id}, RIGHT=cam1=index {config.right_id}, "
+            f"{config.width}x{config.height}@{config.fps:g}, backend={config.backend}, "
+            f"selection={selection_mode}"
+        )
+        print("Complete raw fields of view are shown; no files will be saved. Press Q/ESC to close.")
+        first_pair = True
+        while True:
+            pair = source.read(timeout_sec=0.25)
+            if pair is None:
+                continue
+            key = _show_raw_preview(pair)
+            if first_pair:
+                print(f"Preview displayed: LEFT={pair.left.image.shape[1]}x{pair.left.image.shape[0]}, RIGHT={pair.right.image.shape[1]}x{pair.right.image.shape[0]}; full-frame aspect-ratio scaling only.", flush=True)
+                first_pair = False
+            if key in (ord("q"), ord("Q"), 27):
+                return 0
+    except KeyboardInterrupt:
+        return 0
+    finally:
+        source.close()
+        cv2.destroyAllWindows()
+
+
 def main() -> int:
     args = parse_args()
     if args.duration < 0:
@@ -300,10 +386,6 @@ def main() -> int:
         resolve_camera_selection(args)
     )
 
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-    run_dir = args.output_root.resolve() / stamp
-    run_dir.mkdir(parents=True, exist_ok=False)
-
     config = StereoCameraConfig(
         left_id=left_camera,
         right_id=right_camera,
@@ -315,6 +397,17 @@ def main() -> int:
         queue_size=args.camera_queue_size,
     )
     config.validate()
+
+    if args.preview_only:
+        if args.no_preview:
+            raise ValueError("--preview-only cannot be combined with --no-preview.")
+        if not args.no_video:
+            print("--preview-only implies --no-video; no files will be saved.")
+        return run_preview_only(config, selection_mode=selection_mode)
+
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+    run_dir = args.output_root.resolve() / stamp
+    run_dir.mkdir(parents=True, exist_ok=False)
 
     left_recorder = FrameRecorder(
         run_dir, "LEFT", args.width, args.height, args.fps, args.recorder_queue_size
@@ -369,10 +462,44 @@ def main() -> int:
             f"selection={selection_mode}"
         )
         print("Cameras are live, but formal recording has NOT started.")
-        if args.warmup_seconds > 0:
+        if preview_enabled and (args.warmup_seconds > 0 or args.start_countdown > 0):
+            cv2.namedWindow("Stereo Capture", cv2.WINDOW_NORMAL)
+            total_pre_sec = float(args.warmup_seconds + args.start_countdown)
+            pre_start_t = time.perf_counter()
+            while True:
+                elapsed = time.perf_counter() - pre_start_t
+                if elapsed >= total_pre_sec:
+                    break
+                p_prev = source.read(timeout_sec=0.1)
+                if p_prev is not None:
+                    ls = cv2.resize(p_prev.left.image, (640, 360))
+                    rs = cv2.resize(p_prev.right.image, (640, 360))
+                    comb = np.hstack([ls, rs])
+                else:
+                    comb = np.zeros((360, 1280, 3), dtype=np.uint8)
+
+                if elapsed < args.warmup_seconds:
+                    msg = f"WARMING UP: {args.warmup_seconds - elapsed:.1f}s"
+                    sub = "GET READY AT START MARK"
+                    color = (0, 255, 255)
+                else:
+                    rem_cd = int(np.ceil(total_pre_sec - elapsed))
+                    msg = f"START IN: {rem_cd} SECONDS"
+                    sub = "PREPARE TO WALK"
+                    color = (0, 0, 255)
+
+                cv2.rectangle(comb, (240, 110), (1040, 250), (0, 0, 0), -1)
+                cv2.rectangle(comb, (240, 110), (1040, 250), color, 3)
+                cv2.putText(comb, msg, (280, 175), cv2.FONT_HERSHEY_SIMPLEX, 1.4, color, 3)
+                cv2.putText(comb, sub, (380, 225), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
+                cv2.imshow("Stereo Capture", comb)
+                k = cv2.waitKey(30) & 0xFF
+                if k in (ord("q"), ord("Q"), 27):
+                    break
+        elif args.warmup_seconds > 0:
             print(f"Warming up for {args.warmup_seconds:g} s; position the walker at the start mark.")
             time.sleep(args.warmup_seconds)
-        if args.start_countdown > 0:
+        elif args.start_countdown > 0:
             print("Prepare to walk only when the START RECORDING message appears.")
             for remaining in range(args.start_countdown, 0, -1):
                 print(f"Recording starts in {remaining}...")

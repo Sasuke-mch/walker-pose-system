@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 from pathlib import Path
 import sys
+import time
 
 import cv2
 import numpy as np
@@ -279,6 +280,9 @@ def main():
 
     try:
         source.start()
+        print(f"Cameras opened: {source.left_info}; {source.right_info}", flush=True)
+        last_pair_time = time.monotonic()
+        last_wait_report = last_pair_time
 
         with csv_path.open(
             "w",
@@ -306,12 +310,23 @@ def main():
                     "cam1_file",
                 ]
             )
+            csv_file.flush()
 
             while True:
                 pair = source.read(timeout_sec=1.0)
 
                 if pair is None:
+                    now = time.monotonic()
+                    if now - last_wait_report >= 5.0:
+                        print(f"Waiting for paired frames: {source.stats().to_dict()}", flush=True)
+                        last_wait_report = now
+                    if now - last_pair_time >= 30.0:
+                        raise RuntimeError("No paired frames for 30 seconds; check camera reads and USB connection.")
                     continue
+
+                last_pair_time = time.monotonic()
+                if pair.pair_id == 0:
+                    print(f"First pair: LEFT={pair.left.image.shape}; RIGHT={pair.right.image.shape}", flush=True)
 
                 raw0 = pair.left.image
                 raw1 = pair.right.image

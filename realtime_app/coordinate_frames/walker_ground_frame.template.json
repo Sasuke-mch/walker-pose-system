@@ -1,0 +1,19 @@
+{
+  "status": "template_not_measured",
+  "transform_id": "replace_after_final_camera_mount",
+  "source_coordinate_frame": "left_camera",
+  "target_coordinate_frame": "walker_ground",
+  "length_unit": "millimeter",
+  "target_axis_definition": {
+    "x": "walker forward",
+    "y": "walker left",
+    "z": "ground normal upward"
+  },
+  "rotation_target_from_source": null,
+  "translation_target_from_source_mm": null,
+  "reference_definition": {
+    "method": "replace with the measured rigid reference procedure after the camera mount is locked",
+    "physical_reference": "replace with the surveyed walker/ground markers",
+    "capture_session": "replace with the static reference capture identifier"
+  }
+}

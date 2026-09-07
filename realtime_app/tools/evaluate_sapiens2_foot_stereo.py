@@ -25,6 +25,7 @@ APP_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP_ROOT))
 
 from pose_app.calibration import StereoCalibration
+from pose_app.geometry_input import paired_raw_point_rejection_reason
 from pose_app.rotation import ROTATION_CHOICES, model_to_raw_point
 
 
@@ -132,10 +133,16 @@ def triangulate_foot_points(
             "valid_at_reprojection_gate": False,
             "reason": None,
         }
-        if left_point["score"] < score_threshold or right_point["score"] < score_threshold:
+        coordinate_reason = paired_raw_point_rejection_reason(
+            left_point["raw_xy"],
+            right_point["raw_xy"],
+            calibration.left_image_size,
+            calibration.right_image_size,
+        )
+        if coordinate_reason is not None:
+            row["reason"] = coordinate_reason
+        elif left_point["score"] < score_threshold or right_point["score"] < score_threshold:
             row["reason"] = "low_2d_score"
-        elif left_point["raw_xy"] is None or right_point["raw_xy"] is None:
-            row["reason"] = "missing_2d_point"
         else:
             eligible.append(name)
             left_pixels.append(left_point["raw_xy"])
@@ -346,6 +353,19 @@ def main() -> int:
         "model_input_rotation": {"left": args.left_model_rotation, "right": args.right_model_rotation},
         "keypoint_threshold": args.keypoint_threshold,
         "max_reprojection_error_px": args.max_reprojection_error_px,
+        "out_of_raw_image_bounds_policy": "reject",
+        "foot_point_outcome_counts": dict(
+            sorted(
+                {
+                    outcome: sum(
+                        point["reason"] == outcome
+                        for point in point_rows
+                    )
+                    for outcome in {point["reason"] for point in point_rows}
+                    if outcome is not None
+                }.items()
+            )
+        ),
         "interpretation_boundary": "Sapiens2 foot points are visually checked engineering pseudo-labels, not independent 2-D truth. Reprojection consistency and local foot shape do not prove absolute 3-D accuracy or gait-contact validity.",
     }
     (output_dir / "metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

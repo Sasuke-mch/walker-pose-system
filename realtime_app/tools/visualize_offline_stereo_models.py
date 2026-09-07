@@ -25,6 +25,7 @@ NAMES = {
 COLORS = {
     "valid": (40, 220, 40),
     "high_reprojection_error": (0, 165, 255),
+    "out_of_raw_image_bounds": (255, 0, 255),
     "low_2d_score": (130, 130, 130),
     "negative_depth": (255, 0, 255),
     "association_failed": (255, 255, 0),
@@ -187,7 +188,7 @@ def compose(left, right, record, model, panel_width, threshold):
     canvas[header_height:, panel_width:] = right
 
     title = f"{NAMES[model]} | pair {record['pair_id']:03d} | {summary(record)}"
-    legend = "green=valid_3D  orange=high_reprojection  gray=low_2D_score  cyan=association_failed"
+    legend = "green=valid_3D orange=high_reprojection magenta=raw_bounds gray=low_2D cyan=association_failed"
     cv2.putText(canvas, title, (16, 23), cv2.FONT_HERSHEY_SIMPLEX, 0.58, (255, 255, 255), 1, cv2.LINE_AA)
     cv2.putText(canvas, legend, (16, 47), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (210, 210, 210), 1, cv2.LINE_AA)
     return canvas

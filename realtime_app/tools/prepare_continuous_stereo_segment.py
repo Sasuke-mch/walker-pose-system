@@ -21,7 +21,15 @@ import numpy as np
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--session-dir", required=True, type=Path)
-    parser.add_argument("--condition", required=True, choices=("far", "mid", "near"))
+    parser.add_argument(
+        "--condition",
+        required=True,
+        choices=("far", "mid", "near", "continuous"),
+        help=(
+            "Acquisition stratum label. Use continuous for a single sequence "
+            "whose distance changes during the run rather than assigning it a false fixed distance."
+        ),
+    )
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--start-pair", type=int, default=0)
     parser.add_argument("--pair-count", type=int, default=0, help="0 extracts no frames and writes a preview only")

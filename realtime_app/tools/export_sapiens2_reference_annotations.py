@@ -20,6 +20,7 @@ APP_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP_ROOT))
 
 from pose_app.rotation import model_to_raw_point
+from pose_app.triangulation import COCO17_NAMES
 from tools.evaluate_offline_stereo_predictions import _records
 
 
@@ -33,6 +34,14 @@ JOINTS = {
 }
 
 
+def selected_joints(joint_set: str) -> dict[int, str]:
+    if joint_set == "lower_body":
+        return JOINTS
+    if joint_set == "coco17":
+        return {index: name for index, name in enumerate(COCO17_NAMES)}
+    raise ValueError(f"Unsupported joint set: {joint_set}")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-selection", required=True, type=Path)
@@ -44,6 +53,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--usable-score", type=float, default=0.25)
     parser.add_argument("--high-score", type=float, default=0.50)
     parser.add_argument(
+        "--joint-set",
+        choices=("lower_body", "coco17"),
+        default="lower_body",
+        help="Reference joint set. The default preserves the historical six-joint lower-body export.",
+    )
+    parser.add_argument(
+        "--single-person-protocol",
+        action="store_true",
+        help=(
+            "Declare exactly one physical person per image: select the highest "
+            "detector-confidence instance and retain every remaining box only as "
+            "a detector false-positive audit record."
+        ),
+    )
+    parser.add_argument(
         "--reference-source",
         default="Sapiens2-0.4B_AI_assisted",
         help="Traceable label describing the exact Sapiens2 inference condition.",
@@ -51,17 +75,19 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def select_target(persons):
+def select_target(persons, *, single_person_protocol: bool):
     if not persons:
-        return None, True, "no_person"
+        return None, False, "no_person", []
     ordered = sorted(persons, key=lambda person: person.bbox_score, reverse=True)
     primary = ordered[0]
     ambiguous = (
-        len(ordered) > 1
+        not single_person_protocol
+        and len(ordered) > 1
         and primary.bbox_score > 0
         and ordered[1].bbox_score / primary.bbox_score >= 0.70
     )
-    return primary, ambiguous, "highest_detector_bbox_score"
+    excluded = [str(person.person_id) for person in ordered[1:]]
+    return primary, ambiguous, "highest_detector_bbox_score", excluded
 
 
 def reference_status(score: float, usable_score: float, high_score: float) -> tuple[int, bool, str]:
@@ -85,6 +111,7 @@ def main() -> int:
     if not {"file_name", "condition"}.issubset(manifest[0]):
         raise RuntimeError("Selection manifest must contain file_name and condition")
     condition_by_name = {row["file_name"]: row["condition"] for row in manifest}
+    joints = selected_joints(args.joint_set)
     paths = {
         "left": (args.left_predictions.resolve(), args.left_rotation),
         "right": (args.right_predictions.resolve(), args.right_rotation),
@@ -93,12 +120,16 @@ def main() -> int:
     annotation_rows: list[dict] = []
     review_rows: list[dict] = []
     confidence: dict[str, list[float]] = defaultdict(list)
+    excluded_detector_fp_total = 0
     for side, (path, rotation) in paths.items():
         records = _records(path, "sapiens2", "raw_keypoint")
         if len(records) != len(manifest) or {record["name"] for record in records} != set(condition_by_name):
             raise RuntimeError(f"{side}: Sapiens2 prediction names do not match the selection")
         for record in records:
-            target, ambiguous, method = select_target(record["persons"])
+            target, ambiguous, method, excluded = select_target(
+                record["persons"], single_person_protocol=args.single_person_protocol
+            )
+            excluded_detector_fp_total += len(excluded)
             image_id = f"{side}_{record['name'].removesuffix('.png')}"
             review_rows.append(
                 {
@@ -111,10 +142,17 @@ def main() -> int:
                     "selected_bbox_score": "" if target is None else f"{target.bbox_score:.8f}",
                     "selected_pose_score": "" if target is None else f"{target.pose_score:.8f}",
                     "selection_method": method,
+                    "selection_protocol": (
+                        "single_physical_person_highest_detector_score"
+                        if args.single_person_protocol
+                        else "legacy_highest_detector_score_with_manual_ambiguity_flag"
+                    ),
+                    "excluded_detector_fp_count": len(excluded),
+                    "excluded_detector_fp_person_ids": ";".join(excluded),
                     "needs_manual_target_review": str(ambiguous).lower(),
                 }
             )
-            for index, joint in JOINTS.items():
+            for index, joint in joints.items():
                 if target is None or len(target.keypoints) <= index:
                     score, x, y = 0.0, "", ""
                     visibility, usable, status = 0, False, "no_target_person"
@@ -166,8 +204,16 @@ def main() -> int:
         "reference_source": args.reference_source,
         "coordinate_space": "original 1920x1080 raw fisheye pixels after inverse rotation",
         "images": len(manifest) * len(paths),
-        "reference_joints": list(JOINTS.values()),
-        "target_selection": "highest detector bbox score; rows marked needs_manual_target_review=true require later review",
+        "reference_joints": list(joints.values()),
+        "joint_set": args.joint_set,
+        "target_selection": (
+            "exactly one physical person per image; select the highest detector bbox "
+            "score and retain all lower-score boxes as detector false positives"
+            if args.single_person_protocol
+            else "highest detector bbox score; rows marked needs_manual_target_review=true require later review"
+        ),
+        "single_person_protocol": args.single_person_protocol,
+        "excluded_detector_false_positive_boxes": excluded_detector_fp_total,
         "confidence_thresholds": {"usable": args.usable_score, "high": args.high_score},
         "interpretation_boundary": "AI-assisted Sapiens2 pseudo-labels are an operational reference only. They must not be used to report Sapiens2 accuracy or to call agreement with Sapiens2 an independent model-accuracy comparison.",
         "confidence_summary": confidence_summary,

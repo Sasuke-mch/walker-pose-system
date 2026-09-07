@@ -15,6 +15,8 @@ env/
 .idea/
 .vscode/
 .claude/
+.mimosa/
+.zcode/
 *.swp
 *.swo
 
@@ -78,9 +80,11 @@ realtime_app/raw_pair_recording_patch_20260823/
 realtime_app/undistort_model_input_patch_20260823/
 realtime_app/calibration/iterations/
 realtime_app/calibration/results/*_before_*.json
+realtime_app/calibration/results/stereo_fisheye_[0-9]*.json
 
 # Local handoff notes, not project documentation.
 to_gpt/
+/HANDOFF_*.md
 
 # Physical device bindings are machine-specific.  Publish the template only.
 realtime_app/camera_registry.json

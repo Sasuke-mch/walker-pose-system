@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from pose_app.calibration import StereoCalibration
+from pose_app.geometry_input import count_out_of_raw_image_bounds
 from pose_app.rotation import ROTATION_CHOICES, model_image_size, restore_model_result_to_raw
 from pose_app.schema import InferenceResult, PersonPose
 from pose_app.triangulation import triangulate_matches
@@ -47,7 +48,7 @@ def _person(person_id, bbox, bbox_score, points):
     )
 
 
-def _match_yolo_score(output_box, input_boxes, input_scores, used):
+def _match_input_region_score(output_box, input_boxes, input_scores, used):
     for index, box in enumerate(input_boxes):
         if index in used:
             continue
@@ -57,14 +58,16 @@ def _match_yolo_score(output_box, input_boxes, input_scores, used):
         ):
             used.add(index)
             return float(input_scores[index])
-    raise ValueError("An output bbox cannot be matched to its YOLO input bbox.")
+    raise ValueError("An output bbox cannot be matched to an input prompt region.")
 
 
 def _topdown_record(record, model, score_source):
     boxes = record["output_bboxes"]
     raw_points = record["keypoints"]
-    input_boxes = record["boxes_from_yolo26x"]
-    input_scores = record["bbox_scores_from_yolo26x"]
+    input_boxes = record.get("input_regions_xyxy", record.get("boxes_from_yolo26x"))
+    input_scores = record.get("input_region_scores", record.get("bbox_scores_from_yolo26x"))
+    if input_boxes is None or input_scores is None:
+        raise ValueError(f"{model}: missing input prompt regions or their scores")
     if len(boxes) != len(raw_points) or len(input_boxes) != len(input_scores):
         raise ValueError(f"{model}: misaligned fields for {record.get('file_name')}")
 
@@ -82,7 +85,7 @@ def _topdown_record(record, model, score_source):
             _person(
                 index,
                 box,
-                _match_yolo_score(box, input_boxes, input_scores, used),
+                _match_input_region_score(box, input_boxes, input_scores, used),
                 points,
             )
         )
@@ -116,10 +119,12 @@ def _records(path, model, topdown_score_source):
             persons = [
                 _person(
                     index,
-                    item.get("output_bbox_xyxy", item["bbox_xyxy_from_yolo26x"]),
+                    item.get("output_bbox_xyxy", item.get("input_region_xyxy", item.get("bbox_xyxy_from_yolo26x"))),
                     item.get(
-                        "bbox_score_from_yolo26x",
-                        item.get("output_bbox_score", 1.0),
+                        "input_region_score",
+                        item.get("bbox_score_from_yolo26x",
+                            item.get("output_bbox_score", 1.0),
+                        ),
                     ),
                     _points(item["keypoints_coco17"]),
                 )
@@ -206,6 +211,23 @@ def main():
     parser.add_argument("--max-association-cost", type=float, default=0.05)
     parser.add_argument("--max-reprojection-error-px", type=float, default=10.0)
     parser.add_argument(
+        "--triangulation-mode",
+        choices=("strict", "ungated"),
+        default="strict",
+        help=(
+            "strict requires positive depth and the reprojection threshold; "
+            "ungated retains every finite in-bounds triangulation after the "
+            "2-D score and person-association checks, recording depth and "
+            "reprojection issues as quality_flags instead of rejecting points."
+        ),
+    )
+    parser.add_argument(
+        "--max-matches",
+        type=int,
+        default=1,
+        help="Maximum stereo person matches retained per frame (default: 1).",
+    )
+    parser.add_argument(
         "--topdown-score-source",
         choices=("raw_keypoint", "presence"),
         default="raw_keypoint",
@@ -214,6 +236,8 @@ def main():
 
     if args.fps <= 0 or not 0 <= args.keypoint_threshold <= 1:
         parser.error("fps must be positive and keypoint threshold must be in [0, 1].")
+    if args.max_matches <= 0:
+        parser.error("max-matches must be positive.")
 
     started = time.perf_counter()
     args.left_json = args.left_json.resolve()
@@ -247,8 +271,11 @@ def main():
     valid = 0
     valid_by_name = Counter()
     reasons = Counter()
+    quality_flags = Counter()
     costs, common = [], []
     matched_pairs, matched_persons = 0, 0
+    pair_outcomes = Counter()
+    rejected_out_of_bounds_keypoints = 0
 
     with results_path.open("w", encoding="utf-8") as handle:
         for pair_id, name in enumerate(item["name"] for item in left):
@@ -268,6 +295,15 @@ def main():
                 args.right_model_rotation,
                 timestamp,
             )
+            left_rejected = count_out_of_raw_image_bounds(
+                left_raw.persons,
+                calibration.left_image_size,
+            )
+            right_rejected = count_out_of_raw_image_bounds(
+                right_raw.persons,
+                calibration.right_image_size,
+            )
+            rejected_out_of_bounds_keypoints += left_rejected + right_rejected
 
             people3d = triangulate_matches(
                 left_raw.persons,
@@ -276,10 +312,18 @@ def main():
                 args.keypoint_threshold,
                 args.max_association_cost,
                 args.max_reprojection_error_px,
+                max_matches=args.max_matches,
+                accept_all_finite_triangulations=(args.triangulation_mode == "ungated"),
             )
 
             matched_pairs += bool(people3d)
             matched_persons += len(people3d)
+            if people3d:
+                pair_outcomes["matched"] += 1
+            elif not left_raw.persons or not right_raw.persons:
+                pair_outcomes["no_target_person"] += 1
+            else:
+                pair_outcomes["association_failed"] += 1
 
             for person in people3d:
                 valid += person.valid_keypoints
@@ -291,6 +335,8 @@ def main():
                         valid_by_name[point["name"]] += 1
                     else:
                         reasons[point["reason"]] += 1
+                    for flag in point.get("quality_flags", []):
+                        quality_flags[flag] += 1
 
             payload = {
                 "pair_id": pair_id,
@@ -302,6 +348,21 @@ def main():
                 "timestamp_type": "sequence_file_index_over_fps",
                 "coordinate_frame": "left_camera",
                 "length_unit": calibration.length_unit,
+                "max_matches": args.max_matches,
+                "out_of_raw_image_bounds_policy": "reject",
+                "geometry_rejected_out_of_raw_bounds_keypoints": {
+                    "left": left_rejected,
+                    "right": right_rejected,
+                },
+                "pair_outcome": (
+                    "matched"
+                    if people3d
+                    else (
+                        "no_target_person"
+                        if not left_raw.persons or not right_raw.persons
+                        else "association_failed"
+                    )
+                ),
                 "left": left_raw.to_dict(),
                 "right": right_raw.to_dict(),
                 "persons_3d": [person.to_dict() for person in people3d],
@@ -326,6 +387,16 @@ def main():
         "keypoint_threshold": args.keypoint_threshold,
         "max_association_cost": args.max_association_cost,
         "max_reprojection_error_px": args.max_reprojection_error_px,
+        "triangulation_mode": args.triangulation_mode,
+        "ungated_definition": (
+            "all finite, in-bounds triangulations after 2-D score and association checks; "
+            "depth/reprojection conditions are diagnostic quality flags only"
+            if args.triangulation_mode == "ungated"
+            else None
+        ),
+        "max_matches": args.max_matches,
+        "out_of_raw_image_bounds_policy": "reject",
+        "geometry_rejected_out_of_raw_bounds_keypoints": rejected_out_of_bounds_keypoints,
         "model_input_rotation": {
             "left": args.left_model_rotation,
             "right": args.right_model_rotation,
@@ -334,6 +405,7 @@ def main():
         "topdown_score_source": args.topdown_score_source,
         "matched_pairs": matched_pairs,
         "matched_person_pairs": matched_persons,
+        "pair_outcomes": dict(pair_outcomes),
         "mean_association_cost": sum(costs) / len(costs) if costs else None,
         "mean_common_keypoints_per_matched_person": (
             sum(common) / len(common) if common else None
@@ -342,6 +414,7 @@ def main():
         "mean_valid_3d_keypoints_per_pair": valid / count,
         "valid_3d_keypoints_by_name": dict(valid_by_name),
         "matched_keypoint_rejection_reasons": dict(reasons),
+        "triangulated_quality_flags": dict(quality_flags),
         "results_jsonl": str(results_path),
         "annotated_video": None,
         "accuracy_note": (

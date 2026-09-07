@@ -17,8 +17,11 @@ from pose_app.camera_registry import (
 )
 from pose_app.config import load_config
 from pose_app.docker_service import DockerPoseService
+from pose_app.geometry_input import count_out_of_raw_image_bounds
 from pose_app.http_client import PMPosePipelineClient, PoseServiceClient
 from pose_app.local_perspective import LocalPerspectiveModelInput
+from pose_app.lower_limb_live_status import LowerLimbLiveStatusWriter
+from pose_app.lower_limb_pipeline import build_lower_limb_pipeline
 from pose_app.model_undistort import FisheyeModelInput
 from pose_app.rotation import (
     ROTATION_CHOICES,
@@ -200,6 +203,29 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-json", action="store_true")
     parser.add_argument("--output-dir")
     parser.add_argument(
+        "--enable-lower-limb-pipeline",
+        action="store_true",
+        help=(
+            "After stereo_results.jsonl closes, automatically write T1--T4 lower-limb "
+            "outputs under <output-dir>/lower_limb_pipeline."
+        ),
+    )
+    parser.add_argument(
+        "--coordinate-transform",
+        help=(
+            "Optional measured_locked left-camera-to-physical-frame transform JSON for "
+            "the T3 part of --enable-lower-limb-pipeline."
+        ),
+    )
+    parser.add_argument(
+        "--allow-test-coordinate-transform",
+        action="store_true",
+        help=(
+            "Permit an explicitly test_only T3 transform for software validation. "
+            "It has no physical walker/ground meaning."
+        ),
+    )
+    parser.add_argument(
         "--connect-only",
         action="store_true",
         help="Use an already-running pose inference service; this is not a camera-only test.",
@@ -279,6 +305,12 @@ def parse_args() -> argparse.Namespace:
         parser.error("--sbs-left-panel-width必须大于0。")
     if args.sbs_start_frame < 0:
         parser.error("--sbs-start-frame不能小于0。")
+    if args.enable_lower_limb_pipeline and args.no_json:
+        parser.error("--enable-lower-limb-pipeline需要stereo_results.jsonl，不能与--no-json同时使用。")
+    if args.coordinate_transform and not args.enable_lower_limb_pipeline:
+        parser.error("--coordinate-transform只能与--enable-lower-limb-pipeline一起使用。")
+    if args.allow_test_coordinate_transform and not args.coordinate_transform:
+        parser.error("--allow-test-coordinate-transform需要--coordinate-transform。")
     return args
 
 
@@ -576,6 +608,7 @@ def main() -> int:
     service = None
     writer = None
     raw_writer = None
+    lower_limb_live_status = None
     preview_opened = False
     local_perspective_attempts = 0
     local_perspective_selected = 0
@@ -727,6 +760,17 @@ def main() -> int:
             )
             print(f"\n相机探测输出目录：{run_dir}")
             return 0
+
+        if args.enable_lower_limb_pipeline:
+            lower_limb_live_status = LowerLimbLiveStatusWriter(
+                run_dir / "lower_limb_live_status.jsonl",
+                coordinate_transform_path=args.coordinate_transform,
+                allow_test_coordinate_transform=args.allow_test_coordinate_transform,
+            )
+            log.info(
+                "已启用在线下肢状态：每对严格三角化结果将追加到lower_limb_live_status.jsonl；"
+                "该输出不影响上游二维、关联或几何。"
+            )
 
         if args.connect_only:
             client = connect_client(args, config)
@@ -904,6 +948,24 @@ def main() -> int:
                     left_result.stage_times_ms["local_perspective_selected"] = 1.0
                     right_result.stage_times_ms["local_perspective_selected"] = 1.0
             processed += 1
+            geometry_rejected_out_of_raw_bounds_keypoints = {
+                "left": count_out_of_raw_image_bounds(
+                    left_result.persons, calibration.left_image_size
+                ),
+                "right": count_out_of_raw_image_bounds(
+                    right_result.persons, calibration.right_image_size
+                ),
+            }
+            stereo_payload = writer.build_payload(
+                pair,
+                left_result,
+                right_result,
+                persons_3d,
+                geometry_rejected_out_of_raw_bounds_keypoints,
+            )
+            lower_limb_status = None
+            if lower_limb_live_status is not None:
+                lower_limb_status = lower_limb_live_status.consume(stereo_payload)
             annotated = draw_stereo(
                 pair,
                 left_result,
@@ -912,9 +974,16 @@ def main() -> int:
                 threshold=config.output.draw_keypoint_threshold,
                 processed=processed,
                 display_width=args.display_width,
+                lower_limb_status=lower_limb_status,
             )
             writer.write(
-                annotated, pair, left_result, right_result, persons_3d
+                annotated,
+                pair,
+                left_result,
+                right_result,
+                persons_3d,
+                geometry_rejected_out_of_raw_bounds_keypoints=geometry_rejected_out_of_raw_bounds_keypoints,
+                payload=stereo_payload,
             )
 
             if not args.headless:
@@ -942,6 +1011,16 @@ def main() -> int:
         if raw_writer is not None:
             summary["raw_pair_recording"] = raw_writer.close()
             raw_writer = None
+        if lower_limb_live_status is not None:
+            summary["lower_limb_live_status"] = lower_limb_live_status.close(completed=True)
+            lower_limb_live_status = None
+        if args.enable_lower_limb_pipeline:
+            summary["lower_limb_pipeline"] = build_lower_limb_pipeline(
+                run_dir / "stereo_results.jsonl",
+                run_dir / "lower_limb_pipeline",
+                coordinate_transform_path=args.coordinate_transform,
+                allow_test_coordinate_transform=args.allow_test_coordinate_transform,
+            )
         summary["requested_model"] = args.model
         summary["calibration_file"] = str(Path(args.calibration).resolve())
         summary["model_input_rotation"] = {
@@ -996,6 +1075,11 @@ def main() -> int:
                 raw_writer.close()
             except Exception:
                 log.exception("关闭原始双目帧录制失败")
+        if lower_limb_live_status is not None:
+            try:
+                lower_limb_live_status.close(completed=False)
+            except Exception:
+                log.exception("关闭在线下肢状态输出失败")
         if source is not None:
             try:
                 source.close()

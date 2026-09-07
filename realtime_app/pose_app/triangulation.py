@@ -8,6 +8,11 @@ import cv2
 import numpy as np
 
 from .calibration import StereoCalibration
+from .geometry_input import (
+    OUT_OF_RAW_IMAGE_BOUNDS,
+    paired_raw_point_rejection_reason,
+    raw_point_rejection_reason,
+)
 from .schema import PersonPose
 
 
@@ -67,6 +72,7 @@ class TriangulatedPerson:
 def _visible_pairs(
     left: PersonPose,
     right: PersonPose,
+    calibration: StereoCalibration,
     threshold: float,
 ) -> tuple[np.ndarray, np.ndarray, list[int]]:
     left_points: list[list[float]] = []
@@ -78,10 +84,13 @@ def _visible_pairs(
         if (
             left_point[2] >= threshold
             and right_point[2] >= threshold
-            and math.isfinite(left_point[0])
-            and math.isfinite(left_point[1])
-            and math.isfinite(right_point[0])
-            and math.isfinite(right_point[1])
+            and paired_raw_point_rejection_reason(
+                left_point,
+                right_point,
+                calibration.left_image_size,
+                calibration.right_image_size,
+            )
+            is None
         ):
             left_points.append([left_point[0], left_point[1]])
             right_points.append([right_point[0], right_point[1]])
@@ -93,9 +102,12 @@ def _visible_pairs(
     )
 
 
-def _bbox_center(person: PersonPose) -> np.ndarray:
+def _bbox_center(person: PersonPose, image_size: tuple[int, int]) -> np.ndarray | None:
     x1, y1, x2, y2 = person.bbox
-    return np.asarray([[(x1 + x2) * 0.5, (y1 + y2) * 0.5]], dtype=np.float64)
+    center = [(x1 + x2) * 0.5, (y1 + y2) * 0.5]
+    if raw_point_rejection_reason(center, image_size) is not None:
+        return None
+    return np.asarray([center], dtype=np.float64)
 
 
 def _epipolar_cost(
@@ -133,19 +145,18 @@ def association_cost(
     minimum_common_keypoints: int = 4,
 ) -> tuple[float, int]:
     left_points, right_points, indices = _visible_pairs(
-        left, right, keypoint_threshold
+        left, right, calibration, keypoint_threshold
     )
     if len(indices) >= minimum_common_keypoints:
         return _epipolar_cost(left_points, right_points, calibration), len(indices)
     # A bbox-center fallback keeps the baseline usable when lower-body joints are
     # temporarily missing.  It is only a weak association cue and is therefore
     # accompanied by common_keypoints=0..3 in the output.
-    return (
-        _epipolar_cost(
-            _bbox_center(left), _bbox_center(right), calibration
-        ),
-        len(indices),
-    )
+    left_center = _bbox_center(left, calibration.left_image_size)
+    right_center = _bbox_center(right, calibration.right_image_size)
+    if left_center is None or right_center is None:
+        return float("inf"), len(indices)
+    return _epipolar_cost(left_center, right_center, calibration), len(indices)
 
 
 def associate_persons(
@@ -233,6 +244,7 @@ def triangulate_person(
     stereo_person_id: int,
     association_cost_value: float,
     common_keypoints: int,
+    accept_all_finite_triangulations: bool = False,
 ) -> TriangulatedPerson:
     output: list[dict[str, Any] | None] = [None] * 17
     valid_indices: list[int] = []
@@ -244,13 +256,23 @@ def triangulate_person(
     ):
         left_score = float(left_point[2])
         right_score = float(right_point[2])
+        coordinate_reason = paired_raw_point_rejection_reason(
+            left_point,
+            right_point,
+            calibration.left_image_size,
+            calibration.right_image_size,
+        )
+        if coordinate_reason == OUT_OF_RAW_IMAGE_BOUNDS:
+            output[index] = _invalid_keypoint(
+                index, left_score, right_score, OUT_OF_RAW_IMAGE_BOUNDS
+            )
+            continue
         if left_score < keypoint_threshold or right_score < keypoint_threshold:
             output[index] = _invalid_keypoint(
                 index, left_score, right_score, "low_2d_score"
             )
             continue
-        values = [left_point[0], left_point[1], right_point[0], right_point[1]]
-        if not all(math.isfinite(float(value)) for value in values):
+        if coordinate_reason is not None:
             output[index] = _invalid_keypoint(
                 index, left_score, right_score, "non_finite_2d_point"
             )
@@ -305,18 +327,22 @@ def triangulate_person(
             )
             positive_depth = finite_geometry and depth_left > 0.0 and depth_right > 0.0
             reprojection_ok = positive_depth and mean_error <= max_reprojection_error_px
+            quality_flags: list[str] = []
             if not finite_geometry:
                 reason = "non_finite_triangulation"
             elif not positive_depth:
                 reason = "negative_or_zero_depth"
+                quality_flags.append(reason)
             elif not reprojection_ok:
                 reason = "high_reprojection_error"
+                quality_flags.append(reason)
             else:
                 reason = None
+            accepted = finite_geometry if accept_all_finite_triangulations else reprojection_ok
             output[keypoint_index] = {
                 "index": keypoint_index,
                 "name": COCO17_NAMES[keypoint_index],
-                "valid": bool(reprojection_ok),
+                "valid": bool(accepted),
                 "xyz": [float(value) for value in point] if finite_geometry else None,
                 "score": math.sqrt(max(0.0, left_score) * max(0.0, right_score)),
                 "left_score": left_score,
@@ -326,7 +352,8 @@ def triangulate_person(
                 "reprojection_error_left_px": left_error if finite_geometry else None,
                 "reprojection_error_right_px": right_error if finite_geometry else None,
                 "reprojection_error_mean_px": mean_error if finite_geometry else None,
-                "reason": reason,
+                "reason": None if accepted else reason,
+                "quality_flags": quality_flags,
             }
 
     complete_output = [
@@ -362,6 +389,7 @@ def triangulate_matches(
     max_association_cost: float = 0.05,
     max_reprojection_error_px: float = 10.0,
     max_matches: int | None = None,
+    accept_all_finite_triangulations: bool = False,
 ) -> list[TriangulatedPerson]:
     matches = associate_persons(
         left_persons,
@@ -378,6 +406,7 @@ def triangulate_matches(
             calibration,
             keypoint_threshold,
             max_reprojection_error_px,
+            accept_all_finite_triangulations=accept_all_finite_triangulations,
             stereo_person_id=index,
             association_cost_value=match.association_cost,
             common_keypoints=match.common_keypoints,

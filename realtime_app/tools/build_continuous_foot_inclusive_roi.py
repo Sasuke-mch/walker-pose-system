@@ -36,6 +36,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-json", required=True, type=Path)
     parser.add_argument("--manifest-csv", required=True, type=Path)
     parser.add_argument("--visualization-dir", required=True, type=Path)
+    parser.add_argument(
+        "--inference-image-path-prefix",
+        default=None,
+        help=(
+            "Optional POSIX path prefix written into output image_path values for a "
+            "containerized pose runner, for example /workspace/people. The source "
+            "detector JSON remains recorded separately in the output payload."
+        ),
+    )
     parser.add_argument("--threshold", type=float, default=RULE["threshold"])
     parser.add_argument("--power", type=float, default=RULE["power"])
     parser.add_argument("--side-label", required=True)
@@ -114,6 +123,10 @@ def main() -> int:
     for image in source["images"]:
         det = top_person(image)
         copied = {key: image[key] for key in ("image_id", "frame_index", "file_name", "image_path", "width", "height")}
+        if args.inference_image_path_prefix:
+            copied["image_path"] = (
+                f"{str(args.inference_image_path_prefix).rstrip('/')}/{image['file_name']}"
+            )
         if det is None:
             copied["detections"] = []
             manifest.append({"file_name": image["file_name"], "has_person": 0})
@@ -133,6 +146,7 @@ def main() -> int:
     payload = {
         "schema_version": "continuous_foot_inclusive_pose_roi_v1",
         "source_detection_json": str(args.det_json),
+        "inference_image_path_prefix": args.inference_image_path_prefix,
         "side": args.side_label,
         "rule": {**RULE, "threshold": args.threshold, "power": args.power},
         "images": result_images,

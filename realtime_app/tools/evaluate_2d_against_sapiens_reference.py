@@ -1,10 +1,9 @@
-"""Evaluate saved single-view COCO-17 predictions against Sapiens2 pseudo-labels.
+"""Evaluate saved single-view COCO-17 predictions against a Sapiens2 reference.
 
-This is deliberately an agreement analysis.  The supplied Sapiens2 points are
-not independent ground truth, so no output from this tool may be called model
-accuracy.  Candidate selection is reference-guided to separate pose agreement
-from the unrelated multi-person detector-association problem; the selected
-candidate and every per-point decision are written for audit.
+The default keeps the legacy reference-guided candidate selector for archival
+reproduction.  The single-person protocol instead chooses the highest detector
+confidence instance directly, records all remaining boxes as detector false
+positives, and never uses a reference keypoint to choose a model candidate.
 """
 from __future__ import annotations
 
@@ -22,10 +21,17 @@ APP_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP_ROOT))
 
 from pose_app.rotation import model_to_raw_point
+from pose_app.triangulation import COCO17_NAMES
 from tools.evaluate_offline_stereo_predictions import _records
 
 
-JOINTS = {11: "left_hip", 12: "right_hip", 13: "left_knee", 14: "right_knee", 15: "left_ankle", 16: "right_ankle"}
+BODY_REGION = {
+    "nose": "head", "left_eye": "head", "right_eye": "head", "left_ear": "head", "right_ear": "head",
+    "left_shoulder": "shoulder_girdle", "right_shoulder": "shoulder_girdle",
+    "left_elbow": "upper_limb", "right_elbow": "upper_limb", "left_wrist": "upper_limb", "right_wrist": "upper_limb",
+    "left_hip": "lower_limb", "right_hip": "lower_limb", "left_knee": "lower_limb", "right_knee": "lower_limb",
+    "left_ankle": "lower_limb", "right_ankle": "lower_limb",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -34,6 +40,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reference-selection-review", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--usable-score", type=float, default=0.25)
+    parser.add_argument(
+        "--candidate-selection",
+        choices=("reference_guided_legacy", "highest_detector_bbox_score"),
+        default="reference_guided_legacy",
+    )
+    parser.add_argument(
+        "--single-person-protocol",
+        action="store_true",
+        help=(
+            "Use exactly one physical person per image.  All lower-confidence "
+            "detector boxes remain audited false positives and no ambiguity subset "
+            "or reference-guided candidate selection is emitted."
+        ),
+    )
     parser.add_argument(
         "--condition",
         action="append",
@@ -78,7 +98,7 @@ def load_ambiguous_images(path: Path) -> set[str]:
 
 def raw_points(person, rotation: str, space: str) -> dict[str, tuple[float, float, float]]:
     output = {}
-    for index, joint in JOINTS.items():
+    for index, joint in enumerate(COCO17_NAMES):
         if len(person.keypoints) <= index:
             continue
         x, y, score = [float(value) for value in person.keypoints[index]]
@@ -116,27 +136,32 @@ def select_reference_guided_candidate(persons, reference, rotation, space, usabl
     return person, points, "reference_guided_max_common_then_min_median_error", common, median
 
 
+def select_highest_detector_candidate(persons, rotation, space):
+    if not persons:
+        return None, {}, "no_model_person", None, None
+    person = max(persons, key=lambda item: item.bbox_score)
+    return person, raw_points(person, rotation, space), "highest_detector_bbox_score", None, None
+
+
 def pck(errors: list[float], threshold: float) -> float | None:
     return None if not errors else float(np.mean(np.asarray(errors) <= threshold))
 
 
-def summarize(rows: list[dict], name: str, subset: str) -> list[dict]:
+def summarize(rows: list[dict], name: str, model: str, subset: str, group_fields: tuple[str, ...]) -> list[dict]:
     filtered = [row for row in rows if row["reference_subset"] == subset]
     groups: dict[tuple, list[dict]] = defaultdict(list)
     for row in filtered:
-        groups[(row["distance_condition"], row["camera_side"], row["joint"])].append(row)
+        groups[tuple(row[field] for field in group_fields)].append(row)
     output = []
-    for (condition, side, joint), items in sorted(groups.items()):
+    for key, items in sorted(groups.items()):
         reference_usable = [item for item in items if item["reference_usable"]]
         compared = [item for item in reference_usable if item["model_usable"]]
         errors = [item["error_px"] for item in compared]
         scores = [item["model_confidence"] for item in compared]
-        output.append({
+        record = {
             "condition_name": name,
+            "model": model,
             "reference_subset": subset,
-            "distance_condition": condition,
-            "camera_side": side,
-            "joint": joint,
             "reference_usable_points": len(reference_usable),
             "model_usable_points": len(compared),
             "relative_coverage": len(compared) / len(reference_usable) if reference_usable else None,
@@ -146,7 +171,9 @@ def summarize(rows: list[dict], name: str, subset: str) -> list[dict]:
             "relative_pck_25px": pck(errors, 25.0),
             "relative_pck_50px": pck(errors, 50.0),
             "mean_model_confidence_when_compared": float(np.mean(scores)) if scores else None,
-        })
+        }
+        record.update({field: value for field, value in zip(group_fields, key)})
+        output.append(record)
     return output
 
 
@@ -154,12 +181,29 @@ def main() -> int:
     args = parse_args()
     if not 0 <= args.usable_score <= 1:
         raise ValueError("--usable-score must be in [0, 1]")
+    if args.single_person_protocol and args.candidate_selection != "highest_detector_bbox_score":
+        raise ValueError("--single-person-protocol requires --candidate-selection highest_detector_bbox_score")
     output = args.output_dir.resolve()
     if output.exists():
         raise FileExistsError(f"Refusing to overwrite existing output: {output}")
     reference, image_metadata = load_reference(args.reference_csv.resolve())
-    ambiguous_images = load_ambiguous_images(args.reference_selection_review.resolve())
-    all_rows, all_summaries, manifest = [], [], []
+    ambiguous_images = (
+        set()
+        if args.single_person_protocol
+        else load_ambiguous_images(args.reference_selection_review.resolve())
+    )
+    reference_subsets = (
+        ("all_single_person_reference",)
+        if args.single_person_protocol
+        else ("all_reference_images", "reference_target_unambiguous_only")
+    )
+    all_rows, manifest = [], []
+    summary_tables = {
+        "summary_overall.csv": [],
+        "summary_by_distance.csv": [],
+        "summary_by_body_region.csv": [],
+        "summary_by_model_distance_side_joint.csv": [],
+    }
     for definition in [parse_condition(value) for value in args.condition]:
         if definition["model"] == "sapiens2":
             raise ValueError("Do not evaluate Sapiens2 against labels exported from that same run.")
@@ -175,9 +219,14 @@ def main() -> int:
             if file_name not in records_by_side[side]:
                 raise RuntimeError(f"{definition['name']}: missing {side}/{file_name}")
             record, rotation = records_by_side[side][file_name]
-            selected, points, selection_method, common, median = select_reference_guided_candidate(
-                record["persons"], joints, rotation, definition["space"], args.usable_score
-            )
+            if args.candidate_selection == "highest_detector_bbox_score":
+                selected, points, selection_method, common, median = select_highest_detector_candidate(
+                    record["persons"], rotation, definition["space"]
+                )
+            else:
+                selected, points, selection_method, common, median = select_reference_guided_candidate(
+                    record["persons"], joints, rotation, definition["space"], args.usable_score
+                )
             for joint, ref in joints.items():
                 ref_usable = ref["reference_usable"] == "true"
                 point = points.get(joint)
@@ -189,15 +238,16 @@ def main() -> int:
                     "condition_name": definition["name"], "model": definition["model"], "coordinate_space": definition["space"],
                     "image_id": image_id, "file_name": file_name, "camera_side": side, "distance_condition": meta["condition"],
                     "joint": joint, "reference_usable": ref_usable, "reference_confidence": float(ref["sapiens2_confidence"]),
+                    "body_region": BODY_REGION.get(joint, "other"),
                     "model_person_count": len(record["persons"]), "selected_person_id": "" if selected is None else selected.person_id,
                     "selected_bbox_score": "" if selected is None else selected.bbox_score, "selection_method": selection_method,
+                    "excluded_detector_fp_count": max(0, len(record["persons"]) - 1),
                     "selection_common_usable_joints": common, "selection_median_relative_error_px": median,
                     "model_usable": model_usable, "model_confidence": "" if point is None else point[2],
                     "model_x_px_raw_fisheye": "" if point is None else point[0], "model_y_px_raw_fisheye": "" if point is None else point[1],
                     "error_px": error,
                 }
-                # Report both full data and the subset without reference target ambiguity.
-                for subset in ("all_reference_images", "reference_target_unambiguous_only"):
+                for subset in reference_subsets:
                     if subset == "reference_target_unambiguous_only" and image_id in ambiguous_images:
                         continue
                     copied = dict(row)
@@ -205,38 +255,64 @@ def main() -> int:
                     condition_rows.append(copied)
         # Ambiguity is injected after loading because the point table deliberately has no detector fields.
         all_rows.extend(condition_rows)
-        all_summaries.extend(summarize(condition_rows, definition["name"], "all_reference_images"))
-        all_summaries.extend(summarize(condition_rows, definition["name"], "reference_target_unambiguous_only"))
+        for subset in reference_subsets:
+            summary_tables["summary_overall.csv"].extend(
+                summarize(condition_rows, definition["name"], definition["model"], subset, ())
+            )
+            summary_tables["summary_by_distance.csv"].extend(
+                summarize(condition_rows, definition["name"], definition["model"], subset, ("distance_condition",))
+            )
+            summary_tables["summary_by_body_region.csv"].extend(
+                summarize(condition_rows, definition["name"], definition["model"], subset, ("body_region",))
+            )
+            summary_tables["summary_by_model_distance_side_joint.csv"].extend(
+                summarize(
+                    condition_rows,
+                    definition["name"], definition["model"],
+                    subset,
+                    ("distance_condition", "camera_side", "joint"),
+                )
+            )
 
     output.mkdir(parents=True)
     with (output / "per_keypoint_relative_error_all_reference.csv").open("w", encoding="utf-8-sig", newline="") as handle:
         fields = list(all_rows[0])
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()
-        writer.writerows([row for row in all_rows if row["reference_subset"] == "all_reference_images"])
-    with (output / "summary_by_model_distance_side_joint.csv").open("w", encoding="utf-8-sig", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(all_summaries[0]))
-        writer.writeheader()
-        writer.writerows(all_summaries)
+        writer.writerows([row for row in all_rows if row["reference_subset"] == reference_subsets[0]])
+    for file_name, rows in summary_tables.items():
+        with (output / file_name).open("w", encoding="utf-8-sig", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
     metadata = {
         "reference_csv": str(args.reference_csv.resolve()),
         "reference_selection_review": str(args.reference_selection_review.resolve()),
         "reference_target_ambiguous_images": len(ambiguous_images),
+        "single_person_protocol": args.single_person_protocol,
         "conditions": manifest,
         "scoring": {
             "usable_score": args.usable_score,
             "coordinate_space": "original 1920x1080 raw fisheye pixels",
-            "candidate_selection": "reference-guided max shared usable joints then lowest median point distance; oracle analysis only, not deployment association",
-            "metrics": "relative error and relative PCK measure agreement with Sapiens2 pseudo-labels, not accuracy",
+            "candidate_selection": args.candidate_selection,
+            "metrics": "pixel error and PCK against the frozen Sapiens2 operational reference; not external physical accuracy",
         },
         "limitations": [
-            "Sapiens2 is the label source and is excluded from scoring to avoid circular zero error.",
-            "The current reference source and several compared runs use the historical CW/CCW model-input condition; results cannot restore the retired stereo/rotation experiment as a deployable conclusion.",
-            "Both all-image and reference-target-unambiguous summaries are emitted; the latter excludes images with ambiguous Sapiens2 target selection.",
+            "Sapiens2 is the reference label source and is excluded from scoring to avoid circular zero error.",
+            "All prediction coordinates are compared only after mapping to original 1920x1080 raw-fisheye pixels.",
+            (
+                "Exactly one physical person is declared per image; lower-confidence detector boxes are retained as false-positive audit counts and never selected by reference keypoints."
+                if args.single_person_protocol
+                else "Legacy mode emits both all-image and reference-target-unambiguous summaries."
+            ),
         ],
     }
     (output / "evaluation_metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"output": str(output), "per_keypoint_rows": sum(row["reference_subset"] == "all_reference_images" for row in all_rows), "summary_rows": len(all_summaries)}, ensure_ascii=False))
+    print(json.dumps({
+        "output": str(output),
+        "per_keypoint_rows": sum(row["reference_subset"] == reference_subsets[0] for row in all_rows),
+        "summary_rows": {file_name: len(rows) for file_name, rows in summary_tables.items()},
+    }, ensure_ascii=False))
     return 0
 
 
