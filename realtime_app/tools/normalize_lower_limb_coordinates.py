@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from pose_app.fixed_coordinate import (  # noqa: E402
-    RigidTransform,
+    load_coordinate_transform,
     summarize_static_reference,
     summarize_transformed_trajectory,
     transform_trajectory_records,
@@ -110,8 +110,8 @@ def main() -> int:
     if output_dir.exists():
         raise FileExistsError(f"Refusing to overwrite existing output: {output_dir}")
 
-    transform = RigidTransform.from_mapping(
-        json.loads(transform_path.read_text(encoding="utf-8")),
+    transform = load_coordinate_transform(
+        transform_path,
         allow_test_transform=args.allow_test_transform,
     )
     rows = transform_trajectory_records(load_jsonl(trajectory_path), transform)

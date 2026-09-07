@@ -15,7 +15,7 @@ sys.path.insert(0, str(ROOT))
 from pose_app.calibration import StereoCalibration  # noqa: E402
 from pose_app.camera_registry import load_camera_registry  # noqa: E402
 from pose_app.config import load_config  # noqa: E402
-from pose_app.fixed_coordinate import RigidTransform  # noqa: E402
+from pose_app.fixed_coordinate import load_coordinate_transform  # noqa: E402
 from pose_app.pipeline_preflight import (  # noqa: E402
     PreflightCheck,
     configured_model_checks,
@@ -89,8 +89,8 @@ def main() -> int:
         )
     else:
         try:
-            transform = RigidTransform.from_mapping(
-                json.loads(transform_path.read_text(encoding="utf-8")),
+            transform = load_coordinate_transform(
+                transform_path,
                 allow_test_transform=args.allow_test_coordinate_transform,
             )
             checks.append(

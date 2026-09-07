@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .fixed_coordinate import (
-    RigidTransform,
+    load_coordinate_transform,
     summarize_transformed_trajectory,
     transform_trajectory_records,
 )
@@ -189,8 +189,8 @@ def build_lower_limb_pipeline(
         }
     else:
         transform_path = Path(coordinate_transform_path).resolve()
-        transform = RigidTransform.from_mapping(
-            json.loads(transform_path.read_text(encoding="utf-8")),
+        transform = load_coordinate_transform(
+            transform_path,
             allow_test_transform=allow_test_coordinate_transform,
         )
         transformed = transform_trajectory_records(trajectory, transform)

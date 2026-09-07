@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 import copy
+import json
 import math
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -13,6 +15,7 @@ import numpy as np
 SOURCE_FRAME = "left_camera"
 LENGTH_UNIT = "millimeter"
 RIGID_TOLERANCE = 1e-6
+STATIC_REFERENCE_EVIDENCE_SCHEMA = "t3_static_reference_lock_evidence_v1"
 
 
 def _finite_vector(value: Any, label: str) -> np.ndarray:
@@ -29,6 +32,44 @@ def _finite_matrix(value: Any, label: str) -> np.ndarray:
     if matrix.shape != (3, 3) or not np.all(np.isfinite(matrix)):
         raise ValueError(f"{label} must be a finite 3x3 matrix")
     return matrix
+
+
+def _required_text(value: Any, label: str) -> str:
+    rendered = str(value or "").strip()
+    if not rendered:
+        raise ValueError(f"{label} must be a non-empty string")
+    return rendered
+
+
+def _nonnegative_finite_number(value: Any, label: str) -> float:
+    try:
+        rendered = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be a finite non-negative number") from exc
+    if not math.isfinite(rendered) or rendered < 0:
+        raise ValueError(f"{label} must be a finite non-negative number")
+    return rendered
+
+
+def _positive_integer(value: Any, label: str) -> int:
+    if isinstance(value, bool):
+        raise ValueError(f"{label} must be a positive integer")
+    try:
+        rendered = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{label} must be a positive integer") from exc
+    if rendered < 1 or rendered != value:
+        raise ValueError(f"{label} must be a positive integer")
+    return rendered
+
+
+def _validate_reference_definition(value: Any) -> dict[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ValueError("reference_definition must be an object describing the physical reference")
+    reference = dict(value)
+    for field in ("method", "physical_reference", "capture_session"):
+        reference[field] = _required_text(reference.get(field), f"reference_definition.{field}")
+    return reference
 
 
 class RigidTransform:
@@ -70,7 +111,7 @@ class RigidTransform:
         self.target_frame = target_frame
         self.rotation = rotation
         self.translation_mm = translation
-        self.reference_definition = dict(reference_definition)
+        self.reference_definition = _validate_reference_definition(reference_definition)
         self.status = status
 
     @classmethod
@@ -88,9 +129,7 @@ class RigidTransform:
             )
         if value.get("length_unit") not in {"mm", "millimeter", "millimeters"}:
             raise ValueError("T3 transform length_unit must be millimeter")
-        reference = value.get("reference_definition")
-        if not isinstance(reference, Mapping):
-            raise ValueError("reference_definition must be an object describing the physical reference")
+        reference = _validate_reference_definition(value.get("reference_definition"))
         return cls(
             transform_id=str(value.get("transform_id", "")).strip(),
             source_frame=str(value.get("source_coordinate_frame", "")).strip(),
@@ -213,11 +252,17 @@ def summarize_static_reference(
     """Report residuals for a static, physically measured target-frame reference."""
 
     by_reference: dict[str, list[float]] = {}
+    sample_ids: set[str] = set()
+    capture_session = transform.reference_definition["capture_session"]
     total = 0
     for sample in samples:
-        reference_id = str(sample.get("reference_id", "")).strip()
-        if not reference_id:
-            raise ValueError("static reference sample requires reference_id")
+        reference_id = _required_text(sample.get("reference_id"), "static reference sample reference_id")
+        sample_id = _required_text(sample.get("sample_id"), "static reference sample sample_id")
+        if sample_id in sample_ids:
+            raise ValueError(f"static reference sample_id is duplicated: {sample_id}")
+        sample_ids.add(sample_id)
+        if _required_text(sample.get("capture_session"), "static reference sample capture_session") != capture_session:
+            raise ValueError("static reference sample capture_session must match transform reference_definition")
         estimated = np.asarray(transform.apply(sample.get("xyz_left_camera_mm")), dtype=np.float64)
         expected = _finite_vector(sample.get("expected_xyz_target_mm"), "expected_xyz_target_mm")
         residual = float(np.linalg.norm(estimated - expected))
@@ -240,6 +285,8 @@ def summarize_static_reference(
     all_values = [value for values in by_reference.values() for value in values]
     return {
         "samples": total,
+        "reference_ids": sorted(by_reference),
+        "capture_session": capture_session,
         "per_reference": per_reference,
         "overall_median_residual_mm": float(np.median(all_values)),
         "overall_p95_residual_mm": float(np.percentile(all_values, 95)),
@@ -250,3 +297,127 @@ def summarize_static_reference(
             "or gait-parameter accuracy measurement."
         ),
     }
+
+
+def assess_static_reference_lock(
+    samples: Iterable[Mapping[str, Any]],
+    transform: RigidTransform,
+    criteria: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Evaluate declared field criteria without inventing a physical acceptance threshold."""
+
+    if not isinstance(criteria, Mapping):
+        raise ValueError("static-reference criteria must be an object")
+    normalized_criteria = {
+        "criterion_id": _required_text(criteria.get("criterion_id"), "criteria.criterion_id"),
+        "minimum_distinct_reference_ids": _positive_integer(
+            criteria.get("minimum_distinct_reference_ids"),
+            "criteria.minimum_distinct_reference_ids",
+        ),
+        "minimum_samples_per_reference": _positive_integer(
+            criteria.get("minimum_samples_per_reference"),
+            "criteria.minimum_samples_per_reference",
+        ),
+        "maximum_p95_residual_mm": _nonnegative_finite_number(
+            criteria.get("maximum_p95_residual_mm"),
+            "criteria.maximum_p95_residual_mm",
+        ),
+        "maximum_max_residual_mm": _nonnegative_finite_number(
+            criteria.get("maximum_max_residual_mm"),
+            "criteria.maximum_max_residual_mm",
+        ),
+    }
+    summary = summarize_static_reference(samples, transform)
+    failures: list[str] = []
+    if len(summary["reference_ids"]) < normalized_criteria["minimum_distinct_reference_ids"]:
+        failures.append("too_few_distinct_reference_ids")
+    for reference_id, reference_summary in summary["per_reference"].items():
+        if reference_summary["samples"] < normalized_criteria["minimum_samples_per_reference"]:
+            failures.append(f"too_few_samples:{reference_id}")
+    if summary["overall_p95_residual_mm"] > normalized_criteria["maximum_p95_residual_mm"]:
+        failures.append("overall_p95_residual_exceeds_limit")
+    if summary["overall_max_residual_mm"] > normalized_criteria["maximum_max_residual_mm"]:
+        failures.append("overall_max_residual_exceeds_limit")
+    return {
+        "schema": STATIC_REFERENCE_EVIDENCE_SCHEMA,
+        "status": "accepted" if not failures else "rejected",
+        "transform": transform.audit(),
+        "reference_capture_session": transform.reference_definition["capture_session"],
+        "acceptance_criteria": normalized_criteria,
+        "static_reference_stability": summary,
+        "acceptance_failures": failures,
+        "interpretation": (
+            "A passed result verifies only the supplied static-reference observations against "
+            "the declared transform and field criteria. It is not human-pose, gait-event, "
+            "or gait-parameter accuracy validation."
+        ),
+    }
+
+
+def load_coordinate_transform(
+    path: str | Path, *, allow_test_transform: bool = False
+) -> RigidTransform:
+    """Load a transform and require independent static-reference evidence for physical use."""
+
+    transform_path = Path(path).resolve()
+    transform = RigidTransform.from_mapping(
+        json.loads(transform_path.read_text(encoding="utf-8")),
+        allow_test_transform=allow_test_transform,
+    )
+    if transform.status == "test_only":
+        return transform
+
+    evidence_name = _required_text(
+        transform.reference_definition.get("static_reference_evidence_file"),
+        "reference_definition.static_reference_evidence_file",
+    )
+    evidence_path = Path(evidence_name)
+    if not evidence_path.is_absolute():
+        evidence_path = transform_path.parent / evidence_path
+    if not evidence_path.is_file():
+        raise ValueError(f"measured_locked transform static-reference evidence is missing: {evidence_path}")
+    try:
+        evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid static-reference evidence JSON: {evidence_path}") from exc
+    if evidence.get("schema") != STATIC_REFERENCE_EVIDENCE_SCHEMA:
+        raise ValueError("static-reference evidence has an unsupported schema")
+    if evidence.get("status") != "accepted":
+        raise ValueError("measured_locked transform requires accepted static-reference evidence")
+    evidence_transform = evidence.get("transform")
+    if not isinstance(evidence_transform, Mapping):
+        raise ValueError("static-reference evidence is missing transform audit data")
+    for field, expected in (
+        ("transform_id", transform.transform_id),
+        ("source_coordinate_frame", transform.source_frame),
+        ("target_coordinate_frame", transform.target_frame),
+        ("rotation_target_from_source", transform.rotation.tolist()),
+        ("translation_target_from_source_mm", transform.translation_mm.tolist()),
+    ):
+        if evidence_transform.get(field) != expected:
+            raise ValueError(f"static-reference evidence {field} does not match transform")
+    if evidence.get("reference_capture_session") != transform.reference_definition["capture_session"]:
+        raise ValueError("static-reference evidence capture session does not match transform")
+    static_reference_input = _required_text(
+        evidence.get("static_reference_input"),
+        "static-reference evidence static_reference_input",
+    )
+    raw_reference_path = Path(static_reference_input)
+    if not raw_reference_path.is_absolute():
+        raw_reference_path = evidence_path.parent / raw_reference_path
+    if not raw_reference_path.is_file():
+        raise ValueError(f"static-reference evidence raw input is missing: {raw_reference_path}")
+    recomputed = assess_static_reference_lock(
+        [
+            json.loads(line)
+            for line in raw_reference_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ],
+        transform,
+        evidence.get("acceptance_criteria"),
+    )
+    if recomputed["status"] != "accepted":
+        raise ValueError("static-reference evidence raw input no longer satisfies its acceptance criteria")
+    if recomputed["static_reference_stability"] != evidence.get("static_reference_stability"):
+        raise ValueError("static-reference evidence no longer matches its raw input")
+    return transform

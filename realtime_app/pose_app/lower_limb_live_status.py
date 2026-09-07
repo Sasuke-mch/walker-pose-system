@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-from .fixed_coordinate import RigidTransform, transform_trajectory_record
+from .fixed_coordinate import RigidTransform, load_coordinate_transform, transform_trajectory_record
 from .gait_candidates import derive_gait_candidates
 from .lower_limb_kinematics import derive_frame_kinematics
 from .lower_limb_trajectory import LOWER_LIMB_JOINTS, normalize_stereo_record
@@ -39,9 +39,8 @@ class LowerLimbLiveStatusWriter:
 
         self.transform: RigidTransform | None = None
         if coordinate_transform_path is not None:
-            transform_path = Path(coordinate_transform_path).resolve()
-            self.transform = RigidTransform.from_mapping(
-                json.loads(transform_path.read_text(encoding="utf-8")),
+            self.transform = load_coordinate_transform(
+                coordinate_transform_path,
                 allow_test_transform=allow_test_coordinate_transform,
             )
 

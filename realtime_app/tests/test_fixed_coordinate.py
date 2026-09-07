@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 import math
+import json
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 
 from pose_app.fixed_coordinate import (
     RigidTransform,
+    load_coordinate_transform,
     summarize_static_reference,
     summarize_transformed_trajectory,
     transform_trajectory_record,
@@ -20,7 +26,11 @@ def transform_mapping() -> dict:
         "length_unit": "millimeter",
         "rotation_target_from_source": [[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
         "translation_target_from_source_mm": [100.0, -50.0, 25.0],
-        "reference_definition": {"method": "synthetic unit-test reference"},
+        "reference_definition": {
+            "method": "synthetic unit-test reference",
+            "physical_reference": "synthetic marker set",
+            "capture_session": "unit_test_static_session",
+        },
     }
 
 
@@ -101,10 +111,14 @@ class FixedCoordinateTests(unittest.TestCase):
 
         reference = [{
             "reference_id": "marker_a",
+            "sample_id": "marker_a_001",
+            "capture_session": "unit_test_static_session",
             "xyz_left_camera_mm": [10.0, 20.0, 30.0],
             "expected_xyz_target_mm": [80.0, -40.0, 55.0],
         }, {
             "reference_id": "marker_a",
+            "sample_id": "marker_a_002",
+            "capture_session": "unit_test_static_session",
             "xyz_left_camera_mm": [10.0, 20.0, 30.0],
             "expected_xyz_target_mm": [80.0, -40.0, 56.0],
         }]
@@ -112,6 +126,63 @@ class FixedCoordinateTests(unittest.TestCase):
         self.assertEqual(static["samples"], 2)
         self.assertAlmostEqual(static["overall_max_residual_mm"], 1.0)
         self.assertAlmostEqual(static["overall_median_residual_mm"], 0.5)
+
+    def test_measured_transform_requires_accepted_static_evidence(self) -> None:
+        samples = [{
+            "reference_id": "marker_a",
+            "sample_id": "marker_a_001",
+            "capture_session": "unit_test_static_session",
+            "xyz_left_camera_mm": [10.0, 20.0, 30.0],
+            "expected_xyz_target_mm": [80.0, -40.0, 55.0],
+        }, {
+            "reference_id": "marker_b",
+            "sample_id": "marker_b_001",
+            "capture_session": "unit_test_static_session",
+            "xyz_left_camera_mm": [11.0, 20.0, 30.0],
+            "expected_xyz_target_mm": [80.0, -39.0, 55.0],
+        }]
+        criteria = {
+            "criterion_id": "unit_test_field_criteria",
+            "minimum_distinct_reference_ids": 2,
+            "minimum_samples_per_reference": 1,
+            "maximum_p95_residual_mm": 0.0,
+            "maximum_max_residual_mm": 0.0,
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            raw = root / "static_reference.jsonl"
+            raw.write_text("".join(json.dumps(sample) + "\n" for sample in samples), encoding="utf-8")
+            transform_mapping_with_evidence = transform_mapping()
+            transform_mapping_with_evidence["reference_definition"]["static_reference_evidence_file"] = "evidence.json"
+            transform_file = root / "transform.json"
+            transform_file.write_text(json.dumps(transform_mapping_with_evidence), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "evidence is missing"):
+                load_coordinate_transform(transform_file)
+
+            (root / "criteria.json").write_text(json.dumps(criteria), encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(Path(__file__).resolve().parents[1] / "tools" / "validate_static_reference_lock.py"),
+                    "--transform", str(transform_file),
+                    "--static-reference", str(raw),
+                    "--criteria", str(root / "criteria.json"),
+                    "--output", str(root / "evidence.json"),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            evidence = json.loads((root / "evidence.json").read_text(encoding="utf-8"))
+            self.assertEqual(evidence["status"], "accepted")
+            self.assertEqual(load_coordinate_transform(transform_file).status, "measured_locked")
+
+            changed_transform = json.loads(transform_file.read_text(encoding="utf-8"))
+            changed_transform["translation_target_from_source_mm"][0] = 101.0
+            transform_file.write_text(json.dumps(changed_transform), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "translation_target_from_source_mm"):
+                load_coordinate_transform(transform_file)
 
 
 if __name__ == "__main__":

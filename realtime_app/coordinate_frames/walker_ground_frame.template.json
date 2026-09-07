@@ -14,6 +14,7 @@
   "reference_definition": {
     "method": "replace with the measured rigid reference procedure after the camera mount is locked",
     "physical_reference": "replace with the surveyed walker/ground markers",
-    "capture_session": "replace with the static reference capture identifier"
+    "capture_session": "replace with the static reference capture identifier",
+    "static_reference_evidence_file": "replace with the accepted static-reference evidence JSON path relative to this transform"
   }
 }
