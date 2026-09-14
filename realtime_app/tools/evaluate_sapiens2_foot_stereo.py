@@ -48,6 +48,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--right-predictions", type=Path, required=True)
     parser.add_argument("--calibration", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument(
+        "--association-jsonl",
+        type=Path,
+        help=(
+            "Optional accepted COCO-17 stereo JSONL. When supplied, distal-foot "
+            "triangulation inherits its accepted left/right person IDs and never uses "
+            "foot landmarks to create or repair a person association."
+        ),
+    )
     parser.add_argument("--left-model-rotation", choices=ROTATION_CHOICES, default="ccw90")
     parser.add_argument("--right-model-rotation", choices=ROTATION_CHOICES, default="cw90")
     parser.add_argument("--keypoint-threshold", type=float, default=0.25)
@@ -71,10 +80,19 @@ def load_predictions(path: Path) -> dict[str, dict]:
     return by_name
 
 
-def top_instance(image: dict) -> tuple[dict | None, int]:
+def select_instance(
+    image: dict, *, selected_person_id: int | None = None
+) -> tuple[dict | None, int]:
     instances = image.get("instances", [])
     if not instances:
         return None, 0
+    if selected_person_id is not None:
+        if selected_person_id < 0 or selected_person_id >= len(instances):
+            raise RuntimeError(
+                f"{image.get('file_name')}: associated person_id {selected_person_id} "
+                f"is not present in {len(instances)} Sapiens2 instances"
+            )
+        return instances[selected_person_id], len(instances)
     return max(instances, key=lambda item: float(item.get("bbox_score_from_yolo26x", 0.0))), len(instances)
 
 
@@ -83,8 +101,9 @@ def extract_points(
     *,
     raw_size: tuple[int, int],
     rotation: str,
+    selected_person_id: int | None = None,
 ) -> tuple[dict[str, dict], int]:
-    selected, candidates = top_instance(image)
+    selected, candidates = select_instance(image, selected_person_id=selected_person_id)
     result: dict[str, dict] = {}
     for index, name in FOOT_POINTS.items():
         point = {"index": index, "name": name, "score": 0.0, "raw_xy": None}
@@ -98,6 +117,66 @@ def extract_points(
             point.update({"score": float(scores[index]), "raw_xy": [x_raw, y_raw]})
         result[name] = point
     return result, candidates
+
+
+def load_association(path: Path) -> dict[str, dict]:
+    """Read the upstream person decision without allowing feet to alter it."""
+
+    output: dict[str, dict] = {}
+    with path.open(encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            file_name = str(row.get("file_name", "")).strip()
+            if not file_name or file_name in output:
+                raise RuntimeError(f"{path}:{line_number}: missing or duplicate file_name")
+            persons = row.get("persons_3d", [])
+            if len(persons) == 1:
+                person = persons[0]
+                output[file_name] = {
+                    "status": "accepted_upstream_association",
+                    "left_person_id": int(person["left_person_id"]),
+                    "right_person_id": int(person["right_person_id"]),
+                    "association_cost": person.get("association_cost"),
+                    "common_keypoints": person.get("common_keypoints"),
+                }
+            elif len(persons) == 0:
+                output[file_name] = {
+                    "status": "no_accepted_stereo_person",
+                    "left_person_id": None,
+                    "right_person_id": None,
+                    "association_cost": None,
+                    "common_keypoints": None,
+                }
+            else:
+                raise RuntimeError(
+                    f"{path}:{line_number}: expected at most one upstream stereo person"
+                )
+    return output
+
+
+def unassociated_points() -> dict[str, dict]:
+    return {
+        name: {
+            "name": name,
+            "sapiens_index": index,
+            "left_score": None,
+            "right_score": None,
+            "left_raw_xy": None,
+            "right_raw_xy": None,
+            "xyz_left_camera": None,
+            "depth_left": None,
+            "depth_right": None,
+            "reprojection_error_left_px": None,
+            "reprojection_error_right_px": None,
+            "reprojection_error_mean_px": None,
+            "positive_finite": False,
+            "valid_at_reprojection_gate": False,
+            "reason": "no_accepted_stereo_person",
+        }
+        for index, name in FOOT_POINTS.items()
+    }
 
 
 def finite_vector(values: np.ndarray) -> list[float] | None:
@@ -267,6 +346,11 @@ def main() -> int:
     right_images = load_predictions(args.right_predictions.resolve())
     if set(left_images) != set(right_images) or set(left_images) != set(condition_by_name):
         raise RuntimeError("Selection manifest and left/right prediction file names must match exactly")
+    association = None
+    if args.association_jsonl is not None:
+        association = load_association(args.association_jsonl.resolve())
+        if set(association) != set(condition_by_name):
+            raise RuntimeError("Association JSONL and selection manifest file names must match exactly")
     calibration = StereoCalibration.load(args.calibration.resolve()).for_runtime_sizes((1920, 1080), (1920, 1080))
 
     output_dir.mkdir(parents=True)
@@ -274,15 +358,37 @@ def main() -> int:
     jsonl_path = output_dir / "foot_stereo_results.jsonl"
     with jsonl_path.open("w", encoding="utf-8") as handle:
         for pair_id, file_name in enumerate(sorted(condition_by_name)):
-            left, left_candidates = extract_points(
-                left_images[file_name], raw_size=calibration.left_image_size, rotation=args.left_model_rotation
+            association_record = (
+                association[file_name]
+                if association is not None
+                else {
+                    "status": "independent_top_score_selection",
+                    "left_person_id": None,
+                    "right_person_id": None,
+                    "association_cost": None,
+                    "common_keypoints": None,
+                }
             )
-            right, right_candidates = extract_points(
-                right_images[file_name], raw_size=calibration.right_image_size, rotation=args.right_model_rotation
-            )
-            points = triangulate_foot_points(
-                left, right, calibration, args.keypoint_threshold, args.max_reprojection_error_px
-            )
+            if association_record["status"] == "no_accepted_stereo_person":
+                left_candidates = len(left_images[file_name].get("instances", []))
+                right_candidates = len(right_images[file_name].get("instances", []))
+                points = unassociated_points()
+            else:
+                left, left_candidates = extract_points(
+                    left_images[file_name],
+                    raw_size=calibration.left_image_size,
+                    rotation=args.left_model_rotation,
+                    selected_person_id=association_record["left_person_id"],
+                )
+                right, right_candidates = extract_points(
+                    right_images[file_name],
+                    raw_size=calibration.right_image_size,
+                    rotation=args.right_model_rotation,
+                    selected_person_id=association_record["right_person_id"],
+                )
+                points = triangulate_foot_points(
+                    left, right, calibration, args.keypoint_threshold, args.max_reprojection_error_px
+                )
             condition = condition_by_name[file_name]
             shape_rows.extend(foot_shape_rows(pair_id, file_name, condition, points))
             for point in points.values():
@@ -300,6 +406,7 @@ def main() -> int:
                 "length_unit": calibration.length_unit,
                 "left_candidate_instances": left_candidates,
                 "right_candidate_instances": right_candidates,
+                "association": association_record,
                 "foot_points": list(points.values()),
                 "foot_shape": shape_rows[-2:],
             }
@@ -346,6 +453,7 @@ def main() -> int:
     write_csv(output_dir / "foot_shape_summary.csv", shape_summary)
     metadata = {
         "input": {"selection_manifest": str(args.selection_manifest.resolve()), "left_predictions": str(args.left_predictions.resolve()), "right_predictions": str(args.right_predictions.resolve())},
+        "association_input": str(args.association_jsonl.resolve()) if args.association_jsonl else None,
         "calibration": str(args.calibration.resolve()),
         "camera_model": calibration.camera_model,
         "coordinate_frame": "left_camera",
@@ -365,6 +473,13 @@ def main() -> int:
                     if outcome is not None
                 }.items()
             )
+        ),
+        "association_policy": (
+            "Every distal-foot 3-D point inherits the accepted COCO-17 person association when "
+            "--association-jsonl is supplied. A failed upstream association leaves every foot "
+            "point missing; foot observations never create or repair a person match."
+            if args.association_jsonl
+            else "Independent top-score selection retained only for legacy exploratory replay."
         ),
         "interpretation_boundary": "Sapiens2 foot points are visually checked engineering pseudo-labels, not independent 2-D truth. Reprojection consistency and local foot shape do not prove absolute 3-D accuracy or gait-contact validity.",
     }

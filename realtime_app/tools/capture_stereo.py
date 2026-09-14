@@ -23,6 +23,10 @@ from pose_app.camera_registry import ResolvedStereoCameras, resolve_stereo_camer
 from pose_app.stereo_camera import CameraFrame, StereoCameraConfig, StereoCameraSource
 
 
+class CaptureAbort(KeyboardInterrupt):
+    """Raised when the operator quits the S-gate before formal recording starts."""
+
+
 class FrameRecorder:
     """Asynchronously write one camera stream plus per-frame timestamps.
 
@@ -230,6 +234,15 @@ def parse_args() -> argparse.Namespace:
         help="Visible countdown after warm-up. Formal recording begins only at START RECORDING NOW.",
     )
     parser.add_argument(
+        "--wait-for-s",
+        action="store_true",
+        help=(
+            "Wait in the live preview until the operator presses S, then run "
+            "--start-countdown seconds of on-screen countdown before formal "
+            "recording. Requires the preview window and --start-countdown > 0."
+        ),
+    )
+    parser.add_argument(
         "--duration",
         type=float,
         default=0.0,
@@ -373,6 +386,73 @@ def run_preview_only(
         cv2.destroyAllWindows()
 
 
+def _wait_for_s_gate(
+    source: StereoCameraSource,
+    countdown_seconds: float,
+) -> None:
+    """Live-framing gate: wait for S, then show an on-screen countdown.
+
+    Formal recording begins only after this returns.  Q/ESC at any point
+    raises CaptureAbort so the operator can decline a take without writing
+    any formal frames.
+    """
+
+    cv2.namedWindow("Stereo Capture", cv2.WINDOW_NORMAL)
+    print(
+        "\nPress S in the 'Stereo Capture' window to start recording "
+        f"after a {countdown_seconds:g}s countdown. "
+        "Press Q/ESC to abort this take."
+    )
+
+    def _frame(prepare_text: str, countdown_text: str | None) -> None:
+        pair = source.read(timeout_sec=0.1)
+        if pair is not None:
+            left_show = cv2.resize(pair.left.image, (640, 360))
+            right_show = cv2.resize(pair.right.image, (640, 360))
+            combined = np.hstack([left_show, right_show])
+        else:
+            combined = np.zeros((360, 1280, 3), dtype=np.uint8)
+        cv2.rectangle(combined, (240, 110), (1040, 250), (0, 0, 0), -1)
+        cv2.rectangle(combined, (240, 110), (1040, 250), (0, 255, 255), 3)
+        cv2.putText(
+            combined, prepare_text, (280, 175), cv2.FONT_HERSHEY_SIMPLEX,
+            1.4, (0, 255, 255), 3,
+        )
+        cv2.putText(
+            combined,
+            "SUBJECT AT START MARK"
+            if countdown_text is None
+            else countdown_text,
+            ((330 if countdown_text is None else 430), 225),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.9,
+            (255, 255, 255),
+            2,
+        )
+        cv2.imshow("Stereo Capture", combined)
+
+    while True:
+        _frame("READY - PRESS S TO START", None)
+        key = cv2.waitKey(30) & 0xFF
+        if key in (ord("s"), ord("S")):
+            break
+        if key in (ord("q"), ord("Q"), 27):
+            raise CaptureAbort()
+
+    gate_start = time.perf_counter()
+    while True:
+        remaining = countdown_seconds - (time.perf_counter() - gate_start)
+        if remaining <= 0:
+            break
+        _frame(
+            f"START IN: {int(np.ceil(remaining))} SECONDS",
+            "PREPARE TO WALK",
+        )
+        key = cv2.waitKey(30) & 0xFF
+        if key in (ord("q"), ord("Q"), 27):
+            raise CaptureAbort()
+
+
 def main() -> int:
     args = parse_args()
     if args.duration < 0:
@@ -381,6 +461,13 @@ def main() -> int:
         raise ValueError("--warmup-seconds must be >= 0")
     if args.start_countdown < 0:
         raise ValueError("--start-countdown must be >= 0")
+    if args.wait_for_s and args.no_preview:
+        raise ValueError(
+            "--wait-for-s requires the live preview window "
+            "(cannot combine with --no-preview)."
+        )
+    if args.wait_for_s and args.start_countdown <= 0:
+        raise ValueError("--wait-for-s requires --start-countdown > 0.")
 
     left_camera, right_camera, selected_backend, resolved_cameras, selection_mode = (
         resolve_camera_selection(args)
@@ -462,7 +549,9 @@ def main() -> int:
             f"selection={selection_mode}"
         )
         print("Cameras are live, but formal recording has NOT started.")
-        if preview_enabled and (args.warmup_seconds > 0 or args.start_countdown > 0):
+        if preview_enabled and args.wait_for_s:
+            _wait_for_s_gate(source, float(args.start_countdown))
+        elif preview_enabled and (args.warmup_seconds > 0 or args.start_countdown > 0):
             cv2.namedWindow("Stereo Capture", cv2.WINDOW_NORMAL)
             total_pre_sec = float(args.warmup_seconds + args.start_countdown)
             pre_start_t = time.perf_counter()
@@ -672,6 +761,9 @@ def main() -> int:
 
         capture_ended_perf = time.perf_counter()
 
+    except CaptureAbort:
+        print("Take aborted by the operator before recording started.")
+        capture_ended_perf = time.perf_counter()
     except KeyboardInterrupt:
         print("Stopped by Ctrl+C.")
         capture_ended_perf = time.perf_counter()

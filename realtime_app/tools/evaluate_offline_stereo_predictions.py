@@ -212,13 +212,17 @@ def main():
     parser.add_argument("--max-reprojection-error-px", type=float, default=10.0)
     parser.add_argument(
         "--triangulation-mode",
-        choices=("strict", "ungated"),
+        choices=("strict", "ungated", "force_all"),
         default="strict",
         help=(
             "strict requires positive depth and the reprojection threshold; "
             "ungated retains every finite in-bounds triangulation after the "
             "2-D score and person-association checks, recording depth and "
-            "reprojection issues as quality_flags instead of rejecting points."
+            "reprojection issues as quality_flags instead of rejecting points. "
+            "force_all additionally forces the best left/right person pairing "
+            "per frame (no association gate) and ignores the 2-D score gate, "
+            "so every finitely-triangulable in-bounds joint is produced for a "
+            "continuous skeleton; quality flags and errors are statistics only."
         ),
     )
     parser.add_argument(
@@ -305,15 +309,20 @@ def main():
             )
             rejected_out_of_bounds_keypoints += left_rejected + right_rejected
 
+            force_all = args.triangulation_mode == "force_all"
+            accept_all = args.triangulation_mode in ("ungated", "force_all")
+            keypoint_threshold_eff = 0.0 if force_all else args.keypoint_threshold
+            association_cost_eff = float("inf") if force_all else args.max_association_cost
+
             people3d = triangulate_matches(
                 left_raw.persons,
                 right_raw.persons,
                 calibration,
-                args.keypoint_threshold,
-                args.max_association_cost,
+                keypoint_threshold_eff,
+                association_cost_eff,
                 args.max_reprojection_error_px,
                 max_matches=args.max_matches,
-                accept_all_finite_triangulations=(args.triangulation_mode == "ungated"),
+                accept_all_finite_triangulations=accept_all,
             )
 
             matched_pairs += bool(people3d)
@@ -392,6 +401,14 @@ def main():
             "all finite, in-bounds triangulations after 2-D score and association checks; "
             "depth/reprojection conditions are diagnostic quality flags only"
             if args.triangulation_mode == "ungated"
+            else None
+        ),
+        "force_all_definition": (
+            "forced best-pair association (no 0.05 gate) and no 2-D score gate; every "
+            "finitely-triangulable in-bounds joint is output with depth/reprojection "
+            "errors recorded as diagnostic quality_flags; out-of-bounds/non-finite 2-D "
+            "points remain missing because no image observation exists to triangulate."
+            if args.triangulation_mode == "force_all"
             else None
         ),
         "max_matches": args.max_matches,

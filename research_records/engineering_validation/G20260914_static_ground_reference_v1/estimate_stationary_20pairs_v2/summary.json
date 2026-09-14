@@ -1,0 +1,15 @@
+{
+  "status": "measured_static_reference",
+  "input_pairs": 20,
+  "accepted_pairs": 20,
+  "rejection_counts": {},
+  "board_thickness_mm": 12.0,
+  "camera_height_mm": 703.0458890082084,
+  "repeatability": {
+    "origin_spread_median_mm": 0.7528818006137863,
+    "origin_spread_p95_mm": 2.2146837812237643,
+    "normal_angle_median_deg": 0.22524488880333254,
+    "normal_angle_p95_deg": 0.7494914290234815
+  },
+  "output": "ground_reference.json"
+}

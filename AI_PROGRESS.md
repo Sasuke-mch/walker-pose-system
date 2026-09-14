@@ -7,9 +7,125 @@
 - 当前正式基线：`E20260827-B0_replay_baseline`，389 对真实 CSV 双目重放，`yolo26x_pose`，不启用输入去畸变或局部虚拟视角。
 - 当前已确认的研究瓶颈：右踝比左踝更常在双侧 2D 分数通过阈值后，以高重投影误差被 3D 几何拒绝；不能把它草率归因为“低分漏检”。
 - 当前二维基线：`V20260904_sapiens2_reference_single_person_2d_comparison` 在单人、固定 C3 ROI 的 M2 60 对上，以项目规定的 Sapiens2 操作性参考比较 PMPose/ProbPose；PMPose 的平均差为 15.91 px，低于 ProbPose 的 22.67 px，二者覆盖均为 100%。这不是外部准确率排序。
-- 当前推进方向：用户已明确改为“先把整个技术链条做通，后面再针对性优化”。现有采集、配对、二维、原鱼眼坐标恢复、单人关联和严格三角化作为前半链；T1 下肢三维时序、T2 基础运动学、T3 固定坐标、T4 非接触候选、T5 统一输出及其逐对在线下游状态均已完成软件验证。T3 的真实物理变换待相机架锁定和静态参考采集；软件工作到此停止，紧邻任务为硬件就绪后的 I 现场短序列整链运行。局部投影、相机前伸架和三角化优化暂缓，不删除既有问题记录。
+- 人体主链现状：采集、配对、二维姿态、原鱼眼坐标恢复、单人关联、严格三角化，以及 T1 下肢三维时序、T2 基础运动学、T3 坐标状态、T4 非接触候选、T5 统一输出均已完成软件验证；T3 `measured_locked` 与正式接触/步态指标仍缺物理参考和现场验收。
+- 地面空间主线现状：在同一 12 对 people_1 双目帧上，Mask2Former/人工地面掩膜、SGBM/IGEV/DynamicStereo、稠密 RANSAC/稀疏分块 RANSAC/软权重 IRLS 和分区一致性门均已形成模块化比较。IGEV + 稠密 RANSAC 的内部几何证据最强，SGBM 更快，DynamicStereo 分区门 0/12；这些都只是候选平面的内部证据，不是物理地面精度。
+- 地面时序主线现状：已实现并测试一次人工锚点连续传播、固定间隔人工重锚、Mask2Former 当前帧与光流传播的一致性、以及基于静态背景相对位姿的局部平面传播接口。光流只作为当前帧附加一致性证据，传播掩膜从未替代当前帧掩膜进入几何；VO 在 99 个组合区间中成功传播 0 个，因缺少逐帧助步器排除区和静态背景米制对应而按契约失败关闭。27 组合矩阵已经完成，但 9 个光流组合只是模块组合估算，9 个 VO 组合不可用，没有任何组合完成端到端墙钟实测。
+- 当前时延边界：Mask2Former 24/24 张在线复现缓存掩膜，单图完整语义前端 P50 为 614.468 ms；既有 task-04 把该单图统计只加一次到双目组合，组合总时延口径低估，必须另立 v2 按 `pair_id + repeat` 汇总左右单图时延后才能引用具体组合总时延。当前“不适合实时闭环”的定性结论不受影响。
+- 助步器主线现状：助步器稠密点云、骨架引导稀疏三维和短窗时序共识三条结构链均已实现。现有自动掩膜的对象身份视觉审计未通过；稠密法产生不合理“巨管”，骨架法 10/12 帧有短线段但左右骨架带对应存活率仅约 2.49%，时序共识仅 1/12 帧有线段。因此当前瓶颈是成对助步器语义身份，而不是继续调线拟合阈值；手—扶手仅可输出接近候选，不能称接触。
 
 ## 日志
+
+### 2026-09-13（北京时间）— 根目录当前进度补齐与时序主线复核（完成；仅文档审计，不重跑实验）
+
+- 复核范围：只读检查 `README.md`、`CLAUDE.md`、本文件、实验记录规则，以及 `G20260911_floor_semantic_backend_comparison_v1`、`G20260912_modular_ground_benchmark_v1`、`G20260912_learned_stereo_replacement_benchmark_v1`、`G20260913_temporal_ground_composition_benchmark_v1`、`G20260913_mask2former_online_latency_parity_v1` 和 `G20260912_walker_structure_variants_v1` 的现有记录与结果；未重跑模型、未改标定、门限、已有结果或拒绝原因。
+- 纠正：当前主线不是“尚待建立地面组合比较”。已有 27 组合矩阵覆盖 3 个匹配器、3 个平面拟合器和 3 个时序状态；一次锚点、周期重锚、光流一致性和 VO 平面传播也都已有代码或实验结果。光流通过的是二维内部一致性，VO 为证据不足时的失败关闭，二者都没有证明时序地面重构准确。
+- 文档动作：更新根目录 `README.md`、`CLAUDE.md` 与本文件顶部当前状态，使其反映地面空间/时序、时延口径和助步器结构链的真实进展。没有建立新实验目录或注册表条目，因为本轮没有产生新测量。
+- 下一阶段：先对已有 Mask2Former 120 条单图计时做双目图对级 v2 只读重算，再以现有 27 组合为地面比较主表；助步器分支需先取得左右成对的对象身份参考，再把同一输入送入已实现的 A/B/C 结构链。不得把单侧连续地面标签、光流一致性或未验收自动助步器掩膜升级为三维真值。
+
+### 2026-09-13（北京时间）— Mask2Former 在线语义时延、缓存掩膜逐像素复现与 27 组合延迟边界补齐（task-04，完成；仅附加语义模块估算）
+
+- 验证目标：补上 task-03 的 27 组合速度表**明确缺失的唯一一块**——Mask2Former 的实际在线推理时间（task-03 只读缓存的 `floor_masks` PNG，`mask_load_ms` 不含任何模型前向）。三件事：(1) 在**当前机器、当前已缓存权重、当前接口**下实测 Mask2Former-Swin-S 单图在线推理的**阶段级**耗时；(2) 验证重新推理得到的 floor candidate 是否与历史缓存候选**逐像素一致**；(3) 一致时把实测语义模块耗时作为**附加模块估算**加到既有 27 组合延迟表。任务开始前已按规则阅读 `README.md`、`CLAUDE.md`、`AI_PROGRESS.md`、`research_records/registry/EXPERIMENT_RECORDING_POLICY.md`、`G20260913_temporal_ground_composition_benchmark_v1/EXPERIMENT.md` 与 `FINAL_RECOMMENDATION.md`、`realtime_app/tools/benchmark_floor_semantic_backends.py`、`realtime_app/tools/audit_manual_floor_labels.py`。
+- 输入与不变量：`V20260908_people0_1_2_pmpose_c3_chain/people_1/input_448pairs` 的正立左 `ccw90` / 右 `cw90`，固定 12 个锚点帧 `pair_0000,0040,…,0440`（左右各 12 张，共 24 张）；历史缓存 `G20260911_floor_semantic_backend_comparison_v1/{left,right}_people1_stride40_12frames_stereo_interface/mask2former_swin_small/floor_masks` **只读对照**；`manual_labels_holdout_v1/labels/{left,right}` 只用于二维复核。**未重跑** SGBM / IGEV / DynamicStereo / RANSAC / IRLS / 稀疏 RANSAC / Farneback 光流 / VO；未改标定、门限、任何旧实验产物；未下载权重、未安装依赖；未使用 `KMP_DUPLICATE_LIB_OK=TRUE`。
+- 新增 `realtime_app/tools/benchmark_mask2former_online_latency.py`：固定在线流程严格等于既有接口（`cv2.imread(BGR)` → `cv2.cvtColor(RGB)` → `AutoImageProcessor(..., return_tensors="pt")` → `.to(device)` → `Mask2FormerForUniversalSegmentation` `no_grad` 前向 → `post_process_semantic_segmentation(target_sizes=[原始图高宽])` → `semantic_map == floor_class_id` → `uint8` 二值候选），**没有**改 processor 的 resize / normalize / label 映射 / floor 类判定；模型**只加载一次**。参数契约由代码强制：`--batch-size` 只能为 `1`（其他值 `ValueError`）；`--device cuda` 且 CUDA 不可用即报错退出；`local_files_only=True` 是唯一模式且**不存在任何允许下载的参数**；输出目录已存在即 `FileExistsError`；每个 `pair_id` 的左图/右图/左缓存/右缓存四者缺任一即报错；输入图与缓存掩膜尺寸不一致即报错（含灰度掩膜被静默扩成三通道的情况）。每一个 CUDA 计时段前后都调用 `torch.cuda.synchronize()`，`gpu_forward_ms` 是带同步的 forward 时间而不是异步 launch 时间。
+- 计时字段与口径：`full_online_semantic_ms = image_decode_ms + bgr_to_rgb_ms + processor_cpu_ms + host_to_device_ms + gpu_forward_ms + postprocess_ms + floor_mask_extract_ms`（由 `full_online_semantic_ms()` 单一函数定义并被单测锁定）；`cache_mask_read_ms` 与 `candidate_png_write_ms` **只作 I/O 诊断单独报告，不并入**该模块时间。冷启动单独记录 `model_load_ms`；加载后对左 `pair_0000` 连续 warmup **3** 次且不进主统计；每个视图 12 张按帧号升序推理；全体 24 张重复 `measured-repeats=5` 次 → **120 条主测量记录**；所有 P50/P95 在 120 条上计算，并额外给出左/右各 60 条的独立统计。
+- 实测结果（`NVIDIA GeForce RTX 5070 Ti Laptop GPU`，torch `2.11.0+cu128`，transformers `5.16.1`，CUDA `12.8`，1080×1920，`floor_class_id=3`，`model_load_ms=3712.157`）。整体 120 条 P50/P95（ms）：`image_decode` 185.469/205.252、`bgr_to_rgb` 2.785/3.550、`processor_cpu` 60.119/65.052、`host_to_device` 1.393/1.594、`gpu_forward` **336.128/371.592**、`postprocess` 15.604/17.186、`floor_mask_extract` 10.750/12.265、**`full_online_semantic` 614.468/653.247**；左 P50 `612.155`、右 P50 `615.712`；I/O 诊断 `cache_mask_read_ms` P50 14.637、`candidate_png_write_ms` P50 27.279。
+- 逐像素复现：`parity_records.jsonl` 恰 **24** 条；**24/24 张 `different_pixel_count = 0`、`exact_match = true`、`iou_vs_cached = 1.0`**，`semantic_parity_status = exact_match_all_24`。因此把该语义模块耗时附加到既有 27 组合延迟表是**同一语义输出**的估算，而不是换了语义结果的新结论。历史缓存未被写入、未被静默替换；差异可视化只在存在差异时才会写出，本次没有产生任何差异掩膜。
+- 人工二维掩膜一致性审计（复用 `audit_manual_floor_labels.rasterize_labelme` 的同一互斥优先级 `ignore_uncertain > person > walker > static_other > floor_eligible`；人工标签**只**作二维复核，不作模型输入、后处理条件或阈值选择依据）：左 12 张 precision `0.8411` / recall `0.9830` / IoU `0.8296` / `walker_to_floor_fraction` `0.1186`；右 12 张 precision `0.7843` / recall `0.9890` / IoU `0.7776` / `walker_to_floor_fraction` `null`（右侧人工标签只画 `floor_eligible`，无 walker 多边形，因此该比例不可计算而不是零）。这些数值只能叫**人工二维掩膜一致性审计**，不是语义精度、地面精度或三维精度。
+- 27 组合延迟补齐（只读 `G20260913_temporal_ground_composition_benchmark_v1/combination_matrix_27.json`，输出 `combination_matrix_27_with_semantic_latency.json` / `.csv`）：保留原 27 行、原始组合 ID 与**全部原始字段逐字段相同**（代码内断言 `original_fields_preserved`）；每行新增 `semantic_latency_source = "G20260913_mask2former_online_latency_parity_v1"`、`semantic_online_p50_ms = 614.468`、`semantic_online_p95_ms = 653.247`（120 条整体 P50/P95，对全部 27 行使用同一语义值）、`latency_kind = "estimated_module_sum"`、`measured_end_to_end_latency_ms = null`、`semantic_parity_status = exact_match_all_24` 与固定边界文字。计算规则：原值为数值时新值 = 原值 + 语义值，否则为 `null`（`vo_propagated_plane` 的 9 行原值为 `null`，新值仍为 `null`）。`latency_kind = estimated_module_sum` 27 行、`measured_end_to_end_latency_ms is null` 27 行、`realtime_compatible = false` 27 行——**没有因为补了语义计时而把任何组合改成实时**。
+- 补齐语义耗时后估算 P50 最快的三种组合：`mask2former_swin_small__sgbm__soft_weighted_irls__direct_current_frame` 745.068 + 614.468 → **1359.537**（估算 P95 1438.996）；`...__sgbm__sparse_tile_ransac__direct_current_frame` 1255.937 → **1870.405**（P95 1949.983）；`...__sgbm__dense_ransac__direct_current_frame` 2043.234 → **2657.702**（P95 2999.292）。全部仍远高于 task-03 声明的 35.947 ms 帧预算。
+- 产物与验证：`research_records/engineering_validation/G20260913_mask2former_online_latency_parity_v1/`（`EXPERIMENT.md`、`run_metadata.json`、`command.txt`、`summary.json`、`per_inference_records.jsonl` 120 行、`parity_records.jsonl` 24 行、`semantic_audit_left.json`、`semantic_audit_right.json`、`timing_summary.json`、`combination_matrix_27_with_semantic_latency.json`/`.csv`、`candidate_floor_masks/` 24 张、`visualizations/` 30 张含 6 张规定的并列 overlay）。新增 `realtime_app/tests/test_mask2former_online_latency.py`（**46 项**，覆盖 `batch-size != 1` 被拒、已存在输出目录被拒、缺图/缺缓存/尺寸不一致被拒、阶段和恒等式、逐像素一致与单像素差异、旧延迟为空则新延迟为空、旧值为数值则严格相加、27 行且 ID 唯一、`measured_end_to_end_latency_ms` 全为 `null`、`realtime_compatible` 全为 `false`、以及禁止“真实地面精度提高/真实三维精度提高/接触识别成功/步态识别成功”的文案守卫）。`python -m py_compile` 通过；`python -m unittest tests.test_mask2former_online_latency` **46 passed**；`realtime_app/run_tests.py` 全仓 **301 passed (OK)**。上游四个目录（`G20260911_floor_semantic_backend_comparison_v1` 1512 文件、`G20260912_modular_ground_benchmark_v1` 21、`G20260912_learned_stereo_replacement_benchmark_v1` 1082、`G20260913_temporal_ground_composition_benchmark_v1` 47）运行前后 (size, mtime) 逐文件快照**完全一致**。
+- 一次被保留、未被覆盖的中止运行：首次正式运行在写入 `command.txt` 的代码修正前启动，被主动终止；其输出目录只含 `candidate_floor_masks`/`visualizations` 两个空目录，已整个删除后用当前代码重跑。另：本会话的沙箱会拒绝在 `tempfile.mkdtemp()` 建立的目录内创建子项，仓库既有测试因此出现 24 项与本任务无关的 `PermissionError`；本任务的新测试改用自建唯一名临时目录以避开该环境限制，取得完整权限后全仓 301 项全通过。
+- 结论边界：Mask2Former 输出是**自动二维地面候选**，不是人工真值、三维真值或物理地面；本实验只测**当前机器与当前版本接口**下的模块耗时；新总时延是模块 P50/P95 相加的**估算**（`estimated_module_sum`），不是全链实测，`measured_end_to_end_latency_ms` 全为 `null`；模型输出复现、人工二维 IoU、视差、平面内点率、残差或重投影误差都**不是**真实地面精度；不重跑 VO，VO 仍因逐帧静态背景米制对应和逐帧助步器排除区不足而保持 `unavailable`；语义掩膜未接入姿态、标定、三角化、地面状态、接触或步态链；本目录不写任何 Git 哈希。
+
+### 2026-09-13（北京时间）— 固定经典暗光预处理对 Mask2Former 地面候选的受控比较（已完成；engineering validation，含两次保留的被取代/中止运行）
+
+- 验证目标：只改“语义分割网络的输入图像”这一件事，检验四组**固定**经典暗光预处理是否让现有 Mask2Former-Swin-S 的 floor 候选在既有左右 12 对人工留出标注上改善，并检验这些候选掩膜送入**原始图像**的冻结严格双目链后的内部候选几何是否改善或恶化。任务开始时已按要求阅读 `README.md`、`CLAUDE.md`、`AI_PROGRESS.md`、`research_records/registry/EXPERIMENT_RECORDING_POLICY.md`、`G20260911_floor_semantic_backend_comparison_v1/EXPERIMENT.md` 和 `G20260912_ground_walker_reconstruction_benchmark_v1/EXPERIMENT.md`。
+- 输入与不变量：`V20260908_people0_1_2_pmpose_c3_chain/people_1/input_448pairs` 的正立左右图，固定 12 对（`pair_0000,0040,…,0440`）；`manual_labels_holdout_v1/labels/{left,right}` 的 LabelMe 标注（互斥优先级 `ignore_uncertain > person > walker > static_other > floor_eligible`，直接复用 `audit_manual_floor_labels.rasterize_labelme`）；正式 `stereo_fisheye.json`；全部双目与几何门限只从 `stereo_manual_floor_masks_12pairs_v1/run_metadata.json` 读取，命令行不接受任何门限覆盖，并断言该冻结选择恰好等于规定的 12 帧。未重跑 PMPose，未改标定、人物关联、严格三角化或任何既有拒绝原因，未使用 DA3，未采集新数据，未下载/训练/微调任何模型。
+- 新增 `realtime_app/pose_app/lowlight_floor_preprocessing.py`：四组变换（`raw`、`gamma_0p6`、`clahe_lab`、`gamma_0p6_then_clahe_lab`）、像素契约校验（`assert_transform_contract`）、**拒绝重采样**的掩膜读取（`load_binary_mask_exact`）、亮度诊断、以及“越界表述”语言门（句子中出现真实地面/接触/落地/支撑/ground truth 等词而**没有**显式否定就直接拒绝写出）。新增 `realtime_app/tools/benchmark_lowlight_floor_preprocessing.py`（编排、二维评价、方法选择、严格几何、产物写出）与 `realtime_app/tests/test_lowlight_floor_preprocessing.py`（51 项）。
+- 复用而非复制：Mask2Former 一律通过既有 `benchmark_floor_semantic_backends.py` 接口、在**独立进程**中运行（该机器上 Anaconda MKL NumPy 与 torch 不能共进程，会让 NumPy 线代以 `OMP: Error #15` 直接 abort）；几何一律通过 `observe_local_ground_semantic_stereo`、`observe_local_ground_semantic_stereo_lr_direction_control.reconstruct/fit_and_score`、`diagnose_floor_mask_stereo_correspondence.dense_disparity_right_direction`（修正后的反向视差方向）、`scene_geometry_variants.estimate_region_consensus` 与 `benchmark_ground_walker_reconstruction` 的分区共识门限常量。工具显式**不导入 torch**。
+- 语义结果（左右宏平均 floor precision / recall / IoU，左右各 6 帧）。开发集：`raw` 0.8236/0.9828/0.8124（左）与 0.7919/0.9930/0.7873（右），左右宏平均 IoU **0.7999**；`gamma_0p6` 0.7971（−0.0028）；`clahe_lab` **0.8051**（+0.0052）；`gamma_0p6_then_clahe_lab` 0.7856（−0.0142）。留出集：`raw` 0.8074；`gamma_0p6` 0.8064（**−0.0010**）；`clahe_lab` 0.8118（**+0.0044**）；`gamma_0p6_then_clahe_lab` 0.7867（**−0.0207**）。
+- 方法选择：唯一判据是开发集左右宏平均 floor IoU。最佳组 `clahe_lab` 相对 raw 只有 +0.0052，未超过固定保守阈值 0.01，因此**保守选择 `raw`**（`conservative_raw_applied=true`，参数锁 `{"pixel_transform": "none"}`）。留出集只用于报告四组，未参与选择或调参；选择函数在结构上不读留出集（有单测：签名只接开发集参数、函数体中不含 holdout、额外塞入伪造留出集指标不改变结论）。
+- 留出集几何（6/6 帧四组双侧掩膜都存在、都能形成候选平面；中位值）：`raw` 严格双目候选点 17528、左右一致性后 17644、RANSAC 内点 12996、内点率 0.7609、覆盖率 0.1697、残差 4.971 mm、分区共识 2/6；`gamma_0p6` 16146/16249/12384/0.7978/0.1685/4.625 mm/2/6；`clahe_lab` 16354/16489/11920/0.7697/0.1628/4.740 mm/1/6；`gamma_0p6_then_clahe_lab` 16504/16624/11344/0.6916/0.1574/5.451 mm/1/6。分区的独立参考（人工 `floor_eligible` 掩膜走同一冻结链）为候选点 13056、内点 10508、内点率 0.8321、覆盖率 0.1449、残差 4.992 mm、分区共识 3/6。
+- 条件内部参考比较（人工掩膜 + 稠密 RANSAC）：法向夹角中位 / offset 绝对差中位为 `raw` 0.541°/2.721 mm、`gamma_0p6` 0.420°/1.173 mm、`clahe_lab` 0.875°/3.684 mm、`gamma_0p6_then_clahe_lab` 0.952°/3.715 mm。这只是同一批图像与同一标定下两条管线的一致程度，不是物理地面参考，也不是真实地面。
+- 自动掩膜的边界由代码强制：身份证据恒为 `provided_unvalidated`，`decide_observation` 因此必然返回 `unavailable`；工具在 `state != "unavailable"` 时**直接抛错中止**，四组的 24 条记录全部为 `unavailable`，平面只写在 `unaccepted_candidate_plane`。人工参考臂单独标为 `manually_audited_for_this_comparison_only`，其平面也只作为内部参考。
+- “二维更好但几何更差”的显式统计：18 个（帧 × 非 raw 组）配对中有 **7 个**被标记（该帧左右平均 IoU 高于 raw，同时至少一个内部几何量比 raw 弱）。条件计数为候选点更少 12、内点更少 12、内点率更低 9、覆盖率更低 13、残差中位更高 6、分区共识从通过变为不通过 2。最突出的例子是 `pair_0120`/`gamma_0p6`：IoU 提高 0.0520，但候选点、内点、覆盖率三项同时下降；`pair_0200`/`clahe_lab` 另外丢掉一次分区共识通过。
+- 两次被保留、未被覆盖的中间运行：(1) `aborted_run_path_length_limit_v1` —— 第一次正式运行在第 7 次语义推理调用时以 `WinError 206 文件名或扩展名太长` 中止（既有接口的固定输出树在 165 字符输出根下最深达 243 字符）；据此新增启动前的路径长度预检（最坏计划路径超过 235 字符即拒绝运行），并把该接口的临时目录缩短为 `inf/<arm_code>/`。(2) `superseded_v1_region_consensus_pass_field` —— 一次完整正式运行的 `region_consensus.passed` 错用了 `status == "available"`，而 `scene_geometry_variants` 对**成功**的共识返回 `candidate`、只对失败返回 `unavailable`，导致汇总表把“分区共识通过”写成 0/6（真实值为 raw 2/6、gamma 2/6、clahe 1/6、combo 1/6、人工参考 3/6），并让派生的 `region_consensus_lost` 恒为假。已新增 `region_consensus_passed()`（改用“是否存在共识法向”）和三条单测（合成共面点集必须 `passed=True` 且 `status="candidate"`；散乱点集必须 `passed=False` 且 `status="unavailable"`；禁止再出现 `== "available"` 比较）。两次运行目录都原样保留并各带一份说明文件。
+- 环境与设备：base Anaconda Python 3.13.5 / NumPy 2.1.3 / OpenCV 4.13.0；Mask2Former 在独立子进程中用 `torch 2.11.0+cu128`、`transformers 5.16.1`、CUDA 设备（RTX 5070 Ti Laptop，`local_files_only`，未下载）。8 次接口调用全部 `status=ok`。
+- 验证：`python -m unittest realtime_app.tests.test_lowlight_floor_preprocessing -v` 为 **51 passed**；`realtime_app` 下 `python .\run_tests.py` 为 **255 passed**（本任务开始前的基线是 204 passed，本任务新增 51 项，未减少）。
+- 产物（734 MB）：`research_records/engineering_validation/G20260913_lowlight_floor_preprocessing_v1/mask2former_fixed_classical_preprocessing_12pairs_v1/`，含 `command.txt`、`run_metadata.json`、`semantic_dev_metrics.json`、`semantic_holdout_metrics.json`、`geometry_holdout_metrics.json`、`frame_records.jsonl`（逐帧逐视图逐组的语义记录 + 逐帧逐组的几何记录 + 人工参考记录）、`enhanced_images/<method>/{left,right}`（96 张）、`floor_masks/<method>/{left,right}`（96 张）、`overlays/<method>/{left,right}`（96 张）、`geometry_visualizations/<method>`（24 张 + 6 张人工参考）、`representative_visualizations/`（3 张：`g1_dark_p0320_combo_l.png`、`g2_improve_p0360_clahe_l.png`、`g3_degrade_p0280_combo_l.png`）、`inf/<arm_code>/`（既有接口的原始输出与日志）、`summary.json`、`EXPERIMENT.md`。
+- 结论边界：四组中没有任何一组在开发集上超过 raw 达 0.01 以上，留出集也**没有任何一组**超过该保守阈值（最好的 `clahe_lab` 只有 +0.0044，`gamma_0p6` −0.0010，组合组 −0.0207）。因此结论是**经典增强前端未在本数据上证明有效**，而不是继续扫描更多 Gamma 或 CLAHE 参数。这里的 IoU、precision、recall 都只是小样本（开发 12、留出 12 个视图帧）二维图像空间的一致度，不是真实地面精度；候选点更多、内点率更高、残差更小都只是内部证据；人工 `floor_eligible` 掩膜只是本比较的二维条件输入。没有输出已接受地面、足地高度、落地判定、接触判定、支撑判定或步态量；所有平面都只是 `unaccepted_candidate_plane`。相机随助步器运动且没有已验收相对位姿，因此不做跨帧地面稳定结论。
+- 下一步（允许继续）：(a) 由于所选前端在留出集没有稳定改善，**不建议**此时接入学习型低照度前端，应优先改善采集曝光或补光（例如固定更强的场景照明或更长曝光重采同一段）；(b) 若后续确实要测学习型低照度前端，必须先补齐带独立物理地面参考的数据，并另立目录、一次只改一个变量；(c) 仍存在的、与增强无关的瓶颈是左右地面对应本身（掩膜远端大面积无有效视差、分区共识在多数帧不成立），可作为下一个单变量方向。
+
+### 2026-09-13（北京时间）— task-02 学习型双目匹配器替换（IGEV-Stereo 与 DynamicStereo，已完成；engineering validation）
+
+- 验证目标：在**只替换“左右图 → 视差”这一步**的前提下，实际接入并测试两个官方学习型双目匹配器；Mask2Former 缓存掩膜、人工掩膜、正式标定、掩膜导向局部校正、左右一致性规则、深度/光度门、三角化、三种平面拟合器、RANSAC 门限、共享分区一致性门与四层可信度字段全部保持不变。任务开始时已按要求阅读 `README.md`、`CLAUDE.md`、`AI_PROGRESS.md`、`EXPERIMENT_RECORDING_POLICY.md`、task-01 的 `EXPERIMENT.md` 与 `run_metadata.json`，并记录 `git status --short`、`python --version`、`nvidia-smi`。
+- 输入与不变量：people_1 正立左右图固定 12 对（`pair_0000,0040,…,0440`）；`manual_labels_holdout_v1` 左右人工 `floor_eligible`；缓存 Mask2Former `floor` 候选；`stereo_fisheye.json`；全部双目/几何参数读取自 `stereo_manual_floor_masks_12pairs_v1/run_metadata.json`。**SGBM 对照行从 task-01 归档只读读取，未重跑 SGBM**；未修改 task-01 目录（单测用文件大小与 mtime 快照验证读取前后不变）。
+- 新增 `realtime_app/pose_app/learned_stereo_protocol.py`（request/result 往返、视差契约校验、padding/裁回、NaN 无效值、反向场镜像、五帧窗口元数据）、`realtime_app/tools/run_learned_stereo_worker.py`（独立进程 worker：读 request→读校正图→一次前向→写 `disparity.npy`/`valid_mask.npy`/result.json）、`realtime_app/tools/benchmark_learned_stereo_replacements.py`（主对比工具，复用冻结校正/三角化/三种拟合器/共享门）、`realtime_app/tests/test_learned_stereo_protocol.py`（30 项）。另新增只读校验工具 `realtime_app/tools/verify_rectification_equivalence.py`。
+- 环境与权重：RTX 5070 Ti Laptop 为 Blackwell **sm_120**，两个环境都用 **cu128** 轮子新建（不使用 base 克隆）。`realtime_app/.model_envs/igev`（Python 3.10.21 / torch 2.11.0+cu128 / torchvision 0.26.0+cu128 / timm 0.5.4 / scipy，占用 5.11 GB）与 `realtime_app/.model_envs/dynamicstereo`（同版本 torch + einops 0.8.2，占用 4.87 GB）。官方仓库 `gangweiX/IGEV`（MIT）与 `facebookresearch/dynamic_stereo`（CC BY-NC 4.0）；官方权重 `sceneflow/sceneflow.pth`（50,808,741 B，官方 Google Drive）与 `dynamic_stereo_sf.pth`（88,955,329 B，官方 fbaipublicfiles）。未训练、未微调、未改结构；未修改根目录 requirements。
+- OMP 隔离（task-01 遗留问题）的处置：主 benchmark 进程从不导入 torch；两个模型各自在独立 conda 环境的 worker 进程内运行；**未设置 `KMP_DUPLICATE_LIB_OK=TRUE`**，未关闭 OpenMP，未改系统 DLL，未污染 base。IGEV 需要 timm 0.5.x（更高版本移除 `model.act1`，会让官方代码报错）；DynamicStereo 官方 README 的 torch 1.12.1+cu113+PyTorch3D 在 sm_120 上不可用，其网络本身只依赖 torch/einops，故按官方包装类**完全相同的参数**构造网络并以 `strict=False` 加载官方权重（同样出现官方包装类也会出现的 14 个未使用 `cross_att_fn.*` 张量），模型结构与前向路径未改。
+- 视差契约与符号约定：输出 `float32`、二维、严格 960×540，无效一律 NaN（绝不写 0 冒充有效）；只在右/下补零（540→544）后裁回，96/96 次推理**未发生任何 resize**。冻结链路要求“右像素向右搜索”的反向场，用左右镜像后再推理、结果再镜像回来的方式给出（与 SGBM 修正方向几何等价），因此每个目标帧两次推理。符号因子按官方代码推导（IGEV `build_gwc_volume` ⇒ +1；DynamicStereo `CorrBlock1D.__call__` 采样 `coords + flow` ⇒ −1），并在真实校正输入上用逐块 ZNCC 做确定性核对：96 次推理中 95 次判据明确、1 次像素过少记为 inconclusive 并回退到代码因子，**无一次明确矛盾**，96/96 次实际施加因子与代码推导一致。
+- DynamicStereo 时序：每次目标帧使用五帧前向窗口（`temporal_window_frames=5`、`target_position_in_window=0`、`future_lookahead_frames=4`、`realtime_compatible=false`），窗口帧用目标帧的同一校正映射到同一虚拟相机。`summary.json` 单列离线延迟：源有效配对帧率 27.8188 pairs/s（来自 `realtime_app/outputs/people_1/20260908_203954_366/summary.json`），4 帧未来信息等待 **143.79 ms**，窗口推理中位 **7325.68 ms**，离线端到端中位 **7469.47 ms**，5 帧窗口吞吐 **0.68 窗口/秒**。不得写成实时单帧延迟。
+- 计时：worker 内用 CUDA event（前后真实同步）记录 `stereo_gpu_forward_ms`，并记录 `stereo_cpu_worker_wall_ms`（从读模型输入到写出视差前，不含权重下载/环境创建/模型加载/写 JSON）与 `peak_gpu_memory_mb`；主进程记录 `mask_load/rectification/stereo_transfer/candidate_filter/triangulation/plane_fit/region_consensus`。统一可比估算 `estimated_direct_pipeline_ms = mask_load + rectification + GPU 前向 + GPU 反向 + candidate_filter + triangulation + plane_fit`（反向计入的理由：SGBM 对照行本就把两路视差含在 `rectification_and_disparity_ms` 内）。**未使用 task-01 跨来源不可比的 `total_cpu_wall_ms` 作为排序依据。** 每个模型先做 2 个预热请求，预热结果保留但不进入任何 P50/P90/P95（`count=11`），另给出 task-01 可比的 10 帧集合。
+- 结果（整轮墙钟 **21 分 29 秒**；144 条逐帧记录 = 12 帧 × 2 匹配器 × 2 来源 × 3 方法，`unavailable_combinations` 为空）：三个匹配器在两种来源下都是 **12/12** 平面候选。人工掩膜中位内点率/残差：SGBM 0.8692/4.372 mm、IGEV 0.9954/1.521 mm、DynamicStereo 0.8503/8.736 mm；Mask2Former 来源为 0.8203/5.023、0.9705/1.724、0.8007/8.126。共享跨区域门 pass：SGBM 7/12（人工）与 6/12（候选）、**IGEV 12/12**、**DynamicStereo 0/12**。中位候选点：SGBM 约 1.7–2.0 万、IGEV 约 5.4 万、DynamicStereo 约 1.4–1.7 万；左右一致率 IGEV 0.29–0.34 > SGBM 0.12–0.13 > DynamicStereo 0.09–0.10。
+- 时间基线（本机墙钟，预热已排除）：`stereo_gpu_forward_ms` P50/P90/P95 为 IGEV 2055.6/2451.9/2683.7 ms（人工来源）与 2074.7/2342.4/2567.9 ms（候选来源），DynamicStereo 7349.1/7453.0/7555.2 与 7279.7/7474.9/7637.3 ms；`stereo_cpu_worker_wall_ms` P50 为 IGEV ≈2.76–2.77 s、DynamicStereo ≈8.07–8.13 s；峰值显存 IGEV 988.6 MB、DynamicStereo 3503.9 MB；模型加载 P50 1.53 s / 0.38 s。估算链路 `estimated_direct_pipeline_ms` P50：SGBM 稠密/稀疏/IRLS 2196.2/1397.2/873.7 ms（人工）与 2043.2/1255.9/745.1 ms（候选）；IGEV 7350.5/5504.7/4840.7 与 7252.5/5378.9/4705.3 ms；DynamicStereo 16736.2/15878.8/15342.7 与 16406.5/15525.0/15003.4 ms。即最快的学习型组合仍比最快的 SGBM 组合慢约 5.4–6.5 倍。
+- 视差尺度（如实记录，未调整任何门限）：学习型匹配器不受 SGBM 0–159 px 搜索范围约束，IGEV 中位视差 168–174 px、DynamicStereo 272–281 px，**超过一半有效像素落在 SGBM 搜索范围之外**；下游 250–8000 mm 深度门保持冻结，实际拒绝候选的是该门。
+- 校正等价证书：新工具需要“不跑 SGBM 的校正”，故复制了冻结工具的校正代码块，并用 `verify_rectification_equivalence.py` 在 3 帧 × 2 来源上与冻结函数逐字段比对，**84/84 项一致**（含四张 remap 网格、虚拟内参、旋转/平移、校正左右图与掩膜）；该脚本会顺带执行冻结函数的 SGBM 调用但**丢弃其结果**，不产生也不使用任何 SGBM 对照数字。
+- 验证：项目完整测试 `python run_tests.py` 为 **185 passed**（task-01 结束时 141；本会话期间另一进程新增 `test_walker_structure_variants.py` 14 项使基数为 155；本任务新增 30 项）；`py_compile` 三个文件通过；96/96 次 worker 推理 `status=ok`。
+- 产物：`research_records/engineering_validation/G20260912_learned_stereo_replacement_benchmark_v1`（`frame_records.jsonl`、`summary.json`、`timing_summary.json`、`environment_manifest.json`、`stereo_frame_reports.json`、`worker_runs.json`、`rectification_equivalence.json`、`run_stdout_igev.txt`、`run_stdout_dynamicstereo.txt`、`EXPERIMENT.md`、`command.txt`、12 张视差可视化、`stereo_io/` 逐次推理资产；392.5 MB）。task-01 的 `G20260912_modular_ground_benchmark_v1` 未改动。
+- 结论边界：所有可用帧数、内点率、残差、覆盖率、重投影一致性、左右一致率与时间数字都是**共享图像/共享标定/共享语义输入下的内部证据**，不是真实地面精度、相机几何精度或实时性能。IGEV 的内部一致性明显高于 SGBM、DynamicStereo 明显低于 SGBM，**不能**读成“IGEV 更准”或“DynamicStereo 重建更差”：本轮没有独立物理地面真值，平滑稠密的视差场可以内部高度自洽而米制深度仍然是错的。DynamicStereo 为五帧前向离线窗口（未来 4 帧），不得报告为实时。不得声称步态、接触、支撑、步长/步宽/足地高度或任何临床结论。
+- 下一步（允许继续）：在不改变本目录与本轮口径的前提下，可做的单变量后续是 (a) 为学习型匹配器增加“与 SGBM 同搜索范围（0–159 px）”的对照臂以分离“搜索范围”与“匹配质量”的影响；(b) 在相同冻结门上比较 IGEV 迭代次数敏感性；(c) 采集带独立物理地面参考的数据集后才能进入真实地面精度验证。以上都必须另立目录、一次只改一个变量。
+
+### 2026-09-12（北京时间）— task-01 模块化地面基准、统一可信度证据与 SGBM 速度基线（已完成；engineering validation）
+
+- 验证目标：为后续“双目匹配器 / 平面拟合器 / 时序辅助”三轴比较建立统一基准；本任务只完成当前 SGBM 下的模块级计时、统一可信度证据与实验协议，不接入任何新模型、不做时序辅助。
+- 输入与不变量：`V20260908_people0_1_2_pmpose_c3_chain/people_1/input_448pairs` 的正立左右图，固定 12 对（`pair_0000,0040,...,0440`）；`G20260911_floor_semantic_backend_comparison_v1/manual_labels_holdout_v1` 的左右人工 `floor_eligible` 掩膜；同一实验目录下缓存的 Mask2Former `floor` 候选掩膜；正式 `stereo_fisheye.json`；全部双目与几何参数从 `stereo_manual_floor_masks_12pairs_v1/run_metadata.json` 读取，命令行不接受任何门限覆盖。未重跑 PMPose，未改标定、人物关联、严格三角化或既有拒绝原因，未使用 DA3、GroundNet、SAM、IMU、光流或视觉里程计。
+- 新增 `realtime_app/pose_app/benchmark_timing.py`：`TimingCollector.measure/record_ms/summary`，`perf_counter` 计时，逐模块保留全部逐帧样本，输出 `count/mean/P50/P90/P95/min/max`（线性插值百分位），空样本返回空字典，非有限或负值直接报错。新增 `realtime_app/tests/test_benchmark_timing.py`（11 项）。
+- 唯一修改的既有工具：`realtime_app/tools/benchmark_ground_walker_reconstruction.py`，只增加计时埋点与四层证据组装，不改任何估计器、参数、门限或既有字段语义。
+- 计时协议：逐帧逐来源逐方法记录 `mask_load_ms`、`rectification_and_disparity_ms`（含两路 SGBM 视差与必要校正）、`stereo_candidate_filter_ms`、`triangulation_ms`、`plane_fit_ms`（稠密 RANSAC / 稀疏 RANSAC / IRLS 分别计时）、`region_consensus_ms`（独立记录）、`evidence_ms`（覆盖率与鱼眼重投影证据组装，单列以免混入估计器时间）、`visualization_ms`（面板渲染，写 PNG 不计入）、`total_cpu_wall_ms`（读帧到该方法输出就绪，不含写 PNG/JSONL/报告，也不含共享跨区域门）。未执行的模块写 `null` 并给原因，绝不写 0；本次 12 帧×2 来源×3 方法的全部计时字段都真实执行，故无 `null`。前两帧（`pair_0000`、`pair_0040`）只做预热：几何、理由与逐帧计时保留，但不进入任何 P50/P90/P95（`count=10`）。
+- 证据字段：每个逐帧逐方法输出新增 `semantic_evidence` / `stereo_evidence` / `plane_evidence` / `cross_region_evidence` 四层与 `confidence_boundary`，四层分开保存、不合并成伪概率。Mask2Former 始终为 `mask_status=candidate`、`manual_audit_available=false`；人工掩膜为 `manually_audited`，但它只是二维身份更可信的对照与内部几何参考，不是三维地面真值。
+- 区域共识的角色：`region_consensus` 保留在逐帧 `methods` 中以维持与旧输出的字段可比，但只作为所有方法共享的质量拒绝依据，其耗时单列且**不参与速度排名**；若证据镜像与冻结门状态不一致，工具直接抛错。
+- 环境事实（必须记录）：本机 NumPy 为 Anaconda MKL 构建（`mkl-sdl`），与本机 `torch` 各自带一份 `libiomp5md.dll`；`import torch` 之后的第一次 `np.linalg.eigh`/`np.linalg.svd`（平面拟合必经）会让进程以 `OMP: Error #15` 直接 abort（实测退出码 3），该 abort 不是 Python 异常、无法捕获，因此本工具显式选择 `gpu_synchronize=False` 并且不导入 torch；未使用官方标注为不安全的 `KMP_DUPLICATE_LIB_OK=TRUE`。`benchmark_timing` 仍实现规定的真实 `torch.cuda.is_available()`/`torch.cuda.synchronize()` 行为，并由单测在独立解释器中真实执行验证（隔离原因同上）。本管线不启动任何 GPU kernel，故 `timing_protocol.gpu_synchronized=false` 不影响数值。
+- 结果（新目录 `research_records/engineering_validation/G20260912_modular_ground_benchmark_v1`，未覆盖任何既有目录）：三种主拟合器在人工掩膜与 Mask2Former 两种来源下均为 **12/12** 平面候选帧，无 0 可用方法。共享跨区域门 pass/fail 为人工 7/5、Mask2Former 6/6。几何内部证据中位数：人工掩膜稠密/稀疏/IRLS 内点率 0.8692/0.8680/0.7752、残差 4.372/5.036/7.883 mm；Mask2Former 为 0.8203/0.8263/0.5067、5.023/6.016/10.808 mm；鱼眼重投影中位数均在 0.22 px 量级（内点、左右取大者）。
+- 时间基线（本机 CPU 墙钟，预热已排除，`count=10`）：`plane_fit_ms` P50/P90/P95 为 dense_ransac 1355.29/1590.92/1624.88 ms（人工）与 1317.32/1614.59/1656.55 ms（Mask2Former）；sparse_tile_ransac 561.93/585.59/594.31 与 543.38/587.56/593.40 ms；soft_weighted_irls 27.93/37.73/43.95 与 31.10/48.70/49.53 ms。共享整流与 SGBM 视差 P50 ≈ 440–447 ms，三角化 P50 ≈ 96–98 ms，候选过滤 P50 ≈ 73 ms，掩膜读取 P50 242.84 ms（人工）/97.39 ms（缓存 PNG），共享区域门 P50 ≈ 2451–2473 ms。速度排序：IRLS < 稀疏分块 < 稠密 RANSAC。
+- 字段一致性：与既有 `G20260912_ground_walker_reconstruction_benchmark_v1/manual_and_mask2former_floor_12pairs_v4_current_pair0000` 逐字段比对，96 条方法记录与全部既有 summary 字段**差异 0**；新增键只有 `timing_protocol`、`timing_by_source_and_method`、`evidence_layer_summary` 与方法级 `evidence`/`timing_ms`/`timing_null_reasons`。证明本次只加了测量与证据。
+- 验证：`python -m py_compile realtime_app/pose_app/benchmark_timing.py realtime_app/tools/benchmark_ground_walker_reconstruction.py` 通过；`realtime_app` 下 `python run_tests.py` 为 **141 passed**（改动前为 130 passed，未减少）。完整命令与产物清单见该实验目录的 `command.txt` 与 `EXPERIMENT.md`。
+- 结论边界：可用帧数、内点率、残差、覆盖率、重投影一致性与跨区域离散度都是共享图像与共享标定条件下的内部证据，不是真实地面精度；计时是本机 CPU 墙钟，不是实时性、现场性能或临床结论；不得据此声称步态、接触、支撑或真实地面毫米精度。
+- 下一步（task-02）：只允许替换双目匹配器（SGBM → 其他），其余全部保持不变（同 12 对帧、同掩膜、同标定、同三角化、同三种拟合器与门限、同计时定义与预热规则、同四层证据字段）；如需新的方向或一致性约定，必须另立单变量目录，不得回改任何既有 G20260909/G20260910/G20260911/G20260912 目录。
+
+### 2026-09-12（北京时间）— pair_0000 当前人工标签覆盖与重算（已完成；engineering validation）
+
+- 用户明确确认：`pair_0000` 当前标注中从 `floor_eligible` 去除的区域是先前未分清的助步器像素；因此以 `H20260912_pair0000_left_walker_polygon_correction_v1/labels/left/pair_0000.json` 覆盖 `manual_labels_holdout_v1/labels/left/pair_0000.json`，不保留旧版地面区域作为当前人工标签。当前左图含 3 个 `floor_eligible`、2 个 `person` 与 4 个 `walker` 多边形。
+- 重新生成左侧 12 帧人工审计掩膜：`manual_labels_left12_audit_v3_current_pair0000`；未重跑任何语义模型或人体模型。已用新左掩膜与既有右侧人工掩膜写出旧方向严格诊断 `stereo_manual_floor_masks_12pairs_v2_current_pair0000`，仍为 `direct=2/12`，不得把该旧方向诊断作为地面可用性结论。
+- 使用已修正反向视差搜索方向的四种几何表示重算至 `G20260912_ground_walker_reconstruction_benchmark_v1/manual_and_mask2former_floor_12pairs_v4_current_pair0000`。对唯一改变标签的 `pair_0000`，手工掩膜稠密 RANSAC 候选数 `26106→26042`，法向差 `0.209°`、offset 差 `1.200 mm`；稀疏栅格 RANSAC 差 `0.132°/0.188 mm`。本次标签修正没有构成物理地面精度、跨帧地面稳定、接触、支撑或步态结论；Mask2Former 与人工掩膜的比较仍是条件性二维身份输入下的内部几何对照。
+
+### 2026-09-12（北京时间）— people_1 连续双目人工地面标注交接包（已准备；数据交接，不构成实验）
+
+- 为独立人工二维地面身份审计准备 `research_records/annotation_handoffs/H20260912_people1_contiguous30_labelme_v1` 及同名 ZIP：从保存的 people_1 正立图中只读复制连续 `pair_0001`--`pair_0030` 的左/右图各 30 张（共 60 张，均为 `1080 x 1920`）。这段连续数据避开既有人工标注的 `pair_0000` 与 `pair_0040`--`pair_0440` 时刻。
+- 包内提供固定五类标签、左右独立输出目录、双击启动脚本、免费 Labelme 安装说明、60 文件返还检查脚本和帧清单。Labelme 不随包复制：官方免费安装/便携版本更适合对方机器，复制 Python/Qt 环境会引入体积、版本和 Windows 安全策略风险。
+- 此交接包不运行模型、标定、匹配或三角化；返还的 JSON 只作为后续二维身份审计输入，不能自身构成地面三维真值或精度结论。
+
+### 2026-09-12（北京时间）— 右相机单侧连续 30 帧交接包（已准备；用户范围修正）
+
+- 用户明确只需右相机视图，不需要左图。因此保留上项双侧草稿而不覆盖，另建实际交付包 `research_records/annotation_handoffs/H20260912_people1_right_contiguous30_labelme_v2` 及同名 ZIP。包中只读复制 `right_cw90/pair_0001.png`--`pair_0030.png` 共 30 张，未包含既有人工标注的等间隔帧。
+- 包内提供右侧单键启动、标签表、免费官方 Labelme 安装路径、返还前 JSON 检查和明确的单侧限制。右图单侧标注可独立审计二维语义；若用于严格双目三维地面验证，仍必须补同帧左侧掩膜，不能把右侧掩膜镜像或复制到左侧。
+- 应用户要求，已将完整交接命令写入包内 `ANNOTATOR_INSTRUCTIONS.md` 并更新 ZIP；压缩包内容检查确认该说明文件存在且含 30/30 返还检查命令。
+
+### 2026-09-11 23:30（北京时间）— 人工地面掩膜下双目局部平面失败的只读诊断与单变量受控实验（已完成；engineering validation，含对既有结论的归因修正）
+
+- 验证目标：在左右人工 `floor_eligible` 掩膜已经给定的前提下，定位严格双目地面匹配失败的主导原因；先只读诊断，之后才允许改一个唯一变量。
+- 输入与不变量：`V20260908_people0_1_2_pmpose_c3_chain/people_1/input_448pairs` 的 `left_ccw90`/`right_cw90`，帧 `0,40,...,440` 共 12 对；`G20260911_floor_semantic_backend_comparison_v1` 的左右 12 对人工掩膜（`manually_audited`）；现行 `stereo_fisheye.json`。诊断与受控实验的全部参数都从冻结基线 `stereo_manual_floor_masks_12pairs_v1/run_metadata.json` 读取，工具不接受任何门限覆盖。未重跑 PMPose，未改标定、人物关联、严格三角化或任何已有拒绝原因，未使用 DA3、时序传播、GroundNet 或虚构助步器几何。
+- 只读诊断工具：`realtime_app/tools/diagnose_floor_mask_stereo_correspondence.py`。它逐帧复现冻结工具的掩膜几何、局部校正、SGBM 视差、候选点、RANSAC 平面、内点、覆盖率与鱼眼回投，并与冻结基线 JSONL 逐字段比对；12/12 帧**逐位相同**，重新计算的六项门限判定与基线 `reason` 集合完全一致。输出在 `G20260911_floor_stereo_correspondence_diagnosis_v1/readonly_diagnostic_12pairs_v4_final`（v1/v2/v3 与中止跑目录均保留）。
+- 主导原因（近因，可量化）：12 帧累计漏斗为 掩膜 1,739,870 px → 前向有效视差 658,846 → 右掩膜配对 367,252 → 反向视差>1 104,388 → **左右一致性 `|d_f-d_rev|<=1.5 px` 仅剩 1,927（本阶段损失 98.1%）** → 深度范围后 1,351。单条件反事实：只去掉左右一致性会剩 102,372 个候选。原因是该门读取的反向视差场由 OpenCV SGBM 在参考像素左侧搜索，而本标定的配对在右侧：合成 120 px 位移对照下 `compute(L,R)` 返回 120.0，`compute(R,L)` 返回 -1（有效率 9.7%）；实数据中该门在正确配对位置的命中率中位 0.0126，**低于它自己的两个零假设对照**（配对偏移 17 px 为 0.0163、换行 0.0094），却不高于两个独立量化场偶然一致的概率 0.025；改为几何正确方向后同一 `<=1.5 px` 判据命中率中位 0.9017。
+- 次要原因：人工地面区域逐像素匹配证据弱——62% 的掩膜像素连有效前向视差都没有，匹配器内部滤波再丢掉约三分之一可用匹配，ZSAD 代价曲线在 98.6% 的采样掩膜像素上为“弱对比”。该探测存在加性/乘性亮度偏差（SAD 与 ZSAD 最佳视差中位差 30.25 px），只能作为相对歧义指标，不能当作绝对视差真值。
+- 被数据排除：掩膜面积/校正裁剪（掩膜在校正视图中被放大 1.16–1.33 倍、最大连通块占 94–100%）、左右可见区域重叠太小（掩膜内 45–69% 存在右掩膜配对，高于匹配器自身命中率）、视差范围对整块掩膜不合适（顶端饱和仅 0.7–4.6%）、掩膜边界/遮挡污染（内点落在边界 3 px 内比例中位 0.43%）、鱼眼回投门（候选点由左射线与整数配对构造，左回投恒为 ~7e-6 px，12/12 通过，无区分能力）。
+- 两帧内部 `direct`（240/320）的内点视差被钉在范围上界 158–159（深度约 615–623 mm）、内点行数仅 12–43、线性度 0.03–0.05、帧内分半法向差 0.92/0.93 度：内部自洽但是**局部伪像斑块**。因此此前记录的“法向差 108.99 度、offset 差 226.59 mm”不能再作为相机运动或真实地面变化的证据；由于仍无已验收相对位姿，本阶段也不做任何真实地面稳定结论。
+- 单变量受控实验：`realtime_app/tools/observe_local_ground_semantic_stereo_lr_direction_control.py`，唯一变量是“左右一致性检验读取的反向视差场的搜索方向”，掩膜、帧号、标定、分辨率、虚拟焦距、视差范围、匹配器全部设置、光度/深度上限、RANSAC、六个门限全部不变，未删除或放宽任何门。同一进程内的控制臂仍用冻结方向并断言逐帧复现冻结基线，12/12 通过。输出 `controlled_lr_direction_12pairs_v2_final`。
+- 结果与伪像核查：12/12 帧 `direct`，候选 11,919–30,926（基线 7–452），覆盖率 0.106–0.228，平面残差中位 2.66–6.82 mm；候选落在视差范围顶端的比例从基线中位 0.211（最高 1.0）降到 0.000–0.007；内点行数 149–276（基线 2–44），内点线性度 0.32–0.80，σ2/σ1 0.32–0.90，帧内分半法向差 0.04–0.13 度；内点校正深度跨度 240–973 mm（非常数深度面），平面法向与校正基线夹角 88.5–90.0 度、与局部虚拟光轴夹角 24.2–32.0 度。**不使用 direct 数量增多作为改善判据**。
+- 结论边界：以上只是把一条无效的一致性检验改正后得到的内部几何诊断。人群掩膜的二维身份可信不等于左右像素能可靠对应；本阶段没有地面真值，不输出地面精度、足地高度、接触、支撑或步态；12 帧平面虽都在左相机系表达，但相机随助步器运动且无已验收相对位姿，跨帧仍不可比较，不宣称真实地面稳定。相机自身坐标系内法向/offset 的一致只是相机系自洽性描述。
+- 未解决部分：掩膜远端仍有大面积无有效视差，地面匹配证据弱这一层限制依旧存在，不能靠本修正消除。
+- 记录：实验目录 `research_records/engineering_validation/G20260911_floor_stereo_correspondence_diagnosis_v1`（`EXPERIMENT.md`、`run_metadata.json`、`command.txt`），注册表新增 `G20260911-floor-stereo-correspondence`。未改写 `G20260911_floor_semantic_backend_comparison_v1` 的任何产物或拒绝原因。
+- 验证：项目完整测试 `120 passed`。本会话沙箱下首次运行时 13 项因测试需要写入工作区外的 `%TEMP%` 被拒绝而报 `PermissionError`（非代码回归）；放宽文件权限后重跑为 `120 passed`。仓库只新增两个工具文件，未修改任何既有模块。
+- 下一步（允许继续）：先用独立留出数据确认该方向修正不改变非地面区域的对应关系；地面远端证据弱的下一个单变量候选是在左右图使用完全相同的局部对比度归一化，或固定对称地调整局部匹配窗口，仍保持同一 12 对掩膜且一次只改一个变量。
 
 ### 2026-09-07 11:03（北京时间）— GitHub Actions 跨平台依赖修复（已完成；CI validation）
 
@@ -917,3 +1033,218 @@
 - 实现：新增 `tools/validate_static_reference_lock.py`，要求原始 JSONL 静态样本具备唯一 sample ID、参考 ID、匹配的采集会话、左相机坐标和测得目标系坐标；其验收条件由现场单独声明参考数量、每参考样本数、P95 与最大残差上限。通过证据绑定变换 ID、旋转、平移、坐标系、会话和仍存在的原始样本文件；加载时从原始样本重算摘要，`measured_locked` 变换必须引用它，测试变换仍保留显式许可。
 - 验证：新增自动端到端门禁测试，覆盖“缺证据拒绝”、“匹配会话/样本/条件生成 accepted 证据后放行”和“同 ID 但变更平移拒绝”；`cd realtime_app; python run_tests.py` 完整通过 `79` 项。
 - 结论边界与下一步：这是 T3 的软件可追溯性与拒绝路径验证，不含实测静态点、残差、人体验证、步态或现场实时结果。相机架锁定后，必须定义实体参考物和验收条件，采集静态样本并生成通过证据，之后才进入现场短序列整链运行。
+
+### 2026-09-07（北京时间）— 现场 PMPose 短序列整链尝试：相机身份门禁阻断
+
+- 目标与固定条件：在不加载坐标变换的前提下，以 PMPose、left `ccw90`、right `cw90`、single、`max_pairs=120`、保存原始配对和 T1--T5 下游输出启动真实双相机短序列；T3 预期保持 `not_configured`。
+- 预检：本机配置、模型路径、端口、鱼眼标定和相机注册格式均为 `software_ready`；预检明确未打开相机。
+- 现场结果：真正打开相机时，当前系统仅枚举一个 `FHD Webcam`（`VID_0408&PID_50D1`），而注册表要求两台 `VID_05A3&PID_9230` 相机的精确 left/right 身份。身份校验在配对和推理之前阻断；新输出目录只含 `runtime.log`，没有原始帧、二维预测、三角化或 T1--T5 产物。
+- 结论边界与下一步：这是硬件身份缺失，不是模型、几何、帧率或步态失败。不得把单个通用摄像头登记为双目替代；连接并确认两台已标定相机后，先做有限配对探测，再按相同参数重跑现场短序列。物理 T3 静态参考仍独立待办。
+
+### 2026-09-07（北京时间）— Sapiens2 308 点远端足部关联继承侧链（已完成；离线保存预测）
+
+- 缺口与原则：403 对 C3 主线的 Sapiens2 原始预测已有 308 点（含足趾/足跟），但既有严格双目结果只保留 COCO-17；旧足部脚本会在左右各自独立选最高分人体，可能让足部观测反向决定或修复人物关联。现改为只继承既有严格 COCO-17 结果的 `left_person_id/right_person_id`；上游无关联时八个足部点全量缺失，绝不以脚点新建或补救关联。
+- 离线输入与固定量：只读取同一 403 对的保存 C3 Sapiens2 左右预测、已有严格关联 JSONL、原始鱼眼标定和固定 left `ccw90` / right `cw90`；二维分数阈值 `0.25`、重投影门 `10 px` 不变。未连接相机、未采集数据、未运行检测或姿态模型。
+- 结果与审计：403 对均有唯一上游关联，输出 3,224 条（两踝加六个远端足点）记录；逐帧复核源/输出的人 ID、关联代价和公共关键点数为 0 差异。3,176 条正深度有限，2,788 条通过重投影门。436 条拒绝完整保留，其中 high_reprojection_error 388、low_2d_score 48；八类点的逐点统计、原始坐标、深度、残差和失败原因在 `V20260906_people1_30fps_c3_2d_3d/sapiens2_distal_foot_inherited_association/`。
+- 下游观测序列补齐：历史足部候选脚本依赖已废弃 CSV，不能消费当前严格 JSONL；新增按同名和 pair ID 合并严格 Sapiens2 髋膝踝与远端足点的观测归档，并逐帧强制核对关联状态和左右人 ID。403 帧中左/右/双侧“膝—踝—前足完整”仅为 `204/288/169` 帧，输出只含连续性审计，未生成接触或步态标签。
+- 验证与边界：新增关联继承/缺失传播及观测归档单测 5 项通过，现有 `realtime_app/run_tests.py` 79 项回归、完整 `pytest tests` 84 项均通过。该侧链只补齐保存预测上的可追溯远端足部几何观测，不能宣称足部精度、物理坐标、触地、步态或实时性能；在独立定义并物理验证足部接触方法前，不接入 PMPose T1--T5 主链。
+
+### 2026-09-08（北京时间）— 独立 ChArUco 标定验算（部分通过；全视场结论待补采）
+
+- 输入与不变量：新建独立会话 `V20260908_stereo_calibration_holdout/captures/session_20260908_190210/`，只读当前 `cam0_fisheye.json`、`cam1_fisheye.json` 和 `stereo_fisheye.json`，未重标定、未改内外参。相机身份由物理注册表解析为 cam0/LEFT index 1、cam1/RIGHT index 0；新会话使用 MSMF、1920 x 1080、30 FPS、配对门限 25 ms。
+- 采集与探测：相机探测收到 60/60 对，左右无读帧失败，主机返回时间差均值/最大为 6.280/20.333 ms；ChArUco 会话保存 17 对（均为 35 个共同角点），保存时主机时间差中位/P95/最大为 15.214/21.610/22.316 ms。主机时间戳不是曝光同步证据。
+- 独立板几何验算：17/17 对有效、正深度比例 1.0。已知 30 mm 相邻边绝对误差中位/P95为 0.0558/0.1801 mm，平面残差中位/P95为 0.1097/0.3426 mm，最近射线间隙中位/P95为 1.354/1.692 mm。该结果支持当前标定在本次中央 ChArUco 姿态下没有整体尺度/基线崩坏，但不是人体三维精度。
+- 关键反证与覆盖缺口：同一只读射线验算相对标定拟合会话的角误差中位/P95从 0.572/3.028 mrad 升至 4.043/4.939 mrad，射线间隙中位/P95从 0.214/1.095 mm 升至 1.354/1.692 mm。新会话 cam0/cam1 的最大归一化半径仅为 0.366/0.420，板中心仅覆盖中央少数网格；且采集后端由标定会话的 DirectShow 改为 MSMF。因此当前结果不能确认全视场鱼眼投影或外参仍完全适用，也不能把骨段波动归因或排除为标定问题。
+- 下一步：相机不动、将 ChArUco 固定在刚性支架上，先以 DirectShow 复采一组中心样本以隔离后端影响，再以同一后端采集覆盖画面边缘/角落和人体工作深度的至少 30 对独立样本；继续只读验算，保留原标定文件，只有明确验收失败后才另立重新标定实验。
+
+### 2026-09-08（北京时间）— 相机重新定位后的外参候选（仅拟合内通过；不得直接用于人体三角化）
+
+- 输入与不变量：相机位置改变后，以物理注册表固定 cam0/LEFT=index 1、cam1/RIGHT=index 0，MSMF、1920 x 1080、30 FPS、配对门限 25 ms 采集新 ChArUco 会话 `V20260908_stereo_extrinsic_recalibration_msmf_fullres/captures/session_20260908_195808/`。90 对均保存，公共角点中位数 35，保存时间差最大 24.44 ms；固定现有两台相机内参，仅拟合新的外参，旧 `calibration/results/stereo_fisheye.json` 未覆盖。
+- 覆盖审查：两路 90/90 均可检测；但 cam0 4 x 5 板中心网格只覆盖中间两行，cam1 亦主要为中部，故全视场覆盖不足。候选文件为 `stereo_fisheye_candidate_20260908_195808.json`，固定每对 12 个空间分散点，RMS 0.4098 px、基线 296.266 mm；相对于旧外参，基线差 -2.388 mm、平移向量差 27.057 mm、相对旋转 9.065 度。
+- 对照结果：旧外参用于新会话时，射线角误差中位/P95为 130.235/155.000 mrad，射线间隙中位为 56.990 mm，30 mm 已知边误差中位/P95为 3.298/5.075 mm；候选用于改变前的 17 对独立会话时，分别为 123.752/156.860 mrad、37.140 mm、2.717/3.828 mm。这互相失配符合相机刚体位置改变，旧外参不得用于新位置。
+- 候选的拟合内检查：同一 90 对的射线角误差中位/P95为 0.451/1.346 mrad，射线间隙中位 0.181 mm，30 mm 边误差中位/P95为 0.070/0.249 mm；这仅说明拟合内自洽，不能替代改变相机后的独立验收。
+- 结论边界与下一步：当前候选是新安装状态的待验外参，禁止将其写入正式标定路径、用作人体三角化结论或与旧会话混用。必须在相机不动的条件下新采至少 20 对独立 ChArUco（覆盖边缘、角落与人体工作深度），以候选作只读验证；独立验收通过后，才将候选复制为新位置的正式标定并启动三人 PMPose/自适应框/三角化数据链。
+
+### 2026-09-07（北京时间）— `people_1` 与 `people_1_near` 左右二维 + 三维骨架三联可视化（已完成；engineering visualization）
+
+- 目标：对 2026-09-06 新完成的两组 30 FPS 采集（`people_1` 403 对、`people_1_near` 217 对）生成“左图二维骨架 / 右图二维骨架 / 三维骨架”三联视频；只消费已保存结果，不重跑检测、姿态模型、标定、关联或三角化，不改任何坐标与门限。
+- 输入与不变量：左右二维骨架直接读取 `pmpose_ungated_stereo/offline_stereo_results.jsonl` 内嵌的左右保存关键点（原始鱼眼 `1920 x 1080` 像素域），画在原始鱼眼帧上；三维面板复用 `render_people1_2d_3d_video.py` 的骨盆居中、等比例、固定视角逻辑，读取 `persons_3d[0].keypoints_3d`。三维采用已存在的无门限（`--triangulation-mode ungated`）结果，即所有有限且在原始范围内的三角化点，其中带 `high_reprojection_error` 质量标记的点一并显示并在标题栏计数。
+- 帧对齐：JSONL `pair_id=0..N-1` 是序列序，而采集 AVI 含未配对帧，不能按帧号直接对齐。新增 `realtime_app/tools/render_people1_pair_aligned_2d_3d_video.py`，通过 `input_*pairs/selection_manifest.csv` 与采集 `left/right_frames.csv` 把每个 `pair_id` 映射到正确 AVI 帧，再原样复用 `render_people1_2d_3d_video.py` 的 `draw_side`/`render_3d_panel`/`load_records`。无门限 JSONL 与 strict JSONL 记录数均为 403/217，与 manifest 一致。
+- 输出：`V20260906_people1_30fps_c3_2d_3d/qualitative_video/people_1_pmpose_left_right_3d.mp4`（403 帧、30 FPS、1920 x 1120）与 `V20260906_people1_near_30fps_c3_fullchain/qualitative_video/people_1_near_pmpose_left_right_3d.mp4`（217 帧、30 FPS、1920 x 1120）。两段均可用 OpenCV 重开，抽样帧左右二维面板与三维面板均有骨架像素。
+- 覆盖提醒：`people_1` 无门限 PMPose 匹配 400/403 对（3 对 `association_failed`）；`people_1_near` 匹配 199/217 对（18 对 `association_failed`），左腕多数因越界缺失，1390 点带 `high_reprojection_error` 标记。未匹配帧的三维面板为空，二维骨架仍按检测结果显示。
+- 结论边界：这是保存结果的可视化交付，不是新的二维/三维精度、几何有效率、骨长、步态或实时性能验证；无门限三维只是“有限三角化点全部输出”，含高重投影候选，不能因画面完整就升级为严格几何或真实三维准确率。
+- 三维清晰度修订：按用户要求参考 `V20260902_pmpose_probpose_complete_3d_estimation/qualitative_video/3d_vis/pmpose3d.mp4`、`probpose3d.mp4` 重新绘制三维面板，二维保持不变。`render_people1_pair_aligned_2d_3d_video.py` 的 `render_3d_panel_clear` 改为深色底（`#111111`）、透视斜视、参考网格、`Y lateral / Z depth / X upright` 坐标轴、固定视角与骨盆居中的排版，并按点质量着色（无标记=绿色直接立体、`high_reprojection_error`=橙色），标题栏显示干净/高重投影/视窗外计数，三维面板改为居中竖幅视口以适配竖直骨架。输出为 `people_1_pmpose_left_right_3d_v2.mp4`（403 帧、1920 x 1480）与 `people_1_near_pmpose_left_right_3d_v2.mp4`（217 帧、1920 x 1480）；抽样帧解析确认三维图背景暗、绿/橙骨架齐全、上部坐标轴与文字可见；二维面板绿骨架与 v1 一致。原 v1 成片保留。仅第 2 版改排版与配色，不改变任何二维/三维坐标、来源或几何结果。
+- 正立三联排版（第 3 版）：按用户要求把左右视频与骨架一起转正立并排。`render_people1_pair_aligned_2d_3d_video.py` 仍先在原始鱼眼帧上画骨架，再整体 `cv2.rotate`（左 `ccw90`、右 `cw90`），保证骨架与人体始终贴合；随后左右两个正立竖幅 2D 面板与三维面板做成三栏并排（`left 2D upright | right 2D upright | 3D`）。输出为 `people_1_pmpose_upright_left_right_3d.mp4`（403 帧、30 FPS、1728 x 1064）与 `people_1_near_pmpose_upright_left_right_3d.mp4`（217 帧、30 FPS、1728 x 1064）；抽样帧确认左右正立面板与对应 `*_capture_upright.avi` 帧仅差骨架叠加（约 1.5% 像素），三维面板深底、绿/橙骨架与坐标轴文字齐全。仅改显示方向与排版，不动任何坐标、来源或几何结果。
+
+### 2026-09-08（北京时间）— 新相机位姿外参候选的独立几何验收（通过；仅几何自洽，非人体精度）
+
+- 输入与不变量：相机保持 19:58 拟合会话时的固定位姿未移动；以同一物理注册表（cam0/LEFT=index 1、cam1/RIGHT=index 0）、MSMF、1920 x 1080、30 FPS、配对门限 25 ms 新采独立会话 `V20260908_stereo_extrinsic_recalibration_msmf_fullres/captures/session_20260908_201626/`，共保存 31 对（另有 2 次按 S 因仅 1/11 个公共角点被拒、未保存）。只读使用候选外参 `stereo_fisheye_candidate_20260908_195808.json`（固定内参、单位 mm），未改动任何内参、正式标定或坐标。
+- 覆盖：31/31 两路均检测成功；cam0/cam1 最大归一化半径 0.777/0.864（中位 0.515/0.538），板质心已覆盖画面中部、上下左右边与角落多个网格，明显宽于拟合会话（原记录 0.366/0.420 仅居中）并覆盖人体工作深度。
+- 候选在新会话的只读验算（31/31 对，954 个公共点）：射线角误差中位/P95 1.319/2.457 mrad，最近射线间隙中位/P95 0.526/1.123 mm，正深度比 1.0；30 mm 已知板边绝对误差中位/P95 0.083/0.399 mm（1543 条相邻边，长度中位 29.988 mm），平面残差中位/P95 0.152/0.677 mm。产出位于 `V20260908_stereo_extrinsic_recalibration_msmf_fullres/acceptance_20260908_201626/`（ray 与 charuco_3d 两个候选验算 JSON）。
+- 负对照：旧正式外参作用于同一 31 对时，角误差中位/P95 123.864/153.919 mrad、射线间隙中位/P95 55.307/109.729 mm，约比候选差两个量级；证明旧外参在新位姿失配、候选与其几何一致。
+- 结论边界与下一步：本验收是“候选外参与新位姿相机几何自洽”的只读证据；独立宽覆盖残差约为拟合内残差的 3 倍（边缘鱼眼离轴属预期），但仍远小于旧外参失效对照（约 100 倍差距），因此验收按几何判据通过。这不是人体二维/三维精度、骨长或步态结论。通过后可按交接计划把候选复制为新位姿的正式标定（旧文件先备份、不被删除），再进入三人 PMPose/自适应框/严格三角化数据链；采集参数维持 MSMF、1920 x 1080、30 FPS、同一物理身份与配对门限。
+
+### 2026-09-08（北京时间）— 候选外参已切换为新位姿正式标定（完成；用户确认）
+
+- 执行：先备份正式文件至 `realtime_app/calibration/results/stereo_fisheye_before_reposition_20260908.json`，再把 `V20260908_stereo_extrinsic_recalibration_msmf_fullres/stereo_fisheye_candidate_20260908_195808.json`（与正式文件同 schema、相对内参引用、1920 x 1080、mm）复制为 `calibration/results/stereo_fisheye.json`；旧文件仅另存备份、未删除。
+- 验证：`StereoCalibration.load` 对新正式文件解析成功（fisheye、1920 x 1080、mm、baseline 296.266 mm、det(R)=1.0、for_runtime_sizes 通过），运行时消费方将默认使用新位姿外参。
+- 实验注册表补录 `V20260908-E1_extrinsic_recalibration_acceptance`（engineering_validation、completed）。
+- 边界与下一步：后续双目标定、三角化与二维/三维几何默认基于新位姿外参。按交接计划等待受试者到场后进入三人数据链：每人为独立会话采集约 400 对（MSMF 1920 x 1080 30 FPS、25 ms 门限）→ 逐帧保存原始左右帧/帧号/配对 → YOLO top-1 + C3 连续脚部优先 ROI → 仅 PMPose（左 ccw90/右 cw90，几何前逆映射回原始鱼眼）→ 严格三角化（max_matches=1、固定二维/关联/重投影门限，完整保留拒绝原因）→ 逐点统计与原始鱼眼二维/三维可视化交付；受试者到场前不采集、不推理，结论仅限内部几何与链路运行。
+
+### 2026-09-08（北京时间）— 三人（people_0/1/2）采集、PMPose-C3 整链与正立三维可视化（完成；内部几何与链路）
+
+- 采集：按用户命名 people_0/1/2 各一段连续助步行走（无特殊标记），MSMF 1920 x 1080 30 FPS、25 ms 门限、registry 解析 cam0/LEFT=1、cam1/RIGHT=0。旧 `realtime_app/outputs/people_1`（2026-09-06 数据）经用户授权删除以复用目录名；people_1_near 未动。会话与有效对数：people_0 `20260908_203307_306`=200、people_1 `20260908_203954_366`=448、people_2 `20260908_204215_249`=266；每段 0 读失败、时间差中位 ≤18.6 ms。
+- 外参稳定性验证：三人采集完成后相机不动，补采 22 对 ChArUco（`...people0_1_2_pmpose_c3_chain/calib_stability/`，期间一次 USB 重插）。当前正式外参（baseline 296.266 mm）只读验算：30 mm 板边误差中位/P95 0.077/0.272 mm、平面残差中位 0.136 mm、最近射线间隙中位/P95 0.877/1.204 mm、正深度 1.0；与 20:16 独立验收（0.083/0.526）同量级，确认人像采集期间外参基本可信（几何判据）。
+- 处理链（复现 people_1 C3E2E；新增 torch.load(weights_only=False) 包装修复 PyTorch>=2.6 检查点加载）：upright 输入（prepare_continuous_stereo_segment，左 ccw90/右 cw90）→ 容器内 yolo26_detector top-1 → C3 连续脚部优先 ROI（threshold 0.37/power 0.75）→ bboxmaskpose 容器 PMPose-b（mask_mode bbox）→ 严格三角化（新正式标定、keypoint 0.25、assoc 0.05、reproj 10 px、max_matches=1）＋ ungated（全有限界内点、质量标记）。产物位于 `research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_X/`。
+- 严格结果：people_0 200 对匹配 143（57 association_failed）、有效点 1280；people_1 448 对匹配 447（1 association_failed）、有效点 5286；people_2 266 对匹配 266、有效点 2792。逐点拒绝均保留在 `pmpose_strict_stereo/offline_stereo_results.jsonl`。
+- 黄色（high_reprojection）阈值与统计：显示阈值 = 左右平均重投影 > 10 px（triangulation.py 的 max_reprojection_error_px；严格剔除、ungated 标 quality_flags）。ungated 有限点中黄色占比：people_0 1085/2365=45.9%（中位 8.96 px）、people_1 2228/7514=29.7%（中位 6.46）、people_2 1725/4517=38.2%（中位 7.61）；黄点多集中在肘/腕/髋/膝等摆动肢体，与近距离行走及两相机采样差有关；肩、左踝等较低。
+- 可视化交付（完全复用参考逻辑 render_people1_pair_aligned_2d_3d_video.py：左右正立二维 + 深底清晰三维三栏，绿色=无标记、橙色=high_reprojection，标题计数；三维点源=ungated）：`.../people_X/qualitative_video/people_X_pmpose_upright_left_right_3d.mp4`，people_0 200 帧、people_1 448 帧、people_2 266 帧，均 30 FPS、1728 x 1064。
+- 连续性缺口（待用户决定是否修补）：people_0 57 帧三维整帧为空（association_failed，最长连续 27 帧），people_1 仅 1 帧、people_2 0 帧。原因=整帧未通过 0.05 极线关联门（二维均存在）；未确认方案前不生成插值坐标。
+- 结论边界：上述全部为内部几何与链路运行证据（严格=门限内，ungated=诊断用全点），不是真实三维精度、骨长或步态结论；不因画面完整而升级解释。
+
+### 2026-09-08（北京时间）— 三人 force_all 全点三角化与时间补全（红点）连续骨架（完成；可视化与诊断）
+
+- force_all 模式：在 `tools/evaluate_offline_stereo_predictions.py` 新增 `--triangulation-mode force_all`（强制每帧最优左右配对、无 0.05 关联门、无二维分数门；所有可有限三角化的界内关节全部输出，负深度/高重投影仅作 quality_flags 统计；越界/非有限二维点因无图像观测仍缺失）。people_0 200/200、people_1 448/448、people_2 266/266 全部帧有 3D 人。
+- 时间补全（复用既有逻辑 `tools/estimate_complete_stereo_3d.py`）：单侧可见 → 该侧射线+邻帧直接立体锚（`single_view_temporal_*`）；双侧缺失 → 邻帧直接立体锚时间插值/外推/保持（`temporal_*`）；全程无分数/关联/重投影拒绝；`has_estimate` 覆盖率 people_0 3400/3400、people_1 7616/7616、people_2 4522/4522（17 关节 x 帧）。产出 `...people_X/pmpose_complete_3d_estimates/`（含 estimate_source/锚帧出处）。
+- 渲染合并（`tools/render_people1_pair_aligned_2d_3d_video.py` 增可选 `--fill-jsonl`，只读合并，不改几何文件）：force_all 直接有限正深度点保持绿(≤10px)/橙(>10px)；缺失点用估计补全并标**红点**，含红端连线标**红**；标题/图例增加 fill 计数。成片 `...people_X/qualitative_video/people_X_pmpose_upright_left_right_3d_timefilled.mp4`（people_0 200、people_1 448、people_2 266 帧，30 FPS，1728x1064；抽帧核验红/绿/橙像素均存在）。红点数=force_all 缺失关节数：people_0 235（头部）、people_1 84、people_2 ~5。
+- 边界：红点是**时间补全/射线投影估计**，带显式 `estimate_source` 与锚帧出处，仅为可视化连续性与诊断，不是直接双目观测，不进入严格/ungated 几何统计，也不代表真实三维精度。
+
+- 骨长统计（沿用 estimate_complete_stereo_3d.py 的 BONES=髋膝踝、单位 mm、左相机系，只统计不干预）：estimate 版四段两端均为直接立体（无时间补全参与）——左/右大腿、左/右小腿中位数：people_0 300.8/300.7/484.1/472.4 mm（帧 200/段，MAD 11–27，邻帧变化中位 4.7–13.6 mm）；people_1 264.8/262.6/418.1/430.6 mm（448/段，邻帧变化 1.6–6.5）；people_2 259.0/260.8/421.4/426.0 mm（266/段，邻帧变化 3.6–7.2）。严格门限（两端均过 10px）子集帧数明显少（people_0 24–60、people_1 76–271、people_2 134–164），中位相近。结论边界：为帧内几何统计、非真实骨长/人体尺寸真值，people_0 中近段噪声大（MAD 高、邻帧变化大）不作解剖结论。
+
+### 2026-09-08（北京时间）— 三人冻结协议、逐帧质量审计与同步帧血缘核实（完成；只读诊断）
+
+- 冻结协议：新增 `V20260908_people0_1_2_pmpose_c3_chain/frozen_protocol_v2.json`，固定 PMPose、C3 连续脚部优先 ROI、原始鱼眼 `1920 x 1080`、左 `ccw90`/右 `cw90`、二维阈值 `0.25`、关联门 `0.05`、重投影门 `10 px`、严格三角化和 `max_matches=1`。新增 `tools/audit_frozen_stereo_sequence_quality.py` 与只读审计模块：协议不匹配、清单顺序不一致或输出目录已存在时拒绝；不重跑模型、不重新关联或三角化、不补点、不改拒绝原因。
+- 逐帧诊断输出：三人各产生 `frozen_protocol_v2_quality_audit/`，保存逐帧配对结果、关联代价、二维可用数、有限/正深度/直接有效三维点数、重投影、左右观测射线夹角、逐关节拒绝原因及仅直接观测骨段稳定性。严格匹配帧/总帧为 people_0 `143/200`、people_1 `447/448`、people_2 `266/266`；直接有效三维点为 `1280/5286/2792`。这些是内部质量诊断，不构成真实人体精度、骨长、步态或标定精度。
+- 同步逻辑审查：采集端是两条自由运行 MSMF 相机线程，以 `VideoCapture.read()` 返回后的主机单调时钟做“一帧前瞻、在线、一对一、最近时间”配对，门限 `25 ms`；非硬件触发同步。三段原始 `stereo_pairs.csv`、`left/right_frames.csv` 和提取清单逐项复核：`200/448/266` 个选择图对均能回溯到唯一的左右原始帧，重算主机差为零不一致、原始帧时间戳为零不一致、帧复用为零、单调一对一为真、超门限为零、清单血缘不一致为零。
+- 时间解释修正：离线回放 JSONL 的 `timestamp_skew_ms=0` 来自 `sequence_file_index_over_fps`，只是回放占位，不再作为同步指标。V1 审计输出保留为纠错证据、不分析；V2 只从采集清单读取 `abs_host_delta_ms`。它是主机配对差，仍非曝光同步误差。V2 的主机差中位/P95 为 people_0 `18.552/23.686 ms`、people_1 `3.525/5.975 ms`、people_2 `5.402/9.477 ms`；people_0 接近 25 ms 门限且严格关联率最低，应作为其几何失败的潜在时间混杂因素保留，不能据此单独归因于模型或标定。
+- 验证：新增质量审计单测，并与已有配对单测合计 `13 passed`。下一步若要把人行走中的时序误差降为可解释变量，需要硬件触发或可验证的曝光级时间戳；在此之前仅报告主机配对证据及其限制。
+
+### 2026-09-09（北京时间）— 固定最新外参的左右鱼眼内参独立验证（完成；只读几何自洽）
+
+- 目标与输入：固定已有 `cam0_fisheye.json`、`cam1_fisheye.json` 与新位姿正式 `stereo_fisheye.json`，对 ChArUco 的每一张 cam0/cam1 图分别估计板到单相机位姿并回投到原始鱼眼像素。主验证使用外参拟合后独立采集的 `V20260908_stereo_extrinsic_recalibration_msmf_fullres/captures/session_20260908_201626/`（31 对）；外参拟合会话 `session_20260908_195808/`（90 对）仅作辅助诊断。未重标定或覆盖 K、D、R、T。
+- 单相机独立会话结果：cam0/cam1 分别检测 `1028/975` 个角点，原始像素重投影残差中位 `0.224/0.213 px`、P95 `0.529/0.549 px`、最大 `2.613/3.387 px`；31/31 对两侧均满足至少 8 角点。离轴覆盖最大归一化半径为 `2.79/4.01`，最外层（半径 >=1）P95 为 `0.584/0.593 px`，未见随半径单调失控。少数 2--3 px 异常为单个角点，未形成整板高残差模式。
+- 固定外参的交叉检查：将 cam0 单目板姿态经固定 R/T 变换到 cam1，与 cam1 独立 PnP 姿态比较；31 对的旋转差中位/P95为 `0.413/1.030 deg`，平移差中位/P95为 `1.355/3.896 mm`。辅助 90 对会话相应为 `0.204/0.439 deg`、`0.600/2.656 mm`；其单目残差中位 cam0/cam1=`0.211/0.185 px`。独立会话较拟合会话略大符合独立验收预期，未显示内参或新外参的整体失配。
+- 产物与边界：新增 `tools/validate_charuco_single_camera_intrinsics.py`；详细逐角点、逐图、径向分层和固定外参姿态比较保存于 `.../intrinsic_validation_independent_20260909/` 与 `.../intrinsic_validation_external_fit_session_20260909/`。该实验是固定内参与固定外参在 ChArUco 图像上的独立自洽验证；单目每图位姿由同图角点估计，不能表述为真实人体三维精度、地面坐标精度或曝光同步验证。下一步如需建立地面系，仍须以平放标定板/静态参考建立 `measured_locked`，并使用未参与拟合的独立样本验收。
+
+### 2026-09-09 23:11（北京时间）— 局部动态地面四路线并行实施（进行中；工程研究）
+
+- 验证目标：在不建立永久世界地面坐标系的前提下，同时推进：（1）语义身份约束的双目局部平面直接观测；（2）静态背景视觉里程计下的短时平面传播；（3）双目/IMU 融合的数据接口与验收边界；（4）可调助步器支撑几何模板，并将其作为前三项的条件而非独立地面来源。
+- 输入、对照与不变量：只读消费新位姿正式标定、`V20260908_people0_1_2_pmpose_c3_chain` 保存的原始左右图对及其清单；不重跑 PMPose，不修改人物关联、严格三角化或既有拒绝原因。旧的低饱和下部地面掩膜仅保留为序列特异负对照，不能升级为通用语义地面。
+- 统一输出边界：局部平面一律在 `left_camera` mm 坐标表达，状态只能为 `direct`、`propagated` 或 `unavailable`，必须保存来源、质量量和拒绝原因。助步器相对相机静止的支撑模板不能单独证明接地或抬起；它只能与独立外部地面观测、相对相机运动或 IMU 证据联合审计。当前无 IMU 记录，IMU 分支先做软件接口与单元测试，不报告实际融合改进。
+- 计划的阶段门：路线 1 先验收地面内点的人工身份/双目几何诊断；路线 2 只从路线 1 已验收锚帧传播，并以独立目标帧的 `direct` 平面做一致性比较；路线 3 等硬件外参和时间证据；路线 4 等每次高度调整后的支撑配置测量。任何一项失败都保留为 `unavailable`，不得据此输出足地高度、接触、步长或步态结论。
+- 当前实现与测试：新增只读的 `observe_local_ground_semantic_stereo.py`，其 `direct` 放行同时要求左右外部二值地面掩膜、`manually_audited` 身份声明、严格左右一致性双目、候选/内点/覆盖/残差/鱼眼回投门；没有语义掩膜的下部区域仅能作为几何诊断，强制为 `unavailable`。新增静态背景三维对应 RANSAC、局部平面传播、助步器支撑条件和视觉-IMU接口模块；93 项仓库测试通过。接口明确禁止用 IMU 加速度积分生成高度，并允许 `pair_id=0` 进入相邻帧关系。
+- 路线 1 小样：先在 `G20260909_local_ground_observation_semantic_stereo_v1` 对 people_1 前 12 对执行下部非语义诊断，发现即便有高内点拟合，裸露候选平面字段仍可能被下游误用；该输出保留为协议修正证据，不分析。随后以 `..._v2/people_1_lower_region_nonsemantic_diagnostic/` 重跑：12/12 均为 `unavailable:semantic_evidence_missing`，下游条件层亦为 12/12 `unavailable`、12/12 `contact_unconfirmed`。V2 将非放行拟合明确写为 `unaccepted_candidate_plane`，正式 `plane` 与 `plane_in_left_camera` 为 null；该结果说明现有数据尚未具备经人工验收的地面身份输入，而不是地面、接触或步态的负结论。
+- 路线 1 跨人抽样：对同一保存数据以 people_0/1/2 各约 30 个等间隔对（总 89 对）运行 V2 的下部非语义诊断，全部为 `unavailable`；89/89 均含 `semantic_evidence_missing`，并分别有 33/89 候选点不足、25/89 内点不足、15/89 覆盖不足（原因可重叠）。所有未验收候选的点数/内点数/覆盖/残差中位数为 322/269/0.0364/4.857 mm。低残差与高内点并未使任何帧放行，且覆盖小，进一步证明不能把“下部主平面”解释为真实地面。原始逐帧记录位于 `G20260909_local_ground_observation_semantic_stereo_v2/people_*_stratified_nonsemantic_diagnostic/`。
+- 语义候选尝试：本机原无场景分割工具；通过官方 SegFormer/ADE20K 路线安装可选 `transformers` 依赖，新增 `generate_segformer_floor_masks.py`，明确只生成未验收 `floor` 类候选（ADE20K label 3），不加入核心 requirements。对 people_1 前 12 对左右正立图分别以 `nvidia/segformer-b0-finetuned-ade-512-512`、CUDA 推理，掩膜面积约 24--26%；再作为 `provided_unvalidated` 输入双目工具。12/12 仍为 `unavailable`，均含 `semantic_identity_unvalidated` 与 `insufficient_stereo_candidates`，其中 10/12 内点不足、8/12 覆盖不足。可视化 `.../people_1_segformer_b0_12_unvalidated_stereo/visualizations/pair_0000_local_ground.png` 显示严格左右匹配后仅少量候选；这说明该通用模型在当前鱼眼、人体和助步器遮挡域只能作为待人工审计候选，不能作为直接地面证据。
+
+### 2026-09-10（北京时间）— 相机固定助步器的自身体遮挡区域识别（第一轮完成：候选身份失败；工程研究）
+
+- 验证目标：在不改变 PMPose、人物关联或三角化的前提下，利用相机相对助步器主体近似静止的时序线索与零样本分割，输出逐帧、逐视图的 `walker_occlusion_candidate`。候选仅用于后续地面像素排除和助步器几何建模，不能作为地面、接触或人体状态标签。
+- 输入与不变量：只读消费新位姿下 people_0/1/2 的保存正立左右图像；主体相对相机稳定是待检验假设，小幅关节运动、手/人体遮挡、光照和相机微振动均须输出不确定性，不能硬编码为固定像素。
+- 实现：新增只读 `realtime_app/tools/observe_walker_self_occlusion_temporal.py` 与 7 个单元测试。它固定输出 `candidate/unavailable`，记录左右掩膜、时序稳定度、跨视图面积审计和拒绝原因；不会改写 PMPose、关联、三角化或地面状态。模型下载的 SAM 权重未完成，故未将 SAM 作为实验结果。通用 SegFormer/ADE20K 只以 `person`、`floor` 类作排除提示，绝不声称其识别了助步器。
+- 结果 1（时序基线）：people_1 前 30 对、480 宽度光流、相邻帧和 5 帧间隔两种条件均为 0/30 双视图候选；所有视图均因 `stable_region_dominates_image_ambiguous` 拒绝。这表明短时间差下静态背景同样稳定，不能仅以低运动识别助步器。
+- 结果 2（语义排除反例）：people_1 前 12 对中，仅排除 `person` 的 v2 虽产生 12/12 候选，但 `pair_0000` 叠加图大面积吞入深色地面/阴影，视觉身份失败。排除 `person+floor` 的 v3 只剩 2/12 数值候选；`pair_0007` 与 `pair_0010` 仍主要落在门边或地面残留，不贴合扶手/立柱，亦失败。逐帧 JSONL、掩膜与叠加图位于 `G20260910_walker_self_occlusion_temporal_sam_v1/` 和 `G20260910_walker_self_occlusion_semantic_exclusion_v2/v3/`。
+- 冻结结论与下一门：当前通用场景语义 + 时序稳定性 + 深色结构不能产生可用的自动助步器遮挡掩膜，禁止接入地面候选排除或几何模块。下一条可检验路线不是继续调阈值，而是（a）少量人工首帧/关键帧二值掩膜后作时序传播，并以未见帧人工审计；或（b）建立“助步器”专用标注集并训练/微调分割模型。两者都需要显式对象身份信息，但不等于地面固定坐标系或助步器固定像素先验。
+
+### 2026-09-10（北京时间）— people_1 全程视觉语义审计（完成：自动助步器掩膜不通过）
+
+- 用户要求先以视觉确认人、助步器、地面再验证。人工复核 people_1 左正立开头/中段/末段确认助步器可见主体为上方弧形扶手、左右竖管与下方横杆；人体居中并遮挡局部管架，地面主要在画面下部。新增 `audit_people1_camera_attached_semantics.py`：对全程 448 帧每 10 帧取样 45 帧，缓存 SegFormer/ADE20K 仅输出 `person_candidate`、`floor_candidate`；助步器不使用不存在的 ADE 类，而以全视频持续暗边缘组成相机附着结构候选。
+- 视觉量化验证：建立 `left_visual_reference_polylines.json`，以人工复核的可见扶手/竖管/横杆粗中心线为参考（不是像素真值）。自动模板相对该参考 IoU=3.79%、覆盖率=4.13%、精确率=31.16%；对比图中自动蓝色只覆盖少量管边缘，主要扶手和竖管主体漏失。场景候选平均面积为 person 47.87%、floor 22.97%、walker 1.16%。
+- 结论：这次确实完成了人/助步器/地面的候选语义可视化，但“助步器”候选未通过视觉身份门，仍不得进入地面像素排除、双目几何、接触或步态分支。有效下一步是显式标注少量助步器实例后，以首帧掩膜/提示进行时序传播并在留出帧验收，或训练专用分割器；不是继续依赖通用场景标签或纯稳定性。
+
+### 2026-09-12（北京时间）— 地面多表示、助步器几何与行走候选实现及对比（完成；助步器真实数据受语义输入阻断）
+
+- 目标与实现：在不使用永久世界坐标系、不修改 PMPose/关联/严格三角化的前提下，新增 `scene_geometry_variants.py`，实现地面的稠密 RANSAC、空间分块稀疏 RANSAC、纹理/光度软权重 IRLS、图像分区共识四种表示；实现助步器稠密点云、连通分量管段、刚体模板、允许小关节转动的分段模板及相机附着短窗体素共识。新增 `gait_interaction_candidates.py`，实现严格双踝窗口化走/停候选、脚点到当前平面高度、手腕到扶手圆柱的软接近候选。所有状态均保留 `candidate/ambiguous/unavailable` 与拒绝原因。
+- 地面对比：people_1 同 12 对左右人工地面掩膜下，稠密/稀疏/IRLS/分区共识可拟合 `12/12、12/12、12/12、7/12`，中位残差 `4.37/5.04/7.88/3.40 mm`；Mask2Former 候选下为 `12/12、12/12、12/12、6/12`，残差 `5.02/6.02/10.81/3.38 mm`。相对人工掩膜条件下稠密 RANSAC 的内部参考，Mask2Former+稠密法向差中位 `0.445 deg`、offset 差 `1.482 mm`；分区共识在 6 个可比较帧为 `0.297 deg/0.896 mm`。这些是共享标定/图像的管线一致度，不是真实地面精度。当前主估计建议为稠密 RANSAC，分区共识作拒绝门，稀疏法作低算力对照；启发式 IRLS 以 `11.430 deg/68.674 mm` 失败，保留负对照。
+- 助步器阻断证据：现有 24 个左右 LabelMe 文件只有左 `pair_0000` 含 walker 多边形，右侧 12/12 没有 walker 标签，不能进行成对人工语义的严格双目助步器重构。以此前视觉身份已失败的时序暗区掩膜做压力测试，12/12 仍产生三维候选和管段，候选点中位 `24421`、重复体素 `1127`；这反证“点多、稳定、可拟合”不能替代助步器身份。真实数据分支继续为 `unavailable`，刚体/分段模板只完成软件与合成单测。
+- 行走候选：people_1 严格三维 448 帧中双踝有效 303 帧；15 帧窗口、5 帧步长得到 87 窗，`walking_candidate=9`、`motion_ambiguous=32`、`unavailable=46`。没有动作区间真值，不能报告准确率、步态事件或临床参数。名义帧率只用于窗口索引，不作为曝光同步证据。
+- 产物与验证：完整记录在 `G20260912_ground_walker_reconstruction_benchmark_v1/EXPERIMENT.md`，深度文献与系统路线报告为 `research_records/reports/R20260912_system_roadmap_literature_and_reconstruction.md`。新增 10 项方法单测，全仓在 `realtime_app` 下 `130 passed`；未提交 Git。
+
+### 2026-09-11（北京时间）— 三种公开场景分割后端的地面候选接口与双目诊断（完成；未形成地面观测）
+
+- 目标与边界：按同一 `people_1` 新位姿保存数据对比 SegFormer-B0、Mask2Former-Swin-S、OneFormer-Swin-T 的 ADE20K `floor` 候选；GroundNet 按本轮决定未运行。新增 `tools/benchmark_floor_semantic_backends.py`，对每一模型输出同名二值 `floor_masks/`、叠加图、逐帧状态和模型间掩膜一致度；输出只能以 `provided_unvalidated` 送进既有双目工具，绝不修改 PMPose、关联、三角化或地面状态。
+- 输入与环境：固定 people_1 左 `ccw90`、右 `cw90` 的 12 个全程等间隔时刻（pair 0 到 440，步长 40），当前正式 `stereo_fisheye.json`，CUDA 单图批量。首轮一次 12 图运行使 Mask2Former/OneFormer 显存不足，失败输出保留；改为 batch=1 并在模型间释放显存后，三模型均完成本机推理。新增接口单测后全仓 `112 passed`。
+- 运行版本边界：本机 `transformers 5.16.1` 对 Mask2Former、OneFormer 均报告少量 LayerNorm 参数新初始化及位置索引缓冲区格式提示。两者输出保留为当前接口下的候选比较，但不是官方实现/论文指标的严格复现；任何后续微调前需锁定或复核推荐运行版本。
+- 图像候选比较：左视图三两两平均 IoU（SegFormer/Mask2Former、SegFormer/OneFormer、Mask2Former/OneFormer）为 `0.769/0.762/0.829`，右视图为 `0.791/0.758/0.777`；最小单帧 IoU 左/右 `0.250/0.411`。这只是模型一致/分歧，不是正确率。抽查 `pair_0120`、`pair_0160` 的叠加图发现三者都会把画面下方杂物、鞋面或近景非地面并入候选；不能依面积、一致度或主观画面选择“最佳”。
+- 严格双目诊断：三后端均因 `semantic_identity_unvalidated` 固定为 `direct=0/12`、`unavailable=12/12`。候选点/RANSAC 内点累计为 SegFormer `933/818`、Mask2Former `1449/1110`、OneFormer `1122/830`；但所有三者均大量触发候选点、内点或覆盖不足。Mask2Former 数量最大只表示它保留更多未验证区域，不能升级为更准确、更好平面或真实地面。未放行平面仅记为 `unaccepted_candidate_plane`。
+- 结论与下一门：三个公开模型的环境和统一输出接口已就绪，但当前鱼眼助步器室内域的通用 `floor` 类不能作为地面身份依据，且未通过严格双目覆盖门。下一步应跨序列位置、左右同步配对地人工标注少量可见地面，按 precision/recall/IoU 和错误类型选择或微调后端；不得以相邻帧随机划分、三模型投票或“内点较多”替代该验收。
+
+### 2026-09-11（北京时间）— 两张人工标注图的地面候选初步审计（完成；仅单视图诊断）
+
+- 输入与协议：用户在 `G20260911_floor_semantic_backend_comparison_v1/manual_labels_holdout_v1/` 完成 `pair_0000` 与 `pair_0040` 左正立图的 LabelMe 标注。新增只读 `tools/audit_manual_floor_labels.py` 与 2 项单测，将可见多边形按 `ignore_uncertain > person > walker > static_other > floor_eligible` 写成互斥标签；输出原尺寸人工二值掩膜、三后端误差叠加图（绿 TP、红 FP、洋红 FN）和逐图 JSONL。它不读取右图，不触发双目，也不改变地面状态。
+- 初步数值：两张左图的 floor candidate 平均 precision/recall/IoU 为 SegFormer `0.857/0.879/0.766`、Mask2Former `0.892/0.986/0.881`、OneFormer `0.906/0.898/0.820`。只有 `pair_0000` 有 walker 标注；其 walker 被错误报作 floor 的比例为 `13.97%/8.99%/6.67%`。该单帧泄漏值不能表示总体，也不能选模型；它仅确认助步器漏入地面候选仍是实在风险。
+- 低照度诊断：在 `pair_0000` 的人工区域，地面灰度中位/P10/P90=`16/8/22`，助步器=`6/2/23`，两个分布高度重叠。因此“深色、低纹理或短时稳定”没有可辨识的对象身份，不能以灰度阈值或继续调整时序暗结构解决。这解释此前助步器掩膜与地面候选的混淆，而不构成照明是唯一原因的证明。
+- 下一门与边界：当前是 2 张左视图的一致度诊断，不能视作视频泛化、左右对应、语义真实精度或地面重构。以最小标注量继续采样 `pair_0080/0160/0240/0320` 左图，并只画 `floor_eligible`；达到 6 张后才临时冻结候选后端。随后仅为该后端补同 6 对右图，才可进行 `manually_audited` 的严格双目地面身份/几何门验收。全仓测试为 `114 passed`。
+
+### 2026-09-11（北京时间）— 六张人工左视图的地面候选后端选择（完成；单视图候选冻结）
+
+- 输入与验证：用户完成 people_1 左正立图 `pair_0000/0040/0080/0160/0240/0320` 的 LabelMe 标注；第 0 帧保留 person/walker/floor 的可见层级，其余仅标 `floor_eligible`。工具 `audit_manual_floor_labels.py` 对保存的三种 ADE20K floor candidate 重跑；摘要从初版错误固定为“两张图”修复为读取实际标签数，旧输出保留，新输出写入 `G20260911_floor_semantic_backend_comparison_v1/manual_labels_left6_audit_v2/`。
+- 结果：六图宏平均 precision/recall/IoU 为 SegFormer `0.859/0.842/0.735`、Mask2Former `0.869/0.985/0.857`、OneFormer `0.877/0.848/0.755`。IoU 最小--最大为 `0.348--0.847`、`0.833--0.883`、`0.309--0.900`，相应标准差 `0.184/0.020/0.209`。在视觉审计的困难 `pair_0160`，Mask2Former=0.834，而 SegFormer/OneFormer=0.348/0.309；Mask2Former是唯一未出现灾难性漏检的候选。
+- 冻结的决定与限制：因此只将 `mask2former_swin_small` 冻结为**下一道右图人工验证的候选后端**。这不是自动地面身份、模型泛化、真实语义精度或地面重构结论：它在 6 图中仅 3 图 IoU 第一，且 `pair_0000` 的可见助步器仍有 8.99% 被误作 floor；可视化仍见左下杂物/鞋面假阳性。低照度下助步器和地面亮度重叠仍是明确混杂，不可由阈值解决。
+- 下一门：为同一 6 个 `pair_id` 补右正立图的 `floor_eligible`（无需重新细标 person/walker）。只有左右同帧均由人工确认，才以 `manually_audited` 将 Mask2Former 掩膜送入严格双目局部平面观测，并保留每帧几何拒绝原因。全仓测试已更新为 `115 passed`。
+
+### 2026-09-11（北京时间）— 完整左右人工掩膜、时序传播与严格双目地面诊断（完成；地面重构未验收）
+
+- 标注验收：用户完成 people_1 12 个等间隔时刻（`0,40,...,440`）的左右正立 LabelMe `floor_eligible` 标注，左右帧号一一对应、尺寸均为 `1080 x 1920`。`audit_manual_floor_labels.py` 增加同名 `manual_floor_masks/pair_XXXX.png` 导出，保留原标签、候选错误叠加及逐图记录；人工掩膜仅提供地面像素身份输入，不构成三维真值。
+- 二维候选后端：在左/右各 12 张人工标签上的宏 IoU，SegFormer=`0.725/0.707`、Mask2Former=`0.831/0.778`、OneFormer=`0.769/0.732`；Mask2Former 同时有最高召回（`0.983/0.989`），故仍冻结为唯一自动候选。它不是地面重构成功：左图 `pair_0000` 仍见 8.99% walker-to-floor 泄漏，其他帧仍有杂物/鞋面假阳性。
+- 时序候选的留出评估：实现并运行 `one_shot`（仅 pair 0 人工种子）与 `periodic_reanchor`（pair 0/80 人工准确重锚）相邻光流传播。one-shot 对未参与传播的 40/80/120 帧 IoU=`0.851/0.715/0.644`（宏 0.737）；periodic 对 40/120 的 IoU=`0.851/0.640`（宏 0.746）。在共同 40/120 帧，one-shot/periodic 平均 `0.748/0.746`，重锚没有改善；两者都在 120 帧吞入大量非地面，而内部双向光流门仍全部通过。故时序流是短时候选/失败诊断，不能替代每帧语义身份或人工输入。
+- 人工身份 + 严格双目：左右人工掩膜以 `manually_audited` 输入 `observe_local_ground_semantic_stereo.py`，12 对中 `direct=2`（pair 240/320）、`unavailable=10`；拒绝原因可重叠为候选不足 9、内点不足 9、覆盖不足 7。两 `direct` 候选的跨帧法向差 `108.99 deg`、offset 差 `226.59 mm`，且可视化只见极局部匹配，故它们仅为内部门通过的未稳定候选，不能称可信地面、足地高度、接触、支撑或步态。该结果把主失败定位到：即便有人工地面身份，当前近景低纹理/遮挡/双目条件仍缺少稳定且覆盖足够的左右对应；不单独归因为标定或模型。
+- 代码与验证：新增 `pose_app/temporal_floor_mask_propagation.py`、`tools/propagate_audited_floor_masks.py`、`tools/evaluate_temporal_floor_propagation.py` 及模式单元测试；全仓 `120 passed`。下一步只应诊断人工掩膜失败帧的局部匹配/视差/覆盖并进行单变量几何修复，不应扩大标注或将时序掩膜送入双目。
+
+### 2026-09-12（北京时间）— 助步器“稠密点云 vs 骨架引导 vs 时序骨架”受控对比链（完成；骨架约束消除了巨管，但助步器身份仍未验收）
+
+- 目标与唯一变量：不训练或替换任何语义模型、不改 PMPose、人体关联、标定与冻结双目参数，新增 `realtime_app/tools/benchmark_walker_structure_variants.py` 与 `realtime_app/pose_app/walker_structure_variants.py`，在完全相同的图像、标定、左右助步器掩膜和冻结双目参数下比较三种“由掩膜到三维助步器杆件候选”的方法。唯一新增结构参数是 `--skeleton-band-radius-px`（本次 `3`，圆形核，定义在掩膜自身的正立像素域）；方法 B 相对方法 A 只改变送进冻结链的二值掩膜，方法 C 只以方法 B 的三维点为输入。工具不提供静默回退开关，骨架分支失败即输出 `unavailable` 与原因。
+- 输入与语义证据：people_1 正立 `input_448pairs`（左右各 448 张）＋左右各 12 张自动助步器遮挡候选掩膜（`G20260910_walker_self_occlusion_semantic_exclusion_v2/people_1_first12_stride5_semantic_person_dark70/masks`；该掩膜此前视觉身份审计未通过）。左右同名图像 448、左右同名掩膜 12、四者同名可用 12，实际运行 `pair_0000`–`pair_0011`。全部输出固定 `automatic_candidate`，不升级；未把 `floor_eligible` 掩膜当作助步器掩膜，也未在左右之间复制掩膜。
+- 方法 A（`dense_component_pca`）：12/12 帧有严格双目点（每帧中位 `22119`），12/12 帧各产出 1 条线段；长度中位 `819.9 mm`（706.6–836.5），半径与拟合残差中位 `73.2 mm`、P90 中位 `179.8 mm`。即每帧得到一根覆盖整个掩膜的巨管，其半径在物理尺度上不可能是单根助步器杆件。
+- 方法 B（`skeleton_guided_sparse_stereo`）：骨架像素中位 `5309.5`、骨架带像素中位 `45906`、骨架连通组件中位 `750.5`；严格三维点中位仅 `87.5`（为 A 的 `0.396%`）；10/12 帧有候选，共 23 条线段（每帧中位 2 条），长度中位 `28.5 mm`（6.0–109.3），半径与残差中位 `2.2 mm`、P90 中位 `3.85 mm`。失败原因 93 次 `insufficient_component_stereo_points`，`pair_0000`/`pair_0004` 两帧无任何候选并原样保留。
+- 失败定位：冻结候选链的“对侧掩膜对应”存活率中位（`right_mask_valid / forward_valid`）由 A 的 `0.4946` 降到 B 的 `0.0249`。这把点稀少定位到共享的双侧掩膜互相对应门（两侧 3 px 骨架带在视差伙伴位置上互不重合），而不是线段拟合、SGBM 参数或三角化规则；本次未改任何门限去补偿。
+- 方法 C（`skeleton_guided_temporal_consensus`）：5 帧居中窗（序列边缘帧实际只有 3–4 帧，帧号与帧数逐帧写入记录）、体素固定 `20.0 mm`、最少支持 `max(2, ceil(实际窗口帧数/2))`；窗内输入点总数中位 `411.5`，共识体素中位 `8.5`，仅 1/12 帧达到 ≥10 个共识点并产出 1 条线段（`92.3 mm`），其余 46 次同因失败。共识只表示相机系中的重复观测。
+- 同帧可用性差异（本工具自身候选的可用性，不是识别成功率）：A 与 B 双方可用 10 帧、仅 A 可用 2 帧、仅 B 可用 0 帧；B 与 C 双方可用 1 帧、仅 B 可用 9 帧、仅 C 可用 0 帧。所有失败帧都保留在 `frame_records.jsonl`。
+- 产物与验证：结果写入 `research_records/engineering_validation/G20260912_walker_structure_variants_v1/automatic_candidate_12pairs_v1/`（`EXPERIMENT.md`、`command.txt`、`run_metadata.json`、`frame_records.jsonl`、`summary.json`、12 张三栏 PNG、36 个逐方法 PLY）；本次 12 帧三种方法均有非空点云，故未触发“不写空 PLY”分支。新增 14 项单元测试（含与冻结旋转约定的逐点回归、空掩膜三方法同时 `unavailable`、仅左掩膜时工具显式失败、窗内单帧支持不足、解释文本禁用词边界），`python -m unittest realtime_app.tests.test_walker_structure_variants -v` 通过；`realtime_app/run_tests.py` 全仓 `185 passed`。
+- 结论边界：本次没有任何三维助步器真值，因此不得声明“精度提高”，也不得把这些数字称为准确率、召回率、真实长度误差或助步器识别成功率。可报告的只有内部几何事实：骨架约束下不再出现 A 的半径中位 `73.2 mm`、长度中位 `819.9 mm` 的单一巨管，代之以若干长度中位 `28.5 mm` 的短线段；但短线段本身同样没有经过助步器身份验证，是否对应真实管件仍未知，不能反向证明 A 的巨管全部来自背景混入。
+- 单变量范围的诚实说明：冻结链的掩膜导向校正视点由所提交掩膜自身导出，A 与 B 的正立掩膜中位分别为 `(392.5, 1648.0)` 与 `(291.0, 1375.5)`，因此“只改掩膜”限于送入冻结链的输入；SGBM 设置、反向视差搜索方向、视差范围、左右一致性门、光度门、深度门与三角化规则逐项相同，标定与冻结参数未被修改。
+- 下一步（未执行）：不通过调阈值追分。若要让骨架带在共享门内可存活，需要把带半径显式定义在候选链的运行时域、或为对侧对应单独定义容差，并作为独立单变量实验重新冻结后验收；在此之前骨架引导分支只是候选不足，不得进入地面、接触或步态任何下游。
+
+### 2026-09-13（北京时间）— 光流 / 视觉里程计验证与 27 组合时空地面重构汇总（完成；光流内部一致性通过、VO 失败关闭）
+
+- 目标与范围：只读 task-01 的 `G20260912_modular_ground_benchmark_v1` 与 task-02 的 `G20260912_learned_stereo_replacement_benchmark_v1`，**不重跑** SGBM/IGEV/DynamicStereo、不训练不微调、不改任何空间重构结果、标定或门限。新增 `realtime_app/tools/benchmark_temporal_ground_modules.py` 与 19 项单测，完成：光流的地面掩膜时序一致性与 40 步传播漂移验证；VO 的局部平面传播验证；固定 3 匹配器 × 3 平面拟合器 × 3 时序状态 = 27 组合汇总。在线语义输入固定为 Mask2Former 地面**候选**，人工掩膜只提供二维身份审计，不作为在线时序输入。
+- 光流一致性（`flow_records.jsonl`，22 条 = 11 个相邻锚点区间 × 2 视图；左右独立执行、左掩膜从不复制到右图；全部 `available`）：单步“上一锚点 Mask2Former → 传播 → 当前锚点 Mask2Former”IoU 中位 左 `0.8409` / 右 `0.7649`；前后向一致性分数中位 左 `0.9313` / 右 `0.8896`；`new_area_fraction` 中位 `0.0828/0.1197`；`lost_area_fraction` 中位 `0.0751/0.1266`。每条记录显式写 `current_mask_is_authoritative = true` 与 `propagated_mask_used_as_geometry_input = false`，时序状态只能是 `flow_assisted_current_frame`；一致性不足只会降级状态，绝不绕过当前帧双目、三角化、RANSAC 或分区门。
+- 光流 40 步漂移（`flow_manual_anchor_evaluation.json`；终点标签在传播完成后才读取，单测用调用顺序强制，且换用不同终点标签时传播掩膜逐像素相同）：人工种子到下一人工锚点宏 IoU 左 `0.7500` / 右 `0.7538`，precision `0.8713/0.8694`，recall `0.8539/0.8567`，`false_positive_on_non_floor` `0.0371/0.0318`，`false_negative_on_floor` `0.1461/0.1433`，`mask_area_change` `+0.0095/−0.0052`。改用 Mask2Former 种子后 IoU 降到 `0.7294/0.6714` 且面积增大 `18.6%/26.1%`（precision `0.79/0.73`）——候选掩膜的过覆盖被传播保留下来，不是传播变准。生产兼容评估（Mask2Former 当前帧 vs 由上一帧 Mask2Former 连续传播 40 步）IoU 左 `0.8003` / 右 `0.7493`，仅一致性、不当作真值。
+- 漂移趋势：传播面积分数对步序斜率 左 `−2.28e−5` / 右 `−7.01e−5`，第一→最后四分之一均值 左 `0.2215→0.2209`、右 `0.1960→0.1940`；流一致性斜率 左 `−1.16e−4` / 右 `−1.53e−4`。即 40 步传播面积几乎不漂移（略微收缩），主要损失是端点形状误差与地板漏检；光流因此只适合作为短时“语义是否一致”的附加证据，不足以替代每帧语义或单独支撑地面身份。
+- VO 失败关闭（`vo_records.jsonl`，99 条 = 3 匹配器 × 3 平面拟合器 × 11 区间）：源锚帧合格 `51`、成功传播 `0`、全部 `unavailable`；原因计数 `no_direct_anchor_after_cross_region_gate` 48、`no_per_frame_static_background_metric_correspondences_in_frozen_archives` 51、`static_background_domain_not_certifiable` 51。DynamicStereo 的 33 条全部因冻结分区门 `0/12` 被拒，从未作为 VO direct 锚帧，也未用候选平面替代；SGBM/IGEV 通过门的 51 条进入链后因冻结产物没有逐帧静态背景米制对应而失败关闭（补出它等于重新运行双目匹配器，本任务禁止）。逐帧排除区也只有 12 帧（`pair_0000`–`pair_0011`），而相机装在助步器上、助步器像素每帧都在且近似静止。`vo_runtime_ms_per_step` 与 40 步总时间均为 `null` 并附原因：没有任何一步真正完成，“没有位姿”不等于“位姿耗时为 0”。
+- 27 组合矩阵（`combination_matrix_27.json` / `.csv`）：`27` 行且组合 ID 唯一；`full_chain_measured` true `9` / false `18`；`measurement_scope` `direct_chain` 9 / `temporal_module_composition` 18；`realtime_compatible` true `0` / false `27`；`measured_end_to_end_latency_ms` 非空 `0` 行。最快直接链 `mask2former_swin_small__sgbm__soft_weighted_irls__direct_current_frame` 估算 P50 `745.1 ms`；内部几何证据最强直接链 `...__igev__dense_ransac__direct_current_frame`（中位内点率 `0.9705`、中位残差 `1.724 mm`、分区门 `12/12`）；最快光流组合估算 P50 `7970.3 ms`。DynamicStereo 的 9 行全部带 `future_lookahead_frames = 4`、`offline_window_inference = true`、`realtime_compatible = false`。
+- 速度与延迟口径：空间直接链比较只用 task-02 的 `timing_on_task01_comparable_frames`（共同 `count = 10`），不把 SGBM 的 count=10 与学习型的 count=11 百分位直接排名；所有时间统计都带 `count/median/p90/p95/min/max/warmup_excluded_count`。全分辨率双向 Farneback 光流很贵：`flow_field_ms` count `902`、中位 `3406.7 ms`、P90 `3579.1`、P95 `3636.6`、min `607.4`、max `4108.3`；`flow_consistency_ms` 中位 `183.0 ms`；双视图合并中位 `7225.2 ms`。三条限制必须连带引用：`mask_load_ms` 只读缓存的候选掩膜 PNG（Mask2Former 前向不在本目录任何数字内）、学习型匹配器前向与镜像反向场两次推理都计入上游估算、`estimated` 与 `measured` 严格分开。
+- 产物与验证：`research_records/engineering_validation/G20260913_temporal_ground_composition_benchmark_v1/`（`flow_records.jsonl`、`flow_manual_anchor_evaluation.json`、`vo_records.jsonl`、`combination_matrix_27.json/.csv`、`summary.json`、`timing_summary.json`、`command.txt`、`run_stdout.txt`、`EXPERIMENT.md`、`FINAL_RECOMMENDATION.md`、34 张可视化、`finalize_summary.py` + `finalize_summary_report.txt`）。全仓 `realtime_app/run_tests.py` `204 passed`（新增 19 项，覆盖光流只作附加证据、终点标签不回写、无 direct 锚帧 VO 必须 unavailable、DynamicStereo 分区门失败不得进入 VO、矩阵严格 27 行且 ID 唯一、`full_chain_measured` 标志、estimated 不得标为 measured、上游快照不变）；`py_compile` 通过；task-01（21 文件）与 task-02（1082 文件）运行前后 (size, mtime) 逐文件快照不变。
+- 结论边界：以上全部是同一批图像、同一标定、同一 Mask2Former 候选条件下的内部一致性与本机模块时间；没有独立物理地面真值，因此不得报告真实地面精度、相机高度精度、足地高度、步态事件、接触或临床指标。IGEV 的高内点率/低残差、DynamicStereo 的 `0/12` 分区门、SGBM 的速度优势都只是内部证据；光流通过的是“内部一致性与漂移可控”，不是语义准确率；VO 本次没有产出任何传播平面，这是失败关闭的结果而不是几何负结论。
+- 下一步（未执行）：VO 要在本数据上真正可测，需先补齐（a）覆盖全部 448 对的逐帧助步器候选排除区，（b）逐帧米制静态背景对应；后者等于另立一个单变量、可复现的双目前端任务，不得靠放宽分区门、用候选平面替代 direct 锚帧或让 VO 使用地面/人/助步器点来绕过。
+
+### 2026-09-13（北京时间）— 连续左视图独立地面语义审计（完成；二维留出证据）
+
+- 输入与范围：用户新增的 `H20260912_people1_left_contiguous30_labelme_v1` 左正立连续 `pair_0001`--`pair_0011` 共 11 张 `floor_eligible` LabelMe 标注。它们未参与此前等间隔 12 帧的后端选择或低照度开发/留出实验；每张仅有 floor 多边形，无 person/walker/static_other/ignore 标签。只以缓存、本地 Mask2Former-Swin-S 对原图推理并做单视图人工标签审计；未训练、未下载、未运行右图、双目、三角化或平面拟合。
+- 结果：宏平均 precision/recall/IoU=`0.8762/0.9887/0.8675`；逐帧 IoU 中位 `0.8656`、范围 `0.8525--0.8811`、标准差 `0.0101`，未出现灾难性单帧漏检。对比此前 12 张等间隔左图的 `0.8296` 只能说明这段同人同会话连续左图中候选稳定，不能称独立泛化或精度提升。最低 `pair_0007=0.8525` 的可视化仍显示近处物体/边缘的 floor 假阳性；由于新标签无 walker/person 区域，无法测泄漏率。
+- 结论与下一门：这 11 张适合并已完成二维连续留出审计，但不能替代右图标注做双目地面/助步器重构，也不能据此启动或评价 walker 微调。主线应转向取得左右成对的 `walker_visible / person / ignore_uncertain` 标签；届时再由用户决定是否启动小规模专用助步器分割微调，并将通过审计的掩膜送入既有 A/B/C 三维结构链。产物位于 `G20260913_contiguous_left_floor_semantic_holdout_v1/`；既有标签审计单元测试 `3 passed`。
+### 2026-09-13（北京时间）：双目图对级 Mask2Former 时延更正 v2（完成；只读统计修正）
+
+- 目标与唯一变量：修正 G20260913_mask2former_online_latency_parity_v1 把单张左或右图的语义时延只加一次到"左右双目图对"组合时延的统计单位错误。唯一变量是语义时延统计单位：从"单图测量值"改为同一 (pair_id, repeat_index) 下左图 + 右图两次 Mask2Former 前向测量值之和。不运行任何视觉模型，不重跑 SGBM/IGEV/DynamicStereo/RANSAC/光流/VO/PMPose/三角化，不改标定、掩膜、门限、原始 27 组合结果或助步器模块。
+- 输入与分组：只读 per_inference_records.jsonl（120 条单图记录，每条含 pair_id/repeat_index/view/full_online_semantic_ms）和历史错误组合表 combination_matrix_27_with_semantic_latency.json（27 行）。按 (pair_id, repeat_index) 分组，每组恰好一条 left + 一条 right，得到 60 条双目图对记录；脚本对缺失视图、重复视图、非数值时延均显式报错。
+- 关键结果：stereo_pair P50（median）= 1230.180900 ms，P95 = 1297.682905 ms；修正矩阵 27 行，每行 measured_end_to_end_latency_ms = null。旧 v1 的 semantic_online_p50_ms=614.468 和 semantic_online_p95_ms=653.247 单图值保留为历史字段，但**不再可引用**为双目图对语义总时延。
+- 修正逻辑：新的组合总时延 = 旧的未加语义基础估计值（estimated_end_to_end_latency_ms / _p95_ms）+ 双目图对 P50/P95，而不是旧的单图加法字段继续相加。每行旧的空间证据、时序证据、matcher/plane/temporal 字段全部保留。
+- 产物：esearch_records/engineering_validation/G20260913_mask2former_stereo_pair_latency_correction_v2/ 含 stereo_pair_semantic_latency_records.jsonl（60 条）、corrected_combination_matrix_27.json/.csv（27 行）、summary.json、EXPERIMENT.md、command.txt、un_metadata.json。工具脚本 ealtime_app/tools/correct_mask2former_stereo_pair_latency.py 与单元测试 ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均通过。
+- 结论边界：新的组合总时延仍是估算模块和，不是端到端实测时延；不可报告为物理地面精度、接触、支撑、步态或临床结论。Mask2Former 仍是图像空间候选，不是真实标签或三维真值。
+
+### 2026-09-14（北京时间）— 静止助步器条件下的离线固定地面系（软件完成；待现场采集）
+
+- 目标：仅处理“助步器四脚着地且相机、助步器全程不动”的离线实验，不接入实时入口，也不实现助步器移动后的地面更新。新增独立采集工具 `tools/offline_capture_static_ground_charuco.py`、地面计算工具 `tools/offline_estimate_static_ground.py` 和骨架可视化工具 `tools/offline_visualize_skeleton_on_ground.py`；现有双目采集、PMPose、人物关联和三角化逻辑未改。
+- 坐标定义：ChArUco 检测点位于标定板印刷上表面。按用户实测板厚 `12.0 mm`，地面沿板面朝下平移 12 mm；地面原点为板坐标原点在地面上的垂直投影，X/Y 轴与板面坐标一致，Z 轴朝上。输出同时保存板上表面平面和实际地面平面，防止把板面直接当成地面。
+- 离线计算：左右相机分别以鱼眼内参解算板位姿，右相机结果用正式双目外参换回左相机系；逐对保存重投影误差、左右板原点差和旋转差。多对结果合成固定地面系，并检查板位姿重复性。地面文件只允许用于同一静止布置；助步器或任一相机移动后必须重新采集。
+- 人体输出：读取现有严格 PMPose 双目 `offline_stereo_results.jsonl`，只转换其中已经有效的三维关键点，不补点、不改三角化结果；输出地面坐标 JSONL、逐帧 PNG 和 `skeleton_on_fixed_ground.mp4`。地面绘成 `z=0` 平面，骨架和左右踝历史轨迹绘在同一三维坐标中。
+- 验证：6 项新增数值测试通过，包括鱼眼 ChArUco 位姿反解、左右相机坐标换算、旋转平均、12 mm 板厚修正，以及“板上表面高度=12 mm、实际地面高度=0 mm”。全仓 `312 passed`。尚未打开相机或产生现场地面文件，因此当前只完成软件路径，不能报告本次安装下的地面高度或人体足地距离。
+
+### 2026-09-14（北京时间）— 固定地面实物重构与 people_1 条件验证（完成）
+
+- 使用 `research_records/raw_captures/static_ground/session_20260914_121946` 的20对静止 ChArUco 图像和正式鱼眼标定计算地面。20/20 对通过单目重投影及左右位姿检查；左右板原点差中位/最大 `8.65/9.90 mm`，左右姿态差中位/最大 `1.56/2.44°`，左右重投影 RMSE 最大 `1.11/0.97 px`。
+- 12 mm 板厚修正后的左相机离地高度为 `703.05 mm`。静止重复性为板原点 P95 `2.21 mm`、地面法向 P95 `0.75°`，输出 `G20260914_static_ground_reference_v1/estimate_stationary_20pairs_v2/ground_reference.json`。
+- 修正了重复性计算中的法向符号错误：最终地面坐标为保证 Z 轴朝上会翻转板法向，旧代码却用翻转后的完整姿态与原始 PnP 姿态比较，产生虚假的约 `180°`。失败结果保留在 `estimate_stationary_20pairs_v1`，修正后新增单测并以 v2 重算，没有覆盖旧结果。
+- 将 people_1 的448帧严格 PMPose 三维结果转换到固定地面系并生成逐帧图和视频。有效踝点746个，高度中位 `103.87 mm`、P5/P95 `67.97/139.19 mm`；4个负高度集中在 pair 389–392，最低 `-9.62 mm`，视为局部三角化异常提示，不解释为真实穿地。
+- 当前已经测得“助步器稳定落地后的固定地面平面”，但尚未逐帧识别助步器是否已经落地。people_1 复用结果以相机高度、俯仰和横滚与本次标定姿态一致为前提；平面内平移不改变相机系地面平面。输出不得称为鞋底接触、支撑相或步态真值。
+- 根据完整动画需求，补齐了 COCO 骨架遗漏的耳朵—肩膀连接，并新增不覆盖严格结果的完整显示模式。`people1_skeleton_on_ground_complete_v2` 的448/448帧均为17/17关节：5286点来自严格结果，2246点来自既有 force-all 三维候选，84点来自时间插值。实线/实心点表示严格结果，虚线/白心点表示仅供显示的补全；定量统计仍不得使用补全点。

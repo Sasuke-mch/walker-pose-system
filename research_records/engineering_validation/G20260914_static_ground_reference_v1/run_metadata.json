@@ -1,0 +1,18 @@
+{
+  "experiment_id": "G20260914-static-ground-reference",
+  "status": "completed_fixed_ground_reconstruction",
+  "capture_session": "D:\\my_works\\walker_pose_system\\research_records\\raw_captures\\static_ground\\session_20260914_121946",
+  "calibration": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results\\stereo_fisheye.json",
+  "board_thickness_mm": 12.0,
+  "input_pairs": 20,
+  "accepted_pairs": 20,
+  "camera_height_mm": 703.0458890082084,
+  "origin_repeatability_p95_mm": 2.2146837812237643,
+  "normal_repeatability_p95_deg": 0.7494914290234815,
+  "ground_reference": "estimate_stationary_20pairs_v2\\ground_reference.json",
+  "skeleton_source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\pmpose_strict_stereo\\offline_stereo_results.jsonl",
+  "skeleton_output": "people1_skeleton_on_ground_v1",
+  "complete_display_output": "people1_skeleton_on_ground_complete_v2",
+  "source_frames": 448,
+  "interpretation": "Measured fixed ground plane; reuse on people_1 is conditional on the same settled walker camera height, pitch and roll. Walker ground-contact state is not inferred."
+}
