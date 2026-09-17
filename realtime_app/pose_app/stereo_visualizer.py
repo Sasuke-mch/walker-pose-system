@@ -45,6 +45,32 @@ def lower_limb_status_lines(status: Mapping[str, Any]) -> list[str]:
     ]
 
 
+def stage_walker_status_lines(status: Mapping[str, Any]) -> list[str]:
+    stage = status.get("stage", {})
+    reconstruction = status.get("walker_reconstruction", {})
+    background = stage.get("background", {})
+    view = stage.get("evidence_view")
+    selected = background.get(view, {}) if view else {}
+    motion = selected.get("median_motion_px")
+    motion_text = f"{float(motion):.2f}px" if motion is not None else "unavailable"
+    return [
+        (
+            f"two-stage={stage.get('operational', stage.get('confirmed', 'unknown'))}  "
+            f"candidate={stage.get('candidate', 'unknown')}  "
+            f"vote={float(stage.get('vote_confidence', 0.0)):.2f}"
+        ),
+        f"background motion={motion_text}  evidence view={view or 'none'}",
+        (
+            f"walker reconstruction={reconstruction.get('status', 'unknown')}  "
+            f"3D points={len(reconstruction.get('points_3d', []))}  "
+            f"2D lines L/R={len(reconstruction.get('left_stable_line_segments', []))}/"
+            f"{len(reconstruction.get('right_stable_line_segments', []))}"
+        ),
+        "cyan lines=walker structure candidates; yellow skeleton=human pose",
+        f"stage/walker processing={float(status.get('processing_ms', 0.0)):.1f} ms",
+    ]
+
+
 def _draw_status_panel(image: np.ndarray, lines: list[str], top: int) -> None:
     overlay = image.copy()
     box_width = min(image.shape[1] - 16, 1300)
@@ -64,6 +90,19 @@ def _draw_status_panel(image: np.ndarray, lines: list[str], top: int) -> None:
         )
 
 
+def _draw_walker_segments(
+    image: np.ndarray, segments: list[list[int]], processing_width: int
+) -> None:
+    if processing_width <= 0:
+        return
+    scale = image.shape[1] / float(processing_width)
+    for line in segments:
+        if len(line) != 4:
+            continue
+        x1, y1, x2, y2 = [round(float(value) * scale) for value in line]
+        cv2.line(image, (x1, y1), (x2, y2), (255, 255, 0), 3, cv2.LINE_AA)
+
+
 def draw_stereo(
     pair: StereoFramePair,
     left_result: InferenceResult,
@@ -73,6 +112,7 @@ def draw_stereo(
     processed: int,
     display_width: int = 1920,
     lower_limb_status: Mapping[str, Any] | None = None,
+    stage_walker_status: Mapping[str, Any] | None = None,
 ) -> np.ndarray:
     left = draw(
         pair.left.image,
@@ -90,6 +130,15 @@ def draw_stereo(
         pair.dropped_right,
         "stereo-right",
     )
+    if stage_walker_status is not None:
+        reconstruction = stage_walker_status.get("walker_reconstruction", {})
+        processing_width = int(reconstruction.get("processing_width", 0))
+        _draw_walker_segments(
+            left, reconstruction.get("left_stable_line_segments", []), processing_width
+        )
+        _draw_walker_segments(
+            right, reconstruction.get("right_stable_line_segments", []), processing_width
+        )
     target_height = min(left.shape[0], right.shape[0])
     left = _fit_height(left, target_height)
     right = _fit_height(right, target_height)
@@ -111,4 +160,9 @@ def draw_stereo(
     _draw_status_panel(composite, lines, 8)
     if lower_limb_status is not None:
         _draw_status_panel(composite, lower_limb_status_lines(lower_limb_status), 8 + 32 * len(lines) + 20)
+    if stage_walker_status is not None:
+        top = 8 + 32 * len(lines) + 20
+        if lower_limb_status is not None:
+            top += 28 * len(lower_limb_status_lines(lower_limb_status)) + 24
+        _draw_status_panel(composite, stage_walker_status_lines(stage_walker_status), top)
     return composite

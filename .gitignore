@@ -85,6 +85,9 @@ realtime_app/calibration/results/stereo_fisheye_[0-9]*.json
 # Local handoff notes, not project documentation.
 to_gpt/
 /HANDOFF_*.md
+/handoff.md
+realtime_app/_unit_out.txt
+realtime_app/.model_envs/
 
 # Physical device bindings are machine-specific.  Publish the template only.
 realtime_app/camera_registry.json

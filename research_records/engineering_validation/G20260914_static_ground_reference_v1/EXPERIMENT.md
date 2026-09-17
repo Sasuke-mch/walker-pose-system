@@ -38,3 +38,6 @@
 完整连线版仅解决动画连续性。虚线和白心点不是新增测量，也不参与地面、接触或步态计算；定量分析仍只允许使用严格三角化点。
 
 第一次静止数据计算因法向符号处理错误产生接近180°的重复性数值，原结果保存在 `estimate_stationary_20pairs_v1`。修正后结果保存在 `estimate_stationary_20pairs_v2`，没有覆盖原记录。
+# 2026-09-17 清理说明
+
+当前只保留正式静止20对参考 `estimate_stationary_20pairs_v2`。早期 `estimate_20pairs_v1`、`estimate_stationary_20pairs_v1` 和固定地面骨架展示视频已删除；数值参考算法、正式结果与历史结论不变。

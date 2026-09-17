@@ -29,6 +29,9 @@ from pose_app.rotation import (
     rotate_image_for_model,
 )
 from pose_app.raw_pair_writer import RawStereoPairWriter
+from pose_app.realtime_stage_walker import RealtimeStageWalkerWriter
+from pose_app.dynamic_ground_live import RealtimeDynamicGroundWriter
+from pose_app.static_background_rotation import RealtimeStereoRotationTracker
 from pose_app.stereo_output import StereoOutputWriter
 from pose_app.stereo_sources import (
     StereoCameraInput,
@@ -211,6 +214,43 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--enable-stage-walker",
+        action="store_true",
+        help=(
+            "Enable lightweight real-time recognition of stage 1 (walker static, "
+            "human moving), stage 2 (feet approximately static, walker moving), "
+            "and camera-attached walker structure reconstruction."
+        ),
+    )
+    parser.add_argument(
+        "--stage-walker-processing-width",
+        type=int,
+        default=480,
+        help="Working width for the lightweight stage/walker path (default: 480).",
+    )
+    parser.add_argument(
+        "--dynamic-ground-reference",
+        help=(
+            "Measured ground_reference.json for causal ground-fixed skeleton output. "
+            "Requires --enable-stage-walker; Stage 2 updates ground XY from stationary feet."
+        ),
+    )
+    parser.add_argument(
+        "--dynamic-ground-full-se3",
+        action="store_true",
+        help=(
+            "With --dynamic-ground-reference, use causal left/right fisheye rotation consensus in Stage 2 "
+            "and solve metric XYZ from stationary feet. Short Stage-2 evidence dropouts and the immediate "
+            "landing transition use bounded causal recovery; missing rotation holds orientation explicitly."
+        ),
+    )
+    parser.add_argument(
+        "--walker-reconstruction-interval",
+        type=int,
+        default=10,
+        help="Run sparse stereo walker reconstruction every N moving frames (default: 10).",
+    )
+    parser.add_argument(
         "--coordinate-transform",
         help=(
             "Optional measured_locked left-camera-to-physical-frame transform JSON for "
@@ -278,6 +318,10 @@ def parse_args() -> argparse.Namespace:
         parser.error("--max-pairs必须大于0。")
     if args.keypoint_threshold < 0 or args.keypoint_threshold > 1:
         parser.error("--keypoint-threshold必须在0到1之间。")
+    if args.stage_walker_processing_width < 160:
+        parser.error("--stage-walker-processing-width必须至少为160。")
+    if args.walker_reconstruction_interval < 1:
+        parser.error("--walker-reconstruction-interval必须大于0。")
     if args.max_reprojection_error_px <= 0:
         parser.error("--max-reprojection-error-px必须大于0。")
     if not 0 < args.local_perspective_min_box_fraction <= 1:
@@ -307,6 +351,10 @@ def parse_args() -> argparse.Namespace:
         parser.error("--sbs-start-frame不能小于0。")
     if args.enable_lower_limb_pipeline and args.no_json:
         parser.error("--enable-lower-limb-pipeline需要stereo_results.jsonl，不能与--no-json同时使用。")
+    if args.dynamic_ground_reference and not args.enable_stage_walker:
+        parser.error("--dynamic-ground-reference需要--enable-stage-walker。")
+    if args.dynamic_ground_full_se3 and not args.dynamic_ground_reference:
+        parser.error("--dynamic-ground-full-se3需要--dynamic-ground-reference。")
     if args.coordinate_transform and not args.enable_lower_limb_pipeline:
         parser.error("--coordinate-transform只能与--enable-lower-limb-pipeline一起使用。")
     if args.allow_test_coordinate_transform and not args.coordinate_transform:
@@ -609,6 +657,9 @@ def main() -> int:
     writer = None
     raw_writer = None
     lower_limb_live_status = None
+    stage_walker_writer = None
+    dynamic_ground_writer = None
+    dynamic_rotation_tracker = None
     preview_opened = False
     local_perspective_attempts = 0
     local_perspective_selected = 0
@@ -771,6 +822,40 @@ def main() -> int:
                 "已启用在线下肢状态：每对严格三角化结果将追加到lower_limb_live_status.jsonl；"
                 "该输出不影响上游二维、关联或几何。"
             )
+
+        if args.enable_stage_walker:
+            stage_walker_writer = RealtimeStageWalkerWriter(
+                run_dir / "realtime_stage_walker.jsonl",
+                calibration=calibration,
+                processing_width=args.stage_walker_processing_width,
+                reconstruction_interval=args.walker_reconstruction_interval,
+                keypoint_threshold=args.keypoint_threshold,
+            )
+            log.info(
+                "已启用两阶段识别与助步器基础重构：working_width=%d interval=%d；"
+                "使用轻量光流、人体关键点和相机附着结构候选，不依赖真值标签。",
+                args.stage_walker_processing_width,
+                args.walker_reconstruction_interval,
+            )
+        if args.dynamic_ground_reference:
+            dynamic_ground_writer = RealtimeDynamicGroundWriter(
+                run_dir / "realtime_dynamic_ground_pose.jsonl",
+                args.dynamic_ground_reference,
+                pose_mode="full_se3" if args.dynamic_ground_full_se3 else "planar_xy",
+                stage1_landed_support_reanchor=args.dynamic_ground_full_se3,
+            )
+            if args.dynamic_ground_full_se3:
+                dynamic_rotation_tracker = RealtimeStereoRotationTracker(
+                    calibration, processing_width=args.stage_walker_processing_width,
+                )
+                log.info(
+                    "已启用完整动态地面候选：Stage 2双眼鱼眼旋转共识+双脚XYZ；"
+                    "旋转缺失时显式保持，Stage 1落稳重锚高度/俯仰/横滚。"
+                )
+            else:
+                log.info(
+                    "已启用固定地面实时输出：Stage 1保持位姿，Stage 2用双脚中心更新助步器地面XY平移。"
+                )
 
         if args.connect_only:
             client = connect_client(args, config)
@@ -966,6 +1051,25 @@ def main() -> int:
             lower_limb_status = None
             if lower_limb_live_status is not None:
                 lower_limb_status = lower_limb_live_status.consume(stereo_payload)
+            stage_walker_status = None
+            if stage_walker_writer is not None:
+                stage_walker_status = stage_walker_writer.consume(
+                    pair, left_result, right_result
+                )
+                stereo_payload["stage_walker"] = stage_walker_status
+            if dynamic_ground_writer is not None and stage_walker_status is not None:
+                rotation_status = None
+                if dynamic_rotation_tracker is not None:
+                    operational = str((stage_walker_status.get("stage") or {}).get("operational") or "")
+                    rotation_status = dynamic_rotation_tracker.update(
+                        pair.left.image, pair.right.image, left_result, right_result,
+                        estimate=operational in {
+                            "stage2_feet_static_walker_moving", "transition",
+                        },
+                    )
+                stereo_payload["dynamic_ground"] = dynamic_ground_writer.consume(
+                    stereo_payload, stage_walker_status, rotation_status
+                )
             annotated = draw_stereo(
                 pair,
                 left_result,
@@ -975,6 +1079,7 @@ def main() -> int:
                 processed=processed,
                 display_width=args.display_width,
                 lower_limb_status=lower_limb_status,
+                stage_walker_status=stage_walker_status,
             )
             writer.write(
                 annotated,
@@ -1014,6 +1119,12 @@ def main() -> int:
         if lower_limb_live_status is not None:
             summary["lower_limb_live_status"] = lower_limb_live_status.close(completed=True)
             lower_limb_live_status = None
+        if stage_walker_writer is not None:
+            summary["stage_walker"] = stage_walker_writer.close(completed=True)
+            stage_walker_writer = None
+        if dynamic_ground_writer is not None:
+            summary["dynamic_ground"] = dynamic_ground_writer.close(completed=True)
+            dynamic_ground_writer = None
         if args.enable_lower_limb_pipeline:
             summary["lower_limb_pipeline"] = build_lower_limb_pipeline(
                 run_dir / "stereo_results.jsonl",
@@ -1080,6 +1191,16 @@ def main() -> int:
                 lower_limb_live_status.close(completed=False)
             except Exception:
                 log.exception("关闭在线下肢状态输出失败")
+        if stage_walker_writer is not None:
+            try:
+                stage_walker_writer.close(completed=False)
+            except Exception:
+                log.exception("关闭两阶段识别与助步器重构输出失败")
+        if dynamic_ground_writer is not None:
+            try:
+                dynamic_ground_writer.close(completed=False)
+            except Exception:
+                log.exception("关闭固定地面实时输出失败")
         if source is not None:
             try:
                 source.close()
