@@ -153,3 +153,12 @@ OrbitControls 改为自然的自由拖拽：左键旋转、右键平移、中键
 集合：heel/ball/toe 各 18，无重复，mirror 平均 |x| 间隙 0.009 m，`mirror_ok=true`；审计中修正了两处脚本 bug（解剖改用 ground 系、侧别改用相机帧），均只影响审计脚本，不涉及拟合。
 
 结论：`single_supported_fix=none`，`fit_rerun_allowed=false`，`next_action=audit_gradient`；仍禁止调大接触权重。
+## v5 Stage C 梯度审计（只诊断，不选权重）
+
+sole 映射审计通过后进入 gradient audit：同一 Stage C 参数状态、单次 forward、四项（obs3d/obs2d/foot/hand）分别对 latent/root/transl 求梯度，beta 冻结，Stage D 未执行（审计目录仅含 A/B/C 结果与 gradient_audit.json）。
+
+两次审计（surface 0.10/0.10 与全零对照，输入路径与 Stage A/B/C 完全一致）退出码均为 0；Stage C 观测项 term 值与梯度一致到 1e-6 以内，audit 分支未改变 Stage C。
+
+Term 值：obs3d 0.21256、obs2d 0.28891、foot 0.001868、hand 0.0000954；梯度 L2（all）：obs3d 0.32739、obs2d 0.32769、foot 0.02092、hand 0.000545；surface/observation 梯度比 0.0328 → `surface_gradient_weak_but_active`，graph 为 `pass`（非零、有限）。
+
+结论：表面图有效但弱，不选择权重；下一步 `calibrate_contact_coefficient`（先校准接触系数尺度，而非直接跑接触拟合）。本结论仅为 engineering validation。

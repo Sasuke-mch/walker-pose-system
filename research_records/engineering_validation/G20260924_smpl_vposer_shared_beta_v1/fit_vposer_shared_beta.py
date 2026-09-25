@@ -83,6 +83,8 @@ def main() -> int:
     ap.add_argument("--stage-d-obs-2d-scale", type=float, default=0.10)
     ap.add_argument("--force-stage-d-no-contact", action="store_true",
                     help="Stage D control: same optimizer/steps/frozen beta but zero surface weights")
+    ap.add_argument("--gradient-audit-only", action="store_true",
+                    help="Stop after Stage C and audit term gradients; never run Stage D")
     ap.add_argument("--contact-vertex-sets", type=Path, default=None)
     ap.add_argument("--walker-topology", type=Path, default=None)
     ap.add_argument("--surface-foot-contact-weight", type=float, default=0.0)
@@ -298,7 +300,7 @@ def main() -> int:
         l2=(e2/(20.0**2)*w*valid2d).sum()/(2*(w*valid2d).sum()+1e-6)
         lp=latent.square().mean()
         lfoot=torch.zeros((),device=device); lhand=torch.zeros((),device=device)
-        if surface_mode and contact_enabled:
+        if surface_mode and (contact_enabled or audit_mode):
             lfoot, lhand, foot_res, hand_res_tensors, hand_cover, _, hand_mode = surface_terms(result.vertices)
             surface_audit.update(hand_mode)
             for s in ("left", "right"):
@@ -424,6 +426,9 @@ def main() -> int:
     obs2d_d = float(args.obs_2d_weight * args.stage_d_obs_2d_scale)
     if not (obs3d_d > 0 and obs2d_d > 0):
         raise ValueError("Stage D must keep nonzero observation constraints")
+    audit_mode = bool(args.gradient_audit_only)
+    if audit_mode and not surface_mode:
+        raise ValueError("--gradient-audit-only needs the surface inputs")
     beta.requires_grad_(False)
     s0=run(torch.optim.Adam([{"params":[latent,root],"lr":0.01},{"params":[transl],"lr":0.003}],), args.base_steps, False,
            obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
@@ -439,6 +444,19 @@ def main() -> int:
     s2=run(torch.optim.Adam([{"params":[latent,root],"lr":0.003},{"params":[transl],"lr":0.001},{"params":[beta],"lr":0.0003}],), args.joint_steps, True,
            obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
     stage_c={"loss":s2,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_c_joint")}
+
+    if audit_mode:
+        # Stage C gradient audit: same parameter state, forward once, no
+        # Stage D optimization, no opt.step(). beta stays frozen.
+        beta.requires_grad_(False)
+        train_params = {"latent": latent, "root": root, "transl": transl}
+        grad_audit = gradient_audit(beta, forward, losses, surface, surface_terms, train_params,
+                                    obs3d_abc, obs2d_abc)
+        (out / "gradient_audit.json").write_text(
+            json.dumps(grad_audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"status": "completed_stage_c_gradient_audit",
+                          "stage_d_executed": False}, ensure_ascii=False, indent=2))
+        return 0
 
     beta_before_d = beta.detach().clone()
     beta_frozen_during_stage_d = False
@@ -548,5 +566,62 @@ def main() -> int:
     (out/"command.txt").write_text(" ".join(sys.argv)+"\n",encoding="utf-8")
     print(json.dumps(metrics,ensure_ascii=False,indent=2))
     return 0
+
+def gradient_norms(flat_terms, params):
+    """Return finite L2 and max-abs gradient per term and named parameter.
+
+    All (term, parameter) pairs share one forward graph; only the final pair
+    releases it.
+    """
+    import math
+    import torch
+    rows = {}
+    total = sum(len(plist) for _, plist in flat_terms)
+    done = 0
+    for name, (term, coeff, plist) in flat_terms:
+        l2d, maxd, sq, finite = {}, {}, 0.0, True
+        for pname, p in plist:
+            done += 1
+            g = torch.autograd.grad(term, p, torch.ones_like(term), allow_unused=True,
+                                    retain_graph=(done < total))[0]
+            if g is None:
+                l2d[pname], maxd[pname] = 0.0, 0.0
+                continue
+            if not bool(torch.isfinite(g).all()):
+                finite = False
+            l2 = float(g.detach().float().pow(2).sum().sqrt())
+            l2d[pname] = l2
+            maxd[pname] = float(g.detach().abs().max())
+            sq += l2 * l2
+        l2d["all"] = math.sqrt(sq)
+        maxd["all"] = max((maxd[k] for k, _ in plist), default=0.0)
+        if not finite:
+            raise ValueError(f"non-finite gradient in term {name}")
+        rows[name] = {"term_value": float(term.detach()),
+                      "coeff": float(coeff),
+                      "gradient_l2": l2d, "gradient_max_abs": maxd, "finite": True}
+    return rows
+
+
+def gradient_audit(beta, forward, losses, surface, surface_terms, train_params,
+                   obs3d_coeff, obs2d_coeff):
+    """Audit per-term gradients at the frozen Stage C state (no Stage D)."""
+    import torch
+    if beta.requires_grad:
+        raise ValueError("beta must be frozen for the gradient audit")
+    with torch.enable_grad():
+        result, pose, jc, pl, pr, l3, l2, lp, lfoot, lhand = losses(beta)
+        plist = list(train_params.items())
+        flat = [("obs3d", (obs3d_coeff * l3, obs3d_coeff, plist)),
+                ("obs2d", (obs2d_coeff * l2, obs2d_coeff, plist)),
+                ("foot", (lfoot, 1.0, plist)),
+                ("hand", (lhand, 1.0, plist))]
+        rows = gradient_norms(flat, train_params)
+    return {"status": "completed_stage_c_gradient_audit",
+            "engineering_validation_only": True,
+            "stage_d_executed": False,
+            "beta_optimized_in_audit": False,
+            "terms": rows}
+
 
 if __name__=="__main__": raise SystemExit(main())

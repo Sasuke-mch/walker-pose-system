@@ -2005,3 +2005,10 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 新增 `realtime_app/tools/audit_smpl_sole_mapping_v5.py`，输出 `surface_contact_window60_90_v5_sole_mapping_audit.json`；单位/变换闭环/解剖/集合完整性四项只读审计，未重跑拟合。
 - `unit_status=pass`，`transform_direction_status=ambiguous`（刚体恒等，差 <1e-6），左右 sole 均为 `pass`（右漂移 35.7 mm 未达 suspect 门，如实记录不对称），`single_supported_fix=none`，`fit_rerun_allowed=false`，`next_action=audit_gradient`。
 - v1–v5 产物未修改；仍禁止调大接触权重。
+
+### 2026-09-26 — v5 Stage C 梯度审计（只读诊断，engineering validation）
+
+- `fit_vposer_shared_beta.py` 新增 `--gradient-audit-only` 分支与 `gradient_norms`/`gradient_audit` 函数；正常拟合路径不变。
+- 新增 `realtime_app/tools/summarize_stage_c_gradient_audit.py`；输出 surface/nosurface/summary 三份 JSON。
+- 两次 audit 退出码 0，无 Stage D 产物；`surface_graph_status=pass`，`surface_gradient_status=surface_gradient_weak_but_active`（比值 0.0328），`weight_selection_allowed=false`，`next_action=calibrate_contact_coefficient`。
+- 6 项单测 ok；v1–v5 未修改。
