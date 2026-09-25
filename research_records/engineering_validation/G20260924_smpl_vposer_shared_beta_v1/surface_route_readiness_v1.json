@@ -1,0 +1,316 @@
+{
+  "status": "completed_readiness_audit",
+  "engineering_validation_only": true,
+  "development_window": [
+    60,
+    90
+  ],
+  "routes": {
+    "60_90": {
+      "control": {
+        "stage_c_loss": 0.4452116787433624,
+        "stage_d_loss": 0.15773800015449524,
+        "2d_median": 46.72676086425781,
+        "2d_p95": 165.83302307128906,
+        "3d_median": 67.82335662841797,
+        "3d_p95": 129.4904022216797,
+        "foot_signed": {
+          "left": {
+            "median": -30.647211215141635,
+            "med_abs": 30.647211215141635,
+            "p05": -72.18619945911247,
+            "p95": 2.3063250599366647,
+            "finite": true
+          },
+          "right": {
+            "median": -35.711865045540414,
+            "med_abs": 35.711865045540414,
+            "p05": -82.99154749186853,
+            "p95": 3.7974948292302884,
+            "finite": true
+          }
+        },
+        "hand_signed": {
+          "left": {
+            "median": 42.05211362935004,
+            "med_abs": 42.05211362935004,
+            "p05": 2.208019709639408,
+            "p95": 110.42330360221264,
+            "finite": true
+          },
+          "right": {
+            "median": 46.98569090591158,
+            "med_abs": 46.98569090591158,
+            "p05": 0.3218046079737102,
+            "p95": 95.50667413250441,
+            "finite": true
+          }
+        },
+        "foot_pen_frac": {
+          "left": 0.9348864994026285,
+          "right": 0.9265232974910395
+        },
+        "hand_pen_frac": {
+          "left": 0.03615556845509578,
+          "right": 0.04863587362136164
+        },
+        "verts_stageD": {
+          "max_abs_m": 0.046409547328948975,
+          "l2_m": 8.654710613350499
+        },
+        "hand_coverage": {
+          "left": {
+            "within_15mm": 0.1618708074092865,
+            "within_30mm": 0.34393399953842163,
+            "within_50mm": 0.5964839458465576
+          },
+          "right": {
+            "within_15mm": 0.16398540139198303,
+            "within_30mm": 0.31229788064956665,
+            "within_50mm": 0.5345799922943115
+          }
+        },
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": null,
+        "grad_to_coco": null,
+        "grad_to_verts": null,
+        "foot_valid_weight_sum": 12.484091758728027,
+        "finite": true
+      },
+      "foot_a1": {
+        "stage_c_loss": 0.4452116787433624,
+        "stage_d_loss": 0.15953287482261658,
+        "2d_median": 46.98889923095703,
+        "2d_p95": 164.24876403808594,
+        "3d_median": 69.43584442138672,
+        "3d_p95": 131.57884216308594,
+        "foot_signed": {
+          "left": {
+            "median": -27.805060148239136,
+            "med_abs": 27.805060148239136,
+            "p05": -71.86115682125092,
+            "p95": 2.6619315147399827,
+            "finite": true
+          },
+          "right": {
+            "median": -32.59316086769104,
+            "med_abs": 32.59316086769104,
+            "p05": -80.6404858827591,
+            "p95": 4.04202938079834,
+            "finite": true
+          }
+        },
+        "hand_signed": {
+          "left": {
+            "median": 41.63666442036629,
+            "med_abs": 41.63666442036629,
+            "p05": 1.9721886143088379,
+            "p95": 109.67191234230995,
+            "finite": true
+          },
+          "right": {
+            "median": 46.58674821257591,
+            "med_abs": 46.58674821257591,
+            "p05": 0.2699274569749901,
+            "p95": 95.17155401408672,
+            "finite": true
+          }
+        },
+        "foot_pen_frac": {
+          "left": 0.9313022700119474,
+          "right": 0.9229390681003584
+        },
+        "hand_pen_frac": {
+          "left": 0.03723360145949084,
+          "right": 0.04880172485280703
+        },
+        "verts_stageD": {
+          "max_abs_m": 0.04674500226974487,
+          "l2_m": 8.434558048562073
+        },
+        "hand_coverage": {
+          "left": {
+            "within_15mm": 0.16485612094402313,
+            "within_30mm": 0.3485778272151947,
+            "within_50mm": 0.6006717085838318
+          },
+          "right": {
+            "within_15mm": 0.1666804850101471,
+            "within_30mm": 0.31532466411590576,
+            "within_50mm": 0.5392237901687622
+          }
+        },
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_verts": 0.00020379270426928997,
+        "foot_valid_weight_sum": 12.484091758728027,
+        "finite": true
+      },
+      "hand_a30": {
+        "stage_c_loss": 0.4452116787433624,
+        "stage_d_loss": 0.15943750739097595,
+        "2d_median": 46.872947692871094,
+        "2d_p95": 165.73123168945312,
+        "3d_median": 69.09158325195312,
+        "3d_p95": 128.8489990234375,
+        "foot_signed": {
+          "left": {
+            "median": -30.266940593719482,
+            "med_abs": 30.266940593719482,
+            "p05": -73.69212210178375,
+            "p95": 2.9255658388137697,
+            "finite": true
+          },
+          "right": {
+            "median": -35.38474440574646,
+            "med_abs": 35.38474440574646,
+            "p05": -82.77115225791931,
+            "p95": 4.298567771911621,
+            "finite": true
+          }
+        },
+        "hand_signed": {
+          "left": {
+            "median": 39.204973727464676,
+            "med_abs": 39.204973727464676,
+            "p05": -0.5508102010935536,
+            "p95": 104.53418344259262,
+            "finite": true
+          },
+          "right": {
+            "median": 46.67133092880249,
+            "med_abs": 46.67133092880249,
+            "p05": 0.008414499461653464,
+            "p95": 95.0563184916973,
+            "finite": true
+          }
+        },
+        "foot_pen_frac": {
+          "left": 0.931899641577061,
+          "right": 0.9241338112305855
+        },
+        "hand_pen_frac": {
+          "left": 0.05410896425905962,
+          "right": 0.05000414628078614
+        },
+        "verts_stageD": {
+          "max_abs_m": 0.0636512041091919,
+          "l2_m": 8.91497484399865
+        },
+        "hand_coverage": {
+          "left": {
+            "within_15mm": 0.1969483345746994,
+            "within_30mm": 0.38133344054222107,
+            "within_50mm": 0.6269591450691223
+          },
+          "right": {
+            "within_15mm": 0.1653536707162857,
+            "within_30mm": 0.31623682379722595,
+            "within_50mm": 0.5392652750015259
+          }
+        },
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_verts": 0.0009621242643333972,
+        "foot_valid_weight_sum": 12.484091758728027,
+        "finite": true
+      },
+      "both_a1_a30": {
+        "stage_c_loss": 0.4452116787433624,
+        "stage_d_loss": 0.16122333705425262,
+        "2d_median": 46.888916015625,
+        "2d_p95": 164.55126953125,
+        "3d_median": 69.92415618896484,
+        "3d_p95": 129.25283813476562,
+        "foot_signed": {
+          "left": {
+            "median": -27.653366327285767,
+            "med_abs": 27.653366327285767,
+            "p05": -73.17540049552917,
+            "p95": 3.2572090625762797,
+            "finite": true
+          },
+          "right": {
+            "median": -32.45607018470764,
+            "med_abs": 32.45607018470764,
+            "p05": -81.24541342258452,
+            "p95": 4.372507333755482,
+            "finite": true
+          }
+        },
+        "hand_signed": {
+          "left": {
+            "median": 38.92134130001068,
+            "med_abs": 38.92134130001068,
+            "p05": -0.6170095410197968,
+            "p95": 104.1637707501649,
+            "finite": true
+          },
+          "right": {
+            "median": 46.38080671429634,
+            "med_abs": 46.38080671429634,
+            "p05": 0.025566481053830078,
+            "p95": 94.76747103035449,
+            "finite": true
+          }
+        },
+        "foot_pen_frac": {
+          "left": 0.9277180406212664,
+          "right": 0.9199522102747909
+        },
+        "hand_pen_frac": {
+          "left": 0.05518699726345468,
+          "right": 0.04992122066506344
+        },
+        "verts_stageD": {
+          "max_abs_m": 0.06323440372943878,
+          "l2_m": 8.72136558951449
+        },
+        "hand_coverage": {
+          "left": {
+            "within_15mm": 0.19918732345104218,
+            "within_30mm": 0.3836138844490051,
+            "within_50mm": 0.630068838596344
+          },
+          "right": {
+            "within_15mm": 0.1668878048658371,
+            "within_30mm": 0.3195953369140625,
+            "within_50mm": 0.543494462966919
+          }
+        },
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_verts": 0.0010403726482763886,
+        "foot_valid_weight_sum": 12.484091758728027,
+        "finite": true
+      }
+    }
+  },
+  "foot_toward_zero_gain": 0.08982727880863667,
+  "hand_abs_gain": 0.035507388075167554,
+  "gates": {
+    "graph_ok": true,
+    "beta_frozen": true,
+    "obs_not_diverged": true,
+    "finite": true,
+    "implementation_bug": false
+  },
+  "selected_engineering_route": "both_a1_a30",
+  "route_status": "engineering_route_ready",
+  "hand_auxiliary_graph_verified": true,
+  "physical_touch_validated": false,
+  "true_3d_accuracy_validated": false,
+  "load_bearing_validated": false,
+  "grip_force_validated": false
+}
