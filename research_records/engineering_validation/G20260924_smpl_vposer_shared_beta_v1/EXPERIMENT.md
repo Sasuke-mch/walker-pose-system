@@ -178,3 +178,13 @@ Term 值：obs3d 0.21256、obs2d 0.28891、foot 0.001868、hand 0.0000954；梯�
 v6 汇总对脚部负的有符号中位残差直接计算“下降比例”，把控制组 −32.9434 mm 到 foot_a1 −30.0938 mm 的向零移动误记为负增益。只读复算的绝对中位残差为 32.9434→30.0938 mm，下降 8.6501%；foot_a1 的 3D P95 为 131.579 mm，相对同轮控制 129.490 mm 增加 1.61%，小于原定 2% 门；2D P95 改善 1.58 px，穿透比例未增加，beta 与梯度审计门通过。因此原 `recommended_candidate=null` 是判定公式错误，不应继续引用为当前结论。更正明细保存在 `surface_contact_window60_90_v6_gate_reaudit.json`，原 v6 comparison 保留为历史错误记录，未就地改写。
 
 foot_a1 仅成为开发窗的进一步验证候选：Stage D 后左右 sole 顶点仍有约 93.13%/92.29% 位于当前地面下方，不能称物理触地有效。v6 的 3D/2D 梯度比约 1.25 是从 v5 审计外推，尚未在 v6 Stage C 实测。下一步应先复核脚部接触的逐帧/逐侧改善和当前地面变换质量，再用冻结的 foot=1 方案做独立窗口验证；不得将开发窗通过解释成真实三维精度或承重验证。
+
+## v6 foot=1 独立窗口验证（engineering validation，未冻结）
+
+动机：v6 开发窗 gate 复算（`surface_contact_window60_90_v6_gate_reaudit.json`）给出 foot_a1 穿透幅值改善 8.65%，需三独立窗口验证冻结配置（foot=1/hand=0，obs 1.0/0.20，Stage D 0.70/0.10，80 步）。
+
+执行：129..159 与 278..308 的 control/foot_a1 各退出码 0；373..403 的 control 退出码 0，但 foot_a1 在 Stage D 后审计探针处按设计抛错（`surface loss does not depend on SMPL vertices`）：该窗 31 帧 foot 标签全为 invalid、foot_contact_weight 全零，lfoot 恒为零故无顶点梯度。未改脚本绕过，未事后换窗。
+
+结果：129 窗增益 4.70%、278 窗增益 4.45%，其余门（3D≤2%、2D≤5px、穿透≤1pp、冻结、同图、零 COCO 梯度、有限）均过，仅绝对增益未达 5%；373 窗对子不完整。三窗未全部通过。
+
+结论：`selected_candidate=null`，`stop_reason=foot_a1_not_stable_across_independent_windows`。foot=1 仍只是开发窗候选，不得冻结；脚底约 93% 候选点仍低于地面，不称真实触地。

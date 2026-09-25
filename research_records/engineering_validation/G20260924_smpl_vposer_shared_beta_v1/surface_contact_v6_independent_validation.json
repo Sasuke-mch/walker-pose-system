@@ -1,0 +1,336 @@
+{
+  "status": "v6_independent_validation",
+  "engineering_validation_only": true,
+  "config": {
+    "foot": 1.0,
+    "hand": 0.0,
+    "obs3d": 1.0,
+    "obs2d": 0.2,
+    "stage_d_3d": 0.7,
+    "stage_d_2d": 0.02,
+    "contact_steps": 80
+  },
+  "windows": {
+    "129_159": {
+      "control": {
+        "completed": true,
+        "loss_c": [
+          0.4644521176815033,
+          0.20003685355186462,
+          1.2850455045700073,
+          0.36235514283180237,
+          0.0,
+          0.0,
+          0.00795337837189436
+        ],
+        "loss_d": [
+          0.16016340255737305,
+          0.17670327425003052,
+          1.46147882938385,
+          0.36207661032676697,
+          0.0033493402879685163,
+          4.135995186516084e-05,
+          0.008003823459148407
+        ],
+        "reproj_median": 48.25058364868164,
+        "reproj_p95": 174.3677978515625,
+        "reproj_l": 172.6702880859375,
+        "reproj_r": 176.88084411621094,
+        "tri_median": 65.89524841308594,
+        "tri_p95": 128.5482635498047,
+        "foot": {
+          "left": {
+            "signed_median_mm": -45.05313489751095,
+            "median_abs_mm": 45.29831963040798,
+            "p05_mm": -91.61875534864542,
+            "p95_mm": -2.613330929189783,
+            "frac_z_neg": 0.955794504181601,
+            "frac_z_lt_25mm": 0.8285543608124253,
+            "finite": true
+          },
+          "right": {
+            "signed_median_mm": -50.20449693713003,
+            "median_abs_mm": 50.20449693713003,
+            "p05_mm": -105.137728486165,
+            "p95_mm": -8.859100287791305,
+            "frac_z_neg": 0.9796893667861409,
+            "frac_z_lt_25mm": 0.8369175627240143,
+            "finite": true
+          }
+        },
+        "verts_max_abs_m": 0.05028882622718811,
+        "verts_l2_m": 8.352513244649087,
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": null,
+        "grad_to_coco": null,
+        "grad_to_verts": null,
+        "hand_mode": "all_frames_assumed"
+      },
+      "foot_a1": {
+        "completed": true,
+        "loss_c": [
+          0.4644521176815033,
+          0.20003685355186462,
+          1.2850455045700073,
+          0.36235514283180237,
+          0.0,
+          0.0,
+          0.00795337837189436
+        ],
+        "loss_d": [
+          0.16316473484039307,
+          0.177010178565979,
+          1.4581230878829956,
+          0.3616114556789398,
+          0.002862919820472598,
+          4.074919706908986e-05,
+          0.008003823459148407
+        ],
+        "reproj_median": 48.626625061035156,
+        "reproj_p95": 173.28533935546875,
+        "reproj_l": 172.4029083251953,
+        "reproj_r": 175.45632934570312,
+        "tri_median": 66.24628448486328,
+        "tri_p95": 129.23184204101562,
+        "foot": {
+          "left": {
+            "signed_median_mm": -42.95721650123596,
+            "median_abs_mm": 43.08038949966431,
+            "p05_mm": -85.54351329803467,
+            "p95_mm": -0.5100488662719749,
+            "frac_z_neg": 0.951015531660693,
+            "frac_z_lt_25mm": 0.8022700119474313,
+            "finite": true
+          },
+          "right": {
+            "signed_median_mm": -47.82029986381531,
+            "median_abs_mm": 47.82029986381531,
+            "p05_mm": -102.82913148403168,
+            "p95_mm": -6.885448098182747,
+            "frac_z_neg": 0.9767025089605734,
+            "frac_z_lt_25mm": 0.8094384707287933,
+            "finite": true
+          }
+        },
+        "verts_max_abs_m": 0.049214720726013184,
+        "verts_l2_m": 8.18947422550611,
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_verts": 0.00017150510393548757,
+        "hand_mode": "all_frames_assumed"
+      },
+      "gain": 0.04703156464530645,
+      "gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "foot_abs_gain_5pct": false,
+        "pen_within_1pp": true,
+        "beta_frozen": true,
+        "graph": true,
+        "finite": true
+      },
+      "passed": false
+    },
+    "278_308": {
+      "control": {
+        "completed": true,
+        "loss_c": [
+          0.49144095182418823,
+          0.23418742418289185,
+          1.2428518533706665,
+          0.42605963349342346,
+          0.0,
+          0.0,
+          0.008097643032670021
+        ],
+        "loss_d": [
+          0.17636963725090027,
+          0.19771626591682434,
+          1.4567984342575073,
+          0.44161343574523926,
+          0.0017980654956772923,
+          0.00011808743875008076,
+          0.008137350901961327
+        ],
+        "reproj_median": 46.012760162353516,
+        "reproj_p95": 136.3142547607422,
+        "reproj_l": 140.532958984375,
+        "reproj_r": 127.61144256591797,
+        "tri_median": 68.33795928955078,
+        "tri_p95": 126.84664916992188,
+        "foot": {
+          "left": {
+            "signed_median_mm": -60.18697129562855,
+            "median_abs_mm": 60.18697129562855,
+            "p05_mm": -109.44621387906672,
+            "p95_mm": 2.0563651298730425,
+            "frac_z_neg": 0.9396654719235364,
+            "frac_z_lt_25mm": 0.7825567502986858,
+            "finite": true
+          },
+          "right": {
+            "signed_median_mm": -81.45369367429001,
+            "median_abs_mm": 81.45369367429001,
+            "p05_mm": -143.718633226787,
+            "p95_mm": -12.372531064900237,
+            "frac_z_neg": 0.984468339307049,
+            "frac_z_lt_25mm": 0.9086021505376344,
+            "finite": true
+          }
+        },
+        "verts_max_abs_m": 0.048763394355773926,
+        "verts_l2_m": 10.487280708995327,
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": null,
+        "grad_to_coco": null,
+        "grad_to_verts": null,
+        "hand_mode": "all_frames_assumed"
+      },
+      "foot_a1": {
+        "completed": true,
+        "loss_c": [
+          0.49144095182418823,
+          0.23418742418289185,
+          1.2428518533706665,
+          0.42605963349342346,
+          0.0,
+          0.0,
+          0.008097643032670021
+        ],
+        "loss_d": [
+          0.17777900397777557,
+          0.19810636341571808,
+          1.4552546739578247,
+          0.440473735332489,
+          0.0011899839155375957,
+          0.00011855449702125043,
+          0.008137350901961327
+        ],
+        "reproj_median": 46.24786376953125,
+        "reproj_p95": 136.3142547607422,
+        "reproj_l": 139.50042724609375,
+        "reproj_r": 126.88621520996094,
+        "tri_median": 68.33795928955078,
+        "tri_p95": 126.84664916992188,
+        "foot": {
+          "left": {
+            "signed_median_mm": -56.24958872795105,
+            "median_abs_mm": 56.33193254470825,
+            "p05_mm": -109.44622755050659,
+            "p95_mm": 5.477583408355693,
+            "frac_z_neg": 0.9193548387096774,
+            "frac_z_lt_25mm": 0.7497013142174432,
+            "finite": true
+          },
+          "right": {
+            "signed_median_mm": -79.03486490249634,
+            "median_abs_mm": 79.03486490249634,
+            "p05_mm": -143.7186598777771,
+            "p95_mm": -9.896773099899292,
+            "frac_z_neg": 0.9796893667861409,
+            "frac_z_lt_25mm": 0.8799283154121864,
+            "finite": true
+          }
+        },
+        "verts_max_abs_m": 0.048763394355773926,
+        "verts_l2_m": 10.407028335008974,
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_verts": 0.00020321844203863293,
+        "hand_mode": "all_frames_assumed"
+      },
+      "gain": 0.04487561069288326,
+      "gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "foot_abs_gain_5pct": false,
+        "pen_within_1pp": true,
+        "beta_frozen": true,
+        "graph": true,
+        "finite": true
+      },
+      "passed": false
+    },
+    "373_403": {
+      "control": {
+        "completed": true,
+        "loss_c": [
+          0.5116645693778992,
+          0.23398861289024353,
+          1.3450462818145752,
+          0.4252203106880188,
+          0.0,
+          0.0,
+          0.0081165861338377
+        ],
+        "loss_d": [
+          0.17805317044258118,
+          0.19747291505336761,
+          1.5413910150527954,
+          0.44971543550491333,
+          0.0,
+          0.00017088159802369773,
+          0.008166762068867683
+        ],
+        "reproj_median": 47.15706253051758,
+        "reproj_p95": 173.695068359375,
+        "reproj_l": 176.66729736328125,
+        "reproj_r": 158.0072784423828,
+        "tri_median": 70.3161849975586,
+        "tri_p95": 136.98074340820312,
+        "foot": {
+          "left": {
+            "signed_median_mm": -69.80403506898986,
+            "median_abs_mm": 69.80403506898986,
+            "p05_mm": -111.29657511487316,
+            "p95_mm": -24.50482180595062,
+            "frac_z_neg": 0.9946236559139785,
+            "frac_z_lt_25mm": 0.9480286738351255,
+            "finite": true
+          },
+          "right": {
+            "signed_median_mm": -80.74486117802039,
+            "median_abs_mm": 80.74486117802039,
+            "p05_mm": -142.0127427997939,
+            "p95_mm": -8.122483271086207,
+            "frac_z_neg": 0.9713261648745519,
+            "frac_z_lt_25mm": 0.8870967741935484,
+            "finite": true
+          }
+        },
+        "verts_max_abs_m": 0.05255687236785889,
+        "verts_l2_m": 10.33703253083412,
+        "beta_drift": 0.0,
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": null,
+        "grad_to_coco": null,
+        "grad_to_verts": null,
+        "hand_mode": "all_frames_assumed"
+      },
+      "foot_a1": {
+        "completed": false,
+        "reason": "run did not finish; no metrics.json"
+      },
+      "passed": false,
+      "reason": "incomplete pair"
+    }
+  },
+  "selected_candidate": null,
+  "stop_reason": "foot_a1_not_stable_across_independent_windows",
+  "engineering_validation_candidate": null,
+  "physical_touch_validated": false,
+  "true_3d_accuracy_validated": false,
+  "load_bearing_validated": false,
+  "grip_force_validated": false
+}

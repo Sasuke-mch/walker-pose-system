@@ -2022,3 +2022,7 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 
 - obs2d 默认 0.25→0.20（v5 梯度审计：3D/2D 有效梯度 0.327/0.328 近乎相等，降 2D 后预计 3D 约为 2D 的 1.25 倍）；Stage D 保持 0.70/0.10。
 - 6 条 v6 路线退出码均为 0；无六门全过路线，`recommended_candidate=null`，停止放大权重；v1–v5 未修改，未 push。
+
+### 2026-09-26 — v6 foot=1 独立窗口验证（受阻，engineering validation）
+
+- 129/278 窗 control/foot_a1 退出码 0，增益 4.70%/4.45% 未达 5% 门；373 窗 foot_a1 因全窗零脚权重致 lfoot 恒零，按设计审计失败；`selected_candidate=null`，未冻结 foot=1；v1–v6 未修改，未 push。
