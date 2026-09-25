@@ -1,5 +1,16 @@
 # G20260924_smpl_vposer_shared_beta_v1
 
+## 小窗加权与 Stage D 收敛诊断（2026-09-25）
+
+固定 `60..90` 开发窗和 A/B/C=120/120/120，只测试 D=80 步的三组权重：`both_a1_a30`（foot=1, hand=30）、`both_a2_a30`（foot=2, hand=30）、`both_a1_a45`（foot=1, hand=45）。新增 `--stage-d-trace` 仅记录每步损失，不改变优化更新。
+
+- 三组退出码均为 0，Stage C 参数逐组一致；beta 精确冻结；同进程续跑、surface graph、COCO 梯度隔离和有限性检查通过。
+- `both_a2_a30` 脚 residual 更强，但 3D P95 比 `both_a1_a30` 增加约 1.39%；`both_a1_a45` 手 residual 更强，3D P95 增加约 0.21%。
+- 三组总损失在第 60 到 80 步仍下降约 0.892%/0.925%/0.934%，最后 10 步没有上升，末步变化仍约 7e-5；80 步未进入平台，不能写成已收敛。
+- 机器可读结果：`surface_contact_weight_probe_60_90_v1.json`；逐步记录位于三个 `surface_contact_window60_90_weight_probe_*` 目录的 `stage_d_trace.json`。
+
+本试验只说明更大权重在小窗上能产生额外工程 residual 修正及其观测代价，不冻结更大权重，也不替代完整 448 帧运行或物理接触验证。
+
 ## 当前可复现路线（2026-09-25）
 
 本实验当前采用“先全局拟合，再表面接触微调”的顺序。

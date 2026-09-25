@@ -77,6 +77,8 @@ def main() -> int:
     ap.add_argument("--foot-contact-weight", type=float, default=0.0)
     ap.add_argument("--hand-contact-weight", type=float, default=0.0)
     ap.add_argument("--contact-steps", type=int, default=80)
+    ap.add_argument("--stage-d-trace", action="store_true",
+                    help="Write per-step Stage D loss terms for convergence diagnosis")
     ap.add_argument("--obs-3d-weight", type=float, default=1.0)
     # Gradient audit (v5 summary): with 2D=0.25 the realized 3D/2D gradient
     # L2 norms were nearly equal (0.327/0.328). Lowering 2D to 0.20 puts the
@@ -348,9 +350,9 @@ def main() -> int:
             lhand=(robust_scalar(hd,0.050)*hand_w).sum()/(hand_w.sum()+1e-6)
         return result,pose,jc,pl,pr,l3,l2,lp,lfoot,lhand
 
-    def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.20):
+    def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.20, trace=None):
         last=None
-        for _ in range(steps):
+        for step in range(steps):
             opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand=vals
             lb=beta.square().mean()
             if surface_mode:
@@ -359,6 +361,11 @@ def main() -> int:
                 contact_loss = args.foot_contact_weight*lfoot + args.hand_contact_weight*lhand
             loss=(obs3d_coeff*l3+obs2d_coeff*l2+0.02*lp
                   +(contact_loss if contact_enabled else 0.0)+(0.02*lb if beta_reg else 0.0))
+            if trace is not None:
+                trace.append({"step": step, "total": float(loss.detach()),
+                              "obs3d": float(l3.detach()), "obs2d": float(l2.detach()),
+                              "pose": float(lp.detach()), "foot": float(lfoot.detach()),
+                              "hand": float(lhand.detach())})
             loss.backward(); torch.nn.utils.clip_grad_norm_(opt.param_groups[0]["params"], 10.0); opt.step()
             if beta_reg: beta.data.clamp_(-1.5,1.5)
             last=(float(loss.detach()),float(l3.detach()),float(l2.detach()),float(lp.detach()),float(lfoot.detach()),float(lhand.detach()),float(lb.detach()))
@@ -473,6 +480,7 @@ def main() -> int:
         args.surface_foot_contact_weight > 0 or args.surface_hand_contact_weight > 0 or control_d
     )
     want_ankle_d = (not surface_mode) and args.contact_labels is not None and args.foot_contact_weight > 0
+    stage_d_trace = [] if args.stage_d_trace else None
     if want_surface_d or want_ankle_d:
         contact_enabled = True
         # Real Stage C -> D continuation in the same process: freeze beta and
@@ -480,7 +488,7 @@ def main() -> int:
         beta.requires_grad_(False)
         beta_frozen_during_stage_d = True
         s3=run(torch.optim.Adam([{"params":[latent,root],"lr":0.001},{"params":[transl],"lr":0.0005}],), args.contact_steps, False,
-               obs3d_coeff=obs3d_d, obs2d_coeff=obs2d_d)
+               obs3d_coeff=obs3d_d, obs2d_coeff=obs2d_d, trace=stage_d_trace)
         if not torch.equal(beta.detach(), beta_before_d.detach()):
             raise RuntimeError("beta changed during Stage D despite requires_grad_(False)")
         if want_surface_d:
@@ -531,6 +539,18 @@ def main() -> int:
 
     with torch.no_grad():
         result,pose,jc,pl,pr,_,_,_,lfoot,lhand=losses(beta)
+        if stage_d_trace is not None and stage_d is not None:
+            _, _, _, _, _, l3_end, l2_end, lp_end, _, _ = losses(beta)
+            total_end = (obs3d_d*l3_end + obs2d_d*l2_end + 0.02*lp_end
+                         + eff_foot_w*lfoot + eff_hand_w*lhand)
+            stage_d_trace.append({"step": int(args.contact_steps), "total": float(total_end),
+                                  "obs3d": float(l3_end), "obs2d": float(l2_end),
+                                  "pose": float(lp_end), "foot": float(lfoot),
+                                  "hand": float(lhand)})
+            (out / "stage_d_trace.json").write_text(
+                json.dumps({"loss_evaluation": "pre_step_for_0_to_N_minus_1_post_step_for_N",
+                            "terms": stage_d_trace}, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8")
     verts=result.vertices.cpu().numpy(); pred=jc.cpu().numpy(); roots=root.detach().cpu().numpy(); trans=transl.detach().cpu().numpy(); pose_np=pose.detach().cpu().numpy(); beta_np=beta.detach().cpu().numpy()[0]
     d3=np.linalg.norm(pred-target_np,axis=-1)*1000.0; eL=np.linalg.norm(pl.cpu().numpy()-left[:,:,:2],axis=-1); eR=np.linalg.norm(pr.cpu().numpy()-right[:,:,:2],axis=-1)
     mask=accepted & np.isfinite(d3)
