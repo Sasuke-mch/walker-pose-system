@@ -24,7 +24,7 @@
 
 ## 只允许修改
 
-优先只运行现有入口，不修改代码。若确有必要修正实验逻辑，只允许修改：
+本任务必须补齐同样 80 步的 Stage D 零接触对照，因此允许对入口做最小修改，只允许修改：
 
 `research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/fit_vposer_shared_beta.py`
 
@@ -49,13 +49,14 @@
 
 ## 对照路线
 
-已有路线只读，不重跑：
+已有路线只读，不重跑；其中 v2 no-contact 只到 Stage C，不能作为接触收益的公平对照：
 
 - no-contact：`surface_contact_window60_90_v2_no_contact`
 - surface foot-only：`surface_contact_window60_90_v2_foot_only`
 - hand-only：`surface_contact_window60_90_v3_hand_only`，hand=0.01
 - foot+hand：`surface_contact_window60_90_v3_foot_hand`，foot=0.02、hand=0.01
 
+新增一个严格匹配步数的 Stage D 零接触控制，必须在同一入口中实现一个显式开关，例如 `--force-stage-d-no-contact`。开关开启时，Stage A/B/C 与其他路线完全一致；Stage D 使用相同优化器、学习率、80 步、beta 冻结和同进程内存状态，但 surface foot/hand 权重均为 0。不得把现有 Stage C no-contact 复制成该控制，也不得读取旧结果初始化。输出目录：`surface_contact_window60_90_v4_stage_d_no_contact`。零接触控制不得伪造 surface loss 的 vertices 非零梯度；它只审计无接触、beta 冻结和步数一致。接触路线效果必须主要相对这个控制计算，现有 Stage C no-contact 仅作历史参考。
 新建空输出目录，每个目录运行前确认不存在或为空，禁止覆盖：
 
 1. `surface_contact_window60_90_v4_hand_w003`：foot=0.0，hand=0.03
@@ -88,8 +89,8 @@
 为每一路保存并汇总：
 
 1. Stage C 与 Stage D 的总 loss；
-2. 左右 2D P95、总 2D P95；
-3. 三维 median/P95；
+2. 左右 2D P95、总 2D P95，并计算相对匹配步数 Stage D 零接触控制的差值；
+3. 三维 median/P95，以及相对匹配步数 Stage D 零接触控制的差值；
 4. 左右脚 surface residual median/P95；
 5. 左右手 capsule residual median/P95；
 6. hand surface coverage：15/30/50 mm；
@@ -153,3 +154,4 @@ git commit -m "exp: sweep all-frame surface hand contact weight"
 - 表面图隔离审计结果
 - 是否触发停止条件
 - 明确写：结果仍是 engineering validation，不是物理接触验证
+
