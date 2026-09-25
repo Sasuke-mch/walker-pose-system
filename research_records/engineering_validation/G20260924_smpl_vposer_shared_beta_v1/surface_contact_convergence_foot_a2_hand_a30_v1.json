@@ -1,0 +1,292 @@
+{
+  "status": "stage_d_convergence_probe",
+  "engineering_validation_only": true,
+  "window": [
+    60,
+    90
+  ],
+  "route": {
+    "surface_foot_contact_weight": 2.0,
+    "surface_hand_contact_weight": 30.0
+  },
+  "steps": {
+    "A": 120,
+    "B": 120,
+    "C": 120,
+    "D_tested": 800
+  },
+  "criterion_proposed": {
+    "basic_convergence_requires": "last 40-step relative objective decrease <=0.1% and median parameter step L2 materially near zero; threshold is an engineering stopping rule, not mathematical convergence"
+  },
+  "observed": {
+    "loss": {
+      "0": 0.1766505092382431,
+      "80": 0.16264520585536957,
+      "160": 0.15656980872154236,
+      "240": 0.15121228992938995,
+      "320": 0.14622217416763306,
+      "400": 0.1416424661874771,
+      "480": 0.13779014348983765,
+      "560": 0.13457681238651276,
+      "640": 0.13165698945522308,
+      "720": 0.12893171608448029,
+      "800": 0.12653331458568573
+    },
+    "relative_drop_720_to_760_pct": 0.9573576812423656,
+    "relative_drop_760_to_800_pct": 0.9115800386154541,
+    "median_param_step_l2_720_800": 0.019672893919050694,
+    "max_param_step_l2_720_800": 0.01992855593562126
+  },
+  "metrics_at_800": {
+    "status": "completed_staged_single_frame_vposer_shared_beta",
+    "window": [
+      60,
+      90
+    ],
+    "frames": 31,
+    "full_sequence_fit": false,
+    "stage_c_to_d_same_process": true,
+    "beta_frozen_during_stage_d": true,
+    "stage_a_beta_zero": {
+      "loss": [
+        0.5411617159843445,
+        0.24103569984436035,
+        1.4739562273025513,
+        0.26674026250839233,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "beta": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "metrics": {
+        "tag": "stage_a_beta0",
+        "3d_median_mm": 82.04265594482422,
+        "3d_p95_mm": 151.5470733642578,
+        "2d_median_px": 48.86224365234375,
+        "2d_p95_px": 179.64227294921875,
+        "beta": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "beta_at_boundary": false
+      }
+    },
+    "stage_b_shared_beta": {
+      "loss": [
+        0.5303056836128235,
+        0.23527079820632935,
+        1.4480342864990234,
+        0.26846423745155334,
+        0.0,
+        0.0,
+        0.002936517121270299
+      ],
+      "beta": [
+        0.0594024732708931,
+        -0.057578638195991516,
+        -0.0005656167631968856,
+        -0.05708392709493637,
+        0.06002667173743248,
+        -0.042558006942272186,
+        0.06121683865785599,
+        -0.05970684438943863,
+        0.059223972260951996,
+        -0.05923963710665703
+      ],
+      "metrics": {
+        "tag": "stage_b_shared_beta",
+        "3d_median_mm": 81.18343353271484,
+        "3d_p95_mm": 149.81137084960938,
+        "2d_median_px": 48.174434661865234,
+        "2d_p95_px": 178.0159454345703,
+        "beta": [
+          0.0594024732708931,
+          -0.057578638195991516,
+          -0.0005656167631968856,
+          -0.05708392709493637,
+          0.06002667173743248,
+          -0.042558006942272186,
+          0.06121683865785599,
+          -0.05970684438943863,
+          0.059223972260951996,
+          -0.05923963710665703
+        ],
+        "beta_at_boundary": false
+      }
+    },
+    "stage_c_joint": {
+      "loss": [
+        0.4452116787433624,
+        0.20017355680465698,
+        1.18796706199646,
+        0.36517250537872314,
+        0.0,
+        0.0,
+        0.007063861936330795
+      ],
+      "beta": [
+        0.09493871033191681,
+        -0.09394534677267075,
+        0.030087023973464966,
+        -0.09199285507202148,
+        0.09119629114866257,
+        -0.01096434984356165,
+        0.0961238220334053,
+        -0.09323403984308243,
+        0.0929950624704361,
+        -0.09394782781600952
+      ],
+      "metrics": {
+        "tag": "stage_c_joint",
+        "3d_median_mm": 73.78572845458984,
+        "3d_p95_mm": 137.18003845214844,
+        "2d_median_px": 42.60649108886719,
+        "2d_p95_px": 159.77098083496094,
+        "beta": [
+          0.09493871033191681,
+          -0.09394534677267075,
+          0.030087023973464966,
+          -0.09199285507202148,
+          0.09119629114866257,
+          -0.01096434984356165,
+          0.0961238220334053,
+          -0.09323403984308243,
+          0.0929950624704361,
+          -0.09394782781600952
+        ],
+        "beta_at_boundary": false
+      }
+    },
+    "stage_d_contact": {
+      "loss": [
+        0.12656012177467346,
+        0.13258248567581177,
+        1.1315661668777466,
+        0.4613528549671173,
+        0.0004873867437709123,
+        3.064096745220013e-05,
+        0.0071050627157092094
+      ],
+      "beta": [
+        0.09493871033191681,
+        -0.09394534677267075,
+        0.030087023973464966,
+        -0.09199285507202148,
+        0.09119629114866257,
+        -0.01096434984356165,
+        0.0961238220334053,
+        -0.09323403984308243,
+        0.0929950624704361,
+        -0.09394782781600952
+      ],
+      "metrics": {
+        "tag": "stage_d_surface_foot_hand",
+        "3d_median_mm": 53.705772399902344,
+        "3d_p95_mm": 121.03736877441406,
+        "2d_median_px": 38.08114242553711,
+        "2d_p95_px": 165.4036407470703,
+        "beta": [
+          0.09493871033191681,
+          -0.09394534677267075,
+          0.030087023973464966,
+          -0.09199285507202148,
+          0.09119629114866257,
+          -0.01096434984356165,
+          0.0961238220334053,
+          -0.09323403984308243,
+          0.0929950624704361,
+          -0.09394782781600952
+        ],
+        "beta_at_boundary": false
+      },
+      "surface_mode": true
+    },
+    "contact": {
+      "enabled": true,
+      "foot_weight": 0.0,
+      "hand_weight": 0.0,
+      "label_file": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz",
+      "scene_file": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz",
+      "final_foot_loss": 0.00048703813808970153,
+      "final_hand_loss": 3.0679813789902255e-05
+    },
+    "2d": {
+      "median_px": 38.08114242553711,
+      "p95_px": 165.4036407470703,
+      "left_p95_px": 164.1370849609375,
+      "right_p95_px": 171.2256622314453
+    },
+    "3d": {
+      "median_mm": 53.705772399902344,
+      "p95_mm": 121.03736877441406,
+      "joint_p95_mm": {
+        "nose": 120.92589569091797,
+        "left_eye": 89.56063842773438,
+        "right_eye": 88.01446533203125,
+        "left_ear": 62.086280822753906,
+        "right_ear": 81.37735748291016,
+        "left_shoulder": 68.52200317382812,
+        "right_shoulder": 106.88756561279297,
+        "left_elbow": 141.82322692871094,
+        "right_elbow": 114.43415832519531,
+        "left_wrist": 70.33477783203125,
+        "right_wrist": 62.287757873535156,
+        "left_hip": 171.7686767578125,
+        "right_hip": 154.88372802734375,
+        "left_knee": 177.79356384277344,
+        "right_knee": null,
+        "left_ankle": 91.15000915527344,
+        "right_ankle": 19.876522064208984
+      }
+    },
+    "beta": {
+      "values": [
+        0.09493871033191681,
+        -0.09394534677267075,
+        0.030087023973464966,
+        -0.09199285507202148,
+        0.09119629114866257,
+        -0.01096434984356165,
+        0.0961238220334053,
+        -0.09323403984308243,
+        0.0929950624704361,
+        -0.09394782781600952
+      ],
+      "shared": true,
+      "at_boundary": false
+    },
+    "right_knee_accepted": 0,
+    "vposer": {
+      "latent_dim": 32,
+      "checkpoint": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05\\snapshots\\V02_05_epoch=13_val_loss=0.03.ckpt"
+    },
+    "source_audit": {
+      "raw_left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+      "raw_right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+      "old_fit_inputs_read": false,
+      "stored_triangulation_read": false,
+      "temporal_prefit_read": false
+    }
+  },
+  "converged_basic_at_800": false,
+  "conclusion": "80 steps is insufficient; 320 steps is insufficient; 800 steps still shows material objective and parameter changes, so do not claim basic convergence yet."
+}

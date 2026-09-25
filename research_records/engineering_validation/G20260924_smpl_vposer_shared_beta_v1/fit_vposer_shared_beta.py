@@ -354,6 +354,9 @@ def main() -> int:
         last=None
         for step in range(steps):
             opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand=vals
+            trace_params = None
+            if trace is not None:
+                trace_params = torch.cat([latent.detach().reshape(-1), root.detach().reshape(-1), transl.detach().reshape(-1)])
             lb=beta.square().mean()
             if surface_mode:
                 contact_loss = eff_foot_w*lfoot + eff_hand_w*lhand
@@ -367,6 +370,9 @@ def main() -> int:
                               "pose": float(lp.detach()), "foot": float(lfoot.detach()),
                               "hand": float(lhand.detach())})
             loss.backward(); torch.nn.utils.clip_grad_norm_(opt.param_groups[0]["params"], 10.0); opt.step()
+            if trace is not None:
+                trace_params_after = torch.cat([latent.detach().reshape(-1), root.detach().reshape(-1), transl.detach().reshape(-1)])
+                trace[-1]["param_step_l2"] = float(torch.linalg.vector_norm(trace_params_after - trace_params).detach())
             if beta_reg: beta.data.clamp_(-1.5,1.5)
             last=(float(loss.detach()),float(l3.detach()),float(l2.detach()),float(lp.detach()),float(lfoot.detach()),float(lhand.detach()),float(lb.detach()))
         return last
