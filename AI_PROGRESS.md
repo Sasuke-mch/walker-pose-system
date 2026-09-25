@@ -1,5 +1,48 @@
 # 助步器项目 AI 工作日志
 
+### 2026-09-25（北京时间）— 推进 male SMPL 表面手脚接触拟合路线
+
+- 用户要求继续推进加入手脚接触的 SMPL 拟合；当前唯一推进阶段为同窗口 surface no-contact 与 surface foot-only 对照，并准备 hand-contact 标签门。
+- 当前允许输入仍为原始双目 PMPose、正式标定、male SMPL、COCO observation regressor、VPoser、当前重放的场景变换、当前接触标签和表面顶点集合；不读取旧 interaction target、旧 motion、旧 temporal prefit、旧 HTML 或旧逐帧 contact target。
+- 当前 `contact_labels_stage_audit_v2` 在窗口 `60..90` 的 hand contact weight 全为零，左右 hand candidate count 均为 0；因此本阶段不得直接运行 hand contact。拟合器将改为按手部标签逐帧加权，并在 hand 权重非零但有效标签数为零时硬拒绝运行。
+- 目标对照：同一输入、同一初始化、同一 Stage C 预算下，先运行 surface no-contact，再运行 surface foot-only；唯一变量为 Stage D surface foot loss。结果只能称 technical-chain / engineering validation，不能称真实触地、握力或承重验证。
+- 结果：surface no-contact 与 surface foot-only 均在窗口 `60..90`、31 帧、同一 Stage A/B/C 初始化下运行；foot-only 保持 beta 冻结并在同一进程由 Stage C 进入 Stage D。
+- surface foot-only 相对 no-contact 的内部指标变化为二维 P95 `140.330→134.274 px`、三维 P95 `172.296→170.105 mm`；这只是工程对照，不能解释为真实精度或触地改善。
+- 新审计确认脚残差 `[31,54]`、手残差 `[31,778]`、手索引 `[778]`，同 forward 图中 surface loss 对 vertices 梯度有限非零、对 COCO joints 梯度为零。
+- 手部路线仍阻塞：当前窗口 hand contact weight 左右均无正值、candidate count 均为 0；本轮未运行 hand-contact 拟合。拟合器已改为按手部标签加权，并在无有效标签时硬拒绝。
+
+### 2026-09-25（北京时间）— 启动严格 foot-only 对照阶段
+
+- 用户明确要求：先做支撑标签审计，再在当前运行的小窗口重算 no-contact 基线，最后仅在 Stage C 之后加入 foot-only；本阶段不启用 hand contact，不直接进入全片拟合。
+- 当前唯一允许的实验变量是 foot-only 接触项及其审计标签；不得读取旧 contact target、旧动态助步器位姿或旧 foot-only 结果作为输入。Stage 2 脚踝锚定造成的坐标循环性只可作为低权重工程正则，不能作为独立触地证据。
+- 本轮先进行代码/资产就绪性审计；截至此处尚未启动拟合、尚未生成新实验结果。若当前运行标签或模型输入无法定位，必须先停在阻塞记录，不得用旧结果替代。
+- 新增 `realtime_app/tools/audit_foot_support_labels.py`：只读取当前运行 `motion.json`，输出逐帧 Stage、左右脚标签/速度/高度/地面位置/权重，并要求 Stage 2 双脚同时有效；Transition、invalid、ambiguous、swing 均不产生接触权重，不插值。
+- 新增 `realtime_app/tools/run_strict_foot_only_window.py`：固定同一窗口、同一初始化、共享 beta、无手接触，先跑 `stage_c_joint_no_contact` 再跑低权重 `stage_d_foot_only`；foot-only 使用模型侧 COCO observation 点在地面坐标中的 z 值和 25 mm pseudo-Huber，不再把三角化脚点当作 SMPL 目标。
+- 修改 `benchmark_smplx_r3_integration.py`：当显式提供审计标签时切换到严格脚标签和地面 z 损失；旧 target-proxy 路线保持兼容但不作为本阶段入口。
+- 资产审计发现当前工作区未包含默认运行数据目录，主机也没有 `python`/`py` 可执行入口；因此标签审计、窗口选择和拟合均未运行，不能生成实验结果或把旧 60--90 接触结果当作本轮输入。下一步需在具备当前运行资产和 SMPL-X 环境的机器上先执行标签审计。
+
+### 2026-09-26（北京时间）— 完全独立 male raw-2D SMPL-X 诊断结果
+
+- 新建 `fit_smplx_male_native_bundle.py`，输入白名单仅为原始左右 PMPose JSONL、双鱼眼标定和 `SMPLX_MALE.npz`；明确不读取 motion、temporal prefit、旧三角化、旧 beta/offset/latent/contact/SMPL-X 参数。
+- 在左相机坐标系内重新进行鱼眼反投影和双射线三角化；male 从零 pose/beta 初始化，使用5帧原生参数结点、双目二维主监督、本次三角化弱辅助和序列二阶项。
+- 448帧结果：中位二维17--19 px，P95 左右171.05/93.82 px，加速度P95=20.63 mm/frame²，negative depth=0。左目尾部仍未通过，结论限定为独立诊断候选。
+- 独立网格页面：`research_records/engineering_validation/G20260926_clean_male_raw2d_v1/full448/clean_male_raw2d.html`。
+
+### 2026-09-24（北京时间）— male temporal-prefit 手脚接触候选冻结
+
+- 在既有 male temporal-prefit→SMPL-X 拟合主线上完成接触实验，不建立并行主线。开发窗固定使用 v3 参数初始化、5 帧 knots、balanced Huber 100→20、root/local temporal=220、COCO 骨盆净位移保持。
+- 唯一变量为 contact mode：none、foot-only（foot=100）、both（foot=100、hand=30）。
+- 开发窗 60--90：none strict P95=70.15/78.91 px、accel P95=31.62；foot=70.10/77.02、31.65；both=66.75/76.87、30.73；三路 negative depth=0、availability=372、骨盆位移均保持63.3508 mm。
+- `both` 在二维门和连续性门内优于两个对照，冻结为当前候选。接触损失只使用 motion/interactions 构造的 COCO 代理，不代表真实触地、握力或承重。
+- 448 帧冻结候选诊断：strict P95=239.28/234.52 px、accel P95=21.11 mm/frame²、negative depth=0、availability=5376/5376；仅用于整段连续性和可视化诊断。
+- 新增真实 male SMPL-X 10,475 顶点/20,908 面网格页面：`research_records/engineering_validation/G20260924_smplx_male_temporal_contact_v1/full448/smplx_male_temporal_hand_foot_contact.html`。
+- 记录：`research_records/engineering_validation/G20260924_smplx_male_temporal_contact_v1/`。当前冻结配置不包含 soft-3D、R3 或 beta 扫描；右膝无 accepted 观测，未参与监督或通过判定。
+
+### 2026-09-21（北京时间）— male失败原因追加诊断，仅内存检查
+
+- 同姿态骨盆对齐后，neutral/male在零beta下17点差异中位27.495 mm，移植固定beta后135.436 mm；旧shape/offset/latent确来自neutral。零步消融不能单独证明最终失败的主因排序。
+- 确认translation初始化误把SMPL-X绕骨盆旋转当成绕原点旋转；neutral/male初始COCO骨盆偏差中位427.999/502.990 mm。内存中按transl=0真实前向对齐骨盆后，male零步strict左右中位777/1210→174/158 px、负深度4816→704。未实现修复或跑新400步；需要先重建male独立shape和正确前向初始化，再谈优化收敛。
+
 > **强制规则（适用于所有参与本项目的 AI）：** 每次开始工作、做出重要判断、创建/修改文件、启动/结束实验、发现失败或阻塞时，必须立即更新本文件。记录须包含北京时间、操作范围、输入/对照、唯一变量、结果或阻塞，以及对结论边界的说明。禁止把“输出更多点”写成“精度提高”；没有真实 3D 真值或人工参考时，必须明确标为探索性或工程验证。
 
 ## 当前状态
