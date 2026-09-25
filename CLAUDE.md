@@ -179,3 +179,5 @@ python .\run_stereo.py \
 ### DA3深度分析
 
 参考 `analyze_da3_at_reference_keypoints.py` 的采样和分析模式。
+
+所有 agent 完成可独立验证的修复、迭代或更新后，必须按 `AGENTS.md` 的“Git 版本管理”条款创建仅含本次任务的本地提交；不得混入已有未提交改动，未获明确授权不得推送远端。
