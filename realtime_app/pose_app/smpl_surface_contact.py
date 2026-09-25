@@ -6,6 +6,7 @@ contact loss; they remain restricted to observation losses and diagnostics.
 """
 from __future__ import annotations
 
+import math
 from typing import Any
 
 
@@ -51,24 +52,47 @@ def softmin(values: "Any", temperature: float) -> "Any":
     return -temperature * torch.logsumexp(-values / temperature, dim=-1)
 
 
+def centered_softmin(values: "Any", temperature: float) -> "Any":
+    """Soft minimum corrected for the log(K) offset of K candidates."""
+    torch = _torch()
+    if values.shape[-1] <= 0:
+        raise ValueError("centered_softmin requires a non-empty candidate dimension")
+    if not temperature > 0:
+        raise ValueError(f"softmin temperature must be positive, got {temperature}")
+    k = values.shape[-1]
+    return -temperature * (
+        torch.logsumexp(-values / temperature, dim=-1) - math.log(float(k))
+    )
+
+
 def foot_surface_loss(sole_z: "Any", temperature: float = 0.005,
-                      delta: float = 0.010) -> "Any":
+                      delta: float = 0.010,
+                      penetration_weight: float = 1.0) -> "Any":
     """Sole loss without forcing every surface vertex to z=0.
 
-    ``sole_z`` is z_G of one foot surface set, shape [B,K].
+    ``sole_z`` is z_G of one foot surface set, shape [B,K]. Uses the
+    log(K)-centered soft minimum and a relu penetration penalty.
     """
     torch = _torch()
-    sole_height = softmin(sole_z, temperature)
-    penetration = torch.relu(-sole_z)
-    return robust_scalar(sole_height, delta) + 0.25 * (penetration.square().mean(dim=-1))
+    foot_base = robust_scalar(centered_softmin(sole_z, temperature), delta)
+    foot_penetration = torch.relu(-sole_z).square().mean(dim=-1)
+    return foot_base + penetration_weight * foot_penetration
 
 
 def hand_surface_loss(palm_points: "Any", a: "Any", b: "Any",
                       radius_m: float, delta: float = 0.015,
-                      temperature: float = 0.005) -> "Any":
-    """Wrap-the-handle surface loss for one hand set, shape [B]."""
+                      temperature: float = 0.005,
+                      penetration_weight: float = 1.0) -> "Any":
+    """Wrap-the-handle surface loss for one hand set, shape [B].
+
+    Uses the log(K)-centered soft minimum of capsule-surface residuals and an
+    explicit relu penetration penalty.
+    """
+    torch = _torch()
     residuals = capsule_surface_residual(palm_points, a, b, radius_m)
-    return robust_scalar(softmin(residuals, temperature), delta)
+    hand_base = robust_scalar(centered_softmin(residuals, temperature), delta)
+    hand_penetration = torch.relu(-residuals).square().mean(dim=-1)
+    return hand_base + penetration_weight * hand_penetration
 
 
 def surface_coverage(distances_m: "Any", thresholds_m: tuple = (0.015, 0.030, 0.050)) -> dict:
@@ -87,6 +111,7 @@ __all__ = [
     "capsule_surface_residual",
     "robust_scalar",
     "softmin",
+    "centered_softmin",
     "foot_surface_loss",
     "hand_surface_loss",
     "surface_coverage",

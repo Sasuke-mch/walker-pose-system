@@ -77,6 +77,10 @@ def main() -> int:
     ap.add_argument("--foot-contact-weight", type=float, default=0.0)
     ap.add_argument("--hand-contact-weight", type=float, default=0.0)
     ap.add_argument("--contact-steps", type=int, default=80)
+    ap.add_argument("--obs-3d-weight", type=float, default=1.0)
+    ap.add_argument("--obs-2d-weight", type=float, default=0.25)
+    ap.add_argument("--stage-d-obs-3d-scale", type=float, default=0.70)
+    ap.add_argument("--stage-d-obs-2d-scale", type=float, default=0.10)
     ap.add_argument("--force-stage-d-no-contact", action="store_true",
                     help="Stage D control: same optimizer/steps/frozen beta but zero surface weights")
     ap.add_argument("--contact-vertex-sets", type=Path, default=None)
@@ -289,9 +293,9 @@ def main() -> int:
         result,pose,jc,pl,pr=forward(b)
         finite=torch.isfinite(target).all(-1)
         w3=w*finite
-        l3=(robust_norm(jc-target,0.10)*w3).sum()/(w3.sum()+1e-6)
+        l3=((robust_norm(jc-target,0.10)/(0.10**2))*w3).sum()/(w3.sum()+1e-6)
         e2=robust_norm(pl-obs_l,20.0)+robust_norm(pr-obs_r,20.0)
-        l2=(e2*w*valid2d).sum()/(2*(w*valid2d).sum()+1e-6)
+        l2=(e2/(20.0**2)*w*valid2d).sum()/(2*(w*valid2d).sum()+1e-6)
         lp=latent.square().mean()
         lfoot=torch.zeros((),device=device); lhand=torch.zeros((),device=device)
         if surface_mode and contact_enabled:
@@ -312,6 +316,15 @@ def main() -> int:
             surface_audit["handle_radius_m"] = surface["radius_m"]
             surface_audit["handle_radius_assumption"] = surface["radius_assumption"]
             surface_audit["hand_coverage"] = hand_cover
+            surface_audit["observation_loss_units"] = "dimensionless_delta_normalized"
+            surface_audit["stage_a_to_c_obs_3d_coeff"] = obs3d_abc
+            surface_audit["stage_a_to_c_obs_2d_coeff"] = obs2d_abc
+            surface_audit["stage_d_obs_3d_coeff"] = obs3d_d
+            surface_audit["stage_d_obs_2d_coeff"] = obs2d_d
+            surface_audit["foot_penetration_fraction"] = {
+                s: float((foot_res[s] < 0).float().mean().detach().cpu()) for s in foot_res}
+            surface_audit["hand_penetration_fraction"] = {
+                s: float((hand_res_tensors[s] < 0).float().mean().detach().cpu()) for s in hand_res_tensors}
             surface_audit["hand_label_audit_only"] = {
                 "hand_label_values": sorted(set(str(v) for v in np.asarray(hand_label_stats).ravel().tolist())),
                 "hand_contact_weight_sum": float(hand_w_stats.sum()),
@@ -330,7 +343,7 @@ def main() -> int:
             lhand=(robust_scalar(hd,0.050)*hand_w).sum()/(hand_w.sum()+1e-6)
         return result,pose,jc,pl,pr,l3,l2,lp,lfoot,lhand
 
-    def run(opt, steps, beta_reg=True):
+    def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.25):
         last=None
         for _ in range(steps):
             opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand=vals
@@ -339,7 +352,8 @@ def main() -> int:
                 contact_loss = eff_foot_w*lfoot + eff_hand_w*lhand
             else:
                 contact_loss = args.foot_contact_weight*lfoot + args.hand_contact_weight*lhand
-            loss=l3+0.10*l2+0.02*lp+(contact_loss if contact_enabled else 0.0)+(0.02*lb if beta_reg else 0.0)
+            loss=(obs3d_coeff*l3+obs2d_coeff*l2+0.02*lp
+                  +(contact_loss if contact_enabled else 0.0)+(0.02*lb if beta_reg else 0.0))
             loss.backward(); torch.nn.utils.clip_grad_norm_(opt.param_groups[0]["params"], 10.0); opt.step()
             if beta_reg: beta.data.clamp_(-1.5,1.5)
             last=(float(loss.detach()),float(l3.detach()),float(l2.detach()),float(lp.detach()),float(lfoot.detach()),float(lhand.detach()),float(lb.detach()))
@@ -384,9 +398,11 @@ def main() -> int:
                 "foot_surface_residuals_m": np.stack([foot_z["left"], foot_z["right"]], axis=1),
                 "hand_surface_residuals_m": np.stack([hand_res["left"], hand_res["right"]], axis=1),
                 "foot_softmin_height_m": np.stack([
-                    -0.005 * np.log(np.exp(-foot_z[s] / 0.005).sum(axis=1)) for s in ("left", "right")], axis=1),
+                    -0.005 * (np.log(np.exp(-foot_z[s] / 0.005).sum(axis=1))
+                              - np.log(float(foot_z[s].shape[1]))) for s in ("left", "right")], axis=1),
                 "hand_softmin_capsule_distance_m": np.stack([
-                    -0.005 * np.log(np.exp(-hand_res[s] / 0.005).sum(axis=1)) for s in ("left", "right")], axis=1),
+                    -0.005 * (np.log(np.exp(-hand_res[s] / 0.005).sum(axis=1))
+                              - np.log(float(hand_res[s].shape[1]))) for s in ("left", "right")], axis=1),
                 "foot_active_vertex_count": np.array([sole_idx_np["left"].size, sole_idx_np["right"].size]),
                 "hand_active_vertex_count": np.array([palm_idx_np["left"].size, palm_idx_np["right"].size]),
             }
@@ -401,17 +417,27 @@ def main() -> int:
                 "beta":be.tolist(),"beta_at_boundary":bool(np.any(np.isclose(np.abs(be),1.5,atol=1e-3)))}
 
     # Stage A: beta fixed zero, optimize per-frame latent/root/translation.
+    # 3D-dominant dimensionless observation: 3D coeff 1.0 > 2D coeff 0.25.
+    obs3d_abc = float(args.obs_3d_weight)
+    obs2d_abc = float(args.obs_2d_weight)
+    obs3d_d = float(args.obs_3d_weight * args.stage_d_obs_3d_scale)
+    obs2d_d = float(args.obs_2d_weight * args.stage_d_obs_2d_scale)
+    if not (obs3d_d > 0 and obs2d_d > 0):
+        raise ValueError("Stage D must keep nonzero observation constraints")
     beta.requires_grad_(False)
-    s0=run(torch.optim.Adam([{"params":[latent,root],"lr":0.01},{"params":[transl],"lr":0.003}],), args.base_steps, False)
+    s0=run(torch.optim.Adam([{"params":[latent,root],"lr":0.01},{"params":[transl],"lr":0.003}],), args.base_steps, False,
+           obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
     stage_a={"loss":s0,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_a_beta0")}
     # Stage B: freeze motion and optimize one shared beta only.
     for p in (latent,root,transl): p.requires_grad_(False)
     beta.requires_grad_(True)
-    s1=run(torch.optim.Adam([{"params":[beta],"lr":0.0005}],), args.beta_steps, True)
+    s1=run(torch.optim.Adam([{"params":[beta],"lr":0.0005}],), args.beta_steps, True,
+           obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
     stage_b={"loss":s1,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_b_shared_beta")}
     # Stage C: joint refinement with beta learning rate ten times lower.
     for p in (latent,root,transl): p.requires_grad_(True)
-    s2=run(torch.optim.Adam([{"params":[latent,root],"lr":0.003},{"params":[transl],"lr":0.001},{"params":[beta],"lr":0.0003}],), args.joint_steps, True)
+    s2=run(torch.optim.Adam([{"params":[latent,root],"lr":0.003},{"params":[transl],"lr":0.001},{"params":[beta],"lr":0.0003}],), args.joint_steps, True,
+           obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
     stage_c={"loss":s2,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_c_joint")}
 
     beta_before_d = beta.detach().clone()
@@ -432,7 +458,8 @@ def main() -> int:
         # optimize only latent/root/transl from the Stage C memory state.
         beta.requires_grad_(False)
         beta_frozen_during_stage_d = True
-        s3=run(torch.optim.Adam([{"params":[latent,root],"lr":0.001},{"params":[transl],"lr":0.0005}],), args.contact_steps, False)
+        s3=run(torch.optim.Adam([{"params":[latent,root],"lr":0.001},{"params":[transl],"lr":0.0005}],), args.contact_steps, False,
+               obs3d_coeff=obs3d_d, obs2d_coeff=obs2d_d)
         if not torch.equal(beta.detach(), beta_before_d.detach()):
             raise RuntimeError("beta changed during Stage D despite requires_grad_(False)")
         if want_surface_d:
