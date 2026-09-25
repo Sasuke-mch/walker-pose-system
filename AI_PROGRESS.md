@@ -10,6 +10,9 @@
 - surface foot-only 相对 no-contact 的内部指标变化为二维 P95 `140.330→134.274 px`、三维 P95 `172.296→170.105 mm`；这只是工程对照，不能解释为真实精度或触地改善。
 - 新审计确认脚残差 `[31,54]`、手残差 `[31,778]`、手索引 `[778]`，同 forward 图中 surface loss 对 vertices 梯度有限非零、对 COCO joints 梯度为零。
 - 手部路线仍阻塞：当前窗口 hand contact weight 左右均无正值、candidate count 均为 0；本轮未运行 hand-contact 拟合。拟合器已改为按手部标签加权，并在无有效标签时硬拒绝。
+- 用户随后明确要求所有帧都加入手部表面损失，不使用 hand_contact_weight 门控；Cursor 执行 prompt 已保存为 `dispatch/task-07-surface-hand-weight-sweep.md`。
+- 已生成完整主线实验记载 `research_records/reports/G20260924_smpl_vposer_shared_beta_v1_mainline_record.docx`，覆盖原始二维、鱼眼坐标、三角化、Stage 1/2、地面变换、SMPL/VPoser、COCO 回归、beta、表面脚手损失、梯度审计、当前对照和下一步权重扫描。
+- 下一步唯一变量为全帧 hand surface loss 权重，固定窗口 `60..90`、输入、初始化和步数，计划比较 hand=0.03/0.10 及 foot+hand=0.02+0.03/0.10；不直接进入 full448。
 
 ### 2026-09-25（北京时间）— 启动严格 foot-only 对照阶段
 
