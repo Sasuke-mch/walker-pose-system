@@ -172,3 +172,9 @@ Term 值：obs3d 0.21256、obs2d 0.28891、foot 0.001868、hand 0.0000954；梯�
 结果（相对 v6 control）：foot_a1 通过 3D/2D/穿透/beta/梯度门但 residual 门未过；foot_a3 使脚 |median| 从 32.9 mm 降到 26.1 mm（穿透方向改善约 21%），但 3D P95 恶化 +3.3% 且门公式按 median 下降计为负增益；hand_a30 手 median 44.39→42.74 mm 但左手穿透比例 +1.8pp 超门；both_a3_a60 手增益 +6.6% 达 5% 线但 3D P95 +3.0%、左手穿透 +2.7pp。无路线六门全过。
 
 结论：`recommended_candidate=null`，`stop_reason=contact_geometry_or_pose_response_not_observable`。停止继续放大权重、增加步数或调整阈值。本结论仅为 engineering validation，不是物理接触验证。
+
+## v6 推荐门更正审计（2026-09-25，engineering validation）
+
+v6 汇总对脚部负的有符号中位残差直接计算“下降比例”，把控制组 −32.9434 mm 到 foot_a1 −30.0938 mm 的向零移动误记为负增益。只读复算的绝对中位残差为 32.9434→30.0938 mm，下降 8.6501%；foot_a1 的 3D P95 为 131.579 mm，相对同轮控制 129.490 mm 增加 1.61%，小于原定 2% 门；2D P95 改善 1.58 px，穿透比例未增加，beta 与梯度审计门通过。因此原 `recommended_candidate=null` 是判定公式错误，不应继续引用为当前结论。更正明细保存在 `surface_contact_window60_90_v6_gate_reaudit.json`，原 v6 comparison 保留为历史错误记录，未就地改写。
+
+foot_a1 仅成为开发窗的进一步验证候选：Stage D 后左右 sole 顶点仍有约 93.13%/92.29% 位于当前地面下方，不能称物理触地有效。v6 的 3D/2D 梯度比约 1.25 是从 v5 审计外推，尚未在 v6 Stage C 实测。下一步应先复核脚部接触的逐帧/逐侧改善和当前地面变换质量，再用冻结的 foot=1 方案做独立窗口验证；不得将开发窗通过解释成真实三维精度或承重验证。

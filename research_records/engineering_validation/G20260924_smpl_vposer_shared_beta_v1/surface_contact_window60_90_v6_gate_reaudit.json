@@ -1,0 +1,104 @@
+{
+  "schema": "surface_staged_contact_v6_gate_reaudit",
+  "source_comparison": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_v6_comparison.json",
+  "reason": "Original foot_gain used signed negative foot median; toward-zero movement was scored as negative gain. Corrected gate uses magnitude of the signed median, confirmed against per-vertex median absolute residual for the control and foot_a1.",
+  "original_recommended_candidate": null,
+  "corrected_gate_candidates": [
+    "surface_contact_window60_90_v6_foot_a1"
+  ],
+  "candidate_for_further_validation": "surface_contact_window60_90_v6_foot_a1",
+  "routes": {
+    "surface_contact_window60_90_v6_stage_d_no_contact": {
+      "signed_foot_median_mm": -32.943434890425394,
+      "absolute_signed_foot_median_mm": 32.943434890425394,
+      "foot_toward_zero_gain_fraction": 0.0,
+      "hand_toward_zero_gain_fraction": 0.0,
+      "corrected_gates": {},
+      "all_gates_pass": false
+    },
+    "surface_contact_window60_90_v6_foot_a1": {
+      "signed_foot_median_mm": -30.093789100646973,
+      "absolute_signed_foot_median_mm": 30.093789100646973,
+      "foot_toward_zero_gain_fraction": 0.0865011738835599,
+      "hand_toward_zero_gain_fraction": 0.008705292540980696,
+      "corrected_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": true,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "all_gates_pass": true
+    },
+    "surface_contact_window60_90_v6_foot_a3": {
+      "signed_foot_median_mm": -26.111304759979248,
+      "absolute_signed_foot_median_mm": 26.111304759979248,
+      "foot_toward_zero_gain_fraction": 0.20738973191990434,
+      "hand_toward_zero_gain_fraction": 0.021231254733628933,
+      "corrected_gates": {
+        "3d_p95_within_2pct": false,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": true,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "all_gates_pass": false
+    },
+    "surface_contact_window60_90_v6_hand_a30": {
+      "signed_foot_median_mm": -32.77191519737244,
+      "absolute_signed_foot_median_mm": 32.77191519737244,
+      "foot_toward_zero_gain_fraction": 0.005206490872110222,
+      "hand_toward_zero_gain_fraction": 0.03705131854440597,
+      "corrected_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": false,
+        "penetration_within_1pp": false,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "all_gates_pass": false
+    },
+    "surface_contact_window60_90_v6_both_a1_a30": {
+      "signed_foot_median_mm": -29.920965433120728,
+      "absolute_signed_foot_median_mm": 29.920965433120728,
+      "foot_toward_zero_gain_fraction": 0.0917472469813131,
+      "hand_toward_zero_gain_fraction": 0.043795208766360755,
+      "corrected_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": true,
+        "penetration_within_1pp": false,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "all_gates_pass": false
+    },
+    "surface_contact_window60_90_v6_both_a3_a60": {
+      "signed_foot_median_mm": -25.82341432571411,
+      "absolute_signed_foot_median_mm": 25.82341432571411,
+      "foot_toward_zero_gain_fraction": 0.21612866382614612,
+      "hand_toward_zero_gain_fraction": 0.0657137542168762,
+      "corrected_gates": {
+        "3d_p95_within_2pct": false,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": true,
+        "penetration_within_1pp": false,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "all_gates_pass": false
+    }
+  },
+  "engineering_validation_only": true,
+  "physical_touch_validated": false,
+  "load_bearing_validated": false,
+  "true_3d_accuracy_validated": false,
+  "important_limits": [
+    "v6 foot_a1 still has over 90% sole vertices below z=0",
+    "3D-vs-2D gradient ratio after coefficient change was predicted from v5, not directly measured at v6 Stage C",
+    "Passing development-window gates does not establish held-out or physical contact validity"
+  ]
+}

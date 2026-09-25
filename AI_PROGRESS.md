@@ -1,5 +1,10 @@
 # 助步器项目 AI 工作日志
 
+### 2026-09-25（北京时间）— v6 推荐门有符号残差更正
+
+- v6 comparison 将脚部负的有符号 median 直接代入“下降比例”，把 control −32.9434 mm→foot_a1 −30.0938 mm 错记为负增益；只读复算按向零绝对幅值，foot_a1 改善 8.6501%，其 3D P95 +1.61%、2D P95 −1.58 px、穿透/beta/梯度门均通过。原 `recommended_candidate=null` 不再作为当前结论；更正审计另存 `surface_contact_window60_90_v6_gate_reaudit.json`，不改写历史 v6 comparison。
+- foot_a1 只是开发窗候选，Stage D 后左右 sole 顶点仍有约 93.13%/92.29% 在当前地面下方。v6 的 3D 相对 2D 梯度优势尚未直接复测；后续先做逐帧/逐侧与地面状态审查，再独立窗口验证。
+
 ### 2026-09-25（北京时间）— 可视化规范审计与权重放置决策
 
 - 按 `VISUALIZATION_PIPELINE.md` 审计参考页面 `full448_formal/stage_c_grounded_xoy_viewer_final.html`；该页面包含 448 帧、真实 SMPL 三角面、地面坐标轴、双相机对象和实体助步器渲染，但仍需把示例当作参考而不是自动通过：页面数据含非有限值风险，且示例有墙面几何，与当前规范“只保留 XY 地面和坐标轴、不得绘制 Z 方向墙面”冲突。
