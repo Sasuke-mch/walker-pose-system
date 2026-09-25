@@ -162,3 +162,13 @@ sole 映射审计通过后进入 gradient audit：同一 Stage C 参数状态、
 Term 值：obs3d 0.21256、obs2d 0.28891、foot 0.001868、hand 0.0000954；梯度 L2（all）：obs3d 0.32739、obs2d 0.32769、foot 0.02092、hand 0.000545；surface/observation 梯度比 0.0328 → `surface_gradient_weak_but_active`，graph 为 `pass`（非零、有限）。
 
 结论：表面图有效但弱，不选择权重；下一步 `calibrate_contact_coefficient`（先校准接触系数尺度，而非直接跑接触拟合）。本结论仅为 engineering validation。
+
+## v6 接触系数校准对照（engineering validation）
+
+原因：v5 梯度审计给出 obs3d/obs2d/foot/hand 有效梯度 L2 为 0.327/0.328/0.0209/0.000545；2D 系数 0.25 时 3D/2D 实际梯度几乎相等。降为 0.20 后预计 3D 约为 2D 的 1.25 倍。Stage D 保持 0.70/0.10，即 Stage D 实际 3D=0.70、2D=0.020。系数推导：foot=1/3 对应观测梯度约 3.2%/9.6%，hand=30/60 对应约 2.5%/5%。
+
+实验：窗口 60..90，6 条路线（v6 control + foot 1/3 + hand 30 + both 1/30 + both 3/60），退出码均为 0，command.txt 已存档，未复制旧 Stage C。
+
+结果（相对 v6 control）：foot_a1 通过 3D/2D/穿透/beta/梯度门但 residual 门未过；foot_a3 使脚 |median| 从 32.9 mm 降到 26.1 mm（穿透方向改善约 21%），但 3D P95 恶化 +3.3% 且门公式按 median 下降计为负增益；hand_a30 手 median 44.39→42.74 mm 但左手穿透比例 +1.8pp 超门；both_a3_a60 手增益 +6.6% 达 5% 线但 3D P95 +3.0%、左手穿透 +2.7pp。无路线六门全过。
+
+结论：`recommended_candidate=null`，`stop_reason=contact_geometry_or_pose_response_not_observable`。停止继续放大权重、增加步数或调整阈值。本结论仅为 engineering validation，不是物理接触验证。

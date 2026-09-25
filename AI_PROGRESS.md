@@ -2012,3 +2012,8 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 新增 `realtime_app/tools/summarize_stage_c_gradient_audit.py`；输出 surface/nosurface/summary 三份 JSON。
 - 两次 audit 退出码 0，无 Stage D 产物；`surface_graph_status=pass`，`surface_gradient_status=surface_gradient_weak_but_active`（比值 0.0328），`weight_selection_allowed=false`，`next_action=calibrate_contact_coefficient`。
 - 6 项单测 ok；v1–v5 未修改。
+
+### 2026-09-26 — v6 接触系数校准对照（engineering validation）
+
+- obs2d 默认 0.25→0.20（v5 梯度审计：3D/2D 有效梯度 0.327/0.328 近乎相等，降 2D 后预计 3D 约为 2D 的 1.25 倍）；Stage D 保持 0.70/0.10。
+- 6 条 v6 路线退出码均为 0；无六门全过路线，`recommended_candidate=null`，停止放大权重；v1–v5 未修改，未 push。
