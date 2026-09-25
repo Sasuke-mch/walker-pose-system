@@ -154,4 +154,3 @@ git commit -m "exp: sweep all-frame surface hand contact weight"
 - 表面图隔离审计结果
 - 是否触发停止条件
 - 明确写：结果仍是 engineering validation，不是物理接触验证
-
