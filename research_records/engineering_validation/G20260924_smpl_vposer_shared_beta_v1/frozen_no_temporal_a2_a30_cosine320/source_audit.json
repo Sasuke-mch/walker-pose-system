@@ -1,0 +1,22 @@
+{
+  "inputs": {
+    "raw_left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "raw_right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "contact_labels": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz",
+    "scene_transforms": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz",
+    "contact_vertex_sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_sets_v1\\contact_vertex_sets.json",
+    "walker_topology": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json",
+    "model": "D:\\my_works\\walker_pose_system\\models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+    "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+    "vposer_dir": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results"
+  },
+  "forbidden_inputs_read": [],
+  "old_fit_inputs_read": false,
+  "stored_triangulation_read": false,
+  "temporal_prefit_read": false,
+  "old_interaction_jsonl_read": false,
+  "old_motion_json_read": false,
+  "old_html_read": false,
+  "old_dynamic_walker_pose_read": false
+}

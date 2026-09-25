@@ -1,0 +1,84 @@
+{
+  "coco_joints_in_surface_contact": false,
+  "contact_points": "surface_vertices_not_coco_joints",
+  "hand_contact_mode": "all_frames_assumed",
+  "hand_labels_used_for_hand_loss": false,
+  "hand_contact_weight_gate": false,
+  "hand_frames_optimized": 448,
+  "hand_sides_optimized": 2,
+  "foot_residual_shapes": {
+    "left": [
+      448,
+      54
+    ],
+    "right": [
+      448,
+      54
+    ]
+  },
+  "hand_residual_shapes": {
+    "left": [
+      448,
+      778
+    ],
+    "right": [
+      448,
+      778
+    ]
+  },
+  "hand_vertex_index_shapes": {
+    "left": [
+      778
+    ],
+    "right": [
+      778
+    ]
+  },
+  "foot_active_vertex_count": {
+    "left": 54,
+    "right": 54
+  },
+  "hand_active_vertex_count": {
+    "left": 778,
+    "right": 778
+  },
+  "handle_radius_m": 0.016,
+  "handle_radius_assumption": "handle_radius_m=0.016 is an engineering assumption for a ~32 mm walker handle tube; the static topology JSON carries no radius field",
+  "hand_coverage": {
+    "left": {
+      "within_15mm": 0.18518465757369995,
+      "within_30mm": 0.3503201901912689,
+      "within_50mm": 0.5706682801246643
+    },
+    "right": {
+      "within_15mm": 0.18508997559547424,
+      "within_30mm": 0.34986400604248047,
+      "within_50mm": 0.5911305546760559
+    }
+  },
+  "observation_loss_units": "dimensionless_delta_normalized",
+  "stage_a_to_c_obs_3d_coeff": 1.0,
+  "stage_a_to_c_obs_2d_coeff": 0.2,
+  "stage_d_obs_3d_coeff": 0.7,
+  "stage_d_obs_2d_coeff": 0.020000000000000004,
+  "foot_penetration_fraction": {
+    "left": 0.8812830448150635,
+    "right": 0.8773561716079712
+  },
+  "hand_penetration_fraction": {
+    "left": 0.055987194180488586,
+    "right": 0.05436042323708534
+  },
+  "hand_label_audit_only": {
+    "hand_label_values": [
+      "inactive"
+    ],
+    "hand_contact_weight_sum": 0.0,
+    "hand_contact_weight_nonzero_count": 0,
+    "hand_candidate_score_median": 0.03027547523379326
+  },
+  "same_forward_graph": true,
+  "surface_probe_grad_norm_to_coco": 0.0,
+  "surface_probe_grad_norm_to_vertices": 0.00014818193449173123,
+  "surface_loss_depends_on_vertices": true
+}

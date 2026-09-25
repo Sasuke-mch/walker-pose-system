@@ -1,0 +1,60 @@
+{
+  "status": "frozen_engineering_baseline_no_temporal",
+  "result_directory": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320",
+  "steps": [
+    120,
+    120,
+    120,
+    320
+  ],
+  "surface_weights": {
+    "foot": 2,
+    "hand": 30
+  },
+  "stage_d_effective_obs_weights": {
+    "3d": 0.7,
+    "2d": 0.02
+  },
+  "scheduler": {
+    "type": "CosineAnnealingLR",
+    "T_max": 320,
+    "shared_eta_min": 1e-05,
+    "initial_latent_root": 0.001,
+    "initial_translation": 0.0005
+  },
+  "large_artifacts": [
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\raw_observations.npz",
+      "bytes": 119196
+    },
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\result.npz",
+      "bytes": 34162339
+    },
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\result_grounded.npz",
+      "bytes": 36230540
+    },
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\result_stage_a_beta0.npz",
+      "bytes": 34097911
+    },
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\result_stage_b_shared_beta.npz",
+      "bytes": 34096408
+    },
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\result_stage_c_joint.npz",
+      "bytes": 34122591
+    },
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\result_stage_d_surface_foot_hand.npz",
+      "bytes": 43356604
+    },
+    {
+      "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\full448_surface_both_a2_a30_cosine320\\triangulation.npz",
+      "bytes": 426133
+    }
+  ],
+  "scope": "Actual fitting baseline preserved; visualization artifacts are not evidence of geometry correctness. Temporal proposal not executed."
+}
