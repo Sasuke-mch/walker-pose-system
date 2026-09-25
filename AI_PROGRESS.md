@@ -1,5 +1,39 @@
 # 助步器项目 AI 工作日志
 
+### 2026-09-25（北京时间）— task-14 完成：373..403 脚部接触标签失效根因确认（只读审计）
+
+**状态：完成；当前主线仍受阻，foot_a1 不冻结。**
+
+本 task 只读审计 373..403 窗口为何没有有效脚部表面接触监督，不重跑拟合，不修改标签、场景变换、表面集合、拟合器或验证门。
+
+**根因与证据：**
+
+- 源 contact_labels.npz 共 448 帧、28 个 key；373..403 的 31 帧没有 support 或 stage2_contact_candidate，只有 swing、ambiguous、invalid。
+- 按 audit_foot_support_labels.py 第 124--129 行的规则，只有 support 和 stage2_contact_candidate 才产生非零 foot_contact_weight；该窗口 weight_sum=0.0。
+- 129..159 与 278..308 的 weight_sum 分别为 19.8181476593 和 7.5879850388，说明标签文件并非全局失效。
+- 373..403 的 pair_id 连续，绝对切片正确，无帧号重映射错误；窗口 Stage 缺少 stage2_feet_static_walker_moving，Stage 2 双脚接触门从未打开。
+- fit_vposer_shared_beta.py 第 193 行逐字读取 foot_contact_weight，没有重新转换 label；因此零权重来自源标签状态，不是入口误读。
+- 373..403 foot_a1 的 Stage D npz 已保存，vertices 有限、beta 冻结、foot residual 数组存在；但有效权重全零使 lfoot 为常数零，surface loss 不依赖 vertices，梯度探针按设计抛错。
+
+根因分类：source_labels_invalid。这里表示当前标签生成规则没有承重帧，不表示 npz 损坏或拟合 forward 发散。
+
+**是否允许重跑：否。**
+
+同配置重跑只会复现零权重和无顶点梯度。禁止重新生成标签、插值补点、换窗口、放宽门槛或修改权重。
+
+**新增文件与验证：**
+
+- realtime_app/tools/audit_v6_373_403_contact_labels.py
+- research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/v6_373_403_contact_label_audit.json
+- py_compile 退出码 0；只读审计退出码 0；git diff --check 通过。
+
+**Git 与结论边界：**
+
+- task-14 提交为 81e4cc103cf1221c031b3f30453623e916b86a2a，仅含上述两个审计文件；其他 agent 的未提交改动未触碰。
+- 未修改 v1–v6、未修改标签、未修改门槛、未执行 push。
+- 当前仍为 selected_candidate=null、engineering_validation_candidate=null、stop_reason=foot_a1_not_stable_across_independent_windows；physical_touch_validated、true_3d_accuracy_validated、load_bearing_validated、grip_force_validated 均为 false。
+
+
 ### 2026-09-25（北京时间）— v6 推荐门有符号残差更正
 
 - v6 comparison 将脚部负的有符号 median 直接代入“下降比例”，把 control −32.9434 mm→foot_a1 −30.0938 mm 错记为负增益；只读复算按向零绝对幅值，foot_a1 改善 8.6501%，其 3D P95 +1.61%、2D P95 −1.58 px、穿透/beta/梯度门均通过。原 `recommended_candidate=null` 不再作为当前结论；更正审计另存 `surface_contact_window60_90_v6_gate_reaudit.json`，不改写历史 v6 comparison。
