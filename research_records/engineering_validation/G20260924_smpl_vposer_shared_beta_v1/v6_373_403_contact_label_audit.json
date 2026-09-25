@@ -1,0 +1,2055 @@
+[
+  {
+    "status": "read_only_audit",
+    "window": [
+      373,
+      403
+    ],
+    "source_label_file": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz",
+    "label_file_structure": {
+      "pair_id": {
+        "shape": [
+          448
+        ],
+        "dtype": "int32",
+        "min": 0,
+        "max": 447
+      },
+      "stage": {
+        "shape": [
+          448
+        ],
+        "dtype": "<U64",
+        "unique": [
+          [
+            "stage1_walker_static_human_moving",
+            214
+          ],
+          [
+            "stage2_feet_static_walker_moving",
+            115
+          ],
+          [
+            "transition",
+            114
+          ],
+          [
+            "warming_up",
+            5
+          ]
+        ]
+      },
+      "pose_status": {
+        "shape": [
+          448
+        ],
+        "dtype": "<U64",
+        "unique": [
+          [
+            "accepted",
+            87
+          ],
+          [
+            "accepted_rotation_held",
+            36
+          ],
+          [
+            "held",
+            291
+          ],
+          [
+            "landed_support_reanchored",
+            11
+          ],
+          [
+            "rejected",
+            5
+          ],
+          [
+            "unavailable",
+            18
+          ]
+        ]
+      },
+      "raw_ground_points_m": {
+        "shape": [
+          448,
+          17,
+          3
+        ],
+        "dtype": "float32",
+        "finite": 21258,
+        "nan": 1590,
+        "inf": 0
+      },
+      "accepted": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "bool",
+        "true": 7086,
+        "false": 530
+      },
+      "valid": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "bool",
+        "true": 7086,
+        "false": 530
+      },
+      "joint_confidence": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "float32",
+        "finite": 7616,
+        "nan": 0,
+        "inf": 0
+      },
+      "foot_velocity_xy_mm_per_frame": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 878,
+        "nan": 18,
+        "inf": 0
+      },
+      "foot_velocity_z_mm_per_frame": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 878,
+        "nan": 18,
+        "inf": 0
+      },
+      "foot_height_m": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "foot_speed_score": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "foot_height_score": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "foot_support_score": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "foot_contact_weight": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "foot_label": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "<U32",
+        "unique": [
+          [
+            "ambiguous",
+            77
+          ],
+          [
+            "invalid",
+            272
+          ],
+          [
+            "stage2_contact_candidate",
+            202
+          ],
+          [
+            "support",
+            26
+          ],
+          [
+            "swing",
+            319
+          ]
+        ]
+      },
+      "ankle_proxy_height_m": {
+        "shape": [
+          2
+        ],
+        "dtype": "float32",
+        "finite": 2,
+        "nan": 0,
+        "inf": 0
+      },
+      "handle_ends_ground_m": {
+        "shape": [
+          448,
+          2,
+          2,
+          3
+        ],
+        "dtype": "float32",
+        "finite": 5376,
+        "nan": 0,
+        "inf": 0
+      },
+      "hand_axis_distance_m": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "hand_candidate_score": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "hand_contact_weight": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "float32",
+        "finite": 896,
+        "nan": 0,
+        "inf": 0
+      },
+      "hand_label": {
+        "shape": [
+          448,
+          2
+        ],
+        "dtype": "<U32",
+        "unique": [
+          [
+            "inactive",
+            896
+          ]
+        ]
+      },
+      "confidence_2d": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "float32",
+        "finite": 7616,
+        "nan": 0,
+        "inf": 0
+      },
+      "confidence_ray": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "float32",
+        "finite": 7616,
+        "nan": 0,
+        "inf": 0
+      },
+      "confidence_reproj": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "float32",
+        "finite": 7616,
+        "nan": 0,
+        "inf": 0
+      },
+      "confidence_sync": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "float32",
+        "finite": 7616,
+        "nan": 0,
+        "inf": 0
+      },
+      "confidence_depth": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "float32",
+        "finite": 7616,
+        "nan": 0,
+        "inf": 0
+      },
+      "reject_reason": {
+        "shape": [
+          448,
+          17
+        ],
+        "dtype": "<U64",
+        "unique": [
+          [
+            "None",
+            7086
+          ],
+          [
+            "out_of_raw_image_bounds",
+            82
+          ],
+          [
+            "right_knee_no_accepted_supervision",
+            448
+          ]
+        ]
+      }
+    },
+    "window_comparison": {
+      "w129": {
+        "frames": 31,
+        "pair_id_range": [
+          129,
+          159
+        ],
+        "pair_id_contiguous": true,
+        "left_valid": 22,
+        "right_valid": 22,
+        "both_valid": 22,
+        "weight_pos_frames": 18,
+        "weight_sum": 19.818147659301758,
+        "support_finite": 62,
+        "support_nonzero": 60,
+        "label_values": [
+          "ambiguous",
+          "invalid",
+          "stage2_contact_candidate",
+          "swing"
+        ]
+      },
+      "w278": {
+        "frames": 31,
+        "pair_id_range": [
+          278,
+          308
+        ],
+        "pair_id_contiguous": true,
+        "left_valid": 16,
+        "right_valid": 16,
+        "both_valid": 16,
+        "weight_pos_frames": 9,
+        "weight_sum": 7.587985038757324,
+        "support_finite": 62,
+        "support_nonzero": 62,
+        "label_values": [
+          "invalid",
+          "stage2_contact_candidate",
+          "swing"
+        ]
+      },
+      "w373": {
+        "frames": 31,
+        "pair_id_range": [
+          373,
+          403
+        ],
+        "pair_id_contiguous": true,
+        "left_valid": 13,
+        "right_valid": 13,
+        "both_valid": 13,
+        "weight_pos_frames": 0,
+        "weight_sum": 0.0,
+        "support_finite": 62,
+        "support_nonzero": 62,
+        "label_values": [
+          "ambiguous",
+          "invalid",
+          "swing"
+        ]
+      }
+    },
+    "frame_table": {
+      "w129": [
+        {
+          "frame": 129,
+          "pair_id": 129,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 130,
+          "pair_id": 130,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 131,
+          "pair_id": 131,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.27729538083076477,
+            0.5282215476036072
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 132,
+          "pair_id": 132,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.5446978807449341,
+            0.7544061541557312
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 133,
+          "pair_id": 133,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.33220919966697693,
+            0.8529508113861084
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 134,
+          "pair_id": 134,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.33220919966697693,
+            0.8529508113861084
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 135,
+          "pair_id": 135,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.38392242789268494,
+            0.48138630390167236
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 136,
+          "pair_id": 136,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.8909707069396973,
+            0.6593759655952454
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 137,
+          "pair_id": 137,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.23812580108642578,
+            0.4332885146141052
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 138,
+          "pair_id": 138,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.4585977792739868,
+            0.5822196006774902
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 139,
+          "pair_id": 139,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.4616289734840393,
+            0.9231116771697998
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 140,
+          "pair_id": 140,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.4616289734840393,
+            0.9231116771697998
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 141,
+          "pair_id": 141,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.6891418099403381,
+            0.664287269115448
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 142,
+          "pair_id": 142,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.41920390725135803,
+            0.911251425743103
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 143,
+          "pair_id": 143,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.40269628167152405,
+            0.7698626518249512
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 144,
+          "pair_id": 144,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 145,
+          "pair_id": 145,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.5157720446586609,
+            0.7972612380981445
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 146,
+          "pair_id": 146,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.427142471075058,
+            0.6414739489555359
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 147,
+          "pair_id": 147,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.2568759620189667,
+            0.2343287616968155
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 148,
+          "pair_id": 148,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.44022777676582336,
+            0.4477522373199463
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 149,
+          "pair_id": 149,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.363448828458786,
+            0.4651116132736206
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 150,
+          "pair_id": 150,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 151,
+          "pair_id": 151,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 152,
+          "pair_id": 152,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 153,
+          "pair_id": 153,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 154,
+          "pair_id": 154,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 155,
+          "pair_id": 155,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 156,
+          "pair_id": 156,
+          "foot_label": [
+            "swing",
+            "ambiguous"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 157,
+          "pair_id": 157,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 158,
+          "pair_id": 158,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 159,
+          "pair_id": 159,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        }
+      ],
+      "w278": [
+        {
+          "frame": 278,
+          "pair_id": 278,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.3439076542854309,
+            0.2553403973579407
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 279,
+          "pair_id": 279,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.7324986457824707,
+            0.25049838423728943
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 280,
+          "pair_id": 280,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.7324986457824707,
+            0.25049838423728943
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 281,
+          "pair_id": 281,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.6048141121864319,
+            0.316350519657135
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 282,
+          "pair_id": 282,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.34971559047698975,
+            0.32560083270072937
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 283,
+          "pair_id": 283,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.26865893602371216,
+            0.7148182392120361
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 284,
+          "pair_id": 284,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.3316035866737366,
+            0.5284736156463623
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 285,
+          "pair_id": 285,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.3316035866737366,
+            0.5284736156463623
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 286,
+          "pair_id": 286,
+          "foot_label": [
+            "stage2_contact_candidate",
+            "stage2_contact_candidate"
+          ],
+          "foot_weight": [
+            0.3782108724117279,
+            0.3444191813468933
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 287,
+          "pair_id": 287,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 288,
+          "pair_id": 288,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 289,
+          "pair_id": 289,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 290,
+          "pair_id": 290,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 291,
+          "pair_id": 291,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 292,
+          "pair_id": 292,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 293,
+          "pair_id": 293,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 294,
+          "pair_id": 294,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 295,
+          "pair_id": 295,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 296,
+          "pair_id": 296,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 297,
+          "pair_id": 297,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 298,
+          "pair_id": 298,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 299,
+          "pair_id": 299,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 300,
+          "pair_id": 300,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 301,
+          "pair_id": 301,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 302,
+          "pair_id": 302,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 303,
+          "pair_id": 303,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 304,
+          "pair_id": 304,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 305,
+          "pair_id": 305,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 306,
+          "pair_id": 306,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 307,
+          "pair_id": 307,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 308,
+          "pair_id": 308,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        }
+      ],
+      "w373": [
+        {
+          "frame": 373,
+          "pair_id": 373,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 374,
+          "pair_id": 374,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 375,
+          "pair_id": 375,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 376,
+          "pair_id": 376,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 377,
+          "pair_id": 377,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 378,
+          "pair_id": 378,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 379,
+          "pair_id": 379,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 380,
+          "pair_id": 380,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 381,
+          "pair_id": 381,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 382,
+          "pair_id": 382,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 383,
+          "pair_id": 383,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 384,
+          "pair_id": 384,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 385,
+          "pair_id": 385,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 386,
+          "pair_id": 386,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 387,
+          "pair_id": 387,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 388,
+          "pair_id": 388,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 389,
+          "pair_id": 389,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 390,
+          "pair_id": 390,
+          "foot_label": [
+            "invalid",
+            "invalid"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 391,
+          "pair_id": 391,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 392,
+          "pair_id": 392,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 393,
+          "pair_id": 393,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 394,
+          "pair_id": 394,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 395,
+          "pair_id": 395,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 396,
+          "pair_id": 396,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 397,
+          "pair_id": 397,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 398,
+          "pair_id": 398,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 399,
+          "pair_id": 399,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 400,
+          "pair_id": 400,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 401,
+          "pair_id": 401,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 402,
+          "pair_id": 402,
+          "foot_label": [
+            "ambiguous",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        },
+        {
+          "frame": 403,
+          "pair_id": 403,
+          "foot_label": [
+            "swing",
+            "swing"
+          ],
+          "foot_weight": [
+            0.0,
+            0.0
+          ],
+          "support_finite": [
+            true,
+            true
+          ]
+        }
+      ]
+    },
+    "window_stages": {
+      "w129": [
+        "stage1_walker_static_human_moving",
+        "stage2_feet_static_walker_moving",
+        "transition"
+      ],
+      "w278": [
+        "stage1_walker_static_human_moving",
+        "stage2_feet_static_walker_moving",
+        "transition"
+      ],
+      "w373": [
+        "stage1_walker_static_human_moving",
+        "transition"
+      ]
+    },
+    "frame_mapping": {
+      "method": "absolute array slice window[0]:window[1]+1 (fit:184, fit:130)",
+      "pair_id_contiguous_373": true
+    },
+    "fit_entry_mapping": {
+      "load": "np.load(contact_labels) verbatim (fit:180)",
+      "foot_w": "cl[foot_contact_weight][wsl] direct tensor, no label conversion (fit:193)",
+      "invalid_handling": "no invalid branch for foot; zero weights flow into lfoot denominator guard",
+      "lfoot_without_labels": "lfoot collapses to constant 0 -> probe grads None -> audit raises, Stage D npz already saved"
+    },
+    "saved_result_audit": {
+      "raw_observations.npz": {
+        "exists": true,
+        "keys": [
+          "left_2d",
+          "right_2d"
+        ],
+        "foot_surface_residuals_m": "absent (control-style save or audit-gated)"
+      },
+      "result_stage_c_joint.npz": {
+        "exists": true,
+        "keys": [
+          "vertices",
+          "faces",
+          "predicted_coco",
+          "betas",
+          "body_pose",
+          "global_orient",
+          "transl",
+          "raw_triangulated_points",
+          "temporally_processed_points",
+          "joint_confidence",
+          "accepted_mask",
+          "reject_reason"
+        ],
+        "frames": 31,
+        "vertices_finite": true,
+        "beta_frozen_single_row": true,
+        "foot_surface_residuals_m": "absent (control-style save or audit-gated)"
+      },
+      "result_stage_d_surface_foot.npz": {
+        "exists": true,
+        "keys": [
+          "vertices",
+          "faces",
+          "predicted_coco",
+          "betas",
+          "body_pose",
+          "global_orient",
+          "transl",
+          "raw_triangulated_points",
+          "temporally_processed_points",
+          "joint_confidence",
+          "accepted_mask",
+          "reject_reason",
+          "surface_foot_vertices_ground_m",
+          "surface_hand_vertices_ground_m",
+          "foot_surface_residuals_m",
+          "hand_surface_residuals_m",
+          "foot_softmin_height_m",
+          "hand_softmin_capsule_distance_m",
+          "foot_active_vertex_count",
+          "hand_active_vertex_count"
+        ],
+        "frames": 31,
+        "vertices_finite": true,
+        "beta_frozen_single_row": true,
+        "foot_res_shape": [
+          31,
+          2,
+          54
+        ],
+        "foot_res_all_zero": false
+      },
+      "triangulation.npz": {
+        "exists": true,
+        "keys": [
+          "raw",
+          "left_reprojection_error",
+          "right_reprojection_error",
+          "ray_gap",
+          "depth_left",
+          "depth_right",
+          "accepted",
+          "confidence",
+          "confidence_2d",
+          "confidence_ray",
+          "confidence_reproj",
+          "confidence_sync",
+          "confidence_depth",
+          "reject_reason"
+        ],
+        "foot_surface_residuals_m": "absent (control-style save or audit-gated)"
+      }
+    },
+    "command_record_audit": {
+      "w129_control": {
+        "exists": true,
+        "text": "research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\fit_vposer_shared_beta.py --output-dir research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\v6_validation_129_159_control --left research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json --right research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json --calibration-dir realtime_app\\calibration\\results --model models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl --regressor models\\smpl\\J_regressor_coco.npy --vposer-dir models\\VPoser02_05\\V02_05 --contact-labels research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz --scene-transforms research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz --contact-vertex-sets research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_sets_v1\\contact_vertex_sets.json --walker-topology research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json --foot-contact-weight 0.0 --hand-contact-weight 0.0 --obs-3d-weight 1.0 --obs-2d-weight 0.20 --stage-d-obs-3d-scale 0.70 --stage-d-obs-2d-scale 0.10 --contact-steps 80 --device cpu --start 129 --end 159 --surface-foot-contact-weight 0 --surface-hand-contact-weight 0 --force-stage-d-no-contact"
+      },
+      "w129_foot_a1": {
+        "exists": true,
+        "text": "research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\fit_vposer_shared_beta.py --output-dir research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\v6_validation_129_159_foot_a1 --left research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json --right research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json --calibration-dir realtime_app\\calibration\\results --model models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl --regressor models\\smpl\\J_regressor_coco.npy --vposer-dir models\\VPoser02_05\\V02_05 --contact-labels research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz --scene-transforms research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz --contact-vertex-sets research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_sets_v1\\contact_vertex_sets.json --walker-topology research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json --foot-contact-weight 0.0 --hand-contact-weight 0.0 --obs-3d-weight 1.0 --obs-2d-weight 0.20 --stage-d-obs-3d-scale 0.70 --stage-d-obs-2d-scale 0.10 --contact-steps 80 --device cpu --start 129 --end 159 --surface-foot-contact-weight 1 --surface-hand-contact-weight 0"
+      },
+      "w278_control": {
+        "exists": true,
+        "text": "research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\fit_vposer_shared_beta.py --output-dir research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\v6_validation_278_308_control --left research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json --right research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json --calibration-dir realtime_app\\calibration\\results --model models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl --regressor models\\smpl\\J_regressor_coco.npy --vposer-dir models\\VPoser02_05\\V02_05 --contact-labels research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz --scene-transforms research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz --contact-vertex-sets research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_sets_v1\\contact_vertex_sets.json --walker-topology research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json --foot-contact-weight 0.0 --hand-contact-weight 0.0 --obs-3d-weight 1.0 --obs-2d-weight 0.20 --stage-d-obs-3d-scale 0.70 --stage-d-obs-2d-scale 0.10 --contact-steps 80 --device cpu --start 278 --end 308 --surface-foot-contact-weight 0 --surface-hand-contact-weight 0 --force-stage-d-no-contact"
+      },
+      "w278_foot_a1": {
+        "exists": true,
+        "text": "research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\fit_vposer_shared_beta.py --output-dir research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\v6_validation_278_308_foot_a1 --left research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json --right research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json --calibration-dir realtime_app\\calibration\\results --model models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl --regressor models\\smpl\\J_regressor_coco.npy --vposer-dir models\\VPoser02_05\\V02_05 --contact-labels research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz --scene-transforms research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz --contact-vertex-sets research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_sets_v1\\contact_vertex_sets.json --walker-topology research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json --foot-contact-weight 0.0 --hand-contact-weight 0.0 --obs-3d-weight 1.0 --obs-2d-weight 0.20 --stage-d-obs-3d-scale 0.70 --stage-d-obs-2d-scale 0.10 --contact-steps 80 --device cpu --start 278 --end 308 --surface-foot-contact-weight 1 --surface-hand-contact-weight 0"
+      },
+      "w373_control": {
+        "exists": true,
+        "text": "research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\fit_vposer_shared_beta.py --output-dir research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\v6_validation_373_403_control --left research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json --right research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json --calibration-dir realtime_app\\calibration\\results --model models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl --regressor models\\smpl\\J_regressor_coco.npy --vposer-dir models\\VPoser02_05\\V02_05 --contact-labels research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\contact_labels_stage_audit_v2\\contact_labels.npz --scene-transforms research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz --contact-vertex-sets research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_sets_v1\\contact_vertex_sets.json --walker-topology research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json --start 60 --end 90 --foot-contact-weight 0.0 --hand-contact-weight 0.0 --obs-3d-weight 1.0 --obs-2d-weight 0.20 --stage-d-obs-3d-scale 0.70 --stage-d-obs-2d-scale 0.10 --contact-steps 80 --device cpu --start 373 --end 403 --surface-foot-contact-weight 0 --surface-hand-contact-weight 0 --force-stage-d-no-contact"
+      },
+      "w373_foot_a1": {
+        "exists": false,
+        "text": null
+      }
+    },
+    "root_cause_class": "source_labels_invalid",
+    "direct_evidence": [
+      "pair_id 373..403 contiguous: slice mapping correct, no remap error",
+      "source slice labels are only swing/ambiguous/invalid; no support or stage2_contact_candidate frame",
+      "window stage values lack stage2_feet_static_walker_moving (only stage1/transition); stage2 gate never opens",
+      "foot_contact_weight sum 0.0 by generator design for non-weight-bearing labels; entry reads the field verbatim (fit:193)",
+      "no effective foot frame filtered out: zero weight-bearing frames exist to filter"
+    ],
+    "rerun_allowed": false,
+    "recommendation": "Do not relabel, interpolate or swap windows. The 373..403 pair is a no-effective-foot-contact window by source labels; keep selected_candidate=null."
+  }
+]
