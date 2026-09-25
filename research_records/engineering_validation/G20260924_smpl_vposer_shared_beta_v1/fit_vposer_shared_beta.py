@@ -170,19 +170,16 @@ def main() -> int:
         if int(cl["foot_contact_weight"].shape[0]) != full_frames or int(st["rotation_ground_from_left"].shape[0]) != full_frames:
             raise ValueError("contact/scene frame count does not match full raw input")
         wsl = slice(window[0], window[1] + 1)
-        hand_weights_np = np.asarray(cl["hand_contact_weight"])[wsl].astype(np.float32)
-        if hand_weights_np.shape != (len(ids), 2) or not np.isfinite(hand_weights_np).all():
-            raise ValueError("hand_contact_weight must be finite with shape [N,2]")
-        if np.any(hand_weights_np < 0):
-            raise ValueError("hand_contact_weight must be non-negative")
-        if args.surface_hand_contact_weight > 0 and float(hand_weights_np.sum()) <= 0.0:
-            raise ValueError(
-                "surface hand contact requested but the selected window has no positive hand labels"
-            )
+        # hand_contact_weight / hand_label are audit-only inputs: they never
+        # gate the surface hand loss (which applies to every frame/side).
+        hand_w_stats = torch.tensor(np.asarray(cl["hand_contact_weight"])[wsl].astype(np.float32),
+                                    dtype=torch.float32, device=device)
+        hand_label_stats = np.asarray(cl["hand_label"])[wsl]
+        hand_score_stats = np.asarray(cl["hand_candidate_score"])[wsl]
         Rgc = torch.tensor(np.asarray(st["rotation_ground_from_left"])[wsl], dtype=torch.float32, device=device)
         Tgc = torch.tensor(np.asarray(st["translation_ground_from_left_mm"])[wsl] / 1000.0, dtype=torch.float32, device=device)
         foot_w = torch.tensor(np.asarray(cl["foot_contact_weight"])[wsl], dtype=torch.float32, device=device)
-        hand_w = torch.tensor(hand_weights_np, dtype=torch.float32, device=device)
+        hand_w = torch.zeros_like(foot_w)
         handle_ends = torch.nan_to_num(torch.tensor(np.asarray(cl["handle_ends_ground_m"])[wsl], dtype=torch.float32, device=device), nan=0.0)
     else:
         Rgc = Tgc = foot_w = hand_w = handle_ends = None
@@ -276,14 +273,14 @@ def main() -> int:
             hand_side_terms[s] = surf.hand_surface_loss(
                 palm, a[:, None, :], b[:, None, :], surface["radius_m"]
             )
-        if args.surface_hand_contact_weight > 0:
-            if float(hand_w.sum().detach()) <= 0.0:
-                raise ValueError("surface hand contact requested but no positive hand contact labels are available")
-            lhand = sum(
-                (hand_side_terms[s] * hand_w[:, i]).sum()
-                for i, s in enumerate(("left", "right"))
-            ) / (hand_w.sum() + 1e-6)
-        return lfoot, lhand, foot_res, hand_res, hand_cover, vg
+        # All-frame hand assumption: every frame and both sides enter the
+        # hand loss with uniform normalization. No hand label/weight gating.
+        lhand = (hand_side_terms["left"] + hand_side_terms["right"]).sum() / (2.0 * n)
+        hand_mode_audit = {"hand_contact_mode": "all_frames_assumed",
+                           "hand_labels_used_for_hand_loss": False,
+                           "hand_contact_weight_gate": False,
+                           "hand_frames_optimized": n, "hand_sides_optimized": 2}
+        return lfoot, lhand, foot_res, hand_res, hand_cover, vg, hand_mode_audit
 
     def losses(b):
         result,pose,jc,pl,pr=forward(b)
@@ -295,7 +292,8 @@ def main() -> int:
         lp=latent.square().mean()
         lfoot=torch.zeros((),device=device); lhand=torch.zeros((),device=device)
         if surface_mode and contact_enabled:
-            lfoot, lhand, foot_res, hand_res_tensors, hand_cover, _ = surface_terms(result.vertices)
+            lfoot, lhand, foot_res, hand_res_tensors, hand_cover, _, hand_mode = surface_terms(result.vertices)
+            surface_audit.update(hand_mode)
             for s in ("left", "right"):
                 if tuple(int(v) for v in foot_res[s].shape) != (n, 54):
                     raise ValueError(f"foot residual shape {tuple(foot_res[s].shape)} != ({n},54)")
@@ -311,6 +309,12 @@ def main() -> int:
             surface_audit["handle_radius_m"] = surface["radius_m"]
             surface_audit["handle_radius_assumption"] = surface["radius_assumption"]
             surface_audit["hand_coverage"] = hand_cover
+            surface_audit["hand_label_audit_only"] = {
+                "hand_label_values": sorted(set(str(v) for v in np.asarray(hand_label_stats).ravel().tolist())),
+                "hand_contact_weight_sum": float(hand_w_stats.sum()),
+                "hand_contact_weight_nonzero_count": int((hand_w_stats > 0).sum()),
+                "hand_candidate_score_median": float(np.median(np.asarray(hand_score_stats, dtype=np.float64))),
+            }
         elif contact_enabled:
             jg=torch.einsum("nij,nvj->nvi", Rgc, jc) + Tgc[:,None,:]
             ankle_z=jg[:,[15,16],2]
@@ -349,7 +353,7 @@ def main() -> int:
         m=accepted & np.isfinite(e3)
         finite2=np.isfinite(eleft)&np.isfinite(eright)
         extra = {}
-        if surface_mode and tag == "stage_d_surface_foot":
+        if surface_mode and tag.startswith("stage_d_surface"):
             vg_np = (np.einsum("nij,nvj->nvi", Rgc.detach().cpu().numpy(), v)
                      + Tgc.detach().cpu().numpy()[:, None, :])
             sole_idx_np = {s: surface["sole_idx"][s].detach().cpu().numpy() for s in ("left", "right")}
@@ -423,7 +427,13 @@ def main() -> int:
         s3=run(torch.optim.Adam([{"params":[latent,root],"lr":0.001},{"params":[transl],"lr":0.0005}],), args.contact_steps, False)
         if not torch.equal(beta.detach(), beta_before_d.detach()):
             raise RuntimeError("beta changed during Stage D despite requires_grad_(False)")
-        tag = "stage_d_surface_foot" if want_surface_d else "stage_d_contact"
+        if want_surface_d:
+            foot_on = args.surface_foot_contact_weight > 0
+            hand_on = args.surface_hand_contact_weight > 0
+            tag = ("stage_d_surface_foot_hand" if (foot_on and hand_on)
+                   else "stage_d_surface_hand" if hand_on else "stage_d_surface_foot")
+        else:
+            tag = "stage_d_contact"
         stage_d={"loss":s3,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage(tag),
                  "surface_mode": bool(want_surface_d)}
         if want_surface_d:
@@ -432,7 +442,7 @@ def main() -> int:
             # built from those vertices only, then differentiated w.r.t. both.
             with torch.enable_grad():
                 result_probe, _, jc_probe, _, _ = forward(beta)
-                probe_foot, probe_hand, *_ = surface_terms(result_probe.vertices)
+                probe_foot, probe_hand, *_rest = surface_terms(result_probe.vertices)
                 probe_loss = (
                     args.surface_foot_contact_weight * probe_foot
                     + args.surface_hand_contact_weight * probe_hand
