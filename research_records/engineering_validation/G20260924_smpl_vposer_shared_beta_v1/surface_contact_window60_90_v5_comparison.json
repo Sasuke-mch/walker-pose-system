@@ -1,0 +1,568 @@
+{
+  "schema": "surface_staged_contact_v5",
+  "status": "engineering_validation_only",
+  "window": [
+    60,
+    90
+  ],
+  "frames": 31,
+  "control": "surface_contact_window60_90_v5_stage_d_no_contact",
+  "routes": {
+    "surface_contact_window60_90_v5_stage_d_no_contact": {
+      "stage_c_loss": [
+        0.5101732015609741,
+        0.2128307968378067,
+        1.1579738855361938,
+        0.385089635848999,
+        0.0,
+        0.0,
+        0.0073538487777113914
+      ],
+      "stage_d_loss": [
+        0.17010413110256195,
+        0.18391205370426178,
+        1.347497582435608,
+        0.3839130103588104,
+        0.002460801275447011,
+        8.046808943618089e-05,
+        0.007391437888145447
+      ],
+      "l3_stage_c": 0.2128307968378067,
+      "l2_stage_c": 1.1579738855361938,
+      "reproj_left_p95": 164.00372314453125,
+      "reproj_right_p95": 173.06463623046875,
+      "reproj_median": 46.353641510009766,
+      "reproj_p95": 168.71148681640625,
+      "tri_median": 69.65492248535156,
+      "tri_p95": 134.99075317382812,
+      "residuals": {
+        "foot_surface_residuals_m": {
+          "median_mm": -41.5684604583616,
+          "p95_mm": -3.9332918331496765,
+          "finite": true
+        },
+        "hand_surface_residuals_m": {
+          "median_mm": 43.65976624162812,
+          "p95_mm": 104.45406683653083,
+          "finite": true
+        }
+      },
+      "foot_penetration_fraction": {
+        "left": 0.9635603345280764,
+        "right": 0.9599761051373955
+      },
+      "hand_penetration_fraction": {
+        "left": 0.04490422091384028,
+        "right": 0.04871879923708434
+      },
+      "hand_coverage": {
+        "left": {
+          "within_15mm": 0.17663155496120453,
+          "within_30mm": 0.353346049785614,
+          "within_50mm": 0.6034082174301147
+        },
+        "right": {
+          "within_15mm": 0.168380469083786,
+          "within_30mm": 0.31971970200538635,
+          "within_50mm": 0.5442408323287964
+        }
+      },
+      "beta_drift_stage_c_to_d": 0.0,
+      "beta_frozen": true,
+      "same_process": true,
+      "stage_d_obs_3d": 0.7,
+      "stage_d_obs_2d": 0.025,
+      "grad_to_coco": null,
+      "grad_to_verts": null,
+      "coco_isolated": true,
+      "same_forward_graph": null,
+      "hand_mode": "all_frames_assumed"
+    },
+    "surface_contact_window60_90_v5_foot_a005": {
+      "stage_c_loss": [
+        0.5101732015609741,
+        0.2128307968378067,
+        1.1579738855361938,
+        0.385089635848999,
+        0.0,
+        0.0,
+        0.0073538487777113914
+      ],
+      "stage_d_loss": [
+        0.1702246069908142,
+        0.18392348289489746,
+        1.3471314907073975,
+        0.3838931918144226,
+        0.0024402267299592495,
+        8.036611689021811e-05,
+        0.007391437888145447
+      ],
+      "l3_stage_c": 0.2128307968378067,
+      "l2_stage_c": 1.1579738855361938,
+      "reproj_left_p95": 163.88243103027344,
+      "reproj_right_p95": 172.88217163085938,
+      "reproj_median": 46.29396057128906,
+      "reproj_p95": 168.4340057373047,
+      "tri_median": 69.65492248535156,
+      "tri_p95": 135.23513793945312,
+      "residuals": {
+        "foot_surface_residuals_m": {
+          "median_mm": -41.44096374511719,
+          "p95_mm": -3.919878602027912,
+          "finite": true
+        },
+        "hand_surface_residuals_m": {
+          "median_mm": 43.613988906145096,
+          "p95_mm": 104.44412007927895,
+          "finite": true
+        }
+      },
+      "foot_penetration_fraction": {
+        "left": 0.9635603345280764,
+        "right": 0.9599761051373955
+      },
+      "hand_penetration_fraction": {
+        "left": 0.04498714652956298,
+        "right": 0.04888465046852973
+      },
+      "hand_coverage": {
+        "left": {
+          "within_15mm": 0.176880344748497,
+          "within_30mm": 0.3538021445274353,
+          "within_50mm": 0.6039887070655823
+        },
+        "right": {
+          "within_15mm": 0.168380469083786,
+          "within_30mm": 0.3198026418685913,
+          "within_50mm": 0.5443652272224426
+        }
+      },
+      "beta_drift_stage_c_to_d": 0.0,
+      "beta_frozen": true,
+      "same_process": true,
+      "stage_d_obs_3d": 0.7,
+      "stage_d_obs_2d": 0.025,
+      "grad_to_coco": 0.0,
+      "grad_to_verts": 1.2000847164017614e-05,
+      "coco_isolated": true,
+      "same_forward_graph": true,
+      "hand_mode": "all_frames_assumed",
+      "recommendation_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": false,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "foot_median_gain": -0.003067150234541956,
+      "hand_median_gain": 0.00104850161656103
+    },
+    "surface_contact_window60_90_v5_foot_a010": {
+      "stage_c_loss": [
+        0.5101732015609741,
+        0.2128307968378067,
+        1.1579738855361938,
+        0.385089635848999,
+        0.0,
+        0.0,
+        0.0073538487777113914
+      ],
+      "stage_d_loss": [
+        0.17034441232681274,
+        0.18393699824810028,
+        1.3467546701431274,
+        0.3838837146759033,
+        0.00241966568864882,
+        8.029497985262424e-05,
+        0.007391437888145447
+      ],
+      "l3_stage_c": 0.2128307968378067,
+      "l2_stage_c": 1.1579738855361938,
+      "reproj_left_p95": 163.76832580566406,
+      "reproj_right_p95": 172.7012939453125,
+      "reproj_median": 46.26801300048828,
+      "reproj_p95": 168.1479034423828,
+      "tri_median": 69.65492248535156,
+      "tri_p95": 135.47976684570312,
+      "residuals": {
+        "foot_surface_residuals_m": {
+          "median_mm": -41.16705060005188,
+          "p95_mm": -3.901541233062744,
+          "finite": true
+        },
+        "hand_surface_residuals_m": {
+          "median_mm": 43.591175228357315,
+          "p95_mm": 104.39828224480152,
+          "finite": true
+        }
+      },
+      "foot_penetration_fraction": {
+        "left": 0.9629629629629629,
+        "right": 0.9599761051373955
+      },
+      "hand_penetration_fraction": {
+        "left": 0.045152997761008375,
+        "right": 0.049009038892113777
+      },
+      "hand_coverage": {
+        "left": {
+          "within_15mm": 0.17708764970302582,
+          "within_30mm": 0.3538435995578766,
+          "within_50mm": 0.604361891746521
+        },
+        "right": {
+          "within_15mm": 0.16854631900787354,
+          "within_30mm": 0.3198855519294739,
+          "within_50mm": 0.544655442237854
+        }
+      },
+      "beta_drift_stage_c_to_d": 0.0,
+      "beta_frozen": true,
+      "same_process": true,
+      "stage_d_obs_3d": 0.7,
+      "stage_d_obs_2d": 0.025,
+      "grad_to_coco": 0.0,
+      "grad_to_verts": 2.3908476578071713e-05,
+      "coco_isolated": true,
+      "same_forward_graph": true,
+      "hand_mode": "all_frames_assumed",
+      "recommendation_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": false,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "foot_median_gain": -0.009656596705374852,
+      "hand_median_gain": 0.001571034826233341
+    },
+    "surface_contact_window60_90_v5_hand_a005": {
+      "stage_c_loss": [
+        0.5101732015609741,
+        0.2128307968378067,
+        1.1579738855361938,
+        0.385089635848999,
+        0.0,
+        0.0,
+        0.0073538487777113914
+      ],
+      "stage_d_loss": [
+        0.17010784149169922,
+        0.18391162157058716,
+        1.3474987745285034,
+        0.3839103877544403,
+        0.002460713731124997,
+        8.036682265810668e-05,
+        0.007391437888145447
+      ],
+      "l3_stage_c": 0.2128307968378067,
+      "l2_stage_c": 1.1579738855361938,
+      "reproj_left_p95": 164.00357055664062,
+      "reproj_right_p95": 173.0642852783203,
+      "reproj_median": 46.35329818725586,
+      "reproj_p95": 168.7113037109375,
+      "tri_median": 69.65397644042969,
+      "tri_p95": 134.99156188964844,
+      "residuals": {
+        "foot_surface_residuals_m": {
+          "median_mm": -41.565775871276855,
+          "p95_mm": -3.931984305381808,
+          "finite": true
+        },
+        "hand_surface_residuals_m": {
+          "median_mm": 43.64173486828804,
+          "p95_mm": 104.44431379437447,
+          "finite": true
+        }
+      },
+      "foot_penetration_fraction": {
+        "left": 0.9635603345280764,
+        "right": 0.9599761051373955
+      },
+      "hand_penetration_fraction": {
+        "left": 0.04498714652956298,
+        "right": 0.04871879923708434
+      },
+      "hand_coverage": {
+        "left": {
+          "within_15mm": 0.1767144799232483,
+          "within_30mm": 0.3534289598464966,
+          "within_50mm": 0.6034082174301147
+        },
+        "right": {
+          "within_15mm": 0.168380469083786,
+          "within_30mm": 0.31971970200538635,
+          "within_50mm": 0.5442408323287964
+        }
+      },
+      "beta_drift_stage_c_to_d": 0.0,
+      "beta_frozen": true,
+      "same_process": true,
+      "stage_d_obs_3d": 0.7,
+      "stage_d_obs_2d": 0.025,
+      "grad_to_coco": 0.0,
+      "grad_to_verts": 1.5413468190672575e-06,
+      "coco_isolated": true,
+      "same_forward_graph": true,
+      "hand_mode": "all_frames_assumed",
+      "recommendation_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": false,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "foot_median_gain": -6.458230723827127e-05,
+      "hand_median_gain": 0.00041299747782174605
+    },
+    "surface_contact_window60_90_v5_hand_a010": {
+      "stage_c_loss": [
+        0.5101732015609741,
+        0.2128307968378067,
+        1.1579738855361938,
+        0.385089635848999,
+        0.0,
+        0.0,
+        0.0073538487777113914
+      ],
+      "stage_d_loss": [
+        0.17011161148548126,
+        0.18391135334968567,
+        1.347500205039978,
+        0.3839065134525299,
+        0.002460618270561099,
+        8.027565490920097e-05,
+        0.007391437888145447
+      ],
+      "l3_stage_c": 0.2128307968378067,
+      "l2_stage_c": 1.1579738855361938,
+      "reproj_left_p95": 164.00347900390625,
+      "reproj_right_p95": 173.06407165527344,
+      "reproj_median": 46.3521842956543,
+      "reproj_p95": 168.71119689941406,
+      "tri_median": 69.6528549194336,
+      "tri_p95": 134.9923095703125,
+      "residuals": {
+        "foot_surface_residuals_m": {
+          "median_mm": -41.56234860420227,
+          "p95_mm": -3.930953145027195,
+          "finite": true
+        },
+        "hand_surface_residuals_m": {
+          "median_mm": 43.63524168729782,
+          "p95_mm": 104.43045571446419,
+          "finite": true
+        }
+      },
+      "foot_penetration_fraction": {
+        "left": 0.9635603345280764,
+        "right": 0.9599761051373955
+      },
+      "hand_penetration_fraction": {
+        "left": 0.04498714652956298,
+        "right": 0.04871879923708434
+      },
+      "hand_coverage": {
+        "left": {
+          "within_15mm": 0.1769217997789383,
+          "within_30mm": 0.3534289598464966,
+          "within_50mm": 0.6034911870956421
+        },
+        "right": {
+          "within_15mm": 0.168380469083786,
+          "within_30mm": 0.31971970200538635,
+          "within_50mm": 0.5441993474960327
+        }
+      },
+      "beta_drift_stage_c_to_d": 0.0,
+      "beta_frozen": true,
+      "same_process": true,
+      "stage_d_obs_3d": 0.7,
+      "stage_d_obs_2d": 0.025,
+      "grad_to_coco": 0.0,
+      "grad_to_verts": 3.082097009610152e-06,
+      "coco_isolated": true,
+      "same_forward_graph": true,
+      "hand_mode": "all_frames_assumed",
+      "recommendation_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": false,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "foot_median_gain": -0.0001470310444970878,
+      "hand_median_gain": 0.0005617197809665597
+    },
+    "surface_contact_window60_90_v5_both_a005": {
+      "stage_c_loss": [
+        0.5101732015609741,
+        0.2128307968378067,
+        1.1579738855361938,
+        0.385089635848999,
+        0.0,
+        0.0,
+        0.0073538487777113914
+      ],
+      "stage_d_loss": [
+        0.17022836208343506,
+        0.18392324447631836,
+        1.3471306562423706,
+        0.3838903605937958,
+        0.0024401452392339706,
+        8.027515286812559e-05,
+        0.007391437888145447
+      ],
+      "l3_stage_c": 0.2128307968378067,
+      "l2_stage_c": 1.1579738855361938,
+      "reproj_left_p95": 163.88246154785156,
+      "reproj_right_p95": 172.88148498535156,
+      "reproj_median": 46.294044494628906,
+      "reproj_p95": 168.43373107910156,
+      "tri_median": 69.65397644042969,
+      "tri_p95": 135.2357940673828,
+      "residuals": {
+        "foot_surface_residuals_m": {
+          "median_mm": -41.44063591957092,
+          "p95_mm": -3.918591141700764,
+          "finite": true
+        },
+        "hand_surface_residuals_m": {
+          "median_mm": 43.60717162489891,
+          "p95_mm": 104.43094186484814,
+          "finite": true
+        }
+      },
+      "foot_penetration_fraction": {
+        "left": 0.9635603345280764,
+        "right": 0.9599761051373955
+      },
+      "hand_penetration_fraction": {
+        "left": 0.04498714652956298,
+        "right": 0.04888465046852973
+      },
+      "hand_coverage": {
+        "left": {
+          "within_15mm": 0.1769217997789383,
+          "within_30mm": 0.3538021445274353,
+          "within_50mm": 0.604030191898346
+        },
+        "right": {
+          "within_15mm": 0.168380469083786,
+          "within_30mm": 0.3198440968990326,
+          "within_50mm": 0.5443652272224426
+        }
+      },
+      "beta_drift_stage_c_to_d": 0.0,
+      "beta_frozen": true,
+      "same_process": true,
+      "stage_d_obs_3d": 0.7,
+      "stage_d_obs_2d": 0.025,
+      "grad_to_coco": 0.0,
+      "grad_to_verts": 1.2000764399999753e-05,
+      "coco_isolated": true,
+      "same_forward_graph": true,
+      "hand_mode": "all_frames_assumed",
+      "recommendation_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": false,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "foot_median_gain": -0.0030750366354971473,
+      "hand_median_gain": 0.0012046472360418153
+    },
+    "surface_contact_window60_90_v5_both_a010": {
+      "stage_c_loss": [
+        0.5101732015609741,
+        0.2128307968378067,
+        1.1579738855361938,
+        0.385089635848999,
+        0.0,
+        0.0,
+        0.0073538487777113914
+      ],
+      "stage_d_loss": [
+        0.1703518182039261,
+        0.18393632769584656,
+        1.3467552661895752,
+        0.38387855887413025,
+        0.0024194878060370684,
+        8.010544115677476e-05,
+        0.007391437888145447
+      ],
+      "l3_stage_c": 0.2128307968378067,
+      "l2_stage_c": 1.1579738855361938,
+      "reproj_left_p95": 163.76820373535156,
+      "reproj_right_p95": 172.70062255859375,
+      "reproj_median": 46.26806640625,
+      "reproj_p95": 168.147216796875,
+      "tri_median": 69.6528549194336,
+      "tri_p95": 135.48153686523438,
+      "residuals": {
+        "foot_surface_residuals_m": {
+          "median_mm": -41.16305708885193,
+          "p95_mm": -3.8982629776000977,
+          "finite": true
+        },
+        "hand_surface_residuals_m": {
+          "median_mm": 43.580472469329834,
+          "p95_mm": 104.35566306114197,
+          "finite": true
+        }
+      },
+      "foot_penetration_fraction": {
+        "left": 0.9629629629629629,
+        "right": 0.9599761051373955
+      },
+      "hand_penetration_fraction": {
+        "left": 0.04519446056886972,
+        "right": 0.04913342731569782
+      },
+      "hand_coverage": {
+        "left": {
+          "within_15mm": 0.17721204459667206,
+          "within_30mm": 0.3540094494819641,
+          "within_50mm": 0.6045277118682861
+        },
+        "right": {
+          "within_15mm": 0.1686292439699173,
+          "within_30mm": 0.31996849179267883,
+          "within_50mm": 0.544655442237854
+        }
+      },
+      "beta_drift_stage_c_to_d": 0.0,
+      "beta_frozen": true,
+      "same_process": true,
+      "stage_d_obs_3d": 0.7,
+      "stage_d_obs_2d": 0.025,
+      "grad_to_coco": 0.0,
+      "grad_to_verts": 2.390813642705325e-05,
+      "coco_isolated": true,
+      "same_forward_graph": true,
+      "hand_mode": "all_frames_assumed",
+      "recommendation_gates": {
+        "3d_p95_within_2pct": true,
+        "2d_p95_within_5px": true,
+        "residual_median_gain_5pct": false,
+        "penetration_within_1pp": true,
+        "beta_frozen": true,
+        "gradient_audit": true
+      },
+      "foot_median_gain": -0.009752667407919908,
+      "hand_median_gain": 0.0018161749162706614
+    }
+  },
+  "recommended_candidate": null,
+  "engineering_comparison_only": true,
+  "physical_touch_validated": false,
+  "grip_force_validated": false,
+  "load_bearing_validated": false,
+  "true_3d_accuracy_validated": false
+}
