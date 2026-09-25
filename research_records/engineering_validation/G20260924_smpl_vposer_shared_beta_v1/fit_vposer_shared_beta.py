@@ -6,7 +6,7 @@ temporal prefit, fit parameters, contact targets or HTML are read.
 """
 from __future__ import annotations
 
-import argparse, json, math, sys
+import argparse, json, math, sys, time
 from pathlib import Path
 import numpy as np
 
@@ -454,19 +454,26 @@ def main() -> int:
     if audit_mode and not surface_mode:
         raise ValueError("--gradient-audit-only needs the surface inputs")
     beta.requires_grad_(False)
+    stage_timing = {}
+    t_stage = time.perf_counter()
     s0=run(torch.optim.Adam([{"params":[latent,root],"lr":0.01},{"params":[transl],"lr":0.003}],), args.base_steps, False,
            obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
+    stage_timing["stage_a_seconds"] = time.perf_counter() - t_stage
     stage_a={"loss":s0,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_a_beta0")}
     # Stage B: freeze motion and optimize one shared beta only.
     for p in (latent,root,transl): p.requires_grad_(False)
     beta.requires_grad_(True)
+    t_stage = time.perf_counter()
     s1=run(torch.optim.Adam([{"params":[beta],"lr":0.0005}],), args.beta_steps, True,
            obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
+    stage_timing["stage_b_seconds"] = time.perf_counter() - t_stage
     stage_b={"loss":s1,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_b_shared_beta")}
     # Stage C: joint refinement with beta learning rate ten times lower.
     for p in (latent,root,transl): p.requires_grad_(True)
+    t_stage = time.perf_counter()
     s2=run(torch.optim.Adam([{"params":[latent,root],"lr":0.003},{"params":[transl],"lr":0.001},{"params":[beta],"lr":0.0003}],), args.joint_steps, True,
            obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
+    stage_timing["stage_c_seconds"] = time.perf_counter() - t_stage
     stage_c={"loss":s2,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_c_joint")}
 
     if audit_mode:
@@ -513,9 +520,11 @@ def main() -> int:
             stage_d_scheduler = torch.optim.lr_scheduler.ExponentialLR(stage_d_opt, gamma=gamma)
         else:
             stage_d_scheduler = None
+        t_stage = time.perf_counter()
         s3=run(stage_d_opt, args.contact_steps, False,
                obs3d_coeff=obs3d_d, obs2d_coeff=obs2d_d, trace=stage_d_trace,
                scheduler=stage_d_scheduler)
+        stage_timing["stage_d_seconds"] = time.perf_counter() - t_stage
         if not torch.equal(beta.detach(), beta_before_d.detach()):
             raise RuntimeError("beta changed during Stage D despite requires_grad_(False)")
         if want_surface_d:
@@ -583,6 +592,7 @@ def main() -> int:
     mask=accepted & np.isfinite(d3)
     eLmed=eL[valid2d.cpu().numpy()]; eRmed=eR[valid2d.cpu().numpy()]
     metrics={"status":"completed_staged_single_frame_vposer_shared_beta","window":window,"frames":n,"full_sequence_fit":False,
+             "stage_timing_seconds": stage_timing,
              "stage_c_to_d_same_process":bool(stage_d is not None),"beta_frozen_during_stage_d":bool(beta_frozen_during_stage_d),"stage_a_beta_zero":stage_a,"stage_b_shared_beta":stage_b,"stage_c_joint":stage_c,"stage_d_contact":stage_d,"contact":{"enabled":bool(stage_d is not None),"foot_weight":float(args.foot_contact_weight),"hand_weight":float(args.hand_contact_weight),"label_file":str(args.contact_labels.resolve()) if args.contact_labels else None,"scene_file":str(args.scene_transforms.resolve()) if args.scene_transforms else None,"final_foot_loss":float(lfoot.detach()),"final_hand_loss":float(lhand.detach())},"2d":{"median_px":float(np.median(np.r_[eLmed,eRmed])),"p95_px":float(np.percentile(np.r_[eLmed,eRmed],95)),"left_p95_px":float(np.percentile(eLmed,95)),"right_p95_px":float(np.percentile(eRmed,95))},"3d":{"median_mm":float(np.median(d3[mask])) if mask.any() else None,"p95_mm":float(np.percentile(d3[mask],95)) if mask.any() else None,"joint_p95_mm":{NAMES[j]:float(np.percentile(d3[:,j][mask[:,j]],95)) if mask[:,j].any() else None for j in range(17)}},"beta":{"values":beta_np.tolist(),"shared":True,"at_boundary":bool(np.any(np.isclose(np.abs(beta_np),1.5,atol=1e-3)))},"right_knee_accepted":int(accepted[:,14].sum()),"vposer":{"latent_dim":int(vp_cfg.model_params.latentD),"checkpoint":str(vp_ckpt.resolve())},"source_audit":{"raw_left":str(args.left.resolve()),"raw_right":str(args.right.resolve()),"old_fit_inputs_read":False,"stored_triangulation_read":False,"temporal_prefit_read":False}}
     np.savez_compressed(out/"result.npz",vertices=verts,faces=np.asarray(model.faces),predicted_coco=pred,betas=np.repeat(beta_np[None,:],n,axis=0),body_pose=pose_np,global_orient=roots,transl=trans,raw_triangulated_points=raw,temporally_processed_points=raw,joint_confidence=q,accepted_mask=accepted,reject_reason=reason)
     (out/"metrics.json").write_text(json.dumps(metrics,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
