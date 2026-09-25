@@ -1,5 +1,57 @@
 # 助步器项目 AI 工作日志
 
+### 2026-09-25（北京时间）— task-15 完成：手脚表面接触工程路线就绪（数量级确认，不是最优权重冻结）
+
+**状态：完成；当前工程主线选定为 both_a1_a30。**
+
+本 task 的目标不是寻找最优接触系数，也不是完成三独立窗口冻结，而是排除实现 bug，确认手脚表面损失能通过 SMPL vertices 产生可观测修正，并选出一条可继续使用的工程路线。地面以下脚部残差按当前约定作为可由 penetration penalty 修正的系统性工程误差，不单独判为逻辑错误。
+
+**实现审计结果：**
+
+- foot sole 左右各 54 点，heel/ball/toe 各 18 点，索引范围 [1981,6840] 属于 [0,6889]，左右集合不同且无混用；逐帧使用 R_ground_from_left 与 T_ground_from_left 转换；residual 为 ground z，地下为负；penalty 为 relu(-z)^2，仅作用于地下点；foot_w 有效加权归一化，全零权重时 lfoot 为零并按设计记 unavailable。
+- hand palm 左右各 778 点且不混用；capsule 端点在地面系，半径 0.016 m；residual 为点到中心线距离减半径，外部为正、穿透为负；pseudo-Huber 与 centered soft-min 均沿 778 个候选点计算；不使用 COCO wrist；全帧双侧均匀归一化，未被 hand_contact_weight 关闭。
+- ground transform 方向通过 sole 映射审计；刚体闭环误差小于 1e-6，方向证据不足处保留 ambiguous，不强行判定。
+- 同侧检查左右均通过，mirror 平均 |x| 间隙约 0.009 m。
+- 四条路线的 same_forward_graph 为 true（control 诚实记录 skipped），grad_to_coco=0，grad_to_verts 有限非零：foot 2.04e-4、hand 9.62e-4、both 1.04e-3。
+- 四条路线 beta drift 均为 0.0；Stage C 不含接触项，Stage D 从同进程 Stage C 继续，接触项未进入初始化或 beta 优化。
+- 审计脚本自查并修正了两处变量复用问题，仅影响审计脚本，不改变拟合器、历史结果或接触实现。
+
+**开发窗 60..90 的数量级结果：**
+
+- control：2D 46.7/165.8 px，3D 67.8/129.5 mm，脚 signed median 左右 -30.6/-35.7 mm，手绝对 median 42.1/47.0 mm。
+- foot_a1：脚 signed median -27.8/-32.6 mm，脚向零改善约 8.98%；2D P95 164.2 px，3D P95 131.6 mm。
+- hand_a30：手绝对 median 左 42.1→39.2 mm、右 47.0→46.7 mm；左侧约 3.6% 改善，15 mm coverage 左侧 16.2%→19.7%。
+- both_a1_a30：脚 signed median -27.7/-32.5 mm；手绝对 median 左 42.1→38.9 mm、右 47.0→46.4 mm；脚向零改善约 8.98%，手绝对改善约 3.6%。
+- both_a1_a30 相对 control 的 3D P95 约 -0.2%，2D P95 改善；脚穿透比例变化不超过 0.7 个百分点；所有路线数值有限，无 NaN/Inf。
+- 129..159 与 278..308 独立窗 foot_a1 仍分别只有约 4.7%/4.5% 同向修正，373..403 因源标签无承重帧仍不可用于验证；这些独立窗结果不能被本开发窗数量级判断替代。
+
+**工程路线结论：**
+
+
+```text
+selected_engineering_route = both_a1_a30
+route_status = engineering_route_ready
+foot = 1.0
+hand = 30.0
+obs3d = 1.0
+obs2d = 0.20
+stage_d_obs3d_scale = 0.70
+stage_d_obs2d_scale = 0.10
+contact_steps = 80
+```
+
+选择理由：手脚均有方向一致且超过数值噪声的 residual 修正；surface graph、侧别/索引、beta 冻结和有限性检查通过；主观测项没有出现数量级恶化。该配置是当前可继续推进的工程路线，不是理论最优权重，也不是独立窗口稳定性冻结。
+
+**结论边界：**
+
+- route_status=engineering_route_ready 只表示当前工程链路可继续使用；
+- 地面以下惩罚产生的 residual 修正不等于真实触地；
+- 手部 residual 改善不等于真实握持或握力；
+- 2D/3D 指标变化不等于真实三维精度；
+- physical_touch_validated=false、true_3d_accuracy_validated=false、load_bearing_validated=false、grip_force_validated=false；
+- 未修改 v1–v6 历史实验产物，未执行 push。
+
+
 ### 2026-09-25（北京时间）— task-14 完成：373..403 脚部接触标签失效根因确认（只读审计）
 
 **状态：完成；当前主线仍受阻，foot_a1 不冻结。**
