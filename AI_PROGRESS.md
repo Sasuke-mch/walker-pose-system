@@ -1,5 +1,28 @@
 # 助步器项目 AI 工作日志
 
+### 2026-09-25（北京时间）— 固定完整路线：全片 A/B/C + Stage D foot=2、hand=30、余弦衰减 320 步
+
+当前确定的完整运行配置：
+
+```text
+输入范围：完整 448 帧
+Stage A/B/C：120/120/120 步
+Stage D：320 步
+surface foot：2.0
+surface hand：30.0
+obs3d：1.0
+obs2d：0.20
+Stage D obs3d/obs2d：0.70/0.10
+Stage D lr：CosineAnnealingLR，T_max=320，eta_min=初始学习率×0.01
+latent/root lr：0.001→0.00001
+translation lr：0.0005→0.000005
+device：cpu
+```
+
+小窗 `60..90` 已确认该规则在最后 40 步目标下降约 0.0431%、参数步长中位数约 0.000464，达到当前工程基本收敛标准。该标准是运行停止规则，不是数学收敛或物理验证。
+
+本次下一步只运行上述完整 448 帧路线，统计 A/B/C/D 分阶段耗时、总墙钟时间、帧数和有效吞吐；不再扫描权重，不使用旧 fitted parameters 或旧 HTML。运行完成后，可视化必须使用同一次运行的 vertices、faces、predicted_coco、raw triangulation、当前 scene transforms、Stage 状态和逐帧 walker/camera 数据，遵守 `VISUALIZATION_PIPELINE.md` 的 `[X,-Y,Z]` 显示变换、真实 6890/13776 SMPL 网格、XY 地面、双相机、实体助步器、逐帧播放和浏览器截图验收要求。
+
 ### 2026-09-25（北京时间）— Stage D 学习率规则试验：余弦衰减到 1% 在 320 步达到基本收敛
 
 固定 `60..90`、foot=2.0、hand=30.0、A/B/C=120/120/120，对比固定学习率、指数衰减和余弦衰减；不跑全片。基本收敛停止规则暂定为：最后 40 步总目标相对下降不超过 0.1%，且最后 40 步参数更新 L2 中位数不超过 0.001。
