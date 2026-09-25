@@ -14,6 +14,14 @@
 - 已生成完整主线实验记载 `research_records/reports/G20260924_smpl_vposer_shared_beta_v1_mainline_record.docx`，覆盖原始二维、鱼眼坐标、三角化、Stage 1/2、地面变换、SMPL/VPoser、COCO 回归、beta、表面脚手损失、梯度审计、当前对照和下一步权重扫描。
 - 下一步唯一变量为全帧 hand surface loss 权重，固定窗口 `60..90`、输入、初始化和步数，计划比较 hand=0.03/0.10 及 foot+hand=0.02+0.03/0.10；不直接进入 full448。
 
+### 2026-09-25（北京时间）— v4 手脚表面接触结果可视化
+
+- 用户要求接入手脚接触损失后的 SMPL 拟合结果并可视化。选用 `surface_contact_window60_90_v4_foot_hand_w010`，即窗口 60..90、foot=0.02、全帧 hand=0.10 的结果；未重跑拟合。
+- 新增 `realtime_app/tools/build_surface_contact_viewer.py`，输入当前 v4 `result.npz`、Stage D surface 结果、当前窗口场景变换、当前 contact labels 的扶手端点、静态助步器拓扑和 male SMPL 表面集合，输出固定地面坐标的交互页面与 `result_grounded.npz`。
+- 页面显示真实 6890 顶点/13776 三角面、模型 COCO-17、当前帧 accepted 三角化点、人体骨架、逐帧助步器、左右扶手 capsule、sole/palm 候选点、地面和坐标轴；播放逐帧推进，不做显示平滑或插值。
+- 文件级验收确认页面包含 31 帧、6890 顶点、41328 个扁平三角索引、108 个 sole 候选点、1556 个 palm 候选点和 31 帧扶手端点。浏览器自动化服务当前不可用，因此尚未完成截图级浏览器验收。
+- 当前拟合公式和优化顺序已写入本轮回报：3D robust observation、双目 2D robust reprojection、VPoser latent 正则、surface foot、surface hand 和 beta 正则；Stage A/B/C 后冻结 beta 进入 Stage D。
+
 ### 2026-09-25（北京时间）— 启动严格 foot-only 对照阶段
 
 - 用户明确要求：先做支撑标签审计，再在当前运行的小窗口重算 no-contact 基线，最后仅在 Stage C 之后加入 foot-only；本阶段不启用 hand contact，不直接进入全片拟合。
