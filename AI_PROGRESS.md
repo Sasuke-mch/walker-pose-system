@@ -2254,3 +2254,12 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 ### 2026-09-26 — v6 foot=1 独立窗口验证（受阻，engineering validation）
 
 - 129/278 窗 control/foot_a1 退出码 0，增益 4.70%/4.45% 未达 5% 门；373 窗 foot_a1 因全窗零脚权重致 lfoot 恒零，按设计审计失败；`selected_candidate=null`，未冻结 foot=1；v1–v6 未修改，未 push。
+### 2026-09-25：全片 foot=2 / hand=30 正式运行与可视化
+
+- 已锁定并执行完整 448 帧路线：Stage A/B/C 全局拟合各 120 步；同一进程从 Stage C 续入 Stage D，beta 冻结，surface foot=2.0、hand=30.0，Stage D 320 步，CosineAnnealingLR 从 1.0 降到 0.01，Stage D 观测系数为 3D 0.70、2D 0.10。
+- 运行命令的完整参数保存在 `research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/full448_surface_both_a2_a30_cosine320/command.txt`；原始左右 PMPose、当前场景变换、接触标签、接触顶点集合和助步器拓扑均为显式输入。
+- 运行退出码 0。总墙钟 285.388 s，448 帧，1.5698 帧/s，637.03 ms/帧；Stage A/B/C/D 分别为 28.333/87.531/31.998/124.912 s。
+- 输出 `metrics.json`、`surface_contact_metrics.json`、`surface_contact_forward_audit.json`、`stage_d_trace.json`、`result.npz` 及各 Stage npz 均已生成。顶点、COCO 点和接触残差有限；Stage C→D 同进程为真，beta 在 D 中冻结为真，surface forward graph 审计通过。
+- 320 步结束时最后 40 步总目标相对下降约 0.0477%；参数步长中位数约 0.00180，故记录为“目标已基本稳定，但参数仍有小幅移动”，不能写成严格收敛。373..403 源标签无承重帧的既有边界仍然有效。
+- 已生成同源全片可视化：`surface_contact_full448_viewer.html`、`surface_contact_full448_canvas.html` 和正式地面模板 `surface_contact_full448_formal_viewer.html`；`result_grounded.npz` 形状为 vertices (448,6890,3)、faces (13776,3)、predicted_coco (448,17,3)，有限性检查通过，Canvas 页面已用 Chrome headless 截图核查。
+- 可视化仍只表达固定地面坐标下的工程链路和接触代理；不升级为真实触地、承重、握持或物理三维精度结论。未执行 push。
