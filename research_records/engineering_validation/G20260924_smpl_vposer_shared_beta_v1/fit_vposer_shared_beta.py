@@ -175,6 +175,10 @@ def main() -> int:
             raise ValueError("hand_contact_weight must be finite with shape [N,2]")
         if np.any(hand_weights_np < 0):
             raise ValueError("hand_contact_weight must be non-negative")
+        if args.surface_hand_contact_weight > 0 and float(hand_weights_np.sum()) <= 0.0:
+            raise ValueError(
+                "surface hand contact requested but the selected window has no positive hand labels"
+            )
         Rgc = torch.tensor(np.asarray(st["rotation_ground_from_left"])[wsl], dtype=torch.float32, device=device)
         Tgc = torch.tensor(np.asarray(st["translation_ground_from_left_mm"])[wsl] / 1000.0, dtype=torch.float32, device=device)
         foot_w = torch.tensor(np.asarray(cl["foot_contact_weight"])[wsl], dtype=torch.float32, device=device)
