@@ -2280,3 +2280,10 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 320 步结束时最后 40 步总目标相对下降约 0.0477%；参数步长中位数约 0.00180，故记录为“目标已基本稳定，但参数仍有小幅移动”，不能写成严格收敛。373..403 源标签无承重帧的既有边界仍然有效。
 - 已生成同源全片可视化：`surface_contact_full448_viewer.html`、`surface_contact_full448_canvas.html` 和正式地面模板 `surface_contact_full448_formal_viewer.html`；`result_grounded.npz` 形状为 vertices (448,6890,3)、faces (13776,3)、predicted_coco (448,17,3)，有限性检查通过，Canvas 页面已用 Chrome headless 截图核查。
 - 可视化仍只表达固定地面坐标下的工程链路和接触代理；不升级为真实触地、承重、握持或物理三维精度结论。未执行 push。
+
+### 2026-09-26 — SMPL 表面接触 + 时序平滑 Stage D 开发窗试验（engineering validation）
+
+- `fit_vposer_shared_beta.py` 新增 `--temporal-mode(none/stage_d/stage_c_and_d)`、`--temporal-local-weight`、`--temporal-root-weight`、`--temporal-huber-scale-mm(30)`、`--temporal-max-gap-frames(1)`；默认 none，旧路线行为不变。时序项作用于模型侧 grounded COCO-12（减骨盆）与地面骨盆轨迹的二阶差分（dt=1/30，pseudo-Huber/30mm），三元组需连续 3 帧 ok（triangulation accepted.any + scene accepted.any + 有限 Rgc/Tgc）；0 有效项时返回 0 并记 unavailable。Stage D 首 forward 写 `temporal_gradient_audit.json`；trace 按参数组记 `param_step_l2_local/root/translation`；metrics 新增时序 valid/rejected/gap、wall_seconds、fps。
+- 60..90 窗 control/weak/medium（stage_d，foot=2/hand=30，其余冻结）：初设 0.01/0.0025 探针显示时序梯度达 obs3d 的约 0.8/0.4 倍，判太强，仅作标定探针；按 0.1x/0.25x obs 梯度重标定为 weak(0.0012/0.0003)、medium(0.003/0.00075)，标定过程写入实验 EXPERIMENT.md。
+- 结果：local accel P95 -62.7%/-62.4%，pelvis P95 -80%/-84%，2D P95 -1.5%/-3.3%，y-span -4.4%/-5.2%；但 3D P95 +5.7%/+6.7%（超 5% 门），foot signed 中位 +7.7/+6.4mm（超 2mm 门）；beta 三组一致、同进程 C→D、无 NaN/Inf、valid 29/29。D-only 未过停止门，不进入 C+D。
+- 输出位于 `surface_temporal_window60_90_stage_d_v1/`（control/weak/medium + 标定探针 + comparison.json）；冻结目录与 v1-v6 未修改。本结论仅为工程时序一致性测试，不是真实运动真值或物理接触验证。未执行 push。

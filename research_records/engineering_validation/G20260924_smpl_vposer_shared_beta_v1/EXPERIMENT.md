@@ -297,3 +297,7 @@ foot_a1 仅成为开发窗的进一步验证候选：Stage D 后左右 sole 顶�
 退出码为 0。总墙钟 285.388 s，448 帧，1.5698 帧/s（637.03 ms/帧）；A/B/C/D 分别耗时 28.333/87.531/31.998/124.912 s。`metrics.json`、各 Stage 结果、接触 forward 审计和逐步 trace 均已写出。最后 40 步目标相对下降 0.0477%，参数步长中位数 0.00180，结论为目标基本稳定但参数仍小幅移动，不宣称严格收敛。
 
 依据当前可视化规范，使用本次结果生成了全片接触页面、无外部库 Canvas 页面和正式地面模板页面；`result_grounded.npz` 为 448×6890 顶点、13776 三角面，有限性和三角面索引检查通过。页面和截图仅用于检查当前运行的 SMPL、COCO 点、三角化点、地面、助步器及接触代理的一致性，不构成真实触地、承重、握持或物理精度验证。
+
+## 2026-09-26 时序平滑 Stage D 开发窗试验（engineering validation，未通过停止门）
+
+冻结对照：`full448_surface_both_a2_a30_cosine320/` 与 `frozen_no_temporal_a2_a30_cosine320/freeze_manifest.json` 未修改。新输出：`surface_temporal_window60_90_stage_d_v1/`（control/weak/medium + 标定探针 + comparison.json + 各目录 EXPERIMENT.md）。唯一变量为 Stage D 附加时序损失；foot=2/hand=30、观测系数、学习率、beta 冻结、ground transform 计算均未改变；仅跑 60..90 窗。权重经 Stage D 首 forward 梯度审计重标定（weak=0.0012/0.0003、medium=0.003/0.00075，标定过程见子目录 EXPERIMENT.md）。结果：local accel P95 -62.7%/-62.4%，pelvis P95 -80%/-84%，2D P95 -1.5%/-3.3%，摆动跨度 -4.4%/-5.2%；但 3D P95 +5.7%/+6.7%（超 5% 门），foot 有符号中位 +7.7/+6.4mm（超 2mm 门）。D-only 未过停止门，不进入 C+D。本节仅为工程时序一致性测试，不是真实运动真值或物理接触验证。

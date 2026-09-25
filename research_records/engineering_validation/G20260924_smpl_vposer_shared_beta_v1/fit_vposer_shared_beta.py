@@ -100,6 +100,11 @@ def main() -> int:
     ap.add_argument("--surface-hand-contact-weight", type=float, default=0.0)
     ap.add_argument("--start", type=int, default=None)
     ap.add_argument("--end", type=int, default=None)
+    ap.add_argument("--temporal-mode", choices=("none", "stage_d", "stage_c_and_d"), default="none")
+    ap.add_argument("--temporal-local-weight", type=float, default=0.0)
+    ap.add_argument("--temporal-root-weight", type=float, default=0.0)
+    ap.add_argument("--temporal-huber-scale-mm", type=float, default=30.0)
+    ap.add_argument("--temporal-max-gap-frames", type=int, default=1)
     ap.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     args = ap.parse_args()
     if (args.start is None) != (args.end is None):
@@ -205,6 +210,50 @@ def main() -> int:
     t01=torch.tensor(cal.T_cam0_to_cam1_mm/1000.0,dtype=torch.float32,device=device)
     K0=torch.tensor(cal.K0,dtype=torch.float32,device=device); D0=torch.tensor(cal.D0,dtype=torch.float32,device=device)
     K1=torch.tensor(cal.K1,dtype=torch.float32,device=device); D1=torch.tensor(cal.D1,dtype=torch.float32,device=device)
+    TEMPORAL_LOCAL_IDX = [5,6,7,8,9,10,11,12,13,14,15,16]
+    temporal_enabled = [False]
+    scale_m = float(args.temporal_huber_scale_mm) / 1000.0
+    _acc_np = np.asarray(accepted)
+    _acc_any = _acc_np.any(axis=-1) if _acc_np.ndim == 2 else _acc_np
+    try:
+        _st_raw = np.asarray(st["accepted"])[wsl]
+        _st_acc = (_st_raw.any(axis=-1) if _st_raw.ndim == 2 else _st_raw).reshape(-1).astype(bool)
+        assert _st_acc.shape[0] == n
+    except Exception:
+        _st_acc = np.ones((n,), dtype=bool)
+    if Rgc is not None:
+        Rgc_finite = torch.isfinite(Rgc).all(dim=(1,2)) & torch.isfinite(Tgc).all(dim=1)
+        frame_ok = torch.tensor(np.asarray(_acc_any, dtype=bool) & _st_acc, device=device) & Rgc_finite
+    else:
+        frame_ok = torch.zeros((n,), dtype=torch.bool, device=device)
+    frame_ok_np = frame_ok.detach().cpu().numpy()
+    def temporal_terms(jc):
+        z = torch.zeros((), device=device)
+        if args.temporal_mode == "none" or not temporal_enabled[0] or Rgc is None or n < 3:
+            return z, z, {"local_valid":0,"root_valid":0,"rejected_triplets":0,"gap_triplets":0,"status":"unavailable"}
+        dt = 1.0/30.0
+        jg = torch.einsum("nij,nvj->nvi", Rgc, jc) + Tgc[:,None,:]
+        pelvis = 0.5*(jg[:,11]+jg[:,12])
+        local = jg[:,TEMPORAL_LOCAL_IDX,:] - pelvis[:,None,:]
+        rej=0; gapc=0; la=[]; ra=[]
+        for t in range(1,n-1):
+            ok = bool(frame_ok_np[t-1] and frame_ok_np[t] and frame_ok_np[t+1])
+            if not ok:
+                rej+=1; continue
+            if 1 > int(args.temporal_max_gap_frames):
+                gapc+=1; continue
+            a = (local[t+1]-2*local[t]+local[t-1])/(dt*dt)
+            r = (pelvis[t+1]-2*pelvis[t]+pelvis[t-1])/(dt*dt)
+            la.append(a); ra.append(r)
+        info={"status":"ok" if la else "unavailable"}
+        if not la:
+            info.update({"local_valid":0,"root_valid":0,"rejected_triplets":rej,"gap_triplets":gapc})
+            return z, z, info
+        A=torch.stack(la); R=torch.stack(ra)
+        rho_l = torch.sqrt(1.0+(A/scale_m)**2)-1.0
+        rho_r = torch.sqrt(1.0+(R/scale_m)**2)-1.0
+        info.update({"local_valid":int(A.shape[0]),"root_valid":int(R.shape[0]),"rejected_triplets":int(rej),"gap_triplets":int(gapc)})
+        return rho_l.mean(), rho_r.mean(), info
 
     from pose_app import smpl_surface_contact as surf
     surface = None
@@ -352,33 +401,42 @@ def main() -> int:
             hd=point_segment_distance(wrist,a,bseg)
             assert hd.shape == hand_w.shape
             lhand=(robust_scalar(hd,0.050)*hand_w).sum()/(hand_w.sum()+1e-6)
-        return result,pose,jc,pl,pr,l3,l2,lp,lfoot,lhand
+        tl=torch.zeros((),device=device); tr=torch.zeros((),device=device); tinfo={"local_valid":0,"root_valid":0,"rejected_triplets":0,"gap_triplets":0,"status":"unavailable"}
+        if args.temporal_mode!="none" and temporal_enabled[0]:
+            tl,tr,tinfo = temporal_terms(jc)
+        return result,pose,jc,pl,pr,l3,l2,lp,lfoot,lhand,tl,tr,tinfo
 
     def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.20, trace=None, scheduler=None):
         last=None
         for step in range(steps):
-            opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand=vals
+            opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand,tl,tr,tinfo=vals
             trace_params = None
             if trace is not None:
-                trace_params = torch.cat([latent.detach().reshape(-1), root.detach().reshape(-1), transl.detach().reshape(-1)])
+                trace_params = {"latent": latent.detach().clone(), "root": root.detach().clone(), "transl": transl.detach().clone()}
             lb=beta.square().mean()
             if surface_mode:
                 contact_loss = eff_foot_w*lfoot + eff_hand_w*lhand
             else:
                 contact_loss = args.foot_contact_weight*lfoot + args.hand_contact_weight*lhand
+            tloss = args.temporal_local_weight*tl + args.temporal_root_weight*tr
             loss=(obs3d_coeff*l3+obs2d_coeff*l2+0.02*lp
-                  +(contact_loss if contact_enabled else 0.0)+(0.02*lb if beta_reg else 0.0))
+                  +(contact_loss if contact_enabled else 0.0)+(0.02*lb if beta_reg else 0.0)
+                  +(tloss if temporal_enabled[0] else 0.0))
             if trace is not None:
                 trace.append({"step": step, "total": float(loss.detach()),
                               "obs3d": float(l3.detach()), "obs2d": float(l2.detach()),
                               "pose": float(lp.detach()), "foot": float(lfoot.detach()),
-                              "hand": float(lhand.detach())})
+                              "hand": float(lhand.detach()),
+                              "temporal_local": float(tl.detach()), "temporal_root": float(tr.detach()),
+                              "temporal_total": float(tloss.detach())})
             loss.backward(); torch.nn.utils.clip_grad_norm_(opt.param_groups[0]["params"], 10.0); opt.step()
             if scheduler is not None:
                 scheduler.step()
             if trace is not None:
-                trace_params_after = torch.cat([latent.detach().reshape(-1), root.detach().reshape(-1), transl.detach().reshape(-1)])
-                trace[-1]["param_step_l2"] = float(torch.linalg.vector_norm(trace_params_after - trace_params).detach())
+                trace[-1]["param_step_l2_local"] = float(torch.linalg.vector_norm(latent.detach()-trace_params["latent"]).detach())
+                trace[-1]["param_step_l2_root"] = float(torch.linalg.vector_norm(root.detach()-trace_params["root"]).detach())
+                trace[-1]["param_step_l2_translation"] = float(torch.linalg.vector_norm(transl.detach()-trace_params["transl"]).detach())
+                trace[-1]["param_step_l2"] = float((trace[-1]["param_step_l2_local"]**2+trace[-1]["param_step_l2_root"]**2+trace[-1]["param_step_l2_translation"]**2)**0.5)
                 trace[-1]["lr_latent_root"] = float(opt.param_groups[0]["lr"])
                 trace[-1]["lr_translation"] = float(opt.param_groups[1]["lr"])
             if beta_reg: beta.data.clamp_(-1.5,1.5)
@@ -387,7 +445,7 @@ def main() -> int:
 
     def save_stage(tag):
         with torch.no_grad():
-            result,pose,jc,pl,pr,_,_,_,lfoot,lhand=losses(beta)
+            result,pose,jc,pl,pr,_,_,_,lfoot,lhand,_,_,_=losses(beta)
         v=result.vertices.cpu().numpy(); p=jc.cpu().numpy()
         r=root.detach().cpu().numpy(); tr=transl.detach().cpu().numpy(); po=pose.detach().cpu().numpy(); be=beta.detach().cpu().numpy()[0]
         e3=np.linalg.norm(p-target_np,axis=-1)*1000.0
@@ -455,6 +513,7 @@ def main() -> int:
         raise ValueError("--gradient-audit-only needs the surface inputs")
     beta.requires_grad_(False)
     stage_timing = {}
+    temporal_enabled[0] = False
     t_stage = time.perf_counter()
     s0=run(torch.optim.Adam([{"params":[latent,root],"lr":0.01},{"params":[transl],"lr":0.003}],), args.base_steps, False,
            obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
@@ -470,6 +529,7 @@ def main() -> int:
     stage_b={"loss":s1,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage("stage_b_shared_beta")}
     # Stage C: joint refinement with beta learning rate ten times lower.
     for p in (latent,root,transl): p.requires_grad_(True)
+    temporal_enabled[0] = bool(args.temporal_mode == "stage_c_and_d")
     t_stage = time.perf_counter()
     s2=run(torch.optim.Adam([{"params":[latent,root],"lr":0.003},{"params":[transl],"lr":0.001},{"params":[beta],"lr":0.0003}],), args.joint_steps, True,
            obs3d_coeff=obs3d_abc, obs2d_coeff=obs2d_abc)
@@ -504,10 +564,25 @@ def main() -> int:
     stage_d_trace = [] if args.stage_d_trace else None
     if want_surface_d or want_ankle_d:
         contact_enabled = True
+        temporal_enabled[0] = bool(args.temporal_mode in ("stage_d", "stage_c_and_d"))
         # Real Stage C -> D continuation in the same process: freeze beta and
         # optimize only latent/root/transl from the Stage C memory state.
         beta.requires_grad_(False)
         beta_frozen_during_stage_d = True
+        # Temporal gradient audit at first Stage D forward (no opt.step yet).
+        with torch.enable_grad():
+            _res0, _, _jc0, _, _, _l3, _l2, _lp, _lf, _lh, _tl0, _tr0, _tinfo0 = losses(beta)
+            _plist = [("latent", latent), ("root", root), ("transl", transl)]
+            _zero_attach = 0.0*(latent.sum()+root.sum()+transl.sum())
+            _flat = [(k, (c*v + _zero_attach, c, _plist)) for k, v, c in [
+                ("obs3d", obs3d_d*_l3, obs3d_d), ("obs2d", obs2d_d*_l2, obs2d_d),
+                ("foot", eff_foot_w*_lf, eff_foot_w), ("hand", eff_hand_w*_lh, eff_hand_w),
+                ("temporal_local", args.temporal_local_weight*_tl0, args.temporal_local_weight),
+                ("temporal_root", args.temporal_root_weight*_tr0, args.temporal_root_weight)]]
+            _rows = gradient_norms(_flat, {"latent": latent, "root": root, "transl": transl})
+        (out / "temporal_gradient_audit.json").write_text(json.dumps(
+            {"temporal_mode": args.temporal_mode, "terms": _rows, "masks": _tinfo0,
+             "dt": "1/30", "huber_scale_mm": float(args.temporal_huber_scale_mm)}, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
         stage_d_opt = torch.optim.Adam([{"params":[latent,root],"lr":0.001},{"params":[transl],"lr":0.0005}],)
         if args.stage_d_lr_min_factor <= 0.0 or args.stage_d_lr_min_factor > 1.0:
             raise ValueError("--stage-d-lr-min-factor must be in (0,1]")
@@ -574,15 +649,19 @@ def main() -> int:
                 raise RuntimeError("COCO joints leaked into the surface contact graph")
 
     with torch.no_grad():
-        result,pose,jc,pl,pr,_,_,_,lfoot,lhand=losses(beta)
+        temporal_enabled[0] = bool(args.temporal_mode in ("stage_d", "stage_c_and_d"))
+        result,pose,jc,pl,pr,_,_,_,lfoot,lhand,tl_fin,tr_fin,tinfo_fin=losses(beta)
         if stage_d_trace is not None and stage_d is not None:
-            _, _, _, _, _, l3_end, l2_end, lp_end, _, _ = losses(beta)
+            _, _, _, _, _, l3_end, l2_end, lp_end, _, _, tl_end, tr_end, _ = losses(beta)
             total_end = (obs3d_d*l3_end + obs2d_d*l2_end + 0.02*lp_end
-                         + eff_foot_w*lfoot + eff_hand_w*lhand)
+                         + eff_foot_w*lfoot + eff_hand_w*lhand
+                         + args.temporal_local_weight*tl_end + args.temporal_root_weight*tr_end)
             stage_d_trace.append({"step": int(args.contact_steps), "total": float(total_end),
                                   "obs3d": float(l3_end), "obs2d": float(l2_end),
                                   "pose": float(lp_end), "foot": float(lfoot),
-                                  "hand": float(lhand)})
+                                  "hand": float(lhand), "temporal_local": float(tl_end),
+                                  "temporal_root": float(tr_end),
+                                  "temporal_total": float(args.temporal_local_weight*tl_end+args.temporal_root_weight*tr_end)})
             (out / "stage_d_trace.json").write_text(
                 json.dumps({"loss_evaluation": "pre_step_for_0_to_N_minus_1_post_step_for_N",
                             "terms": stage_d_trace}, ensure_ascii=False, indent=2) + "\n",
@@ -592,10 +671,13 @@ def main() -> int:
     mask=accepted & np.isfinite(d3)
     eLmed=eL[valid2d.cpu().numpy()]; eRmed=eR[valid2d.cpu().numpy()]
     metrics={"status":"completed_staged_single_frame_vposer_shared_beta","window":window,"frames":n,"full_sequence_fit":False,
-             "stage_timing_seconds": stage_timing,
+             "stage_timing_seconds": stage_timing, "wall_seconds": float(sum(stage_timing.values())), "frames_per_second": float(n/max(sum(stage_timing.values()),1e-6)),
+             "temporal_mode": args.temporal_mode, "temporal_local_weight": float(args.temporal_local_weight), "temporal_root_weight": float(args.temporal_root_weight), "temporal_huber_scale_mm": float(args.temporal_huber_scale_mm),
+             "temporal_local_loss": float(tl_fin.detach()), "temporal_root_loss": float(tr_fin.detach()), "temporal_local_valid_count": int(tinfo_fin.get("local_valid",0)), "temporal_root_valid_count": int(tinfo_fin.get("root_valid",0)), "temporal_rejected_triplet_count": int(tinfo_fin.get("rejected_triplets",0)), "temporal_gap_count": int(tinfo_fin.get("gap_triplets",0)),
              "stage_c_to_d_same_process":bool(stage_d is not None),"beta_frozen_during_stage_d":bool(beta_frozen_during_stage_d),"stage_a_beta_zero":stage_a,"stage_b_shared_beta":stage_b,"stage_c_joint":stage_c,"stage_d_contact":stage_d,"contact":{"enabled":bool(stage_d is not None),"foot_weight":float(args.foot_contact_weight),"hand_weight":float(args.hand_contact_weight),"label_file":str(args.contact_labels.resolve()) if args.contact_labels else None,"scene_file":str(args.scene_transforms.resolve()) if args.scene_transforms else None,"final_foot_loss":float(lfoot.detach()),"final_hand_loss":float(lhand.detach())},"2d":{"median_px":float(np.median(np.r_[eLmed,eRmed])),"p95_px":float(np.percentile(np.r_[eLmed,eRmed],95)),"left_p95_px":float(np.percentile(eLmed,95)),"right_p95_px":float(np.percentile(eRmed,95))},"3d":{"median_mm":float(np.median(d3[mask])) if mask.any() else None,"p95_mm":float(np.percentile(d3[mask],95)) if mask.any() else None,"joint_p95_mm":{NAMES[j]:float(np.percentile(d3[:,j][mask[:,j]],95)) if mask[:,j].any() else None for j in range(17)}},"beta":{"values":beta_np.tolist(),"shared":True,"at_boundary":bool(np.any(np.isclose(np.abs(beta_np),1.5,atol=1e-3)))},"right_knee_accepted":int(accepted[:,14].sum()),"vposer":{"latent_dim":int(vp_cfg.model_params.latentD),"checkpoint":str(vp_ckpt.resolve())},"source_audit":{"raw_left":str(args.left.resolve()),"raw_right":str(args.right.resolve()),"old_fit_inputs_read":False,"stored_triangulation_read":False,"temporal_prefit_read":False}}
     np.savez_compressed(out/"result.npz",vertices=verts,faces=np.asarray(model.faces),predicted_coco=pred,betas=np.repeat(beta_np[None,:],n,axis=0),body_pose=pose_np,global_orient=roots,transl=trans,raw_triangulated_points=raw,temporally_processed_points=raw,joint_confidence=q,accepted_mask=accepted,reject_reason=reason)
     (out/"metrics.json").write_text(json.dumps(metrics,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (out/"temporal_metrics.json").write_text(json.dumps({"temporal_mode":args.temporal_mode,"dt":"1/30 (30 FPS, no timestamps)","frame_ok":"triangulation accepted.any + scene accepted + finite Rgc/Tgc; triplet needs 3 consecutive ok, gap<=max_gap","huber_scale_mm":float(args.temporal_huber_scale_mm),"local_joints":"predicted_coco_ground minus pelvis_ground, COCO [5,6,7,8,9,10,11,12,13,14,15,16]","accel":"second difference /(dt^2), pseudo-Huber mean","local_loss":float(tl_fin.detach()),"root_loss":float(tr_fin.detach()),"local_valid":int(tinfo_fin.get("local_valid",0)),"root_valid":int(tinfo_fin.get("root_valid",0)),"rejected_triplets":int(tinfo_fin.get("rejected_triplets",0)),"gap_triplets":int(tinfo_fin.get("gap_triplets",0)),"status":str(tinfo_fin.get("status",""))},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     if surface_mode:
         scm = {"status": "technical_chain_only_not_physical_contact_validation",
                "model": "male_smpl_6890", "contact_points": "surface_vertices_not_coco_joints",
@@ -670,7 +752,7 @@ def gradient_audit(beta, forward, losses, surface, surface_terms, train_params,
     if beta.requires_grad:
         raise ValueError("beta must be frozen for the gradient audit")
     with torch.enable_grad():
-        result, pose, jc, pl, pr, l3, l2, lp, lfoot, lhand = losses(beta)
+        result, pose, jc, pl, pr, l3, l2, lp, lfoot, lhand, _, _, _ = losses(beta)
         plist = list(train_params.items())
         flat = [("obs3d", (obs3d_coeff * l3, obs3d_coeff, plist)),
                 ("obs2d", (obs2d_coeff * l2, obs2d_coeff, plist)),
