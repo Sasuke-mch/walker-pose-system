@@ -1,0 +1,169 @@
+{
+  "status": "stage_d_lr_schedule_comparison",
+  "engineering_validation_only": true,
+  "window": [
+    60,
+    90
+  ],
+  "route": {
+    "foot": 2.0,
+    "hand": 30.0
+  },
+  "criterion": {
+    "last_window_steps": 40,
+    "relative_objective_drop_max_pct": 0.1,
+    "median_param_step_l2_should_be_small": true
+  },
+  "runs": {
+    "fixed320": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_convergence_foot_a2_hand_a30_320",
+      "steps": 320,
+      "lr_first": null,
+      "lr_last": null,
+      "loss_last": 0.14622217416763306,
+      "drop_last40_pct": 1.6230564952386033,
+      "median_param_step_last40": 0.021841011941432953,
+      "max_param_step_last40": 0.02209720015525818,
+      "last10_deltas": [
+        -6.076693534851074e-05,
+        -6.020069122314453e-05,
+        -6.090104579925537e-05,
+        -6.121397018432617e-05,
+        -6.157159805297852e-05,
+        -6.103515625e-05,
+        -6.115436553955078e-05,
+        -6.170570850372314e-05,
+        -6.170570850372314e-05,
+        -6.183981895446777e-05
+      ],
+      "basic_converged": false,
+      "2d_p95_px": 163.2234649658203,
+      "3d_p95_mm": 124.79388427734375
+    },
+    "cosine10pct320": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_lr_cosine_foot_a2_hand_a30_320",
+      "steps": 320,
+      "lr_first": 0.0009999783140316977,
+      "lr_last": 0.0001,
+      "loss_last": 0.1553100198507309,
+      "drop_last40_pct": 0.20491989673385336,
+      "median_param_step_last40": 0.0025446772342547774,
+      "max_param_step_last40": 0.0030751172453165054,
+      "last10_deltas": [
+        -7.241964340209961e-06,
+        -7.241964340209961e-06,
+        -7.256865501403809e-06,
+        -7.167458534240723e-06,
+        -7.197260856628418e-06,
+        -7.167458534240723e-06,
+        -7.137656211853027e-06,
+        -7.152557373046875e-06,
+        -7.063150405883789e-06,
+        -7.107853889465332e-06
+      ],
+      "basic_converged": false,
+      "2d_p95_px": 164.03834533691406,
+      "3d_p95_mm": 126.52915954589844
+    },
+    "exp10pct320": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_lr_exp_foot_a2_hand_a30_320",
+      "steps": 320,
+      "lr_first": 0.0009928302477768373,
+      "lr_last": 0.0001000000000000017,
+      "loss_last": 0.15877148509025574,
+      "drop_last40_pct": 0.25519940349561676,
+      "median_param_step_last40": 0.002806708333082497,
+      "max_param_step_last40": 0.003260226221755147,
+      "last10_deltas": [
+        -9.328126907348633e-06,
+        -9.179115295410156e-06,
+        -9.298324584960938e-06,
+        -9.104609489440918e-06,
+        -9.015202522277832e-06,
+        -9.000301361083984e-06,
+        -8.970499038696289e-06,
+        -8.910894393920898e-06,
+        -8.77678394317627e-06,
+        -8.806586265563965e-06
+      ],
+      "basic_converged": false,
+      "2d_p95_px": 165.23670959472656,
+      "3d_p95_mm": 129.2124786376953
+    },
+    "cosine10pct480": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_lr_cosine_foot_a2_hand_a30_480",
+      "steps": 480,
+      "lr_first": 0.0009999903617488582,
+      "lr_last": 0.0001,
+      "loss_last": 0.1494528204202652,
+      "drop_last40_pct": 0.18584269571229234,
+      "median_param_step_last40": 0.002390096429735422,
+      "max_param_step_last40": 0.002671930706128478,
+      "last10_deltas": [
+        -6.705522537231445e-06,
+        -6.645917892456055e-06,
+        -6.571412086486816e-06,
+        -6.586313247680664e-06,
+        -6.556510925292969e-06,
+        -6.586313247680664e-06,
+        -6.556510925292969e-06,
+        -6.5267086029052734e-06,
+        -6.631016731262207e-06,
+        -6.496906280517578e-06
+      ],
+      "basic_converged": false,
+      "2d_p95_px": 162.80706787109375,
+      "3d_p95_mm": 125.5637435913086
+    },
+    "cosine10pct640": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_lr_cosine_foot_a2_hand_a30_640",
+      "steps": 640,
+      "lr_first": 0.0009999945784752657,
+      "lr_last": 0.0001,
+      "loss_last": 0.1441028118133545,
+      "drop_last40_pct": 0.16480600916323063,
+      "median_param_step_last40": 0.0022483108332380652,
+      "max_param_step_last40": 0.002420261036604643,
+      "last10_deltas": [
+        -5.811452865600586e-06,
+        -5.647540092468262e-06,
+        -5.781650543212891e-06,
+        -5.707144737243652e-06,
+        -5.692243576049805e-06,
+        -5.647540092468262e-06,
+        -5.7220458984375e-06,
+        -5.692243576049805e-06,
+        -5.692243576049805e-06,
+        -5.766749382019043e-06
+      ],
+      "basic_converged": false,
+      "2d_p95_px": 162.6517333984375,
+      "3d_p95_mm": 124.49394989013672
+    },
+    "cosine1pct320": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_lr_cosine01_foot_a2_hand_a30_320",
+      "steps": 320,
+      "lr_first": 0.0009999761454348674,
+      "lr_last": 1e-05,
+      "loss_last": 0.15631350874900818,
+      "drop_last40_pct": 0.043108105867562065,
+      "median_param_step_last40": 0.00046393861703108996,
+      "max_param_step_last40": 0.0011028624139726162,
+      "last10_deltas": [
+        -9.08970832824707e-07,
+        -8.642673492431641e-07,
+        -8.046627044677734e-07,
+        -8.642673492431641e-07,
+        -8.046627044677734e-07,
+        -7.450580596923828e-07,
+        -7.748603820800781e-07,
+        -7.599592208862305e-07,
+        -7.599592208862305e-07,
+        -7.599592208862305e-07
+      ],
+      "basic_converged": true,
+      "2d_p95_px": 164.5939483642578,
+      "3d_p95_mm": 128.0571746826172
+    }
+  }
+}
