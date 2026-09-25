@@ -54,6 +54,7 @@ def main() -> int:
                   lambda m: m.group(1) + json.dumps(data, separators=(",", ":")) + m.group(3), html, count=1)
     html = html.replace("Current-run · grounded male SMPL", "Current-run · grounded male SMPL · surface foot=2 hand=30")
     html = html.replace("接触状态未作为拟合监督", "Stage D 已加入 surface foot=2、hand=30；页面仍不代表真实接触或握持")
+    html = html.replace("0xcbd8cf", "0x718279")
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(html, encoding="utf-8")
     print(a.output.resolve())

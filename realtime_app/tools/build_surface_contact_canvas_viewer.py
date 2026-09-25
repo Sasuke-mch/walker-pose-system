@@ -14,7 +14,7 @@ def main() -> int:
     p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();s=a.source.read_text(encoding='utf-8');m=re.search(r'<script id="data" type="application/json">(.*?)</script>',s,re.S)
     if not m: raise RuntimeError('source viewer has no embedded data')
     data=json.loads(m.group(1))
-    for key in ('v','w','t','he'):
+    for key in ('v','w','t','he','j'):
         data[key]=base64.b64encode(gzip.decompress(base64.b64decode(data[key]))).decode('ascii')
     def finite_json(value):
         if isinstance(value,float) and not math.isfinite(value): return None
@@ -22,5 +22,13 @@ def main() -> int:
         if isinstance(value,dict): return {k:finite_json(v) for k,v in value.items()}
         return value
     data=finite_json(data)
-    a.output.write_text(PAGE.replace('DATA',json.dumps(data,ensure_ascii=False,allow_nan=False,separators=(',',':'))),encoding='utf-8');print(a.output.resolve());return 0
+    page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(',', ':')))
+    page = page.replace('<label><input id="walker" type="checkbox" checked> 助步器</label>', '<label><input id="walker" type="checkbox" checked> 助步器实体杆件</label><label><input id="links" type="checkbox" checked> 人体骨架线</label>')
+    page = page.replace("Promise.all([unpack(d.v),unpack(d.w),unpack(d.t),unpack(d.he)]).then(([v,w,t,he])=>", "Promise.all([unpack(d.v),unpack(d.w),unpack(d.t),unpack(d.he),unpack(d.j)]).then(([v,w,t,he,j])=>")
+    page = page.replace("const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length;", "const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,E=[[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16],[0,1],[0,2],[1,3],[2,4]];")
+    page = page.replace("ctx.fillStyle='#edf1f3'", "ctx.fillStyle='#718279'").replace("' #d3dcdf'", "' #b9c8c0'").replace("'#d3dcdf'", "'#b9c8c0'")
+    marker = "if(document.getElementById('walker').checked){"
+    skeleton = "if(document.getElementById('links').checked){for(const e of E)seg([j[fi*51+3*e[0]],-j[fi*51+3*e[0]+1],j[fi*51+3*e[0]+2]],[j[fi*51+3*e[1]],-j[fi*51+3*e[1]+1],j[fi*51+3*e[1]+2]],'#101820',3)}"
+    page = page.replace(marker, skeleton + marker)
+    a.output.write_text(page, encoding='utf-8'); print(a.output.resolve()); return 0
 if __name__=='__main__':raise SystemExit(main())
