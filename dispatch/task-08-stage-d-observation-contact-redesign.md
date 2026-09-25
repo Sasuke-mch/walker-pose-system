@@ -210,29 +210,48 @@ contact_loss = (
 7. `surface_contact_window60_90_v5_both_a010`
    - surface foot=0.10, hand=0.10
 
-完整命令模板（每条只替换 output-dir 与两个 surface 权重）：
+完整可执行命令脚本：
 
 ```powershell
-& .venv-smplx\Scripts\python.exe -u research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\fit_vposer_shared_beta.py `
-  --output-dir <NEW_V5_OUTPUT_DIR> `
-  --left research_records\engineering_validation\V20260908_people0_1_2_pmpose_c3_chain\people_1\c3_predictions\left\pmpose\raw_predictions.json `
-  --right research_records\engineering_validation\V20260908_people0_1_2_pmpose_c3_chain\people_1\c3_predictions\right\pmpose\raw_predictions.json `
-  --calibration-dir realtime_app\calibration\results `
-  --model models\smpl\basicmodel_m_lbs_10_207_0_v1.0.0.pkl `
-  --regressor models\smpl\J_regressor_coco.npy `
-  --vposer-dir models\VPoser02_05\V02_05 `
-  --contact-labels research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\contact_labels_stage_audit_v2\contact_labels.npz `
-  --scene-transforms research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\scene_stage_ground_v3_pair_replay\scene_transforms.npz `
-  --contact-vertex-sets research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\surface_contact_sets_v1\contact_vertex_sets.json `
-  --walker-topology research_records\engineering_validation\G20260918_offline_walker_frame_evidence_v1\coarse_complete_model_v2_camera_rail\coarse_walker_model.json `
-  --start 60 --end 90 --foot-contact-weight 0.0 --hand-contact-weight 0.0 `
-  --surface-foot-contact-weight <FOOT_ALPHA> `
-  --surface-hand-contact-weight <HAND_ALPHA> `
-  --contact-steps 80 --obs-3d-weight 1.0 --obs-2d-weight 0.25 `
-  --stage-d-obs-3d-scale 0.70 --stage-d-obs-2d-scale 0.10 --device cpu
+$root = 'D:\my_works\walker_pose_system'
+$fit = 'research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\fit_vposer_shared_beta.py'
+$base = 'research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1'
+$common = @(
+  '--left','research_records\engineering_validation\V20260908_people0_1_2_pmpose_c3_chain\people_1\c3_predictions\left\pmpose\raw_predictions.json',
+  '--right','research_records\engineering_validation\V20260908_people0_1_2_pmpose_c3_chain\people_1\c3_predictions\right\pmpose\raw_predictions.json',
+  '--calibration-dir','realtime_app\calibration\results',
+  '--model','models\smpl\basicmodel_m_lbs_10_207_0_v1.0.0.pkl',
+  '--regressor','models\smpl\J_regressor_coco.npy',
+  '--vposer-dir','models\VPoser02_05\V02_05',
+  '--contact-labels','research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\contact_labels_stage_audit_v2\contact_labels.npz',
+  '--scene-transforms','research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\scene_stage_ground_v3_pair_replay\scene_transforms.npz',
+  '--contact-vertex-sets','research_records\engineering_validation\G20260924_smpl_vposer_shared_beta_v1\surface_contact_sets_v1\contact_vertex_sets.json',
+  '--walker-topology','research_records\engineering_validation\G20260918_offline_walker_frame_evidence_v1\coarse_complete_model_v2_camera_rail\coarse_walker_model.json',
+  '--start','60','--end','90','--foot-contact-weight','0.0','--hand-contact-weight','0.0',
+  '--contact-steps','80','--obs-3d-weight','1.0','--obs-2d-weight','0.25',
+  '--stage-d-obs-3d-scale','0.70','--stage-d-obs-2d-scale','0.10','--device','cpu'
+)
+$routes = @(
+  @{name='surface_contact_window60_90_v5_stage_d_no_contact'; foot='0'; hand='0'; control=$true},
+  @{name='surface_contact_window60_90_v5_foot_a005'; foot='0.05'; hand='0'; control=$false},
+  @{name='surface_contact_window60_90_v5_foot_a010'; foot='0.10'; hand='0'; control=$false},
+  @{name='surface_contact_window60_90_v5_hand_a005'; foot='0'; hand='0.05'; control=$false},
+  @{name='surface_contact_window60_90_v5_hand_a010'; foot='0'; hand='0.10'; control=$false},
+  @{name='surface_contact_window60_90_v5_both_a005'; foot='0.05'; hand='0.05'; control=$false},
+  @{name='surface_contact_window60_90_v5_both_a010'; foot='0.10'; hand='0.10'; control=$false}
+)
+Set-Location $root
+foreach($route in $routes){
+  $out = Join-Path $base $route.name
+  if(Test-Path $out){$items=Get-ChildItem $out -Force; if($items){throw "refuse non-empty output: $out"}}
+  $args = @('-u',$fit,'--output-dir',$out) + $common + @('--surface-foot-contact-weight',$route.foot,'--surface-hand-contact-weight',$route.hand)
+  if($route.control){$args += '--force-stage-d-no-contact'}
+  & .venv-smplx\Scripts\python.exe @args
+  if($LASTEXITCODE -ne 0){throw "route failed: $($route.name), exit=$LASTEXITCODE"}
+}
 ```
 
-每条命令保存到对应目录 `command.txt`；退出码必须为 0。
+每条命令保存到对应目录 `command.txt`；退出码必须为 0.
 
 ## 结果判定
 
