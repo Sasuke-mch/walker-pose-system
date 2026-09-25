@@ -77,6 +77,8 @@ def main() -> int:
     ap.add_argument("--foot-contact-weight", type=float, default=0.0)
     ap.add_argument("--hand-contact-weight", type=float, default=0.0)
     ap.add_argument("--contact-steps", type=int, default=80)
+    ap.add_argument("--force-stage-d-no-contact", action="store_true",
+                    help="Stage D control: same optimizer/steps/frozen beta but zero surface weights")
     ap.add_argument("--contact-vertex-sets", type=Path, default=None)
     ap.add_argument("--walker-topology", type=Path, default=None)
     ap.add_argument("--surface-foot-contact-weight", type=float, default=0.0)
@@ -90,6 +92,7 @@ def main() -> int:
     if args.hand_contact_weight < 0.0 or args.surface_hand_contact_weight < 0.0:
         raise ValueError("hand contact weights must be non-negative")
     surface_mode = args.contact_vertex_sets is not None
+    eff_foot_w, eff_hand_w = args.surface_foot_contact_weight, args.surface_hand_contact_weight
     if surface_mode and (args.walker_topology is None or args.contact_labels is None or args.scene_transforms is None):
         raise ValueError("surface mode needs --walker-topology, --contact-labels and --scene-transforms together")
     if surface_mode and args.foot_contact_weight != 0.0:
@@ -333,7 +336,7 @@ def main() -> int:
             opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand=vals
             lb=beta.square().mean()
             if surface_mode:
-                contact_loss = args.surface_foot_contact_weight*lfoot + args.surface_hand_contact_weight*lhand
+                contact_loss = eff_foot_w*lfoot + eff_hand_w*lhand
             else:
                 contact_loss = args.foot_contact_weight*lfoot + args.hand_contact_weight*lhand
             loss=l3+0.10*l2+0.02*lp+(contact_loss if contact_enabled else 0.0)+(0.02*lb if beta_reg else 0.0)
@@ -414,8 +417,13 @@ def main() -> int:
     beta_before_d = beta.detach().clone()
     beta_frozen_during_stage_d = False
     stage_d = None
+    control_d = surface_mode and bool(args.force_stage_d_no_contact)
+    if control_d and (args.surface_foot_contact_weight > 0 or args.surface_hand_contact_weight > 0):
+        raise ValueError("--force-stage-d-no-contact requires zero surface contact weights")
+    if control_d:
+        eff_foot_w, eff_hand_w = 0.0, 0.0
     want_surface_d = surface_mode and (
-        args.surface_foot_contact_weight > 0 or args.surface_hand_contact_weight > 0
+        args.surface_foot_contact_weight > 0 or args.surface_hand_contact_weight > 0 or control_d
     )
     want_ankle_d = (not surface_mode) and args.contact_labels is not None and args.foot_contact_weight > 0
     if want_surface_d or want_ankle_d:
@@ -428,15 +436,21 @@ def main() -> int:
         if not torch.equal(beta.detach(), beta_before_d.detach()):
             raise RuntimeError("beta changed during Stage D despite requires_grad_(False)")
         if want_surface_d:
-            foot_on = args.surface_foot_contact_weight > 0
-            hand_on = args.surface_hand_contact_weight > 0
-            tag = ("stage_d_surface_foot_hand" if (foot_on and hand_on)
+            foot_on = eff_foot_w > 0
+            hand_on = eff_hand_w > 0
+            tag = ("stage_d_no_contact_control" if control_d
+                   else "stage_d_surface_foot_hand" if (foot_on and hand_on)
                    else "stage_d_surface_hand" if hand_on else "stage_d_surface_foot")
         else:
             tag = "stage_d_contact"
         stage_d={"loss":s3,"beta":beta.detach().cpu().numpy()[0].tolist(),"metrics":save_stage(tag),
                  "surface_mode": bool(want_surface_d)}
-        if want_surface_d:
+        if control_d:
+            # Zero-contact control: no surface gradient proof is fabricated.
+            surface_audit["surface_probe"] = "skipped_no_contact_control"
+            surface_audit["stage_d_control_steps"] = int(args.contact_steps)
+            surface_audit["stage_d_control_weights"] = {"foot": 0.0, "hand": 0.0}
+        if want_surface_d and not control_d:
             # Same-forward COCO isolation proof: one forward(beta) call yields
             # both the vertices and the COCO joints; the probe surface loss is
             # built from those vertices only, then differentiated w.r.t. both.
