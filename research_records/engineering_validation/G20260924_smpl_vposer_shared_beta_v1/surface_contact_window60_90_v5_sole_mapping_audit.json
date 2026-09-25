@@ -1,0 +1,212 @@
+{
+  "status": "completed_sole_mapping_audit",
+  "engineering_validation_only": true,
+  "unit_audit": {
+    "vertices": {
+      "shape": [
+        31,
+        6890,
+        3
+      ],
+      "min": -0.858342170715332,
+      "max": 0.9809856414794922,
+      "median": 0.21168173104524612,
+      "finite": true,
+      "unit": "m",
+      "basis": "SMPL forward output; median |x| ~0.3 inconsistent with mm"
+    },
+    "predicted_coco": {
+      "shape": [
+        31,
+        17,
+        3
+      ],
+      "min": -0.7097274661064148,
+      "max": 0.874779224395752,
+      "median": 0.25027185678482056,
+      "finite": true,
+      "unit": "m",
+      "basis": "J_regressor_coco @ vertices, same frame as vertices"
+    },
+    "raw_triangulated_points": {
+      "shape": [
+        31,
+        17,
+        3
+      ],
+      "min": -674.2547607421875,
+      "max": 760.2161254882812,
+      "median": 235.6947784423828,
+      "finite": false,
+      "unit": "mm",
+      "basis": "entry :136 converts with /1000.0 before use"
+    },
+    "translation_ground_from_left_mm": {
+      "shape": [
+        31,
+        3
+      ],
+      "min": -600.3441615435531,
+      "max": 745.1154513471079,
+      "median": 253.60497380251886,
+      "finite": true,
+      "unit": "mm",
+      "basis": "entry :187 converts with /1000.0 before use"
+    }
+  },
+  "unit_status": "pass",
+  "transform_closed_loop": {
+    "forward_model": {
+      "left": {
+        "ankle_z_mm": 47.18771380003584,
+        "ankle_xy_mm": [
+          202.75094560112686,
+          131.61671392214402
+        ]
+      },
+      "right": {
+        "ankle_z_mm": 73.13080778988845,
+        "ankle_xy_mm": [
+          12.710031437720565,
+          149.9884806899937
+        ]
+      },
+      "pelvis_z_mm": 808.993662802742
+    },
+    "forward_raw": {
+      "left": {
+        "ankle_z_mm": 113.56882332394879,
+        "ankle_xy_mm": [
+          201.59544268891662,
+          71.94440481312952
+        ]
+      },
+      "right": {
+        "ankle_z_mm": 94.18703464903444,
+        "ankle_xy_mm": [
+          13.661508922062387,
+          125.37973917619816
+        ]
+      },
+      "pelvis_z_mm": 781.1367480995402
+    },
+    "inverse_model": {
+      "left": {
+        "ankle_z_mm": 1175.827877419184,
+        "ankle_xy_mm": [
+          -240.1762428009759,
+          -418.0977549645535
+        ]
+      },
+      "right": {
+        "ankle_z_mm": 1026.4972541104594,
+        "ankle_xy_mm": [
+          -166.91272200449643,
+          -500.5481393836103
+        ]
+      },
+      "pelvis_z_mm": 587.3247743793819
+    },
+    "inverse_raw": {
+      "left": {
+        "ankle_z_mm": 1107.382714849937,
+        "ankle_xy_mm": [
+          -293.5111238726287,
+          -364.3586729274289
+        ]
+      },
+      "right": {
+        "ankle_z_mm": 1019.2952081500299,
+        "ankle_xy_mm": [
+          -169.5305703510808,
+          -496.6328565853571
+        ]
+      },
+      "pelvis_z_mm": 604.0522206693657
+    },
+    "model_obs_3d_forward_mm": {
+      "median": 75.36830311904818,
+      "p95": 142.46280504902947
+    },
+    "model_obs_3d_inverse_mm": {
+      "median": 75.36830311904801,
+      "p95": 142.46280504902944
+    }
+  },
+  "transform_direction_status": "ambiguous",
+  "sole_ankle_anatomy": {
+    "left": {
+      "stage_c_dz_mm": {
+        "median": -75.72076931885213,
+        "p05": -90.96737038757738,
+        "p95": -52.61013534650394
+      },
+      "stage_c_centroid_xy_mm": 133.83925113268697,
+      "same_side_as_ankle": true,
+      "zero_pose_dz_mm": {
+        "median": -72.47803812016019,
+        "p05": -73.43050849717613,
+        "p95": -69.98726453150637
+      },
+      "zero_pose_lowest60_overlap": 15
+    },
+    "right": {
+      "stage_c_dz_mm": {
+        "median": -113.04741929981259,
+        "p05": -140.11683946384727,
+        "p95": -88.72114328187575
+      },
+      "stage_c_centroid_xy_mm": 126.47380023113463,
+      "same_side_as_ankle": true,
+      "zero_pose_dz_mm": {
+        "median": -77.271629442489,
+        "p05": -78.35067180842613,
+        "p95": -73.87798393888875
+      },
+      "zero_pose_lowest60_overlap": 45
+    }
+  },
+  "left_sole_mapping_status": "pass",
+  "right_sole_mapping_status": "pass",
+  "set_integrity": {
+    "left": {
+      "counts": {
+        "heel": 18,
+        "ball": 18,
+        "toe": 18
+      },
+      "duplicates": 0,
+      "low60_overlap": 15,
+      "x_range": [
+        0.06842044659018566,
+        0.15868512639184462
+      ]
+    },
+    "right": {
+      "counts": {
+        "heel": 18,
+        "ball": 18,
+        "toe": 18
+      },
+      "duplicates": 0,
+      "low60_overlap": 45,
+      "x_range": [
+        -0.16176408926629768,
+        -0.07581589332571596
+      ]
+    },
+    "mirror_mean_absx_gap_m": 0.009128329885991812,
+    "mirror_ok": true
+  },
+  "single_supported_fix": "none",
+  "fit_rerun_allowed": false,
+  "next_action": "audit_gradient",
+  "physical_touch_validated": false,
+  "true_3d_accuracy_validated": false,
+  "inputs": {
+    "stage_c": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_v5_stage_d_no_contact\\result_stage_c_joint.npz",
+    "stage_d": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_v5_stage_d_no_contact\\result_stage_d_no_contact_control.npz",
+    "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\scene_stage_ground_v3_pair_replay\\scene_transforms.npz",
+    "sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_sets_v1\\contact_vertex_sets.json"
+  }
+}

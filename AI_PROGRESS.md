@@ -1999,3 +1999,9 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 新建只读审计脚本 `realtime_app/tools/audit_surface_contact_geometry_v5.py`，复算 control 与 both_a010 的 Stage C/D 地面系脚 z、手 capsule 残差、集合语义与 C→D 变化；未重跑拟合，未改动任何 v1–v5 产物。
 - control Stage C 脚 z 负比例左 92.47%、右 95.52%（>90%），判定 `foot_geometry_status=blocked`，`next_action=geometry_fix`，禁止继续调脚权重；手 median <40 mm 门未触发（pass），扶手端点高度约 0.84–0.88 m 合理；坐标与集合语义 pass。
 - 高度穿透是当前地面变换与 SMPL 表面的工程一致性问题，不解释为真实触地失败。下一步先修几何，再做 Stage C 起点梯度审查。
+
+### 2026-09-26 — v5 sole 映射审计（只读，engineering validation）
+
+- 新增 `realtime_app/tools/audit_smpl_sole_mapping_v5.py`，输出 `surface_contact_window60_90_v5_sole_mapping_audit.json`；单位/变换闭环/解剖/集合完整性四项只读审计，未重跑拟合。
+- `unit_status=pass`，`transform_direction_status=ambiguous`（刚体恒等，差 <1e-6），左右 sole 均为 `pass`（右漂移 35.7 mm 未达 suspect 门，如实记录不对称），`single_supported_fix=none`，`fit_rerun_allowed=false`，`next_action=audit_gradient`。
+- v1–v5 产物未修改；仍禁止调大接触权重。

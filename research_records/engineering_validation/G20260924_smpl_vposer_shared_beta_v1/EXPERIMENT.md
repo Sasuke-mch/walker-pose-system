@@ -140,3 +140,16 @@ OrbitControls 改为自然的自由拖拽：左键旋转、右键平移、中键
 判定：foot_geometry_status=blocked、hand_geometry_status=pass、coordinate_frame_status=pass、weight_tuning_allowed=false、next_action=geometry_fix。
 
 结论与停止原因：脚部 >90% 候选点 z_G<0 且残差中位仍为负，说明这是当前地面变换与 SMPL 表面之间的工程一致性问题（不是真实触地失败），继续调脚权重没有意义，必须先修几何。手部 median 约 <40 mm 未达 suspect 门，但同样不增加手权重。下一步为 geometry fix（先核对地面 z=0 参考与 SMPL 足底模板偏移），之后再做 Stage C 起点梯度审查。
+## v5 sole 映射审计（只读，未重跑拟合）
+
+输入：v5 control Stage C/D 结果、当前 scene、surface sets、官方 male SMPL 模板；输出 `surface_contact_window60_90_v5_sole_mapping_audit.json`。
+
+单位：vertices/coco 为 m（中位 |x| 约 0.28/0.30），raw triangulated 与 scene translation 为 mm（中位约 288/703），与入口 `:136`/`:187` 的 `/1000.0` 一致；`unit_status=pass`，无静默换单位。
+
+变换闭环：同一刚体变换作用于模型与观测时差值恒等，forward/inverse 的模型—观测 3D 误差中位均为 75.37 mm（差 <1e-6），方向检验本身无信息量，记 `ambiguous`；forward 给出 ankle 47/73 mm、pelvis 809 mm 的合理高度，inverse 给出 ankle 约 1026–1176 mm（高于 pelvis），仅作辅助记录，不作为方向证据。
+
+解剖：同侧检查在左相机帧完成（左右均为 True）；ground 系 z 差 median 左 −75.7 mm（零 pose −72.5 mm，漂移 3.2 mm），右 −113.0 mm（零 pose −77.3 mm，漂移 35.7 mm，未达 60 mm suspect 门，记 pass，但不对称性如实记录）；左右 sole 与最低 60 点重叠 15/45，均为同侧正确集合。
+
+集合：heel/ball/toe 各 18，无重复，mirror 平均 |x| 间隙 0.009 m，`mirror_ok=true`；审计中修正了两处脚本 bug（解剖改用 ground 系、侧别改用相机帧），均只影响审计脚本，不涉及拟合。
+
+结论：`single_supported_fix=none`，`fit_rerun_allowed=false`，`next_action=audit_gradient`；仍禁止调大接触权重。
