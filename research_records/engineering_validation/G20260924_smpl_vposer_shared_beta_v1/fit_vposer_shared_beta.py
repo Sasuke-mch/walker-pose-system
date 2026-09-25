@@ -78,7 +78,10 @@ def main() -> int:
     ap.add_argument("--hand-contact-weight", type=float, default=0.0)
     ap.add_argument("--contact-steps", type=int, default=80)
     ap.add_argument("--obs-3d-weight", type=float, default=1.0)
-    ap.add_argument("--obs-2d-weight", type=float, default=0.25)
+    # Gradient audit (v5 summary): with 2D=0.25 the realized 3D/2D gradient
+    # L2 norms were nearly equal (0.327/0.328). Lowering 2D to 0.20 puts the
+    # realized 3D gradient ~1.25x above 2D ("3D slightly dominant").
+    ap.add_argument("--obs-2d-weight", type=float, default=0.20)
     ap.add_argument("--stage-d-obs-3d-scale", type=float, default=0.70)
     ap.add_argument("--stage-d-obs-2d-scale", type=float, default=0.10)
     ap.add_argument("--force-stage-d-no-contact", action="store_true",
@@ -345,7 +348,7 @@ def main() -> int:
             lhand=(robust_scalar(hd,0.050)*hand_w).sum()/(hand_w.sum()+1e-6)
         return result,pose,jc,pl,pr,l3,l2,lp,lfoot,lhand
 
-    def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.25):
+    def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.20):
         last=None
         for _ in range(steps):
             opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand=vals
