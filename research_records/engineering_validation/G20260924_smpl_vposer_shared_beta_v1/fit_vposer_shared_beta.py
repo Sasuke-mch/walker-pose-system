@@ -79,6 +79,10 @@ def main() -> int:
     ap.add_argument("--contact-steps", type=int, default=80)
     ap.add_argument("--stage-d-trace", action="store_true",
                     help="Write per-step Stage D loss terms for convergence diagnosis")
+    ap.add_argument("--stage-d-lr-schedule", choices=("fixed", "cosine", "exponential"), default="fixed",
+                    help="Stage D learning-rate schedule; default preserves the historical fixed LR")
+    ap.add_argument("--stage-d-lr-min-factor", type=float, default=0.10,
+                    help="Final/target LR factor for cosine or exponential Stage D decay")
     ap.add_argument("--obs-3d-weight", type=float, default=1.0)
     # Gradient audit (v5 summary): with 2D=0.25 the realized 3D/2D gradient
     # L2 norms were nearly equal (0.327/0.328). Lowering 2D to 0.20 puts the
@@ -350,7 +354,7 @@ def main() -> int:
             lhand=(robust_scalar(hd,0.050)*hand_w).sum()/(hand_w.sum()+1e-6)
         return result,pose,jc,pl,pr,l3,l2,lp,lfoot,lhand
 
-    def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.20, trace=None):
+    def run(opt, steps, beta_reg=True, obs3d_coeff=1.0, obs2d_coeff=0.20, trace=None, scheduler=None):
         last=None
         for step in range(steps):
             opt.zero_grad(); vals=losses(beta); _,pose,_,_,_,l3,l2,lp,lfoot,lhand=vals
@@ -370,9 +374,13 @@ def main() -> int:
                               "pose": float(lp.detach()), "foot": float(lfoot.detach()),
                               "hand": float(lhand.detach())})
             loss.backward(); torch.nn.utils.clip_grad_norm_(opt.param_groups[0]["params"], 10.0); opt.step()
+            if scheduler is not None:
+                scheduler.step()
             if trace is not None:
                 trace_params_after = torch.cat([latent.detach().reshape(-1), root.detach().reshape(-1), transl.detach().reshape(-1)])
                 trace[-1]["param_step_l2"] = float(torch.linalg.vector_norm(trace_params_after - trace_params).detach())
+                trace[-1]["lr_latent_root"] = float(opt.param_groups[0]["lr"])
+                trace[-1]["lr_translation"] = float(opt.param_groups[1]["lr"])
             if beta_reg: beta.data.clamp_(-1.5,1.5)
             last=(float(loss.detach()),float(l3.detach()),float(l2.detach()),float(lp.detach()),float(lfoot.detach()),float(lhand.detach()),float(lb.detach()))
         return last
@@ -493,8 +501,21 @@ def main() -> int:
         # optimize only latent/root/transl from the Stage C memory state.
         beta.requires_grad_(False)
         beta_frozen_during_stage_d = True
-        s3=run(torch.optim.Adam([{"params":[latent,root],"lr":0.001},{"params":[transl],"lr":0.0005}],), args.contact_steps, False,
-               obs3d_coeff=obs3d_d, obs2d_coeff=obs2d_d, trace=stage_d_trace)
+        stage_d_opt = torch.optim.Adam([{"params":[latent,root],"lr":0.001},{"params":[transl],"lr":0.0005}],)
+        if args.stage_d_lr_min_factor <= 0.0 or args.stage_d_lr_min_factor > 1.0:
+            raise ValueError("--stage-d-lr-min-factor must be in (0,1]")
+        if args.stage_d_lr_schedule == "cosine":
+            stage_d_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                stage_d_opt, T_max=max(1, args.contact_steps),
+                eta_min=0.001 * args.stage_d_lr_min_factor)
+        elif args.stage_d_lr_schedule == "exponential":
+            gamma = args.stage_d_lr_min_factor ** (1.0 / max(1, args.contact_steps))
+            stage_d_scheduler = torch.optim.lr_scheduler.ExponentialLR(stage_d_opt, gamma=gamma)
+        else:
+            stage_d_scheduler = None
+        s3=run(stage_d_opt, args.contact_steps, False,
+               obs3d_coeff=obs3d_d, obs2d_coeff=obs2d_d, trace=stage_d_trace,
+               scheduler=stage_d_scheduler)
         if not torch.equal(beta.detach(), beta_before_d.detach()):
             raise RuntimeError("beta changed during Stage D despite requires_grad_(False)")
         if want_surface_d:
