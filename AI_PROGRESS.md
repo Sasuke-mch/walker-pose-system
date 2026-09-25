@@ -1994,3 +1994,8 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - `fit_vposer_shared_beta.py` 新增观测权重参数（3D 1.0 / 2D 0.25，Stage D 缩放 0.70/0.10），l3/l2 改为 delta 归一化无量纲形式；Stage D 保留非零观测约束；audit 新增观测系数与脚/手穿透比例。
 - 窗口 60..90 共 7 条路线（v5 no-contact 控制 + foot/hand/both × 0.05/0.10）全部退出码 0；相对控制 3D P95 变化 ≤0.36%，2D P95 变化 ≤0.28 px，residual median 增益 <1%，穿透变化 ≤0.02pp，beta 漂移 0 且精确冻结，gradient audit 全通过。
 - 无推荐系数：接触几何或优化尺度仍未形成可观测收益，停止增大权重。本结论仅为 engineering validation。
+### 2026-09-26 — v5 表面接触几何与坐标审查（engineering validation，只读）
+
+- 新建只读审计脚本 `realtime_app/tools/audit_surface_contact_geometry_v5.py`，复算 control 与 both_a010 的 Stage C/D 地面系脚 z、手 capsule 残差、集合语义与 C→D 变化；未重跑拟合，未改动任何 v1–v5 产物。
+- control Stage C 脚 z 负比例左 92.47%、右 95.52%（>90%），判定 `foot_geometry_status=blocked`，`next_action=geometry_fix`，禁止继续调脚权重；手 median <40 mm 门未触发（pass），扶手端点高度约 0.84–0.88 m 合理；坐标与集合语义 pass。
+- 高度穿透是当前地面变换与 SMPL 表面的工程一致性问题，不解释为真实触地失败。下一步先修几何，再做 Stage C 起点梯度审查。

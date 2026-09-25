@@ -125,3 +125,18 @@ OrbitControls 改为自然的自由拖拽：左键旋转、右键平移、中键
 实验：窗口 60..90，输入/步数与 v4 一致，共 7 条路线（v5_stage_d_no_contact 对照 + foot 0.05/0.10 + hand 0.05/0.10 + both 0.05/0.10），全部退出码 0。相对同一 v5 控制：3D P95 变化 ≤ 0.36%，2D P95 变化 ≤ 0.28 px；脚/手 residual median 增益均 < 1%（未达 5% 门）；穿透比例变化 ≤ 0.02 个百分点；beta 漂移全 0 且精确冻结；gradient audit 全通过；无 NaN/Inf。
 
 结论：无推荐系数。当前接触几何或优化尺度仍未形成可观测收益，停止继续增大权重；不增加步数、不改阈值、不挑选最好看路线。本结论仅为 engineering validation，不是物理接触/握力/承重/真实三维精度验证。
+## v5 表面接触几何与坐标审查（几何先于权重）
+
+输入：v5 控制与 both_a010 的 Stage C/D 结果、当前 scene_transforms、surface sets、静态 walker 拓扑；仅只读复算，不重跑拟合，不改动任何 v1–v5 产物。
+
+检查公式：`vg = R_ground_from_left @ v + T_ground_from_left_mm/1000`（逐帧转换到地面系）；脚 z_G 统计与 `fraction(z<0)/z<-10mm/z<-25mm`；扶手端点为 topology `nodes_left_camera_mm` 转换到地面，capsule 长度、palm 到中心线距离、`distance-radius` 残差、负残差比例；一套索引语义与左右侧质心核对；Stage C→D 顶点与 sole z 变化。
+
+关键统计（control Stage C）：
+- 脚 z 负比例：左 92.47%、右 95.52%（均 >90%）；脚 z median 左 −27.4 mm、右 −39.7 mm；z<-25mm 比例左 57.83%、右 71.27%。
+- 扶手 capsule 长度固定约 0.30 m；端点高度约 0.84–0.88 m（合理）；手 residual median 左 36.2 mm、右 39.6 mm；手负残差比例 左 8.09%、右 6.11%。
+- 集合：sole 各 54、palm 各 778，索引范围 [1981,6840] 在 [0,6889] 内，左右集合不相同；左右 sole/palm 质心 x 无异常交换。
+- Stage C→D：control 顶点 max-abs 40.1 mm、L2 9.30；both_a010 顶点 max-abs 40.2 mm、L2 9.27（两者接近）。
+
+判定：foot_geometry_status=blocked、hand_geometry_status=pass、coordinate_frame_status=pass、weight_tuning_allowed=false、next_action=geometry_fix。
+
+结论与停止原因：脚部 >90% 候选点 z_G<0 且残差中位仍为负，说明这是当前地面变换与 SMPL 表面之间的工程一致性问题（不是真实触地失败），继续调脚权重没有意义，必须先修几何。手部 median 约 <40 mm 未达 suspect 门，但同样不增加手权重。下一步为 geometry fix（先核对地面 z=0 参考与 SMPL 足底模板偏移），之后再做 Stage C 起点梯度审查。
