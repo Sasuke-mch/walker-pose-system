@@ -1,0 +1,162 @@
+{
+  "status": "completed_small_weight_probe",
+  "engineering_validation_only": true,
+  "window": [
+    60,
+    90
+  ],
+  "stage_steps": {
+    "A": 120,
+    "B": 120,
+    "C": 120,
+    "D": 80
+  },
+  "routes": {
+    "both_a1_a30": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_weight_probe_base_a1_a30",
+      "surface_foot_weight": 1,
+      "surface_hand_weight": 30,
+      "metrics": {
+        "2d_p95_px": 164.55126953125,
+        "3d_p95_mm": 129.25283813476562,
+        "foot_median_abs_mm": [
+          27.653366088867188,
+          32.45606994628906
+        ],
+        "foot_signed_median_mm": [
+          -27.653366088867188,
+          -32.45606994628906
+        ],
+        "hand_median_abs_mm": [
+          38.92134094238281,
+          46.38080596923828
+        ],
+        "foot_penetration_fraction": [
+          0.9277180406212664,
+          0.9199522102747909
+        ],
+        "hand_penetration_fraction": [
+          0.05518699726345468,
+          0.04992122066506344
+        ]
+      },
+      "convergence": {
+        "trace_steps": 80,
+        "loss_step_0": 0.17505896091461182,
+        "loss_step_40": 0.16420793533325195,
+        "loss_step_60": 0.1626027673482895,
+        "loss_step_80": 0.16115188598632812,
+        "loss_drop_60_to_80_pct": 0.8922857744810869,
+        "last_step_delta": -7.145106792449951e-05,
+        "last10_increases": 0,
+        "plateau_at_80": false
+      },
+      "audit": {
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_vertices": 0.0010403726482763886,
+        "finite": true
+      }
+    },
+    "both_a2_a30": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_weight_probe_foot_a2_hand_a30",
+      "surface_foot_weight": 2,
+      "surface_hand_weight": 30,
+      "metrics": {
+        "2d_p95_px": 164.3099365234375,
+        "3d_p95_mm": 131.04747009277344,
+        "foot_median_abs_mm": [
+          25.640636444091797,
+          30.329137802124023
+        ],
+        "foot_signed_median_mm": [
+          -25.640636444091797,
+          -30.329137802124023
+        ],
+        "hand_median_abs_mm": [
+          38.73408508300781,
+          46.03178787231445
+        ],
+        "foot_penetration_fraction": [
+          0.9241338112305855,
+          0.9163679808841099
+        ],
+        "hand_penetration_fraction": [
+          0.055891864997097605,
+          0.05016999751223153
+        ]
+      },
+      "convergence": {
+        "trace_steps": 80,
+        "loss_step_0": 0.1766505092382431,
+        "loss_step_40": 0.16584359109401703,
+        "loss_step_60": 0.16416385769844055,
+        "loss_step_80": 0.16264520585536957,
+        "loss_drop_60_to_80_pct": 0.9250829411310856,
+        "last_step_delta": -7.50422477722168e-05,
+        "last10_increases": 0,
+        "plateau_at_80": false
+      },
+      "audit": {
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_vertices": 0.0008544630836695433,
+        "finite": true
+      }
+    },
+    "both_a1_a45": {
+      "output_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260924_smpl_vposer_shared_beta_v1\\surface_contact_window60_90_weight_probe_foot_a1_hand_a45",
+      "surface_foot_weight": 1,
+      "surface_hand_weight": 45,
+      "metrics": {
+        "2d_p95_px": 164.75401306152344,
+        "3d_p95_mm": 129.52565002441406,
+        "foot_median_abs_mm": [
+          27.608335494995117,
+          32.514068603515625
+        ],
+        "foot_signed_median_mm": [
+          -27.608335494995117,
+          -32.514068603515625
+        ],
+        "hand_median_abs_mm": [
+          38.376461029052734,
+          46.2618408203125
+        ],
+        "foot_penetration_fraction": [
+          0.9265232974910395,
+          0.9199522102747909
+        ],
+        "hand_penetration_fraction": [
+          0.05904303839456008,
+          0.04992122066506344
+        ]
+      },
+      "convergence": {
+        "trace_steps": 80,
+        "loss_step_0": 0.17631450295448303,
+        "loss_step_40": 0.16510218381881714,
+        "loss_step_60": 0.16340219974517822,
+        "loss_step_80": 0.16187597811222076,
+        "loss_drop_60_to_80_pct": 0.9340275928583361,
+        "last_step_delta": -7.461011409759521e-05,
+        "last10_increases": 0,
+        "plateau_at_80": false
+      },
+      "audit": {
+        "beta_frozen": true,
+        "same_process": true,
+        "same_forward_graph": true,
+        "grad_to_coco": 0.0,
+        "grad_to_vertices": 0.001328934682533145,
+        "finite": true
+      }
+    }
+  },
+  "selected_route_for_now": "both_a1_a30",
+  "conclusion": "All three 80-step runs continue decreasing with nonzero nearly constant final slope; 80 steps is not convergence evidence. Weight increases are observable but must not be adopted as frozen configuration."
+}
