@@ -1,5 +1,54 @@
 # G20260924_smpl_vposer_shared_beta_v1
 
+## 当前可复现路线（2026-09-25）
+
+本实验当前采用“先全局拟合，再表面接触微调”的顺序。
+
+### 全局拟合阶段
+
+完整运行以 448 帧为拟合范围。每帧独立优化 VPoser latent、global orientation 和 translation；全片共享一组 beta。先执行：
+
+1. Stage A：beta 固定为零，优化逐帧运动参数；
+2. Stage B：冻结逐帧运动，只优化共享 beta；
+3. Stage C：联合微调逐帧运动和共享 beta，仍不加入手脚接触项。
+
+全局拟合使用当前白名单输入，从零初始化，不读取旧 fitted parameters、旧 temporal prefit、旧 contact target 或旧 HTML。这里的“全局”指全片共享 beta 和统一 448 帧范围，不包含额外 temporal smoothing。
+
+### 表面接触阶段
+
+Stage C 完成后，必须在同一进程中继续 Stage D：
+
+- beta 逐元素冻结；
+- 只优化逐帧 latent、global orientation 和 translation；
+- 加入 foot surface loss，系数 1.0；
+- 加入 hand surface loss，系数 30.0；
+- Stage D 观测缩放为 3D=0.70、2D=0.10；
+- 接触优化步数为 80；
+- foot 只对非零 foot_contact_weight 的有效帧/侧计算，零权重帧保留为 unavailable；
+- hand 使用全帧双侧 surface loss，不用 hand_contact_weight 关闭；
+- 保留 penetration penalty，用于修正系统性地面以下表面误差。
+
+### 当前固定配置
+
+```text
+surface_foot_contact_weight=1.0
+surface_hand_contact_weight=30.0
+obs_3d_weight=1.0
+obs_2d_weight=0.20
+stage_d_obs_3d_scale=0.70
+stage_d_obs_2d_scale=0.10
+contact_steps=80
+device=cpu
+```
+
+### control 对照
+
+control 与接触路线必须使用相同的全局输入、初始化和 Stage A/B/C；唯一差异是 Stage D 的 surface foot/hand 权重。control 使用 0/0，接触路线使用 1.0/30.0。禁止把 Stage C 结果复制为初始化，禁止把接触项提前加入 A/B/C。
+
+### 当前证据边界
+
+开发窗 60..90 已确认 both_a1_a30 的图构建、梯度、beta 冻结、有限性和数量级修正；该路线可作为工程主线继续使用，但不是最优权重、严格独立窗口冻结或物理接触验证。现有 `full448_formal` 是无接触三阶段全片结果；完整 448 帧 both_a1_a30 运行仍待执行。
+
 本实验验证单帧 VPoser latent 拟合和全片共享 beta 的三阶段流程。每一帧独立优化 32 维 VPoser latent、global orientation 和 translation；不启用帧间时序项。beta 在全片共享。
 
 输入白名单：原始左右 PMPose JSON、双鱼眼标定、官方 male SMPL 6890 模型、17×6890 COCO observation regressor、官方 VPoser V02_05 权重。脚本内部重新执行鱼眼三角化，不读取旧三角化、旧 temporal prefit、旧 beta、旧 contact 或旧 HTML。

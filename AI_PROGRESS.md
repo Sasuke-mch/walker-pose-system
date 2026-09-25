@@ -1,5 +1,70 @@
 # 助步器项目 AI 工作日志
 
+### 2026-09-25（北京时间）— 当前可复现 SMPL 手脚表面接触路线：先全局拟合，再接触微调
+
+本条明确当前路线的实际顺序，避免把开发窗对照、独立窗口验证和完整主线混为一谈。
+
+**“先全局”具体含义：**
+
+- 以同一输入范围（完整运行时为 448 帧）从零开始执行 Stage A、B、C；
+- 每帧独立优化 32 维 VPoser latent、global orientation 和 translation；
+- 全片共享一组 10 维 beta；
+- Stage A 固定 beta=0，Stage B 只优化共享 beta，Stage C 联合微调逐帧运动和共享 beta；
+- 这里的“全局”指全片共享 beta 和统一全片拟合范围，不表示加入 temporal smoothing，也不读取旧 fitted parameters、旧 temporal prefit 或旧 contact target。
+
+**“再加入手脚损失”具体含义：**
+
+- Stage C 完成后，从同一进程的 Stage C 内存状态进入 Stage D；
+- Stage D 逐元素冻结 beta，只优化逐帧 latent、global orientation 和 translation；
+- Stage D 在同一全局拟合结果上加入 foot surface loss 和 hand surface loss；
+- foot 只在当前 foot_contact_weight 非零的有效帧/侧计算，零权重帧保留并标记 unavailable，不补标签、不插值、不删除；
+- hand 按当前路线全帧双侧表面项计算，不用 hand_contact_weight 关闭；
+- penetration penalty 保留，用于修正当前地面以下的系统性表面误差。
+
+**当前路线参数：**
+
+```text
+surface_foot_contact_weight = 1.0
+surface_hand_contact_weight = 30.0
+obs_3d_weight = 1.0
+obs_2d_weight = 0.20
+stage_d_obs_3d_scale = 0.70
+stage_d_obs_2d_scale = 0.10
+contact_steps = 80
+device = cpu
+```
+
+**控制关系：**
+
+- control 与 both_a1_a30 的 Stage A/B/C 必须完全相同；
+- 唯一拟合变量差异在 Stage D：control 的 surface foot/hand 权重为 0，both_a1_a30 使用 1.0/30.0；
+- 不能把接触项提前放入初始化、Stage B beta、Stage C 联合拟合或旧结果初始化。
+
+**已有证据与当前状态：**
+
+- 开发窗 60..90 已完成 control、foot_a1、hand_a30、both_a1_a30 的实现审计和数量级比较；both_a1_a30 的 foot 向零修正约 8.98%，hand 绝对 residual 修正约 3.6%，计算图、beta 冻结和有限性检查通过，主观测项没有数量级恶化；
+- 因此 both_a1_a30 是当前可继续推进的工程路线，不是最优权重，也不是物理接触验证或独立窗口稳定性冻结；
+- 129..159、278..308 的 foot_a1 独立窗只有约 4.7%/4.5% 同向修正，373..403 没有承重标签，不能用来宣称严格独立验证已通过；
+- 现有 full448_formal 是无接触三阶段全片结果，完整 448 帧的 both_a1_a30 接触主线尚未运行。
+
+**完整主线的最低成本复现顺序：**
+
+1. 使用 `fit_voser_shared_beta.py`、原始左右 PMPose、正式标定、male SMPL、COCO regressor、VPoser、当前 contact_labels、scene transforms、surface sets 和静态 walker topology；
+2. 先运行全片 Stage A→B→C 的无接触 control，输出新的 control 目录并保存完整命令；
+3. 在相同 448 帧范围、相同输入和相同初始化预算下运行 Stage A→B→C→D 的 both_a1_a30 路线，显式传入上述参数；
+4. 保存逐帧 foot availability、hand residual、Stage D 参数变化、beta drift、surface graph audit、2D/3D 指标和所有失败/拒绝原因；
+5. 用同一运行输出生成可视化，不用旧 HTML、旧 fitted parameters 或显示插值补齐缺帧；
+6. 只有在完整运行通过实现和有限性检查后，才把输出记为当前工程主线结果。
+
+**明确不需要做的事：**
+
+- 不再做大范围权重扫描；
+- 不修改 surface loss 公式、顶点集合、标签生成规则或验证门；
+- 不因某些帧 foot unavailable 就删除整帧或伪造接触；
+- 不把工程 residual 修正写成真实触地、真实握持、承重或真实三维精度。
+
+当前路线状态：`both_a1_a30 = engineering_route_ready`；完整主线运行状态：`pending`。
+
 ### 2026-09-25（北京时间）— task-15 完成：手脚表面接触工程路线就绪（数量级确认，不是最优权重冻结）
 
 **状态：完成；当前工程主线选定为 both_a1_a30。**
