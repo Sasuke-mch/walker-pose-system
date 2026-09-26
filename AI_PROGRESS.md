@@ -2353,3 +2353,10 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 助步器严格使用静态 `nodes_walker_mm + edges`，9 条拓扑边以八边形三维圆柱杆件绘制；相机轨迹显示在 YZ 侧面墙上，踝关节保留 12 帧地面投影拖尾，坐标系为长 X/Y/Z 三轴。
 - 输出：`full448_surface_both_a2_a30_cosine320/surface_contact_full448_baseline_final.mp4` 与 `full448_surface_temporal_basic_v1/surface_contact_full448_temporal_final.mp4`。两者均为 448 帧、30 FPS、960×540；首帧和第200帧可读，视频元数据 JSON 同步记录输入与显示边界。
 - 该视频是工程可视化，不把地下脚底颜色、轨迹、网格表面或助步器接近关系解释为真实承重、触地或物理接触真值。
+
+### 2026-09-26 — 网页可视化墙体与左键拖拽方向修正
+
+- 针对全片 baseline/temporal 两个 Canvas 页面，按参考 `visualize.mp4` 将两面与地面相接的开放浅色网格墙加入网页场景；墙体为 `x=-4` 与 `y=4` 的半透明网格平面，页面背景仍保持浅色，未扩散墙体颜色。新增“两面网格墙”显示开关。
+- 左键旋转方向统一为：垂直 `pitch += dy`，因此从下往上拖动（dy<0）人体画面向上；水平 `yaw += dx`，因此面对观察者从左往右拖动时按人体自身视角向左转。右键/Shift+左键平移、滚轮缩放和逐帧播放逻辑不变。
+- 页面标题去掉“Canvas 本地兼容版”字样，改为“本地离线版”；未改拟合结果、视频数据、模型、墙体外的背景或其他显示元素。
+- 本次验证范围：重新生成两个全片 Canvas 页面，检查 JS 语法、页面初始化、播放推进、滑块范围、墙体字段和拖拽处理；未执行 push。
