@@ -2316,3 +2316,10 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 更新 `VISUALIZATION_PIPELINE.md`：明确只有地面平面可以加深颜色；背景和地面之外空间保持浅色；助步器不得用临时连接关系替代拓扑，Canvas 也必须显示实体厚杆。
 - 重新生成 `full448_surface_both_a2_a30_cosine320/surface_contact_full448_canvas.html` 与正式入口 `surface_contact_full448_formal_viewer.html`。正式入口仍为 file:// 可打开的同目录离线 Canvas wrapper。
 - 本次只改可视化生成与规范，不改拟合结果、地面数据、拓扑输入或实验结论；页面显示仍属于工程链路观察，不构成真实触地、承重或握持结论。
+
+### 2026-09-26 — 最新统一时序全片结果的同源可视化
+
+- 对 `full448_surface_temporal_basic_v1` 重新执行可视化生成，输入为该次运行的 `result.npz`、Stage D surface 输出、场景变换和静态助步器拓扑；未混用无时序基线的动态结果。
+- 生成 `surface_contact_full448_temporal_basic_viewer.html`、`surface_contact_full448_canvas.html` 和 `surface_contact_full448_formal_viewer.html`。
+- 页面沿用已冻结要求：浅色空间背景，只有 Z=0 XY 地面平面使用深灰绿色；人体 COCO 骨架线默认显示；助步器由静态 `nodes_walker_mm` + `edges` 重构为实体厚杆。
+- 页面数据核对：448 帧、6890 顶点、15 个助步器节点、9 条拓扑边，拓扑与 JSON 完全一致。该页面仍只表达当前时序拟合结果的工程可视化，不升级为真实触地、承重或运动真值。
