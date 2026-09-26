@@ -14,6 +14,7 @@ def main() -> int:
     p.add_argument("--grounded", type=Path, required=True)
     p.add_argument("--scene", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--canvas-name", default="surface_contact_full448_canvas.html")
     a = p.parse_args()
     r = np.load(a.result, allow_pickle=True)
     g = np.load(a.grounded, allow_pickle=True)
@@ -59,11 +60,11 @@ def main() -> int:
     # Local file:// pages cannot rely on the template's CDN import map. Keep
     # the formal path stable, but load the sibling dependency-free Canvas page
     # so opening this exact artifact never depends on network module loading.
-    canvas_name = "surface_contact_full448_canvas.html"
+    canvas_name = Path(a.canvas_name).name
     wrapper = """<!doctype html><meta charset=\"utf-8\"><title>Current-run grounded male SMPL</title>
 <style>html,body,iframe{margin:0;width:100%;height:100%;border:0;background:#edf1f3}</style>
-<iframe title=\"offline grounded SMPL viewer\" src=\"surface_contact_full448_canvas.html\"></iframe>
-"""
+<iframe title=\"offline grounded SMPL viewer\" src=\"CANVAS_NAME\"></iframe>
+""".replace("CANVAS_NAME", canvas_name)
     a.output.write_text(wrapper, encoding="utf-8")
     print(a.output.resolve())
     return 0

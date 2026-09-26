@@ -60,7 +60,14 @@ def main() -> int:
     Rc = np.asarray(static['rotation_left_camera_from_walker'], np.float32); tc = np.asarray(static['translation_left_camera_from_walker_mm'], np.float32) / 1000.0
     Wc = np.asarray([nodes[x] for x in names], np.float32) / 1000.0; Wc = Wc @ Rc.T + tc
     Wg = np.einsum('nij,vj->nvi', R, Wc) + T[:, None, :]
-    # Camera centers are not required for the contact claim; show walker and ground consistently.
+    # Camera centers and ankle projections use the same current ground transform.
+    camera_left = np.zeros((n, 2, 3), np.float32)
+    camera_left[:, 0, :] = T
+    right_origin_left = np.asarray(static['camera_centers_left_camera_mm']['right'], np.float32) / 1000.0
+    camera_left[:, 1, :] = np.einsum('nij,j->ni', R, right_origin_left) + T
+    ankle_ground = Tg[:, [15, 16], :].astype(np.float32)
+    ankle_valid = acc[:, [15, 16]].astype(bool) & np.isfinite(ankle_ground).all(axis=2)
+    ankle_ground = np.where(ankle_valid[:, :, None], ankle_ground, 0.0).astype(np.float32)
     rows = [json.loads(x) for x in (a.scene.parent / 'stage1_stage2.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()][a.start:a.end+1]
     gr = [json.loads(x) for x in (a.scene.parent / 'dynamic_ground_pose.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()][a.start:a.end+1]
     stage = [str(x['stage'].get('operational','unknown')) for x in rows]
@@ -86,7 +93,7 @@ def main() -> int:
     else:
         raise FileNotFoundError(sets_path)
     he = np.asarray(labels['handle_ends_ground_m'], np.float32)[sl]
-    data = {'v':enc(Vg),'j':enc(Jg),'t':enc(Tg),'w':enc(Wg),'c':enc(np.zeros((n,2,3),np.float32)),'sl':enc(foot_res[:,0].astype(np.float32)),'sr':enc(foot_res[:,1].astype(np.float32)),'hl':enc(hand_res[:,0].astype(np.float32)),'hr':enc(hand_res[:,1].astype(np.float32)),'he':enc(he),'faces':faces.tolist(),'n':n,'nv':int(Vg.shape[1]),'ids':ids.tolist(),'stage':stage,'pose':pose,'e3':e3m.tolist(),'el':el.tolist(),'er':er.tolist(),'fm':fm.tolist(),'hm':hm.tolist(),'acc':acc.ravel().tolist(),'wn':list(range(len(names))),'we':[[ni[x],ni[y]] for x,y in static['edges']],'si':si.tolist(),'pi':pi.tolist()}
+    data = {'v':enc(Vg),'j':enc(Jg),'t':enc(Tg),'w':enc(Wg),'c':enc(camera_left),'a':enc(ankle_ground),'av':ankle_valid.ravel().tolist(),'sl':enc(foot_res[:,0].astype(np.float32)),'sr':enc(foot_res[:,1].astype(np.float32)),'hl':enc(hand_res[:,0].astype(np.float32)),'hr':enc(hand_res[:,1].astype(np.float32)),'he':enc(he),'faces':faces.tolist(),'n':n,'nv':int(Vg.shape[1]),'ids':ids.tolist(),'stage':stage,'pose':pose,'e3':e3m.tolist(),'el':el.tolist(),'er':er.tolist(),'fm':fm.tolist(),'hm':hm.tolist(),'acc':acc.ravel().tolist(),'wn':list(range(len(names))),'we':[[ni[x],ni[y]] for x,y in static['edges']],'si':si.tolist(),'pi':pi.tolist()}
     # Contact points use actual left/right index sets; both hands/feet are displayed by concatenated symmetric sets.
     data['si'] = np.concatenate([si, sole_indices('right')]).tolist()
     data['pi'] = np.concatenate([pi, np.asarray(sets_doc['sets']['right_palm_surface_candidate']['palm_fingers'], np.int32)]).tolist()

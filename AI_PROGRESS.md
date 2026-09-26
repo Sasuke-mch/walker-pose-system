@@ -2323,3 +2323,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 生成 `surface_contact_full448_temporal_basic_viewer.html`、`surface_contact_full448_canvas.html` 和 `surface_contact_full448_formal_viewer.html`。
 - 页面沿用已冻结要求：浅色空间背景，只有 Z=0 XY 地面平面使用深灰绿色；人体 COCO 骨架线默认显示；助步器由静态 `nodes_walker_mm` + `edges` 重构为实体厚杆。
 - 页面数据核对：448 帧、6890 顶点、15 个助步器节点、9 条拓扑边，拓扑与 JSON 完全一致。该页面仍只表达当前时序拟合结果的工程可视化，不升级为真实触地、承重或运动真值。
+
+### 2026-09-26 — 可视化修正：脚底可见性、COCO 观测骨架、相机投影与行走空间
+
+- 针对无时序基线和统一时序全片结果，重新生成两套同源页面。脚底/手掌候选点默认显示；脚底点按当前地面高度分色，低于 `Z=0` 的候选点为红色，便于观察地下部分，未改变拟合数据。
+- 骨架线改为连接当前运行的 accepted 原始三角化 COCO-17 关键点；不再使用 SMPL 内部关节或模型侧 COCO 回归点作为观测骨架。
+- 从当前场景变换和助步器静态相机基线计算左右相机地面位置，显示光心到地面的侧面投影；使用当前运行左右踝 accepted 点绘制 12 帧短拖尾，不插值、不平滑。
+- 增加浅色两面墙体（其中一面平行于人体运行方向）和较长的 X/Y/Z 坐标轴；页面背景仍保持浅色，只有地面平面使用深色。
+- 新页面：`full448_surface_both_a2_a30_cosine320/surface_contact_full448_updated_formal_viewer.html` 与 `full448_surface_temporal_basic_v1/surface_contact_full448_temporal_updated_formal_viewer.html`。这是显示层改动，不改变时序或接触拟合结果，也不把视觉效果解释为真实接触或物理支撑。
