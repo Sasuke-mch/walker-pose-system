@@ -22,7 +22,7 @@ EDGES = ((5, 6), (5, 7), (7, 9), (6, 8), (8, 10), (5, 11), (6, 12),
 
 def display(x: np.ndarray) -> np.ndarray:
     y = np.asarray(x, dtype=np.float32).copy()
-    y[..., 1] *= -1.0
+    y[..., 1] *= 1.0
     return y
 
 
@@ -86,14 +86,18 @@ def main() -> int:
     lo = np.nanpercentile(all_points, 0.5, axis=0) - np.array([0.7, 0.7, 0.15])
     hi = np.nanpercentile(all_points, 99.5, axis=0) + np.array([0.7, 0.7, 0.45])
     lo[2] = min(lo[2], -0.12); hi[2] = max(hi[2], 1.8)
-    side_x = float(lo[0])
+    side_x = float(hi[0])
 
     fig = plt.figure(figsize=(12.8, 7.2), dpi=75)
     ax = fig.add_subplot(111, projection="3d")
     canvas = FigureCanvasAgg(fig)
     ax.set_xlim(lo[0], hi[0]); ax.set_ylim(lo[1], hi[1]); ax.set_zlim(lo[2], hi[2])
     ax.set_box_aspect((hi - lo).tolist())
-    ax.view_init(elev=20, azim=-62)
+    # Use reference-video physical [X,Y,Z] coordinates without reflection.
+    # Derive the same oblique camera view from the walking displacement.
+    movement = Cd[-1, 0, :2] - Cd[0, 0, :2]
+    view_azim = float(np.degrees(np.arctan2(movement[1], movement[0])) - 35.0) if np.linalg.norm(movement) else -58.0
+    ax.view_init(elev=23, azim=view_azim)
     ax.set_xlabel("Ground X (m)"); ax.set_ylabel("Ground Y (m)"); ax.set_zlabel("Height Z (m)")
     ax.set_title(args.title)
     ax.grid(False)
@@ -115,6 +119,7 @@ def main() -> int:
         ax.plot([side_x, side_x], [y, y], [0, hi[2]], color=wall_color, lw=0.7, alpha=0.7)
     for z in wall_z:
         ax.plot([side_x, side_x], [lo[1], hi[1]], [z, z], color=wall_color, lw=0.7, alpha=0.7)
+    # The second wall is behind the subject walking along negative ground Y.
     for x in gx:
         ax.plot([x, x], [hi[1], hi[1]], [0, hi[2]], color=wall_color, lw=0.7, alpha=0.7)
     for z in wall_z:
@@ -138,6 +143,7 @@ def main() -> int:
     ax.add_collection3d(handle_tubes)
     model_sc = ax.scatter([], [], [], s=13, color="#101820", depthshade=False)
     tri_sc = ax.scatter([], [], [], s=10, color="#c62828", depthshade=False)
+    rejected_tri_sc = ax.scatter([], [], [], s=18, color="#b36b1e", depthshade=False, marker="x")
     foot_sc = ax.scatter([], [], [], s=22, color="#1b7f4a", depthshade=False)
     foot_below_sc = ax.scatter([], [], [], s=26, color="#c62828", depthshade=False)
     rejected_lines = []
@@ -171,10 +177,13 @@ def main() -> int:
             walker_tubes.set_verts([face for a, b in edges for face in cylinder_faces(Wd[i, a], Wd[i, b])])
             handle_tubes.set_verts([face for a, b in handle_edges
                                     for face in cylinder_faces(Wd[i, a], Wd[i, b], radius=0.022)])
-            model_sc._offsets3d = (J[i, :, 0], -J[i, :, 1], J[i, :, 2])
+            model_sc._offsets3d = (J[i, :, 0], J[i, :, 1], J[i, :, 2])
             valid_tri = np.isfinite(T[i]).all(axis=1) & accepted[i]
             tri = Td[i, valid_tri]
             tri_sc._offsets3d = (tri[:, 0], tri[:, 1], tri[:, 2])
+            finite_rejected = np.isfinite(T[i]).all(axis=1) & ~accepted[i]
+            rejected_tri = Td[i, finite_rejected]
+            rejected_tri_sc._offsets3d = (rejected_tri[:, 0], rejected_tri[:, 1], rejected_tri[:, 2])
             fp = Vd[i, sole_idx]
             below = fp[:, 2] < 0
             foot_sc._offsets3d = (fp[~below, 0], fp[~below, 1], fp[~below, 2])
@@ -197,7 +206,7 @@ def main() -> int:
             writer.write(frame)
     finally:
         writer.release(); plt.close(fig)
-    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, short past-only trail", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 with two gridded room walls", "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, short past-only trail", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 with two gridded room walls; rear wall behind walking direction", "display_coordinates": "X,Y,Z physical ground (reference video)", "view_elevation": 23, "view_azimuth": view_azim, "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(args.output.resolve())
     return 0
 
