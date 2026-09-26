@@ -2394,3 +2394,8 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 视频输出：各目录 `surface_contact_full448_baseline_final.mp4`、`surface_contact_full448_temporal_final.mp4`，按参考视频采用物理 `[X,Y,Z]` 观察坐标、elev=23°、由行走位移计算 azim、两面网格墙位于行走区域后方；视频保留全部有限 rejected 点的橙色叉号。
 - 验收：两个网页均含6890顶点/13776三角面，地面 `[-6,6]`，无 Canvas 墙体代码；内嵌 JS `node --check` 通过。两个视频均448帧、30 FPS、960×540。
 - 本次仅生成可视化，不修改拟合结果；工程可视化仍不代表真实三维真值或真实触地/承重。
+
+### 2026-09-26 — Canvas 横向拖拽方向最终固定
+
+- 修正本地 Canvas 页面左键旋转的横向符号：`dx>0`（鼠标从左向右）现在执行 `yaw -= dx*0.007`；当人体面对观察者时，画面朝向按人体自身视角向左转；`dx<0` 时向右转。竖直方向保持 `pitch += dy*0.007`，从下向上拖动时人体朝向向上。
+- 重新生成无时序 baseline 与统一时序 full17 两个 `viewer.html`，只修改交互显示层，不改拟合结果、三角化、接触项、时序项或视频。
