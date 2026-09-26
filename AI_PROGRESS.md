@@ -2308,3 +2308,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 与无时序全片基线比较：local acceleration P95 125.95→45.28 m/s²；pelvis acceleration P95 100.18→14.54 m/s²；2D P95 174.56→165.68 px；3D P95 137.72→139.06 mm（约+0.97%）。
 - 接触代价：foot signed median −43.57→−50.05 mm，foot absolute median 44.23→50.11 mm，地下表面比例 87.93%→94.96%；hand loss 也由 3.78e−5 增至 6.03e−5。说明统一时序项有效减少运动变化，但会把部分身体/脚部表面牵向更平滑的轨迹，地面以下误差加深。
 - 当前判断：该路线完成了“基本时序平滑能否工作”的主线测试，证明能工作且三维主误差代价较小；脚部代价仍需在后续方案决策中明确接受或修正。没有进行逐关节权重搜索，也没有进入 stage_c_and_d。
+
+### 2026-09-26 — 修正全片可视化地面与助步器实体显示
+
+- 修复 Canvas 生成器把 `#718279` 错误填满整张画布的问题：页面背景保持浅色 `#edf1f3`，仅绘制 `Z_display=0` 的 XY 地面多边形使用深灰绿色 `#718279`，网格使用较浅线色。
+- 助步器显示改为严格使用同源静态拓扑的 `nodes_walker_mm` 与 `edges`。每条拓扑边用深色外轮廓 + 彩色内芯 + 节点端盖绘制厚杆，Canvas 本地兼容页面不再把助步器退化成细线。
+- 更新 `VISUALIZATION_PIPELINE.md`：明确只有地面平面可以加深颜色；背景和地面之外空间保持浅色；助步器不得用临时连接关系替代拓扑，Canvas 也必须显示实体厚杆。
+- 重新生成 `full448_surface_both_a2_a30_cosine320/surface_contact_full448_canvas.html` 与正式入口 `surface_contact_full448_formal_viewer.html`。正式入口仍为 file:// 可打开的同目录离线 Canvas wrapper。
+- 本次只改可视化生成与规范，不改拟合结果、地面数据、拓扑输入或实验结论；页面显示仍属于工程链路观察，不构成真实触地、承重或握持结论。

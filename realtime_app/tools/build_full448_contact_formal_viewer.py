@@ -61,7 +61,7 @@ def main() -> int:
     # so opening this exact artifact never depends on network module loading.
     canvas_name = "surface_contact_full448_canvas.html"
     wrapper = """<!doctype html><meta charset=\"utf-8\"><title>Current-run grounded male SMPL</title>
-<style>html,body,iframe{margin:0;width:100%;height:100%;border:0;background:#718279}</style>
+<style>html,body,iframe{margin:0;width:100%;height:100%;border:0;background:#edf1f3}</style>
 <iframe title=\"offline grounded SMPL viewer\" src=\"surface_contact_full448_canvas.html\"></iframe>
 """
     a.output.write_text(wrapper, encoding="utf-8")
