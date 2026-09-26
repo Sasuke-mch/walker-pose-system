@@ -2366,3 +2366,23 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 按最新显示要求，两个全片 Canvas 页面移除两面网格墙及其显示开关；页面背景保持浅色，地面 XY 显示范围由 `[-4,4]` 扩大为 `[-6,6]`，地面网格同步扩大。
 - 人体表面、COCO-17 骨架、地下脚底标记、实体助步器、相机侧面投影轨迹、踝关节拖尾、长坐标系、播放和左键拖拽方向均保持不变。既有 MP4 不重渲染，仍保留其已生成的墙体。
 - 重新生成 baseline 与 temporal 两个 updated Canvas 页面；未修改拟合结果和视频数据。
+
+### 2026-09-26 — 两个视频参考视角修正
+
+- 对照参考视频首帧和224帧后，修正 MP4 观察角与墙体位置；视频改用物理地面 [X,Y,Z]，不镜像行走方向，elev=23°、azim=相机位移角−35°（约−121.36°），墙体 x=hi、y=hi，横墙位于负 Y 行走方向后方。网页不变。
+- 首版镜像参考视角截图方向仍不匹配，保留为诊断；最终输出命名 `surface_contact_full448_baseline_reference_view_v2.mp4`、`surface_contact_full448_temporal_reference_view_v2.mp4`，同源结果、实体助步器、COCO骨架、脚底分色与拖尾保留，旧视频不覆盖。
+
+### 2026-09-26 — 完整关节点重跑前冻结要求
+
+- 用户确认：任何逻辑错误导致一个要求的关节点缺失，整条可视化结果均视为错误；本轮必须先修复数据链并重跑，暂不生成可视化。
+- 本轮唯一代码变量是移除 `run_clean_full_sequence.py::raw_triangulate` 对 COCO-14 右膝的无条件 `accepted=False/q=0`；三角化、质量权重、SMPL/VPoser、Stage A/B/C/D、foot=2、hand=30、时序权重和 Cosine 学习率全部保持冻结。
+- 完整关节点要求写入 `VISUALIZATION_PIPELINE.md`：17 个 COCO 索引固定、有限 rejected 点必须保留并以拒绝样式显示、左右腿 `11-13-15`/`12-14-16` 必须连通、不得按关节编号硬编码删除。
+- 计划输出两个新结果目录：无时序 baseline 与统一时序 Stage-D；旧结果目录不覆盖。首先核查每个关节的 finite/accepted/rejected/原因、NaN/Inf、阶段和步数；通过后再决定可视化。
+
+### 2026-09-26 — 完整17点两条冻结路线重跑完成（不生成可视化）
+
+- baseline 输出 `full448_surface_both_a2_a30_cosine320_alljoints_v1/`，temporal 输出 `full448_surface_temporal_basic_v1_alljoints_v1/`；两次退出0、448帧，A/B/C/D=120/120/120/320，foot=2/hand=30、观测系数、余弦LR、D冻结beta保持原实际实现。时序仅D启用local=0.0012/root=0.0003。命令与局部记录写入新目录command.txt、EXPERIMENT.md。
+- 三角化raw与旧结果逐元素一致（含NaN）；其余16点候选掩码一致。移除右膝无条件清零后右膝448帧正权重；所有17个模型COCO点在448帧均有限，vertices有限，C→D同进程、beta逐元素冻结。逐点审计见各目录all_joints_validation.json。候选计数：448/433/439/390/448/448/448/448/448/448/448/448/448/448/448/448/448；眼耳部分拒绝保留，未补点。
+- baseline：182.065s、2.461帧/s；2D med/P95=45.95/162.48px，3D=70.84/147.67mm。temporal：237.075s、1.890帧/s；2D=46.60/154.33px，3D=77.91/143.87mm。统计支持集合因右膝纳入而变化，不能直接把与旧指标差异归因为拟合改善。
+- 重要纠正：冻结工程拟合的accepted仅是有限正深度候选，未应用严格10px硬门；右膝两侧重投影均≤10px为71帧，平均≤10px为84帧。448帧正权重不是448帧严格通过。保留连续质量路线以保证本次唯一变量，未静默修改全部监督门。旧“无accepted右膝”是硬编码的结果，不能当作原始数据事实。
+- 当前只交付数值结果；未为新结果运行任何HTML/MP4生成器，未push。此前视频视角调整和有限rejected点标记修复作为独立显示变更保留。

@@ -1,0 +1,258 @@
+{
+  "joints": [
+    {
+      "index": 0,
+      "name": "nose",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 257,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 1,
+      "name": "left_eye",
+      "raw_finite": 433,
+      "model_finite": 448,
+      "fit_available": 433,
+      "positive_weight": 433,
+      "strict_mean_reprojection_le10": 246,
+      "reasons": {
+        "out_of_raw_image_bounds": 15,
+        "None": 433
+      }
+    },
+    {
+      "index": 2,
+      "name": "right_eye",
+      "raw_finite": 439,
+      "model_finite": 448,
+      "fit_available": 439,
+      "positive_weight": 439,
+      "strict_mean_reprojection_le10": 234,
+      "reasons": {
+        "out_of_raw_image_bounds": 9,
+        "None": 439
+      }
+    },
+    {
+      "index": 3,
+      "name": "left_ear",
+      "raw_finite": 390,
+      "model_finite": 448,
+      "fit_available": 390,
+      "positive_weight": 390,
+      "strict_mean_reprojection_le10": 295,
+      "reasons": {
+        "out_of_raw_image_bounds": 58,
+        "None": 390
+      }
+    },
+    {
+      "index": 4,
+      "name": "right_ear",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 356,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 5,
+      "name": "left_shoulder",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 300,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 6,
+      "name": "right_shoulder",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 415,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 7,
+      "name": "left_elbow",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 265,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 8,
+      "name": "right_elbow",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 378,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 9,
+      "name": "left_wrist",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 280,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 10,
+      "name": "right_wrist",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 431,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 11,
+      "name": "left_hip",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 326,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 12,
+      "name": "right_hip",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 325,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 13,
+      "name": "left_knee",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 357,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 14,
+      "name": "right_knee",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 84,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 15,
+      "name": "left_ankle",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 317,
+      "reasons": {
+        "None": 448
+      }
+    },
+    {
+      "index": 16,
+      "name": "right_ankle",
+      "raw_finite": 448,
+      "model_finite": 448,
+      "fit_available": 448,
+      "positive_weight": 448,
+      "strict_mean_reprojection_le10": 430,
+      "reasons": {
+        "None": 448
+      }
+    }
+  ],
+  "vertices_shape": [
+    448,
+    6890,
+    3
+  ],
+  "predicted_coco_shape": [
+    448,
+    17,
+    3
+  ],
+  "finite": true,
+  "beta_d_frozen": true,
+  "triangulation_unchanged": true,
+  "other_joint_mask_unchanged": true,
+  "wall_seconds": 182.06480489997193,
+  "fps": 2.460662291353539,
+  "2d": {
+    "median_px": 45.947200775146484,
+    "p95_px": 162.48162841796875,
+    "left_p95_px": 162.90122985839844,
+    "right_p95_px": 162.08811950683594
+  },
+  "3d": {
+    "median_mm": 70.83694458007812,
+    "p95_mm": 147.67483520507812,
+    "joint_p95_mm": {
+      "nose": 165.9825439453125,
+      "left_eye": 149.20748901367188,
+      "right_eye": 138.72723388671875,
+      "left_ear": 126.756591796875,
+      "right_ear": 109.0164566040039,
+      "left_shoulder": 115.48516845703125,
+      "right_shoulder": 117.02452850341797,
+      "left_elbow": 165.14620971679688,
+      "right_elbow": 123.26029968261719,
+      "left_wrist": 83.83802795410156,
+      "right_wrist": 83.48880004882812,
+      "left_hip": 150.5558319091797,
+      "right_hip": 123.55118560791016,
+      "left_knee": 157.1757049560547,
+      "right_knee": 198.11038208007812,
+      "left_ankle": 143.4618377685547,
+      "right_ankle": 123.15128326416016
+    }
+  },
+  "qualification": "fit_available uses finite positive-depth soft quality; not strict10px acceptance",
+  "visualization_generated": false
+}
