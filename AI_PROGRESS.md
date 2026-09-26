@@ -2386,3 +2386,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - baseline：182.065s、2.461帧/s；2D med/P95=45.95/162.48px，3D=70.84/147.67mm。temporal：237.075s、1.890帧/s；2D=46.60/154.33px，3D=77.91/143.87mm。统计支持集合因右膝纳入而变化，不能直接把与旧指标差异归因为拟合改善。
 - 重要纠正：冻结工程拟合的accepted仅是有限正深度候选，未应用严格10px硬门；右膝两侧重投影均≤10px为71帧，平均≤10px为84帧。448帧正权重不是448帧严格通过。保留连续质量路线以保证本次唯一变量，未静默修改全部监督门。旧“无accepted右膝”是硬编码的结果，不能当作原始数据事实。
 - 当前只交付数值结果；未为新结果运行任何HTML/MP4生成器，未push。此前视频视角调整和有限rejected点标记修复作为独立显示变更保留。
+
+### 2026-09-26 — 完整17点结果的两个网页与两个视频可视化完成
+
+- 输入为本次新跑的 `full448_surface_both_a2_a30_cosine320_alljoints_v1` 与 `full448_surface_temporal_basic_v1_alljoints_v1`，未使用旧 HTML/旧顶点/旧动态结果。
+- 网页输出：各目录 `surface_data.html` 与 `viewer.html`。Canvas 按当前要求取消墙面、地面范围 `[-6,6]`、浅色背景、深色地面、实体助步器、原始 COCO-17 骨架、有限 rejected 点橙色叉号/虚线、双相机侧面轨迹、双踝拖尾、长坐标轴和自由拖拽。
+- 视频输出：各目录 `surface_contact_full448_baseline_final.mp4`、`surface_contact_full448_temporal_final.mp4`，按参考视频采用物理 `[X,Y,Z]` 观察坐标、elev=23°、由行走位移计算 azim、两面网格墙位于行走区域后方；视频保留全部有限 rejected 点的橙色叉号。
+- 验收：两个网页均含6890顶点/13776三角面，地面 `[-6,6]`，无 Canvas 墙体代码；内嵌 JS `node --check` 通过。两个视频均448帧、30 FPS、960×540。
+- 本次仅生成可视化，不修改拟合结果；工程可视化仍不代表真实三维真值或真实触地/承重。
