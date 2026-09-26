@@ -2345,3 +2345,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - Canvas 拖拽改为左键旋转，右键或 Shift+左键平移，屏幕方向平移，俯仰限制在可自由观察但不翻转的范围；滚轮缩放限制在安全范围，指针捕获保证拖拽结束可靠。
 - 骨架连接检查确认 COCO 右膝 index 14 在严格 accepted mask 中为 0，但原始三角化坐标有限。当前页面对所有有限的 COCO 骨架边绘制：accepted 边为深色实线，含被拒绝点的边为橙色虚线，因此腿部拓扑不会消失，同时保留拒绝状态边界。
 - 重新生成两个 updated Canvas 页面；Python 编译、JavaScript `node --check`、页面数据结构检查通过。未修改拟合结果、accepted mask 或接触数据。
+
+### 2026-09-26 — 两套全片接触视频最终生成
+
+- 根据用户提供的 `visualize.mp4` 参考效果，新增 `realtime_app/tools/render_surface_contact_video.py`，分别从无时序基线和统一时序全片的同源 `result_grounded.npz` 生成 MP4；不读取旧动态人体/地面/助步器结果。
+- 最终视频保留两面浅色网格墙与 Z=0 深色地面；人体使用真实 6890 顶点、13776 三角面；脚底候选点按地面上下显示，地下部分为红色；骨架连接原始三角化 COCO-17，accepted 边实线、被拒绝但坐标有限的边橙色虚线。
+- 助步器严格使用静态 `nodes_walker_mm + edges`，9 条拓扑边以八边形三维圆柱杆件绘制；相机轨迹显示在 YZ 侧面墙上，踝关节保留 12 帧地面投影拖尾，坐标系为长 X/Y/Z 三轴。
+- 输出：`full448_surface_both_a2_a30_cosine320/surface_contact_full448_baseline_final.mp4` 与 `full448_surface_temporal_basic_v1/surface_contact_full448_temporal_final.mp4`。两者均为 448 帧、30 FPS、960×540；首帧和第200帧可读，视频元数据 JSON 同步记录输入与显示边界。
+- 该视频是工程可视化，不把地下脚底颜色、轨迹、网格表面或助步器接近关系解释为真实承重、触地或物理接触真值。
