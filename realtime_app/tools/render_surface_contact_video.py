@@ -148,8 +148,8 @@ def main() -> int:
     model_sc = ax.scatter([], [], [], s=13, color="#101820", depthshade=False, zorder=25)
     tri_sc = ax.scatter([], [], [], s=10, color="#c62828", depthshade=False, zorder=25)
     rejected_tri_sc = ax.scatter([], [], [], s=18, color="#b36b1e", depthshade=False, marker="x", zorder=25)
-    foot_sc = ax.scatter([], [], [], s=22, color="#1b7f4a", depthshade=False, zorder=25)
-    foot_below_sc = ax.scatter([], [], [], s=26, color="#c62828", depthshade=False, zorder=25)
+    foot_sc = ax.scatter([], [], [], s=0.5, color="#1b7f4a", linewidths=0, alpha=0.6, depthshade=False, zorder=25)
+    foot_below_sc = ax.scatter([], [], [], s=0.8, color="#c62828", linewidths=0, alpha=0.8, depthshade=False, zorder=25)
     rejected_lines = []
     for _ in EDGES:
         line, = ax.plot([], [], [], color="#b36b1e", lw=1.8, ls="--", zorder=20)

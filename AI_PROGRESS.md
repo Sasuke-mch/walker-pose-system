@@ -2411,3 +2411,8 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 用户反馈人体表面遮挡助步器。修正 `render_surface_contact_video.py` 的显式层级为：地面/墙体 < SMPL 表面 < COCO 骨架 < 模型与三角化点 < 助步器实体杆件；助步器主体和扶手分别使用更高 `zorder`，因此杆件不会再被人体遮掉。
 - 输出分辨率从 960×540 提高到 1920×1080，帧率仍为30 FPS；先完成1080p单帧探针，再完整重渲染两条448帧视频。
 - 新输出：`full448_surface_both_a2_a30_cosine320_alljoints_v1/surface_contact_full448_baseline_priority_v3_1080p.mp4`、`full448_surface_temporal_basic_v1_alljoints_v1/surface_contact_full448_temporal_priority_v3_1080p.mp4`。两条视频元数据均为448帧、30 FPS、1920×1080；中段抽帧确认人体、助步器和地面层级正确。
+
+### 2026-09-26 — 视频地下脚底标记缩小
+
+- 用户反馈脚部标记过粗，遮挡脚的轮廓。将视频地下脚底候选点改为极小红点（0.8 pt²、无描边、alpha=0.8），地上脚底点同步缩小为0.5 pt²、alpha=0.6；保留真实 SMPL 脚部表面作为主要轮廓。
+- 重新生成 `surface_contact_baseline_v4_fine_1080p.mp4` 与 `surface_contact_temporal_v4_fine_1080p.mp4`，两者均448帧、30 FPS、1920×1080；中段抽帧确认红点不再覆盖脚部轮廓。
