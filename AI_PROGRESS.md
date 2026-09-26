@@ -2300,3 +2300,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 原因：正式页面依赖 CDN 的 Three.js ES module；从本地 `file:///` 打开时模块加载失败，初始化中止，嵌入数据本身没有丢失。
 - 修复：正式 viewer 路径改为加载同目录、无网络依赖的 Canvas viewer；Canvas 页面保留 448 帧数据、COCO 骨架线、深色地面、逐帧助步器和滑块范围 0..447。
 - `py_compile`、页面字段检查和 `git diff --check` 通过。未改拟合结果、未执行 push。
+### 2026-09-26 — 基础统一时序路线全片运行
+
+- 按用户要求取消逐关节特化设计，采用最基本的统一时序先验：模型 grounded COCO [5..16] 相对骨盆的二阶差分 + grounded 骨盆轨迹二阶差分，统一 pseudo-Huber/30 mm；不做逐关节权重、不做上肢/下肢特例、不平滑原始观测。
+- 448 帧使用 Stage D、foot=2、hand=30、A/B/C/D=120/120/120/320、原冻结学习率；时序权重固定 local=0.0012、root=0.0003。结果目录：`full448_surface_temporal_basic_v1/`。
+- 退出码 0，总墙钟 281.180 s，1.692 帧/s。时序 valid=446 个三元组，拒绝/断点均为 0。
+- 与无时序全片基线比较：local acceleration P95 125.95→45.28 m/s²；pelvis acceleration P95 100.18→14.54 m/s²；2D P95 174.56→165.68 px；3D P95 137.72→139.06 mm（约+0.97%）。
+- 接触代价：foot signed median −43.57→−50.05 mm，foot absolute median 44.23→50.11 mm，地下表面比例 87.93%→94.96%；hand loss 也由 3.78e−5 增至 6.03e−5。说明统一时序项有效减少运动变化，但会把部分身体/脚部表面牵向更平滑的轨迹，地面以下误差加深。
+- 当前判断：该路线完成了“基本时序平滑能否工作”的主线测试，证明能工作且三维主误差代价较小；脚部代价仍需在后续方案决策中明确接受或修正。没有进行逐关节权重搜索，也没有进入 stage_c_and_d。

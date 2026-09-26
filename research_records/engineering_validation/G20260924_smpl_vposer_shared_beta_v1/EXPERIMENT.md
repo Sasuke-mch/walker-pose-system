@@ -301,3 +301,10 @@ foot_a1 仅成为开发窗的进一步验证候选：Stage D 后左右 sole 顶�
 ## 2026-09-26 时序平滑 Stage D 开发窗试验（engineering validation，未通过停止门）
 
 冻结对照：`full448_surface_both_a2_a30_cosine320/` 与 `frozen_no_temporal_a2_a30_cosine320/freeze_manifest.json` 未修改。新输出：`surface_temporal_window60_90_stage_d_v1/`（control/weak/medium + 标定探针 + comparison.json + 各目录 EXPERIMENT.md）。唯一变量为 Stage D 附加时序损失；foot=2/hand=30、观测系数、学习率、beta 冻结、ground transform 计算均未改变；仅跑 60..90 窗。权重经 Stage D 首 forward 梯度审计重标定（weak=0.0012/0.0003、medium=0.003/0.00075，标定过程见子目录 EXPERIMENT.md）。结果：local accel P95 -62.7%/-62.4%，pelvis P95 -80%/-84%，2D P95 -1.5%/-3.3%，摆动跨度 -4.4%/-5.2%；但 3D P95 +5.7%/+6.7%（超 5% 门），foot 有符号中位 +7.7/+6.4mm（超 2mm 门）。D-only 未过停止门，不进入 C+D。本节仅为工程时序一致性测试，不是真实运动真值或物理接触验证。
+## 2026-09-26 基础统一时序路线全片结果
+
+按主线要求，本次不做逐关节特化，直接在冻结的 foot=2、hand=30 路线 Stage D 加入统一时序项：grounded COCO [5..16] 相对骨盆二阶差分与 grounded 骨盆二阶差分，pseudo-Huber 尺度 30 mm，权重 local=0.0012、root=0.0003。原始二维、三角化点、accepted 门和接触权重均未平滑或重定义。
+
+448 帧退出码 0，总墙钟 281.180 s，1.692 帧/s；时序有效三元组 446，拒绝和 gap 均为 0。相对 `full448_surface_both_a2_a30_cosine320`：local acceleration P95 125.95→45.28 m/s²，pelvis acceleration P95 100.18→14.54 m/s²，2D P95 174.56→165.68 px，3D P95 137.72→139.06 mm。脚部 surface signed median −43.57→−50.05 mm，absolute median 44.23→50.11 mm，地下比例 87.93%→94.96%；手部最终项也由 3.78e−5 增至 6.03e−5。
+
+结论是统一时序项确实产生了明显平滑效果，三维主误差代价约 0.97%，但脚部表面误差加深。该结果属于基础路线工程验证，不是真实运动或物理接触验证；本次不运行逐关节权重搜索，也不进入 `stage_c_and_d`。
