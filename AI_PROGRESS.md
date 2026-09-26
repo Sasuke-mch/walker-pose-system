@@ -2405,3 +2405,9 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 修改 `realtime_app/tools/render_surface_contact_video.py`：视频 Z=0 地面改用与墙面相同的 `#a9b4b9`，网格线改为浅色；背景仍保持白色，不把整个空间填成地面色。
 - 设置 Matplotlib 3D 显式绘制顺序：地面/墙体在底层，助步器在其上，SMPL 表面、COCO 骨架、模型点、三角化点、脚底点和拒绝标记在更高层；人体表面 alpha 提高到 0.92，确保人体覆盖地面，即使脚底顶点低于 Z=0 也能直接看到。
 - 新输出（未覆盖旧视频）：`surface_contact_full448_baseline_priority_v2.mp4`、`surface_contact_full448_temporal_priority_v2.mp4`；均为448帧、30 FPS、960×540。首帧/中段抽帧检查通过，未修改拟合、三角化、接触或时序结果。
+
+### 2026-09-26 — 接触视频渲染层级与分辨率再次修正
+
+- 用户反馈人体表面遮挡助步器。修正 `render_surface_contact_video.py` 的显式层级为：地面/墙体 < SMPL 表面 < COCO 骨架 < 模型与三角化点 < 助步器实体杆件；助步器主体和扶手分别使用更高 `zorder`，因此杆件不会再被人体遮掉。
+- 输出分辨率从 960×540 提高到 1920×1080，帧率仍为30 FPS；先完成1080p单帧探针，再完整重渲染两条448帧视频。
+- 新输出：`full448_surface_both_a2_a30_cosine320_alljoints_v1/surface_contact_full448_baseline_priority_v3_1080p.mp4`、`full448_surface_temporal_basic_v1_alljoints_v1/surface_contact_full448_temporal_priority_v3_1080p.mp4`。两条视频元数据均为448帧、30 FPS、1920×1080；中段抽帧确认人体、助步器和地面层级正确。

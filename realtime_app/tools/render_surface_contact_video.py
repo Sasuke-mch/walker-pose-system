@@ -88,7 +88,8 @@ def main() -> int:
     lo[2] = min(lo[2], -0.12); hi[2] = max(hi[2], 1.8)
     side_x = float(hi[0])
 
-    fig = plt.figure(figsize=(12.8, 7.2), dpi=75)
+    output_size = (1920, 1080)
+    fig = plt.figure(figsize=(12.8, 7.2), dpi=150)
     ax = fig.add_subplot(111, projection="3d")
     # Use explicit insertion order so the body and observation overlays are
     # composited above the floor even when mesh vertices dip below Z=0.
@@ -140,13 +141,13 @@ def main() -> int:
     for a, b in EDGES:
         line, = ax.plot([], [], [], color="#101820", lw=2.5, zorder=20)
         sk_lines.append(line)
-    walker_tubes = Poly3DCollection([], facecolor="#176b7e", edgecolor="#0d3640", linewidth=0.2, zorder=8)
+    walker_tubes = Poly3DCollection([], facecolor="#176b7e", edgecolor="#0d3640", linewidth=0.2, zorder=40)
     ax.add_collection3d(walker_tubes)
-    handle_tubes = Poly3DCollection([], facecolor="#f57c00", edgecolor="#55305f", linewidth=0.2, zorder=9)
+    handle_tubes = Poly3DCollection([], facecolor="#f57c00", edgecolor="#55305f", linewidth=0.2, zorder=41)
     ax.add_collection3d(handle_tubes)
     model_sc = ax.scatter([], [], [], s=13, color="#101820", depthshade=False, zorder=25)
     tri_sc = ax.scatter([], [], [], s=10, color="#c62828", depthshade=False, zorder=25)
-    rejected_tri_sc = ax.scatter([], [], [], s=18, color="#b36b1e", depthshade=False, marker="x")
+    rejected_tri_sc = ax.scatter([], [], [], s=18, color="#b36b1e", depthshade=False, marker="x", zorder=25)
     foot_sc = ax.scatter([], [], [], s=22, color="#1b7f4a", depthshade=False, zorder=25)
     foot_below_sc = ax.scatter([], [], [], s=26, color="#c62828", depthshade=False, zorder=25)
     rejected_lines = []
@@ -155,7 +156,7 @@ def main() -> int:
         rejected_lines.append(line)
     camera_sc = [ax.scatter([], [], [], s=34, color=c, depthshade=False, zorder=25) for c in ("#aa4a18", "#7b3f98")]
     ankle_sc = [ax.scatter([], [], [], s=12, color=c, depthshade=False, zorder=25) for c in ("#1e6b8b", "#8b5a20")]
-    camera_drop = [ax.plot([], [], [], color="#819199", lw=1, ls=":")[0] for _ in range(2)]
+    camera_drop = [ax.plot([], [], [], color="#819199", lw=1, ls=":", zorder=24)[0] for _ in range(2)]
 
     sets_doc = json.loads(args.surface_sets.read_text(encoding="utf-8"))
     sole_parts = []
@@ -165,7 +166,7 @@ def main() -> int:
     sole_idx = np.unique(np.concatenate(sole_parts)).astype(int)
     sole_idx = sole_idx[(sole_idx >= 0) & (sole_idx < 6890)]
     frame_label = ax.text2D(0.02, 0.96, "", transform=ax.transAxes)
-    writer = cv2.VideoWriter(str(args.output), cv2.VideoWriter_fourcc(*"mp4v"), args.fps, (960, 540))
+    writer = cv2.VideoWriter(str(args.output), cv2.VideoWriter_fourcc(*"mp4v"), args.fps, output_size)
     if not writer.isOpened(): raise RuntimeError(f"cannot open video writer: {args.output}")
     try:
         for i in range(n):
@@ -205,11 +206,11 @@ def main() -> int:
             canvas.draw()
             rgba = np.asarray(canvas.buffer_rgba())
             frame = cv2.cvtColor(rgba, cv2.COLOR_RGBA2BGR)
-            frame = cv2.resize(frame, (960, 540), interpolation=cv2.INTER_AREA)
+            frame = cv2.resize(frame, output_size, interpolation=cv2.INTER_AREA)
             writer.write(frame)
     finally:
         writer.release(); plt.close(fig)
-    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, short past-only trail", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 colored the same as room walls; explicit render order keeps human overlays above floor; two gridded room walls; rear wall behind walking direction", "display_coordinates": "X,Y,Z physical ground (reference video)", "view_elevation": 23, "view_azimuth": view_azim, "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, short past-only trail", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 colored the same as room walls; explicit render order floor<mesh<skeleton<points<walker keeps human visible while walker overlays human; two gridded room walls; rear wall behind walking direction", "resolution": "1920x1080", "display_coordinates": "X,Y,Z physical ground (reference video)", "view_elevation": 23, "view_azimuth": view_azim, "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(args.output.resolve())
     return 0
 
