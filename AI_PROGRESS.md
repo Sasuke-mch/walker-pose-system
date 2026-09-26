@@ -2287,3 +2287,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 60..90 窗 control/weak/medium（stage_d，foot=2/hand=30，其余冻结）：初设 0.01/0.0025 探针显示时序梯度达 obs3d 的约 0.8/0.4 倍，判太强，仅作标定探针；按 0.1x/0.25x obs 梯度重标定为 weak(0.0012/0.0003)、medium(0.003/0.00075)，标定过程写入实验 EXPERIMENT.md。
 - 结果：local accel P95 -62.7%/-62.4%，pelvis P95 -80%/-84%，2D P95 -1.5%/-3.3%，y-span -4.4%/-5.2%；但 3D P95 +5.7%/+6.7%（超 5% 门），foot signed 中位 +7.7/+6.4mm（超 2mm 门）；beta 三组一致、同进程 C→D、无 NaN/Inf、valid 29/29。D-only 未过停止门，不进入 C+D。
 - 输出位于 `surface_temporal_window60_90_stage_d_v1/`（control/weak/medium + 标定探针 + comparison.json）；冻结目录与 v1-v6 未修改。本结论仅为工程时序一致性测试，不是真实运动真值或物理接触验证。未执行 push。
+
+### 2026-09-26 — 时序恶化只读诊断（engineering validation，不重跑拟合）
+
+- 一致性：三组 Stage C `predicted_coco` 逐元素一致（0.0 mm），beta 冻结，accepted 493 点，步数/学习率/接触权重与 command 一致；29/29 三元组有效。
+- 定位：3D P95 恶化集中左踝（+22.9 mm）、头耳眼（+10~12）、右踝（+8.7）、左肩（+7.2），髋膝腕反有改善；最差帧 62/84/85/75/78/68/81/76。接触有效帧脚底全部门限以下比例 0.986/0.958→1.0，有符号中位下探约 10 mm；骨盆垂向范围 65→44 mm，膝峰帧 73→72，踝中位高度 67→60 mm。
+- 梯度探针（Stage C 末/Stage D 末，相同有效系数，重建 latent，保真度约 0.24；中段无 checkpoint 记 unavailable）：时序 local 对 latent/root 梯度约为有效 obs3d 的 20 倍，时序 root 对 transl 约 13 倍；时序与其他项余弦均 |cos|<0.3，无方向对冲，属量级压制。
+- 掩码：本次数据未触发回退；但原 try/except 静默全 True 属 fail-open，已改为 fail-closed `resolve_scene_frame_mask` 并新增 4 项定向测试（缺失/形状/异常值均报错），py_compile、新测试与 diff--check 通过。
+- 判定 `STOP_NO_ABLATION`：local 与 root 均明显冲突，不做盲目消融；D-only 失败结论不变。唯一推荐下一步：重设计时序项（自归一化尺度不变损失、接触门控三元组、或仅上肢局部集合）后再做一次 local-only 探针。未执行 push。

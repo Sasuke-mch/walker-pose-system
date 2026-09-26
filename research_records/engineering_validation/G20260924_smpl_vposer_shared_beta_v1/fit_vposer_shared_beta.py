@@ -31,6 +31,43 @@ NAMES = ("nose","left_eye","right_eye","left_ear","right_ear","left_shoulder","r
          "left_knee","right_knee","left_ankle","right_ankle")
 
 
+def resolve_scene_frame_mask(st_accepted_full, wsl, n, tri_any):
+    """Fail-closed scene-accepted mask for temporal triplets (pure numpy).
+
+    Returns a boolean (n,) frame mask. Raises ValueError when the field is
+    missing, has wrong shape, or holds abnormal values; never silently
+    returns all-True, which would fabricate a temporal pass.
+    """
+    if st_accepted_full is None:
+        raise ValueError("scene transforms carry no 'accepted' field: temporal mask unavailable")
+    arr = np.asarray(st_accepted_full)
+    try:
+        win = arr[wsl]
+    except Exception as exc:
+        raise ValueError(f"scene 'accepted' window slice failed: {exc}")
+    if win.ndim == 2:
+        if win.shape[1] != 17:
+            raise ValueError(f"scene 'accepted' joint dim {win.shape[1]} != 17")
+        flat = np.asarray(win).reshape(-1)
+        if flat.dtype != bool and not np.isin(flat, [0, 1]).all():
+            raise ValueError("scene 'accepted' holds values outside {0,1}")
+        mask = win.any(axis=-1)
+    elif win.ndim == 1:
+        mask = win
+    else:
+        raise ValueError(f"scene 'accepted' ndim {win.ndim} not in (1,2)")
+    mask = np.asarray(mask).reshape(-1)
+    if mask.shape[0] != n:
+        raise ValueError(f"scene 'accepted' window frames {mask.shape[0]} != {n}")
+    if mask.dtype != bool:
+        if not np.isin(mask, [0, 1]).all():
+            raise ValueError("scene 'accepted' holds values outside {0,1}")
+        mask = mask.astype(bool)
+    if not np.isfinite(np.asarray(tri_any, dtype=float)).all():
+        raise ValueError("triangulation frame mask is non-finite")
+    return mask
+
+
 def aa_from_matrix(m: np.ndarray) -> np.ndarray:
     from scipy.spatial.transform import Rotation
     return Rotation.from_matrix(m).as_rotvec().astype(np.float32)
@@ -215,12 +252,14 @@ def main() -> int:
     scale_m = float(args.temporal_huber_scale_mm) / 1000.0
     _acc_np = np.asarray(accepted)
     _acc_any = _acc_np.any(axis=-1) if _acc_np.ndim == 2 else _acc_np
-    try:
-        _st_raw = np.asarray(st["accepted"])[wsl]
-        _st_acc = (_st_raw.any(axis=-1) if _st_raw.ndim == 2 else _st_raw).reshape(-1).astype(bool)
-        assert _st_acc.shape[0] == n
-    except Exception:
-        _st_acc = np.ones((n,), dtype=bool)
+    # Fail-closed: missing/malformed scene 'accepted' raises instead of
+    # silently enabling all triplets (which would fabricate a temporal pass).
+    _st_src = (st["accepted"] if ("st" in locals() and st is not None and "accepted" in st)
+               else None)
+    # Without scene transforms temporal stays unavailable (frame_ok=zeros
+    # below); the fail-closed resolver only runs when Rgc exists.
+    _st_acc = (np.ones((n,), dtype=bool) if Rgc is None else resolve_scene_frame_mask(
+        _st_src, wsl, n, _acc_any))
     if Rgc is not None:
         Rgc_finite = torch.isfinite(Rgc).all(dim=(1,2)) & torch.isfinite(Tgc).all(dim=1)
         frame_ok = torch.tensor(np.asarray(_acc_any, dtype=bool) & _st_acc, device=device) & Rgc_finite
