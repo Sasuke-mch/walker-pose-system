@@ -14,7 +14,7 @@ def main() -> int:
     p=argparse.ArgumentParser();p.add_argument('--source',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();s=a.source.read_text(encoding='utf-8');m=re.search(r'<script id="data" type="application/json">(.*?)</script>',s,re.S)
     if not m: raise RuntimeError('source viewer has no embedded data')
     data=json.loads(m.group(1))
-    for key in ('v','w','t','he','j'):
+    for key in ('v','w','t','he','j','c','a'):
         data[key]=base64.b64encode(gzip.decompress(base64.b64decode(data[key]))).decode('ascii')
     def finite_json(value):
         if isinstance(value,float) and not math.isfinite(value): return None

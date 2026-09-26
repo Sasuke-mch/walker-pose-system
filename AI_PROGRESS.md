@@ -2331,3 +2331,9 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 从当前场景变换和助步器静态相机基线计算左右相机地面位置，显示光心到地面的侧面投影；使用当前运行左右踝 accepted 点绘制 12 帧短拖尾，不插值、不平滑。
 - 增加浅色两面墙体（其中一面平行于人体运行方向）和较长的 X/Y/Z 坐标轴；页面背景仍保持浅色，只有地面平面使用深色。
 - 新页面：`full448_surface_both_a2_a30_cosine320/surface_contact_full448_updated_formal_viewer.html` 与 `full448_surface_temporal_basic_v1/surface_contact_full448_temporal_updated_formal_viewer.html`。这是显示层改动，不改变时序或接触拟合结果，也不把视觉效果解释为真实接触或物理支撑。
+
+### 2026-09-26 — 修复两个全片 viewer 空白及无法播放
+
+- 根因：新增的相机位置 `c` 和踝关节拖尾 `a` 在源 viewer 中为 gzip+base64 编码，但 Canvas 生成器只解压了 `v/w/t/he/j`。生成页面对 `c/a` 执行 `new Float32Array(...)` 时字节数不是 4 的倍数，抛出 `RangeError`，导致首次绘制和播放/滑块事件绑定均未执行。
+- 生成器现在同时解压 `c/a`，并重新生成无时序基线与统一时序结果的两个 updated Canvas 页面。正式 wrapper 路径保持不变，指向各自同目录的新页面。
+- 验证：两套页面的 `v/w/t/he/j/c/a` 解码字节长度均可被 4 整除；Node 运行页面脚本显示初始化为 `warming_up, 0/447`，播放后为 `1/447`，滑块切至 `147/447`；Python 编译和 diff 检查通过。未修改拟合、接触或时序结果。
