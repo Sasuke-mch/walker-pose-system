@@ -2399,3 +2399,9 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 
 - 修正本地 Canvas 页面左键旋转的横向符号：`dx>0`（鼠标从左向右）现在执行 `yaw -= dx*0.007`；当人体面对观察者时，画面朝向按人体自身视角向左转；`dx<0` 时向右转。竖直方向保持 `pitch += dy*0.007`，从下向上拖动时人体朝向向上。
 - 重新生成无时序 baseline 与统一时序 full17 两个 `viewer.html`，只修改交互显示层，不改拟合结果、三角化、接触项、时序项或视频。
+
+### 2026-09-26 — 两个接触视频地面配色与人体渲染优先级修正
+
+- 修改 `realtime_app/tools/render_surface_contact_video.py`：视频 Z=0 地面改用与墙面相同的 `#a9b4b9`，网格线改为浅色；背景仍保持白色，不把整个空间填成地面色。
+- 设置 Matplotlib 3D 显式绘制顺序：地面/墙体在底层，助步器在其上，SMPL 表面、COCO 骨架、模型点、三角化点、脚底点和拒绝标记在更高层；人体表面 alpha 提高到 0.92，确保人体覆盖地面，即使脚底顶点低于 Z=0 也能直接看到。
+- 新输出（未覆盖旧视频）：`surface_contact_full448_baseline_priority_v2.mp4`、`surface_contact_full448_temporal_priority_v2.mp4`；均为448帧、30 FPS、960×540。首帧/中段抽帧检查通过，未修改拟合、三角化、接触或时序结果。

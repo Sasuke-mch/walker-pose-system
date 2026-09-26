@@ -90,6 +90,9 @@ def main() -> int:
 
     fig = plt.figure(figsize=(12.8, 7.2), dpi=75)
     ax = fig.add_subplot(111, projection="3d")
+    # Use explicit insertion order so the body and observation overlays are
+    # composited above the floor even when mesh vertices dip below Z=0.
+    ax.computed_zorder = False
     canvas = FigureCanvasAgg(fig)
     ax.set_xlim(lo[0], hi[0]); ax.set_ylim(lo[1], hi[1]); ax.set_zlim(lo[2], hi[2])
     ax.set_box_aspect((hi - lo).tolist())
@@ -106,52 +109,52 @@ def main() -> int:
         axis.pane.set_edgecolor((1, 1, 1, 0))
     gx = np.linspace(lo[0], hi[0], 12); gy = np.linspace(lo[1], hi[1], 12)
     xx, yy = np.meshgrid(gx, gy)
-    ax.plot_surface(xx, yy, np.zeros_like(xx), color="#718279", alpha=0.72, linewidth=0, shade=False)
+    ground_surface = ax.plot_surface(xx, yy, np.zeros_like(xx), color="#a9b4b9", alpha=0.90, linewidth=0, shade=False, zorder=1)
     for x in gx:
-        ax.plot([x, x], [lo[1], hi[1]], [0, 0], color="#b9c8c0", lw=0.5, alpha=0.8)
+        ax.plot([x, x], [lo[1], hi[1]], [0, 0], color="#d4dde0", lw=0.5, alpha=0.8, zorder=2)
     for y in gy:
-        ax.plot([lo[0], hi[0]], [y, y], [0, 0], color="#b9c8c0", lw=0.5, alpha=0.8)
+        ax.plot([lo[0], hi[0]], [y, y], [0, 0], color="#d4dde0", lw=0.5, alpha=0.8, zorder=2)
     # Two open room walls, as in the supplied reference video. Their gridlines
     # meet the Z=0 floor; the space elsewhere stays light and unfilled.
     wall_color = "#a9b4b9"
     wall_z = np.linspace(0, hi[2], 8)
     for y in gy:
-        ax.plot([side_x, side_x], [y, y], [0, hi[2]], color=wall_color, lw=0.7, alpha=0.7)
+        ax.plot([side_x, side_x], [y, y], [0, hi[2]], color=wall_color, lw=0.7, alpha=0.7, zorder=0)
     for z in wall_z:
-        ax.plot([side_x, side_x], [lo[1], hi[1]], [z, z], color=wall_color, lw=0.7, alpha=0.7)
+        ax.plot([side_x, side_x], [lo[1], hi[1]], [z, z], color=wall_color, lw=0.7, alpha=0.7, zorder=0)
     # The second wall is behind the subject walking along negative ground Y.
     for x in gx:
-        ax.plot([x, x], [hi[1], hi[1]], [0, hi[2]], color=wall_color, lw=0.7, alpha=0.7)
+        ax.plot([x, x], [hi[1], hi[1]], [0, hi[2]], color=wall_color, lw=0.7, alpha=0.7, zorder=0)
     for z in wall_z:
-        ax.plot([lo[0], hi[0]], [hi[1], hi[1]], [z, z], color=wall_color, lw=0.7, alpha=0.7)
+        ax.plot([lo[0], hi[0]], [hi[1], hi[1]], [z, z], color=wall_color, lw=0.7, alpha=0.7, zorder=0)
     axis_len = max(2.5, float(max(hi[0] - lo[0], hi[1] - lo[1]) * 0.72))
-    ax.plot([0, axis_len], [0, 0], [0, 0], color="#ba3030", lw=3)
-    ax.plot([0, 0], [0, axis_len], [0, 0], color="#1c7a43", lw=3)
-    ax.plot([0, 0], [0, 0], [0, 2.2], color="#365bb5", lw=3)
+    ax.plot([0, axis_len], [0, 0], [0, 0], color="#ba3030", lw=3, zorder=3)
+    ax.plot([0, 0], [0, axis_len], [0, 0], color="#1c7a43", lw=3, zorder=3)
+    ax.plot([0, 0], [0, 0], [0, 2.2], color="#365bb5", lw=3, zorder=3)
     # Camera trails will be updated per frame on the side wall; no future path leaks into a frame.
     camera_side_trails = [ax.plot([], [], [], color=color, lw=2.2, alpha=0.9)[0]
                           for color in ("#aa4a18", "#7b3f98")]
-    mesh = Poly3DCollection([Vd[0][f] for f in faces], facecolor="#bd8060", edgecolor="none", alpha=0.68)
+    mesh = Poly3DCollection([Vd[0][f] for f in faces], facecolor="#bd8060", edgecolor="none", alpha=0.92, zorder=10)
     ax.add_collection3d(mesh)
     sk_lines = []
     for a, b in EDGES:
-        line, = ax.plot([], [], [], color="#101820", lw=2.5)
+        line, = ax.plot([], [], [], color="#101820", lw=2.5, zorder=20)
         sk_lines.append(line)
-    walker_tubes = Poly3DCollection([], facecolor="#176b7e", edgecolor="#0d3640", linewidth=0.2)
+    walker_tubes = Poly3DCollection([], facecolor="#176b7e", edgecolor="#0d3640", linewidth=0.2, zorder=8)
     ax.add_collection3d(walker_tubes)
-    handle_tubes = Poly3DCollection([], facecolor="#f57c00", edgecolor="#55305f", linewidth=0.2)
+    handle_tubes = Poly3DCollection([], facecolor="#f57c00", edgecolor="#55305f", linewidth=0.2, zorder=9)
     ax.add_collection3d(handle_tubes)
-    model_sc = ax.scatter([], [], [], s=13, color="#101820", depthshade=False)
-    tri_sc = ax.scatter([], [], [], s=10, color="#c62828", depthshade=False)
+    model_sc = ax.scatter([], [], [], s=13, color="#101820", depthshade=False, zorder=25)
+    tri_sc = ax.scatter([], [], [], s=10, color="#c62828", depthshade=False, zorder=25)
     rejected_tri_sc = ax.scatter([], [], [], s=18, color="#b36b1e", depthshade=False, marker="x")
-    foot_sc = ax.scatter([], [], [], s=22, color="#1b7f4a", depthshade=False)
-    foot_below_sc = ax.scatter([], [], [], s=26, color="#c62828", depthshade=False)
+    foot_sc = ax.scatter([], [], [], s=22, color="#1b7f4a", depthshade=False, zorder=25)
+    foot_below_sc = ax.scatter([], [], [], s=26, color="#c62828", depthshade=False, zorder=25)
     rejected_lines = []
     for _ in EDGES:
-        line, = ax.plot([], [], [], color="#b36b1e", lw=1.8, ls="--")
+        line, = ax.plot([], [], [], color="#b36b1e", lw=1.8, ls="--", zorder=20)
         rejected_lines.append(line)
-    camera_sc = [ax.scatter([], [], [], s=34, color=c, depthshade=False) for c in ("#aa4a18", "#7b3f98")]
-    ankle_sc = [ax.scatter([], [], [], s=12, color=c, depthshade=False) for c in ("#1e6b8b", "#8b5a20")]
+    camera_sc = [ax.scatter([], [], [], s=34, color=c, depthshade=False, zorder=25) for c in ("#aa4a18", "#7b3f98")]
+    ankle_sc = [ax.scatter([], [], [], s=12, color=c, depthshade=False, zorder=25) for c in ("#1e6b8b", "#8b5a20")]
     camera_drop = [ax.plot([], [], [], color="#819199", lw=1, ls=":")[0] for _ in range(2)]
 
     sets_doc = json.loads(args.surface_sets.read_text(encoding="utf-8"))
@@ -206,7 +209,7 @@ def main() -> int:
             writer.write(frame)
     finally:
         writer.release(); plt.close(fig)
-    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, short past-only trail", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 with two gridded room walls; rear wall behind walking direction", "display_coordinates": "X,Y,Z physical ground (reference video)", "view_elevation": 23, "view_azimuth": view_azim, "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, short past-only trail", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 colored the same as room walls; explicit render order keeps human overlays above floor; two gridded room walls; rear wall behind walking direction", "display_coordinates": "X,Y,Z physical ground (reference video)", "view_elevation": 23, "view_azimuth": view_azim, "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(args.output.resolve())
     return 0
 
