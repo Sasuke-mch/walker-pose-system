@@ -2295,3 +2295,8 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 梯度探针（Stage C 末/Stage D 末，相同有效系数，重建 latent，保真度约 0.24；中段无 checkpoint 记 unavailable）：时序 local 对 latent/root 梯度约为有效 obs3d 的 20 倍，时序 root 对 transl 约 13 倍；时序与其他项余弦均 |cos|<0.3，无方向对冲，属量级压制。
 - 掩码：本次数据未触发回退；但原 try/except 静默全 True 属 fail-open，已改为 fail-closed `resolve_scene_frame_mask` 并新增 4 项定向测试（缺失/形状/异常值均报错），py_compile、新测试与 diff--check 通过。
 - 判定 `STOP_NO_ABLATION`：local 与 root 均明显冲突，不做盲目消融；D-only 失败结论不变。唯一推荐下一步：重设计时序项（自归一化尺度不变损失、接触门控三元组、或仅上肢局部集合）后再做一次 local-only 探针。未执行 push。
+### 2026-09-26 — 修复全片正式可视化 file:// 空白问题
+
+- 原因：正式页面依赖 CDN 的 Three.js ES module；从本地 `file:///` 打开时模块加载失败，初始化中止，嵌入数据本身没有丢失。
+- 修复：正式 viewer 路径改为加载同目录、无网络依赖的 Canvas viewer；Canvas 页面保留 448 帧数据、COCO 骨架线、深色地面、逐帧助步器和滑块范围 0..447。
+- `py_compile`、页面字段检查和 `git diff --check` 通过。未改拟合结果、未执行 push。
