@@ -56,7 +56,15 @@ def main() -> int:
     html = html.replace("接触状态未作为拟合监督", "Stage D 已加入 surface foot=2、hand=30；页面仍不代表真实接触或握持")
     html = html.replace("0xcbd8cf", "0x718279")
     a.output.parent.mkdir(parents=True, exist_ok=True)
-    a.output.write_text(html, encoding="utf-8")
+    # Local file:// pages cannot rely on the template's CDN import map. Keep
+    # the formal path stable, but load the sibling dependency-free Canvas page
+    # so opening this exact artifact never depends on network module loading.
+    canvas_name = "surface_contact_full448_canvas.html"
+    wrapper = """<!doctype html><meta charset=\"utf-8\"><title>Current-run grounded male SMPL</title>
+<style>html,body,iframe{margin:0;width:100%;height:100%;border:0;background:#718279}</style>
+<iframe title=\"offline grounded SMPL viewer\" src=\"surface_contact_full448_canvas.html\"></iframe>
+"""
+    a.output.write_text(wrapper, encoding="utf-8")
     print(a.output.resolve())
     return 0
 

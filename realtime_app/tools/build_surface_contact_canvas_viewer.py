@@ -23,6 +23,8 @@ def main() -> int:
         return value
     data=finite_json(data)
     page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(',', ':')))
+    page = page.replace('窗口 60..90 · 31 帧 · 无外部库', f'全片 0..{int(data["n"])-1} · {int(data["n"])} 帧 · 无外部库')
+    page = page.replace('min="0" max="30" value="0"', f'min="0" max="{int(data["n"])-1}" value="0"')
     page = page.replace('<label><input id="walker" type="checkbox" checked> 助步器</label>', '<label><input id="walker" type="checkbox" checked> 助步器实体杆件</label><label><input id="links" type="checkbox" checked> 人体骨架线</label>')
     page = page.replace("Promise.all([unpack(d.v),unpack(d.w),unpack(d.t),unpack(d.he)]).then(([v,w,t,he])=>", "Promise.all([unpack(d.v),unpack(d.w),unpack(d.t),unpack(d.he),unpack(d.j)]).then(([v,w,t,he,j])=>")
     page = page.replace("const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length;", "const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,E=[[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16],[0,1],[0,2],[1,3],[2,4]];")
