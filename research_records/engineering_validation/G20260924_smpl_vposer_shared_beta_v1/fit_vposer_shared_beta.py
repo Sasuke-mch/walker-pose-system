@@ -121,6 +121,12 @@ def main() -> int:
     ap.add_argument("--stage-d-lr-min-factor", type=float, default=0.10,
                     help="Final/target LR factor for cosine or exponential Stage D decay")
     ap.add_argument("--obs-3d-weight", type=float, default=1.0)
+    ap.add_argument("--obs-3d-mode", choices=("uniform", "reprojection_uncertainty"), default="uniform",
+                    help="3-D observation model; uniform preserves the frozen baseline")
+    ap.add_argument("--obs-3d-base-sigma-mm", type=float, default=100.0,
+                    help="base 3-D robust scale for reprojection_uncertainty mode")
+    ap.add_argument("--obs-3d-max-sigma-factor", type=float, default=4.0,
+                    help="upper clamp for the uncertainty scale factor")
     # Gradient audit (v5 summary): with 2D=0.25 the realized 3D/2D gradient
     # L2 norms were nearly equal (0.327/0.328). Lowering 2D to 0.20 puts the
     # realized 3D gradient ~1.25x above 2D ("3D slightly dominant").
@@ -148,6 +154,8 @@ def main() -> int:
         raise ValueError("--start and --end must be supplied together")
     if args.hand_contact_weight < 0.0 or args.surface_hand_contact_weight < 0.0:
         raise ValueError("hand contact weights must be non-negative")
+    if not math.isfinite(args.obs_3d_base_sigma_mm) or not math.isfinite(args.obs_3d_max_sigma_factor) or args.obs_3d_base_sigma_mm <= 0.0 or args.obs_3d_max_sigma_factor < 1.0:
+        raise ValueError("3-D uncertainty scale must be positive and max factor >= 1")
     surface_mode = args.contact_vertex_sets is not None
     eff_foot_w, eff_hand_w = args.surface_foot_contact_weight, args.surface_hand_contact_weight
     if surface_mode and (args.walker_topology is None or args.contact_labels is None or args.scene_transforms is None):
@@ -210,6 +218,25 @@ def main() -> int:
     lu /= max(np.linalg.norm(lu),1e-8); ll -= lu*np.dot(ll,lu); ll /= max(np.linalg.norm(ll),1e-8)
     ld=np.cross(ll,lu); ld/=max(np.linalg.norm(ld),1e-8); local_basis=np.stack([ll,lu,ld],axis=1)
     target_np = np.nan_to_num(tri, nan=0.0)
+    # q already combines the existing 2-D confidence, ray-gap, reprojection,
+    # sync and depth factors. The candidate experiment keeps q unchanged and
+    # adds only a per-point uncertainty scale derived from reprojection error
+    # and ray gap, avoiding a second copy of the same confidence product.
+    reproj_px = 0.5 * (np.asarray(el, dtype=np.float32) + np.asarray(er, dtype=np.float32))
+    ray_gap_mm = np.asarray(gap, dtype=np.float32)
+    finite_quality = np.isfinite(reproj_px) & np.isfinite(ray_gap_mm)
+    if args.obs_3d_mode != "uniform" and np.any(accepted & ~finite_quality):
+        raise ValueError("accepted 3-D candidate has unavailable uncertainty diagnostics")
+    sigma_factor_np = np.ones_like(q, dtype=np.float32)
+    sigma_factor_np[finite_quality] = np.clip(
+        1.0 + reproj_px[finite_quality] / 8.0 + ray_gap_mm[finite_quality] / 30.0,
+        1.0, float(args.obs_3d_max_sigma_factor))
+    sigma_factor_np[~np.isfinite(sigma_factor_np)] = float(args.obs_3d_max_sigma_factor)
+    sigma_factor_np[~accepted] = 1.0
+    if args.obs_3d_mode == "uniform":
+        sigma_np = np.full_like(q, 0.10, dtype=np.float32)
+    else:
+        sigma_np = (float(args.obs_3d_base_sigma_mm) / 1000.0) * sigma_factor_np
     root0=np.stack([orientation_init(target_np[t], local_basis) for t in range(n)])
     pelvis_target=np.nanmean(target_np[:,[11,12]],axis=1)
     model_pelvis=zero_coco[0][[11,12]].mean(0)
@@ -221,6 +248,7 @@ def main() -> int:
     obs_l=torch.tensor(left[:,:,:2],device=device); obs_r=torch.tensor(right[:,:,:2],device=device)
     target=torch.tensor(target_np,device=device)
     w=torch.tensor(q,dtype=torch.float32,device=device)
+    sigma3d=torch.tensor(sigma_np,dtype=torch.float32,device=device)
     contact_enabled = False
     if (args.contact_labels is None) != (args.scene_transforms is None):
         raise ValueError("--contact-labels and --scene-transforms must be supplied together")
@@ -392,7 +420,12 @@ def main() -> int:
         result,pose,jc,pl,pr=forward(b)
         finite=torch.isfinite(target).all(-1)
         w3=w*finite
-        l3=((robust_norm(jc-target,0.10)/(0.10**2))*w3).sum()/(w3.sum()+1e-6)
+        if args.obs_3d_mode == "uniform":
+            l3=((robust_norm(jc-target,0.10)/(0.10**2))*w3).sum()/(w3.sum()+1e-6)
+        else:
+            point_residual = torch.linalg.vector_norm(jc - target, dim=-1)
+            point_loss = torch.sqrt(1.0 + (point_residual / sigma3d) ** 2) - 1.0
+            l3=(point_loss*w3).sum()/(w3.sum()+1e-6)
         e2=robust_norm(pl-obs_l,20.0)+robust_norm(pr-obs_r,20.0)
         l2=(e2/(20.0**2)*w*valid2d).sum()/(2*(w*valid2d).sum()+1e-6)
         lp=latent.square().mean()
@@ -711,10 +744,12 @@ def main() -> int:
     eLmed=eL[valid2d.cpu().numpy()]; eRmed=eR[valid2d.cpu().numpy()]
     metrics={"status":"completed_staged_single_frame_vposer_shared_beta","window":window,"frames":n,"full_sequence_fit":False,
              "stage_timing_seconds": stage_timing, "wall_seconds": float(sum(stage_timing.values())), "frames_per_second": float(n/max(sum(stage_timing.values()),1e-6)),
+             "obs_3d_mode": args.obs_3d_mode, "obs_3d_base_sigma_mm": float(args.obs_3d_base_sigma_mm), "obs_3d_max_sigma_factor": float(args.obs_3d_max_sigma_factor),
+             "obs_3d_sigma_factor": {"median": float(np.median(sigma_factor_np[accepted])) if accepted.any() else None, "p95": float(np.percentile(sigma_factor_np[accepted],95)) if accepted.any() else None, "max": float(np.max(sigma_factor_np[accepted])) if accepted.any() else None},
              "temporal_mode": args.temporal_mode, "temporal_local_weight": float(args.temporal_local_weight), "temporal_root_weight": float(args.temporal_root_weight), "temporal_huber_scale_mm": float(args.temporal_huber_scale_mm),
              "temporal_local_loss": float(tl_fin.detach()), "temporal_root_loss": float(tr_fin.detach()), "temporal_local_valid_count": int(tinfo_fin.get("local_valid",0)), "temporal_root_valid_count": int(tinfo_fin.get("root_valid",0)), "temporal_rejected_triplet_count": int(tinfo_fin.get("rejected_triplets",0)), "temporal_gap_count": int(tinfo_fin.get("gap_triplets",0)),
              "stage_c_to_d_same_process":bool(stage_d is not None),"beta_frozen_during_stage_d":bool(beta_frozen_during_stage_d),"stage_a_beta_zero":stage_a,"stage_b_shared_beta":stage_b,"stage_c_joint":stage_c,"stage_d_contact":stage_d,"contact":{"enabled":bool(stage_d is not None),"foot_weight":float(args.foot_contact_weight),"hand_weight":float(args.hand_contact_weight),"label_file":str(args.contact_labels.resolve()) if args.contact_labels else None,"scene_file":str(args.scene_transforms.resolve()) if args.scene_transforms else None,"final_foot_loss":float(lfoot.detach()),"final_hand_loss":float(lhand.detach())},"2d":{"median_px":float(np.median(np.r_[eLmed,eRmed])),"p95_px":float(np.percentile(np.r_[eLmed,eRmed],95)),"left_p95_px":float(np.percentile(eLmed,95)),"right_p95_px":float(np.percentile(eRmed,95))},"3d":{"median_mm":float(np.median(d3[mask])) if mask.any() else None,"p95_mm":float(np.percentile(d3[mask],95)) if mask.any() else None,"joint_p95_mm":{NAMES[j]:float(np.percentile(d3[:,j][mask[:,j]],95)) if mask[:,j].any() else None for j in range(17)}},"beta":{"values":beta_np.tolist(),"shared":True,"at_boundary":bool(np.any(np.isclose(np.abs(beta_np),1.5,atol=1e-3)))},"right_knee_accepted":int(accepted[:,14].sum()),"vposer":{"latent_dim":int(vp_cfg.model_params.latentD),"checkpoint":str(vp_ckpt.resolve())},"source_audit":{"raw_left":str(args.left.resolve()),"raw_right":str(args.right.resolve()),"old_fit_inputs_read":False,"stored_triangulation_read":False,"temporal_prefit_read":False}}
-    np.savez_compressed(out/"result.npz",vertices=verts,faces=np.asarray(model.faces),predicted_coco=pred,betas=np.repeat(beta_np[None,:],n,axis=0),body_pose=pose_np,global_orient=roots,transl=trans,raw_triangulated_points=raw,temporally_processed_points=raw,joint_confidence=q,accepted_mask=accepted,reject_reason=reason)
+    np.savez_compressed(out/"result.npz",vertices=verts,faces=np.asarray(model.faces),predicted_coco=pred,betas=np.repeat(beta_np[None,:],n,axis=0),body_pose=pose_np,global_orient=roots,transl=trans,raw_triangulated_points=raw,temporally_processed_points=raw,joint_confidence=q,accepted_mask=accepted,reject_reason=reason,obs3d_sigma_m=sigma_np,obs3d_sigma_factor=sigma_factor_np)
     (out/"metrics.json").write_text(json.dumps(metrics,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     (out/"temporal_metrics.json").write_text(json.dumps({"temporal_mode":args.temporal_mode,"dt":"1/30 (30 FPS, no timestamps)","frame_ok":"triangulation accepted.any + scene accepted + finite Rgc/Tgc; triplet needs 3 consecutive ok, gap<=max_gap","huber_scale_mm":float(args.temporal_huber_scale_mm),"local_joints":"predicted_coco_ground minus pelvis_ground, COCO [5,6,7,8,9,10,11,12,13,14,15,16]","accel":"second difference /(dt^2), pseudo-Huber mean","local_loss":float(tl_fin.detach()),"root_loss":float(tr_fin.detach()),"local_valid":int(tinfo_fin.get("local_valid",0)),"root_valid":int(tinfo_fin.get("root_valid",0)),"rejected_triplets":int(tinfo_fin.get("rejected_triplets",0)),"gap_triplets":int(tinfo_fin.get("gap_triplets",0)),"status":str(tinfo_fin.get("status",""))},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     if surface_mode:

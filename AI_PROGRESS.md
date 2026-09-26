@@ -2421,3 +2421,4 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 
 - 按用户要求移除 MP4 中 X/Y/Z 三条粗坐标轴。相机投影改为在 YZ 侧面参考平面显示完整 448 帧轨迹，使用细线；每帧只显示当前相机中心和当前中心到投影面的辅助线，不再使用12帧短轨迹。
 - 新输出：`surface_contact_baseline_v5_full_camera_trajectory_1080p.mp4`、`surface_contact_temporal_v5_full_camera_trajectory_1080p.mp4`；均为448帧、30 FPS、1920×1080。中段抽帧确认完整细轨迹可见，粗坐标轴已移除。
+`n### 2026-09-26 — 逐点三维鲁棒尺度实验`n保留full17无时序和有时序基线。新增full448_surface_uncertainty_v1，从原始PMPose重新拟合，仅改变3D pseudo-Huber尺度：100mm×clip(1+平均重投影/8px+射线间隙/30mm,1,4)，原q、2D、contact、Stage和LR不变，时序关闭。这是工程尺度代理，尚未标定协方差。448帧运行退出0；2D P95 162.48→155.41px，3D P95 147.67→158.47mm（+7.31%），停止门失败，保留基线，不扩展后续模块。raw/accepted/q一致、vertices有限、D beta冻结。详细协议及comparison在新目录；4项mask测试、编译及差异检查通过。

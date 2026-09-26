@@ -1,0 +1,91 @@
+{
+  "decision": "retain_baseline",
+  "reason": "3d_p95_worse_than_5_percent_gate",
+  "raw_and_masks_identical": true,
+  "baseline_2d_p95_px": 162.48162841796875,
+  "candidate_2d_p95_px": 155.41253662109375,
+  "baseline_3d_p95_mm": 147.67483520507812,
+  "candidate_3d_p95_mm": 158.47451782226562,
+  "joint_3d_p95_mm": {
+    "nose": {
+      "baseline": 165.9825439453125,
+      "candidate": 185.32981872558594
+    },
+    "left_eye": {
+      "baseline": 149.20748901367188,
+      "candidate": 175.48545837402344
+    },
+    "right_eye": {
+      "baseline": 138.72723388671875,
+      "candidate": 159.45654296875
+    },
+    "left_ear": {
+      "baseline": 126.756591796875,
+      "candidate": 149.9899139404297
+    },
+    "right_ear": {
+      "baseline": 109.0164566040039,
+      "candidate": 137.45059204101562
+    },
+    "left_shoulder": {
+      "baseline": 115.48516845703125,
+      "candidate": 131.2659912109375
+    },
+    "right_shoulder": {
+      "baseline": 117.02452850341797,
+      "candidate": 127.87660217285156
+    },
+    "left_elbow": {
+      "baseline": 165.14620971679688,
+      "candidate": 178.0493621826172
+    },
+    "right_elbow": {
+      "baseline": 123.26029968261719,
+      "candidate": 135.85231018066406
+    },
+    "left_wrist": {
+      "baseline": 83.83802795410156,
+      "candidate": 80.18050384521484
+    },
+    "right_wrist": {
+      "baseline": 83.48880004882812,
+      "candidate": 84.78430938720703
+    },
+    "left_hip": {
+      "baseline": 150.5558319091797,
+      "candidate": 137.52427673339844
+    },
+    "right_hip": {
+      "baseline": 123.55118560791016,
+      "candidate": 123.90938568115234
+    },
+    "left_knee": {
+      "baseline": 157.1757049560547,
+      "candidate": 152.05091857910156
+    },
+    "right_knee": {
+      "baseline": 198.11038208007812,
+      "candidate": 186.9554901123047
+    },
+    "left_ankle": {
+      "baseline": 143.4618377685547,
+      "candidate": 179.09620666503906
+    },
+    "right_ankle": {
+      "baseline": 123.15128326416016,
+      "candidate": 154.37228393554688
+    }
+  },
+  "groups": {
+    "factor_le_2": {
+      "count": 3439,
+      "baseline_p95_mm": 106.3108918655875,
+      "candidate_p95_mm": 120.64677788927241
+    },
+    "factor_gt_2": {
+      "count": 4095,
+      "baseline_p95_mm": 161.318894822227,
+      "candidate_p95_mm": 172.6867313069002
+    }
+  }
+}
