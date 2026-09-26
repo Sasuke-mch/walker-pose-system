@@ -2416,3 +2416,8 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 
 - 用户反馈脚部标记过粗，遮挡脚的轮廓。将视频地下脚底候选点改为极小红点（0.8 pt²、无描边、alpha=0.8），地上脚底点同步缩小为0.5 pt²、alpha=0.6；保留真实 SMPL 脚部表面作为主要轮廓。
 - 重新生成 `surface_contact_baseline_v4_fine_1080p.mp4` 与 `surface_contact_temporal_v4_fine_1080p.mp4`，两者均448帧、30 FPS、1920×1080；中段抽帧确认红点不再覆盖脚部轮廓。
+
+### 2026-09-26 — 视频相机完整投影轨迹与坐标轴调整
+
+- 按用户要求移除 MP4 中 X/Y/Z 三条粗坐标轴。相机投影改为在 YZ 侧面参考平面显示完整 448 帧轨迹，使用细线；每帧只显示当前相机中心和当前中心到投影面的辅助线，不再使用12帧短轨迹。
+- 新输出：`surface_contact_baseline_v5_full_camera_trajectory_1080p.mp4`、`surface_contact_temporal_v5_full_camera_trajectory_1080p.mp4`；均为448帧、30 FPS、1920×1080。中段抽帧确认完整细轨迹可见，粗坐标轴已移除。

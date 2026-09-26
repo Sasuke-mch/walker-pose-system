@@ -128,13 +128,13 @@ def main() -> int:
         ax.plot([x, x], [hi[1], hi[1]], [0, hi[2]], color=wall_color, lw=0.7, alpha=0.7, zorder=0)
     for z in wall_z:
         ax.plot([lo[0], hi[0]], [hi[1], hi[1]], [z, z], color=wall_color, lw=0.7, alpha=0.7, zorder=0)
-    axis_len = max(2.5, float(max(hi[0] - lo[0], hi[1] - lo[1]) * 0.72))
-    ax.plot([0, axis_len], [0, 0], [0, 0], color="#ba3030", lw=3, zorder=3)
-    ax.plot([0, 0], [0, axis_len], [0, 0], color="#1c7a43", lw=3, zorder=3)
-    ax.plot([0, 0], [0, 0], [0, 2.2], color="#365bb5", lw=3, zorder=3)
-    # Camera trails will be updated per frame on the side wall; no future path leaks into a frame.
-    camera_side_trails = [ax.plot([], [], [], color=color, lw=2.2, alpha=0.9)[0]
-                          for color in ("#aa4a18", "#7b3f98")]
+    # Video view intentionally omits the three thick world-axis overlays.
+    # Show the complete camera projection paths as thin side-plane lines; only
+    # the current camera centers are updated frame by frame below.
+    camera_side_trails = []
+    for side, color in enumerate(("#aa4a18", "#7b3f98")):
+        camera_side_trails.append(ax.plot(np.full(n, side_x), Cd[:, side, 1], Cd[:, side, 2],
+                                          color=color, lw=0.8, alpha=0.85, zorder=4)[0])
     mesh = Poly3DCollection([Vd[0][f] for f in faces], facecolor="#bd8060", edgecolor="none", alpha=0.92, zorder=10)
     ax.add_collection3d(mesh)
     sk_lines = []
@@ -196,9 +196,6 @@ def main() -> int:
                 c = Cd[i, side]
                 camera_sc[side]._offsets3d = ([c[0]], [c[1]], [c[2]])
                 camera_drop[side].set_data_3d(([c[0], side_x], [c[1], c[1]], [c[2], c[2]]))
-                q0 = max(0, i - args.trail_frames)
-                trail = Cd[q0:i + 1, side]
-                camera_side_trails[side].set_data_3d((np.full(len(trail), side_x), trail[:, 1], trail[:, 2]))
                 ankle = Td[max(0, i - args.trail_frames):i + 1, 15 + side]
                 ankle[:, 2] = 0
                 ankle_sc[side]._offsets3d = (ankle[:, 0], ankle[:, 1], ankle[:, 2])
@@ -210,7 +207,7 @@ def main() -> int:
             writer.write(frame)
     finally:
         writer.release(); plt.close(fig)
-    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, short past-only trail", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 colored the same as room walls; explicit render order floor<mesh<skeleton<points<walker keeps human visible while walker overlays human; two gridded room walls; rear wall behind walking direction", "resolution": "1920x1080", "display_coordinates": "X,Y,Z physical ground (reference video)", "view_elevation": 23, "view_azimuth": view_azim, "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.with_suffix(".json").write_text(json.dumps({"frames": n, "fps": args.fps, "surface_vertices": 6890, "faces": 13776, "walker_members": len(edges), "walker_geometry": "eight-sided 3D cylinder meshes from static topology", "skeleton": "raw triangulated COCO-17; rejected finite edges dashed", "camera_projection": "YZ side wall, complete all-frame thin trajectory; current camera center and projection shown", "ankle_trail_frames": args.trail_frames, "ground": "Z=0 colored the same as room walls; explicit render order floor<mesh<skeleton<points<walker keeps human visible while walker overlays human; two gridded room walls; rear wall behind walking direction", "resolution": "1920x1080", "display_coordinates": "X,Y,Z physical ground (reference video)", "view_elevation": 23, "view_azimuth": view_azim, "sole_vertices": int(len(sole_idx)), "input": str(args.result_grounded.resolve())}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(args.output.resolve())
     return 0
 
