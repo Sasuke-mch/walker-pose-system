@@ -2445,3 +2445,9 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 发现并修复结果契约缺陷：`run_stereo` 三角化实际使用 `max_matches=1`，但 `StereoOutputWriter` 原先没有把该字段写入每行结果和摘要，导致 SMPL 入口错误拒绝回放。代码现已在 `d2cbab6b`、`a02652c4` 分两次提交；相关 Python 编译和三角化 8 项单元测试通过。当前回放 JSONL 已补写 `max_matches=1` 作为本次结果的等价契约修复。
 - 单帧 1157 探针成功；5 帧独立 SMPL 短窗 1157–1161 全部成功。短窗使用 fixed-zero beta、独立 clean-zero 初始化、二维鱼眼 Huber 拟合，未使用存储三维、时序或接触；综合重投影中位数 19.77 px、P95 172.47 px，右膝因当前监督策略为 0 个 supervised samples。该结果仅证明入口和优化链可运行，不能解释为真实姿态精度。
 - 下一步若继续全片拟合，应先选择明确的阶段协议（独立 2D 诊断或带三维 guardrail/地面预拟合的主线），不能把 5 帧独立短窗结果直接升级为 360 帧 Stage A/B/C/D 结论。
+
+### 2026-09-27 — 严格三角化固定地面视频可视化
+
+- 使用同源 `pipeline_20260927_201716_pmpose_mainline/stereo_results.jsonl` 和当前静态地面参考生成 `triangulation_video_strict/skeleton_on_fixed_ground.mp4`，共 360 帧、30 FPS；未启用 display-completion，不使用 force-all、插值或旧结果。
+- 视频显示严格 accepted 三角化点，2976 个点记录为 `strict_valid`，每帧有效点数中位数 9/17，360 帧并非全部 17 点完整；踝点有效观测 550 个，固定地面坐标下高度中位数 92.23 mm，但这不是鞋底触地或承重测量。
+- 该视频仅用于检查当前三角化在固定地面坐标中的连续性、拒绝状态和空间关系；不能解释为真实三维精度、触地、支撑、步态或人体真值。
