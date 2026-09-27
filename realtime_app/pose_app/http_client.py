@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 import cv2
 import numpy as np
 from .schema import InferenceResult, PersonPose
-from .adaptive_bbox import DEFAULT_POWER, DEFAULT_THRESHOLD, expand_detections
+from tools.build_continuous_foot_inclusive_roi import RULE, foot_inclusive_box
 
 
 class ServiceError(RuntimeError):
@@ -105,8 +105,8 @@ class PMPosePipelineClient:
     timeout: float
     jpeg_quality: int
     adaptive_box_enabled: bool = True
-    adaptive_box_threshold: float = DEFAULT_THRESHOLD
-    adaptive_box_power: float = DEFAULT_POWER
+    adaptive_box_threshold: float = RULE["threshold"]
+    adaptive_box_power: float = RULE["power"]
     adaptive_box_frames: int = 0
     adaptive_box_expanded_detections: int = 0
 
@@ -142,13 +142,20 @@ class PMPosePipelineClient:
             detections = []
         adaptive_stats = {"expanded_detections": 0}
         if self.adaptive_box_enabled:
-            detections, adaptive_stats = expand_detections(
-                detections,
-                width,
-                height,
-                threshold=self.adaptive_box_threshold,
-                power=self.adaptive_box_power,
-            )
+            # Reuse the original audited offline rule without reimplementing it.
+            expanded_detections = []
+            for detection in detections:
+                original = list(detection["bbox"])
+                roi, stats = foot_inclusive_box(
+                    original, width, height,
+                    self.adaptive_box_threshold, self.adaptive_box_power,
+                )
+                expanded_detections.append(dict(
+                    detection, bbox=roi, adaptive_original_bbox=original,
+                    adaptive_box_stats=stats,
+                ))
+                adaptive_stats["expanded_detections"] += int(stats["growth"] > 0)
+            detections = expanded_detections
             self.adaptive_box_frames += 1
             self.adaptive_box_expanded_detections += int(
                 adaptive_stats["expanded_detections"]
@@ -183,6 +190,7 @@ class PMPosePipelineClient:
     def adaptive_box_summary(self) -> dict[str, Any]:
         return {
             "enabled": self.adaptive_box_enabled,
+            "implementation": "tools.build_continuous_foot_inclusive_roi.foot_inclusive_box",
             "threshold": self.adaptive_box_threshold,
             "power": self.adaptive_box_power,
             "frames": self.adaptive_box_frames,
