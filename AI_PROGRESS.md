@@ -4,6 +4,10 @@
 
 修正 `realtime_app/tools/fit_smplh_wilor_sequence.py`：右目 WiLoR 候选改为按 `right` 读取；候选不再因单个点越界而整只手被丢弃；输出保留完整 21 点、逐点有限性和原始鱼眼边界状态，边界状态仅作诊断，不作为点删除门。对现有 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/wilor_left.jsonl` 与 `wilor_right.jsonl` 做读取预检：左侧有限点 6426、边界内 6426，右侧有限点 7623、边界内 5092。编译和合成 JSONL 检查通过；旧 `fit_cuda_full` 的右手 80 点统计来自旧读取错误，不能继续引用。下一门是按修正入口重跑短窗并核查 WiLoR 左右候选关联与 SMPL-H 关节映射，当前不宣称真实手部姿态或握持。
 
+### 2026-09-27：SMPL-H 全 448 帧接入候选拟合（已完成，未通过可用门）
+
+使用修正后的 `fit_smplh_wilor_sequence.py`，输入为 people1 原始 PMPose、正式双鱼眼标定、`wilor_left.jsonl`/`wilor_right.jsonl`、SMPL-H male 和固定 COCO regressor；CUDA、180 步 Adam，输出 `G20260927_wilor_smplh_full448_v1/fit_cuda_full_v3/`。结果网格为 `(448,6890,3)`、面为 `(13776,3)`，完整 WiLoR 21 点和逐点掩码均已保存；有限点左/右为 6426/7623，原始鱼眼边界内为 6426/5092。最后一步身体项 RMS 为约 378.3 mm，左右手二维项 RMS 为约 189.7/191.8 px；这些是当前工程目标残差，不是真实误差。由于保留所有有限点后残差仍大，当前只能记为 `engineering_candidate`，不能进入握持判断或正式主线。下一步优先核查 WiLoR 左右候选关联、SMPL-H 手部关节顺序和鱼眼回投模型，再考虑初始化或损失权重调整。
+
 ## 2026-09-25：冻结无时序基线，提出时序联合拟合试验（尚未执行）
 
 冻结目录：`research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/frozen_no_temporal_a2_a30_cosine320/`，保存拟合入口、surface loss 实现、原实验记录快照、完整命令、metrics、trace、审计及 freeze_manifest.json。大型 NPZ 保留在原 full448_surface_both_a2_a30_cosine320 目录，以路径和字节数定位；新试验使用新输出目录。
