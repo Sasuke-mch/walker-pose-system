@@ -35,23 +35,60 @@ raw_clean = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(raw_clean)
 
 
-def read_wilor(path: Path, n: int, side: str) -> tuple[np.ndarray, np.ndarray]:
+def read_wilor(path: Path, n: int, side: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Read the best side candidate while retaining every finite point.
+
+    ``valid`` is a per-point finite-value mask used only to avoid NaNs in the
+    optimizer.  ``bounds_ok`` is diagnostic metadata; it is deliberately not
+    used to discard an entire hand or an individual point.  WiLoR does not
+    provide an independent per-joint confidence, so the detector confidence
+    remains a candidate-level field in the audit output.
+    """
     obs = np.full((n, 21, 2), np.nan, np.float32)
-    mask = np.zeros((n, 21), bool)
+    valid = np.zeros((n, 21), bool)
+    bounds_ok = np.zeros((n, 21), bool)
     for line in path.open(encoding="utf-8"):
         row = json.loads(line)
         frame = int(row["frame_index"])
         if not (0 <= frame < n):
             continue
-        candidates = [c for c in row["records"] if c.get("side") == side and c.get("raw_pixel_bounds_ok")]
+        candidates = [c for c in row["records"] if c.get("side") == side]
         if not candidates:
             continue
         candidate = max(candidates, key=lambda c: float(c.get("detector_confidence", 0.0)))
         points = np.asarray(candidate["keypoints_2d_raw_fisheye"], np.float32)
-        if points.shape == (21, 2) and np.isfinite(points).all():
-            obs[frame] = points
-            mask[frame] = True
-    return obs, mask
+        if points.shape != (21, 2):
+            continue
+        obs[frame] = points
+        valid[frame] = np.isfinite(points).all(axis=-1)
+        # The sequence audit currently stores only a candidate-level bounds
+        # flag.  Recompute the per-joint state from the raw image dimensions
+        # when available, while preserving points outside the image.
+        image_path = row.get("image")
+        width = height = None
+        if image_path:
+            try:
+                import cv2
+                image = cv2.imread(str(image_path), cv2.IMREAD_UNCHANGED)
+                if image is not None:
+                    height, width = image.shape[:2]
+                    # people1 audit images are stored upright (1920 high x
+                    # 1080 wide), while the saved WiLoR points are explicitly
+                    # mapped back to the original raw-fisheye (1920 wide x
+                    # 1080 high) frame.
+                    if height > width:
+                        width, height = height, width
+            except Exception:
+                pass
+        if width is not None and height is not None:
+            bounds_ok[frame] = (
+                valid[frame]
+                & (points[:, 0] >= 0) & (points[:, 0] < width)
+                & (points[:, 1] >= 0) & (points[:, 1] < height)
+            )
+        else:
+            bounds_ok[frame] = bool(candidate.get("raw_pixel_bounds_ok", False))
+    return obs, valid, bounds_ok
 
 
 def main() -> int:
@@ -96,11 +133,16 @@ def main() -> int:
     n = len(ids)
     tri_m = np.nan_to_num(np.asarray(tri, np.float32) / 1000.0)
     body_mask = np.asarray(accepted, bool) & np.isfinite(tri).all(axis=-1)
-    hand_l, hand_l_mask = read_wilor(args.wilor_left, n, "left")
-    hand_r, hand_r_mask = read_wilor(args.wilor_right, n, "left")
+    hand_l, hand_l_valid, hand_l_bounds = read_wilor(args.wilor_left, n, "left")
+    hand_r, hand_r_valid, hand_r_bounds = read_wilor(args.wilor_right, n, "right")
     hand_keep = [0, 5, 6, 7, 9, 10, 11, 17, 18, 19, 13, 14, 15, 1, 2, 3]
-    hand_l, hand_l_mask = hand_l[:, hand_keep], hand_l_mask[:, hand_keep]
-    hand_r, hand_r_mask = hand_r[:, hand_keep], hand_r_mask[:, hand_keep]
+    # Keep the complete 21-point observations for audit/export.  The SMPL-H
+    # joint adapter currently uses the documented 16-point subset below.
+    hand_l_full, hand_r_full = hand_l.copy(), hand_r.copy()
+    hand_l_full_valid, hand_r_full_valid = hand_l_valid.copy(), hand_r_valid.copy()
+    hand_l_full_bounds, hand_r_full_bounds = hand_l_bounds.copy(), hand_r_bounds.copy()
+    hand_l, hand_l_mask = hand_l[:, hand_keep], hand_l_valid[:, hand_keep]
+    hand_r, hand_r_mask = hand_r[:, hand_keep], hand_r_valid[:, hand_keep]
 
     # WiLoR ships a full-pose SMPL-H pickle without the optional PCA metadata
     # expected by smplx.  Supply identity components and zero means; posedirs
@@ -189,11 +231,17 @@ def main() -> int:
                         raw_triangulated_points=tri, body_accepted=body_mask,
                         wilor_left_2d=hand_l, wilor_left_mask=hand_l_mask,
                         wilor_right_2d=hand_r, wilor_right_mask=hand_r_mask,
+                        wilor_left_2d_full=hand_l_full, wilor_right_2d_full=hand_r_full,
+                        wilor_left_valid_full=hand_l_full_valid, wilor_right_valid_full=hand_r_full_valid,
+                        wilor_left_bounds_ok_full=hand_l_full_bounds, wilor_right_bounds_ok_full=hand_r_full_bounds,
                         body_quality=quality)
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
         "status": "engineering_candidate", "frames": n, "steps": args.steps,
         "model": str(args.smplh_model.resolve()), "vertices": 6890,
         "hand_observation_source": "WiLoR_model_projected_MANO_joints",
+        "hand_observation_points_retained": 21,
+        "hand_fit_subset_points": len(hand_keep),
+        "hand_bounds_are_diagnostic_only": True,
         "wilor_left_valid_points": int(hand_l_mask.sum()),
         "wilor_right_valid_points": int(hand_r_mask.sum()), "history": history,
         "body_accepted_points": int(body_mask.sum()),
