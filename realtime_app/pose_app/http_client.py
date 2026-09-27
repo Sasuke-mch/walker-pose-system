@@ -9,6 +9,7 @@ from urllib.request import Request, urlopen
 import cv2
 import numpy as np
 from .schema import InferenceResult, PersonPose
+from .adaptive_bbox import DEFAULT_POWER, DEFAULT_THRESHOLD, expand_detections
 
 
 class ServiceError(RuntimeError):
@@ -103,6 +104,11 @@ class PMPosePipelineClient:
     pose_url: str
     timeout: float
     jpeg_quality: int
+    adaptive_box_enabled: bool = True
+    adaptive_box_threshold: float = DEFAULT_THRESHOLD
+    adaptive_box_power: float = DEFAULT_POWER
+    adaptive_box_frames: int = 0
+    adaptive_box_expanded_detections: int = 0
 
     def health(self) -> dict[str, Any]:
         detector = _json_request(
@@ -134,6 +140,19 @@ class PMPosePipelineClient:
         detections = detector_response.get("detections", [])
         if not isinstance(detections, list):
             detections = []
+        adaptive_stats = {"expanded_detections": 0}
+        if self.adaptive_box_enabled:
+            detections, adaptive_stats = expand_detections(
+                detections,
+                width,
+                height,
+                threshold=self.adaptive_box_threshold,
+                power=self.adaptive_box_power,
+            )
+            self.adaptive_box_frames += 1
+            self.adaptive_box_expanded_detections += int(
+                adaptive_stats["expanded_detections"]
+            )
         pose_payload = dict(common)
         pose_payload["detections"] = detections
         pose_response = _json_request(
@@ -155,5 +174,17 @@ class PMPosePipelineClient:
             stage_times_ms={
                 "detector_ms": detector_ms,
                 "pose_ms": pose_ms,
+                "adaptive_box_expanded_detections": float(
+                    adaptive_stats["expanded_detections"]
+                ),
             },
         )
+
+    def adaptive_box_summary(self) -> dict[str, Any]:
+        return {
+            "enabled": self.adaptive_box_enabled,
+            "threshold": self.adaptive_box_threshold,
+            "power": self.adaptive_box_power,
+            "frames": self.adaptive_box_frames,
+            "expanded_detections": self.adaptive_box_expanded_detections,
+        }

@@ -2422,3 +2422,10 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 按用户要求移除 MP4 中 X/Y/Z 三条粗坐标轴。相机投影改为在 YZ 侧面参考平面显示完整 448 帧轨迹，使用细线；每帧只显示当前相机中心和当前中心到投影面的辅助线，不再使用12帧短轨迹。
 - 新输出：`surface_contact_baseline_v5_full_camera_trajectory_1080p.mp4`、`surface_contact_temporal_v5_full_camera_trajectory_1080p.mp4`；均为448帧、30 FPS、1920×1080。中段抽帧确认完整细轨迹可见，粗坐标轴已移除。
 `n### 2026-09-26 — 逐点三维鲁棒尺度实验`n保留full17无时序和有时序基线。新增full448_surface_uncertainty_v1，从原始PMPose重新拟合，仅改变3D pseudo-Huber尺度：100mm×clip(1+平均重投影/8px+射线间隙/30mm,1,4)，原q、2D、contact、Stage和LR不变，时序关闭。这是工程尺度代理，尚未标定协方差。448帧运行退出0；2D P95 162.48→155.41px，3D P95 147.67→158.47mm（+7.31%），停止门失败，保留基线，不扩展后续模块。raw/accepted/q一致、vertices有限、D beta冻结。详细协议及comparison在新目录；4项mask测试、编译及差异检查通过。
+
+### 2026-09-27 — PMPose 二维检测接入宽度自适应扩框
+
+- 在 `realtime_app/pose_app/adaptive_bbox.py` 下沉既有连续脚部包容 ROI 规则：检测框宽度占模型输入图像宽度小于 0.37 时保持原框；超过后按 `((r-0.37)/(1-0.37))^0.75` 连续增长，左右/顶部/底部最大相对框尺寸分别为 0.20/0.08/1.30。
+- PMPose 链路现在在 YOLO 检测结果发送给 PMPose 之前执行扩框，默认开启，可用 `--pmpose-adaptive-box off` 关闭；原始框作为请求附加字段保留，扩框统计写入 `stage_times_ms` 和 `stereo_summary.json`。
+- 扩框坐标始终是旋转后的模型输入坐标；PMPose 关键点仍沿原有逆旋转路径回到原始鱼眼像素，再进入既有严格三角化。没有修改标定、关联、三角化质量门或 SMPL 主线。
+- 验证：`tests/test_adaptive_bbox.py` 3项 unittest 通过，`compileall` 通过，`run_stereo.py --help` 能显示新增参数。尚未用新策略重跑完整人体视频，因此准确性改善仍属于待验证的工程假设，不宣称真实精度提升。

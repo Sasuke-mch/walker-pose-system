@@ -19,6 +19,7 @@ from pose_app.config import load_config
 from pose_app.docker_service import DockerPoseService
 from pose_app.geometry_input import count_out_of_raw_image_bounds
 from pose_app.http_client import PMPosePipelineClient, PoseServiceClient
+from pose_app.adaptive_bbox import DEFAULT_POWER, DEFAULT_THRESHOLD
 from pose_app.local_perspective import LocalPerspectiveModelInput
 from pose_app.lower_limb_live_status import LowerLimbLiveStatusWriter
 from pose_app.lower_limb_pipeline import build_lower_limb_pipeline
@@ -193,6 +194,28 @@ def parse_args() -> argparse.Namespace:
         help="Virtual-view box expansion factor; must be greater than 1.0.",
     )
     parser.add_argument(
+        "--pmpose-adaptive-box",
+        choices=["off", "on"],
+        default="on",
+        help=(
+            "Expand YOLO person boxes before PMPose. The existing continuous "
+            "foot-inclusive rule is applied in rotated model-input coordinates; "
+            "default: on."
+        ),
+    )
+    parser.add_argument(
+        "--pmpose-adaptive-box-threshold",
+        type=float,
+        default=DEFAULT_THRESHOLD,
+        help="Person-box width/image-width threshold for adaptive PMPose expansion.",
+    )
+    parser.add_argument(
+        "--pmpose-adaptive-box-power",
+        type=float,
+        default=DEFAULT_POWER,
+        help="Growth power for adaptive PMPose expansion.",
+    )
+    parser.add_argument(
         "--save-raw-pairs",
         action="store_true",
         help="Save pre-inference raw left/right camera images as separate replay videos plus raw_pairs.jsonl.",
@@ -333,6 +356,10 @@ def parse_args() -> argparse.Namespace:
             "--model-input-undistort与--model-input-local-perspective不能同时使用；"
             "两种投影的串联没有经过验证。"
         )
+    if not 0.0 < args.pmpose_adaptive_box_threshold < 1.0:
+        parser.error("--pmpose-adaptive-box-threshold必须在(0, 1)内。")
+    if args.pmpose_adaptive_box_power <= 0.0:
+        parser.error("--pmpose-adaptive-box-power必须大于0。")
     if args.max_pair_delta_ms <= 0:
         parser.error("--max-pair-delta-ms必须大于0。")
     if args.warn_skew_ms < 0:
@@ -375,6 +402,9 @@ def connect_client(args: argparse.Namespace, config):
             f"http://127.0.0.1:{config.pmpose.host_port}",
             config.docker.request_timeout_sec,
             config.output.jpeg_quality,
+            adaptive_box_enabled=args.pmpose_adaptive_box == "on",
+            adaptive_box_threshold=args.pmpose_adaptive_box_threshold,
+            adaptive_box_power=args.pmpose_adaptive_box_power,
         )
     client.health()
     return client
@@ -783,6 +813,14 @@ def main() -> int:
                 args.local_perspective_min_box_fraction,
                 args.local_perspective_margin,
             )
+        if args.model == "pmpose":
+            log.info(
+                "PMPose检测框自适应扩展：enabled=%s threshold=%.3f power=%.3f；"
+                "扩框只发生在旋转后的模型输入坐标，三角化前仍反变换回原始鱼眼像素。",
+                args.pmpose_adaptive_box == "on",
+                args.pmpose_adaptive_box_threshold,
+                args.pmpose_adaptive_box_power,
+            )
         if args.stereo_sbs_video is not None:
             log.info(
                 "离线SBS重放：每个已解码帧按x=%d直接分成left=%dx%d、right=%dx%d；"
@@ -862,6 +900,12 @@ def main() -> int:
         else:
             service = DockerPoseService(config, run_dir, args.model)
             client = service.start()
+        if isinstance(client, PMPosePipelineClient):
+            # DockerPoseService creates its client internally; apply the same
+            # runtime policy as connect-only mode after the services are ready.
+            client.adaptive_box_enabled = args.pmpose_adaptive_box == "on"
+            client.adaptive_box_threshold = args.pmpose_adaptive_box_threshold
+            client.adaptive_box_power = args.pmpose_adaptive_box_power
 
         output_fps = args.output_fps or min(
             config.output.realtime_output_fps, source.fps
@@ -1154,6 +1198,8 @@ def main() -> int:
                 "improvement greater than 0.25 px"
             ),
         }
+        if isinstance(client, PMPosePipelineClient):
+            summary["pmpose_adaptive_box"] = client.adaptive_box_summary()
         summary["max_pair_delta_ms"] = (
             args.max_pair_delta_ms if camera_mode else None
         )
