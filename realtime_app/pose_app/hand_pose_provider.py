@@ -152,6 +152,8 @@ def preflight_backend(name: str) -> dict[str, Any]:
         modules.update({
             "torchvision": importlib.util.find_spec("torchvision") is not None,
             "yacs": importlib.util.find_spec("yacs") is not None,
+            "kornia": importlib.util.find_spec("kornia") is not None,
+            "pytorch3d": importlib.util.find_spec("pytorch3d") is not None,
         })
     report["python_modules"] = modules
     report["assets_ready"] = (

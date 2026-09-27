@@ -1,0 +1,25 @@
+# Install CUDA PyTorch first from the matching PyTorch index:
+# uv pip install --python ..\.venv-cuda\Scripts\python.exe torch torchvision --index-url https://download.pytorch.org/whl/cu128
+#
+# xtcocotools is intentionally omitted: its Windows/Python 3.12 build in the
+# upstream WiLoR requirements is broken because the sdist misses _mask.c.
+numpy==1.26.4
+opencv-python
+pyrender
+pytorch-lightning
+scikit-image
+smplx==0.1.28
+yacs
+chumpy==0.70
+timm
+einops
+pandas
+hydra-core
+hydra-submitit-launcher
+hydra-colorlog
+pyrootutils
+rich
+webdataset
+gradio
+ultralytics==8.1.34
+kornia
