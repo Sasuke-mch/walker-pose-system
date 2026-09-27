@@ -1091,6 +1091,7 @@ def main() -> int:
                 right_result,
                 persons_3d,
                 geometry_rejected_out_of_raw_bounds_keypoints,
+                max_matches=1 if args.stereo_subject_mode == "single" else None,
             )
             lower_limb_status = None
             if lower_limb_live_status is not None:

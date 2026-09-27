@@ -87,6 +87,7 @@ class StereoOutputWriter:
         right_result: InferenceResult,
         persons_3d: list[TriangulatedPerson],
         geometry_rejected_out_of_raw_bounds_keypoints: dict[str, int] | None = None,
+        max_matches: int | None = None,
     ) -> dict:
         """Build the one immutable result record shared by file and live consumers."""
 
@@ -121,6 +122,7 @@ class StereoOutputWriter:
                     )
                 ),
             },
+            "max_matches": max_matches,
             "left": left_result.to_dict(),
             "right": right_result.to_dict(),
             "persons_3d": [person.to_dict() for person in persons_3d],
@@ -151,6 +153,7 @@ class StereoOutputWriter:
             right_result,
             persons_3d,
             geometry_rejected_out_of_raw_bounds_keypoints,
+            max_matches=payload.get("max_matches") if payload else None,
         )
         if payload.get("pair_id") != pair.pair_id:
             raise ValueError("stereo output payload pair_id does not match its frame pair")
