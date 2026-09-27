@@ -2451,3 +2451,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 使用同源 `pipeline_20260927_201716_pmpose_mainline/stereo_results.jsonl` 和当前静态地面参考生成 `triangulation_video_strict/skeleton_on_fixed_ground.mp4`，共 360 帧、30 FPS；未启用 display-completion，不使用 force-all、插值或旧结果。
 - 视频显示严格 accepted 三角化点，2976 个点记录为 `strict_valid`，每帧有效点数中位数 9/17，360 帧并非全部 17 点完整；踝点有效观测 550 个，固定地面坐标下高度中位数 92.23 mm，但这不是鞋底触地或承重测量。
 - 该视频仅用于检查当前三角化在固定地面坐标中的连续性、拒绝状态和空间关系；不能解释为真实三维精度、触地、支撑、步态或人体真值。
+
+### 2026-09-27 — 无质量阈值 force-all 骨架与助步器行走视频
+
+- 根据用户要求重新从同源 PMPose 原始二维结果重算 force-all 三角化：`keypoint_threshold=0`、`max_association_cost=999`、`max_reprojection_error_px=999`、`max_matches=1`。每个左右都有观测且可形成有限三角化的点均进入结果；二维越界/非有限观测无法形成三角化的点保留缺失原因。新结果：`pipeline_20260927_201716_pmpose_mainline/force_all_replay_v2/offline_stereo_results.jsonl`。
+- 360 对中平均 16.56/17 个三角化点，5960 个有效三维点；COCO 右膝 360/360 均有输出。质量不再用于拒绝，误差和质量标志单独记录：负深度标志 143 个、高重投影标志 27 个、原始边界拒绝 160 个。
+- 将 force-all 结果按当前真实 pair_id 对齐为显示输入 `visual_stereo_force_all_aligned.jsonl`，使用本次动态地面 `realtime_dynamic_ground_pose.jsonl`、本次 Stage 1/2 `realtime_stage_walker.jsonl` 和记录中的 `coarse_walker_model_v2_camera_rail` 拓扑生成视频：`walker_ground_stage_skeleton_force_all_video/raw_visual_human_partial_handles_ground.mp4`。
+- 视频 360 帧、30 FPS；Stage 计数为 warming_up 3、Stage 1 212、transition 62、Stage 2 83。助步器节点随本次 `T_G<-C_t` 逐帧重构，首尾代表节点位移约 1038.5 mm，Stage 2 段显示相机/助步器移动候选。该位移是当前算法估计，不是外部运动真值。
+- 视频中的骨架显示所有可三角化点，误差保存在同目录 `interaction_distance_records.jsonl`，并按质量状态着色；没有使用插值或旧逐帧位姿。仍需注意：原始鱼眼边界外或非有限二维点没有几何输入，不能凭空生成三维点。
