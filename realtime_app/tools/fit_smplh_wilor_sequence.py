@@ -35,7 +35,7 @@ raw_clean = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(raw_clean)
 
 
-def read_wilor(path: Path, n: int, side: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Read the best side candidate while retaining every finite point.
 
     ``valid`` is a per-point finite-value mask used only to avoid NaNs in the
@@ -55,7 +55,15 @@ def read_wilor(path: Path, n: int, side: str) -> tuple[np.ndarray, np.ndarray, n
         candidates = [c for c in row["records"] if c.get("side") == side]
         if not candidates:
             continue
-        candidate = max(candidates, key=lambda c: float(c.get("detector_confidence", 0.0)))
+        # Candidate identity is tied to the PMPose wrist in the same camera.
+        # Historical JSONL may not contain detector confidence, so confidence
+        # alone cannot establish the person association.
+        if body_points is not None and np.isfinite(body_points[frame, 9 if side == "left" else 10, :2]).all():
+            wrist = body_points[frame, 9 if side == "left" else 10, :2]
+            candidate = min(candidates, key=lambda c: float(np.linalg.norm(
+                np.asarray(c["keypoints_2d_raw_fisheye"], np.float32)[0] - wrist)))
+        else:
+            candidate = max(candidates, key=lambda c: float(c.get("detector_confidence", 0.0)))
         points = np.asarray(candidate["keypoints_2d_raw_fisheye"], np.float32)
         if points.shape != (21, 2):
             continue
@@ -133,9 +141,10 @@ def main() -> int:
     n = len(ids)
     tri_m = np.nan_to_num(np.asarray(tri, np.float32) / 1000.0)
     body_mask = np.asarray(accepted, bool) & np.isfinite(tri).all(axis=-1)
-    hand_l, hand_l_valid, hand_l_bounds = read_wilor(args.wilor_left, n, "left")
-    hand_r, hand_r_valid, hand_r_bounds = read_wilor(args.wilor_right, n, "right")
-    hand_keep = [0, 5, 6, 7, 9, 10, 11, 17, 18, 19, 13, 14, 15, 1, 2, 3]
+    hand_l, hand_l_valid, hand_l_bounds = read_wilor(args.wilor_left, n, "left", left)
+    hand_r, hand_r_valid, hand_r_bounds = read_wilor(args.wilor_right, n, "right", right)
+    hand_keep = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    # WiLoR 21-pt unified names: wrist + 5 fingers x (j1,j2,j3,tip_surface).
     # Keep the complete 21-point observations for audit/export.  The SMPL-H
     # joint adapter currently uses the documented 16-point subset below.
     hand_l_full, hand_r_full = hand_l.copy(), hand_r.copy()
@@ -173,24 +182,52 @@ def main() -> int:
     K0, D0 = cal.K0, cal.D0
     K1, D1 = cal.K1, cal.D1
 
-    # Initialize translation from observed pelvis and the zero-pose SMPL-H mesh.
+    # Translation init with NaN guard (no nanmean->nan_to_num silence).
     with torch.no_grad():
         z = model(betas=torch.zeros(n, 10, device=device),
                   global_orient=root, body_pose=body_pose,
                   left_hand_pose=lhand, right_hand_pose=rhand,
                   transl=torch.zeros(n, 3, device=device), return_verts=True)
         zc = regress_coco17_torch(z.vertices, reg)
-        pelvis_obs = np.nanmean(tri_m[:, [11, 12]], axis=1)
-        transl[:] = torch.tensor(pelvis_obs, device=device) - zc[:, [11, 12]].mean(1)
+        zc_np = zc.detach().cpu().numpy()
+        init_source = []
+        t0 = np.zeros((n, 3), np.float32)
+        for i in range(n):
+            hl = tri_m[i, 11] if np.isfinite(tri_m[i, 11]).all() and body_mask[i, 11] else None
+            hr = tri_m[i, 12] if np.isfinite(tri_m[i, 12]).all() and body_mask[i, 12] else None
+            if hl is not None and hr is not None:
+                t0[i] = (hl + hr) / 2 - (zc_np[i, 11] + zc_np[i, 12]) / 2; init_source.append("hips_midpoint")
+            elif hl is not None:
+                t0[i] = hl - zc_np[i, 11]; init_source.append("left_hip_only")
+            elif hr is not None:
+                t0[i] = hr - zc_np[i, 12]; init_source.append("right_hip_only")
+            else:
+                t0[i] = np.zeros(3, np.float32); init_source.append("translation_init_unavailable")
+        transl[:] = torch.tensor(t0, device=device)
 
     optim = torch.optim.Adam([beta, root, transl, body_pose, lhand, rhand], lr=args.lr)
     history = []
-    # The WiLoR pickle contains 21 body/hand regressor joints followed by
-    # 15 left- and 15 right-hand joints (51 total); wrist joints are the last
-    # two body entries.
-    hand_map_l = [19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
-    hand_map_r = [20, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
-    # WiLoR OpenPose order -> SMPL-H joints: wrist, then index/middle/pinky/ring/thumb.
+    from pose_app.smplh_hand_observation import HAND_JOINTS, TIP_VERTICES, HAND_NAMES, validate_smplh, hand21
+    validate_smplh(model)
+    # Named SMPL-H internal-joint maps (16 pts, wrist + 3 per finger, no tips).
+    # WiLoR/MANO 21-pt order (mano_to_openpose): wrist, then per finger
+    # thumb/index/middle/ring/pinky x (mcp,pip,dip,tip) + 5 tips at indices 16..20.
+    # Internal joints map to WiLoR indices [0..15]; tips [16..20] use TIP_VERTICES.
+    W2S_L = [0, 13, 14, 15, 1, 2, 3, 4, 5, 6, 10, 11, 12, 7, 8, 9]
+    W2S_R = W2S_L
+    hand_map_l = HAND_JOINTS["left"]
+    hand_map_r = HAND_JOINTS["right"]
+    assert hand_map_l == [20, 34, 35, 36, 22, 23, 24, 25, 26, 27, 31, 32, 33, 28, 29, 30]
+    assert hand_map_r == [21, 49, 50, 51, 37, 38, 39, 40, 41, 42, 46, 47, 48, 43, 44, 45]
+    # WiLoR OpenPose order -> SMPL-H joints verified above; tips via hand21 vertices.
+    stages = [("A_body_only", 0.0, ["beta", "root", "transl", "body_pose"]),
+              ("B_hands_only", 1e-5, ["lhand", "rhand"]),
+              ("C_wrist_forearm_hands", 1e-5, ["beta", "root", "transl", "body_pose", "lhand", "rhand"]),
+              ("D_weak_hand3d", 1e-5, ["beta", "root", "transl", "body_pose", "lhand", "rhand"])]
+    def set_stage(train):
+        for p in (beta, root, transl, body_pose, lhand, rhand): p.requires_grad_(False)
+        m = {"beta": beta, "root": root, "transl": transl, "body_pose": body_pose, "lhand": lhand, "rhand": rhand}
+        for k in train: m[k].requires_grad_(True)
     for step in range(args.steps):
         optim.zero_grad(set_to_none=True)
         out = model(betas=beta.expand(n, -1), global_orient=root,
@@ -198,10 +235,11 @@ def main() -> int:
                     right_hand_pose=rhand, transl=transl, return_verts=True)
         coco = regress_coco17_torch(out.vertices, reg)
         body_res = (coco - target).pow(2).sum(-1)
-        body_loss = body_res[mask_body].mean() if mask_body.any() else body_res.mean() * 0.0
+        body_w = torch.tensor(np.asarray(quality, np.float32), device=device).clamp_min(0.0)
+        body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
         joints = out.joints
-        jl = joints[:, hand_map_l]
-        jr = joints[:, hand_map_r]
+        jl = hand21(joints, out.vertices, "left")
+        jr = hand21(joints, out.vertices, "right")
         pl = fisheye_project_torch(jl, K0, D0)
         pr = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
         hand_l_loss = (pl - obs_l).pow(2).sum(-1)[mask_l].mean() if mask_l.any() else pl.sum() * 0.0
