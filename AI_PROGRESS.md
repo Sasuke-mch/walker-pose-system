@@ -2429,3 +2429,4 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - PMPose 链路在 YOLO 检测结果发送给 PMPose 之前复用该函数，默认开启，可用 `--pmpose-adaptive-box off` 关闭；原始框作为请求附加字段保留，扩框统计写入 `stage_times_ms` 和 `stereo_summary.json`。
 - 扩框坐标始终是旋转后的模型输入坐标；PMPose 关键点仍沿原有逆旋转路径回到原始鱼眼像素，再进入既有严格三角化。没有修改标定、关联、三角化质量门或 SMPL 主线。
 - 验证：360 对新采集回放完成，输出为 `realtime_app/outputs/pipeline_20260927_201716_pmpose_original_roi`；720 次左右模型调用中 887 个检测框按旧规则扩展。平均有效三维点 8.27/17，平均配对处理速度 2.308 对/秒，右侧原始边界拒绝点 168 个。以上是工程统计，不是精度真值；尚未完成与 `pmpose-adaptive-box off` 的严格成对指标比较。
+- 当前下一步不是扩框 A/B，而是把该固定主线接入下肢、Stage 1/2、动态地面、助步器和 SMPL：先生成同源完整 `stereo_results.jsonl`，核查坐标/拒绝状态和场景变换，再进入 SMPL 拟合。

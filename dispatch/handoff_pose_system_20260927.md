@@ -77,7 +77,7 @@ RIGHT --right-model-rotation cw90
 
 规则含义：远处或较小人体框保持原框；近处人体框连续增大，底部扩展更强，目标是减少脚部和被遮挡下肢被裁剪。扩框只在旋转后的模型输入坐标中发生，原始框作为请求附加信息保留，扩框数量和参数写入 `stage_times_ms` 及 `stereo_summary.json`。
 
-按原有逻辑完成了一次 360 对回放：输出为 `realtime_app/outputs/pipeline_20260927_201716_pmpose_original_roi`；720 次左右模型调用中 887 个检测框扩展，平均有效三维点 8.27/17，平均配对处理速度 2.308 对/秒，右侧越界拒绝点 168 个。此次运行确认了接入路径，但没有证明精度提升；仍需关闭扩框做严格 A/B 对照。
+按原有逻辑完成了一次 360 对回放：输出为 `realtime_app/outputs/pipeline_20260927_201716_pmpose_original_roi`；720 次左右模型调用中 887 个检测框扩展，平均有效三维点 8.27/17，平均配对处理速度 2.308 对/秒，右侧越界拒绝点 168 个。此次运行的作用是确认主线接入和输出完整性，不把这些统计解释为真实精度。
 
 ### 3.3 旧回放基线
 
@@ -134,65 +134,60 @@ RIGHT --right-model-rotation cw90
 - 已完成候选环境/模型路径的规划，但尚未作为主线稳定接入并通过遮挡场景对照。
 - InterWild 适合作为强遮挡手部候选和补充诊断，不应在没有同一输入、同一遮挡片段和同一评价协议前替换 WiLoR 或 PMPose 主线。
 
-## 6. 下一阶段实验方向
+## 6. 当前正在做什么
 
-必须按以下顺序推进，每次只改变一个主要变量。
+当前不是扩框算法对比实验，而是在固定使用既有扩框逻辑的前提下，恢复新相机位置后的完整主线。扩框只是二维 PMPose 输入预处理，不是独立研究变量。
 
-### 阶段 A：验证自适应扩框是否真的改善二维观测
+当前主线顺序必须保持：
 
-固定：新标定、360 对回放、旋转方向、YOLO 权重、PMPose 权重、阈值、关联和三角化质量门。
+1. 读取新双目标定和新静态地面参考；
+2. 用真实配对回放执行左右图像旋转；
+3. PMPose 前调用原有 `foot_inclusive_box()`；
+4. 保存左右二维关键点、框、置信度和失败状态；
+5. 用原始鱼眼像素执行单人关联和严格三角化；
+6. 在三角化结果上运行下肢 T1–T5、Stage 1/2、动态地面和助步器候选重构；
+7. 对通过上游门槛的结果导出 SMPL 主线输入；
+8. 按既有 Stage A/B/C/D 流程拟合 SMPL，最后才生成同源可视化。
 
-只比较：
+每一步必须先检查输入输出契约，再进入下一步。某一步失败时保留失败帧和拒绝原因，不能用后续 SMPL、插值、平滑或旧结果补齐。
 
-1. `--pmpose-adaptive-box off`
-2. `--pmpose-adaptive-box on`（本次已完成）
+## 7. 下一步主线任务
 
-必须输出并对齐：
+### 7.1 完成含下游模块的 PMPose 回放
 
-- 每帧左右原框与扩框；
-- 17 个关键点置信度和缺失情况；
-- 每关节双目有效/拒绝数量；
-- 三角化重投影误差、射线间隙和拒绝原因；
-- 下肢关键点覆盖；
-- 失败帧完整保留。
+在已经验证的 360 对回放基础上，重新运行同一输入，但开启当前主线的下游模块：下肢状态、Stage walker、静态地面参考和完整动态 SE(3) 选项。唯一意图是生成当前相机位置下的一套同源中间结果，不做扩框开关对照。
 
-停止条件：扩框导致有效点减少、误检增加、关联错误或几何质量下降时，不能默认保留扩框；应退回原框或改成分段规则。
+必须核查：
 
-### 阶段 B：只在 A 通过后测试局部虚拟透视
+- 左右旋转方向是否使人体正立；
+- PMPose 二维结果是否仍回到原始鱼眼坐标；
+- 三角化是否使用新标定而非旧外参；
+- 右侧越界拒绝点是否完整保留；
+- Stage 1/2 是否按当前协议转换；
+- 动态地面是否真的更新，不能只看文件存在；
+- 助步器节点/边是否来自现有拓扑；
+- 所有输出是否来自同一批 360 对输入。
 
-当前已有 `--model-input-local-perspective {off,auto,always}`。它是第二次局部模型输入推理，不等同于扩展 YOLO 框。
+### 7.2 生成 SMPL 输入并执行主线拟合
 
-建议先比较：
+使用本次 PMPose 回放的 `stereo_results.jsonl`，通过现有 PMPose 导出适配器生成 SMPL 输入。SMPL 拟合仍使用固定 COCO-17 regressor、male SMPL 6890 顶点和当前地面/助步器场景变换。
 
-```text
-adaptive on + local perspective off
-adaptive on + local perspective auto
-```
+拟合顺序保持：
 
-不能同时改变扩框阈值、局部 margin、三角化门和 SMPL 拟合权重。
+- Stage A：beta 固定，逐帧姿态和根变量；
+- Stage B：冻结运动，只更新共享 beta；
+- Stage C：联合拟合；
+- Stage D：同一进程继续，逐元素冻结 beta，再加入表面手脚项或当前已冻结的时序项。
 
-### 阶段 C：手部模型候选对照
+在 SMPL 之前必须先检查：输入帧数、17 个 COCO 索引、finite/NaN、accepted/rejected mask、相机坐标系和地面变换来源。若二维或三角化输入不完整，停止在 SMPL 入口，不用拟合结果掩盖上游问题。
 
-只使用 A/B 确认后的二维人体主线作为固定身体输入，分别运行：
+### 7.3 手部模型暂不改变身体主线
 
-1. PMPose 身体主线；
-2. WiLoR 手部观测；
-3. InterWild 手部观测。
+WiLoR/InterWild 仍作为后续手部观测候选，不阻塞当前 SMPL 身体主线。下一步先把 PMPose+三角化+SMPL 主线在新相机数据上跑通，再在同一帧范围上接入 WiLoR 手部观测；只有手部观测契约稳定后，才讨论 SMPL-H/SMPL-X 统一参数化。
 
-比较内容应是遮挡片段的手部观测可用率、左右一致性、关键点置信度、重投影/三角化内部一致性和失败模式，不得直接比较“谁更像真实手势”。
+## 8. 推荐下一次运行命令
 
-### 阶段 D：统一人体模型方案选择
-
-只有当 WiLoR/InterWild 手部观测在固定片段上稳定后，才选择：
-
-- 继续 SMPL 身体 + 手部观测约束；或
-- 迁移到 SMPL-H/SMPL-X，重新建立身体、手部和 COCO 回归器的统一参数化。
-
-迁移模型必须重新验证模型顶点、关节回归器、坐标系、相机投影和手脚表面项，不能只替换 checkpoint。
-
-## 7. 推荐下一次运行命令
-
-先做自适应扩框 A/B 对照，暂不进入正式 SMPL 拟合：
+下一次直接运行包含当前主线下游模块的 PMPose 回放，不切换扩框开关：
 
 ```powershell
 cd D:\my_works\walker_pose_system\realtime_app
@@ -211,15 +206,18 @@ cd D:\my_works\walker_pose_system\realtime_app
   --max-reprojection-error-px 10 `
   --stereo-subject-mode single `
   --pmpose-adaptive-box on `
-  --output-dir .\outputs\pipeline_20260927_201716_pmpose_adaptive `
+  --enable-lower-limb-pipeline `
+  --enable-stage-walker `
+  --walker-reconstruction-interval 10 `
+  --dynamic-ground-reference .\calibration\results\static_ground_20260927_201028\ground_reference.json `
+  --dynamic-ground-full-se3 `
+  --output-dir .\outputs\pipeline_20260927_201716_pmpose_mainline `
   --output-fps 30 `
   --headless
 ```
-
-然后只把 `--pmpose-adaptive-box on` 改为 `off`，输出到另一个目录。两次都不要启用 SMPL、动态地面或助步器后处理，先完成二维/三角化数据审计。
 
 ## 8. 工作区与交接纪律
 
 当前工作区存在大量用户已有修改、实验产物和未跟踪文件，不能执行 `git reset --hard`、批量删除或覆盖。自适应扩框应继续维护原有 `build_continuous_foot_inclusive_roi.py` 单一实现；交接者只应修改与当前阶段直接相关的文件。
 
-实验记录必须写输入路径、帧范围、参数、输出路径和结论边界，不在实验记录中写 Git 哈希。所有失败帧和拒绝原因必须保留。完成 A/B 后，再更新 `AI_PROGRESS.md` 和对应实验记录，不能先写“准确性提升”。
+实验记录必须写输入路径、帧范围、参数、输出路径和结论边界，不在实验记录中写 Git 哈希。所有失败帧和拒绝原因必须保留。当前先完成主线闭环，不把扩框统计写成“准确性提升”。
