@@ -2475,3 +2475,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 修正 `export_pmpose_raw_predictions.py`：缺人帧输出空检测列表，不再写入全 NaN 人体占位，阻止后续适配器把缺失帧伪造成零分数人体。
 - 当前 360 帧 PMPose 重放修正结果：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/complete_3d_corrected_v2/complete_3d_estimates.jsonl`；6120/6120 关节点有估计，其中 `stereo_raw=5408`、`single_view_temporal_interpolated=677`、`temporal_interpolated=35`。这属于工程估计链结果，不是三维真值或人体精度验证。
 - 验证：`python -m unittest realtime_app.tests.test_complete_stereo_3d_estimation -v`（3 项通过）；两个修正脚本通过 `py_compile`。
+
+### 2026-09-28 — 冻结“原始视频到三角化”唯一主线
+
+- 新增固定路线文档：根目录 `TRIANGULATION_PIPELINE_FIXED.md`；实验报告目录 `资料/docs/实验报告/原始视频到三角化固定路线_20260928.md`。两份内容相同，记录输入、代码路径、坐标回映、人物关联、严格三角化、单侧射线+时间锚、缺失处理、Stage 1/2、助步器变换、当前360帧证据和后续规则。
+- `estimate_complete_stereo_3d.py` 新增 `--stereo-jsonl`，直接读取当前运行的原始鱼眼 `stereo_results.jsonl`，保留真实 pair_id，不再依赖临时 top-down 转换文件。
+- 直接原始输入重放输出：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/complete_3d_direct_raw/complete_3d_estimates.jsonl`；来源计数 `stereo_raw=5408`、`single_view_temporal_interpolated=677`、`temporal_interpolated=35`。
+- 最终视频：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/complete_3d_direct_raw/walker_ground_stage_video_final/raw_visual_human_partial_handles_ground.mp4`，已核验 360 帧、30 FPS、文件大小约 6.2 MB。
+- 后续原始视频到三角化任务必须沿该文档执行；新算法只能作为有独立输出、独立统计的单变量对照，不能绕过或覆盖严格主链。

@@ -81,8 +81,12 @@ class TemporalAnchor:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", choices=("pmpose", "probpose"), required=True)
-    parser.add_argument("--left-json", required=True, type=Path)
-    parser.add_argument("--right-json", required=True, type=Path)
+    parser.add_argument("--left-json", type=Path)
+    parser.add_argument("--right-json", type=Path)
+    parser.add_argument(
+        "--stereo-jsonl", type=Path,
+        help="Current run_stereo output with raw-fisheye 2-D observations and original pair IDs.",
+    )
     parser.add_argument("--calibration", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--fps", type=float, default=30.0)
@@ -442,6 +446,46 @@ def _load_joint_inputs(args: argparse.Namespace, calibration: StereoCalibration)
     return joints
 
 
+def _load_joint_inputs_from_stereo_jsonl(
+    path: Path, calibration: StereoCalibration
+) -> dict[str, list[JointFrameInput]]:
+    """Read the current stereo replay directly; never create placeholder people."""
+
+    joints: dict[str, list[JointFrameInput]] = {name: [] for name in COCO17_NAMES}
+    previous_pair_id: int | None = None
+    with path.open("r", encoding="utf-8-sig") as handle:
+        for line_number, line in enumerate(handle, 1):
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            pair_id = int(row["pair_id"])
+            if previous_pair_id is not None and pair_id != previous_pair_id + 1:
+                raise ValueError(f"{path}:{line_number}: nonconsecutive pair_id")
+            previous_pair_id = pair_id
+            left_persons = (row.get("left") or {}).get("persons") or []
+            right_persons = (row.get("right") or {}).get("persons") or []
+            left_unique = len(left_persons) == 1
+            right_unique = len(right_persons) == 1
+            for side, persons, unique in (
+                ("left", left_persons, left_unique),
+                ("right", right_persons, right_unique),
+            ):
+                if unique and len(persons[0].get("keypoints") or []) < len(COCO17_NAMES):
+                    raise ValueError(f"{path}:{line_number}: {side} person lacks COCO-17")
+            for index, name in enumerate(COCO17_NAMES):
+                left_point = list(left_persons[0]["keypoints"][index]) if left_unique else None
+                right_point = list(right_persons[0]["keypoints"][index]) if right_unique else None
+                joints[name].append(_joint_input(
+                    pair_id, f"pair_{pair_id:04d}.png", left_point, right_point,
+                    calibration, target_is_unique=left_unique or right_unique,
+                    left_identity_reason=None if left_unique else "no_unique_left_person",
+                    right_identity_reason=None if right_unique else "no_unique_right_person",
+                ))
+    if previous_pair_id is None:
+        raise ValueError(f"empty stereo JSONL: {path}")
+    return joints
+
+
 def _direct_payload(candidate: DirectStereoCandidate | None) -> dict[str, Any]:
     if candidate is None:
         return {
@@ -632,7 +676,12 @@ def main() -> int:
     args = parse_args()
     if args.fps <= 0:
         raise ValueError("--fps must be positive")
-    for field in ("left_json", "right_json", "calibration"):
+    if args.stereo_jsonl is None and (args.left_json is None or args.right_json is None):
+        raise ValueError("Supply --stereo-jsonl or both --left-json and --right-json")
+    if args.stereo_jsonl is not None and (args.left_json is not None or args.right_json is not None):
+        raise ValueError("--stereo-jsonl cannot be combined with saved model prediction JSONs")
+    fields = ("calibration", "stereo_jsonl") if args.stereo_jsonl is not None else ("calibration", "left_json", "right_json")
+    for field in fields:
         path = getattr(args, field).resolve()
         if not path.is_file():
             raise FileNotFoundError(path)
@@ -650,7 +699,10 @@ def main() -> int:
     calibration = source_calibration.for_runtime_sizes(
         source_calibration.left_image_size, source_calibration.right_image_size
     )
-    joint_inputs = _load_joint_inputs(args, calibration)
+    joint_inputs = (
+        _load_joint_inputs_from_stereo_jsonl(args.stereo_jsonl, calibration)
+        if args.stereo_jsonl is not None else _load_joint_inputs(args, calibration)
+    )
     estimates = {
         joint: estimate_joint_series(samples, calibration)
         for joint, samples in joint_inputs.items()
@@ -673,7 +725,10 @@ def main() -> int:
         "frames": len(frames),
         "coordinate_frame": "left_camera",
         "length_unit": calibration.length_unit,
-        "inputs": {"left": str(args.left_json), "right": str(args.right_json)},
+        "inputs": (
+            {"stereo_jsonl": str(args.stereo_jsonl)} if args.stereo_jsonl is not None
+            else {"left": str(args.left_json), "right": str(args.right_json)}
+        ),
         "calibration": str(args.calibration),
         "rotations": {"left": args.left_model_rotation, "right": args.right_model_rotation},
         "score_or_reprojection_rejection": "none",
