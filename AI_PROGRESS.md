@@ -1,5 +1,9 @@
 # 助步器项目 AI 工作日志
 
+## 2026-09-27：people1 手部入口修复（已验证，尚未重跑拟合）
+
+修正 `realtime_app/tools/fit_smplh_wilor_sequence.py`：右目 WiLoR 候选改为按 `right` 读取；候选不再因单个点越界而整只手被丢弃；输出保留完整 21 点、逐点有限性和原始鱼眼边界状态，边界状态仅作诊断，不作为点删除门。对现有 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/wilor_left.jsonl` 与 `wilor_right.jsonl` 做读取预检：左侧有限点 6426、边界内 6426，右侧有限点 7623、边界内 5092。编译和合成 JSONL 检查通过；旧 `fit_cuda_full` 的右手 80 点统计来自旧读取错误，不能继续引用。下一门是按修正入口重跑短窗并核查 WiLoR 左右候选关联与 SMPL-H 关节映射，当前不宣称真实手部姿态或握持。
+
 ## 2026-09-25：冻结无时序基线，提出时序联合拟合试验（尚未执行）
 
 冻结目录：`research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/frozen_no_temporal_a2_a30_cosine320/`，保存拟合入口、surface loss 实现、原实验记录快照、完整命令、metrics、trace、审计及 freeze_manifest.json。大型 NPZ 保留在原 full448_surface_both_a2_a30_cosine320 目录，以路径和字节数定位；新试验使用新输出目录。
