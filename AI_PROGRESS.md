@@ -2467,3 +2467,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 将 force-all 结果按当前真实 pair_id 对齐为显示输入 `visual_stereo_force_all_aligned.jsonl`，使用本次动态地面 `realtime_dynamic_ground_pose.jsonl`、本次 Stage 1/2 `realtime_stage_walker.jsonl` 和记录中的 `coarse_walker_model_v2_camera_rail` 拓扑生成视频：`walker_ground_stage_skeleton_force_all_video/raw_visual_human_partial_handles_ground.mp4`。
 - 视频 360 帧、30 FPS；Stage 计数为 warming_up 3、Stage 1 212、transition 62、Stage 2 83。助步器节点随本次 `T_G<-C_t` 逐帧重构，首尾代表节点位移约 1038.5 mm，Stage 2 段显示相机/助步器移动候选。该位移是当前算法估计，不是外部运动真值。
 - 视频中的骨架显示所有可三角化点，误差保存在同目录 `interaction_distance_records.jsonl`，并按质量状态着色；没有使用插值或旧逐帧位姿。仍需注意：原始鱼眼边界外或非有限二维点没有几何输入，不能凭空生成三维点。
+
+### 2026-09-27 — 修正缺失视图与全点三维输出
+
+- 核查旧实现 `realtime_app/tools/estimate_complete_stereo_3d.py`：原设计保留有限双目三角化点，重投影误差只记录；单侧观测使用该关节邻近直接双目时间锚投影到当前相机射线；双侧缺失使用同关节直接双目时间锚；无锚点才明确 `unavailable_no_stereo_anchor`。
+- 修正 `estimate_complete_stereo_3d.py`：左右相机的人体身份独立判定。某一侧恰好一个人、另一侧无人时，保留单侧观测进入射线+时间锚估计；某侧多人时该侧标记 `no_unique_*_person`，不擅自选人。双目点仍只在两侧均唯一且观测有限时产生。
+- 修正 `export_pmpose_raw_predictions.py`：缺人帧输出空检测列表，不再写入全 NaN 人体占位，阻止后续适配器把缺失帧伪造成零分数人体。
+- 当前 360 帧 PMPose 重放修正结果：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/complete_3d_corrected_v2/complete_3d_estimates.jsonl`；6120/6120 关节点有估计，其中 `stereo_raw=5408`、`single_view_temporal_interpolated=677`、`temporal_interpolated=35`。这属于工程估计链结果，不是三维真值或人体精度验证。
+- 验证：`python -m unittest realtime_app.tests.test_complete_stereo_3d_estimation -v`（3 项通过）；两个修正脚本通过 `py_compile`。
