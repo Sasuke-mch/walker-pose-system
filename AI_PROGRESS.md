@@ -2483,3 +2483,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 直接原始输入重放输出：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/complete_3d_direct_raw/complete_3d_estimates.jsonl`；来源计数 `stereo_raw=5408`、`single_view_temporal_interpolated=677`、`temporal_interpolated=35`。
 - 最终视频：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/complete_3d_direct_raw/walker_ground_stage_video_final/raw_visual_human_partial_handles_ground.mp4`，已核验 360 帧、30 FPS、文件大小约 6.2 MB。
 - 后续原始视频到三角化任务必须沿该文档执行；新算法只能作为有独立输出、独立统计的单变量对照，不能绕过或覆盖严格主链。
+
+### 2026-09-28 — 当前360帧主线中的SMPL A/B/C窗口推进
+
+- 严格沿 `research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/fit_vposer_shared_beta.py` 运行，不切换到 SMPL-X，也不把 `complete_3d_direct_raw` 的单视图时间锚补全点混入 SMPL 目标。输入为同一批新相机回放的原始 PMPose 二维 JSON 和 `smpl_calibration`：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/pmpose_left_raw_predictions.json`、`pmpose_right_raw_predictions.json`、`smpl_calibration/`。
+- 选择索引 60–90（31 帧，对应真实 pair_id 1217–1247）的开发窗口。窗口包含 Stage 1 19 帧、transition 7 帧、Stage 2 5 帧；拟合使用 `obs_3d_mode=uniform`、3D权重1.0、2D权重0.20、`temporal_mode=none`、不提供接触标签/场景变换，因此只执行主线 Stage A（beta=0）、Stage B（共享 beta）、Stage C（联合运动+beta）。
+- 输出目录：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/smpl_mainline_window60_90_no_contact/`。输出包含 `raw_observations.npz`、`triangulation.npz`、A/B/C三个 `result_*.npz` 和最终 `result.npz`；最终网格为 31×6890 顶点、真实 SMPL faces 为 13776×3，未使用插值或旧拟合结果。
+- 指标（拟合器内部观测一致性）：Stage A 3D 中位数/P95 为 76.55/182.76 mm，2D 中位数/P95 为 52.93/123.00 px；Stage B 为 75.78/183.07 mm、52.95/122.98 px；Stage C 为 71.00/168.04 mm、43.83/113.09 px。共享 beta 的10维结果未触及边界；右膝在该窗口 31/31 帧有 accepted 观测。运行耗时 9.63 s，退出状态 `completed_staged_single_frame_vposer_shared_beta`。
+- 证据边界：这次结果证明当前 360 帧主线的原始二维→严格三角化→SMPL A/B/C 链路可以连续运行，并给出可审计的逐点误差；不证明三维真值、姿态精度、触地、承重或助步器识别。下一道门仍是先审计该窗口的观测残差和网格/骨架可视化，再决定是否扩展到更长窗口或接入记录中的 Stage D 地面/表面接触；不能直接把该31帧结果升级为全360帧结论。
