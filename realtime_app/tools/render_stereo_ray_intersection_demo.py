@@ -10,6 +10,12 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d.proj3d import proj_transform
 import json
+from pathlib import Path
+import sys
+
+APP_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(APP_ROOT))
+from pose_app.project_paths import project_path
 
 
 class Arrow3D(FancyArrowPatch):
@@ -220,7 +226,8 @@ def plot_ray_intersection_scene(joint_name, output_path, view_elev=None, view_az
 def main():
     """生成三个不同关节点的射线相交图"""
 
-    output_dir = r"D:\my_works\walker_pose_system\research_records\engineering_validation\stereo_ray_intersection_demo"
+    output_dir = str(project_path("research_records", "engineering_validation",
+                                  "stereo_ray_intersection_demo"))
 
     import os
     os.makedirs(output_dir, exist_ok=True)
