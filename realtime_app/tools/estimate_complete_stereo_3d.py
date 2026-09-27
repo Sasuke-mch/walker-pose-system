@@ -354,6 +354,8 @@ def _joint_input(
     calibration: StereoCalibration,
     *,
     target_is_unique: bool,
+    left_identity_reason: str | None = None,
+    right_identity_reason: str | None = None,
 ) -> JointFrameInput:
     if not target_is_unique:
         return JointFrameInput(
@@ -361,12 +363,12 @@ def _joint_input(
             file_name=file_name,
             left_point=None,
             right_point=None,
-            left_reason="not_unique_target_person",
-            right_reason="not_unique_target_person",
+            left_reason=left_identity_reason or "not_unique_target_person",
+            right_reason=right_identity_reason or "not_unique_target_person",
             direct=None,
         )
-    left_reason = raw_point_rejection_reason(left_point, calibration.left_image_size)
-    right_reason = raw_point_rejection_reason(right_point, calibration.right_image_size)
+    left_reason = left_identity_reason or raw_point_rejection_reason(left_point, calibration.left_image_size)
+    right_reason = right_identity_reason or raw_point_rejection_reason(right_point, calibration.right_image_size)
     direct = None
     if left_reason is None and right_reason is None:
         direct = _triangulate_unfiltered(calibration, left_point, right_point)
@@ -409,15 +411,21 @@ def _load_joint_inputs(args: argparse.Namespace, calibration: StereoCalibration)
             args.right_model_rotation,
             pair_id / args.fps,
         )
-        target_is_unique = len(left_result.persons) == 1 and len(right_result.persons) == 1
+        # Person identity and joint visibility are separate decisions.  A single
+        # person in one view remains a usable one-sided observation when the
+        # other camera has zero detections; only a view with multiple candidates
+        # is withheld because its identity is ambiguous.
+        left_unique = len(left_result.persons) == 1
+        right_unique = len(right_result.persons) == 1
+        target_is_unique = left_unique and right_unique
         for joint_index, joint_name in enumerate(COCO17_NAMES):
             left_point = (
                 list(left_result.persons[0].keypoints[joint_index])
-                if target_is_unique else None
+                if left_unique else None
             )
             right_point = (
                 list(right_result.persons[0].keypoints[joint_index])
-                if target_is_unique else None
+                if right_unique else None
             )
             joints[joint_name].append(
                 _joint_input(
@@ -426,7 +434,9 @@ def _load_joint_inputs(args: argparse.Namespace, calibration: StereoCalibration)
                     left_point,
                     right_point,
                     calibration,
-                    target_is_unique=target_is_unique,
+                    target_is_unique=left_unique or right_unique,
+                    left_identity_reason=None if left_unique else "no_unique_left_person",
+                    right_identity_reason=None if right_unique else "no_unique_right_person",
                 )
             )
     return joints
@@ -669,7 +679,7 @@ def main() -> int:
         "score_or_reprojection_rejection": "none",
         "raw_image_bounds_policy": "out-of-bounds or non-finite 2-D points do not enter calibration; they are treated as missing observations for temporal estimation",
         "bone_length_usage": "post-estimation statistics only; never an estimation input",
-        "identity_policy": "only frames with exactly one left and one right saved person use image observations; non-unique frames use temporal estimation only",
+        "identity_policy": "each view contributes its observation when it has exactly one saved person; zero detections produce a one-sided observation, multiple detections are withheld as ambiguous; two-view stereo requires unique persons in both views",
         "interpretation": "The output contains raw stereo candidates and temporal estimates with explicit provenance. It is not a replacement for strict triangulation, an accuracy benchmark, or a clinical gait result.",
     }
     (args.output_dir / "metadata.json").write_text(

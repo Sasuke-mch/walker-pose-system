@@ -31,7 +31,11 @@ def export(input_path: Path, output_path: Path, side: str) -> int:
         persons = payload.get(side, {}).get("persons") or []
         person = persons[0] if persons else None
         if person is None:
-            keypoints = [[float("nan"), float("nan"), 0.0] for _ in range(23)]
+            # Preserve a missing person as an empty detection list.  A synthetic
+            # all-NaN person is still a person-shaped record and can be mistaken
+            # for a real target by downstream adapters that pad or score points.
+            # Missing-view handling belongs to the stereo observation layer.
+            keypoints = []
         else:
             source = person.get("keypoints") or []
             keypoints = []
@@ -46,7 +50,7 @@ def export(input_path: Path, output_path: Path, side: str) -> int:
         rows.append({
             "image_id": frame_index,
             "file_name": f"pair_{frame_index:04d}.png",
-            "keypoints": [keypoints],
+            "keypoints": [keypoints] if person is not None else [],
         })
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps({"images": rows}, ensure_ascii=False), encoding="utf-8")
