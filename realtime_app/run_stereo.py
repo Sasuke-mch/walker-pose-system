@@ -917,6 +917,7 @@ def main() -> int:
             output_fps=output_fps,
             source_name=source.name,
             calibration=calibration,
+            max_matches=1 if args.stereo_subject_mode == "single" else None,
         )
         if args.save_raw_pairs:
             raw_output_dir = (

@@ -24,6 +24,7 @@ class StereoOutputWriter:
         output_fps: float,
         source_name: str,
         calibration: StereoCalibration,
+        max_matches: int | None = None,
     ) -> None:
         self.run_dir = run_dir
         self.run_dir.mkdir(parents=True, exist_ok=True)
@@ -32,6 +33,7 @@ class StereoOutputWriter:
         self.output_fps = max(1.0, float(output_fps))
         self.source_name = source_name
         self.calibration = calibration
+        self.max_matches = max_matches
         self.writer: cv2.VideoWriter | None = None
         self.size: tuple[int, int] | None = None
         self.video_path = self.run_dir / "stereo_annotated.mp4"
@@ -224,6 +226,7 @@ class StereoOutputWriter:
             ),
             "annotated_video": str(self.video_path) if self.save_video else None,
             "results_jsonl": str(self.json_path) if self.save_json else None,
+            "max_matches": self.max_matches,
         }
         (self.run_dir / "stereo_summary.json").write_text(
             json.dumps(summary, ensure_ascii=False, indent=2, allow_nan=False),
