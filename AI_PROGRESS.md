@@ -2438,3 +2438,10 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 下游输出均为 360 行：`stereo_results.jsonl`、`lower_limb_live_status.jsonl`、`realtime_stage_walker.jsonl`、`realtime_dynamic_ground_pose.jsonl`。动态地面接受更新 76 次；Stage walker 9 次重构中 1 次成功、8 次失败，最后状态为 `basic_candidate`；助步器候选语义仍是相机附着结构候选，未做类别真值确认。
 - 下肢 T1 直接观测覆盖率为 1446/2160=0.6694，T3 坐标变换仍为 `not_configured`；T4 候选事件 186 个但接受接触事件为 0。以上仅是工程链路输出，不构成真实三维精度、真实触地、承重、步态或助步器识别结论。
 - 下一阶段进入 SMPL 前，必须先对该目录的输入帧数、COCO-17 索引、finite/NaN、accepted/rejected mask、相机坐标系和地面变换来源做入口预检；若契约不完整则停止在 SMPL 入口。
+
+### 2026-09-27 — SMPL 入口契约补齐与短窗探针
+
+- 从同一 AVI 回放按 `ccw90/cw90` 提取 360 对正立图像，按真实 PMPose `pair_id` 1157–1516 保存到 `pipeline_20260927_201716_pmpose_mainline/upright_extract/`；新标定另存为拟合器要求的 `smpl_calibration/` 目录并通过资产预检，male SMPL 与 `17x6890` COCO 回归器均有效。
+- 发现并修复结果契约缺陷：`run_stereo` 三角化实际使用 `max_matches=1`，但 `StereoOutputWriter` 原先没有把该字段写入每行结果和摘要，导致 SMPL 入口错误拒绝回放。代码现已在 `d2cbab6b`、`a02652c4` 分两次提交；相关 Python 编译和三角化 8 项单元测试通过。当前回放 JSONL 已补写 `max_matches=1` 作为本次结果的等价契约修复。
+- 单帧 1157 探针成功；5 帧独立 SMPL 短窗 1157–1161 全部成功。短窗使用 fixed-zero beta、独立 clean-zero 初始化、二维鱼眼 Huber 拟合，未使用存储三维、时序或接触；综合重投影中位数 19.77 px、P95 172.47 px，右膝因当前监督策略为 0 个 supervised samples。该结果仅证明入口和优化链可运行，不能解释为真实姿态精度。
+- 下一步若继续全片拟合，应先选择明确的阶段协议（独立 2D 诊断或带三维 guardrail/地面预拟合的主线），不能把 5 帧独立短窗结果直接升级为 360 帧 Stage A/B/C/D 结论。
