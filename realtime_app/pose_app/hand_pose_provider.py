@@ -23,6 +23,8 @@ from .project_paths import project_path
 
 INTERWILD_ROOT = project_path("third_party", "InterWild")
 WILOR_ROOT = project_path("third_party", "WiLoR")
+RAW_FISHEYE_PIXEL_FRAME = "raw_fisheye"
+MODEL_LOCAL_3D_FRAME = "model_local_unaccepted"
 
 
 @dataclass(frozen=True)
@@ -55,8 +57,113 @@ class HandObservation:
     mano_pose: Any = None
     mano_shape: Any = None
     camera_translation: Any = None
-    coordinate_frame: str = "model_local_unaccepted"
+    coordinate_frame: str = MODEL_LOCAL_3D_FRAME
     metadata: dict[str, Any] = field(default_factory=dict)
+
+
+def validate_raw_fisheye_pixels(
+    points: Any,
+    image_size: tuple[int, int],
+    *,
+    allow_out_of_bounds: bool = False,
+) -> Any:
+    """Validate Nx2 pixels in the original, unrotated fisheye image frame.
+
+    ``image_size`` is ``(width, height)``.  The function deliberately does not
+    clip points: clipping would hide crop/rotation mistakes before a stereo
+    quality gate can reject them.
+    """
+
+    import numpy as np
+
+    pixels = np.asarray(points, dtype=np.float64)
+    if pixels.ndim != 2 or pixels.shape[1] != 2:
+        raise ValueError(f"expected Nx2 pixel array, got {pixels.shape}")
+    if not np.isfinite(pixels).all():
+        raise ValueError("pixel array contains NaN or Inf")
+    width, height = (int(image_size[0]), int(image_size[1]))
+    if width <= 0 or height <= 0:
+        raise ValueError(f"invalid image size: {image_size}")
+    if not allow_out_of_bounds and (
+        (pixels[:, 0] < 0).any()
+        or (pixels[:, 0] >= width).any()
+        or (pixels[:, 1] < 0).any()
+        or (pixels[:, 1] >= height).any()
+    ):
+        raise ValueError("pixel array is outside the original fisheye image")
+    return pixels
+
+
+def project_wilor_vertices_to_image(
+    vertices_3d_local: Any,
+    camera_translation: Any,
+    focal_length: float,
+    image_size: tuple[int, int],
+) -> Any:
+    """Reproduce WiLoR's full-image projection in the raw-image frame.
+
+    ``vertices_3d_local`` must already contain WiLoR's handedness correction;
+    this function does not guess left/right from a crop or image orientation.
+    """
+
+    import numpy as np
+
+    vertices = np.asarray(vertices_3d_local, dtype=np.float64)
+    translation = np.asarray(camera_translation, dtype=np.float64).reshape(3)
+    if vertices.ndim != 2 or vertices.shape[1] != 3:
+        raise ValueError(f"expected Nx3 vertices, got {vertices.shape}")
+    if not np.isfinite(vertices).all() or not np.isfinite(translation).all():
+        raise ValueError("WiLoR 3D output contains NaN or Inf")
+    width, height = (float(image_size[0]), float(image_size[1]))
+    points = vertices + translation[None, :]
+    if np.any(points[:, 2] <= 0.0):
+        raise ValueError("WiLoR camera-translated points must have positive depth")
+    pixels = points[:, :2] / points[:, 2:3]
+    pixels[:, 0] = pixels[:, 0] * float(focal_length) + width / 2.0
+    pixels[:, 1] = pixels[:, 1] * float(focal_length) + height / 2.0
+    return pixels
+
+
+def make_wilor_observation(
+    *,
+    side: str,
+    bbox_xyxy: Any,
+    keypoints_2d: Any,
+    image_size: tuple[int, int],
+    keypoints_3d_local: Any = None,
+    vertices_3d_local: Any = None,
+    mano_pose: Any = None,
+    mano_shape: Any = None,
+    camera_translation: Any = None,
+    confidence: Any = None,
+) -> HandObservation:
+    """Adapt WiLoR's full-image outputs without accepting model-local 3D.
+
+    The caller must pass points produced from the same unrotated raw fisheye
+    image that was given to WiLoR.  The 3D fields are retained for audit only;
+    downstream stereo code must check ``coordinate_frame`` before consuming
+    them.
+    """
+
+    pixels = validate_raw_fisheye_pixels(keypoints_2d, image_size)
+    return HandObservation(
+        backend="wilor",
+        side=str(side),
+        bbox_xyxy=bbox_xyxy,
+        keypoints_2d=pixels,
+        keypoints_2d_confidence=confidence,
+        keypoints_3d_local=keypoints_3d_local,
+        vertices_3d_local=vertices_3d_local,
+        mano_pose=mano_pose,
+        mano_shape=mano_shape,
+        camera_translation=camera_translation,
+        coordinate_frame=MODEL_LOCAL_3D_FRAME,
+        metadata={
+            "pixel_frame": RAW_FISHEYE_PIXEL_FRAME,
+            "input_image_transform": "identity_raw_fisheye",
+            "three_d_acceptance": "blocked_until_calibrated_cross_view_gate",
+        },
+    )
 
 
 def local_assets() -> dict[str, HandModelAssets]:
@@ -210,8 +317,13 @@ __all__ = [
     "HandObservation",
     "INTERWILD_ROOT",
     "WILOR_ROOT",
+    "RAW_FISHEYE_PIXEL_FRAME",
+    "MODEL_LOCAL_3D_FRAME",
     "local_assets",
     "preflight_backend",
+    "validate_raw_fisheye_pixels",
+    "project_wilor_vertices_to_image",
+    "make_wilor_observation",
     "build_wilor_command",
     "build_interwild_command",
     "run_checked",
