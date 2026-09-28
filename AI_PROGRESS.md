@@ -1,3 +1,9 @@
+# 2026-09-28：审计修复后 people1 全帧 SMPL-H + WiLoR 重跑
+
+- 使用新审计修复后的拟合入口运行 448 帧，输出 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_audited_v3/`，未覆盖旧结果。
+- 阶段步数 A/B/C/D1/D2/D3 = 30/30/30/30/30/0；无接触输入，D3 跳过。最终工程目标残差 body 83.13 mm、左手 337.08 px、右手 266.40 px，不代表外部精度。
+- 同源 viewer 为 `smplh_people1_mano_pca_audited_v3_viewer.html`；网格 `(448,6890,3)`、真实面 `(13776,3)`、手部 `(448,21,3)`、PCA `(448,12)`，viewer 索引 41328。
+- 结论边界：MANO 仅用于 WiLoR 手部局部参数和二维辅助观测；身体仍由 PMPose 严格三角化 COCO-17 驱动，未加入手部三角化、独立手部真值或接触标签。
 # 助步器项目 AI 工作日志
 
 ## 2026-09-28：接入真实 MANO PCA 手部先验和手部时间正则
