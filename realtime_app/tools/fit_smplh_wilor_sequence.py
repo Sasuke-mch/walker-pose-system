@@ -38,7 +38,7 @@ spec.loader.exec_module(raw_clean)
 
 
 def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
-               image_size: tuple[int, int], camera: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[dict]]:
+               image_size: tuple[int, int], camera: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict]]:
     """Use the single audited WiLoR association implementation.
 
     The shared reader validates frame/image identity, duplicate frames and
@@ -47,14 +47,14 @@ def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
     """
     from pose_app.smplh_hand_observation import read_view
 
-    points, _weights, audit = read_view(path, body_points, image_size, camera)
+    points, weights, audit = read_view(path, body_points, image_size, camera)
     hand_index = 0 if side == "left" else 1
     obs = points[:, hand_index]
     valid = np.isfinite(obs).all(axis=-1)
     width, height = image_size
     bounds_ok = (valid & (obs[:, :, 0] >= 0) & (obs[:, :, 0] < width)
                  & (obs[:, :, 1] >= 0) & (obs[:, :, 1] < height))
-    return obs, valid, bounds_ok, audit
+    return obs, valid, bounds_ok, weights[:, hand_index], audit
 
 
 def main() -> int:
@@ -150,13 +150,13 @@ def main() -> int:
     # Each camera file contains both anatomical sides. Fit each hand from both
     # cameras; a single camera must not be mistaken for an anatomical hand.
     image_size = (int(cal.image_width), int(cal.image_height))
-    hand_ll, hand_ll_valid, hand_ll_bounds, audit_left_cam_left = read_wilor(
+    hand_ll, hand_ll_valid, hand_ll_bounds, hand_ll_weights, audit_left_cam_left = read_wilor(
         args.wilor_left, n, "left", left, image_size, "left")
-    hand_lr, hand_lr_valid, hand_lr_bounds, audit_left_cam_right = read_wilor(
+    hand_lr, hand_lr_valid, hand_lr_bounds, hand_lr_weights, audit_left_cam_right = read_wilor(
         args.wilor_left, n, "right", left, image_size, "left")
-    hand_rl, hand_rl_valid, hand_rl_bounds, audit_right_cam_left = read_wilor(
+    hand_rl, hand_rl_valid, hand_rl_bounds, hand_rl_weights, audit_right_cam_left = read_wilor(
         args.wilor_right, n, "left", right, image_size, "right")
-    hand_rr, hand_rr_valid, hand_rr_bounds, audit_right_cam_right = read_wilor(
+    hand_rr, hand_rr_valid, hand_rr_bounds, hand_rr_weights, audit_right_cam_right = read_wilor(
         args.wilor_right, n, "right", right, image_size, "right")
     (args.output_dir / "wilor_association_audit.json").write_text(
         json.dumps({"left_camera": audit_left_cam_left + audit_left_cam_right,
@@ -171,8 +171,8 @@ def main() -> int:
     hand_l_full_valid, hand_r_full_valid = hand_l_valid.copy(), hand_r_valid.copy()
     hand_l_full_bounds, hand_r_full_bounds = hand_l_bounds.copy(), hand_r_bounds.copy()
     hand_l_mask, hand_r_mask = hand_l_valid, hand_r_valid
-    hand_l_weight_np = hand_l_valid.astype(np.float32) * np.where(hand_l_bounds, 1.0, 0.1).astype(np.float32)
-    hand_r_weight_np = hand_r_valid.astype(np.float32) * np.where(hand_r_bounds, 1.0, 0.1).astype(np.float32)
+    hand_l_weight_np = hand_ll_weights.astype(np.float32)
+    hand_r_weight_np = hand_rr_weights.astype(np.float32)
 
     if not (1 <= args.hand_pca_comps <= 45):
         raise ValueError("--hand-pca-comps must be in 1..45")
@@ -349,10 +349,10 @@ def main() -> int:
     mask_body = torch.tensor(body_mask, device=device)
     mask_ll = torch.tensor(hand_ll_valid, device=device); mask_lr = torch.tensor(hand_lr_valid, device=device)
     mask_rl = torch.tensor(hand_rl_valid, device=device); mask_rr = torch.tensor(hand_rr_valid, device=device)
-    weight_ll = torch.tensor(hand_ll_valid.astype(np.float32) * np.where(hand_ll_bounds, 1.0, 0.1), device=device)
-    weight_lr = torch.tensor(hand_lr_valid.astype(np.float32) * np.where(hand_lr_bounds, 1.0, 0.1), device=device)
-    weight_rl = torch.tensor(hand_rl_valid.astype(np.float32) * np.where(hand_rl_bounds, 1.0, 0.1), device=device)
-    weight_rr = torch.tensor(hand_rr_valid.astype(np.float32) * np.where(hand_rr_bounds, 1.0, 0.1), device=device)
+    weight_ll = torch.tensor(hand_ll_weights, device=device)
+    weight_lr = torch.tensor(hand_lr_weights, device=device)
+    weight_rl = torch.tensor(hand_rl_weights, device=device)
+    weight_rr = torch.tensor(hand_rr_weights, device=device)
     hand_order_weights_np = np.asarray(
         [1.00, 0.95, 0.82, 0.68, 0.48,
          0.95, 0.82, 0.68, 0.48, 0.95, 0.82, 0.68, 0.48,
@@ -596,7 +596,7 @@ def main() -> int:
         "wilor_observation_views": {"left_camera": ["left_hand", "right_hand"],
                                      "right_camera": ["left_hand", "right_hand"]},
         "stage_schedule": stage_history,
-        "hand_confidence_source": "detector_box_or_missing_neutral_weight",
+        "hand_confidence_source": "candidate_box_confidence_weighted_or_missing_neutral_weight",
         "vposer_checkpoint": str(vp_ckpt), "vposer_latent_dim": latent_dim,
         "mano_left": str(args.mano_left.resolve()), "mano_right": str(args.mano_right.resolve()),
         "hand_pose_parameterization": "MANO_PCA_decode_to_SMPLH_45D_axis_angle",

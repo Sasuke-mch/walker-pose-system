@@ -57,21 +57,34 @@ def load_model(repo: Path, checkpoint: Path, device: str):
     return model, cfg
 
 
-def process_image(model, cfg, detector, image_path: Path, device: str, orientation: str):
+def process_image(model, cfg, detector, image_path: Path, device: str, orientation: str,
+                  raw_size: tuple[int, int] = (1920, 1080)):
     import cv2
-    import torch
-    from wilor.datasets.vitdet_dataset import ViTDetDataset
-    from wilor.utils import recursive_to
 
     image = cv2.imread(str(image_path))
     if image is None:
         raise ValueError(f"cannot read image: {image_path}")
+    raw_width, raw_height = raw_size
+    source_height, source_width = image.shape[:2]
+    expected_source = (raw_width, raw_height) if orientation == "raw" else (raw_height, raw_width)
+    if (source_width, source_height) != expected_source:
+        raise ValueError(
+            f"orientation/image-size contract failed for {image_path.name}: "
+            f"orientation={orientation}, source={(source_width, source_height)}, "
+            f"expected={expected_source}")
     if orientation == "left_ccw90":
         image = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
     elif orientation == "right_cw90":
         image = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
     elif orientation != "raw":
         raise ValueError(f"unsupported orientation: {orientation}")
+    if (image.shape[1], image.shape[0]) != (raw_width, raw_height):
+        raise ValueError(
+            f"inverse orientation did not restore raw size for {image_path.name}: "
+            f"got={(image.shape[1], image.shape[0])}, expected={(raw_width, raw_height)}")
+    import torch
+    from wilor.datasets.vitdet_dataset import ViTDetDataset
+    from wilor.utils import recursive_to
     detections = detector(image, conf=0.3, verbose=False)[0]
     boxes, right, detector_confidences = [], [], []
     for det in detections:
@@ -146,6 +159,11 @@ def process_image(model, cfg, detector, image_path: Path, device: str, orientati
                 "pixel_frame": "raw_fisheye",
                 "raw_pixel_bounds_ok": pixels_in_bounds,
                 "input_image_transform": f"inverse_{orientation}_to_raw_fisheye",
+                "orientation_contract": {
+                    "source_size_wh": [source_width, source_height],
+                    "raw_size_wh": [raw_width, raw_height],
+                    "validated": True,
+                },
                 "focal_length_model_projection_px": float(focal),
             })
         batch_offset += len(joints)
@@ -159,6 +177,8 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     parser.add_argument("--orientation", choices=("left_ccw90", "right_cw90", "raw"), default="raw")
+    parser.add_argument("--raw-width", type=int, default=1920)
+    parser.add_argument("--raw-height", type=int, default=1080)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
     repo = root / "third_party" / "WiLoR"
@@ -188,7 +208,8 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8") as handle:
         for frame_index, path in enumerate(images):
-            records = process_image(model, cfg, detector, path, args.device, args.orientation)
+            records = process_image(model, cfg, detector, path, args.device, args.orientation,
+                                    (args.raw_width, args.raw_height))
             handle.write(json.dumps({"frame_index": frame_index, "image": str(path.resolve()), "records": records}, ensure_ascii=False) + "\n")
             handle.flush()
             print(frame_index, path.name, len(records), flush=True)
