@@ -119,6 +119,14 @@ def main() -> int:
                     help="Stage C/D3 penalty for drifting from the triangulation-initialized root")
     ap.add_argument("--max-init-body-rms-mm", type=float, default=300.0,
                     help="stop before optimization when rigid initialization is inconsistent")
+    ap.add_argument("--hand-pca-comps", type=int, default=12,
+                    help="number of real MANO PCA hand-pose coefficients per hand")
+    ap.add_argument("--hand-pca-prior-weight", type=float, default=1e-3,
+                    help="quadratic prior on normalized MANO PCA coefficients")
+    ap.add_argument("--hand-temporal-weight", type=float, default=2e-2,
+                    help="second-order temporal prior on MANO PCA coefficients")
+    ap.add_argument("--mano-left", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl")
+    ap.add_argument("--mano-right", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl")
     ap.add_argument("--bone-weight", type=float, default=0.0,
                     help="optional beta-zero bone-length prior; default off because it biases shared beta")
     ap.add_argument("--contact-labels", type=Path, default=None)
@@ -189,15 +197,23 @@ def main() -> int:
     hand_l_weight_np = hand_l_valid.astype(np.float32) * np.where(hand_l_bounds, 1.0, 0.1).astype(np.float32)
     hand_r_weight_np = hand_r_valid.astype(np.float32) * np.where(hand_r_bounds, 1.0, 0.1).astype(np.float32)
 
-    # WiLoR ships a full-pose SMPL-H pickle without the optional PCA metadata
-    # expected by smplx.  Supply identity components and zero means; posedirs
-    # and the 52-joint regressor remain those of the downloaded model.
+    if not (1 <= args.hand_pca_comps <= 45):
+        raise ValueError("--hand-pca-comps must be in 1..45")
+    # The SMPL-H file shipped with WiLoR lacks optional PCA fields. Load the
+    # matching MANO assets explicitly; identity matrices are not a hand prior.
     with args.smplh_model.open("rb") as handle:
         model_data = pickle.load(handle, encoding="latin1")
-    model_data.setdefault("hands_componentsl", np.eye(45, dtype=np.float32))
-    model_data.setdefault("hands_componentsr", np.eye(45, dtype=np.float32))
-    model_data.setdefault("hands_meanl", np.zeros(45, dtype=np.float32))
-    model_data.setdefault("hands_meanr", np.zeros(45, dtype=np.float32))
+    with args.mano_left.open("rb") as handle:
+        mano_left_data = pickle.load(handle, encoding="latin1")
+    with args.mano_right.open("rb") as handle:
+        mano_right_data = pickle.load(handle, encoding="latin1")
+    for name, data in (("left", mano_left_data), ("right", mano_right_data)):
+        if np.asarray(data["hands_components"]).shape != (45, 45) or np.asarray(data["hands_mean"]).shape != (45,):
+            raise ValueError(f"MANO {name} PCA asset must contain components (45,45) and mean (45,)")
+    model_data["hands_componentsl"] = np.asarray(mano_left_data["hands_components"], np.float32)
+    model_data["hands_componentsr"] = np.asarray(mano_right_data["hands_components"], np.float32)
+    model_data["hands_meanl"] = np.asarray(mano_left_data["hands_mean"], np.float32)
+    model_data["hands_meanr"] = np.asarray(mano_right_data["hands_mean"], np.float32)
     model = smplx.SMPLH(str(args.smplh_model), data_struct=Struct(**model_data),
                         gender="male", use_pca=False, flat_hand_mean=True,
                         batch_size=n).to(device)
@@ -209,8 +225,22 @@ def main() -> int:
     root = torch.nn.Parameter(torch.zeros(n, 3, device=device))
     transl = torch.nn.Parameter(torch.zeros(n, 3, device=device))
     latent = torch.nn.Parameter(torch.zeros(n, latent_dim, device=device))
-    lhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
-    rhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
+    hand_pca_dim = int(args.hand_pca_comps)
+    mano_l_components = torch.tensor(model_data["hands_componentsl"][:hand_pca_dim], dtype=torch.float32, device=device)
+    mano_r_components = torch.tensor(model_data["hands_componentsr"][:hand_pca_dim], dtype=torch.float32, device=device)
+    mano_l_mean = torch.tensor(model_data["hands_meanl"], dtype=torch.float32, device=device)
+    mano_r_mean = torch.tensor(model_data["hands_meanr"], dtype=torch.float32, device=device)
+    # Normalize coefficients by the empirical MANO coefficient scales. This
+    # keeps the prior dimensionless and prevents the first PCA directions from
+    # dominating solely because their raw units are larger.
+    mano_l_scale = torch.linalg.vector_norm(mano_l_components, dim=1).clamp_min(1e-6)
+    mano_r_scale = torch.linalg.vector_norm(mano_r_components, dim=1).clamp_min(1e-6)
+    lhand = torch.nn.Parameter(torch.zeros(n, hand_pca_dim, device=device))
+    rhand = torch.nn.Parameter(torch.zeros(n, hand_pca_dim, device=device))
+
+    def decode_hand_pose(coeff, components, mean, scale):
+        normalized = coeff / scale[None, :]
+        return mean[None, :] + normalized @ components
 
     def decode_body_pose(z):
         pose = vposer.decode(z)["pose_body"].reshape(n, 63)
@@ -438,9 +468,11 @@ def main() -> int:
             global_step += 1
             optim.zero_grad(set_to_none=True)
             body_pose = decode_body_pose(latent)
+            lhand_pose = decode_hand_pose(lhand, mano_l_components, mano_l_mean, mano_l_scale)
+            rhand_pose = decode_hand_pose(rhand, mano_r_components, mano_r_mean, mano_r_scale)
             out = model(betas=beta.expand(n, -1), global_orient=root,
-                        body_pose=body_pose, left_hand_pose=lhand,
-                        right_hand_pose=rhand, transl=transl, return_verts=True)
+                        body_pose=body_pose, left_hand_pose=lhand_pose,
+                        right_hand_pose=rhand_pose, transl=transl, return_verts=True)
             coco = regress_coco17_torch(out.vertices, reg)
             body_res = (coco - target).pow(2).sum(-1)
             body_w = torch.tensor(np.asarray(quality, np.float32), device=device).clamp_min(0.0)
@@ -467,7 +499,19 @@ def main() -> int:
                 return (res * w).sum() / w.sum().clamp_min(1e-6) if mask.any() else res.sum() * 0.0
             hand_l_loss = weighted(hand_ll_res, weight_ll, mask_ll) + weighted(hand_rl_res, weight_rl, mask_rl)
             hand_r_loss = weighted(hand_lr_res, weight_lr, mask_lr) + weighted(hand_rr_res, weight_rr, mask_rr)
-            pose_reg = args.vposer_prior_weight * latent.pow(2).mean() + 1e-4 * (lhand.pow(2).mean() + rhand.pow(2).mean())
+            pose_reg = (args.vposer_prior_weight * latent.pow(2).mean()
+                        + args.hand_pca_prior_weight * (lhand.pow(2).mean() + rhand.pow(2).mean()))
+            hand_temporal = (lhand.sum() + rhand.sum()) * 0.0
+            if n >= 3:
+                l_valid_frame = mask_ll.any(dim=1) | mask_rl.any(dim=1)
+                r_valid_frame = mask_lr.any(dim=1) | mask_rr.any(dim=1)
+                l_edge = l_valid_frame[2:] & l_valid_frame[1:-1] & l_valid_frame[:-2]
+                r_edge = r_valid_frame[2:] & r_valid_frame[1:-1] & r_valid_frame[:-2]
+                l_acc = (lhand[2:] - 2 * lhand[1:-1] + lhand[:-2]).pow(2).mean(dim=1)
+                r_acc = (rhand[2:] - 2 * rhand[1:-1] + rhand[:-2]).pow(2).mean(dim=1)
+                l_term = l_acc[l_edge].mean() if l_edge.any() else l_acc.mean() * 0.0
+                r_term = r_acc[r_edge].mean() if r_edge.any() else r_acc.mean() * 0.0
+                hand_temporal = 0.5 * (l_term + r_term)
             if stage_index in (3, 4):
                 body_term = body_loss.detach() * 0.0
             elif stage_index == 5:
@@ -480,6 +524,8 @@ def main() -> int:
             hand_term = 1e-7 * (hand_l_loss + hand_r_loss) if stage_index >= 3 else (hand_l_loss + hand_r_loss).detach() * 0.0
             structure_term = (args.bone_weight * bone_loss if stage_index in (0, 2)
                               else bone_loss.detach() * 0.0)
+            temporal_term = (args.hand_temporal_weight * hand_temporal
+                             if stage_index >= 3 else hand_temporal.detach() * 0.0)
             root_term = (args.root_anchor_weight * root_anchor if stage_index == 2
                          else root_anchor.detach() * 0.0)
             contact_loss = left_in_cam0.sum() * 0.0
@@ -492,7 +538,7 @@ def main() -> int:
                     terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
                                  * contact_hand_weight[:, j])
                 contact_loss = torch.stack(terms, dim=1).sum() / contact_hand_weight.sum().clamp_min(1e-6)
-            loss = body_term + structure_term + root_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
+            loss = body_term + structure_term + root_term + temporal_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
                    (args.surface_hand_contact_weight * contact_loss if stage_index >= 4 else contact_loss.detach() * 0.0)
             loss.backward()
             optim.step()
@@ -506,6 +552,7 @@ def main() -> int:
                             "contact_active": bool(contact_enabled and stage_index >= 4)}
                 row["bone_m"] = float(torch.sqrt(bone_loss.detach()))
                 row["root_anchor"] = float(torch.sqrt(root_anchor.detach()))
+                row["hand_temporal"] = float(torch.sqrt(hand_temporal.detach()))
                 history.append(row)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "hand_3d_term": False,
@@ -515,9 +562,11 @@ def main() -> int:
 
     with torch.no_grad():
         body_pose = decode_body_pose(latent)
+        lhand_pose = decode_hand_pose(lhand, mano_l_components, mano_l_mean, mano_l_scale)
+        rhand_pose = decode_hand_pose(rhand, mano_r_components, mano_r_mean, mano_r_scale)
         final = model(betas=beta.expand(n, -1), global_orient=root,
-                      body_pose=body_pose, left_hand_pose=lhand,
-                      right_hand_pose=rhand, transl=transl, return_verts=True)
+                      body_pose=body_pose, left_hand_pose=lhand_pose,
+                      right_hand_pose=rhand_pose, transl=transl, return_verts=True)
         final_hand_l = hand21(final.joints, final.vertices, "left")
         final_hand_r = hand21(final.joints, final.vertices, "right")
         contact_diag = {}
@@ -536,7 +585,8 @@ def main() -> int:
                         transl=transl.detach().cpu().numpy(),
                         body_pose=body_pose.detach().cpu().numpy(),
                         vposer_latent=latent.detach().cpu().numpy(),
-                        left_hand_pose=lhand.detach().cpu().numpy(), right_hand_pose=rhand.detach().cpu().numpy(),
+                        left_hand_pose=lhand_pose.detach().cpu().numpy(), right_hand_pose=rhand_pose.detach().cpu().numpy(),
+                        left_hand_pca=lhand.detach().cpu().numpy(), right_hand_pca=rhand.detach().cpu().numpy(),
                         raw_triangulated_points=tri, body_accepted=body_mask,
                         wilor_left_2d=hand_l, wilor_left_mask=hand_l_mask,
                         wilor_right_2d=hand_r, wilor_right_mask=hand_r_mask,
@@ -570,6 +620,11 @@ def main() -> int:
         "stage_schedule": stage_history,
         "hand_confidence_source": "detector_box_or_missing_neutral_weight",
         "vposer_checkpoint": str(vp_ckpt), "vposer_latent_dim": latent_dim,
+        "mano_left": str(args.mano_left.resolve()), "mano_right": str(args.mano_right.resolve()),
+        "hand_pose_parameterization": "MANO_PCA_decode_to_SMPLH_45D_axis_angle",
+        "hand_pca_components": hand_pca_dim,
+        "hand_pca_prior_weight": float(args.hand_pca_prior_weight),
+        "hand_temporal_weight": float(args.hand_temporal_weight),
         "hand_priority_weights": hand_order_weights_np.tolist(),
         "contact_enabled": bool(contact_enabled),
         "contact_schedule": ["D1 hand observation",

@@ -400,3 +400,56 @@ smplh_people1_rigid_init_viewer.html
 该页面使用本次结果的网格、三角面、COCO 点、SMPL-H 关节和手部点，以及当前 `audit_20260928/scene` 的地面、助步器、Stage 和相机轨迹。
 
 后续初始化门和 D3 参数范围调整完成后，使用 448 帧、A/B/C/D1/D2 各 1 步的冒烟运行确认审计文件写出且初始化门通过；该冒烟不用于报告拟合精度。上一段完整运行与最终代码之间的新增差异仅是初始化门和有接触输入时的 D3 参数范围；people1 当前无有效接触输入，D3 为零步。
+
+## 17. 2026-09-28：真实 MANO PCA 手部先验和时间正则
+
+当前本地已有真实 MANO 先验资产：
+
+```text
+third_party/WiLoR/mano_data/models/MANO_LEFT.pkl
+third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl
+```
+
+两个文件均包含 `hands_components=(45,45)`、`hands_mean=(45,)` 和 `hands_coeffs`。因此手部拟合已从逐帧独立 45 维轴角改为低维 PCA 系数。默认每只手使用 12 个系数：
+
+```text
+a_left[t], a_right[t] ∈ R^12
+theta_left[t]  = mean_left  + (a_left[t]  / scale_left)  @ components_left[:12]
+theta_right[t] = mean_right + (a_right[t] / scale_right) @ components_right[:12]
+```
+
+解码后的 `theta` 仍以 45 维局部轴角传入现有 `SMPLH(..., use_pca=False, flat_hand_mean=True)`，避免改动 SMPL-H 网格和现有手部观测映射。`scale` 使用对应 PCA 行范数做无量纲归一化，防止大尺度主成分单独支配正则项。单位矩阵只在历史兼容版本中出现，当前正式 PCA 路径不允许缺失资产静默回退。
+
+D1 和 D2 的手部二维项仍使用由腕部到指尖的固定降权顺序；同时加入：
+
+```text
+E_hand_prior = mean(||a_left||² + ||a_right||²)
+E_hand_temporal = mean(||a[t+1] - 2a[t] + a[t-1]||²)
+```
+
+时间项作用于 MANO PCA 系数，不作用于世界坐标手部点，因此主要抑制手形跳变，不会强迫行走过程中的整只手固定在世界坐标。当前实现只在三帧左右手观测连续有效时计算，不跨缺失段插值。
+
+完整运行配置：
+
+```text
+hand_pca_components = 12
+hand_pca_prior_weight = 0.001
+hand_temporal_weight = 0.02
+```
+
+输出目录：
+
+```text
+research_records/engineering_validation/
+G20260927_wilor_smplh_full448_v1/
+fit_cuda_vposer_mano_pca12_temporal_v1/
+```
+
+结果：身体 COCO RMS 约 `95.9 mm`；左/右手二维目标项约 `337.4/266.4 px`，相对于无手部 PCA 先验的 `545.4/754.2 px` 降低；左右手模型点逐帧变化 P95 约 `0.071/0.052 m`。这些仍是工程目标统计，WiLoR 点来自模型投影，没有独立手部真值。
+
+同源查看器为：
+
+```text
+fit_cuda_vposer_mano_pca12_temporal_v1/
+smplh_people1_mano_pca_viewer.html
+```

@@ -1,5 +1,13 @@
 # 助步器项目 AI 工作日志
 
+## 2026-09-28：接入真实 MANO PCA 手部先验和手部时间正则
+
+- 本地 `third_party/WiLoR/mano_data/models/MANO_LEFT.pkl`、`MANO_RIGHT.pkl` 均包含真实 `hands_components(45×45)`、`hands_mean(45)`；不再把单位矩阵占位当作手部先验。
+- `fit_smplh_wilor_sequence.py` 将每帧左右手优化变量由 45 维轴角改为 12 维 MANO PCA 系数，前向时解码为 `mean + normalized_coeff @ components` 的 45 维 SMPL-H 局部手指轴角。结果同时保存解码后的 `left_hand_pose/right_hand_pose` 和 `left_hand_pca/right_hand_pca`。
+- D1/D2 仍保留腕部到指尖的固定观测权重；手部 PCA 系数增加二次先验和连续帧二阶差分正则，时间项只在左右手三帧连续有效时计算，不跨缺失段插值。
+- people1 完整 448 帧输出为 `fit_cuda_vposer_mano_pca12_temporal_v1/`。身体 COCO RMS 约 95.9 mm，与刚体初始化基线基本一致；左/右手二维项约 337.4/266.4 px，相比无 PCA 先验的 545.4/754.2 px 降低。手部模型点相邻帧变化 P95 约 0.071/0.052 m。
+- 同源页面为 `fit_cuda_vposer_mano_pca12_temporal_v1/smplh_people1_mano_pca_viewer.html`。当前仍是 WiLoR 模型派生观测的工程候选，手部残差不能解释为独立真实手部精度。
+
 ## 2026-09-28：SMPL-H 刚体初始化、手部相机配对和全片复核
 
 - 修正 `realtime_app/tools/fit_smplh_wilor_sequence.py` 的身体初始化：用 SMPL-H VPoser 均值姿态和模板 COCO 肩髋基，与每帧三角化肩髋基求 `R_global = R_obs @ R_model.T` 初始化 `global_orient`；再用同一旋转后的模板髋中点初始化 translation，避免零旋转平移和非零 root 不一致。
