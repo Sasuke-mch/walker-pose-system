@@ -53,3 +53,13 @@ SMPL-H 接口、6890 顶点统一输出、COCO regressor 接入和 CUDA 全序�
 本次只读审计提出的候选关联分叉、SMPL-H 环指/小指映射无断言、WiLoR 旋转尺寸契约、viewer 右相机光心来源和框级置信度语义已在代码中修正。拟合入口统一调用 `smplh_hand_observation.read_view()`，逐候选关联结果写入 `wilor_association_audit.json`；SMPL-H 运行时执行模板几何断言；WiLoR 记录 `orientation_contract`；viewer 使用标定 `C_right=-R01.T@T01` 并记录与静态 walker 光心的差值；框级 `detector_confidence` 进入四路手部二维残差权重，缺失时使用中性权重 1。
 
 本次修复尚未重跑完整 448 帧拟合。既有 `fit_cuda_vposer_mano_pca12_temporal_v1/` 仍是修复前输出，只用于历史工程对照；短窗对照和手部射线/深度审计通过后，才能启动新的完整运行。新 viewer 代码已用临时输出验证 13776 个三角面对应 41328 个索引，并确认页面证据标签存在。
+
+## 2026-09-28 — 审计修复后全帧运行与同源可视化
+
+使用已提交的候选关联统一、SMPL-H 几何断言、WiLoR 尺寸契约、标定右光心和框级置信度权重逻辑，重新运行 people1 全 448 帧。输出目录：`research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_audited_v3/`；未覆盖旧结果。
+
+参数保持原 PCA12 主线：`--steps 180`、默认阶段 30/30/30/30/30/0、`lr=0.02`、VPoser、MANO PCA 12 维、PCA 先验 `1e-3`、手部二阶时间项 `2e-2`，无 contact 输入，D3=0。最终工程目标残差为 body `83.13 mm`、左手 `337.08 px`、右手 `266.40 px`；这些不是外部精度指标。候选审计写入 `wilor_association_audit.json`，命令写入 `command.txt`。
+
+结果数组检查：vertices `(448,6890,3)`、faces `(13776,3)`、predicted COCO `(448,17,3)`、SMPL-H joints `(448,73,3)`、左右手点 `(448,21,3)`、左右 PCA `(448,12)`；模型数组有限，raw triangulation 继续保留 rejected 非有限状态。使用同一次 result 和 `audit_20260928/scene` 生成 `smplh_people1_mano_pca_audited_v3_viewer.html`，viewer 真实三角索引 `41328`，右光心来自标定 `-R01.T@T01`，页面标记 `engineering_candidate`、WiLoR 模型派生手部观测、`contact_active=false`。
+
+解释边界保持不变：MANO 只用于 WiLoR 手部观测的手部局部参数与二维辅助项；身体 COCO-17 仍来自 PMPose 严格三角化，SMPL-H 身体表面经固定 COCO 回归器拟合。当前运行不包含手部三角化、独立手部真值或物理握持标签。

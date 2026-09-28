@@ -1,3 +1,10 @@
+# 2026-09-28：审计修复后 people1 全帧 SMPL-H + WiLoR 重跑
+
+- 使用新审计修复后的拟合入口运行 448 帧，输出 esearch_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_audited_v3/，未覆盖旧结果。
+- 阶段步数 A/B/C/D1/D2/D3 = 30/30/30/30/30/0；无接触输入，D3 跳过。最终工程目标残差 body 83.13 mm、左手 337.08 px、右手 266.40 px，不代表外部精度。
+- 同源 viewer 为 smplh_people1_mano_pca_audited_v3_viewer.html；网格 (448,6890,3)、真实面 (13776,3)、手部 (448,21,3)、PCA (448,12)，viewer 索引 41328。
+- 结论边界：MANO 仅用于 WiLoR 手部局部参数和二维辅助观测；身体仍由 PMPose 严格三角化 COCO-17 驱动，未加入手部三角化、独立手部真值或接触标签。
+
 # 助步器项目 AI 工作日志
 
 ## 2026-09-28：接入真实 MANO PCA 手部先验和手部时间正则
@@ -2517,3 +2524,4 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 输出目录：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/smpl_mainline_window60_90_no_contact/`。输出包含 `raw_observations.npz`、`triangulation.npz`、A/B/C三个 `result_*.npz` 和最终 `result.npz`；最终网格为 31×6890 顶点、真实 SMPL faces 为 13776×3，未使用插值或旧拟合结果。
 - 指标（拟合器内部观测一致性）：Stage A 3D 中位数/P95 为 76.55/182.76 mm，2D 中位数/P95 为 52.93/123.00 px；Stage B 为 75.78/183.07 mm、52.95/122.98 px；Stage C 为 71.00/168.04 mm、43.83/113.09 px。共享 beta 的10维结果未触及边界；右膝在该窗口 31/31 帧有 accepted 观测。运行耗时 9.63 s，退出状态 `completed_staged_single_frame_vposer_shared_beta`。
 - 证据边界：这次结果证明当前 360 帧主线的原始二维→严格三角化→SMPL A/B/C 链路可以连续运行，并给出可审计的逐点误差；不证明三维真值、姿态精度、触地、承重或助步器识别。下一道门仍是先审计该窗口的观测残差和网格/骨架可视化，再决定是否扩展到更长窗口或接入记录中的 Stage D 地面/表面接触；不能直接把该31帧结果升级为全360帧结论。
+
