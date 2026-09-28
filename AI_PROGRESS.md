@@ -1,9 +1,9 @@
-# 2026-09-28：二次修正助步器实体拓扑：前横杆中心高度
+# 2026-09-28：按参考 HTML 恢复助步器实体拓扑
 
-- 定位到上一版仍有错误：`front_top_center` 虽然没有连杆，却仍被放在总高度 `h=838 mm`，作为页面节点显示成悬空球；而 `kp_03` 的历史语义是前横杆中心。
-- 修改 `realtime_app/pose_app/parametric_walker_model.py`：`front_top_center.z` 改为 `front_rail_height≈673 mm`，前横杆改成 `front_left_rail↔front_top_center↔front_right_rail` 两段；四根立柱仍为 `foot→mid→rail→top` 三段，左右中层侧梁和左右上层扶手保持，后侧开放。
-- 同步更新当前全帧候选与 canonical v2 静态模型 JSON，并重新生成 `fit_cuda_vposer_mano_pca12_temporal_reproj015_full448_v2/smplh_people1_pca12_reproj015_topology_fixed_v2_viewer.html`。新拓扑共17条实体边，前横杆中心球不再悬空，前横杆不与上层侧扶手同高。
-- 静态检查通过：中心点 z=673.0459 mm，中心两侧各有一条前横杆，`front_top_center`不再是孤立节点；HTML 保留真实 SMPL-H 三角面与同源 scene 数据。浏览器 `file:` 页面限制仍未解除，因此未取得浏览器截图验收。
+- 核查参考 `walker_motion_viewer.html` 后确认实体结构为9条边：四根落地立柱、两根中部侧梁、两根上部侧扶手和一根高位前横杆；不存在 `front_left_mid↔front_right_mid`。
+- 修正 `realtime_app/pose_app/parametric_walker_model.py`：恢复9条物理边，前横杆改为 `front_left_rail↔front_right_rail`；`front_top_center` 仅保留为拟合语义锚点，不属于实体连接点。
+- 修正 `realtime_app/tools/build_smplh_people1_reference_viewer.py`：球体只为物理边端点生成，语义锚点不会再显示成悬空球；重新生成当前全帧页面 `smplh_people1_pca12_reproj015_topology_fixed_v3_viewer.html`。
+- 静态验收：页面载荷9条边、无前侧中部横杆、无 `front_top_center` 球体、存在直接高位前横杆；助步器仍由圆柱和连接球组成实体结构。浏览器 `file:` 页面继续受应用策略阻止，未取得浏览器截图。
 
 # 2026-09-28：PCA12 + 身体时序/双鱼眼重投影全帧候选与同源可视化
 
