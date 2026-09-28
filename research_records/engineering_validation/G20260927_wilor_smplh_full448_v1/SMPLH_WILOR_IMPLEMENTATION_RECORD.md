@@ -29,6 +29,31 @@ WiLoR 作为手部候选来源：
 → SMPL-H 手部二维辅助项
 ```
 
+## 当前修正后的拟合主线
+
+身体姿态不再直接优化 63 维轴角，而是复用项目已验证的 VPoser V02_05：
+
+```text
+latent(32) --VPoser.decode--> body_pose(21×3=63) --> SMPL-H
+```
+
+VPoser 只约束 SMPL-H 的 21 个身体关节，SMPL-H 的手部仍由左右各 15 个局部轴角参数控制；这是接口兼容的部分。SMPL-H 的身体 `body_pose` 顺序必须与 SMPL 的 21 个 body joints 一致，不能把 15 个手指关节塞进 VPoser。
+
+阶段顺序固定为：
+
+1. `A_body_vposer`：只使用 COCO-17 三角化项，优化 `beta/root/transl/latent`。
+2. `B_shared_beta`：冻结逐帧运动，只优化全序列共享 `beta`。
+3. `C_body_vposer_refine`：低学习率重新打开身体 latent、root 和 translation。
+4. `D1_hand_proximal`：冻结身体和 beta，只优化左右手姿态；WiLoR 21 点全部保留，但按腕部→掌指→指尖固定降权。
+5. `D2_hand_surface_contact`：在 D1 状态继续，只加入 SMPL-H 掌面顶点到助步器把手胶囊的接触项，默认不打开身体自由度。
+6. `D3_contact_refine`：仅在需要时低学习率打开 root/translation 做受限接触微调，COCO 身体项仍保持冻结梯度，避免手部模型候选反向拖坏身体。
+
+代码入口为 `realtime_app/tools/fit_smplh_wilor_sequence.py`，新增参数包括 `--vposer-dir`、`--base-steps`、`--beta-steps`、`--joint-steps`、`--hand-steps`、`--contact-steps`、`--contact-refine-steps` 以及四个接触输入路径。每个阶段都会写入 `fit_summary.json` 的 `stage_schedule`，保存 `vposer_latent` 和解码后的 `body_pose`。
+
+手部优先级不是逐关节冻结。每一轮都计算全部 21 点残差，权重为腕部最高、三段指骨逐渐降低、表面指尖最低；这样近腕关节先决定手掌/整体方向，远端仍会随同一套 SMPL-H 运动学一起更新。指尖来自 SMPL-H 表面顶点，不伪装为内部骨骼关节。
+
+接触项只使用 SMPL-H 表面顶点、场景变换和 `handle_ends_ground_m`，不使用 COCO 腕关节代替掌面接触。若接触标签权重全为零，接触项保持零梯度并在结果中记录，不得把该阶段写成已获得接触证据。
+
 WiLoR 的手部局部三维来自模型自身，不能直接作为项目米制三维真值。它的二维点也不是独立人工标注，而是由 MANO 局部三维经过 WiLoR 的针孔相机投影得到。
 
 ## 主要文件和作用
