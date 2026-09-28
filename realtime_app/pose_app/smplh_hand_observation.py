@@ -57,7 +57,9 @@ def validate_smplh(model):
     v_template = model.v_template.detach()
     if v_template.ndim == 3:
         v_template = v_template[0]
-    rest_joints = torch.as_tensor(model.J_regressor.detach().cpu().numpy(), dtype=v_template.dtype) @ v_template
+    rest_regressor = torch.as_tensor(model.J_regressor.detach().cpu().numpy(),
+                                     dtype=v_template.dtype, device=v_template.device)
+    rest_joints = rest_regressor @ v_template
     for side in ("left", "right"):
         ids = HAND_JOINTS[side]
         ring_chain = ids[1 + 3 * 3: 4 + 3 * 3]
