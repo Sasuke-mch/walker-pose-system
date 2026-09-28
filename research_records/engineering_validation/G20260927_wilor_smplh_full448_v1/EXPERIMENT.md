@@ -1,5 +1,17 @@
 # WiLoR + SMPL-H 全序列候选拟合
 
+## 2026-09-28 — VPoser + 双目 WiLoR 修正后完整运行
+
+本次使用 `realtime_app/tools/fit_smplh_wilor_sequence.py`，对 people1 的 448 帧原始 PMPose、左右相机 WiLoR JSONL、当前标定、SMPL-H male 和 VPoser V02_05 进行完整运行。输出目录为 `fit_cuda_vposer_corrected_stereo448_v1/`，未覆盖旧结果。
+
+阶段为 A 身体 VPoser、B 共享 beta、C 身体 VPoser 微调、D1 手部观测、D2 接触接口、D3 受限整体微调；本次未启用接触输入，因为现有 hand contact 权重全为零。左右解剖手均由左右相机共同约束，WiLoR 候选使用腕部距离和歧义门。
+
+输出数组检查通过：vertices `(448,6890,3)`、faces `(13776,3)`、模型 COCO `(448,17,3)`、SMPL-H joints `(448,73,3)`、左右手点 `(448,21,3)`；所有模型数组有限，三角面最大索引 6889。原始三角化点 7534 个有限且 accepted，当前运行没有 finite rejected 点。
+
+拟合效果评估：最终身体 COCO 三维残差 RMS 约 504 mm，手部二维 RMS 约 1092 px（左手）和 699 px（右手）。身体和手部损失虽在阶段内下降，但残差仍很大，且可视化显示人体姿态明显偏离自然人体。该结果只能作为工程链路运行证据，不能作为有效 SMPL-H 姿态或真实手部姿态结果。
+
+同源可视化页面为 `fit_cuda_vposer_corrected_stereo448_v1/smplh_people1_vposer_viewer.html`，使用该次结果的网格、真实三角面、COCO 点、三角化点、SMPL-H 手部点以及当前场景重放的地面、助步器和双相机轨迹。浏览器加载无 JavaScript 错误，页面可逐帧播放和交互旋转。
+
 ## 目的
 
 验证 WiLoR 是否能在现有双鱼眼 SMPL 主线上作为手部辅助观测，并把最终人体统一输出为 SMPL-H 的 6890 个顶点。该记录是工程候选验证，不代表手部真实精度或物理抓取成功。
