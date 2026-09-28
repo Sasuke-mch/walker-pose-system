@@ -54,35 +54,24 @@ def build_coarse_frame(dimensions: WalkerDimensions) -> dict[str, Any]:
         "front_left_top": [-x, -y, h],
         "rear_right_top": [x, y, h],
         "rear_left_top": [-x, y, h],
-        # This is the center of the elevated front rail, not a top-handle
-        # node.  It is also the semantic kp_03 anchor used by the fitted
-        # coarse model, so keeping it at h made the rendered sphere float.
+        # Semantic fitting anchor only. It is not a physical joint and must
+        # not be rendered as a walker connection ball.
         "front_top_center": [0.0, -y, f],
     }
-    # Keep the frame as connected structural members.  The previous version
-    # used foot->top members, which hid the intermediate joints and omitted
-    # the front middle crossbar.  The rear remains open for user entry.
+    # Physical topology from the reference walker: four uprights, two side
+    # rails at the middle height, two upper side handles, and one elevated
+    # front rail. The rear remains open for user entry. The middle rail is
+    # deliberately not bridged across the front.
     edges = [
-        # four segmented legs/uprights
-        ["front_right_foot", "front_right_mid"],
-        ["front_right_mid", "front_right_rail"],
-        ["front_right_rail", "front_right_top"],
-        ["front_left_foot", "front_left_mid"],
-        ["front_left_mid", "front_left_rail"],
-        ["front_left_rail", "front_left_top"],
-        ["rear_right_foot", "rear_right_mid"],
-        ["rear_right_mid", "rear_right_top"],
-        ["rear_left_foot", "rear_left_mid"],
-        ["rear_left_mid", "rear_left_top"],
-        # side rails and handles
-        ["front_right_mid", "rear_right_mid"],
-        ["front_left_mid", "rear_left_mid"],
+        ["front_right_foot", "front_right_top"],
+        ["front_left_foot", "front_left_top"],
+        ["rear_right_foot", "rear_right_top"],
+        ["rear_left_foot", "rear_left_top"],
+        ["front_left_rail", "front_right_rail"],
         ["front_right_top", "rear_right_top"],
         ["front_left_top", "rear_left_top"],
-        # front crossbars; rear stays open
-        ["front_left_mid", "front_right_mid"],
-        ["front_left_rail", "front_top_center"],
-        ["front_top_center", "front_right_rail"],
+        ["front_right_mid", "rear_right_mid"],
+        ["front_left_mid", "rear_left_mid"],
     ]
     # COCO body-left appears on positive ground X in this installation.
     handles = {
