@@ -35,24 +35,25 @@
 
 不要使用当前错误的 `[19, 21, 22, ...]` 和 `[20, 36, 37, ...]` 映射。
 
-WiLoR/MANO 21 点必须先确认实际顺序。按当前 WiLoR `mano_wrapper.py` 的 `mano_to_openpose` 逻辑，预期顺序为：
+WiLoR/MANO 21 点必须先确认实际顺序。按当前 WiLoR `mano_wrapper.py` 的 `mano_to_openpose = [0,13,14,15,16,1,2,3,17,4,5,6,18,10,11,12,19,7,8,9,20]`，实际顺序为：
 
 ```text
 wrist,
-thumb1, thumb2, thumb3,
-index1, index2, index3,
-middle1, middle2, middle3,
-ring1, ring2, ring3,
-pinky1, pinky2, pinky3,
-tip_thumb, tip_index, tip_middle, tip_ring, tip_pinky
+index1, index2, index3, index_tip,
+middle1, middle2, middle3, middle_tip,
+pinky1, pinky2, pinky3, pinky_tip,
+ring1, ring2, ring3, ring_tip,
+thumb1, thumb2, thumb3, thumb_tip
 ```
 
-SMPL-H 内部关节只能对应前 16 个点；5 个指尖必须使用明确的 SMPL-H 表面顶点索引或单独定义的表面候选，不能把指尖伪装成内部关节。建议的前 16 点映射为：
+因此前 16 个位置中也夹着四个指尖，`[0..15]` 不是 16 个内部关节；`16..20` 也不是五个指尖。SMPL-H 内部关节对应 WiLoR 索引 `[0,1,2,3,5,6,7,9,10,11,13,14,15,17,18,19]`，五个指尖对应 `[4,8,12,16,20]`。指尖必须使用明确的 SMPL-H 表面顶点索引或单独定义的表面候选，不能把指尖伪装成内部关节。若模型端采用 `wrist, thumb, index, middle, ring, pinky` 顺序，其 16 个内部关节映射为：
 
 ```python
 HAND_MAP_L = [20, 34, 35, 36, 22, 23, 24, 25, 26, 27, 31, 32, 33, 28, 29, 30]
 HAND_MAP_R = [21, 49, 50, 51, 37, 38, 39, 40, 41, 42, 46, 47, 48, 43, 44, 45]
 ```
+
+上述模型端映射必须与相同语义重排后的 WiLoR 观测比较；不能直接拿原始 WiLoR `[0..15]` 对齐。`hand21()` 输出与观测均须明确采用同一个 21 点顺序，且进入损失前断言形状都是 `(T,21,2)`。
 
 把这些映射写成有名称的常量，并增加父子链断言。保存 `joint_names`、映射版本和每个点的语义。
 

@@ -209,7 +209,13 @@ HAND_MAP_R = [21, 49, 50, 51, 37, 38, 39,
 
 ### WiLoR 21 点顺序没有稳定命名
 
-旧代码的 `hand_keep` 按数字选择点，注释却使用了另一套顺序。WiLoR 的 MANO 包装器实际把 thumb、index、middle、ring、pinky 排列在 wrist 后面。必须先统一命名，再映射到 SMPL-H。fingertip 只能是表面点，不能冒充内部骨骼关节。
+旧代码的 `hand_keep` 按数字选择点，注释却使用了另一套顺序。重新核查 `mano_to_openpose` 后，实际原始顺序是 `wrist, index×(3关节+tip), middle×(3关节+tip), pinky×(3关节+tip), ring×(3关节+tip), thumb×(3关节+tip)`。内部关节索引是 `[0,1,2,3,5,6,7,9,10,11,13,14,15,17,18,19]`，指尖索引是 `[4,8,12,16,20]`。此前本记录和 Cursor prompt 写成“前 16 点是内部关节、后 5 点是指尖”，这是错误的；已在本次修订中纠正。必须先统一命名，再映射到 SMPL-H。fingertip 只能是表面点，不能冒充内部骨骼关节。
+
+### `a8094c88` 修正提交的复核结果
+
+该提交修正了部分 SMPL-H 内部关节编号，但当前入口仍不能运行有效拟合：`hand21()` 返回 `(T,21,3)`，观测却被 `hand_keep=[0..15]` 裁成 `(T,16,2)`，投影后相减会形状不匹配。`stages` 和 `set_stage()` 仅被定义，主优化循环未调用，实际仍是全部参数同时训练；`D_weak_hand3d` 没有 3D 手部输入。`read_view()` 的候选关联和逐点权重也未接入主拟合。旧结果 `fit_cuda_full_v3` 未受该提交影响。
+
+本机 `.venv-cuda/Scripts/python.exe` 存在，当前环境的 PyTorch 报告 `2.11.0+cu128` 且 `torch.cuda.is_available() == True`。报告中“无可用 CUDA python”不符合本机当前状态。短窗仍须先修复上述形状和调度错误，再运行。
 
 ### 越界点进入了损失
 
