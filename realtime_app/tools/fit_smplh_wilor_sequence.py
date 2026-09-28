@@ -476,8 +476,8 @@ def main() -> int:
         stage_steps[5] = 0
     stage_names = ["A_body_vposer", "B_shared_beta", "C_body_vposer_refine",
                    "D1_hand_proximal",
-                   "D2_hand_surface_contact" if contact_enabled else "D2_hand_refine_no_contact",
-                   "D3_hand_contact_refine"]
+                   "D2_hand_foot_surface_contact" if contact_enabled else "D2_hand_refine_no_contact",
+                   "D3_hand_foot_contact_refine"]
     stage_train = [["transl", "latent"], ["beta"],
                    ["beta", "root", "transl", "latent"], ["lhand", "rhand"],
                    ["lhand", "rhand"], ["lhand", "rhand"]]
@@ -718,8 +718,8 @@ def main() -> int:
         "contact_weighting": {"hand_surface": float(args.surface_hand_contact_weight),
                                "foot_surface": float(args.surface_foot_contact_weight)},
         "contact_schedule": ["D1 hand observation",
-                             "D2 surface hand contact" if contact_enabled else "D2 hand-only refinement",
-                             "D3 hand-only contact refinement" if contact_enabled else "D3 skipped: no contact input"],
+                             "D2 surface hand+foot contact" if contact_enabled else "D2 hand-only refinement",
+                             "D3 hand+foot contact refinement" if contact_enabled else "D3 skipped: no contact input"],
         "hand_3d_observation_used": False,
         "body_accepted_points": int(body_mask.sum()),
         "initialization": {
