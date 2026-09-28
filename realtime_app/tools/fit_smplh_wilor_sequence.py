@@ -37,55 +37,24 @@ raw_clean = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(raw_clean)
 
 
-def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray | None = None,
-               image_size: tuple[int, int] = (1920, 1080)) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Read the best side candidate while retaining every finite point.
+def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
+               image_size: tuple[int, int], camera: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, list[dict]]:
+    """Use the single audited WiLoR association implementation.
 
-    ``valid`` is a per-point finite-value mask used only to avoid NaNs in the
-    optimizer.  ``bounds_ok`` is diagnostic metadata; it is deliberately not
-    used to discard an entire hand or an individual point.  WiLoR does not
-    provide an independent per-joint confidence, so the detector confidence
-    remains a candidate-level field in the audit output.
+    The shared reader validates frame/image identity, duplicate frames and
+    same-camera wrist association.  ``valid`` remains finite-only so rejected
+    or out-of-bounds points are preserved for diagnostics and soft weighting.
     """
-    obs = np.full((n, 21, 2), np.nan, np.float32)
-    valid = np.zeros((n, 21), bool)
-    bounds_ok = np.zeros((n, 21), bool)
-    for line in path.open(encoding="utf-8"):
-        row = json.loads(line)
-        frame = int(row["frame_index"])
-        if not (0 <= frame < n):
-            continue
-        candidates = [c for c in row["records"] if c.get("side") == side]
-        if not candidates:
-            continue
-        # Candidate identity is tied to the PMPose wrist in the same camera.
-        # Historical JSONL may not contain detector confidence, so confidence
-        # alone cannot establish the person association.
-        if body_points is not None and np.isfinite(body_points[frame, 9 if side == "left" else 10, :2]).all():
-            wrist = body_points[frame, 9 if side == "left" else 10, :2]
-            ranked = sorted(candidates, key=lambda c: float(np.linalg.norm(
-                np.asarray(c["keypoints_2d_raw_fisheye"], np.float32)[0] - wrist)))
-            distances = [float(np.linalg.norm(np.asarray(c["keypoints_2d_raw_fisheye"], np.float32)[0] - wrist)) for c in ranked]
-            if distances[0] > 150.0 or (len(distances) > 1 and distances[1] - distances[0] < 25.0):
-                continue
-            candidate = ranked[0]
-        else:
-            candidate = max(candidates, key=lambda c: float(c.get("detector_confidence", 0.0)))
-        points = np.asarray(candidate["keypoints_2d_raw_fisheye"], np.float32)
-        if points.shape != (21, 2):
-            continue
-        obs[frame] = points
-        valid[frame] = np.isfinite(points).all(axis=-1)
-        # The sequence audit currently stores only a candidate-level bounds
-        # flag.  Recompute the per-joint state from the raw image dimensions
-        # when available, while preserving points outside the image.
-        width, height = image_size
-        bounds_ok[frame] = (
-                valid[frame]
-                & (points[:, 0] >= 0) & (points[:, 0] < width)
-                & (points[:, 1] >= 0) & (points[:, 1] < height)
-            )
-    return obs, valid, bounds_ok
+    from pose_app.smplh_hand_observation import read_view
+
+    points, _weights, audit = read_view(path, body_points, image_size, camera)
+    hand_index = 0 if side == "left" else 1
+    obs = points[:, hand_index]
+    valid = np.isfinite(obs).all(axis=-1)
+    width, height = image_size
+    bounds_ok = (valid & (obs[:, :, 0] >= 0) & (obs[:, :, 0] < width)
+                 & (obs[:, :, 1] >= 0) & (obs[:, :, 1] < height))
+    return obs, valid, bounds_ok, audit
 
 
 def main() -> int:
@@ -181,10 +150,18 @@ def main() -> int:
     # Each camera file contains both anatomical sides. Fit each hand from both
     # cameras; a single camera must not be mistaken for an anatomical hand.
     image_size = (int(cal.image_width), int(cal.image_height))
-    hand_ll, hand_ll_valid, hand_ll_bounds = read_wilor(args.wilor_left, n, "left", left, image_size)
-    hand_lr, hand_lr_valid, hand_lr_bounds = read_wilor(args.wilor_left, n, "right", left, image_size)
-    hand_rl, hand_rl_valid, hand_rl_bounds = read_wilor(args.wilor_right, n, "left", right, image_size)
-    hand_rr, hand_rr_valid, hand_rr_bounds = read_wilor(args.wilor_right, n, "right", right, image_size)
+    hand_ll, hand_ll_valid, hand_ll_bounds, audit_left_cam_left = read_wilor(
+        args.wilor_left, n, "left", left, image_size, "left")
+    hand_lr, hand_lr_valid, hand_lr_bounds, audit_left_cam_right = read_wilor(
+        args.wilor_left, n, "right", left, image_size, "left")
+    hand_rl, hand_rl_valid, hand_rl_bounds, audit_right_cam_left = read_wilor(
+        args.wilor_right, n, "left", right, image_size, "right")
+    hand_rr, hand_rr_valid, hand_rr_bounds, audit_right_cam_right = read_wilor(
+        args.wilor_right, n, "right", right, image_size, "right")
+    (args.output_dir / "wilor_association_audit.json").write_text(
+        json.dumps({"left_camera": audit_left_cam_left + audit_left_cam_right,
+                    "right_camera": audit_right_cam_left + audit_right_cam_right},
+                   ensure_ascii=False, indent=2), encoding="utf-8")
     hand_l, hand_l_valid, hand_l_bounds = hand_ll, hand_ll_valid, hand_ll_bounds
     hand_r, hand_r_valid, hand_r_bounds = hand_rr, hand_rr_valid, hand_rr_bounds
     # Keep the complete WiLoR 21-point order.  The first point is the wrist;
@@ -615,6 +592,7 @@ def main() -> int:
         "hand_bounds_are_diagnostic_only": True,
         "wilor_left_valid_points": int(hand_ll_valid.sum() + hand_rl_valid.sum()),
         "wilor_right_valid_points": int(hand_lr_valid.sum() + hand_rr_valid.sum()), "history": history,
+        "association_audit": "wilor_association_audit.json",
         "wilor_observation_views": {"left_camera": ["left_hand", "right_hand"],
                                      "right_camera": ["left_hand", "right_hand"]},
         "stage_schedule": stage_history,

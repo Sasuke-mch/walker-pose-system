@@ -50,6 +50,32 @@ def validate_smplh(model):
             if [int(parents[a]), int(parents[b]), int(parents[c])] != [wrist, a, b]:
                 raise ValueError(f"SMPL-H {side} finger parent chain mismatch")
 
+    # The parent graph cannot distinguish ring from pinky.  Check the rest
+    # template once so a MANO/SMPL-H asset or hand-order change fails closed
+    # instead of silently swapping the two distal fingers.
+    import torch
+    v_template = model.v_template.detach()
+    if v_template.ndim == 3:
+        v_template = v_template[0]
+    rest_joints = torch.as_tensor(model.J_regressor.detach().cpu().numpy(), dtype=v_template.dtype) @ v_template
+    for side in ("left", "right"):
+        ids = HAND_JOINTS[side]
+        ring_chain = ids[1 + 3 * 3: 4 + 3 * 3]
+        pinky_chain = ids[1 + 3 * 4: 4 + 3 * 4]
+        ring_len = float(torch.linalg.vector_norm(rest_joints[ring_chain[1]] - rest_joints[ring_chain[0]])
+                         + torch.linalg.vector_norm(rest_joints[ring_chain[2]] - rest_joints[ring_chain[1]]))
+        pinky_len = float(torch.linalg.vector_norm(rest_joints[pinky_chain[1]] - rest_joints[pinky_chain[0]])
+                          + torch.linalg.vector_norm(rest_joints[pinky_chain[2]] - rest_joints[pinky_chain[1]]))
+        if not ring_len > pinky_len:
+            raise ValueError(f"SMPL-H {side} ring/pinky template order check failed: {ring_len} <= {pinky_len}")
+        distal = [ids[3], ids[6], ids[9], ids[12], ids[15]]
+        tips = TIP_VERTICES[side]
+        for finger, (distal_joint, tip_vertex) in enumerate(zip(distal, tips)):
+            distances = torch.linalg.vector_norm(rest_joints[distal] - v_template[tip_vertex])
+            all_distances = torch.stack([torch.linalg.vector_norm(rest_joints[j] - v_template[tip_vertex]) for j in distal])
+            if int(torch.argmin(all_distances)) != finger:
+                raise ValueError(f"SMPL-H {side} fingertip order check failed at finger {finger}")
+
 def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera: str):
     """Keep all candidates; select by same-side PMPose wrist proximity.
 
