@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import time
 
 import numpy as np
 
@@ -187,6 +188,7 @@ def main() -> int:
         import torch
         if not torch.cuda.is_available():
             raise RuntimeError("CUDA requested but unavailable")
+    load_start = time.perf_counter()
     model, cfg = load_model(repo, checkpoint, args.device)
     # The bundled detector is a trusted local Ultralytics checkpoint.  The
     # PyTorch 2.6+ default ``weights_only=True`` rejects its PoseModel class.
@@ -200,6 +202,7 @@ def main() -> int:
     torch.load = _trusted_torch_load
     from ultralytics import YOLO
     detector = YOLO(str(repo / "pretrained_models" / "detector.pt")).to(args.device)
+    load_ms = (time.perf_counter() - load_start) * 1000.0
     images = sorted(args.image_dir.glob("pair_*.png"))
     if args.limit is not None:
         images = images[:args.limit]
@@ -208,11 +211,17 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8") as handle:
         for frame_index, path in enumerate(images):
+            frame_start = time.perf_counter()
             records = process_image(model, cfg, detector, path, args.device, args.orientation,
                                     (args.raw_width, args.raw_height))
-            handle.write(json.dumps({"frame_index": frame_index, "image": str(path.resolve()), "records": records}, ensure_ascii=False) + "\n")
+            if args.device == "cuda":
+                torch.cuda.synchronize()
+            processing_ms = (time.perf_counter() - frame_start) * 1000.0
+            handle.write(json.dumps({"frame_index": frame_index, "image": str(path.resolve()),
+                                     "processing_ms": processing_ms, "records": records}, ensure_ascii=False) + "\n")
             handle.flush()
-            print(frame_index, path.name, len(records), flush=True)
+            print(frame_index, path.name, len(records), f"{processing_ms:.1f} ms", flush=True)
+    print(f"model_and_detector_load_ms={load_ms:.1f}", flush=True)
     return 0
 
 
