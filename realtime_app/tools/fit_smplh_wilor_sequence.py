@@ -226,8 +226,8 @@ def main() -> int:
     stage_train = [
         ["beta", "root", "transl", "body_pose"],
         ["lhand", "rhand"],
-        ["beta", "root", "transl", "body_pose", "lhand", "rhand"],
-        ["beta", "root", "transl", "body_pose", "lhand", "rhand"],
+        ["lhand", "rhand"],
+        ["lhand", "rhand"],
     ]
     def set_stage(train):
         for p in (beta, root, transl, body_pose, lhand, rhand): p.requires_grad_(False)
@@ -259,7 +259,10 @@ def main() -> int:
             hand_r_loss = (hand_r_res * weight_r).sum() / weight_r.sum().clamp_min(1e-6) if mask_r.any() else pr.sum() * 0.0
             pose_reg = 1e-4 * (body_pose.pow(2).mean() + lhand.pow(2).mean() + rhand.pow(2).mean())
             body_term = body_loss if stage_index != 1 else body_loss.detach() * 0.0
-            hand_term = 1e-5 * (hand_l_loss + hand_r_loss) if stage_index != 0 else (hand_l_loss + hand_r_loss).detach() * 0.0
+            # Pixel residuals are numerically much larger than metre-scale
+            # body residuals. Keep hand fitting auxiliary and prevent it from
+            # moving the body/root to explain WiLoR's model-derived pixels.
+            hand_term = 1e-7 * (hand_l_loss + hand_r_loss) if stage_index != 0 else (hand_l_loss + hand_r_loss).detach() * 0.0
             loss = body_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean()
             loss.backward()
             optim.step()

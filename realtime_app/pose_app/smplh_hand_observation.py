@@ -5,24 +5,25 @@ from pathlib import Path
 import numpy as np
 
 # SMPL-H has 22 body joints INCLUDING root, followed by 15 joints per hand.
-# WiLoR's mano_to_openpose output: wrist, index, middle, pinky, ring, thumb;
+# WiLoR's mano_to_openpose output: wrist, thumb, index, middle, ring, pinky;
 # each finger has three internal joints followed by one fingertip.
 HAND_JOINTS = {
     "left": [20, 34, 35, 36, 22, 23, 24, 25, 26, 27, 31, 32, 33, 28, 29, 30],
     "right": [21, 49, 50, 51, 37, 38, 39, 40, 41, 42, 46, 47, 48, 43, 44, 45],
 }
-TIP_VERTICES = {"left": [2319, 2445, 2673, 2556, 2746],
-                "right": [5782, 5905, 6133, 6016, 6191]}
-HAND_NAMES = ["wrist"] + [f"{f}_{j}" for f in ("index", "middle", "pinky", "ring", "thumb") for j in (1, 2, 3, "tip")]
+TIP_VERTICES = {"left": [2746, 2319, 2445, 2556, 2673],
+                "right": [6191, 5782, 5905, 6016, 6133]}
+HAND_NAMES = ["wrist"] + [f"{f}_{j}" for f in ("thumb", "index", "middle", "ring", "pinky") for j in (1, 2, 3, "tip")]
 
 def hand21(joints, vertices, side):
     """Differentiable model points in WiLoR OpenPose order, including fingertips."""
     import torch
     internal = joints[:, HAND_JOINTS[side]]
     tips = vertices[:, TIP_VERTICES[side]]
-    # HAND_JOINTS is stored in anatomical SMPL-H order (thumb, index, ...),
-    # while WiLoR emits OpenPose order (index, middle, pinky, ring, thumb).
-    order = [1, 2, 4, 3, 0]
+    # MANO internal order is index, middle, pinky, ring, thumb. WiLoR
+    # reorders it with [0,13,14,15,16,1,2,3,17,...] to thumb first.
+    # HAND_JOINTS and TIP_VERTICES are already in that output order.
+    order = range(5)
     return torch.stack(
         [internal[:, 0]]
         + [
