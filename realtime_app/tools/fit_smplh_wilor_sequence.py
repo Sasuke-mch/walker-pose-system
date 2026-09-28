@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fit SMPL-H from the raw body stereo observations plus WiLoR hand pixels.
+"""Fit VPoser-parameterized SMPL-H from body stereo plus WiLoR hand pixels.
 
 This is an engineering candidate run.  WiLoR pixels are model-derived MANO
 projections, so they are masked and reported as an auxiliary 2-D term rather
@@ -28,6 +28,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "realtime_app"))
 from pose_app.fisheye_camera import fisheye_project_torch, load_stereo_fisheye
 from pose_app.smpl_coco_observation import load_coco17_regressor, regress_coco17_torch
+from pose_app.smplx_fitting import load_vposer_explicit
+from pose_app import smpl_surface_contact as surface_contact
 
 RAW = ROOT / "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py"
 spec = importlib.util.spec_from_file_location("raw_clean", RAW)
@@ -110,6 +112,26 @@ def main() -> int:
     ap.add_argument("--smplh-model", type=Path, required=True)
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--steps", type=int, default=180)
+    ap.add_argument("--base-steps", type=int, default=None,
+                    help="Stage A body/VPoser steps; defaults to steps//6")
+    ap.add_argument("--beta-steps", type=int, default=None,
+                    help="Stage B shared-beta steps; defaults to steps//6")
+    ap.add_argument("--joint-steps", type=int, default=None,
+                    help="Stage C VPoser/body refinement steps; defaults to steps//6")
+    ap.add_argument("--hand-steps", type=int, default=None,
+                    help="Stage D1 proximal-weighted hand steps; defaults to steps//6")
+    ap.add_argument("--contact-steps", type=int, default=None,
+                    help="Stage D2 hand-contact steps; defaults to steps//6")
+    ap.add_argument("--contact-refine-steps", type=int, default=None,
+                    help="Stage D3 limited contact refinement; defaults to steps//6")
+    ap.add_argument("--vposer-dir", type=Path, default=None)
+    ap.add_argument("--vposer-prior-weight", type=float, default=0.02)
+    ap.add_argument("--contact-labels", type=Path, default=None)
+    ap.add_argument("--scene-transforms", type=Path, default=None)
+    ap.add_argument("--contact-vertex-sets", type=Path, default=None)
+    ap.add_argument("--walker-topology", type=Path, default=None,
+                    help="validated walker topology; used to check handle semantics")
+    ap.add_argument("--surface-hand-contact-weight", type=float, default=0.0)
     ap.add_argument("--lr", type=float, default=0.02)
     ap.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     args = ap.parse_args()
@@ -126,6 +148,14 @@ def main() -> int:
     device = torch.device(args.device)
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA unavailable")
+    if args.vposer_dir is None:
+        raise ValueError("--vposer-dir is required: SMPL-H body pose is parameterized by VPoser")
+    if args.surface_hand_contact_weight < 0:
+        raise ValueError("--surface-hand-contact-weight must be non-negative")
+    contact_args = (args.contact_labels, args.scene_transforms,
+                    args.contact_vertex_sets, args.walker_topology)
+    if any(v is not None for v in contact_args) and not all(v is not None for v in contact_args):
+        raise ValueError("contact mode requires contact-labels, scene-transforms, contact-vertex-sets and walker-topology together")
 
     cal = load_stereo_fisheye(args.calibration_dir)
     raw_clean.cv2 = cv2
@@ -165,10 +195,14 @@ def main() -> int:
     model = smplx.SMPLH(str(args.smplh_model), data_struct=Struct(**model_data),
                         gender="male", use_pca=False, flat_hand_mean=True,
                         batch_size=n).to(device)
+    vposer, vp_cfg, vp_ckpt = load_vposer_explicit(args.vposer_dir, args.device)
+    latent_dim = int(vp_cfg.model_params.latentD)
+    if latent_dim != 32:
+        raise ValueError(f"VPoser latentD={latent_dim}, expected the installed V02_05 latentD=32")
     beta = torch.nn.Parameter(torch.zeros(1, 10, device=device))
     root = torch.nn.Parameter(torch.zeros(n, 3, device=device))
     transl = torch.nn.Parameter(torch.zeros(n, 3, device=device))
-    body_pose = torch.nn.Parameter(torch.zeros(n, 63, device=device))
+    latent = torch.nn.Parameter(torch.zeros(n, latent_dim, device=device))
     lhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
     rhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
     target = torch.tensor(tri_m, device=device)
@@ -179,6 +213,33 @@ def main() -> int:
     mask_r = torch.tensor(hand_r_mask, device=device)
     weight_l = torch.tensor(hand_l_weight_np, device=device)
     weight_r = torch.tensor(hand_r_weight_np, device=device)
+    hand_order_weights_np = np.asarray(
+        [1.00, 0.95, 0.82, 0.68, 0.48,
+         0.95, 0.82, 0.68, 0.48, 0.95, 0.82, 0.68, 0.48,
+         0.95, 0.82, 0.68, 0.48, 0.95, 0.82, 0.68, 0.48], np.float32)
+    order_w = torch.tensor(hand_order_weights_np, device=device)[None, :]
+    weight_l = weight_l * order_w
+    weight_r = weight_r * order_w
+    contact_enabled = args.contact_labels is not None
+    contact_hand_weight = contact_handle = contact_R = contact_T = palm_idx = None
+    if contact_enabled:
+        labels = np.load(args.contact_labels, allow_pickle=True)
+        scene = np.load(args.scene_transforms, allow_pickle=True)
+        if int(labels["handle_ends_ground_m"].shape[0]) != n:
+            raise ValueError("contact labels frame count does not match raw input")
+        contact_handle = torch.tensor(labels["handle_ends_ground_m"], dtype=torch.float32, device=device)
+        contact_hand_weight = torch.tensor(labels["hand_contact_weight"], dtype=torch.float32, device=device)
+        contact_R = torch.tensor(scene["rotation_ground_from_left"], dtype=torch.float32, device=device)
+        contact_T = torch.tensor(scene["translation_ground_from_left_mm"] / 1000.0, dtype=torch.float32, device=device)
+        sets = json.loads(args.contact_vertex_sets.read_text(encoding="utf-8"))["sets"]
+        topology = json.loads(args.walker_topology.read_text(encoding="utf-8"))
+        handles = topology.get("handle_segments", {})
+        if set(handles) != {"left", "right"} or any(len(v) != 2 for v in handles.values()):
+            raise ValueError("walker topology must expose exactly two endpoints for left/right handles")
+        palm_idx = {s: torch.tensor(sum(sets[f"{s}_palm_surface_candidate"].values(), []), dtype=torch.long, device=device)
+                    for s in ("left", "right")}
+        if any(int(v.numel()) == 0 for v in palm_idx.values()):
+            raise ValueError("contact vertex sets contain no palm vertices")
     R01 = torch.tensor(cal.R_cam0_to_cam1, dtype=torch.float32, device=device)
     T01 = torch.tensor(cal.T_cam0_to_cam1_mm / 1000.0, dtype=torch.float32, device=device)
     K0, D0 = cal.K0, cal.D0
@@ -187,7 +248,7 @@ def main() -> int:
     # Translation init with NaN guard (no nanmean->nan_to_num silence).
     with torch.no_grad():
         z = model(betas=torch.zeros(n, 10, device=device),
-                  global_orient=root, body_pose=body_pose,
+                  global_orient=root, body_pose=torch.zeros(n, 63, device=device),
                   left_hand_pose=lhand, right_hand_pose=rhand,
                   transl=torch.zeros(n, 3, device=device), return_verts=True)
         zc = regress_coco17_torch(z.vertices, reg)
@@ -207,7 +268,14 @@ def main() -> int:
                 t0[i] = np.zeros(3, np.float32); init_source.append("translation_init_unavailable")
         transl[:] = torch.tensor(t0, device=device)
 
-    optim = torch.optim.Adam([beta, root, transl, body_pose, lhand, rhand], lr=args.lr)
+    def decode_body_pose(z):
+        pose = vposer.decode(z)["pose_body"].reshape(n, 63)
+        if pose.shape != (n, 63) or not bool(torch.isfinite(pose).all()):
+            raise RuntimeError(f"VPoser decoded pose has invalid shape/values: {tuple(pose.shape)}")
+        return pose
+    with torch.no_grad():
+        _ = decode_body_pose(latent)
+    optim = torch.optim.Adam([beta, root, transl, latent, lhand, rhand], lr=args.lr)
     history = []
     from pose_app.smplh_hand_observation import HAND_JOINTS, TIP_VERTICES, HAND_NAMES, validate_smplh, hand21
     validate_smplh(model)
@@ -218,20 +286,18 @@ def main() -> int:
     assert hand_map_l == [20, 34, 35, 36, 22, 23, 24, 25, 26, 27, 31, 32, 33, 28, 29, 30]
     assert hand_map_r == [21, 49, 50, 51, 37, 38, 39, 40, 41, 42, 46, 47, 48, 43, 44, 45]
     # WiLoR OpenPose order -> SMPL-H joints verified above; tips via hand21 vertices.
-    stage_names = ["A_body_only", "B_hands_only", "C_wrist_forearm_hands", "D_joint_refinement_no_hand3d"]
-    base = args.steps // len(stage_names)
-    stage_steps = [base] * len(stage_names)
-    for i in range(args.steps % len(stage_names)):
-        stage_steps[i] += 1
-    stage_train = [
-        ["beta", "root", "transl", "body_pose"],
-        ["lhand", "rhand"],
-        ["lhand", "rhand"],
-        ["lhand", "rhand"],
-    ]
+    default_stage = max(1, args.steps // 6)
+    stage_steps = [x if x is not None else default_stage for x in
+                   (args.base_steps, args.beta_steps, args.joint_steps,
+                    args.hand_steps, args.contact_steps, args.contact_refine_steps)]
+    stage_names = ["A_body_vposer", "B_shared_beta", "C_body_vposer_refine",
+                   "D1_hand_proximal", "D2_hand_surface_contact", "D3_contact_refine"]
+    stage_train = [["beta", "root", "transl", "latent"], ["beta"],
+                   ["beta", "root", "transl", "latent"], ["lhand", "rhand"],
+                   ["lhand", "rhand"], ["lhand", "rhand", "root", "transl"]]
     def set_stage(train):
-        for p in (beta, root, transl, body_pose, lhand, rhand): p.requires_grad_(False)
-        m = {"beta": beta, "root": root, "transl": transl, "body_pose": body_pose, "lhand": lhand, "rhand": rhand}
+        for p in (beta, root, transl, latent, lhand, rhand): p.requires_grad_(False)
+        m = {"beta": beta, "root": root, "transl": transl, "latent": latent, "lhand": lhand, "rhand": rhand}
         for k in train: m[k].requires_grad_(True)
     stage_history = []
     global_step = 0
@@ -241,6 +307,7 @@ def main() -> int:
             step = global_step
             global_step += 1
             optim.zero_grad(set_to_none=True)
+            body_pose = decode_body_pose(latent)
             out = model(betas=beta.expand(n, -1), global_orient=root,
                         body_pose=body_pose, left_hand_pose=lhand,
                         right_hand_pose=rhand, transl=transl, return_verts=True)
@@ -257,26 +324,42 @@ def main() -> int:
             hand_r_res = (pr - obs_r).pow(2).sum(-1)
             hand_l_loss = (hand_l_res * weight_l).sum() / weight_l.sum().clamp_min(1e-6) if mask_l.any() else pl.sum() * 0.0
             hand_r_loss = (hand_r_res * weight_r).sum() / weight_r.sum().clamp_min(1e-6) if mask_r.any() else pr.sum() * 0.0
-            pose_reg = 1e-4 * (body_pose.pow(2).mean() + lhand.pow(2).mean() + rhand.pow(2).mean())
-            body_term = body_loss if stage_index != 1 else body_loss.detach() * 0.0
+            pose_reg = args.vposer_prior_weight * latent.pow(2).mean() + 1e-4 * (lhand.pow(2).mean() + rhand.pow(2).mean())
+            body_term = body_loss if stage_index not in (1, 3, 4) else body_loss.detach() * 0.0
             # Pixel residuals are numerically much larger than metre-scale
             # body residuals. Keep hand fitting auxiliary and prevent it from
             # moving the body/root to explain WiLoR's model-derived pixels.
-            hand_term = 1e-7 * (hand_l_loss + hand_r_loss) if stage_index != 0 else (hand_l_loss + hand_r_loss).detach() * 0.0
-            loss = body_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean()
+            hand_term = 1e-7 * (hand_l_loss + hand_r_loss) if stage_index >= 3 else (hand_l_loss + hand_r_loss).detach() * 0.0
+            contact_loss = pl.sum() * 0.0
+            if contact_enabled and stage_index >= 4:
+                vg = torch.einsum("nij,nvj->nvi", contact_R, out.vertices) + contact_T[:, None, :]
+                terms = []
+                for side, j in (("left", 0), ("right", 1)):
+                    pts = vg[:, palm_idx[side], :]
+                    a, b = contact_handle[:, j, 0, :], contact_handle[:, j, 1, :]
+                    terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
+                                 * contact_hand_weight[:, j])
+                contact_loss = torch.stack(terms, dim=1).sum() / contact_hand_weight.sum().clamp_min(1e-6)
+            loss = body_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
+                   (args.surface_hand_contact_weight * contact_loss if stage_index >= 4 else contact_loss.detach() * 0.0)
             loss.backward()
             optim.step()
-            if step % 10 == 0 or step == args.steps - 1:
+            if step % 10 == 0 or step == sum(stage_steps) - 1:
                 row = {"stage": stage_name, "stage_step": local_step, "step": step, "loss": float(loss.detach()),
                             "body_m": float(torch.sqrt(body_loss.detach())),
                             "hand_l_px": float(torch.sqrt(hand_l_loss.detach())),
                             "hand_r_px": float(torch.sqrt(hand_r_loss.detach())),
-                            "hand_l_points": int(mask_l.sum()), "hand_r_points": int(mask_r.sum())}
+                            "hand_l_points": int(mask_l.sum()), "hand_r_points": int(mask_r.sum()),
+                            "contact": float(contact_loss.detach()),
+                            "contact_active": bool(contact_enabled and stage_index >= 4)}
                 history.append(row)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
-                              "hand_3d_term": False})
+                              "hand_3d_term": False,
+                              "hand_priority": "wrist_to_distal_fixed_weights" if stage_index >= 3 else "inactive",
+                              "contact_term": bool(contact_enabled and stage_index >= 4)})
 
     with torch.no_grad():
+        body_pose = decode_body_pose(latent)
         final = model(betas=beta.expand(n, -1), global_orient=root,
                       body_pose=body_pose, left_hand_pose=lhand,
                       right_hand_pose=rhand, transl=transl, return_verts=True)
@@ -288,6 +371,7 @@ def main() -> int:
                         betas=beta.detach().cpu().numpy(), global_orient=root.detach().cpu().numpy(),
                         transl=transl.detach().cpu().numpy(),
                         body_pose=body_pose.detach().cpu().numpy(),
+                        vposer_latent=latent.detach().cpu().numpy(),
                         left_hand_pose=lhand.detach().cpu().numpy(), right_hand_pose=rhand.detach().cpu().numpy(),
                         raw_triangulated_points=tri, body_accepted=body_mask,
                         wilor_left_2d=hand_l, wilor_left_mask=hand_l_mask,
@@ -302,7 +386,7 @@ def main() -> int:
                         hand_points_left=final_hand_l.detach().cpu().numpy(),
                         hand_points_right=final_hand_r.detach().cpu().numpy())
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
-        "status": "engineering_candidate", "frames": n, "steps": args.steps,
+        "status": "engineering_candidate", "frames": n, "steps": int(sum(stage_steps)),
         "model": str(args.smplh_model.resolve()), "vertices": 6890,
         "hand_observation_source": "WiLoR_model_projected_MANO_joints",
         "hand_observation_points_retained": 21,
@@ -312,6 +396,10 @@ def main() -> int:
         "wilor_right_valid_points": int(hand_r_mask.sum()), "history": history,
         "stage_schedule": stage_history,
         "hand_confidence_source": "detector_box_or_missing_neutral_weight",
+        "vposer_checkpoint": str(vp_ckpt), "vposer_latent_dim": latent_dim,
+        "hand_priority_weights": hand_order_weights_np.tolist(),
+        "contact_enabled": bool(contact_enabled),
+        "contact_schedule": ["D1 hand observation", "D2 surface hand contact", "D3 limited contact refinement"],
         "hand_3d_observation_used": False,
         "body_accepted_points": int(body_mask.sum()),
     }, ensure_ascii=False, indent=2), encoding="utf-8")
