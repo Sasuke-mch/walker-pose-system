@@ -79,3 +79,9 @@ SMPL-H 接口、6890 顶点统一输出、COCO regressor 接入和 CUDA 全序�
 检查当前全帧页面后确认，旧 `edges` 把四根立柱写成 `foot→top` 长杆，中间 `mid/rail` 节点未参与拓扑，并缺少前侧中层横梁。已修改 `realtime_app/pose_app/parametric_walker_model.py`，将四根立柱拆成 `foot→mid→rail→top` 三段，保留左右中层侧梁和左右上层扶手，新增前侧中层横梁和前侧上层横梁，后侧继续开放。`front_top_center` 未加入实体边。
 
 当前全帧目录中的静态 walker JSON 已同步为16条边，并重新生成 `smplh_people1_pca12_reproj015_topology_fixed_viewer.html`。页面继续使用实体圆柱杆和球节点；本次拓扑检查确认前侧横梁2条、`front_top_center`不在边集合中。浏览器 `file:` 页面限制仍存在，页面完成静态文件验收但未取得浏览器截图证据。
+
+## 2026-09-28 — 二次修正前横杆中心高度
+
+复查历史 `coarse_walker_model_v1`、`coarse_walker_model_v2_camera_rail` 和 `fit_coarse_walker_model.py` 后确认，`front_top_center` 对应历史 `kp_03` 的前横杆中心，不是相机孤立节点。上一版虽然补齐了杆件，但仍把该中心球留在总高度 `h=838 mm`，因此页面中出现悬空球。
+
+本次将 `front_top_center.z` 改为 `front_rail_height=673.045889 mm`，前横杆改为 `front_left_rail→front_top_center→front_right_rail` 两段；它不再与上层侧扶手同高。四根立柱继续按 `foot→mid→rail→top` 分段，左右中层侧梁、左右上层扶手和前侧中层横梁保持。当前全帧页面重新生成为 `smplh_people1_pca12_reproj015_topology_fixed_v2_viewer.html`，静态拓扑共17条边，中心点不再孤立。

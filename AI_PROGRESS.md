@@ -1,9 +1,9 @@
-# 2026-09-28：修正助步器实体拓扑
+# 2026-09-28：二次修正助步器实体拓扑：前横杆中心高度
 
-- 定位到旧拓扑缺陷：四根立柱被错误建成 `foot→top` 长杆，中间节点没有参与连杆；前侧中层横梁缺失，导致页面中出现结构穿越和错误的悬空连接。
-- 修改 `realtime_app/pose_app/parametric_walker_model.py`：四根立柱改为 `foot→mid→rail→top` 三段；保留左右中层侧梁和左右上层扶手；加入前侧 `front_left_mid↔front_right_mid` 与 `front_left_rail↔front_right_rail` 两条横梁；后侧保持开放；`front_top_center` 仅作为参考/相机节点，不加入实体边。
-- 同步更新当前全帧候选使用的静态模型 JSON，并重新生成 `fit_cuda_vposer_mano_pca12_temporal_reproj015_full448_v2/smplh_people1_pca12_reproj015_topology_fixed_viewer.html`。新拓扑共16条实体边，前侧横梁2条，页面继续使用圆柱杆和球节点，不生成竖直网格墙。
-- 静态检查通过：拓扑16条边、前侧横梁2条、`front_top_center`未进入边；当前 HTML 保留真实 SMPL-H 三角面与同源 scene 数据。浏览器 `file:` 页面限制仍未解除，因此未取得浏览器截图验收。
+- 定位到上一版仍有错误：`front_top_center` 虽然没有连杆，却仍被放在总高度 `h=838 mm`，作为页面节点显示成悬空球；而 `kp_03` 的历史语义是前横杆中心。
+- 修改 `realtime_app/pose_app/parametric_walker_model.py`：`front_top_center.z` 改为 `front_rail_height≈673 mm`，前横杆改成 `front_left_rail↔front_top_center↔front_right_rail` 两段；四根立柱仍为 `foot→mid→rail→top` 三段，左右中层侧梁和左右上层扶手保持，后侧开放。
+- 同步更新当前全帧候选与 canonical v2 静态模型 JSON，并重新生成 `fit_cuda_vposer_mano_pca12_temporal_reproj015_full448_v2/smplh_people1_pca12_reproj015_topology_fixed_v2_viewer.html`。新拓扑共17条实体边，前横杆中心球不再悬空，前横杆不与上层侧扶手同高。
+- 静态检查通过：中心点 z=673.0459 mm，中心两侧各有一条前横杆，`front_top_center`不再是孤立节点；HTML 保留真实 SMPL-H 三角面与同源 scene 数据。浏览器 `file:` 页面限制仍未解除，因此未取得浏览器截图验收。
 
 # 2026-09-28：PCA12 + 身体时序/双鱼眼重投影全帧候选与同源可视化
 

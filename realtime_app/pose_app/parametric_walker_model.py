@@ -54,7 +54,10 @@ def build_coarse_frame(dimensions: WalkerDimensions) -> dict[str, Any]:
         "front_left_top": [-x, -y, h],
         "rear_right_top": [x, y, h],
         "rear_left_top": [-x, y, h],
-        "front_top_center": [0.0, -y, h],
+        # This is the center of the elevated front rail, not a top-handle
+        # node.  It is also the semantic kp_03 anchor used by the fitted
+        # coarse model, so keeping it at h made the rendered sphere float.
+        "front_top_center": [0.0, -y, f],
     }
     # Keep the frame as connected structural members.  The previous version
     # used foot->top members, which hid the intermediate joints and omitted
@@ -78,7 +81,8 @@ def build_coarse_frame(dimensions: WalkerDimensions) -> dict[str, Any]:
         ["front_left_top", "rear_left_top"],
         # front crossbars; rear stays open
         ["front_left_mid", "front_right_mid"],
-        ["front_left_rail", "front_right_rail"],
+        ["front_left_rail", "front_top_center"],
+        ["front_top_center", "front_right_rail"],
     ]
     # COCO body-left appears on positive ground X in this installation.
     handles = {
