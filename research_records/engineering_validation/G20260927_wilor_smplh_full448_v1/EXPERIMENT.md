@@ -73,3 +73,9 @@ SMPL-H 接口、6890 顶点统一输出、COCO regressor 接入和 CUDA 全序�
 手部跨视角几何审计写入 `wilor_hand_geometry_audit.jsonl` 和 `wilor_hand_geometry_summary.json`：左/右有限配对为5166/7539，通过当前原始边界、正深度、双视图各10px回投影门为1882/2974（36.4%/39.4%）。该审计只做诊断，`used_for_fitting=false`；拒绝原因保留，不将手部三角化点作为真值。
 
 为本次结果单独重放 `scene/`，其 Stage 与动态地面记录均为448行。最终页面 `smplh_people1_pca12_reproj015_solid_walker_current_scene.html` 只读本次 `result.npz` 和本次 `scene/`，使用真实SMPL-H三角面、XY水平地面、实体圆柱/球节点助步器、双相机光心及轨迹，无竖直网格墙和显示平滑。数组验收：vertices `(448,6890,3)`、faces `(13776,3)`、所有模型数组有限、面索引0..6889；身体严格 accepted 7534，rejected 82。应用内浏览器策略拒绝打开 `file:` 页面，因此未取得浏览器画面验收；静态页面和数据检查通过。结果仍只标记 `engineering_candidate`。
+
+## 2026-09-28 — 修正助步器实体拓扑
+
+检查当前全帧页面后确认，旧 `edges` 把四根立柱写成 `foot→top` 长杆，中间 `mid/rail` 节点未参与拓扑，并缺少前侧中层横梁。已修改 `realtime_app/pose_app/parametric_walker_model.py`，将四根立柱拆成 `foot→mid→rail→top` 三段，保留左右中层侧梁和左右上层扶手，新增前侧中层横梁和前侧上层横梁，后侧继续开放。`front_top_center` 未加入实体边。
+
+当前全帧目录中的静态 walker JSON 已同步为16条边，并重新生成 `smplh_people1_pca12_reproj015_topology_fixed_viewer.html`。页面继续使用实体圆柱杆和球节点；本次拓扑检查确认前侧横梁2条、`front_top_center`不在边集合中。浏览器 `file:` 页面限制仍存在，页面完成静态文件验收但未取得浏览器截图证据。

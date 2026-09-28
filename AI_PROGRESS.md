@@ -1,3 +1,10 @@
+# 2026-09-28：修正助步器实体拓扑
+
+- 定位到旧拓扑缺陷：四根立柱被错误建成 `foot→top` 长杆，中间节点没有参与连杆；前侧中层横梁缺失，导致页面中出现结构穿越和错误的悬空连接。
+- 修改 `realtime_app/pose_app/parametric_walker_model.py`：四根立柱改为 `foot→mid→rail→top` 三段；保留左右中层侧梁和左右上层扶手；加入前侧 `front_left_mid↔front_right_mid` 与 `front_left_rail↔front_right_rail` 两条横梁；后侧保持开放；`front_top_center` 仅作为参考/相机节点，不加入实体边。
+- 同步更新当前全帧候选使用的静态模型 JSON，并重新生成 `fit_cuda_vposer_mano_pca12_temporal_reproj015_full448_v2/smplh_people1_pca12_reproj015_topology_fixed_viewer.html`。新拓扑共16条实体边，前侧横梁2条，页面继续使用圆柱杆和球节点，不生成竖直网格墙。
+- 静态检查通过：拓扑16条边、前侧横梁2条、`front_top_center`未进入边；当前 HTML 保留真实 SMPL-H 三角面与同源 scene 数据。浏览器 `file:` 页面限制仍未解除，因此未取得浏览器截图验收。
+
 # 2026-09-28：PCA12 + 身体时序/双鱼眼重投影全帧候选与同源可视化
 
 - 用 `fit_smplh_wilor_sequence.py` 在新目录 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_reproj015_full448_v2/` 完成448帧、A/B/C/D1/D2/D3=30/30/30/30/30/0步 CUDA 拟合。参数：MANO PCA12、身体时序权重0.02、双鱼眼身体重投影权重0.15、像素尺度100；无接触输入。`v1` 目录记录了日志路径与入口非空保护门冲突的启动失败，没有拟合产物，不作为结果。
