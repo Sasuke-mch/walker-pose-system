@@ -325,7 +325,14 @@ def main() -> int:
             hand_l_loss = (hand_l_res * weight_l).sum() / weight_l.sum().clamp_min(1e-6) if mask_l.any() else pl.sum() * 0.0
             hand_r_loss = (hand_r_res * weight_r).sum() / weight_r.sum().clamp_min(1e-6) if mask_r.any() else pr.sum() * 0.0
             pose_reg = args.vposer_prior_weight * latent.pow(2).mean() + 1e-4 * (lhand.pow(2).mean() + rhand.pow(2).mean())
-            body_term = body_loss if stage_index not in (1, 3, 4) else body_loss.detach() * 0.0
+            if stage_index in (1, 3, 4):
+                body_term = body_loss.detach() * 0.0
+            elif stage_index == 5:
+                # D3 opens only root/translation and keeps a low-strength
+                # COCO guardrail so contact cannot translate the whole body.
+                body_term = 0.10 * body_loss
+            else:
+                body_term = body_loss
             # Pixel residuals are numerically much larger than metre-scale
             # body residuals. Keep hand fitting auxiliary and prevent it from
             # moving the body/root to explain WiLoR's model-derived pixels.
