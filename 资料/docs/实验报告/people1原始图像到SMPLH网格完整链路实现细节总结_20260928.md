@@ -70,6 +70,8 @@
 - 阶段（150步，lr=0.02×阶段缩放）：A[transl,latent]（root冻结）→ B[beta]（body梯度保留）→ C[beta,root,transl,latent]+root锚定0.01 → D1/D2[lhand,rhand]（身体项 detach 冻结）→ D3（无接触输入→0步跳过）。每阶段重建 Adam（仅当阶段变量），`stage_history` 与 summary 一致。
 - 损失：`body + 1e-7·hand(≥D1) + 0.02·temporal(≥D1) + 1e-3·PCA先验 + 0.02·VPoser先验 + 0.01·root锚定(仅C) + 1e-3·beta²`。数量级核对：hand 均值约 (300px)²×1e-7≈9e-3，与 body≈7e-3 同量级，手部梯度只流向 PCA 参数——权重设计有效，非"过小无梯度"。
 - 新增可选身体模型空间时序项：命令行 `--body-temporal-weight` 默认0以保持旧基线；显式开启时仅在 Stage A/C 对 COCO-17 点减去双髋中点后的轨迹计算连续三帧二阶差分，使用 delta=0.03 m 的 Huber 惩罚，不跨身体无效帧。该项只约束模型运动，不平滑二维/三维观测，也不替代失败帧。
+- MANO 维度消融现在有显式 profile：`--hand-pca-profile pca12|pca24|full45` 必须分别对应 `--hand-pca-comps 12|24|45`；结果 summary 保存 profile，便于逐变量比较 PCA 低维先验与45维全参数化。三档都仍通过 SMPL-H 解码，输出同一个6890顶点拓扑。
+- 新增可选身体双鱼眼回投影项：`--body-reprojection-weight` 大于0时，在 Stage A/B/C 将同一组模型 COCO-17 点分别投影到 cam0/cam1 原始鱼眼像素，与对应 PMPose 二维点做置信度加权 Huber 残差；`--body-reprojection-scale-px` 默认100，用于无量纲化。相机参数冻结，三角化3D项保留，D1/D2手部阶段不继续牵引身体。默认权重0，旧基线不变。
 - 时间正则：二阶差分作用于 **PCA 系数**（手形），`E=0.5·(L+R)`，三帧连续有效掩码（任一相机任一点 valid），不跨缺失段，不把整手平移误作抖动。
 - 接触：本次无输入（`surface_hand_contact_weight=0`），D2 改名 `D2_hand_refine_no_contact` 且 `contact_active=false`；请求接触但全零权重会 `raise`，逻辑正确。
 - 输出（result.npz）：vertices(448,6890,3)、faces(13776,3)、predicted_coco、smplh_joints、hand_points_left/right、左右 PCA(448,12) 与解码 pose(448,45)、vposer_latent、root/transl/beta、tri/mask/quality、WILOR 四组二维与 mask/权重、接触诊断、root_init_source、initialization_body_rms_mm。
@@ -125,6 +127,7 @@ hand_3d_observation_used=false，contact_active=false，D3 skipped
 1. 手部射线夹角/深度分布审计已接入拟合入口：同一解剖手左右目观测的三角化夹角、正深度、鱼眼回投影误差和逐点拒绝原因均落盘；仍需在具备 OpenCV 运行环境的短窗中执行数值审计。
 2. 框级 `detector_confidence` 已接入四路手部残差权重；后续若做单变量实验，应比较“加权/不加权”而不是再次声称尚未接入。
 3. 在三角化审计完成前，不加三维手部项、不调大手部权重。身体时序项已实现为显式单变量开关，尚未运行消融。
+4. MANO PCA 12/24/45 和身体双鱼眼回投影均已实现为显式单变量开关；尚未进行短窗数值对照，不能宣称其中任何配置改善了残差。
 
 ### 方向三：完整 448 帧重跑（短窗和手部几何审计通过后）
 

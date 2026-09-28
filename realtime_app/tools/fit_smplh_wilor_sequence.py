@@ -90,12 +90,18 @@ def main() -> int:
                     help="stop before optimization when rigid initialization is inconsistent")
     ap.add_argument("--hand-pca-comps", type=int, default=12,
                     help="number of real MANO PCA hand-pose coefficients per hand")
+    ap.add_argument("--hand-pca-profile", choices=("pca12", "pca24", "full45"), default=None,
+                    help="explicit ablation label; must agree with --hand-pca-comps")
     ap.add_argument("--hand-pca-prior-weight", type=float, default=1e-3,
                     help="quadratic prior on normalized MANO PCA coefficients")
     ap.add_argument("--hand-temporal-weight", type=float, default=2e-2,
                     help="second-order temporal prior on MANO PCA coefficients")
     ap.add_argument("--body-temporal-weight", type=float, default=0.0,
                     help="model-COCO relative-to-pelvis second-order prior; 0 preserves the audited baseline")
+    ap.add_argument("--body-reprojection-weight", type=float, default=0.0,
+                    help="dual-fisheye body 2-D reprojection term; 0 preserves the audited baseline")
+    ap.add_argument("--body-reprojection-scale-px", type=float, default=100.0,
+                    help="pixel scale used to make the body reprojection Huber term dimensionless")
     ap.add_argument("--mano-left", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl")
     ap.add_argument("--mano-right", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl")
     ap.add_argument("--bone-weight", type=float, default=0.0,
@@ -126,6 +132,10 @@ def main() -> int:
         raise ValueError("--vposer-dir is required: SMPL-H body pose is parameterized by VPoser")
     if args.surface_hand_contact_weight < 0:
         raise ValueError("--surface-hand-contact-weight must be non-negative")
+    if args.body_temporal_weight < 0 or args.body_reprojection_weight < 0:
+        raise ValueError("body temporal/reprojection weights must be non-negative")
+    if args.body_reprojection_scale_px <= 0:
+        raise ValueError("--body-reprojection-scale-px must be positive")
     contact_args = (args.contact_labels, args.scene_transforms,
                     args.contact_vertex_sets, args.walker_topology)
     if any(v is not None for v in contact_args) and not all(v is not None for v in contact_args):
@@ -199,6 +209,10 @@ def main() -> int:
 
     if not (1 <= args.hand_pca_comps <= 45):
         raise ValueError("--hand-pca-comps must be in 1..45")
+    profile_for_dim = {12: "pca12", 24: "pca24", 45: "full45"}.get(args.hand_pca_comps)
+    if args.hand_pca_profile is not None and args.hand_pca_profile != profile_for_dim:
+        raise ValueError("--hand-pca-profile must agree with --hand-pca-comps (12/24/45)")
+    hand_pca_profile = args.hand_pca_profile or profile_for_dim or f"pca{args.hand_pca_comps}"
     # The SMPL-H file shipped with WiLoR lacks optional PCA fields. Load the
     # matching MANO assets explicitly; identity matrices are not a hand prior.
     with args.smplh_model.open("rb") as handle:
@@ -365,6 +379,12 @@ def main() -> int:
     if init_report["valid_root_basis_frames"] != n:
         raise RuntimeError("rigid initialization lacks accepted shoulder/hip basis on some frames")
     target = torch.tensor(tri_m, device=device)
+    raw_left_2d = torch.tensor(np.nan_to_num(left[:, :, :2], nan=0.0), device=device)
+    raw_right_2d = torch.tensor(np.nan_to_num(right[:, :, :2], nan=0.0), device=device)
+    raw_left_conf = torch.tensor(np.clip(np.nan_to_num(left[:, :, 2], nan=0.0), 0.0, 1.0), device=device)
+    raw_right_conf = torch.tensor(np.clip(np.nan_to_num(right[:, :, 2], nan=0.0), 0.0, 1.0), device=device)
+    raw_left_valid = torch.isfinite(torch.tensor(left[:, :, :2], device=device)).all(dim=-1) & (raw_left_conf > 0)
+    raw_right_valid = torch.isfinite(torch.tensor(right[:, :, :2], device=device)).all(dim=-1) & (raw_right_conf > 0)
     obs_ll = torch.tensor(np.nan_to_num(hand_ll, nan=0.0), device=device)
     obs_lr = torch.tensor(np.nan_to_num(hand_lr, nan=0.0), device=device)
     obs_rl = torch.tensor(np.nan_to_num(hand_rl, nan=0.0), device=device)
@@ -477,6 +497,25 @@ def main() -> int:
             body_res = (coco - target).pow(2).sum(-1)
             body_w = torch.tensor(np.asarray(quality, np.float32), device=device).clamp_min(0.0)
             body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
+            model_cam1 = (R01 @ coco.transpose(1, 2)).transpose(1, 2) + T01
+            proj_cam0 = fisheye_project_torch(coco, K0, D0)
+            proj_cam1 = fisheye_project_torch(model_cam1, K1, D1)
+            body_2d_loss = body_loss.detach() * 0.0
+            body_2d_px = body_loss.detach() * 0.0
+            if args.body_reprojection_weight > 0 and stage_index in (0, 1, 2):
+                e0 = torch.linalg.vector_norm(proj_cam0 - raw_left_2d, dim=-1) / args.body_reprojection_scale_px
+                e1 = torch.linalg.vector_norm(proj_cam1 - raw_right_2d, dim=-1) / args.body_reprojection_scale_px
+                delta = 1.0
+                h0 = torch.where(e0 <= delta, 0.5 * e0.pow(2), delta * (e0 - 0.5 * delta))
+                h1 = torch.where(e1 <= delta, 0.5 * e1.pow(2), delta * (e1 - 0.5 * delta))
+                d0 = raw_left_conf * raw_left_valid
+                d1 = raw_right_conf * raw_right_valid
+                body_2d_loss = ((h0 * d0).sum() / d0.sum().clamp_min(1e-6) +
+                                (h1 * d1).sum() / d1.sum().clamp_min(1e-6)) * 0.5
+                body_2d_px = ((torch.linalg.vector_norm(proj_cam0 - raw_left_2d, dim=-1) * d0).sum() /
+                              d0.sum().clamp_min(1e-6) +
+                              (torch.linalg.vector_norm(proj_cam1 - raw_right_2d, dim=-1) * d1).sum() /
+                              d1.sum().clamp_min(1e-6)) * 0.5
             joints = out.joints
             current_bone_lengths = torch.stack([
                 torch.linalg.vector_norm(joints[:, a] - joints[:, b], dim=-1)
@@ -553,7 +592,9 @@ def main() -> int:
                     terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
                                  * contact_hand_weight[:, j])
                 contact_loss = torch.stack(terms, dim=1).sum() / contact_hand_weight.sum().clamp_min(1e-6)
-            loss = body_term + structure_term + root_term + temporal_term + \
+            reproj_term = (args.body_reprojection_weight * body_2d_loss
+                           if stage_index in (0, 1, 2) else body_2d_loss.detach() * 0.0)
+            loss = body_term + reproj_term + structure_term + root_term + temporal_term + \
                    args.body_temporal_weight * body_temporal + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
                    (args.surface_hand_contact_weight * contact_loss if stage_index >= 4 else contact_loss.detach() * 0.0)
             loss.backward()
@@ -561,6 +602,7 @@ def main() -> int:
             if step % 10 == 0 or step == sum(stage_steps) - 1:
                 row = {"stage": stage_name, "stage_step": local_step, "step": step, "loss": float(loss.detach()),
                             "body_m": float(torch.sqrt(body_loss.detach())),
+                            "body_2d_px": float(body_2d_px.detach()),
                             "hand_l_px": float(torch.sqrt(hand_l_loss.detach())),
                             "hand_r_px": float(torch.sqrt(hand_r_loss.detach())),
                             "hand_l_points": int(mask_ll.sum() + mask_rl.sum()), "hand_r_points": int(mask_lr.sum() + mask_rr.sum()),
@@ -641,12 +683,20 @@ def main() -> int:
         "mano_left": str(args.mano_left.resolve()), "mano_right": str(args.mano_right.resolve()),
         "hand_pose_parameterization": "MANO_PCA_decode_to_SMPLH_45D_axis_angle",
         "hand_pca_components": hand_pca_dim,
+        "hand_pca_profile": hand_pca_profile,
+        "hand_pca_ablation_supported": ["pca12", "pca24", "full45"],
         "hand_pca_prior_weight": float(args.hand_pca_prior_weight),
         "hand_temporal_weight": float(args.hand_temporal_weight),
         "body_temporal_weight": float(args.body_temporal_weight),
         "body_temporal": {"mode": "model_coco_relative_pelvis_huber" if args.body_temporal_weight > 0 else "disabled",
                            "huber_delta_m": 0.03, "cross_gap": False,
                            "used_for_hand_3d": False},
+        "body_reprojection": {"weight": float(args.body_reprojection_weight),
+                               "scale_px": float(args.body_reprojection_scale_px),
+                               "mode": "dual_fisheye_raw_pmpose_huber" if args.body_reprojection_weight > 0 else "disabled",
+                               "camera_parameters_optimized": False,
+                               "stages": ["A_body_vposer", "B_shared_beta", "C_body_vposer_refine"],
+                               "uses_triangulated_3d_term": True},
         "hand_geometry_audit": {"path": "wilor_hand_geometry_audit.jsonl",
                                 "summary": "wilor_hand_geometry_summary.json",
                                 "used_for_fitting": False},

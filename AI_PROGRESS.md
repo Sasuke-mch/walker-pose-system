@@ -1,3 +1,10 @@
+# 2026-09-28：实现 MANO 维度消融配置与双鱼眼身体重投影项（未重跑全帧）
+
+- `fit_smplh_wilor_sequence.py` 新增 `--hand-pca-profile {pca12,pca24,full45}`，与 `--hand-pca-comps {12,24,45}` 做一致性校验；`fit_summary.json` 写入当前 profile 和支持的消融档位。MANO PCA 12/24/45 仍只改变手部参数维度，不拼接 MANO 网格，也不改变 SMPL-H 6890 顶点输出。
+- 新增 `--body-reprojection-weight` 和 `--body-reprojection-scale-px`。开启后，Stage A/B/C 对同一组模型 COCO-17 点同时执行 cam0/cam1 原始鱼眼回投影，并与原始 PMPose 二维点计算置信度加权 Huber 项；三角化三维项保留，相机内外参冻结，不优化相机。默认权重0，旧审计基线不变。
+- 每步 history 增加 `body_2d_px`，`fit_summary.json` 写入重投影权重、像素尺度、启用阶段、相机冻结状态和三维项保留状态。
+- 本轮只完成第三、第四优先级逻辑和静态检查，没有重跑完整448帧，也没有宣称消融或重投影收益。
+
 # 2026-09-28：实现手部跨视角几何审计与身体模型空间时序项（未重跑全帧）
 
 - `realtime_app/pose_app/smplh_hand_observation.py` 新增 `audit_cross_view_geometry()`：对左右相机同一解剖手的21点逐点执行原始鱼眼边界检查、OpenCV fisheye 去畸变、双目 DLT 三角化、双目正深度、射线夹角和两视图鱼眼回投影误差检查。结果写入 `wilor_hand_geometry_audit.jsonl`，汇总写入 `wilor_hand_geometry_summary.json`；该审计不改变拟合 mask，不把手部三角化结果偷偷加入损失。
