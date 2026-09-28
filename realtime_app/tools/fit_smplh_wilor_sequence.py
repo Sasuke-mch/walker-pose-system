@@ -112,6 +112,7 @@ def main() -> int:
     ap.add_argument("--walker-topology", type=Path, default=None,
                     help="validated walker topology; used to check handle semantics")
     ap.add_argument("--surface-hand-contact-weight", type=float, default=0.0)
+    ap.add_argument("--surface-foot-contact-weight", type=float, default=0.0)
     ap.add_argument("--lr", type=float, default=0.02)
     ap.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     args = ap.parse_args()
@@ -130,8 +131,8 @@ def main() -> int:
         raise RuntimeError("CUDA unavailable")
     if args.vposer_dir is None:
         raise ValueError("--vposer-dir is required: SMPL-H body pose is parameterized by VPoser")
-    if args.surface_hand_contact_weight < 0:
-        raise ValueError("--surface-hand-contact-weight must be non-negative")
+    if args.surface_hand_contact_weight < 0 or args.surface_foot_contact_weight < 0:
+        raise ValueError("surface contact weights must be non-negative")
     if args.body_temporal_weight < 0 or args.body_reprojection_weight < 0:
         raise ValueError("body temporal/reprojection weights must be non-negative")
     if args.body_reprojection_scale_px <= 0:
@@ -140,8 +141,8 @@ def main() -> int:
                     args.contact_vertex_sets, args.walker_topology)
     if any(v is not None for v in contact_args) and not all(v is not None for v in contact_args):
         raise ValueError("contact mode requires contact-labels, scene-transforms, contact-vertex-sets and walker-topology together")
-    if all(v is not None for v in contact_args) and args.surface_hand_contact_weight <= 0.0:
-        raise ValueError("contact inputs supplied but --surface-hand-contact-weight is zero")
+    if all(v is not None for v in contact_args) and (args.surface_hand_contact_weight + args.surface_foot_contact_weight) <= 0.0:
+        raise ValueError("contact inputs supplied but both surface contact weights are zero")
 
     cal = load_stereo_fisheye(args.calibration_dir)
     raw_clean.cv2 = cv2
@@ -404,7 +405,7 @@ def main() -> int:
     weight_ll = weight_ll * order_w; weight_lr = weight_lr * order_w
     weight_rl = weight_rl * order_w; weight_rr = weight_rr * order_w
     contact_enabled = args.contact_labels is not None
-    contact_hand_weight = contact_handle = contact_R = contact_T = palm_idx = None
+    contact_hand_weight = contact_foot_weight = contact_handle = contact_R = contact_T = palm_idx = sole_idx = None
     if contact_enabled:
         labels = np.load(args.contact_labels, allow_pickle=True)
         scene = np.load(args.scene_transforms, allow_pickle=True)
@@ -412,6 +413,8 @@ def main() -> int:
             raise ValueError("contact labels frame count does not match raw input")
         if tuple(labels["hand_contact_weight"].shape) != (n, 2):
             raise ValueError("hand_contact_weight must have shape (frames,2)")
+        if tuple(labels["foot_contact_weight"].shape) != (n, 2):
+            raise ValueError("foot_contact_weight must have shape (frames,2)")
         if tuple(labels["handle_ends_ground_m"].shape) != (n, 2, 2, 3):
             raise ValueError("handle_ends_ground_m must have shape (frames,2,2,3)")
         if tuple(scene["rotation_ground_from_left"].shape) != (n, 3, 3):
@@ -420,10 +423,13 @@ def main() -> int:
             raise ValueError("translation_ground_from_left_mm must have shape (frames,3)")
         if not np.isfinite(labels["hand_contact_weight"]).all() or np.any(labels["hand_contact_weight"] < 0):
             raise ValueError("hand_contact_weight must be finite and non-negative")
+        if not np.isfinite(labels["foot_contact_weight"]).all() or np.any(labels["foot_contact_weight"] < 0):
+            raise ValueError("foot_contact_weight must be finite and non-negative")
         if not np.isfinite(labels["handle_ends_ground_m"]).all():
             raise ValueError("handle_ends_ground_m contains non-finite values")
         contact_handle = torch.tensor(labels["handle_ends_ground_m"], dtype=torch.float32, device=device)
         contact_hand_weight = torch.tensor(labels["hand_contact_weight"], dtype=torch.float32, device=device)
+        contact_foot_weight = torch.tensor(labels["foot_contact_weight"], dtype=torch.float32, device=device)
         contact_R = torch.tensor(scene["rotation_ground_from_left"], dtype=torch.float32, device=device)
         contact_T = torch.tensor(scene["translation_ground_from_left_mm"] / 1000.0, dtype=torch.float32, device=device)
         sets = json.loads(args.contact_vertex_sets.read_text(encoding="utf-8"))["sets"]
@@ -433,12 +439,16 @@ def main() -> int:
             raise ValueError("walker topology must expose exactly two endpoints for left/right handles")
         palm_idx = {s: torch.tensor(sum(sets[f"{s}_palm_surface_candidate"].values(), []), dtype=torch.long, device=device)
                     for s in ("left", "right")}
+        sole_idx = {s: torch.tensor(sum(sets[f"{s}_sole_surface_candidate"].values(), []), dtype=torch.long, device=device)
+                    for s in ("left", "right")}
         if any(int(v.numel()) == 0 for v in palm_idx.values()):
             raise ValueError("contact vertex sets contain no palm vertices")
+        if any(int(v.numel()) == 0 for v in sole_idx.values()):
+            raise ValueError("contact vertex sets contain no sole vertices")
         if any(int(v.min()) < 0 or int(v.max()) >= 6890 for v in palm_idx.values()):
             raise ValueError("contact vertex index is outside the 6890-vertex SMPL-H topology")
-        if float(np.asarray(labels["hand_contact_weight"]).sum()) <= 0.0:
-            raise ValueError("contact mode requested but all hand_contact_weight values are zero")
+        if float(np.asarray(labels["hand_contact_weight"]).sum() + np.asarray(labels["foot_contact_weight"]).sum()) <= 0.0:
+            raise ValueError("contact mode requested but all contact weights are zero")
     R01 = torch.tensor(cal.R_cam0_to_cam1, dtype=torch.float32, device=device)
     T01 = torch.tensor(cal.T_cam0_to_cam1_mm / 1000.0, dtype=torch.float32, device=device)
     K0, D0 = cal.K0, cal.D0
@@ -591,7 +601,10 @@ def main() -> int:
                     a, b = contact_handle[:, j, 0, :], contact_handle[:, j, 1, :]
                     terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
                                  * contact_hand_weight[:, j])
-                contact_loss = torch.stack(terms, dim=1).sum() / contact_hand_weight.sum().clamp_min(1e-6)
+                for side, j in (("left", 0), ("right", 1)):
+                    sole_z = vg[:, sole_idx[side], 2]
+                    terms.append(surface_contact.foot_surface_loss(sole_z) * contact_foot_weight[:, j])
+                contact_loss = torch.stack(terms, dim=1).sum() / (contact_hand_weight.sum() + contact_foot_weight.sum()).clamp_min(1e-6)
             reproj_term = (args.body_reprojection_weight * body_2d_loss
                            if stage_index in (0, 1, 2) else body_2d_loss.detach() * 0.0)
             loss = body_term + reproj_term + structure_term + root_term + temporal_term + \
@@ -702,6 +715,8 @@ def main() -> int:
                                 "used_for_fitting": False},
         "hand_priority_weights": hand_order_weights_np.tolist(),
         "contact_enabled": bool(contact_enabled),
+        "contact_weighting": {"hand_surface": float(args.surface_hand_contact_weight),
+                               "foot_surface": float(args.surface_foot_contact_weight)},
         "contact_schedule": ["D1 hand observation",
                              "D2 surface hand contact" if contact_enabled else "D2 hand-only refinement",
                              "D3 hand-only contact refinement" if contact_enabled else "D3 skipped: no contact input"],
