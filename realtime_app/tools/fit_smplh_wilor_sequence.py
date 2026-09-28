@@ -143,15 +143,15 @@ def main() -> int:
     body_mask = np.asarray(accepted, bool) & np.isfinite(tri).all(axis=-1)
     hand_l, hand_l_valid, hand_l_bounds = read_wilor(args.wilor_left, n, "left", left)
     hand_r, hand_r_valid, hand_r_bounds = read_wilor(args.wilor_right, n, "right", right)
-    hand_keep = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-    # WiLoR 21-pt unified names: wrist + 5 fingers x (j1,j2,j3,tip_surface).
-    # Keep the complete 21-point observations for audit/export.  The SMPL-H
-    # joint adapter currently uses the documented 16-point subset below.
+    # Keep the complete WiLoR 21-point order.  The first point is the wrist;
+    # each following finger contributes three internal joints and one surface
+    # fingertip.  Bounds are a soft quality signal, never a deletion gate.
     hand_l_full, hand_r_full = hand_l.copy(), hand_r.copy()
     hand_l_full_valid, hand_r_full_valid = hand_l_valid.copy(), hand_r_valid.copy()
     hand_l_full_bounds, hand_r_full_bounds = hand_l_bounds.copy(), hand_r_bounds.copy()
-    hand_l, hand_l_mask = hand_l[:, hand_keep], hand_l_valid[:, hand_keep]
-    hand_r, hand_r_mask = hand_r[:, hand_keep], hand_r_valid[:, hand_keep]
+    hand_l_mask, hand_r_mask = hand_l_valid, hand_r_valid
+    hand_l_weight_np = hand_l_valid.astype(np.float32) * np.where(hand_l_bounds, 1.0, 0.1).astype(np.float32)
+    hand_r_weight_np = hand_r_valid.astype(np.float32) * np.where(hand_r_bounds, 1.0, 0.1).astype(np.float32)
 
     # WiLoR ships a full-pose SMPL-H pickle without the optional PCA metadata
     # expected by smplx.  Supply identity components and zero means; posedirs
@@ -177,6 +177,8 @@ def main() -> int:
     mask_body = torch.tensor(body_mask, device=device)
     mask_l = torch.tensor(hand_l_mask, device=device)
     mask_r = torch.tensor(hand_r_mask, device=device)
+    weight_l = torch.tensor(hand_l_weight_np, device=device)
+    weight_r = torch.tensor(hand_r_weight_np, device=device)
     R01 = torch.tensor(cal.R_cam0_to_cam1, dtype=torch.float32, device=device)
     T01 = torch.tensor(cal.T_cam0_to_cam1_mm / 1000.0, dtype=torch.float32, device=device)
     K0, D0 = cal.K0, cal.D0
@@ -209,51 +211,67 @@ def main() -> int:
     history = []
     from pose_app.smplh_hand_observation import HAND_JOINTS, TIP_VERTICES, HAND_NAMES, validate_smplh, hand21
     validate_smplh(model)
-    # Named SMPL-H internal-joint maps (16 pts, wrist + 3 per finger, no tips).
-    # WiLoR/MANO 21-pt order (mano_to_openpose): wrist, then per finger
-    # thumb/index/middle/ring/pinky x (mcp,pip,dip,tip) + 5 tips at indices 16..20.
-    # Internal joints map to WiLoR indices [0..15]; tips [16..20] use TIP_VERTICES.
-    W2S_L = [0, 13, 14, 15, 1, 2, 3, 4, 5, 6, 10, 11, 12, 7, 8, 9]
-    W2S_R = W2S_L
+    # Named SMPL-H internal-joint maps; hand21() emits the verified WiLoR
+    # OpenPose order and appends five surface fingertip vertices.
     hand_map_l = HAND_JOINTS["left"]
     hand_map_r = HAND_JOINTS["right"]
     assert hand_map_l == [20, 34, 35, 36, 22, 23, 24, 25, 26, 27, 31, 32, 33, 28, 29, 30]
     assert hand_map_r == [21, 49, 50, 51, 37, 38, 39, 40, 41, 42, 46, 47, 48, 43, 44, 45]
     # WiLoR OpenPose order -> SMPL-H joints verified above; tips via hand21 vertices.
-    stages = [("A_body_only", 0.0, ["beta", "root", "transl", "body_pose"]),
-              ("B_hands_only", 1e-5, ["lhand", "rhand"]),
-              ("C_wrist_forearm_hands", 1e-5, ["beta", "root", "transl", "body_pose", "lhand", "rhand"]),
-              ("D_weak_hand3d", 1e-5, ["beta", "root", "transl", "body_pose", "lhand", "rhand"])]
+    stage_names = ["A_body_only", "B_hands_only", "C_wrist_forearm_hands", "D_joint_refinement_no_hand3d"]
+    base = args.steps // len(stage_names)
+    stage_steps = [base] * len(stage_names)
+    for i in range(args.steps % len(stage_names)):
+        stage_steps[i] += 1
+    stage_train = [
+        ["beta", "root", "transl", "body_pose"],
+        ["lhand", "rhand"],
+        ["beta", "root", "transl", "body_pose", "lhand", "rhand"],
+        ["beta", "root", "transl", "body_pose", "lhand", "rhand"],
+    ]
     def set_stage(train):
         for p in (beta, root, transl, body_pose, lhand, rhand): p.requires_grad_(False)
         m = {"beta": beta, "root": root, "transl": transl, "body_pose": body_pose, "lhand": lhand, "rhand": rhand}
         for k in train: m[k].requires_grad_(True)
-    for step in range(args.steps):
-        optim.zero_grad(set_to_none=True)
-        out = model(betas=beta.expand(n, -1), global_orient=root,
-                    body_pose=body_pose, left_hand_pose=lhand,
-                    right_hand_pose=rhand, transl=transl, return_verts=True)
-        coco = regress_coco17_torch(out.vertices, reg)
-        body_res = (coco - target).pow(2).sum(-1)
-        body_w = torch.tensor(np.asarray(quality, np.float32), device=device).clamp_min(0.0)
-        body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
-        joints = out.joints
-        jl = hand21(joints, out.vertices, "left")
-        jr = hand21(joints, out.vertices, "right")
-        pl = fisheye_project_torch(jl, K0, D0)
-        pr = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
-        hand_l_loss = (pl - obs_l).pow(2).sum(-1)[mask_l].mean() if mask_l.any() else pl.sum() * 0.0
-        hand_r_loss = (pr - obs_r).pow(2).sum(-1)[mask_r].mean() if mask_r.any() else pr.sum() * 0.0
-        pose_reg = 1e-4 * (body_pose.pow(2).mean() + lhand.pow(2).mean() + rhand.pow(2).mean())
-        loss = body_loss + 1e-5 * (hand_l_loss + hand_r_loss) + pose_reg + 1e-3 * beta.pow(2).mean()
-        loss.backward()
-        optim.step()
-        if step % 10 == 0 or step == args.steps - 1:
-            history.append({"step": step, "loss": float(loss.detach()),
+    stage_history = []
+    global_step = 0
+    for stage_index, (stage_name, train_names, n_stage) in enumerate(zip(stage_names, stage_train, stage_steps)):
+        set_stage(train_names)
+        for local_step in range(n_stage):
+            step = global_step
+            global_step += 1
+            optim.zero_grad(set_to_none=True)
+            out = model(betas=beta.expand(n, -1), global_orient=root,
+                        body_pose=body_pose, left_hand_pose=lhand,
+                        right_hand_pose=rhand, transl=transl, return_verts=True)
+            coco = regress_coco17_torch(out.vertices, reg)
+            body_res = (coco - target).pow(2).sum(-1)
+            body_w = torch.tensor(np.asarray(quality, np.float32), device=device).clamp_min(0.0)
+            body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
+            joints = out.joints
+            jl = hand21(joints, out.vertices, "left")
+            jr = hand21(joints, out.vertices, "right")
+            pl = fisheye_project_torch(jl, K0, D0)
+            pr = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
+            hand_l_res = (pl - obs_l).pow(2).sum(-1)
+            hand_r_res = (pr - obs_r).pow(2).sum(-1)
+            hand_l_loss = (hand_l_res * weight_l).sum() / weight_l.sum().clamp_min(1e-6) if mask_l.any() else pl.sum() * 0.0
+            hand_r_loss = (hand_r_res * weight_r).sum() / weight_r.sum().clamp_min(1e-6) if mask_r.any() else pr.sum() * 0.0
+            pose_reg = 1e-4 * (body_pose.pow(2).mean() + lhand.pow(2).mean() + rhand.pow(2).mean())
+            body_term = body_loss if stage_index != 1 else body_loss.detach() * 0.0
+            hand_term = 1e-5 * (hand_l_loss + hand_r_loss) if stage_index != 0 else (hand_l_loss + hand_r_loss).detach() * 0.0
+            loss = body_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean()
+            loss.backward()
+            optim.step()
+            if step % 10 == 0 or step == args.steps - 1:
+                row = {"stage": stage_name, "stage_step": local_step, "step": step, "loss": float(loss.detach()),
                             "body_m": float(torch.sqrt(body_loss.detach())),
                             "hand_l_px": float(torch.sqrt(hand_l_loss.detach())),
                             "hand_r_px": float(torch.sqrt(hand_r_loss.detach())),
-                            "hand_l_points": int(mask_l.sum()), "hand_r_points": int(mask_r.sum())})
+                            "hand_l_points": int(mask_l.sum()), "hand_r_points": int(mask_r.sum())}
+                history.append(row)
+        stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
+                              "hand_3d_term": False})
 
     with torch.no_grad():
         final = model(betas=beta.expand(n, -1), global_orient=root,
@@ -272,16 +290,21 @@ def main() -> int:
                         wilor_left_2d_full=hand_l_full, wilor_right_2d_full=hand_r_full,
                         wilor_left_valid_full=hand_l_full_valid, wilor_right_valid_full=hand_r_full_valid,
                         wilor_left_bounds_ok_full=hand_l_full_bounds, wilor_right_bounds_ok_full=hand_r_full_bounds,
-                        body_quality=quality)
+                        body_quality=quality,
+                        translation_init_source=np.asarray(init_source, dtype="U32"),
+                        wilor_left_weight=hand_l_weight_np, wilor_right_weight=hand_r_weight_np)
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
         "status": "engineering_candidate", "frames": n, "steps": args.steps,
         "model": str(args.smplh_model.resolve()), "vertices": 6890,
         "hand_observation_source": "WiLoR_model_projected_MANO_joints",
         "hand_observation_points_retained": 21,
-        "hand_fit_subset_points": len(hand_keep),
+        "hand_fit_subset_points": 21,
         "hand_bounds_are_diagnostic_only": True,
         "wilor_left_valid_points": int(hand_l_mask.sum()),
         "wilor_right_valid_points": int(hand_r_mask.sum()), "history": history,
+        "stage_schedule": stage_history,
+        "hand_confidence_source": "detector_box_or_missing_neutral_weight",
+        "hand_3d_observation_used": False,
         "body_accepted_points": int(body_mask.sum()),
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return 0

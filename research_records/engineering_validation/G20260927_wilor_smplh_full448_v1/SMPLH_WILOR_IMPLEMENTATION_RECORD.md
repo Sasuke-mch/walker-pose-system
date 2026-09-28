@@ -310,11 +310,18 @@ hands_meanr = np.zeros(45)
 - `realtime_app/tools/fit_smplh_wilor_sequence.py`：候选关联改为优先使用 PMPose 腕部距离，身体项加入连续质量权重；
 - `realtime_app/tools/build_smplh_people1_reference_viewer.py`：参考式页面草稿，使用当前 `audit_20260928/scene` 重放数据。
 
-这些修正尚未完成短窗重跑，因此不能把工作区中的代码草稿或旧 `fit_cuda_full_v3` 结果称为已验证修复。Cursor 执行 prompt 位于：
+这些修正已完成 448 帧、4 步 CUDA 冒烟运行，输出目录为 `fit_corrected_smoke/`。冒烟结果确认模型前向、鱼眼投影、完整 21 点损失、阶段切换和结果落盘均可运行；它不是正式拟合结果，也不证明手部姿态精度。Cursor 执行 prompt 位于：
 
 ```text
 docs/CURSOR_FIX_SMPLH_WILOR_PEOPLE1_PROMPT.md
 ```
+
+### 2026-09-28 — 完整 21 点与阶段调度修正
+
+- 修正 `smplh_hand_observation.py` 的 `hand21()`：严格按 WiLoR `mano_to_openpose` 的 `wrist, index, middle, pinky, ring, thumb` 顺序输出 16 个内部关节和 5 个指尖表面顶点，模型侧与 JSONL 观测均为 `21×2/21×3`，不再把 21 点观测截成 16 点。
+- 修正拟合权重：有限点进入优化；图像边界外点保留并赋予较低软权重；缺少逐点 WiLoR 置信度时使用明确标记的中性候选权重，未伪造关节级 confidence。
+- 阶段调度实际执行：A 仅身体，B 仅手指，C 身体加手部有限开放，D 联合细化。当前没有独立手部三维观测，D 不加入虚假的 3D 项，并在 summary 中写入 `hand_3d_observation_used=false`。
+- 4 步 CUDA 冒烟：448 帧、6890 顶点、完整 21 点手部输入，退出状态为 0；输出 `fit_summary.json` 记录了四阶段、有效点数、平移初始化来源和逐点软权重。该结果仅证明工程链路可运行。
 
 ## 后续正确执行顺序
 
