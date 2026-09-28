@@ -323,6 +323,13 @@ docs/CURSOR_FIX_SMPLH_WILOR_PEOPLE1_PROMPT.md
 - 阶段调度实际执行：A 仅身体，B 仅手指，C 身体加手部有限开放，D 联合细化。当前没有独立手部三维观测，D 不加入虚假的 3D 项，并在 summary 中写入 `hand_3d_observation_used=false`。
 - 4 步 CUDA 冒烟：448 帧、6890 顶点、完整 21 点手部输入，退出状态为 0；输出 `fit_summary.json` 记录了四阶段、有效点数、平移初始化来源和逐点软权重。该结果仅证明工程链路可运行。
 
+### 2026-09-28 — 修正后完整 448 帧与 SMPL-H 手部可视化
+
+- 使用 people1 原始 PMPose、WiLoR 左右 JSONL、当前拟合器、SMPL-H male 和当前标定目录完成 448 帧、180 步 CUDA 拟合。输出目录为 `fit_cuda_corrected_full448/`，未覆盖历史 `fit_cuda_full_v3/`。
+- 结果保存完整 SMPL-H 顶点、真实三角面、模型侧 COCO-17、原始三角化 COCO-17、52 个内部骨架关节及 SMPL-H 左右各 21 个手部点。数组检查通过：`(448,6890,3)`、`(13776,3)`、`(448,17,3)`、`(448,73,3)`、`(448,21,3)`；顶点和手部点均有限，三角索引共 41328 个且最大索引为 6889。
+- 查看器脚本 `realtime_app/tools/build_smplh_people1_reference_viewer.py` 已加入左右手 21 点和手指连接线，页面使用同一次拟合的网格和 `audit_20260928/scene` 的当前地面、Stage、助步器与相机重放。页面输出为 `fit_cuda_corrected_full448/smplh_people1_corrected_viewer.html`。
+- 当前结论仍限于工程候选和内部一致性。手部像素来自 WiLoR 的 MANO 模型投影，完整运行和可视化不能证明真实手部三维精度、握持或承重。浏览器自动化在本环境不可用，因此只完成文件级和数组级验收。
+
 ## 后续正确执行顺序
 
 ```text

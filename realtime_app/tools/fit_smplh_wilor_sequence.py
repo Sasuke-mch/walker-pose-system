@@ -277,6 +277,8 @@ def main() -> int:
         final = model(betas=beta.expand(n, -1), global_orient=root,
                       body_pose=body_pose, left_hand_pose=lhand,
                       right_hand_pose=rhand, transl=transl, return_verts=True)
+        final_hand_l = hand21(final.joints, final.vertices, "left")
+        final_hand_r = hand21(final.joints, final.vertices, "right")
     np.savez_compressed(args.output_dir / "result.npz",
                         vertices=final.vertices.cpu().numpy(), faces=np.asarray(model.faces),
                         predicted_coco=regress_coco17_torch(final.vertices, reg).cpu().numpy(),
@@ -292,7 +294,10 @@ def main() -> int:
                         wilor_left_bounds_ok_full=hand_l_full_bounds, wilor_right_bounds_ok_full=hand_r_full_bounds,
                         body_quality=quality,
                         translation_init_source=np.asarray(init_source, dtype="U32"),
-                        wilor_left_weight=hand_l_weight_np, wilor_right_weight=hand_r_weight_np)
+                        wilor_left_weight=hand_l_weight_np, wilor_right_weight=hand_r_weight_np,
+                        smplh_joints=final.joints.detach().cpu().numpy(),
+                        hand_points_left=final_hand_l.detach().cpu().numpy(),
+                        hand_points_right=final_hand_r.detach().cpu().numpy())
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
         "status": "engineering_candidate", "frames": n, "steps": args.steps,
         "model": str(args.smplh_model.resolve()), "vertices": 6890,

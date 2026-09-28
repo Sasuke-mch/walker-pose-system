@@ -1,5 +1,13 @@
 # 助步器项目 AI 工作日志
 
+## 2026-09-28：SMPL-H + WiLoR 修正后完整 448 帧与手部查看器
+
+- 修正后的 `fit_smplh_wilor_sequence.py` 完成 people1 全 448 帧、180 步 CUDA 运行，输出为 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_corrected_full448/`。
+- 本次运行使用完整 WiLoR `21×2` 点，不再截成16点；SMPL-H 侧保存左右各 `21×3` 模型手部点，指尖来自表面顶点，WiLoR 模型投影仍只作为工程二维辅助项。
+- 输出数组已检查：顶点 `(448,6890,3)`、真实面 `(13776,3)`、模型 COCO `(448,17,3)`、原始三角化 `(448,17,3)`、SMPL-H joints `(448,73,3)`、左右手 `(448,21,3)`，有限性通过，面索引范围和41328个索引通过。
+- 查看器为同一次运行结果与 `audit_20260928/scene` 重放生成，包含真实 SMPL-H 表面、模型/三角化 COCO 点、Stage/地面状态、助步器、双相机轨迹、左右手21点和手指连接线：`fit_cuda_corrected_full448/smplh_people1_corrected_viewer.html`。
+- 当前仍为 engineering candidate：手部观测来自 WiLoR 模型投影，没有独立手部二维/三维真值；右侧手部二维残差较大时不能解释为真实关节误差。当前环境的浏览器自动化不可用，页面完成文件级和数组级验收，但尚未取得自动化浏览器截图证据。
+
 ## 2026-09-27：people1 手部入口修复（已验证，尚未重跑拟合）
 
 修正 `realtime_app/tools/fit_smplh_wilor_sequence.py`：右目 WiLoR 候选改为按 `right` 读取；候选不再因单个点越界而整只手被丢弃；输出保留完整 21 点、逐点有限性和原始鱼眼边界状态，边界状态仅作诊断，不作为点删除门。对现有 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/wilor_left.jsonl` 与 `wilor_right.jsonl` 做读取预检：左侧有限点 6426、边界内 6426，右侧有限点 7623、边界内 5092。编译和合成 JSONL 检查通过；旧 `fit_cuda_full` 的右手 80 点统计来自旧读取错误，不能继续引用。下一门是按修正入口重跑短窗并核查 WiLoR 左右候选关联与 SMPL-H 关节映射，当前不宣称真实手部姿态或握持。
