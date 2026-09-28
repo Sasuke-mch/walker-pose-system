@@ -205,3 +205,9 @@ docker_logs/
 详见 `third_party/README.md`。
 
 版本管理以 `AGENTS.md` 的“Git 版本管理”条款为准：每项已验证的修复、迭代或更新均须独立提交本地 Git，且不得混入已有改动。
+
+## WiLoR 与 SMPL-H 资产
+
+- WiLoR 手部链使用 `MANO_LEFT.pkl`、`MANO_RIGHT.pkl` 和 `SMPLH_male.pkl`；SMPL-H 拟合显式使用双 MANO PCA 资产。
+- 该链路输出仍属于 WiLoR 模型派生观测的工程候选，不能解释为独立手部真值或真实握持结论。
+
