@@ -55,6 +55,7 @@
 - 同相机 PMPose 腕部（COCO 9=左腕、10=右腕）选最近 WiLoR 同侧候选；门：最近距离 ≤150px，且第一/第二距离差 ≥25px，否则该帧该手无观测，并在 audit 中保留原因。函数同时检查 `pair_XXXX` 图像名、帧号范围和重复帧。
 - `valid` = per-point finite（仅防 NaN）；`bounds_ok` 为诊断元数据，**不剔除**，越界点权重 0.1 保留参与优化。
 - `detector_confidence` 作为候选级权重进入四路手部残差；缺失时记录 `missing_neutral_weight` 并使用中性权重1。逐候选结果写入输出目录的 `wilor_association_audit.json`。
+- 新增手部跨视角几何审计：拟合入口读取四路同侧观测后，分别对左手和右手的 cam0/cam1 21点执行原始鱼眼边界、去畸变 DLT 三角化、双目正深度、射线夹角和两视图鱼眼回投影误差检查。逐点结果写入 `wilor_hand_geometry_audit.jsonl`，统计写入 `wilor_hand_geometry_summary.json`；这些结果只用于审计，`used_for_fitting=false`，不会把未经验证的手部三维点加入损失。
 
 ### 4. SMPL-H 拟合（`realtime_app/tools/fit_smplh_wilor_sequence.py`）
 
@@ -68,6 +69,7 @@
 - COCO：`J_regressor_coco.npy` 校验 `17×6890` 行和为1 → `predicted_coco`；body 残差用 quality 连续权重、仅 accepted mask；rejected 点不入监督（当前 finite-rejected=0，属分布声明）。
 - 阶段（150步，lr=0.02×阶段缩放）：A[transl,latent]（root冻结）→ B[beta]（body梯度保留）→ C[beta,root,transl,latent]+root锚定0.01 → D1/D2[lhand,rhand]（身体项 detach 冻结）→ D3（无接触输入→0步跳过）。每阶段重建 Adam（仅当阶段变量），`stage_history` 与 summary 一致。
 - 损失：`body + 1e-7·hand(≥D1) + 0.02·temporal(≥D1) + 1e-3·PCA先验 + 0.02·VPoser先验 + 0.01·root锚定(仅C) + 1e-3·beta²`。数量级核对：hand 均值约 (300px)²×1e-7≈9e-3，与 body≈7e-3 同量级，手部梯度只流向 PCA 参数——权重设计有效，非"过小无梯度"。
+- 新增可选身体模型空间时序项：命令行 `--body-temporal-weight` 默认0以保持旧基线；显式开启时仅在 Stage A/C 对 COCO-17 点减去双髋中点后的轨迹计算连续三帧二阶差分，使用 delta=0.03 m 的 Huber 惩罚，不跨身体无效帧。该项只约束模型运动，不平滑二维/三维观测，也不替代失败帧。
 - 时间正则：二阶差分作用于 **PCA 系数**（手形），`E=0.5·(L+R)`，三帧连续有效掩码（任一相机任一点 valid），不跨缺失段，不把整手平移误作抖动。
 - 接触：本次无输入（`surface_hand_contact_weight=0`），D2 改名 `D2_hand_refine_no_contact` 且 `contact_active=false`；请求接触但全零权重会 `raise`，逻辑正确。
 - 输出（result.npz）：vertices(448,6890,3)、faces(13776,3)、predicted_coco、smplh_joints、hand_points_left/right、左右 PCA(448,12) 与解码 pose(448,45)、vposer_latent、root/transl/beta、tri/mask/quality、WILOR 四组二维与 mask/权重、接触诊断、root_init_source、initialization_body_rms_mm。
@@ -120,9 +122,9 @@ hand_3d_observation_used=false，contact_active=false，D3 skipped
 
 ### 方向二：手部几何审计（短窗通过后）
 
-1. 手部射线夹角/深度分布审计：同一解剖手左右目观测的三角化夹角、WiLoR 局部三维与三角化腕部的一致性、针孔回映 vs 鱼眼投影的系统偏差。
+1. 手部射线夹角/深度分布审计已接入拟合入口：同一解剖手左右目观测的三角化夹角、正深度、鱼眼回投影误差和逐点拒绝原因均落盘；仍需在具备 OpenCV 运行环境的短窗中执行数值审计。
 2. 框级 `detector_confidence` 已接入四路手部残差权重；后续若做单变量实验，应比较“加权/不加权”而不是再次声称尚未接入。
-3. 在三角化审计完成前，不加三维手部项、不调大手部权重。
+3. 在三角化审计完成前，不加三维手部项、不调大手部权重。身体时序项已实现为显式单变量开关，尚未运行消融。
 
 ### 方向三：完整 448 帧重跑（短窗和手部几何审计通过后）
 

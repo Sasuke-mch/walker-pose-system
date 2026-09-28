@@ -15,6 +15,81 @@ TIP_VERTICES = {"left": [2746, 2319, 2445, 2556, 2673],
                 "right": [6191, 5782, 5905, 6016, 6133]}
 HAND_NAMES = ["wrist"] + [f"{f}_{j}" for f in ("thumb", "index", "middle", "ring", "pinky") for j in (1, 2, 3, "tip")]
 
+def audit_cross_view_geometry(points_cam0: np.ndarray, points_cam1: np.ndarray,
+                              K0: np.ndarray, D0: np.ndarray,
+                              K1: np.ndarray, D1: np.ndarray,
+                              R01: np.ndarray, T01_mm: np.ndarray,
+                              image_size: tuple[int, int]) -> tuple[list[dict], dict]:
+    """Audit paired raw-fisheye hand points without changing fitting masks.
+
+    The returned records are diagnostics only.  Each finite paired point is
+    undistorted, triangulated in the cam0 frame, reprojected into both raw
+    fisheye images, and checked for positive depth and ray-angle degeneracy.
+    Rejected points remain in the JSONL with an explicit reason.
+    """
+    import cv2
+    from .fisheye_camera import fisheye_project_numpy
+    p0 = np.asarray(points_cam0, dtype=np.float64)
+    p1 = np.asarray(points_cam1, dtype=np.float64)
+    if p0.shape != p1.shape or p0.ndim != 3 or p0.shape[-2:] != (21, 2):
+        raise ValueError(f"expected paired hand points (N,21,2), got {p0.shape}/{p1.shape}")
+    R = np.asarray(R01, dtype=np.float64).reshape(3, 3)
+    T = np.asarray(T01_mm, dtype=np.float64).reshape(3) / 1000.0
+    P0 = np.concatenate([np.eye(3), np.zeros((3, 1))], axis=1)
+    P1 = np.concatenate([R, T[:, None]], axis=1)
+    width, height = image_size
+    records, counts = [], {"paired_finite": 0, "positive_depth": 0,
+                           "reprojection_ok": 0, "accepted": 0,
+                           "rejected": 0}
+    for frame in range(p0.shape[0]):
+        for joint in range(21):
+            a, b = p0[frame, joint], p1[frame, joint]
+            finite = bool(np.isfinite(a).all() and np.isfinite(b).all())
+            rec = {"frame_index": frame, "joint_index": joint,
+                   "cam0_point": a.tolist(), "cam1_point": b.tolist(),
+                   "finite_pair": finite, "accepted": False}
+            if not finite:
+                rec["reject_reason"] = "nonfinite_pair"
+                records.append(rec); counts["rejected"] += 1; continue
+            counts["paired_finite"] += 1
+            in_bounds = (0 <= a[0] < width and 0 <= a[1] < height and
+                         0 <= b[0] < width and 0 <= b[1] < height)
+            rec["both_in_raw_bounds"] = bool(in_bounds)
+            u0 = cv2.fisheye.undistortPoints(a.reshape(1, 1, 2), K0, D0).reshape(2)
+            u1 = cv2.fisheye.undistortPoints(b.reshape(1, 1, 2), K1, D1).reshape(2)
+            x0 = np.array([[u0[0]], [u0[1]]], dtype=np.float64)
+            x1 = np.array([[u1[0]], [u1[1]]], dtype=np.float64)
+            Xh = cv2.triangulatePoints(P0, P1, x0, x1).reshape(4)
+            if abs(float(Xh[3])) < 1e-12:
+                rec["reject_reason"] = "triangulation_at_infinity"
+                records.append(rec); counts["rejected"] += 1; continue
+            X = Xh[:3] / Xh[3]
+            X1 = R @ X + T
+            rec["point_cam0_m"] = X.tolist()
+            rec["point_cam1_m"] = X1.tolist()
+            rec["positive_depth"] = bool(X[2] > 0 and X1[2] > 0)
+            counts["positive_depth"] += int(rec["positive_depth"])
+            ray0 = np.array([u0[0], u0[1], 1.0])
+            ray1_in_0 = R.T @ np.array([u1[0], u1[1], 1.0])
+            cosang = np.dot(ray0, ray1_in_0) / max(np.linalg.norm(ray0) * np.linalg.norm(ray1_in_0), 1e-12)
+            rec["ray_angle_deg"] = float(np.degrees(np.arccos(np.clip(cosang, -1.0, 1.0))))
+            q0 = fisheye_project_numpy((X * 1000.0).reshape(1, 3), K0, D0)[0]
+            q1 = fisheye_project_numpy((X1 * 1000.0).reshape(1, 3), K1, D1)[0]
+            e0, e1 = float(np.linalg.norm(q0-a)), float(np.linalg.norm(q1-b))
+            rec["reprojected_cam0"] = q0.tolist(); rec["reprojected_cam1"] = q1.tolist()
+            rec["reprojection_error_px"] = {"cam0": e0, "cam1": e1, "mean": 0.5*(e0+e1)}
+            rec["reprojection_ok"] = bool(np.isfinite(e0+e1) and e0 <= 10.0 and e1 <= 10.0)
+            counts["reprojection_ok"] += int(rec["reprojection_ok"])
+            rec["accepted"] = bool(in_bounds and rec["positive_depth"] and rec["reprojection_ok"])
+            if not rec["accepted"]:
+                rec["reject_reason"] = ("raw_bounds" if not in_bounds else
+                                         "nonpositive_depth" if not rec["positive_depth"] else
+                                         "reprojection_error")
+            counts["accepted"] += int(rec["accepted"]); counts["rejected"] += int(not rec["accepted"])
+            records.append(rec)
+    counts["acceptance_rate"] = (counts["accepted"] / max(counts["paired_finite"], 1))
+    return records, counts
+
 def hand21(joints, vertices, side):
     """Differentiable model points in WiLoR OpenPose order, including fingertips."""
     import torch

@@ -94,6 +94,8 @@ def main() -> int:
                     help="quadratic prior on normalized MANO PCA coefficients")
     ap.add_argument("--hand-temporal-weight", type=float, default=2e-2,
                     help="second-order temporal prior on MANO PCA coefficients")
+    ap.add_argument("--body-temporal-weight", type=float, default=0.0,
+                    help="model-COCO relative-to-pelvis second-order prior; 0 preserves the audited baseline")
     ap.add_argument("--mano-left", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl")
     ap.add_argument("--mano-right", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl")
     ap.add_argument("--bone-weight", type=float, default=0.0,
@@ -173,6 +175,27 @@ def main() -> int:
     hand_l_mask, hand_r_mask = hand_l_valid, hand_r_valid
     hand_l_weight_np = hand_ll_weights.astype(np.float32)
     hand_r_weight_np = hand_rr_weights.astype(np.float32)
+
+    # Geometry audit is deliberately separate from fitting masks.  It tests
+    # whether the two raw-fisheye WiLoR views can form a valid stereo point;
+    # no point is deleted or promoted to a hand-3D observation here.
+    from pose_app.smplh_hand_observation import audit_cross_view_geometry
+    hand_geom_left, hand_geom_left_summary = audit_cross_view_geometry(
+        hand_ll, hand_rl, cal.K0, cal.D0, cal.K1, cal.D1,
+        cal.R_cam0_to_cam1, cal.T_cam0_to_cam1_mm, image_size)
+    hand_geom_right, hand_geom_right_summary = audit_cross_view_geometry(
+        hand_lr, hand_rr, cal.K0, cal.D0, cal.K1, cal.D1,
+        cal.R_cam0_to_cam1, cal.T_cam0_to_cam1_mm, image_size)
+    (args.output_dir / "wilor_hand_geometry_audit.jsonl").write_text(
+        "\n".join(json.dumps({"hand": "left", **r}, ensure_ascii=False) for r in hand_geom_left)
+        + "\n" + "\n".join(json.dumps({"hand": "right", **r}, ensure_ascii=False) for r in hand_geom_right)
+        + "\n", encoding="utf-8")
+    (args.output_dir / "wilor_hand_geometry_summary.json").write_text(
+        json.dumps({"left": hand_geom_left_summary, "right": hand_geom_right_summary,
+                    "used_for_fitting": False,
+                    "gate": {"raw_bounds": True, "positive_depth": True,
+                              "reprojection_error_px_each_view": 10.0}},
+                   ensure_ascii=False, indent=2), encoding="utf-8")
 
     if not (1 <= args.hand_pca_comps <= 45):
         raise ValueError("--hand-pca-comps must be in 1..45")
@@ -489,6 +512,21 @@ def main() -> int:
                 l_term = l_acc[l_edge].mean() if l_edge.any() else l_acc.mean() * 0.0
                 r_term = r_acc[r_edge].mean() if r_edge.any() else r_acc.mean() * 0.0
                 hand_temporal = 0.5 * (l_term + r_term)
+            body_temporal = body_loss.detach() * 0.0
+            if args.body_temporal_weight > 0 and n >= 3 and stage_index in (0, 2):
+                pelvis = 0.5 * (coco[:, 11] + coco[:, 12])
+                rel = coco - pelvis[:, None, :]
+                acc = rel[2:] - 2.0 * rel[1:-1] + rel[:-2]
+                body_valid_frame = mask_body.all(dim=1)
+                edge = body_valid_frame[2:] & body_valid_frame[1:-1] & body_valid_frame[:-2]
+                acc_norm = torch.linalg.vector_norm(acc, dim=-1)
+                # Huber in metres: preserve genuine motion while suppressing
+                # one-frame detector spikes. Delta is fixed and recorded.
+                delta = 0.03
+                robust = torch.where(acc_norm <= delta,
+                                     0.5 * acc_norm.pow(2),
+                                     delta * (acc_norm - 0.5 * delta))
+                body_temporal = robust[edge].mean() if edge.any() else robust.mean() * 0.0
             if stage_index in (3, 4):
                 body_term = body_loss.detach() * 0.0
             elif stage_index == 5:
@@ -515,7 +553,8 @@ def main() -> int:
                     terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
                                  * contact_hand_weight[:, j])
                 contact_loss = torch.stack(terms, dim=1).sum() / contact_hand_weight.sum().clamp_min(1e-6)
-            loss = body_term + structure_term + root_term + temporal_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
+            loss = body_term + structure_term + root_term + temporal_term + \
+                   args.body_temporal_weight * body_temporal + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
                    (args.surface_hand_contact_weight * contact_loss if stage_index >= 4 else contact_loss.detach() * 0.0)
             loss.backward()
             optim.step()
@@ -530,6 +569,7 @@ def main() -> int:
                 row["bone_m"] = float(torch.sqrt(bone_loss.detach()))
                 row["root_anchor"] = float(torch.sqrt(root_anchor.detach()))
                 row["hand_temporal"] = float(torch.sqrt(hand_temporal.detach()))
+                row["body_temporal"] = float(torch.sqrt(body_temporal.detach()))
                 history.append(row)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "hand_3d_term": False,
@@ -603,6 +643,13 @@ def main() -> int:
         "hand_pca_components": hand_pca_dim,
         "hand_pca_prior_weight": float(args.hand_pca_prior_weight),
         "hand_temporal_weight": float(args.hand_temporal_weight),
+        "body_temporal_weight": float(args.body_temporal_weight),
+        "body_temporal": {"mode": "model_coco_relative_pelvis_huber" if args.body_temporal_weight > 0 else "disabled",
+                           "huber_delta_m": 0.03, "cross_gap": False,
+                           "used_for_hand_3d": False},
+        "hand_geometry_audit": {"path": "wilor_hand_geometry_audit.jsonl",
+                                "summary": "wilor_hand_geometry_summary.json",
+                                "used_for_fitting": False},
         "hand_priority_weights": hand_order_weights_np.tolist(),
         "contact_enabled": bool(contact_enabled),
         "contact_schedule": ["D1 hand observation",

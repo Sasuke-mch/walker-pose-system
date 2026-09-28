@@ -1,3 +1,10 @@
+# 2026-09-28：实现手部跨视角几何审计与身体模型空间时序项（未重跑全帧）
+
+- `realtime_app/pose_app/smplh_hand_observation.py` 新增 `audit_cross_view_geometry()`：对左右相机同一解剖手的21点逐点执行原始鱼眼边界检查、OpenCV fisheye 去畸变、双目 DLT 三角化、双目正深度、射线夹角和两视图鱼眼回投影误差检查。结果写入 `wilor_hand_geometry_audit.jsonl`，汇总写入 `wilor_hand_geometry_summary.json`；该审计不改变拟合 mask，不把手部三角化结果偷偷加入损失。
+- `realtime_app/tools/fit_smplh_wilor_sequence.py` 在四路同侧 WiLoR 读取后自动生成上述审计，明确记录 `used_for_fitting=false`。当前通过门为两视图原始边界、正深度和每视图回投影误差不超过10 px；拒绝点保留原因。
+- 新增 `--body-temporal-weight`，默认 `0.0` 以保持已有审计结果可复现；显式大于0时，在 Stage A/C 对模型 COCO-17 相对骨盆轨迹加入二阶差分 Huber 项（delta=0.03 m），只跨连续三帧全身有效段，不跨缺失段。每步记录 `body_temporal`，summary 写入模式、权重和门。
+- 本轮只完成逻辑和记录，没有重跑448帧；编译检查通过。当前 bundled Python 缺少 `cv2`，因此未执行依赖 OpenCV 的数值审计样例；不能把该样例记为通过。
+
 # 2026-09-28：审计修复后 people1 全帧 SMPL-H + WiLoR 重跑
 
 - 使用新审计修复后的拟合入口运行 448 帧，输出 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_audited_v3/`，未覆盖旧结果。
