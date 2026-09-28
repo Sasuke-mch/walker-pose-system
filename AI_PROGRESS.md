@@ -1,3 +1,11 @@
+# 2026-09-28：PCA12 + 身体时序/双鱼眼重投影全帧候选与同源可视化
+
+- 用 `fit_smplh_wilor_sequence.py` 在新目录 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_reproj015_full448_v2/` 完成448帧、A/B/C/D1/D2/D3=30/30/30/30/30/0步 CUDA 拟合。参数：MANO PCA12、身体时序权重0.02、双鱼眼身体重投影权重0.15、像素尺度100；无接触输入。`v1` 目录记录了日志路径与入口非空保护门冲突的启动失败，没有拟合产物，不作为结果。
+- 本次结果的工程目标残差：body 111.15 mm、左手214.55 px、右手168.86 px。旧审计基线为83.13 mm、337.08 px、266.40 px；本次同时开启两个新身体项，不能把差异归因于其中一项。身体项明显恶化，不能替代旧基线；手部像素项降低也不能解释为真实手部精度改善。
+- 手部双目审计：有限配对左5166、右7539；当前边界/正深度/两视图各10px回投影门通过左1882（36.4%）、右2974（39.4%）。失败点和原因保留在 `wilor_hand_geometry_audit.jsonl`；手部三维项未进入拟合。
+- 在该新目录下重新执行448帧 Stage/动态地面 scene replay，生成 `scene/`；最终同源页面为 `smplh_people1_pca12_reproj015_solid_walker_current_scene.html`。页面使用本次result与本次scene，地面网格在水平XY面，无竖直网格墙；助步器由圆柱/球体实体拓扑渲染。模型数组有限，vertices `(448,6890,3)`、faces `(13776,3)`、面索引0..6889、浏览器索引预期41328；scene Stage/ground 各448行，严格身体点7534 accepted、82 rejected。
+- 浏览器画面验收未完成：应用内浏览器策略拒绝打开 `file:` 页面且明确禁止绕过；仅完成静态HTML、数组和同源输入验收。当前结论为 `engineering_candidate`，不宣称物理接触、握持或外部精度。
+
 # 2026-09-28：实现 MANO 维度消融配置与双鱼眼身体重投影项（未重跑全帧）
 
 - `fit_smplh_wilor_sequence.py` 新增 `--hand-pca-profile {pca12,pca24,full45}`，与 `--hand-pca-comps {12,24,45}` 做一致性校验；`fit_summary.json` 写入当前 profile 和支持的消融档位。MANO PCA 12/24/45 仍只改变手部参数维度，不拼接 MANO 网格，也不改变 SMPL-H 6890 顶点输出。

@@ -63,3 +63,13 @@ SMPL-H 接口、6890 顶点统一输出、COCO regressor 接入和 CUDA 全序�
 结果数组检查：vertices `(448,6890,3)`、faces `(13776,3)`、predicted COCO `(448,17,3)`、SMPL-H joints `(448,73,3)`、左右手点 `(448,21,3)`、左右 PCA `(448,12)`；模型数组有限，raw triangulation 继续保留 rejected 非有限状态。使用同一次 result 和 `audit_20260928/scene` 生成 `smplh_people1_mano_pca_audited_v3_viewer.html`，viewer 真实三角索引 `41328`，右光心来自标定 `-R01.T@T01`，页面标记 `engineering_candidate`、WiLoR 模型派生手部观测、`contact_active=false`。
 
 解释边界保持不变：MANO 只用于 WiLoR 手部观测的手部局部参数与二维辅助项；身体 COCO-17 仍来自 PMPose 严格三角化，SMPL-H 身体表面经固定 COCO 回归器拟合。当前运行不包含手部三角化、独立手部真值或物理握持标签。
+
+## 2026-09-28 — PCA12 + 身体时序与双鱼眼重投影全帧候选
+
+输入仍为本实验 people1 原始左右 PMPose、左右 WiLoR JSONL、正式双鱼眼标定、SMPL-H male、双 MANO PCA 资产、VPoser V02_05 和固定 COCO regressor。新输出目录为 `fit_cuda_vposer_mano_pca12_temporal_reproj015_full448_v2/`；旧结果未覆盖。拟合为448帧 CUDA，A/B/C/D1/D2/D3=30/30/30/30/30/0步，`lr=0.02`，`--hand-pca-comps 12 --hand-pca-profile pca12 --body-temporal-weight 0.02 --body-reprojection-weight 0.15 --body-reprojection-scale-px 100.0`；无接触输入，D3跳过。命令保存在本次输出目录的 `command.txt`。
+
+本次输出的最终工程目标残差为 body 111.15 mm、左手214.55 px、右手168.86 px。与上一审计基线83.13 mm、337.08 px、266.40 px相比，身体项恶化，手部像素项降低。身体时序和二维重投影两个新项同时开启，不能单独归因；本候选不能替代旧基线。D阶段 `body_2d_px=0` 表示该项关闭，不代表二维重投影误差为零。
+
+手部跨视角几何审计写入 `wilor_hand_geometry_audit.jsonl` 和 `wilor_hand_geometry_summary.json`：左/右有限配对为5166/7539，通过当前原始边界、正深度、双视图各10px回投影门为1882/2974（36.4%/39.4%）。该审计只做诊断，`used_for_fitting=false`；拒绝原因保留，不将手部三角化点作为真值。
+
+为本次结果单独重放 `scene/`，其 Stage 与动态地面记录均为448行。最终页面 `smplh_people1_pca12_reproj015_solid_walker_current_scene.html` 只读本次 `result.npz` 和本次 `scene/`，使用真实SMPL-H三角面、XY水平地面、实体圆柱/球节点助步器、双相机光心及轨迹，无竖直网格墙和显示平滑。数组验收：vertices `(448,6890,3)`、faces `(13776,3)`、所有模型数组有限、面索引0..6889；身体严格 accepted 7534，rejected 82。应用内浏览器策略拒绝打开 `file:` 页面，因此未取得浏览器画面验收；静态页面和数据检查通过。结果仍只标记 `engineering_candidate`。
