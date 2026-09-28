@@ -2552,3 +2552,11 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 输出目录：`realtime_app/outputs/pipeline_20260927_201716_pmpose_mainline/smpl_mainline_window60_90_no_contact/`。输出包含 `raw_observations.npz`、`triangulation.npz`、A/B/C三个 `result_*.npz` 和最终 `result.npz`；最终网格为 31×6890 顶点、真实 SMPL faces 为 13776×3，未使用插值或旧拟合结果。
 - 指标（拟合器内部观测一致性）：Stage A 3D 中位数/P95 为 76.55/182.76 mm，2D 中位数/P95 为 52.93/123.00 px；Stage B 为 75.78/183.07 mm、52.95/122.98 px；Stage C 为 71.00/168.04 mm、43.83/113.09 px。共享 beta 的10维结果未触及边界；右膝在该窗口 31/31 帧有 accepted 观测。运行耗时 9.63 s，退出状态 `completed_staged_single_frame_vposer_shared_beta`。
 - 证据边界：这次结果证明当前 360 帧主线的原始二维→严格三角化→SMPL A/B/C 链路可以连续运行，并给出可审计的逐点误差；不证明三维真值、姿态精度、触地、承重或助步器识别。下一道门仍是先审计该窗口的观测残差和网格/骨架可视化，再决定是否扩展到更长窗口或接入记录中的 Stage D 地面/表面接触；不能直接把该31帧结果升级为全360帧结论。
+
+# 2026-09-29：手脚表面接触候选全帧拟合
+
+- 扩展 `fit_smplh_wilor_sequence.py`：在已有手掌‑握把表面损失外加入左右脚底表面‑地面损失，使用 SMPL-H 6890 表面候选点；接触权重分别由 `--surface-hand-contact-weight` 和 `--surface-foot-contact-weight` 控制。
+- 从上一版同源工程结果的手‑握把距离和脚底‑地面高度生成 `contact_candidates_from_v2_geometry.npz`。该文件是几何候选标签，不是人工接触真值；因此本实验仍标记为 `engineering_candidate`。
+- 新运行目录：`research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_reproj015_contact_candidate_full448_v1/`；448 帧，MANO PCA12，身体时序权重0.02，身体双鱼眼重投影权重0.15，手接触权重0.05，脚接触权重0.02。
+- `fit_summary.json` 显示 `contact_enabled=true`，阶段为 D2 surface hand contact / D3 hand-only contact refinement；接触历史项非零。新页面为 `smplh_people1_pca12_contact_candidate_topology_v1_viewer.html`，使用同源 result 和 scene，助步器为参考9边实体拓扑。
+- 限制：接触候选由上一版工程拟合几何生成，不能证明真实握持、触地、支撑或承重；没有外部物理接触真值。
