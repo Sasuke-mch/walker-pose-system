@@ -314,16 +314,17 @@ def main() -> int:
     stage_train = [["root", "transl", "latent"], ["beta"],
                    ["beta", "root", "transl", "latent"], ["lhand", "rhand"],
                    ["lhand", "rhand"], ["lhand", "rhand", "root", "transl"]]
+    param_map = {"beta": beta, "root": root, "transl": transl,
+                 "latent": latent, "lhand": lhand, "rhand": rhand}
     def set_stage(train):
         for p in (beta, root, transl, latent, lhand, rhand): p.requires_grad_(False)
-        m = {"beta": beta, "root": root, "transl": transl, "latent": latent, "lhand": lhand, "rhand": rhand}
-        for k in train: m[k].requires_grad_(True)
+        for k in train: param_map[k].requires_grad_(True)
     stage_history = []
     global_step = 0
     for stage_index, (stage_name, train_names, n_stage) in enumerate(zip(stage_names, stage_train, stage_steps)):
         set_stage(train_names)
         lr_scale = {0: 1.0, 1: 0.10, 2: 0.25, 3: 0.50, 4: 0.25, 5: 0.10}[stage_index]
-        stage_params = [m[k] for k in train_names]
+        stage_params = [param_map[k] for k in train_names]
         optim = torch.optim.Adam(stage_params, lr=args.lr * lr_scale)
         for local_step in range(n_stage):
             step = global_step
