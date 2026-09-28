@@ -37,7 +37,8 @@ raw_clean = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(raw_clean)
 
 
-def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray | None = None,
+               image_size: tuple[int, int] = (1920, 1080)) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Read the best side candidate while retaining every finite point.
 
     ``valid`` is a per-point finite-value mask used only to avoid NaNs in the
@@ -62,8 +63,12 @@ def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray | None = N
         # alone cannot establish the person association.
         if body_points is not None and np.isfinite(body_points[frame, 9 if side == "left" else 10, :2]).all():
             wrist = body_points[frame, 9 if side == "left" else 10, :2]
-            candidate = min(candidates, key=lambda c: float(np.linalg.norm(
+            ranked = sorted(candidates, key=lambda c: float(np.linalg.norm(
                 np.asarray(c["keypoints_2d_raw_fisheye"], np.float32)[0] - wrist)))
+            distances = [float(np.linalg.norm(np.asarray(c["keypoints_2d_raw_fisheye"], np.float32)[0] - wrist)) for c in ranked]
+            if distances[0] > 150.0 or (len(distances) > 1 and distances[1] - distances[0] < 25.0):
+                continue
+            candidate = ranked[0]
         else:
             candidate = max(candidates, key=lambda c: float(c.get("detector_confidence", 0.0)))
         points = np.asarray(candidate["keypoints_2d_raw_fisheye"], np.float32)
@@ -74,30 +79,12 @@ def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray | None = N
         # The sequence audit currently stores only a candidate-level bounds
         # flag.  Recompute the per-joint state from the raw image dimensions
         # when available, while preserving points outside the image.
-        image_path = row.get("image")
-        width = height = None
-        if image_path:
-            try:
-                import cv2
-                image = cv2.imread(str(image_path), cv2.IMREAD_UNCHANGED)
-                if image is not None:
-                    height, width = image.shape[:2]
-                    # people1 audit images are stored upright (1920 high x
-                    # 1080 wide), while the saved WiLoR points are explicitly
-                    # mapped back to the original raw-fisheye (1920 wide x
-                    # 1080 high) frame.
-                    if height > width:
-                        width, height = height, width
-            except Exception:
-                pass
-        if width is not None and height is not None:
-            bounds_ok[frame] = (
+        width, height = image_size
+        bounds_ok[frame] = (
                 valid[frame]
                 & (points[:, 0] >= 0) & (points[:, 0] < width)
                 & (points[:, 1] >= 0) & (points[:, 1] < height)
             )
-        else:
-            bounds_ok[frame] = bool(candidate.get("raw_pixel_bounds_ok", False))
     return obs, valid, bounds_ok
 
 
@@ -105,8 +92,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--left-raw", type=Path, required=True)
     ap.add_argument("--right-raw", type=Path, required=True)
-    ap.add_argument("--wilor-left", type=Path, required=True)
-    ap.add_argument("--wilor-right", type=Path, required=True)
+    ap.add_argument("--wilor-left", type=Path, required=True,
+                    help="WiLoR JSONL from left camera; both left/right records are read")
+    ap.add_argument("--wilor-right", type=Path, required=True,
+                    help="WiLoR JSONL from right camera; both left/right records are read")
     ap.add_argument("--calibration-dir", type=Path, required=True)
     ap.add_argument("--regressor", type=Path, required=True)
     ap.add_argument("--smplh-model", type=Path, required=True)
@@ -156,6 +145,8 @@ def main() -> int:
                     args.contact_vertex_sets, args.walker_topology)
     if any(v is not None for v in contact_args) and not all(v is not None for v in contact_args):
         raise ValueError("contact mode requires contact-labels, scene-transforms, contact-vertex-sets and walker-topology together")
+    if all(v is not None for v in contact_args) and args.surface_hand_contact_weight <= 0.0:
+        raise ValueError("contact inputs supplied but --surface-hand-contact-weight is zero")
 
     cal = load_stereo_fisheye(args.calibration_dir)
     raw_clean.cv2 = cv2
@@ -171,8 +162,17 @@ def main() -> int:
     n = len(ids)
     tri_m = np.nan_to_num(np.asarray(tri, np.float32) / 1000.0)
     body_mask = np.asarray(accepted, bool) & np.isfinite(tri).all(axis=-1)
-    hand_l, hand_l_valid, hand_l_bounds = read_wilor(args.wilor_left, n, "left", left)
-    hand_r, hand_r_valid, hand_r_bounds = read_wilor(args.wilor_right, n, "right", right)
+    if not np.isfinite(np.asarray(quality, dtype=np.float32)).all():
+        raise ValueError("body quality contains non-finite values")
+    # Each camera file contains both anatomical sides. Fit each hand from both
+    # cameras; a single camera must not be mistaken for an anatomical hand.
+    image_size = (int(cal.image_width), int(cal.image_height))
+    hand_ll, hand_ll_valid, hand_ll_bounds = read_wilor(args.wilor_left, n, "left", left, image_size)
+    hand_lr, hand_lr_valid, hand_lr_bounds = read_wilor(args.wilor_left, n, "right", left, image_size)
+    hand_rl, hand_rl_valid, hand_rl_bounds = read_wilor(args.wilor_right, n, "left", right, image_size)
+    hand_rr, hand_rr_valid, hand_rr_bounds = read_wilor(args.wilor_right, n, "right", right, image_size)
+    hand_l, hand_l_valid, hand_l_bounds = hand_ll, hand_ll_valid, hand_ll_bounds
+    hand_r, hand_r_valid, hand_r_bounds = hand_rr, hand_rr_valid, hand_rr_bounds
     # Keep the complete WiLoR 21-point order.  The first point is the wrist;
     # each following finger contributes three internal joints and one surface
     # fingertip.  Bounds are a soft quality signal, never a deletion gate.
@@ -206,20 +206,24 @@ def main() -> int:
     lhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
     rhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
     target = torch.tensor(tri_m, device=device)
-    obs_l = torch.tensor(np.nan_to_num(hand_l, nan=0.0), device=device)
-    obs_r = torch.tensor(np.nan_to_num(hand_r, nan=0.0), device=device)
+    obs_ll = torch.tensor(np.nan_to_num(hand_ll, nan=0.0), device=device)
+    obs_lr = torch.tensor(np.nan_to_num(hand_lr, nan=0.0), device=device)
+    obs_rl = torch.tensor(np.nan_to_num(hand_rl, nan=0.0), device=device)
+    obs_rr = torch.tensor(np.nan_to_num(hand_rr, nan=0.0), device=device)
     mask_body = torch.tensor(body_mask, device=device)
-    mask_l = torch.tensor(hand_l_mask, device=device)
-    mask_r = torch.tensor(hand_r_mask, device=device)
-    weight_l = torch.tensor(hand_l_weight_np, device=device)
-    weight_r = torch.tensor(hand_r_weight_np, device=device)
+    mask_ll = torch.tensor(hand_ll_valid, device=device); mask_lr = torch.tensor(hand_lr_valid, device=device)
+    mask_rl = torch.tensor(hand_rl_valid, device=device); mask_rr = torch.tensor(hand_rr_valid, device=device)
+    weight_ll = torch.tensor(hand_ll_valid.astype(np.float32) * np.where(hand_ll_bounds, 1.0, 0.1), device=device)
+    weight_lr = torch.tensor(hand_lr_valid.astype(np.float32) * np.where(hand_lr_bounds, 1.0, 0.1), device=device)
+    weight_rl = torch.tensor(hand_rl_valid.astype(np.float32) * np.where(hand_rl_bounds, 1.0, 0.1), device=device)
+    weight_rr = torch.tensor(hand_rr_valid.astype(np.float32) * np.where(hand_rr_bounds, 1.0, 0.1), device=device)
     hand_order_weights_np = np.asarray(
         [1.00, 0.95, 0.82, 0.68, 0.48,
          0.95, 0.82, 0.68, 0.48, 0.95, 0.82, 0.68, 0.48,
          0.95, 0.82, 0.68, 0.48, 0.95, 0.82, 0.68, 0.48], np.float32)
     order_w = torch.tensor(hand_order_weights_np, device=device)[None, :]
-    weight_l = weight_l * order_w
-    weight_r = weight_r * order_w
+    weight_ll = weight_ll * order_w; weight_lr = weight_lr * order_w
+    weight_rl = weight_rl * order_w; weight_rr = weight_rr * order_w
     contact_enabled = args.contact_labels is not None
     contact_hand_weight = contact_handle = contact_R = contact_T = palm_idx = None
     if contact_enabled:
@@ -227,6 +231,18 @@ def main() -> int:
         scene = np.load(args.scene_transforms, allow_pickle=True)
         if int(labels["handle_ends_ground_m"].shape[0]) != n:
             raise ValueError("contact labels frame count does not match raw input")
+        if tuple(labels["hand_contact_weight"].shape) != (n, 2):
+            raise ValueError("hand_contact_weight must have shape (frames,2)")
+        if tuple(labels["handle_ends_ground_m"].shape) != (n, 2, 2, 3):
+            raise ValueError("handle_ends_ground_m must have shape (frames,2,2,3)")
+        if tuple(scene["rotation_ground_from_left"].shape) != (n, 3, 3):
+            raise ValueError("rotation_ground_from_left must have shape (frames,3,3)")
+        if tuple(scene["translation_ground_from_left_mm"].shape) != (n, 3):
+            raise ValueError("translation_ground_from_left_mm must have shape (frames,3)")
+        if not np.isfinite(labels["hand_contact_weight"]).all() or np.any(labels["hand_contact_weight"] < 0):
+            raise ValueError("hand_contact_weight must be finite and non-negative")
+        if not np.isfinite(labels["handle_ends_ground_m"]).all():
+            raise ValueError("handle_ends_ground_m contains non-finite values")
         contact_handle = torch.tensor(labels["handle_ends_ground_m"], dtype=torch.float32, device=device)
         contact_hand_weight = torch.tensor(labels["hand_contact_weight"], dtype=torch.float32, device=device)
         contact_R = torch.tensor(scene["rotation_ground_from_left"], dtype=torch.float32, device=device)
@@ -240,6 +256,10 @@ def main() -> int:
                     for s in ("left", "right")}
         if any(int(v.numel()) == 0 for v in palm_idx.values()):
             raise ValueError("contact vertex sets contain no palm vertices")
+        if any(int(v.min()) < 0 or int(v.max()) >= 6890 for v in palm_idx.values()):
+            raise ValueError("contact vertex index is outside the 6890-vertex SMPL-H topology")
+        if float(np.asarray(labels["hand_contact_weight"]).sum()) <= 0.0:
+            raise ValueError("contact mode requested but all hand_contact_weight values are zero")
     R01 = torch.tensor(cal.R_cam0_to_cam1, dtype=torch.float32, device=device)
     T01 = torch.tensor(cal.T_cam0_to_cam1_mm / 1000.0, dtype=torch.float32, device=device)
     K0, D0 = cal.K0, cal.D0
@@ -275,7 +295,6 @@ def main() -> int:
         return pose
     with torch.no_grad():
         _ = decode_body_pose(latent)
-    optim = torch.optim.Adam([beta, root, transl, latent, lhand, rhand], lr=args.lr)
     history = []
     from pose_app.smplh_hand_observation import HAND_JOINTS, TIP_VERTICES, HAND_NAMES, validate_smplh, hand21
     validate_smplh(model)
@@ -292,7 +311,7 @@ def main() -> int:
                     args.hand_steps, args.contact_steps, args.contact_refine_steps)]
     stage_names = ["A_body_vposer", "B_shared_beta", "C_body_vposer_refine",
                    "D1_hand_proximal", "D2_hand_surface_contact", "D3_contact_refine"]
-    stage_train = [["beta", "root", "transl", "latent"], ["beta"],
+    stage_train = [["root", "transl", "latent"], ["beta"],
                    ["beta", "root", "transl", "latent"], ["lhand", "rhand"],
                    ["lhand", "rhand"], ["lhand", "rhand", "root", "transl"]]
     def set_stage(train):
@@ -303,6 +322,9 @@ def main() -> int:
     global_step = 0
     for stage_index, (stage_name, train_names, n_stage) in enumerate(zip(stage_names, stage_train, stage_steps)):
         set_stage(train_names)
+        lr_scale = {0: 1.0, 1: 0.10, 2: 0.25, 3: 0.50, 4: 0.25, 5: 0.10}[stage_index]
+        stage_params = [m[k] for k in train_names]
+        optim = torch.optim.Adam(stage_params, lr=args.lr * lr_scale)
         for local_step in range(n_stage):
             step = global_step
             global_step += 1
@@ -320,12 +342,18 @@ def main() -> int:
             jr = hand21(joints, out.vertices, "right")
             pl = fisheye_project_torch(jl, K0, D0)
             pr = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
-            hand_l_res = (pl - obs_l).pow(2).sum(-1)
-            hand_r_res = (pr - obs_r).pow(2).sum(-1)
-            hand_l_loss = (hand_l_res * weight_l).sum() / weight_l.sum().clamp_min(1e-6) if mask_l.any() else pl.sum() * 0.0
-            hand_r_loss = (hand_r_res * weight_r).sum() / weight_r.sum().clamp_min(1e-6) if mask_r.any() else pr.sum() * 0.0
+            # Both cameras constrain each anatomical hand. This avoids the
+            # old camera-side/anatomical-side mix-up.
+            hand_ll_res = (pl - obs_ll).pow(2).sum(-1)
+            hand_rl_res = (pr - obs_rl).pow(2).sum(-1)
+            hand_lr_res = (pl - obs_lr).pow(2).sum(-1)
+            hand_rr_res = (pr - obs_rr).pow(2).sum(-1)
+            def weighted(res, w, mask):
+                return (res * w).sum() / w.sum().clamp_min(1e-6) if mask.any() else res.sum() * 0.0
+            hand_l_loss = weighted(hand_ll_res, weight_ll, mask_ll) + weighted(hand_rl_res, weight_rl, mask_rl)
+            hand_r_loss = weighted(hand_lr_res, weight_lr, mask_lr) + weighted(hand_rr_res, weight_rr, mask_rr)
             pose_reg = args.vposer_prior_weight * latent.pow(2).mean() + 1e-4 * (lhand.pow(2).mean() + rhand.pow(2).mean())
-            if stage_index in (1, 3, 4):
+            if stage_index in (3, 4):
                 body_term = body_loss.detach() * 0.0
             elif stage_index == 5:
                 # D3 opens only root/translation and keeps a low-strength
@@ -356,12 +384,13 @@ def main() -> int:
                             "body_m": float(torch.sqrt(body_loss.detach())),
                             "hand_l_px": float(torch.sqrt(hand_l_loss.detach())),
                             "hand_r_px": float(torch.sqrt(hand_r_loss.detach())),
-                            "hand_l_points": int(mask_l.sum()), "hand_r_points": int(mask_r.sum()),
+                            "hand_l_points": int(mask_ll.sum() + mask_rl.sum()), "hand_r_points": int(mask_lr.sum() + mask_rr.sum()),
                             "contact": float(contact_loss.detach()),
                             "contact_active": bool(contact_enabled and stage_index >= 4)}
                 history.append(row)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "hand_3d_term": False,
+                              "learning_rate": float(args.lr * lr_scale),
                               "hand_priority": "wrist_to_distal_fixed_weights" if stage_index >= 3 else "inactive",
                               "contact_term": bool(contact_enabled and stage_index >= 4)})
 
@@ -372,6 +401,15 @@ def main() -> int:
                       right_hand_pose=rhand, transl=transl, return_verts=True)
         final_hand_l = hand21(final.joints, final.vertices, "left")
         final_hand_r = hand21(final.joints, final.vertices, "right")
+        contact_diag = {}
+        if contact_enabled:
+            vg = torch.einsum("nij,nvj->nvi", contact_R, final.vertices) + contact_T[:, None, :]
+            for side, j in (("left", 0), ("right", 1)):
+                a, b = contact_handle[:, j, 0, :], contact_handle[:, j, 1, :]
+                contact_diag[f"{side}_palm_ground_m"] = vg[:, palm_idx[side], :].cpu().numpy()
+                contact_diag[f"{side}_hand_capsule_residual_m"] = surface_contact.capsule_surface_residual(
+                    vg[:, palm_idx[side], :], a[:, None, :], b[:, None, :], 0.016).cpu().numpy()
+            contact_diag["hand_contact_weight"] = contact_hand_weight.cpu().numpy()
     np.savez_compressed(args.output_dir / "result.npz",
                         vertices=final.vertices.cpu().numpy(), faces=np.asarray(model.faces),
                         predicted_coco=regress_coco17_torch(final.vertices, reg).cpu().numpy(),
@@ -383,6 +421,10 @@ def main() -> int:
                         raw_triangulated_points=tri, body_accepted=body_mask,
                         wilor_left_2d=hand_l, wilor_left_mask=hand_l_mask,
                         wilor_right_2d=hand_r, wilor_right_mask=hand_r_mask,
+                        wilor_left_camera_left_2d=hand_ll, wilor_left_camera_right_2d=hand_rl,
+                        wilor_right_camera_left_2d=hand_lr, wilor_right_camera_right_2d=hand_rr,
+                        wilor_left_camera_left_mask=hand_ll_valid, wilor_left_camera_right_mask=hand_rl_valid,
+                        wilor_right_camera_left_mask=hand_lr_valid, wilor_right_camera_right_mask=hand_rr_valid,
                         wilor_left_2d_full=hand_l_full, wilor_right_2d_full=hand_r_full,
                         wilor_left_valid_full=hand_l_full_valid, wilor_right_valid_full=hand_r_full_valid,
                         wilor_left_bounds_ok_full=hand_l_full_bounds, wilor_right_bounds_ok_full=hand_r_full_bounds,
@@ -391,7 +433,7 @@ def main() -> int:
                         wilor_left_weight=hand_l_weight_np, wilor_right_weight=hand_r_weight_np,
                         smplh_joints=final.joints.detach().cpu().numpy(),
                         hand_points_left=final_hand_l.detach().cpu().numpy(),
-                        hand_points_right=final_hand_r.detach().cpu().numpy())
+                        hand_points_right=final_hand_r.detach().cpu().numpy(), **contact_diag)
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
         "status": "engineering_candidate", "frames": n, "steps": int(sum(stage_steps)),
         "model": str(args.smplh_model.resolve()), "vertices": 6890,
@@ -399,8 +441,10 @@ def main() -> int:
         "hand_observation_points_retained": 21,
         "hand_fit_subset_points": 21,
         "hand_bounds_are_diagnostic_only": True,
-        "wilor_left_valid_points": int(hand_l_mask.sum()),
-        "wilor_right_valid_points": int(hand_r_mask.sum()), "history": history,
+        "wilor_left_valid_points": int(hand_ll_valid.sum() + hand_rl_valid.sum()),
+        "wilor_right_valid_points": int(hand_lr_valid.sum() + hand_rr_valid.sum()), "history": history,
+        "wilor_observation_views": {"left_camera": ["left_hand", "right_hand"],
+                                     "right_camera": ["left_hand", "right_hand"]},
         "stage_schedule": stage_history,
         "hand_confidence_source": "detector_box_or_missing_neutral_weight",
         "vposer_checkpoint": str(vp_ckpt), "vposer_latent_dim": latent_dim,

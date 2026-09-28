@@ -64,9 +64,9 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
     width, height = image_size
     for line in path.open(encoding="utf-8"):
         row = json.loads(line); i = int(row["frame_index"])
+        if i < 0 or i >= n: raise ValueError(f"{camera} frame {i} outside 0..{n-1}")
         if i in seen: raise ValueError(f"duplicate {camera} frame {i}")
         seen.add(i)
-        if i >= n: continue
         if Path(row["image"]).stem != f"pair_{i:04d}":
             raise ValueError(f"image/pair_id mismatch: {row['image']}")
         for h, side in enumerate(("left", "right")):
@@ -95,7 +95,9 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
                         conf = c.get("detector_confidence")
                         weight = 1.0 if conf is None else float(np.clip(conf, 0, 1))
                         points[i,h] = p
-                        weights[i,h] = np.isfinite(p).all(-1)*weight
+                        finite = np.isfinite(p).all(-1)
+                        bounds = finite & (p[:, 0] >= 0) & (p[:, 0] < width) & (p[:, 1] >= 0) & (p[:, 1] < height)
+                        weights[i,h] = finite * np.where(bounds, 1.0, 0.1) * weight
             for dist, ordinal, c, p in entries:
                 finite = np.isfinite(p).all(-1)
                 bounds = finite & (p[:,0]>=0)&(p[:,0]<width)&(p[:,1]>=0)&(p[:,1]<height)
