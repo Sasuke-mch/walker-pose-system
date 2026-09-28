@@ -1,5 +1,15 @@
 # 助步器项目 AI 工作日志
 
+## 2026-09-28：SMPL-H 刚体初始化、手部相机配对和全片复核
+
+- 修正 `realtime_app/tools/fit_smplh_wilor_sequence.py` 的身体初始化：用 SMPL-H VPoser 均值姿态和模板 COCO 肩髋基，与每帧三角化肩髋基求 `R_global = R_obs @ R_model.T` 初始化 `global_orient`；再用同一旋转后的模板髋中点初始化 translation，避免零旋转平移和非零 root 不一致。
+- Stage A 现在冻结 root，只优化 translation/VPoser；Stage B 只优化共享 beta；Stage C 才释放 root，并使用 root 初始锚定项。没有接触输入时自动跳过 D3，避免 WiLoR 模型派生手部像素牵引整个人体。
+- 修正四条手部观测配对：左手模型只比较左目左手和右目左手，右手模型只比较左目右手和右目右手。旧版本曾把左右解剖手交叉比较，导致手部残差异常。
+- 增加模型骨段诊断和可选骨段先验；默认关闭 beta=0 骨长先验，避免把共享形状强行压回模板。三角化骨架只作为位置观测，不作为人体骨长真值。
+- 初始化探针的身体 COCO RMS 为约 128.4 mm。默认参数完整 448 帧输出为 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_rigid_init_fixed_views_stereo448_v1/`，身体 RMS 约 95.9 mm、中位数约 87.0 mm、P95 约 147.9 mm；root 相邻帧变化 P95 约 0.098 rad。
+- 当前没有有效手部接触标签，D3 被跳过；手部仍是 WiLoR 模型派生的二维辅助观测，结果继续标记为 `engineering_candidate`。
+- 同源 SMPL-H 页面为该输出目录中的 `smplh_people1_rigid_init_viewer.html`，使用当前结果和 `audit_20260928/scene`，未混用旧网格或旧参数。
+
 ## 2026-09-28：SMPL-H + WiLoR 修正后完整 448 帧与手部查看器
 
 - 修正后的 `fit_smplh_wilor_sequence.py` 完成 people1 全 448 帧、180 步 CUDA 运行，输出为 `research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_corrected_full448/`。

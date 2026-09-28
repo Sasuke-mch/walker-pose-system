@@ -115,6 +115,12 @@ def main() -> int:
                     help="Stage D3 limited contact refinement; defaults to steps//6")
     ap.add_argument("--vposer-dir", type=Path, default=None)
     ap.add_argument("--vposer-prior-weight", type=float, default=0.02)
+    ap.add_argument("--root-anchor-weight", type=float, default=0.01,
+                    help="Stage C/D3 penalty for drifting from the triangulation-initialized root")
+    ap.add_argument("--max-init-body-rms-mm", type=float, default=300.0,
+                    help="stop before optimization when rigid initialization is inconsistent")
+    ap.add_argument("--bone-weight", type=float, default=0.0,
+                    help="optional beta-zero bone-length prior; default off because it biases shared beta")
     ap.add_argument("--contact-labels", type=Path, default=None)
     ap.add_argument("--scene-transforms", type=Path, default=None)
     ap.add_argument("--contact-vertex-sets", type=Path, default=None)
@@ -205,6 +211,129 @@ def main() -> int:
     latent = torch.nn.Parameter(torch.zeros(n, latent_dim, device=device))
     lhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
     rhand = torch.nn.Parameter(torch.zeros(n, 45, device=device))
+
+    def decode_body_pose(z):
+        pose = vposer.decode(z)["pose_body"].reshape(n, 63)
+        if pose.shape != (n, 63) or not bool(torch.isfinite(pose).all()):
+            raise RuntimeError(f"VPoser decoded pose has invalid shape/values: {tuple(pose.shape)}")
+        return pose
+
+    # Build a model-space body basis before any optimization.  The basis is
+    # defined by semantic COCO points, so it does not assume that SMPL-H's
+    # local +X/+Y/+Z already match the calibrated camera axes.
+    def make_body_basis(points: np.ndarray) -> np.ndarray | None:
+        p = np.asarray(points, dtype=np.float64)
+        needed = (5, 6, 11, 12)
+        if not np.isfinite(p[list(needed)]).all():
+            return None
+        left = p[5] - p[6]
+        up = 0.5 * (p[5] + p[6]) - 0.5 * (p[11] + p[12])
+        nl = np.linalg.norm(left)
+        if nl < 1e-8:
+            return None
+        left = left / nl
+        up = up - left * float(left @ up)
+        nu = np.linalg.norm(up)
+        if nu < 1e-8:
+            return None
+        up = up / nu
+        forward = np.cross(left, up)
+        nf = np.linalg.norm(forward)
+        if nf < 1e-8:
+            return None
+        forward = forward / nf
+        basis = np.column_stack((left, up, forward))
+        if np.linalg.det(basis) < 0:
+            basis[:, 2] *= -1.0
+        return basis
+
+    # Decode the VPoser mean and use it for the template basis.  A zero axis
+    # angle is not treated as an observation-based body orientation.
+    with torch.no_grad():
+        template_latent = torch.zeros(n, latent_dim, device=device)
+        template_body_pose = decode_body_pose(template_latent)
+        template = model(
+            betas=torch.zeros(n, 10, device=device),
+            global_orient=torch.zeros(n, 3, device=device),
+            body_pose=template_body_pose,
+            left_hand_pose=torch.zeros(n, 45, device=device),
+            right_hand_pose=torch.zeros(n, 45, device=device),
+            transl=torch.zeros(n, 3, device=device), return_verts=True)
+        template_coco = regress_coco17_torch(template.vertices, reg).detach().cpu().numpy()
+        template_joints = template.joints.detach().cpu().numpy()
+    model_basis = make_body_basis(template_coco[0])
+    if model_basis is None:
+        raise RuntimeError("cannot construct a valid SMPL-H template shoulder/hip basis")
+    root_init_np = np.zeros((n, 3), dtype=np.float32)
+    root_init_source = np.full(n, "basis_unavailable", dtype="U32")
+    from scipy.spatial.transform import Rotation
+    for i in range(n):
+        observed_basis = make_body_basis(tri_m[i]) if body_mask[i, [5, 6, 11, 12]].all() else None
+        if observed_basis is None:
+            root_init_np[i] = np.zeros(3, dtype=np.float32)
+            continue
+        global_rotation = observed_basis @ model_basis.T
+        if not np.isfinite(global_rotation).all() or np.linalg.det(global_rotation) <= 0:
+            continue
+        root_init_np[i] = Rotation.from_matrix(global_rotation).as_rotvec().astype(np.float32)
+        root_init_source[i] = "shoulder_hip_rigid_basis"
+
+    # Translation is computed from the same rotated template used for root
+    # initialization.  This prevents a zero-rotation translation from being
+    # paired with a later nonzero global orientation.
+    with torch.no_grad():
+        root_init_t = torch.tensor(root_init_np, dtype=torch.float32, device=device)
+        rotated_template = model(
+            betas=torch.zeros(n, 10, device=device), global_orient=root_init_t,
+            body_pose=template_body_pose,
+            left_hand_pose=torch.zeros(n, 45, device=device),
+            right_hand_pose=torch.zeros(n, 45, device=device),
+            transl=torch.zeros(n, 3, device=device), return_verts=True)
+        rotated_template_coco = regress_coco17_torch(rotated_template.vertices, reg)
+        rotated_template_np = rotated_template_coco.detach().cpu().numpy()
+    init_source = []
+    t0 = np.zeros((n, 3), np.float32)
+    for i in range(n):
+        hl = tri_m[i, 11] if np.isfinite(tri_m[i, 11]).all() and body_mask[i, 11] else None
+        hr = tri_m[i, 12] if np.isfinite(tri_m[i, 12]).all() and body_mask[i, 12] else None
+        if hl is not None and hr is not None:
+            t0[i] = (hl + hr) / 2 - (rotated_template_np[i, 11] + rotated_template_np[i, 12]) / 2
+            init_source.append("rotated_template_hips_midpoint")
+        elif hl is not None:
+            t0[i] = hl - rotated_template_np[i, 11]; init_source.append("rotated_template_left_hip")
+        elif hr is not None:
+            t0[i] = hr - rotated_template_np[i, 12]; init_source.append("rotated_template_right_hip")
+        else:
+            t0[i] = np.zeros(3, np.float32); init_source.append("translation_init_unavailable")
+    with torch.no_grad():
+        root[:] = root_init_t
+        transl[:] = torch.tensor(t0, device=device)
+
+    # SMPL-H supplies the reference lengths.  The triangulated skeleton is
+    # not used as a bone-length truth source.
+    body_bones = ((16, 17), (1, 2), (16, 18), (18, 20), (17, 19), (19, 21),
+                  (1, 4), (4, 7), (2, 5), (5, 8))
+    ref_bone_lengths = np.asarray([
+        np.linalg.norm(template_joints[0, a] - template_joints[0, b])
+        for a, b in body_bones], dtype=np.float32)
+    root_anchor_target = root_init_t.detach().clone()
+    init_coco_after_translation = rotated_template_np + t0[:, None, :]
+    init_res = init_coco_after_translation - tri_m
+    init_valid = body_mask & np.isfinite(init_res).all(axis=-1)
+    init_body_rms_mm = float(np.sqrt(np.mean(np.sum(init_res[init_valid] ** 2, axis=-1))) * 1000.0) if init_valid.any() else float("nan")
+    init_report = {
+        "body_rms_mm": init_body_rms_mm,
+        "valid_root_basis_frames": int(np.sum(root_init_source == "shoulder_hip_rigid_basis")),
+        "total_frames": n,
+        "max_init_body_rms_mm": float(args.max_init_body_rms_mm),
+        "root_init_source_counts": {name: int(np.sum(root_init_source == name)) for name in np.unique(root_init_source)},
+    }
+    (args.output_dir / "initialization_audit.json").write_text(
+        json.dumps(init_report, ensure_ascii=False, indent=2), encoding="utf-8")
+    if not np.isfinite(init_body_rms_mm) or init_body_rms_mm > args.max_init_body_rms_mm:
+        raise RuntimeError(f"rigid initialization failed body RMS gate: {init_body_rms_mm:.1f} mm")
+    if init_report["valid_root_basis_frames"] != n:
+        raise RuntimeError("rigid initialization lacks accepted shoulder/hip basis on some frames")
     target = torch.tensor(tri_m, device=device)
     obs_ll = torch.tensor(np.nan_to_num(hand_ll, nan=0.0), device=device)
     obs_lr = torch.tensor(np.nan_to_num(hand_lr, nan=0.0), device=device)
@@ -265,34 +394,6 @@ def main() -> int:
     K0, D0 = cal.K0, cal.D0
     K1, D1 = cal.K1, cal.D1
 
-    # Translation init with NaN guard (no nanmean->nan_to_num silence).
-    with torch.no_grad():
-        z = model(betas=torch.zeros(n, 10, device=device),
-                  global_orient=root, body_pose=torch.zeros(n, 63, device=device),
-                  left_hand_pose=lhand, right_hand_pose=rhand,
-                  transl=torch.zeros(n, 3, device=device), return_verts=True)
-        zc = regress_coco17_torch(z.vertices, reg)
-        zc_np = zc.detach().cpu().numpy()
-        init_source = []
-        t0 = np.zeros((n, 3), np.float32)
-        for i in range(n):
-            hl = tri_m[i, 11] if np.isfinite(tri_m[i, 11]).all() and body_mask[i, 11] else None
-            hr = tri_m[i, 12] if np.isfinite(tri_m[i, 12]).all() and body_mask[i, 12] else None
-            if hl is not None and hr is not None:
-                t0[i] = (hl + hr) / 2 - (zc_np[i, 11] + zc_np[i, 12]) / 2; init_source.append("hips_midpoint")
-            elif hl is not None:
-                t0[i] = hl - zc_np[i, 11]; init_source.append("left_hip_only")
-            elif hr is not None:
-                t0[i] = hr - zc_np[i, 12]; init_source.append("right_hip_only")
-            else:
-                t0[i] = np.zeros(3, np.float32); init_source.append("translation_init_unavailable")
-        transl[:] = torch.tensor(t0, device=device)
-
-    def decode_body_pose(z):
-        pose = vposer.decode(z)["pose_body"].reshape(n, 63)
-        if pose.shape != (n, 63) or not bool(torch.isfinite(pose).all()):
-            raise RuntimeError(f"VPoser decoded pose has invalid shape/values: {tuple(pose.shape)}")
-        return pose
     with torch.no_grad():
         _ = decode_body_pose(latent)
     history = []
@@ -309,11 +410,17 @@ def main() -> int:
     stage_steps = [x if x is not None else default_stage for x in
                    (args.base_steps, args.beta_steps, args.joint_steps,
                     args.hand_steps, args.contact_steps, args.contact_refine_steps)]
+    if not contact_enabled:
+        # Without a physical contact target, D3 must not release the whole
+        # body's root/translation to explain model-derived WiLoR pixels.
+        stage_steps[5] = 0
     stage_names = ["A_body_vposer", "B_shared_beta", "C_body_vposer_refine",
-                   "D1_hand_proximal", "D2_hand_surface_contact", "D3_contact_refine"]
-    stage_train = [["root", "transl", "latent"], ["beta"],
+                   "D1_hand_proximal",
+                   "D2_hand_surface_contact" if contact_enabled else "D2_hand_refine_no_contact",
+                   "D3_hand_contact_refine"]
+    stage_train = [["transl", "latent"], ["beta"],
                    ["beta", "root", "transl", "latent"], ["lhand", "rhand"],
-                   ["lhand", "rhand"], ["lhand", "rhand", "root", "transl"]]
+                   ["lhand", "rhand"], ["lhand", "rhand"]]
     param_map = {"beta": beta, "root": root, "transl": transl,
                  "latent": latent, "lhand": lhand, "rhand": rhand}
     def set_stage(train):
@@ -339,16 +446,23 @@ def main() -> int:
             body_w = torch.tensor(np.asarray(quality, np.float32), device=device).clamp_min(0.0)
             body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
             joints = out.joints
+            current_bone_lengths = torch.stack([
+                torch.linalg.vector_norm(joints[:, a] - joints[:, b], dim=-1)
+                for a, b in body_bones], dim=1)
+            ref_bones_t = torch.tensor(ref_bone_lengths, dtype=torch.float32, device=device)[None, :]
+            bone_loss = (current_bone_lengths - ref_bones_t).pow(2).mean()
+            root_anchor = (root - root_anchor_target).pow(2).mean()
             jl = hand21(joints, out.vertices, "left")
             jr = hand21(joints, out.vertices, "right")
-            pl = fisheye_project_torch(jl, K0, D0)
-            pr = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
-            # Both cameras constrain each anatomical hand. This avoids the
-            # old camera-side/anatomical-side mix-up.
-            hand_ll_res = (pl - obs_ll).pow(2).sum(-1)
-            hand_rl_res = (pr - obs_rl).pow(2).sum(-1)
-            hand_lr_res = (pl - obs_lr).pow(2).sum(-1)
-            hand_rr_res = (pr - obs_rr).pow(2).sum(-1)
+            left_in_cam0 = fisheye_project_torch(jl, K0, D0)
+            right_in_cam0 = fisheye_project_torch(jr, K0, D0)
+            left_in_cam1 = fisheye_project_torch((R01 @ jl.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
+            right_in_cam1 = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
+            # The two axes are camera identity and anatomical hand side.
+            hand_ll_res = (left_in_cam0 - obs_ll).pow(2).sum(-1)
+            hand_rl_res = (left_in_cam1 - obs_rl).pow(2).sum(-1)
+            hand_lr_res = (right_in_cam0 - obs_lr).pow(2).sum(-1)
+            hand_rr_res = (right_in_cam1 - obs_rr).pow(2).sum(-1)
             def weighted(res, w, mask):
                 return (res * w).sum() / w.sum().clamp_min(1e-6) if mask.any() else res.sum() * 0.0
             hand_l_loss = weighted(hand_ll_res, weight_ll, mask_ll) + weighted(hand_rl_res, weight_rl, mask_rl)
@@ -357,16 +471,18 @@ def main() -> int:
             if stage_index in (3, 4):
                 body_term = body_loss.detach() * 0.0
             elif stage_index == 5:
-                # D3 opens only root/translation and keeps a low-strength
-                # COCO guardrail so contact cannot translate the whole body.
-                body_term = 0.10 * body_loss
+                body_term = body_loss.detach() * 0.0
             else:
                 body_term = body_loss
             # Pixel residuals are numerically much larger than metre-scale
             # body residuals. Keep hand fitting auxiliary and prevent it from
             # moving the body/root to explain WiLoR's model-derived pixels.
             hand_term = 1e-7 * (hand_l_loss + hand_r_loss) if stage_index >= 3 else (hand_l_loss + hand_r_loss).detach() * 0.0
-            contact_loss = pl.sum() * 0.0
+            structure_term = (args.bone_weight * bone_loss if stage_index in (0, 2)
+                              else bone_loss.detach() * 0.0)
+            root_term = (args.root_anchor_weight * root_anchor if stage_index == 2
+                         else root_anchor.detach() * 0.0)
+            contact_loss = left_in_cam0.sum() * 0.0
             if contact_enabled and stage_index >= 4:
                 vg = torch.einsum("nij,nvj->nvi", contact_R, out.vertices) + contact_T[:, None, :]
                 terms = []
@@ -376,7 +492,7 @@ def main() -> int:
                     terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
                                  * contact_hand_weight[:, j])
                 contact_loss = torch.stack(terms, dim=1).sum() / contact_hand_weight.sum().clamp_min(1e-6)
-            loss = body_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
+            loss = body_term + structure_term + root_term + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
                    (args.surface_hand_contact_weight * contact_loss if stage_index >= 4 else contact_loss.detach() * 0.0)
             loss.backward()
             optim.step()
@@ -388,6 +504,8 @@ def main() -> int:
                             "hand_l_points": int(mask_ll.sum() + mask_rl.sum()), "hand_r_points": int(mask_lr.sum() + mask_rr.sum()),
                             "contact": float(contact_loss.detach()),
                             "contact_active": bool(contact_enabled and stage_index >= 4)}
+                row["bone_m"] = float(torch.sqrt(bone_loss.detach()))
+                row["root_anchor"] = float(torch.sqrt(root_anchor.detach()))
                 history.append(row)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "hand_3d_term": False,
@@ -431,6 +549,9 @@ def main() -> int:
                         wilor_left_bounds_ok_full=hand_l_full_bounds, wilor_right_bounds_ok_full=hand_r_full_bounds,
                         body_quality=quality,
                         translation_init_source=np.asarray(init_source, dtype="U32"),
+                        root_init=root_init_np,
+                        root_init_source=root_init_source,
+                        initialization_body_rms_mm=np.asarray(init_body_rms_mm, dtype=np.float32),
                         wilor_left_weight=hand_l_weight_np, wilor_right_weight=hand_r_weight_np,
                         smplh_joints=final.joints.detach().cpu().numpy(),
                         hand_points_left=final_hand_l.detach().cpu().numpy(),
@@ -451,9 +572,20 @@ def main() -> int:
         "vposer_checkpoint": str(vp_ckpt), "vposer_latent_dim": latent_dim,
         "hand_priority_weights": hand_order_weights_np.tolist(),
         "contact_enabled": bool(contact_enabled),
-        "contact_schedule": ["D1 hand observation", "D2 surface hand contact", "D3 limited contact refinement"],
+        "contact_schedule": ["D1 hand observation",
+                             "D2 surface hand contact" if contact_enabled else "D2 hand-only refinement",
+                             "D3 hand-only contact refinement" if contact_enabled else "D3 skipped: no contact input"],
         "hand_3d_observation_used": False,
         "body_accepted_points": int(body_mask.sum()),
+        "initialization": {
+            "root_source": "SMPLH_template_to_triangulated_shoulder_hip_rigid_basis",
+            "translation_source": "same_rotated_template_hip_midpoint",
+            "body_rms_mm": init_body_rms_mm,
+            "valid_root_basis_frames": int(np.sum(root_init_source == "shoulder_hip_rigid_basis")),
+            "bone_pairs_smplh": [list(x) for x in body_bones],
+            "bone_weight": float(args.bone_weight),
+            "root_anchor_weight": float(args.root_anchor_weight),
+        },
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return 0
 
