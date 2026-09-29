@@ -478,9 +478,14 @@ def main() -> int:
                    "D1_hand_proximal",
                    "D2_hand_foot_surface_contact" if contact_enabled else "D2_hand_refine_no_contact",
                    "D3_hand_foot_contact_refine"]
+    # Contact refinement must be able to move the body/feet as well as the
+    # hands.  Keep the no-contact route unchanged: WiLoR observations are
+    # model-derived and must not release the body root in that route.
+    contact_body_train = ["root", "transl", "latent"] if contact_enabled else []
     stage_train = [["transl", "latent"], ["beta"],
                    ["beta", "root", "transl", "latent"], ["lhand", "rhand"],
-                   ["lhand", "rhand"], ["lhand", "rhand"]]
+                   ["lhand", "rhand"] + contact_body_train,
+                   ["lhand", "rhand"] + contact_body_train]
     param_map = {"beta": beta, "root": root, "transl": transl,
                  "latent": latent, "lhand": lhand, "rhand": rhand}
     def set_stage(train):
@@ -592,24 +597,33 @@ def main() -> int:
                              if stage_index >= 3 else hand_temporal.detach() * 0.0)
             root_term = (args.root_anchor_weight * root_anchor if stage_index == 2
                          else root_anchor.detach() * 0.0)
-            contact_loss = left_in_cam0.sum() * 0.0
+            contact_hand_loss = left_in_cam0.sum() * 0.0
+            contact_foot_loss = left_in_cam0.sum() * 0.0
             if contact_enabled and stage_index >= 4:
                 vg = torch.einsum("nij,nvj->nvi", contact_R, out.vertices) + contact_T[:, None, :]
-                terms = []
+                hand_terms = []
+                foot_terms = []
                 for side, j in (("left", 0), ("right", 1)):
                     pts = vg[:, palm_idx[side], :]
                     a, b = contact_handle[:, j, 0, :], contact_handle[:, j, 1, :]
-                    terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
-                                 * contact_hand_weight[:, j])
+                    hand_terms.append(surface_contact.hand_surface_loss(pts, a[:, None, :], b[:, None, :], 0.016)
+                                      * contact_hand_weight[:, j])
                 for side, j in (("left", 0), ("right", 1)):
                     sole_z = vg[:, sole_idx[side], 2]
-                    terms.append(surface_contact.foot_surface_loss(sole_z) * contact_foot_weight[:, j])
-                contact_loss = torch.stack(terms, dim=1).sum() / (contact_hand_weight.sum() + contact_foot_weight.sum()).clamp_min(1e-6)
+                    foot_terms.append(surface_contact.foot_surface_loss(sole_z) * contact_foot_weight[:, j])
+                hand_den = contact_hand_weight.sum().clamp_min(1e-6)
+                foot_den = contact_foot_weight.sum().clamp_min(1e-6)
+                contact_hand_loss = torch.stack(hand_terms, dim=1).sum() / hand_den
+                contact_foot_loss = torch.stack(foot_terms, dim=1).sum() / foot_den
             reproj_term = (args.body_reprojection_weight * body_2d_loss
                            if stage_index in (0, 1, 2) else body_2d_loss.detach() * 0.0)
-            loss = body_term + reproj_term + structure_term + root_term + temporal_term + \
+            contact_total = (args.surface_hand_contact_weight * contact_hand_loss
+                             + args.surface_foot_contact_weight * contact_foot_loss)
+            contact_anchor = (args.root_anchor_weight * root_anchor
+                              if contact_enabled and stage_index >= 4 else root_anchor.detach() * 0.0)
+            loss = body_term + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
                    args.body_temporal_weight * body_temporal + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
-                   (args.surface_hand_contact_weight * contact_loss if stage_index >= 4 else contact_loss.detach() * 0.0)
+                   (contact_total if stage_index >= 4 else contact_total.detach() * 0.0)
             loss.backward()
             optim.step()
             if step % 10 == 0 or step == sum(stage_steps) - 1:
@@ -619,7 +633,9 @@ def main() -> int:
                             "hand_l_px": float(torch.sqrt(hand_l_loss.detach())),
                             "hand_r_px": float(torch.sqrt(hand_r_loss.detach())),
                             "hand_l_points": int(mask_ll.sum() + mask_rl.sum()), "hand_r_points": int(mask_lr.sum() + mask_rr.sum()),
-                            "contact": float(contact_loss.detach()),
+                            "contact_hand": float(contact_hand_loss.detach()),
+                            "contact_foot": float(contact_foot_loss.detach()),
+                            "contact": float(contact_total.detach()),
                             "contact_active": bool(contact_enabled and stage_index >= 4)}
                 row["bone_m"] = float(torch.sqrt(bone_loss.detach()))
                 row["root_anchor"] = float(torch.sqrt(root_anchor.detach()))
@@ -630,7 +646,8 @@ def main() -> int:
                               "hand_3d_term": False,
                               "learning_rate": float(args.lr * lr_scale),
                               "hand_priority": "wrist_to_distal_fixed_weights" if stage_index >= 3 else "inactive",
-                              "contact_term": bool(contact_enabled and stage_index >= 4)})
+                              "contact_term": bool(contact_enabled and stage_index >= 4),
+                              "contact_weights_independent": True})
 
     with torch.no_grad():
         body_pose = decode_body_pose(latent)
