@@ -109,6 +109,8 @@ def main() -> int:
                     help="native WiLoR local rotation soft prior (SO3 chordal); enabled only in D1/D2/D3")
     ap.add_argument("--mano-pose-init", action="store_true",
                     help="initialize hand PCA at the start of D1 from accepted native MANO poses")
+    ap.add_argument("--shared-hand-pose", action="store_true",
+                    help="one PCA vector per anatomical hand shared by all frames; local articulation only")
     ap.add_argument("--hand-2d-weight", type=float, default=1e-7,
                     help="WiLoR model-derived 2D auxiliary weight; set 0 for native-MANO-only hand information")
     ap.add_argument("--body-temporal-weight", type=float, default=0.0,
@@ -156,6 +158,8 @@ def main() -> int:
         raise ValueError("body temporal/reprojection weights must be non-negative")
     if not np.isfinite([args.mano_pose_weight, args.hand_2d_weight]).all() or min(args.mano_pose_weight, args.hand_2d_weight) < 0:
         raise ValueError("MANO pose and hand 2D weights must be finite and non-negative")
+    if args.shared_hand_pose and not (args.mano_pose_init and args.mano_pose_weight > 0):
+        raise ValueError("shared hand solve requires native MANO init and a positive pose weight")
     if args.body_reprojection_scale_px <= 0:
         raise ValueError("--body-reprojection-scale-px must be positive")
     contact_args = (args.contact_labels, args.scene_transforms,
@@ -282,12 +286,14 @@ def main() -> int:
     # dominating solely because their raw units are larger.
     mano_l_scale = torch.linalg.vector_norm(mano_l_components, dim=1).clamp_min(1e-6)
     mano_r_scale = torch.linalg.vector_norm(mano_r_components, dim=1).clamp_min(1e-6)
-    lhand = torch.nn.Parameter(torch.zeros(n, hand_pca_dim, device=device))
-    rhand = torch.nn.Parameter(torch.zeros(n, hand_pca_dim, device=device))
+    hand_parameter_frames = 1 if args.shared_hand_pose else n
+    lhand = torch.nn.Parameter(torch.zeros(hand_parameter_frames, hand_pca_dim, device=device))
+    rhand = torch.nn.Parameter(torch.zeros(hand_parameter_frames, hand_pca_dim, device=device))
 
     def decode_hand_pose(coeff, components, mean, scale):
         normalized = coeff / scale[None, :]
-        return mean[None, :] + normalized @ components
+        pose = mean[None, :] + normalized @ components
+        return pose.expand(n, -1) if args.shared_hand_pose else pose
 
     # Native local MANO information is independent of the pinhole-derived
     # keypoints. The detector box + body wrist associates the hypotheses.
@@ -325,6 +331,12 @@ def main() -> int:
             initial = coeff[np.arange(n), best]
             covered = w[:, :, h].max(axis=1) > 0
             initial[~covered] = 0  # explicit unavailable, not interpolation
+            if args.shared_hand_pose:
+                # This is only a linear PCA-space starting point. The actual
+                # shared solution minimizes rotation loss over both views and
+                # every accepted frame, not an average axis-angle pose.
+                initial = ((coeff * w[:, :, h, None]).sum(axis=(0, 1)) /
+                           w[:, :, h].sum())[None, :]
             mano_initial[side] = torch.tensor(initial, dtype=torch.float32, device=device)
             mano_targets[side] = torch.tensor(rot[:, :, h], dtype=torch.float32, device=device)
             mano_weights[side] = torch.tensor(w[:, :, h], dtype=torch.float32, device=device)
@@ -669,7 +681,7 @@ def main() -> int:
             pose_reg = (args.vposer_prior_weight * latent.pow(2).mean()
                         + args.hand_pca_prior_weight * (lhand.pow(2).mean() + rhand.pow(2).mean()))
             hand_temporal = (lhand.sum() + rhand.sum()) * 0.0
-            if n >= 3:
+            if n >= 3 and not args.shared_hand_pose:
                 l_valid_frame = mask_ll.any(dim=1) | mask_rl.any(dim=1)
                 r_valid_frame = mask_lr.any(dim=1) | mask_rr.any(dim=1)
                 if mano_enabled and args.hand_2d_weight == 0:
@@ -819,7 +831,7 @@ def main() -> int:
                         body_pose=body_pose.detach().cpu().numpy(),
                         vposer_latent=latent.detach().cpu().numpy(),
                         left_hand_pose=lhand_pose.detach().cpu().numpy(), right_hand_pose=rhand_pose.detach().cpu().numpy(),
-                        left_hand_pca=lhand.detach().cpu().numpy(), right_hand_pca=rhand.detach().cpu().numpy(),
+                        left_hand_pca=lhand.detach().expand(n, -1).cpu().numpy(), right_hand_pca=rhand.detach().expand(n, -1).cpu().numpy(),
                         raw_triangulated_points=tri, body_accepted=body_mask,
                         wilor_left_2d=hand_l, wilor_left_mask=hand_l_mask,
                         wilor_right_2d=hand_r, wilor_right_mask=hand_r_mask,
@@ -848,7 +860,7 @@ def main() -> int:
             "initialization": args.mano_pose_init, "hand_2d_weight": args.hand_2d_weight,
             "audit": "wilor_mano_parameter_audit.json" if mano_enabled else None,
             "loss": "SO3_chordal_1_minus_cos_angle",
-            "trainable": "existing_MANO_PCA_only",
+            "trainable": "shared_MANO_PCA_only" if args.shared_hand_pose else "existing_MANO_PCA_only",
             "global_orient_transl_betas_used": False,
             "stage": "D1_D2_D3_only"},
         "hand_observation_points_retained": 21,
@@ -865,6 +877,9 @@ def main() -> int:
         "mano_left": str(args.mano_left.resolve()), "mano_right": str(args.mano_right.resolve()),
         "hand_pose_parameterization": "MANO_PCA_decode_to_SMPLH_45D_axis_angle",
         "hand_pca_components": hand_pca_dim,
+        "shared_hand_pose": bool(args.shared_hand_pose),
+        "hand_pose_parameter_frames": hand_parameter_frames,
+        "shared_hand_pose_scope": "local_finger_rotations_only_not_walker_relative_SE3" if args.shared_hand_pose else None,
         "hand_pca_profile": hand_pca_profile,
         "hand_pca_ablation_supported": ["pca12", "pca24", "full45"],
         "hand_pca_prior_weight": float(args.hand_pca_prior_weight),

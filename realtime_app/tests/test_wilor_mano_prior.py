@@ -96,5 +96,23 @@ class NativeManoTests(unittest.TestCase):
         self.assertEqual(float(loss.detach()),0)
         self.assertEqual(float(pose.grad.abs().sum()),0)
 
+    def test_shared_pca_receives_gradients_from_all_frames(self):
+        import torch
+        from smplx.lbs import batch_rodrigues
+        # Only one PCA vector, decoded and broadcast to all frames. Distinct
+        # observations must drive that SAME parameter, not independent poses.
+        coeff = torch.zeros(1, 12, requires_grad=True)
+        components = torch.eye(45)[:12]
+        theta = (coeff @ components).expand(3, -1)
+        observed = torch.zeros(3, 45)
+        observed[:, :12] = torch.tensor([.1, .3, .5])[:, None]
+        targets = batch_rodrigues(observed.reshape(-1,3)).reshape(3,1,15,3,3)
+        loss = rotation_pose_loss(theta, targets, torch.ones(3,1))
+        loss.backward()
+        self.assertEqual(coeff.grad.shape, (1,12))
+        self.assertTrue(torch.isfinite(coeff.grad).all())
+        self.assertGreater(float(coeff.grad.abs().sum()), 0)
+        self.assertTrue(torch.equal(theta[0], theta[2]))
+
 if __name__ == "__main__":
     unittest.main()
