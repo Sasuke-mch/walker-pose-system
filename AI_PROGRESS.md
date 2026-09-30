@@ -2560,3 +2560,13 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 新运行目录：`research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/fit_cuda_vposer_mano_pca12_temporal_reproj015_contact_candidate_full448_v1/`；448 帧，MANO PCA12，身体时序权重0.02，身体双鱼眼重投影权重0.15，手接触权重0.05，脚接触权重0.02。
 - `fit_summary.json` 显示 `contact_enabled=true`，阶段为 D2 surface hand contact / D3 hand-only contact refinement；接触历史项非零。新页面为 `smplh_people1_pca12_contact_candidate_topology_v1_viewer.html`，使用同源 result 和 scene，助步器为参考9边实体拓扑。
 - 限制：接触候选由上一版工程拟合几何生成，不能证明真实握持、触地、支撑或承重；没有外部物理接触真值。
+
+### 2026-09-30 — 接触状态模型与脚底表面约束 C0/C1/C2 实验
+
+- 修正 `research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/fit_vposer_shared_beta.py`：增加脚底表面非穿透权重 `--surface-foot-nonpenetration-weight` 和固定鞋底顶点切向速度权重 `--surface-foot-tangential-weight`；使用左右各54个固定鞋底顶点，在地面坐标中计算，切向项仅对相邻两帧均为 `support` 的点组启用。非穿透安全裕量为3 mm，时间间隔为1/30 s。未把 `stage2_contact_candidate` 自动升级为 `support`。
+- 预注册三组工程对照：C0=无脚底表面项；C1=脚底表面接触+非穿透；C2=C1+支持状态门控的切向速度。输入、初始化、优化步数和观测权重固定，唯一变量为新增脚底项。实验详细记录见 `资料/实验报告/接触状态与地面一致性推进记录_20260930.md`。
+- 开发窗口60–90：C0 Stage-D 3D median/P95=72.330/133.969 mm、2D=46.969/156.028 px；C1=73.399/135.204 mm、47.397/152.986 px；C2=73.705/135.209 mm、47.198/152.357 px。C1脚底表面绝对残差 median 左/右=22.563/28.731 mm，P95=66.717/75.508 mm；地面下顶点比例=83.15%/90.86%。C2只有4个脚-相邻帧点组有效，不能视为完整切向静止验证。
+- 独立窗口129–159：C0 3D P95=137.597 mm、2D P95=150.790 px；C1/C2分别为137.366 mm、150.273 px，但两脚均无 `support` 相邻帧，C2等同C1。独立窗口278–308：C1/C2 3D P95=123.994 mm、2D P95=128.665 px；两脚仍无 `support` 相邻帧，地面下顶点比例=88.65%/99.76%。278–308的C0为既有同协议控制，只作支持性工程对照，不能当作完全同批次配对真值。
+- 独立窗口373–403：C1在最终表面梯度审计处按 fail-closed 规则失败，原因是 `surface loss does not depend on SMPL vertices`；没有生成C2，没有插值或旧结果补齐。标签覆盖统计：60–90 support帧数左/右=0/5、相邻support对=0/4；129–159、278–308、373–403均无support相邻帧。
+- 判定：C1未通过物理一致性候选门，多个窗口仍有约83%–100%的鞋底表面顶点低于当前估计地面，观测误差改善也不稳定；C2未通过可验证性门；`selected_candidate=null`。当前证据仍只能称为工程链路/内部一致性验证，不能推出真实触地、支撑、摩擦力、承重或步态结论。
+- 验证：脚底表面单元测试8/8通过，接触状态测试4/4通过，拟合脚本通过`py_compile`。下一门是补充独立人工 `support/swing/unknown` 标签并检查Stage-2地面高度/法向，再重新做同批次C0/C1/C2；在此之前不推进摩擦锥、支撑多边形或承重结论。
