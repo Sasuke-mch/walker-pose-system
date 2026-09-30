@@ -26,6 +26,44 @@ def rotation_angle_rad(rotation: np.ndarray) -> np.ndarray:
     return np.arccos(cosine)
 
 
+def ground_normal_drift(normals: np.ndarray) -> dict:
+    """Measure normal drift relative to the first externally defined normal.
+
+    ``normals`` must be supplied by the ground estimator or an independent
+    plane tracker.  This function never infers a reference normal from the
+    foot or ankle trajectory.
+    """
+    n = np.asarray(normals, dtype=float)
+    if n.ndim != 2 or n.shape[1] != 3 or len(n) == 0:
+        raise ValueError("normals must have shape [T,3] with T > 0")
+    if not np.isfinite(n).all():
+        raise ValueError("normals contains non-finite values")
+    length = np.linalg.norm(n, axis=1)
+    if np.any(length <= 1e-8):
+        raise ValueError("normals contains a zero vector")
+    unit = n / length[:, None]
+    cosine = np.clip(unit @ unit[0], -1.0, 1.0)
+    angles = np.degrees(np.arccos(cosine))
+    return {
+        "frames": int(len(n)),
+        "median_deg": float(np.median(angles)),
+        "p95_deg": float(np.percentile(angles, 95)),
+        "max_deg": float(np.max(angles)),
+        "angles_deg": angles.tolist(),
+        "reference": "first_frame_normal",
+    }
+
+
+def failure_reason_counts(reasons: list[str] | np.ndarray) -> dict:
+    """Count explicit frame rejection reasons without dropping failures."""
+    values = np.asarray(reasons, dtype=object).reshape(-1)
+    counts: dict[str, int] = {}
+    for value in values.tolist():
+        key = "<missing>" if value is None or str(value) == "" else str(value)
+        counts[key] = counts.get(key, 0) + 1
+    return {"frames": int(len(values)), "counts": dict(sorted(counts.items()))}
+
+
 def compare_ground_poses(estimated: np.ndarray, reference: np.ndarray) -> dict:
     """Compare estimated and external poses in the same frame convention."""
     est = _check_pose_array("estimated", estimated)
@@ -88,5 +126,5 @@ def stage_switch_jumps(poses: np.ndarray, stages: list[str] | np.ndarray) -> dic
     }
 
 
-__all__ = ["compare_ground_poses", "foot_support_speed", "rotation_angle_rad",
-           "stage_switch_jumps"]
+__all__ = ["compare_ground_poses", "failure_reason_counts", "foot_support_speed",
+           "ground_normal_drift", "rotation_angle_rad", "stage_switch_jumps"]
