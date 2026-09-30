@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse, json
 from pathlib import Path
 import numpy as np
-from pose_app.grip_mode_search import search_grip_modes
+from pose_app.grip_mode_search import search_grip_modes, refine_grip_modes
 from pose_app.global_hand_handle_pose import load_static_handle_ends, transform_ground_to_walker
 
 def main() -> int:
@@ -15,5 +15,6 @@ def main() -> int:
     for s,j in (('left',0),('right',1)):
         idx=np.asarray(sets[f'{s}_palm_surface_candidate']['palm_fingers'],int); palm=transform_ground_to_walker(z['vertices'][:,idx],R,t)
         out['hands'][s]=search_grip_modes(palm,ends[:,j])
+        out['hands'][s]['continuous_refinement']=refine_grip_modes(palm,ends[:,j],starts=24,bootstrap=0)
     args.output.parent.mkdir(parents=True,exist_ok=True); args.output.write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8'); return 0
 if __name__=='__main__': raise SystemExit(main())
