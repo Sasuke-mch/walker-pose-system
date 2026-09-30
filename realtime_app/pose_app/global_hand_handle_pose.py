@@ -45,7 +45,7 @@ def _frame_from_points(points: np.ndarray) -> tuple[np.ndarray, np.ndarray] | No
     p = np.asarray(points, dtype=float)
     if p.ndim != 2 or p.shape[0] < 3 or not np.isfinite(p).all():
         return None
-    c = np.median(p, axis=0)
+    c = np.mean(p, axis=0)
     _, _, vh = np.linalg.svd(p - c, full_matrices=False)
     x = vh[0]
     y = vh[1]
@@ -148,12 +148,12 @@ def estimate_global_hand_handle_pose(
     }
 
 
-def load_static_handle_ends(model_path: Path, n: int) -> np.ndarray:
+def load_static_handle_ends(model_path: Path, n: int, coordinate_frame: str = "nodes_walker_mm") -> np.ndarray:
     doc = json.loads(Path(model_path).read_text(encoding="utf-8"))
-    nodes = doc.get("nodes_initial_ground_mm")
+    nodes = doc.get(coordinate_frame)
     segs = doc.get("handle_segments")
     if not isinstance(nodes, dict) or not isinstance(segs, dict):
-        raise ValueError("walker model lacks nodes_initial_ground_mm/handle_segments")
+        raise ValueError(f"walker model lacks {coordinate_frame}/handle_segments")
     out = []
     for key in ("left", "right"):
         a, b = segs[key]

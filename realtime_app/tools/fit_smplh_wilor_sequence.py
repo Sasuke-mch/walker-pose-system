@@ -413,6 +413,7 @@ def main() -> int:
     contact_enabled = args.contact_labels is not None
     contact_hand_weight = contact_foot_weight = contact_handle = contact_R = contact_T = palm_idx = sole_idx = None
     global_hand_offset = None
+    global_hand_surface = global_camera_R = global_camera_t = None
     if contact_enabled:
         labels = np.load(args.contact_labels, allow_pickle=True)
         scene = np.load(args.scene_transforms, allow_pickle=True)
@@ -460,8 +461,15 @@ def main() -> int:
             prior = json.loads(args.global_hand_handle_pose.read_text(encoding="utf-8"))
             if prior.get("assumption") != "hand_static_relative_to_walker_for_entire_video":
                 raise ValueError("global hand-handle prior assumption mismatch")
-            if prior.get("relative_frame") != "walker_rigid_frame_per_frame" or not prior.get("handle_trajectory_external_truth", False):
-                raise ValueError("global hand-handle prior must contain per-frame walker-relative handle geometry")
+            if prior.get("status") != "engineering_candidate" or prior.get("geometry_source") != "camera_rigid_mount_assumption":
+                raise ValueError("global prior requires validated camera-rigid solver provenance")
+            global_camera_R = torch.tensor(topology["rotation_left_camera_from_walker"], dtype=torch.float32, device=device)
+            global_camera_t = torch.tensor(topology["translation_left_camera_from_walker_mm"], dtype=torch.float32, device=device) / 1000
+            global_hand_surface = {}
+            for s in ("left", "right"):
+                indices = prior["hands"][s]["vertex_indices"]
+                palm_idx[s] = torch.tensor(indices, dtype=torch.long, device=device)
+                global_hand_surface[s] = torch.tensor(prior["hands"][s]["shared_surface_walker_m"], dtype=torch.float32, device=device)
             global_hand_offset = torch.tensor(
                 [prior["hands"][s]["palm_offset_handle_m"] for s in ("left", "right")],
                 dtype=torch.float32, device=device)
@@ -633,21 +641,13 @@ def main() -> int:
                 contact_hand_loss = torch.stack(hand_terms, dim=1).sum() / hand_den
                 contact_foot_loss = torch.stack(foot_terms, dim=1).sum() / foot_den
                 if global_hand_offset is not None:
-                    centers, targets = [], []
-                    for side, j in (("left", 0), ("right", 1)):
-                        center = vg[:, palm_idx[side], :].mean(dim=1)
-                        a, b = contact_handle[:, j, 0, :], contact_handle[:, j, 1, :]
-                        x = b - a
-                        x = x / torch.linalg.vector_norm(x, dim=-1, keepdim=True).clamp_min(1e-6)
-                        z = torch.zeros_like(x); z[:, 2] = 1.0
-                        y = torch.linalg.cross(z, x, dim=-1)
-                        y = y / torch.linalg.vector_norm(y, dim=-1, keepdim=True).clamp_min(1e-6)
-                        z = torch.linalg.cross(x, y, dim=-1)
-                        basis = torch.stack((x, y, z), dim=-1)
-                        targets.append(0.5 * (a + b) + torch.einsum("nij,j->ni", basis, global_hand_offset[j]))
-                        centers.append(center)
-                    err = torch.linalg.vector_norm(torch.stack(centers, dim=1) - torch.stack(targets, dim=1), dim=-1) / 0.03
-                    global_hand_loss = torch.where(err <= 1.0, 0.5 * err.pow(2), err - 0.5).mean()
+                    terms = []
+                    for side in ("left", "right"):
+                        pc = out.vertices[:, palm_idx[side], :]
+                        pw = torch.einsum("ij,nvj->nvi", global_camera_R.T, pc-global_camera_t)
+                        err = torch.linalg.vector_norm(pw-global_hand_surface[side],dim=-1)/0.03
+                        terms.append(torch.where(err <= 1, .5*err.pow(2),err-.5).mean())
+                    global_hand_loss = torch.stack(terms).mean()
             reproj_term = (args.body_reprojection_weight * body_2d_loss
                            if stage_index in (0, 1, 2) else body_2d_loss.detach() * 0.0)
             contact_total = (args.surface_hand_contact_weight * contact_hand_loss
