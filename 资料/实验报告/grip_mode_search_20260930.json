@@ -1,0 +1,232 @@
+{
+  "schema_version": "grip_mode_search_v1",
+  "status": "engineering_candidate",
+  "uses_previous_pose_solution": false,
+  "relative_frame": "walker_rigid_frame",
+  "hands": {
+    "left": {
+      "status": "engineering_candidate",
+      "valid_frames": 448,
+      "rejected_frames": [],
+      "radius_m": 0.016,
+      "modes": [
+        {
+          "mode": "normal_in_roll_0",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.430298967259972,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 26.67176103542621
+        },
+        {
+          "mode": "normal_out_roll_0",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.430298967259972,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 26.67176103542621
+        },
+        {
+          "mode": "normal_in_roll_270",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.580802751140202,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 26.82226481930644
+        },
+        {
+          "mode": "normal_out_roll_270",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.580802751140202,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 26.82226481930644
+        },
+        {
+          "mode": "normal_in_roll_90",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.616392869404201,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 26.85785493757044
+        },
+        {
+          "mode": "normal_out_roll_90",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.616392869404201,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 26.85785493757044
+        },
+        {
+          "mode": "normal_in_roll_180",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.984412529400955,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 27.225874597567195
+        },
+        {
+          "mode": "normal_out_roll_180",
+          "handle_offset_m": [
+            -0.0663295001625977,
+            -0.02001498628155278,
+            0.042862395018108734
+          ],
+          "orientation_residual_median_rad": 2.984412529400955,
+          "offset_residual_median_m": 0.046536888295307985,
+          "contact_band_fraction": 0.23664730995225855,
+          "penetration_mean_m": 0.0002100549810052812,
+          "score": 27.225874597567195
+        }
+      ]
+    },
+    "right": {
+      "status": "engineering_candidate",
+      "valid_frames": 448,
+      "rejected_frames": [],
+      "radius_m": 0.016,
+      "modes": [
+        {
+          "mode": "normal_in_roll_180",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.2763028164977177,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.03244886032283
+        },
+        {
+          "mode": "normal_out_roll_180",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.2763028164977177,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.03244886032283
+        },
+        {
+          "mode": "normal_in_roll_90",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.408223768520946,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.16436981234606
+        },
+        {
+          "mode": "normal_out_roll_90",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.408223768520946,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.16436981234606
+        },
+        {
+          "mode": "normal_in_roll_270",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.566490442101478,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.32263648592659
+        },
+        {
+          "mode": "normal_out_roll_270",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.566490442101478,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.32263648592659
+        },
+        {
+          "mode": "normal_in_roll_0",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.8799812352701952,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.636127279095305
+        },
+        {
+          "mode": "normal_out_roll_0",
+          "handle_offset_m": [
+            -0.0817951574437508,
+            0.022001684099764177,
+            0.03356661987924009
+          ],
+          "orientation_residual_median_rad": 2.8799812352701952,
+          "offset_residual_median_m": 0.033299811379973815,
+          "contact_band_fraction": 0.36665958960705103,
+          "penetration_mean_m": 0.00033622982390758176,
+          "score": 23.636127279095305
+        }
+      ]
+    }
+  }
+}
