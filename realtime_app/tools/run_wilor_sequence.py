@@ -110,8 +110,15 @@ def process_image(model, cfg, detector, image_path: Path, device: str, orientati
         batch = recursive_to(batch, torch.device(device))
         with torch.no_grad():
             out = model(batch)
+        # Keep native parameters BEFORE full-image camera/handedness mutation.
+        # WiLoR flips left crops and uses canonical right MANO for both sides.
+        if not model.mano.is_rhand:
+            raise RuntimeError("native MANO schema requires canonical right model")
+        native_mano = {k: v.detach().cpu().numpy().copy()
+                       for k, v in out["pred_mano_params"].items()}
+        native_cam = out["pred_cam"].detach().cpu().numpy().copy()
         multiplier = 2.0 * batch["right"] - 1.0
-        pred_cam = out["pred_cam"]
+        pred_cam = out["pred_cam"].clone()
         pred_cam[:, 1] = multiplier * pred_cam[:, 1]
         focal = cfg.EXTRA.FOCAL_LENGTH / cfg.MODEL.IMAGE_SIZE * max(image.shape[:2])
         box_center = batch["box_center"].float()
@@ -131,19 +138,35 @@ def process_image(model, cfg, detector, image_path: Path, device: str, orientati
             joints_i[:, 0] *= sign; verts_i[:, 0] *= sign
             cam_i = cam_t_np[index]
             xyz = joints_i + cam_i[None, :]
-            if np.any(xyz[:, 2] <= 0) or not np.isfinite(xyz).all():
-                raise ValueError(f"invalid WiLoR depth on {image_path.name} candidate {index}")
-            pixels = xyz[:, :2] / xyz[:, 2:3]
-            pixels[:, 0] = pixels[:, 0] * focal + image.shape[1] / 2.0
-            pixels[:, 1] = pixels[:, 1] * focal + image.shape[0] / 2.0
+            projection_ok = bool(np.isfinite(xyz).all() and (xyz[:, 2] > 0).all())
+            pixels = np.full((len(xyz), 2), np.nan)
+            if projection_ok:
+                pixels = xyz[:, :2] / xyz[:, 2:3]
+                pixels[:, 0] = pixels[:, 0] * focal + image.shape[1] / 2.0
+                pixels[:, 1] = pixels[:, 1] * focal + image.shape[0] / 2.0
             pixels_in_bounds = bool(
-                not ((pixels[:, 0] < 0).any() or (pixels[:, 0] >= image.shape[1]).any()
+                projection_ok and not ((pixels[:, 0] < 0).any() or (pixels[:, 0] >= image.shape[1]).any()
                      or (pixels[:, 1] < 0).any() or (pixels[:, 1] >= image.shape[0]).any())
             )
             records.append({
                 "candidate_index": index,
                 "side": "right" if sign > 0 else "left",
                 "detector_confidence": detector_confidences[batch_offset + index],
+                "detector_bbox_xyxy_raw": boxes[batch_offset + index],
+                "mano_parameter_convention": "wilor_canonical_right_rotmat_v1",
+                "mano_parameters": {
+                    "global_orient": native_mano["global_orient"][index].reshape(1, 3, 3).tolist(),
+                    "hand_pose": native_mano["hand_pose"][index].reshape(15, 3, 3).tolist(),
+                    "betas": native_mano["betas"][index].reshape(10).tolist(),
+                },
+                "pred_cam_crop_native": native_cam[index].tolist(),
+                "mano_parameter_metadata": {
+                    "joint_order": ["index", "middle", "pinky", "ring", "thumb"],
+                    "rotation_type": "parent_relative_rotmat",
+                    "left_crop_mirrored": bool(sign < 0),
+                    "pose_mean_added_by_layer": False,
+                    "metric_camera_pose_accepted": False,
+                },
                 "bbox_xyxy": [
                     float(centers[index][0] - sizes[index] / 2.0),
                     float(centers[index][1] - sizes[index] / 2.0),
@@ -159,6 +182,7 @@ def process_image(model, cfg, detector, image_path: Path, device: str, orientati
                 "coordinate_frame_3d": "model_local_unaccepted",
                 "pixel_frame": "raw_fisheye",
                 "raw_pixel_bounds_ok": pixels_in_bounds,
+                "model_projection_status": "pinhole_hypothesis" if projection_ok else "invalid_model_depth_or_nonfinite",
                 "input_image_transform": f"inverse_{orientation}_to_raw_fisheye",
                 "orientation_contract": {
                     "source_size_wh": [source_width, source_height],
@@ -181,6 +205,8 @@ def main() -> int:
     parser.add_argument("--raw-width", type=int, default=1920)
     parser.add_argument("--raw-height", type=int, default=1080)
     args = parser.parse_args()
+    if args.output.exists():
+        raise RuntimeError(f"refuse to overwrite existing WiLoR output: {args.output}")
     root = Path(__file__).resolve().parents[2]
     repo = root / "third_party" / "WiLoR"
     checkpoint = repo / "pretrained_models" / "wilor_final.ckpt"

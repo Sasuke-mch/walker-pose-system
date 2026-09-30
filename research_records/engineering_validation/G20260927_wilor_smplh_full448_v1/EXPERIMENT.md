@@ -85,3 +85,15 @@ SMPL-H 接口、6890 顶点统一输出、COCO regressor 接入和 CUDA 全序�
 复查历史 `coarse_walker_model_v1`、`coarse_walker_model_v2_camera_rail` 和 `fit_coarse_walker_model.py` 后确认，`front_top_center` 对应历史 `kp_03` 的前横杆中心，不是相机孤立节点。上一版虽然补齐了杆件，但仍把该中心球留在总高度 `h=838 mm`，因此页面中出现悬空球。
 
 本次将 `front_top_center.z` 改为 `front_rail_height=673.045889 mm`，前横杆改为 `front_left_rail→front_top_center→front_right_rail` 两段；它不再与上层侧扶手同高。四根立柱继续按 `foot→mid→rail→top` 分段，左右中层侧梁、左右上层扶手和前侧中层横梁保持。当前全帧页面重新生成为 `smplh_people1_pca12_reproj015_topology_fixed_v2_viewer.html`，静态拓扑共17条边，中心点不再孤立。
+
+## 2026-10-01：原生 MANO 姿态与 PCA 接口集成验证
+
+新增可选路径见 `realtime_app/pose_app/wilor_mano_prior.py`。WiLoR 导出未经左右几何变换的原生 MANO 旋转和参数约定；局部姿态通过 SO(3)、手指父链、左右镜像和资产检查后转入既有 MANO PCA。优化器继续只优化 PCA 系数，保留均值、尺度、系数正则与时间正则；局部旋转先验仅在 Stage D1/D2/D3 使用，初始化在 D1开始执行，不影响 A/B/C。
+
+直接参数模式：`--mano-pose-init --mano-pose-weight 0.1 --hand-2d-weight 0 --hand-pca-comps 12 --hand-pca-profile pca12`。新项默认关闭，0.1是工程探针并非标定权重。二维项关闭后无需输入投影点，几何/像素误差明确 unavailable/null。global_orient、camera_translation 和 MANO betas 只保留审计，不写入全身或腕部。
+
+同源输入是 people_1 帧0–3图像、对应PMpose、当前标定、SMPL-H male、MANO左右资产和VPoser。输出 `research_records/engineering_validation/G20261001_native_mano_pca_v1/`；参数命令为 `fit_*_args.json`，定量检查为 `integration_validation.json`。无接触，PCA12，lr0.02，阶段6/6/6/25/15/0，PCA正则0.001、时间正则0.02。先验证无先验→仅初始化，再在相同初始化和覆盖下单独改变原生旋转权重0→0.1。
+
+左右手均有4帧参数，PCA重建旋转 median/P95 左3.743°/9.480°，右5.519°/15.767°。左右相机原生旋转不一致 median/P95 左10.769°/25.508°，右11.611°/32.463°。最终旋转先验损失左/右：无原生信息0.114995/0.130283；仅初始化0.014184/0.034474；加先验0.011124/0.019048。
+
+移除WiLoR二维点、局部三维点云、网格和相机平移后再次拟合，模型网格/PCA/身体参数逐元素相同。身体beta/根旋转/平移/身体姿态与控制组也逐元素相同。15项相关测试通过，三个修改模块通过py_compile。以上仅验证信息链和优化接入，不能证明真实手姿态或包裹握持；全448帧尚未重跑，旧JSONL必须重新推理导出原生参数。

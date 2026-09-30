@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fit VPoser-parameterized SMPL-H from body stereo plus WiLoR hand pixels.
+"""Fit PCA/VPoser SMPL-H from body stereo and optional native WiLoR pose.
 
 This is an engineering candidate run.  WiLoR pixels are model-derived MANO
 projections, so they are masked and reported as an auxiliary 2-D term rather
@@ -38,7 +38,7 @@ spec.loader.exec_module(raw_clean)
 
 
 def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
-               image_size: tuple[int, int], camera: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict]]:
+               image_size: tuple[int, int], camera: str, consume_pixels: bool = True) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict]]:
     """Use the single audited WiLoR association implementation.
 
     The shared reader validates frame/image identity, duplicate frames and
@@ -46,6 +46,15 @@ def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
     or out-of-bounds points are preserved for diagnostics and soft weighting.
     """
     from pose_app.smplh_hand_observation import read_view
+
+    if not consume_pixels:
+        # Native-MANO-only runs must not require projected points at all.
+        # Original records remain in the input JSONL, not replaced with zero
+        # observations. The unavailable arrays preserve downstream shapes.
+        return (np.full((n,21,2), np.nan, np.float32), np.zeros((n,21), bool),
+                np.zeros((n,21), bool), np.zeros((n,21), np.float32),
+                [{"source": str(path), "camera": camera, "hand": side,
+                  "reason": "hand_2d_disabled_not_consumed", "selected": False}])
 
     points, weights, audit = read_view(path, body_points, image_size, camera)
     hand_index = 0 if side == "left" else 1
@@ -96,6 +105,12 @@ def main() -> int:
                     help="quadratic prior on normalized MANO PCA coefficients")
     ap.add_argument("--hand-temporal-weight", type=float, default=2e-2,
                     help="second-order temporal prior on MANO PCA coefficients")
+    ap.add_argument("--mano-pose-weight", type=float, default=0.0,
+                    help="native WiLoR local rotation soft prior (SO3 chordal); enabled only in D1/D2/D3")
+    ap.add_argument("--mano-pose-init", action="store_true",
+                    help="initialize hand PCA at the start of D1 from accepted native MANO poses")
+    ap.add_argument("--hand-2d-weight", type=float, default=1e-7,
+                    help="WiLoR model-derived 2D auxiliary weight; set 0 for native-MANO-only hand information")
     ap.add_argument("--body-temporal-weight", type=float, default=0.0,
                     help="model-COCO relative-to-pelvis second-order prior; 0 preserves the audited baseline")
     ap.add_argument("--body-reprojection-weight", type=float, default=0.0,
@@ -139,6 +154,8 @@ def main() -> int:
         raise ValueError("global hand-handle weight must be non-negative")
     if args.body_temporal_weight < 0 or args.body_reprojection_weight < 0:
         raise ValueError("body temporal/reprojection weights must be non-negative")
+    if not np.isfinite([args.mano_pose_weight, args.hand_2d_weight]).all() or min(args.mano_pose_weight, args.hand_2d_weight) < 0:
+        raise ValueError("MANO pose and hand 2D weights must be finite and non-negative")
     if args.body_reprojection_scale_px <= 0:
         raise ValueError("--body-reprojection-scale-px must be positive")
     contact_args = (args.contact_labels, args.scene_transforms,
@@ -170,13 +187,13 @@ def main() -> int:
     # cameras; a single camera must not be mistaken for an anatomical hand.
     image_size = (int(cal.image_width), int(cal.image_height))
     hand_ll, hand_ll_valid, hand_ll_bounds, hand_ll_weights, audit_left_cam_left = read_wilor(
-        args.wilor_left, n, "left", left, image_size, "left")
+        args.wilor_left, n, "left", left, image_size, "left", args.hand_2d_weight > 0)
     hand_lr, hand_lr_valid, hand_lr_bounds, hand_lr_weights, audit_left_cam_right = read_wilor(
-        args.wilor_left, n, "right", left, image_size, "left")
+        args.wilor_left, n, "right", left, image_size, "left", args.hand_2d_weight > 0)
     hand_rl, hand_rl_valid, hand_rl_bounds, hand_rl_weights, audit_right_cam_left = read_wilor(
-        args.wilor_right, n, "left", right, image_size, "right")
+        args.wilor_right, n, "left", right, image_size, "right", args.hand_2d_weight > 0)
     hand_rr, hand_rr_valid, hand_rr_bounds, hand_rr_weights, audit_right_cam_right = read_wilor(
-        args.wilor_right, n, "right", right, image_size, "right")
+        args.wilor_right, n, "right", right, image_size, "right", args.hand_2d_weight > 0)
     (args.output_dir / "wilor_association_audit.json").write_text(
         json.dumps({"left_camera": audit_left_cam_left + audit_left_cam_right,
                     "right_camera": audit_right_cam_left + audit_right_cam_right},
@@ -197,18 +214,27 @@ def main() -> int:
     # whether the two raw-fisheye WiLoR views can form a valid stereo point;
     # no point is deleted or promoted to a hand-3D observation here.
     from pose_app.smplh_hand_observation import audit_cross_view_geometry
-    hand_geom_left, hand_geom_left_summary = audit_cross_view_geometry(
-        hand_ll, hand_rl, cal.K0, cal.D0, cal.K1, cal.D1,
-        cal.R_cam0_to_cam1, cal.T_cam0_to_cam1_mm, image_size)
-    hand_geom_right, hand_geom_right_summary = audit_cross_view_geometry(
-        hand_lr, hand_rr, cal.K0, cal.D0, cal.K1, cal.D1,
-        cal.R_cam0_to_cam1, cal.T_cam0_to_cam1_mm, image_size)
+    if args.hand_2d_weight > 0:
+        hand_geom_left, hand_geom_left_summary = audit_cross_view_geometry(
+            hand_ll, hand_rl, cal.K0, cal.D0, cal.K1, cal.D1,
+            cal.R_cam0_to_cam1, cal.T_cam0_to_cam1_mm, image_size)
+        hand_geom_right, hand_geom_right_summary = audit_cross_view_geometry(
+            hand_lr, hand_rr, cal.K0, cal.D0, cal.K1, cal.D1,
+            cal.R_cam0_to_cam1, cal.T_cam0_to_cam1_mm, image_size)
+    else:
+        # Missing-by-configuration is not a failed triangulation measurement.
+        hand_geom_left = hand_geom_right = []
+        hand_geom_left_summary = hand_geom_right_summary = {
+            "status": "unavailable_2d_not_consumed", "accepted": None,
+            "acceptance_rate": None, "unavailable_frames": list(range(n))}
     (args.output_dir / "wilor_hand_geometry_audit.jsonl").write_text(
         "\n".join(json.dumps({"hand": "left", **r}, ensure_ascii=False) for r in hand_geom_left)
         + "\n" + "\n".join(json.dumps({"hand": "right", **r}, ensure_ascii=False) for r in hand_geom_right)
         + "\n", encoding="utf-8")
     (args.output_dir / "wilor_hand_geometry_summary.json").write_text(
         json.dumps({"left": hand_geom_left_summary, "right": hand_geom_right_summary,
+                    "pixels_consumed": bool(args.hand_2d_weight > 0),
+                    "status": "diagnostic_only" if args.hand_2d_weight > 0 else "unavailable_2d_not_consumed",
                     "used_for_fitting": False,
                     "gate": {"raw_bounds": True, "positive_depth": True,
                               "reprojection_error_px_each_view": 10.0}},
@@ -262,6 +288,64 @@ def main() -> int:
     def decode_hand_pose(coeff, components, mean, scale):
         normalized = coeff / scale[None, :]
         return mean[None, :] + normalized @ components
+
+    # Native local MANO information is independent of the pinhole-derived
+    # keypoints. The detector box + body wrist associates the hypotheses.
+    # Keep both views rather than averaging incompatible axis-angle vectors.
+    mano_enabled = args.mano_pose_init or args.mano_pose_weight > 0
+    mano_targets = mano_weights = mano_initial = None
+    if mano_enabled:
+        from pose_app.wilor_mano_prior import audit_assets, read_parameter_view, encode_pca
+        with (ROOT / "third_party/WiLoR/mano_data/MANO_RIGHT.pkl").open("rb") as handle:
+            canonical_right = pickle.load(handle, encoding="latin1")
+        asset_audit = audit_assets(model_data, mano_left_data, mano_right_data, canonical_right)
+        rotations0, weights0, audit0 = read_parameter_view(args.wilor_left, left, image_size)
+        rotations1, weights1, audit1 = read_parameter_view(args.wilor_right, right, image_size)
+        rot = np.stack([rotations0, rotations1], axis=1)  # N, views, side, 15,3,3
+        w = np.stack([weights0, weights1], axis=1)
+        mano_targets, mano_weights, mano_initial = {}, {}, {}
+        reconstruction = {}
+        disagreement = {}
+        for side, h, components, mean, scale in (
+            ("left", 0, mano_l_components, mano_l_mean, mano_l_scale),
+            ("right", 1, mano_r_components, mano_r_mean, mano_r_scale)):
+            if not (w[:, :, h] > 0).any():
+                # Audit all rejected records before stopping, including legacy
+                # files that have no native parameters. Never reconstruct pose
+                # from the old 21 model-projected points.
+                (args.output_dir / "wilor_mano_parameter_audit.json").write_text(
+                    json.dumps({"left_camera": audit0, "right_camera": audit1,
+                                "failure": f"no native MANO coverage for {side}"}, indent=2), encoding="utf-8")
+                raise ValueError(f"no accepted native MANO parameters for {side}; regenerate WiLoR JSONL")
+            coeff, errors = encode_pca(rot[:, :, h], components.detach().cpu().numpy(),
+                                      mean.detach().cpu().numpy(), scale.detach().cpu().numpy())
+            # Choose highest box-confidence view for initialization only.
+            # The fitting prior retains BOTH independent camera hypotheses.
+            best = np.argmax(w[:, :, h], axis=1)
+            initial = coeff[np.arange(n), best]
+            covered = w[:, :, h].max(axis=1) > 0
+            initial[~covered] = 0  # explicit unavailable, not interpolation
+            mano_initial[side] = torch.tensor(initial, dtype=torch.float32, device=device)
+            mano_targets[side] = torch.tensor(rot[:, :, h], dtype=torch.float32, device=device)
+            mano_weights[side] = torch.tensor(w[:, :, h], dtype=torch.float32, device=device)
+            valid_errors = np.degrees(errors[w[:, :, h] > 0])
+            paired = (w[:, 0, h] > 0) & (w[:, 1, h] > 0)
+            delta = rot[paired, 0, h].swapaxes(-1, -2) @ rot[paired, 1, h]
+            view_angles = np.degrees(Rotation.from_matrix(delta.reshape(-1,3,3)).magnitude()) if paired.any() else np.array([])
+            disagreement[side] = {"paired_frames": int(paired.sum()),
+                                 "median_deg": float(np.median(view_angles)) if len(view_angles) else None,
+                                 "p95_deg": float(np.percentile(view_angles,95)) if len(view_angles) else None}
+            reconstruction[side] = {"covered_frames": int(covered.sum()),
+                                    "unavailable_frames": np.flatnonzero(~covered).tolist(),
+                                    "pca_rotation_error_median_deg": float(np.median(valid_errors)),
+                                    "pca_rotation_error_p95_deg": float(np.percentile(valid_errors, 95))}
+        (args.output_dir / "wilor_mano_parameter_audit.json").write_text(
+            json.dumps({"assets": asset_audit, "left_camera": audit0, "right_camera": audit1,
+                        "pca_reconstruction": reconstruction,
+                        "cross_view_local_rotation_disagreement": disagreement,
+                        "pose_weight": args.mano_pose_weight, "init": args.mano_pose_init,
+                        "hand_2d_weight": args.hand_2d_weight,
+                        "status": "model_pose_hypothesis_not_truth"}, indent=2), encoding="utf-8")
 
     def decode_body_pose(z):
         pose = vposer.decode(z)["pose_body"].reshape(n, 63)
@@ -518,6 +602,11 @@ def main() -> int:
     stage_history = []
     global_step = 0
     for stage_index, (stage_name, train_names, n_stage) in enumerate(zip(stage_names, stage_train, stage_steps)):
+        # Do not let MANO initialization alter A/B/C body or shared-beta fits.
+        if stage_index == 3 and args.mano_pose_init:
+            with torch.no_grad():
+                lhand.copy_(mano_initial["left"])
+                rhand.copy_(mano_initial["right"])
         set_stage(train_names)
         lr_scale = {0: 1.0, 1: 0.10, 2: 0.25, 3: 0.50, 4: 0.25, 5: 0.10}[stage_index]
         stage_params = [param_map[k] for k in train_names]
@@ -583,6 +672,12 @@ def main() -> int:
             if n >= 3:
                 l_valid_frame = mask_ll.any(dim=1) | mask_rl.any(dim=1)
                 r_valid_frame = mask_lr.any(dim=1) | mask_rr.any(dim=1)
+                if mano_enabled and args.hand_2d_weight == 0:
+                    l_valid_frame = mano_weights["left"].sum(dim=1) > 0
+                    r_valid_frame = mano_weights["right"].sum(dim=1) > 0
+                elif mano_enabled:
+                    l_valid_frame = l_valid_frame | (mano_weights["left"].sum(dim=1) > 0)
+                    r_valid_frame = r_valid_frame | (mano_weights["right"].sum(dim=1) > 0)
                 l_edge = l_valid_frame[2:] & l_valid_frame[1:-1] & l_valid_frame[:-2]
                 r_edge = r_valid_frame[2:] & r_valid_frame[1:-1] & r_valid_frame[:-2]
                 l_acc = (lhand[2:] - 2 * lhand[1:-1] + lhand[:-2]).pow(2).mean(dim=1)
@@ -614,7 +709,13 @@ def main() -> int:
             # Pixel residuals are numerically much larger than metre-scale
             # body residuals. Keep hand fitting auxiliary and prevent it from
             # moving the body/root to explain WiLoR's model-derived pixels.
-            hand_term = 1e-7 * (hand_l_loss + hand_r_loss) if stage_index >= 3 else (hand_l_loss + hand_r_loss).detach() * 0.0
+            hand_term = args.hand_2d_weight * (hand_l_loss + hand_r_loss) if stage_index >= 3 else (hand_l_loss + hand_r_loss).detach() * 0.0
+            mano_pose_loss = (lhand_pose.sum() + rhand_pose.sum()) * 0.0
+            if mano_enabled and stage_index >= 3:
+                from pose_app.wilor_mano_prior import rotation_pose_loss
+                mano_pose_loss = 0.5 * (
+                    rotation_pose_loss(lhand_pose, mano_targets["left"], mano_weights["left"]) +
+                    rotation_pose_loss(rhand_pose, mano_targets["right"], mano_weights["right"]))
             structure_term = (args.bone_weight * bone_loss if stage_index in (0, 2)
                               else bone_loss.detach() * 0.0)
             temporal_term = (args.hand_temporal_weight * hand_temporal
@@ -657,7 +758,7 @@ def main() -> int:
             contact_anchor = (args.root_anchor_weight * root_anchor
                               if contact_enabled and stage_index >= 4 else root_anchor.detach() * 0.0)
             loss = body_term + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
-                   args.body_temporal_weight * body_temporal + hand_term + pose_reg + 1e-3 * beta.pow(2).mean() + \
+                   args.body_temporal_weight * body_temporal + hand_term + args.mano_pose_weight * mano_pose_loss + pose_reg + 1e-3 * beta.pow(2).mean() + \
                    (contact_total if stage_index >= 4 else contact_total.detach() * 0.0)
             loss.backward()
             optim.step()
@@ -665,10 +766,11 @@ def main() -> int:
                 row = {"stage": stage_name, "stage_step": local_step, "step": step, "loss": float(loss.detach()),
                             "body_m": float(torch.sqrt(body_loss.detach())),
                             "body_2d_px": float(body_2d_px.detach()),
-                            "hand_l_px": float(torch.sqrt(hand_l_loss.detach())),
-                            "hand_r_px": float(torch.sqrt(hand_r_loss.detach())),
+                            "hand_l_px": float(torch.sqrt(hand_l_loss.detach())) if mask_ll.any() or mask_rl.any() else None,
+                            "hand_r_px": float(torch.sqrt(hand_r_loss.detach())) if mask_lr.any() or mask_rr.any() else None,
                             "hand_l_points": int(mask_ll.sum() + mask_rl.sum()), "hand_r_points": int(mask_lr.sum() + mask_rr.sum()),
                             "contact_hand": float(contact_hand_loss.detach()),
+                            "mano_pose_chordal": float(mano_pose_loss.detach()),
                             "contact_foot": float(contact_foot_loss.detach()),
                             "contact": float(contact_total.detach()),
                             "global_hand_handle": float(global_hand_loss.detach()),
@@ -680,6 +782,7 @@ def main() -> int:
                 history.append(row)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "hand_3d_term": False,
+                              "mano_local_pose_term": bool(args.mano_pose_weight > 0 and stage_index >= 3),
                               "learning_rate": float(args.lr * lr_scale),
                               "hand_priority": "wrist_to_distal_fixed_weights" if stage_index >= 3 else "inactive",
                               "contact_term": bool(contact_enabled and stage_index >= 4),
@@ -695,6 +798,11 @@ def main() -> int:
         final_hand_l = hand21(final.joints, final.vertices, "left")
         final_hand_r = hand21(final.joints, final.vertices, "right")
         contact_diag = {}
+        if mano_enabled:
+            for side in ("left", "right"):
+                contact_diag[f"mano_{side}_target_rotations"] = mano_targets[side].cpu().numpy()
+                contact_diag[f"mano_{side}_view_weights"] = mano_weights[side].cpu().numpy()
+                contact_diag[f"mano_{side}_initial_pca"] = mano_initial[side].cpu().numpy()
         if contact_enabled:
             vg = torch.einsum("nij,nvj->nvi", contact_R, final.vertices) + contact_T[:, None, :]
             for side, j in (("left", 0), ("right", 1)):
@@ -734,9 +842,17 @@ def main() -> int:
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
         "status": "engineering_candidate", "frames": n, "steps": int(sum(stage_steps)),
         "model": str(args.smplh_model.resolve()), "vertices": 6890,
-        "hand_observation_source": "WiLoR_model_projected_MANO_joints",
+        "hand_observation_source": "WiLoR_native_MANO_local_rotations" if mano_enabled and args.hand_2d_weight == 0 else "WiLoR_model_projected_MANO_joints",
+        "native_mano_prior": {
+            "enabled": bool(mano_enabled), "weight": args.mano_pose_weight,
+            "initialization": args.mano_pose_init, "hand_2d_weight": args.hand_2d_weight,
+            "audit": "wilor_mano_parameter_audit.json" if mano_enabled else None,
+            "loss": "SO3_chordal_1_minus_cos_angle",
+            "trainable": "existing_MANO_PCA_only",
+            "global_orient_transl_betas_used": False,
+            "stage": "D1_D2_D3_only"},
         "hand_observation_points_retained": 21,
-        "hand_fit_subset_points": 21,
+        "hand_fit_subset_points": 21 if args.hand_2d_weight > 0 else 0,
         "hand_bounds_are_diagnostic_only": True,
         "wilor_left_valid_points": int(hand_ll_valid.sum() + hand_rl_valid.sum()),
         "wilor_right_valid_points": int(hand_lr_valid.sum() + hand_rr_valid.sum()), "history": history,
