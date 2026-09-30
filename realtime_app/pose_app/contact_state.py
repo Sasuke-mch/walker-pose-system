@@ -121,6 +121,10 @@ class ContactStateMachine:
         elif far:
             self._far_since = obs.timestamp_s if self._far_since is None else self._far_since
             self._near_since = None
+        elif self.state == ContactState.CONTACT_CANDIDATE:
+            if (self._near_since is not None and
+                    (obs.timestamp_s - self._near_since) * 1000.0 >= c.enter_duration_ms):
+                self.state = self._motion_state(obs)
         else:
             self._near_since = None
             self._far_since = None
