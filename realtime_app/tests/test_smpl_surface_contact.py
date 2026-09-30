@@ -17,6 +17,18 @@ from pose_app import smpl_surface_contact as sc
 
 
 class SurfaceContactTests(unittest.TestCase):
+    def test_nonpenetration_only_penalizes_below_margin(self):
+        z = torch.tensor([[-0.010, 0.002, 0.020]], requires_grad=True)
+        loss = sc.nonpenetration_loss(z, margin_m=0.003)
+        self.assertAlmostEqual(float(loss), ((0.013 ** 2) + (0.001 ** 2)) / 3.0, places=8)
+
+    def test_tangential_velocity_removes_normal_component(self):
+        now = torch.tensor([[[0.1, 0.0, 0.2], [0.0, 0.1, 0.2]]])
+        prev = torch.tensor([[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]])
+        tangent = sc.tangential_velocity(now, prev, 0.1, torch.tensor([0.0, 0.0, 1.0]))
+        self.assertTrue(torch.allclose(tangent[..., 2], torch.zeros(1, 2)))
+        self.assertAlmostEqual(float(sc.tangential_velocity_loss(now, prev, 0.1, [0, 0, 1])), 1.0, places=6)
+
     def test_ground_distances_shape(self):
         v = torch.randn(4, 10, 3)
         self.assertEqual(sc.signed_ground_distances(v).shape, (4, 10))

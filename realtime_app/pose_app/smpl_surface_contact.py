@@ -79,6 +79,45 @@ def foot_surface_loss(sole_z: "Any", temperature: float = 0.005,
     return foot_base + penetration_weight * foot_penetration
 
 
+def nonpenetration_loss(signed_distances_m: "Any", margin_m: float = 0.003) -> "Any":
+    """Penalize surface points below the permitted contact margin."""
+    torch = _torch()
+    if margin_m < 0:
+        raise ValueError("margin_m must be non-negative")
+    return torch.relu(margin_m - signed_distances_m).square().mean(dim=-1)
+
+
+def tangential_velocity(points_now: "Any", points_prev: "Any",
+                       dt_s: float, normal: "Any") -> "Any":
+    """Return per-point tangential velocity, preserving the point dimension."""
+    torch = _torch()
+    if dt_s <= 0:
+        raise ValueError("dt_s must be positive")
+    if points_now.shape != points_prev.shape or points_now.shape[-1] != 3:
+        raise ValueError("points_now and points_prev must have matching [...,3] shape")
+    n = torch.as_tensor(normal, dtype=points_now.dtype, device=points_now.device)
+    if n.shape[-1] != 3:
+        raise ValueError("normal must have final dimension 3")
+    n = n / torch.linalg.vector_norm(n, dim=-1, keepdim=True).clamp_min(1e-8)
+    velocity = (points_now - points_prev) / float(dt_s)
+    return velocity - (velocity * n).sum(dim=-1, keepdim=True) * n
+
+
+def tangential_velocity_loss(points_now: "Any", points_prev: "Any",
+                             dt_s: float, normal: "Any",
+                             active: "Any | None" = None) -> "Any":
+    """Squared tangential speed, optionally masked by a contact state."""
+    torch = _torch()
+    tangent = tangential_velocity(points_now, points_prev, dt_s, normal)
+    values = tangent.square().sum(dim=-1)
+    if active is not None:
+        mask = torch.as_tensor(active, dtype=values.dtype, device=values.device)
+        if mask.shape != values.shape:
+            raise ValueError("active mask must match the per-point velocity shape")
+        return (values * mask).sum() / mask.sum().clamp_min(1e-8)
+    return values.mean()
+
+
 def hand_surface_loss(palm_points: "Any", a: "Any", b: "Any",
                       radius_m: float, delta: float = 0.015,
                       temperature: float = 0.005,
@@ -113,6 +152,9 @@ __all__ = [
     "softmin",
     "centered_softmin",
     "foot_surface_loss",
+    "nonpenetration_loss",
+    "tangential_velocity",
+    "tangential_velocity_loss",
     "hand_surface_loss",
     "surface_coverage",
 ]
