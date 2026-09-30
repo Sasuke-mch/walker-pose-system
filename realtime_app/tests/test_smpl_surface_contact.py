@@ -20,7 +20,7 @@ class SurfaceContactTests(unittest.TestCase):
     def test_nonpenetration_only_penalizes_below_margin(self):
         z = torch.tensor([[-0.010, 0.002, 0.020]], requires_grad=True)
         loss = sc.nonpenetration_loss(z, margin_m=0.003)
-        self.assertAlmostEqual(float(loss), ((0.013 ** 2) + (0.001 ** 2)) / 3.0, places=8)
+        self.assertAlmostEqual(float(loss.detach()), ((0.013 ** 2) + (0.001 ** 2)) / 3.0, places=8)
 
     def test_tangential_velocity_removes_normal_component(self):
         now = torch.tensor([[[0.1, 0.0, 0.2], [0.0, 0.1, 0.2]]])
