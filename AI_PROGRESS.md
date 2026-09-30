@@ -2578,3 +2578,53 @@ ealtime_app/tests/test_correct_mask2former_stereo_pair_latency.py（5 项）均�
 - 使用同一60–90窗口复跑验证：C0 与修正后 C2 的 Stage C `vertices` 和 `beta` 逐元素一致；因此 C1/C2 不再改变 Stage A/B/C 初始化和 beta，只改变 Stage D。
 - 修正梯度审计的系数重复计算问题后，C2 当前权重0.001的切向梯度约为观测3D梯度的25%，并非此前误判的万分之一；C1脚底接触和非穿透项梯度约为观测3D项的9%–12%。因此保留 C1/C2，暂不盲目把切向权重提高到0.1。
 - 当前权重策略：脚底表面接触=1、非穿透=1、切向=0.001 作为开发探针冻结；下一次权重扫描必须在连续 `support` 覆盖充足的独立窗口进行，并以梯度比例、非穿透违反量和观测项代价共同判断，不能只看2D/3D表面指标。
+
+### 2026-09-30 — 第三、第四优先级：Stage 2 独立验证准备与脚底表面审计
+
+#### C1/C2 结论保留
+
+C1/C2 是物理逻辑所需的约束，不因当前表面指标暂时不理想而删除。当前实现和权重冻结为：脚底表面接触=1.0、全帧非穿透=1.0、`support AND support` 相邻帧切向速度=0.001。Stage A/B/C 不再使用新增脚底动力学项，C1/C2 只在 Stage D 生效。此前“C1/C2未通过候选门”只表示当前数据不能证明物理改善，不表示逻辑错误。
+
+#### 第三优先级：Stage 2/地面坐标独立验证
+
+当前已有的 `realtime_app/pose_app/ground_external_validation.py` 被补充为独立指标模块：
+
+- `compare_ground_poses`：外部刚体轨迹与估计轨迹的平移 median/P95、旋转角 median/P95；
+- `ground_normal_drift`：地面法向相对于参考法向的角度 median/P95/max；
+- `foot_support_speed`：只统计相邻两帧均为明确 `support` 的脚部速度；
+- `stage_switch_jumps`：Stage 标签切换处的位姿平移/旋转跳变；
+- `failure_reason_counts`：完整保留 accepted、held、rejected、unavailable 和具体失败原因。
+
+当前 360 帧主线 `realtime_dynamic_ground_pose.jsonl` 和 `realtime_stage_walker.jsonl` 只做了内部诊断，结果见 `资料/实验报告/stage2_internal_diagnostic_20260930.json`：
+
+- 阶段计数：Stage 1=212，Stage 2=83，Transition=62，Warming-up=3；
+- 估计地面法向相对首帧的内部漂移：median=0°、P95=1.018°、max=1.277°；该量来自估计变换本身，不是外部真值；
+- 位姿状态计数：accepted=55、accepted_rotation_held=21、held=245、landed_support_reanchored=10、rejected=2、unavailable=27；
+- 阶段切换共43处，最大内部平移跳变约107.8 mm；这只能提示状态机/保持策略需要审查，不能作为真实相机运动误差；
+- 没有外部刚体轨迹、IMU或标记板的逐帧4x4位姿，因此外部平移/旋转误差和真实地面法向误差仍为 unavailable；脚部支撑速度也没有独立 support 标签可用于验证。
+
+三个短场景的正式门控协议已固定为：
+
+1. 人体走动、助步器静止：外部刚体轨迹应近零，地面高度和法向保持稳定；
+2. 人体静止、助步器移动：外部标记板轨迹与 Stage 2 估计轨迹比较；
+3. 人体和助步器同时运动：以外部刚体轨迹区分相机运动与脚运动。
+
+每个场景必须有外部刚体逐帧位姿、帧对齐关系、Stage 标签或独立阶段标注、失败帧原因；没有这些输入，Stage 2 仍只能称为工程估计。当前踝点反推平移与踝点静止检查仍存在自洽循环，尚未被外部验证打破。
+
+#### 第四优先级：脚底表面路线
+
+当前表面顶点集合已经按鞋底区域分区：左右脚各 54 点，分别为 heel/ball/toe 各 18 点，来源为 `surface_contact_sets_v1/contact_vertex_sets.json`。C1/C2 计算使用固定顶点，不使用 COCO 踝点作为接触几何。
+
+已能报告：
+
+- 每个区域的最低点高度和地面下顶点比例；
+- 整脚最低点高度；
+- 脚底相邻帧相对地面速度；
+- 左右脚分别统计，并可按 support/swing/invalid 分开；
+- 固定鞋底顶点的切向速度和 active 点组数量。
+
+当前 60–90 修正后 C2 运行的工程诊断：左脚 heel/ball/toe 地面下比例约 84.1%/82.8%/83.9%，右脚约 84.8%/95.0%/99.3%；整脚最低点 median 左/右约 -31.3/-43.2 mm；全相邻帧脚底 XY 速度 P95 左/右约 1.75/1.43 m/s。由于地面坐标和姿态仍未有外部真值，这些只是内部不一致诊断。
+
+“接触面积”目前不能写成物理面积：当前只有分区表面顶点，没有经过鞋底三角面、尺度和压力分布校准的接触区域。因此输出应称为 `within_margin_vertex_fraction` 或接触面积代理，不能称为真实接触面积。只有在压力鞋垫或人工逐帧标签加入后，才计算接触事件 precision、recall 和进入/退出时序误差。
+
+第四优先级的下一步是先做人工逐帧标签审计，再做 surface loss 的候选评估；不能通过只优化最低点来代替整块鞋底约束，也不能把遮挡脚或摆动脚的不可用状态当成非接触真值。
