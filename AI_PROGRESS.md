@@ -35,6 +35,17 @@
 - 结论边界：MANO 仅用于 WiLoR 手部局部参数和二维辅助观测；身体仍由 PMPose 严格三角化 COCO-17 驱动，未加入手部三角化、独立手部真值或接触标签。
 # 助步器项目 AI 工作日志
 
+## 2026-09-30：全片固定手—助步器姿态求解器与拟合先验入口
+
+按当前任务假设，整段视频内每只手相对于助步器保持固定。新增
+`realtime_app/pose_app/global_hand_handle_pose.py` 和
+`realtime_app/tools/solve_global_hand_handle_pose.py`：从 SMPL-H 每帧掌面顶点与扶手端点，先在扶手局部坐标系计算掌面中心偏移和掌面 PCA 姿态，再用 MAD 规则剔除离群帧并做全片鲁棒聚合。输出 `global_hand_handle_pose_v1`，保留有效帧、拒绝帧、残差和输入来源。
+
+新增 `fit_smplh_wilor_sequence.py` 的 `--global-hand-handle-pose` 与
+`--global-hand-handle-weight`。在 D2/D3 接触阶段，它把全片聚合的掌心偏移作为 3 cm 尺度的 Huber 软先验加入；默认权重为 0，保持旧基线可复现，显式开启后才改变拟合。先验要求同时提供逐帧接触标签、场景变换、表面顶点集合和助步器拓扑，避免把静态模型误当作动态外部真值。
+
+本轮用现有 `fit_cuda_vposer_mano_pca12_temporal_reproj015_contact_candidate_full448_v1/result.npz` 运行 448 帧求解，输出 `资料/实验报告/global_hand_handle_pose_20260930.json`。该输入的扶手端点来自 `static_walker_model.json` 的初始地面节点重复到各帧，因此 `handle_trajectory_external_truth=false`；左右手均有工程候选姿态和逐帧有效/拒绝列表，不能解释为真实握持或外部精度。当前先验已接入拟合入口，但尚未用该先验重跑完整拟合；下一步只在固定接触输入和固定优化预算下做一次开关对照，比较全片掌心残差、身体/脚项和失败帧，不调其他权重。
+
 ## 2026-09-28：接入真实 MANO PCA 手部先验和手部时间正则
 
 - 本地 `third_party/WiLoR/mano_data/models/MANO_LEFT.pkl`、`MANO_RIGHT.pkl` 均包含真实 `hands_components(45×45)`、`hands_mean(45)`；不再把单位矩阵占位当作手部先验。
