@@ -61,9 +61,11 @@ def estimate_global_hand_handle_pose(
     palm_ground_m: np.ndarray,
     handle_ends_ground_m: np.ndarray,
 ) -> dict:
-    """Aggregate a fixed pose for one hand.
+    """Aggregate a fixed pose for one hand in the walker rigid frame.
 
-    ``palm_ground_m`` is ``(N,V,3)`` and ``handle_ends_ground_m`` is ``(N,2,3)``.
+    ``palm_ground_m`` and ``handle_ends_ground_m`` are expressed in a common
+    world frame, but the handle endpoints must come from the per-frame walker
+    pose.  The output is invariant to the walker's world translation/rotation.
     The returned offset maps the handle midpoint to the palm centroid in the
     handle frame.  Orientation is represented by a rotation matrix from the
     hand PCA frame to the handle frame.

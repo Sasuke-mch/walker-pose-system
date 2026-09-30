@@ -53,6 +53,8 @@ def main():
     ap.add_argument("--result", type=Path, required=True)
     ap.add_argument("--pose", type=Path, required=True)
     ap.add_argument("--walker-model", type=Path, required=True)
+    ap.add_argument("--handle-ends-ground", type=Path, required=True,
+                    help="per-frame walker handle endpoints; static topology is not a valid interaction trajectory")
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--frame", type=int, default=None)
     args = ap.parse_args(); args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -62,10 +64,14 @@ def main():
     nodes = {k: np.asarray(v, float)/1000 for k,v in model["nodes_initial_ground_mm"].items()}
     edges = model["edges"]
     handles = model["handle_segments"]
+    q = np.load(args.handle_ends_ground, allow_pickle=False)
+    ends_all = q["handle_ends_ground_m"] if isinstance(q, np.lib.npyio.NpzFile) else q
+    if ends_all.shape[0] != z["left_palm_ground_m"].shape[0] or ends_all.shape[1:] != (2, 2, 3):
+        raise ValueError("handle-ends-ground must contain per-frame (N,2,2,3) handle_ends_ground_m")
     frame = int(args.frame if args.frame is not None else z["left_palm_ground_m"].shape[0]//2)
     clouds = {}
-    for side, key in (("left", "right"), ("right", "left")):
-        ends = np.asarray([nodes[n] for n in handles[side]])
+    for side, key in (("left", 0), ("right", 1)):
+        ends = ends_all[frame, key]
         clouds[side] = solved_cloud(z[f"{side}_palm_ground_m"][frame], ends, pose["hands"][side])
     walker_edges = [(nodes[a], nodes[b]) for a,b in edges]
     # Local interaction view: include only handle segments and solved palms.
@@ -79,7 +85,7 @@ def main():
         for a,b in walker_edges: cylinder(ax, display(a), display(b), .014, "#69747e")
         for side, color in (("left", "#d94b4b"), ("right", "#2d73c8")):
             q=display(clouds[side]); ax.scatter(q[:,0],q[:,1],q[:,2],s=3,c=color,alpha=.72,label=f"{side} solved palm")
-            h=display(np.asarray([nodes[n] for n in handles[side]])); ax.plot(h[:,0],h[:,1],h[:,2],lw=4,c=color,alpha=.9)
+            h=display(ends_all[frame, 0 if side == "left" else 1]); ax.plot(h[:,0],h[:,1],h[:,2],lw=4,c=color,alpha=.9)
             mid=h.mean(axis=0); ax.scatter(*mid,s=45,c="#111111",marker="x")
         ax.set_xlim(center[0]-span/2,center[0]+span/2); ax.set_ylim(center[1]-span/2,center[1]+span/2); ax.set_zlim(max(0,center[2]-span/2),center[2]+span/2)
         ax.set_xlabel("X display (m)"); ax.set_ylabel("-Y display (m)"); ax.set_zlabel("Z display (m)")

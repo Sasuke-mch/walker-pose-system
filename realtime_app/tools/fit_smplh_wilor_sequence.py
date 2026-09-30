@@ -460,6 +460,8 @@ def main() -> int:
             prior = json.loads(args.global_hand_handle_pose.read_text(encoding="utf-8"))
             if prior.get("assumption") != "hand_static_relative_to_walker_for_entire_video":
                 raise ValueError("global hand-handle prior assumption mismatch")
+            if prior.get("relative_frame") != "walker_rigid_frame_per_frame" or not prior.get("handle_trajectory_external_truth", False):
+                raise ValueError("global hand-handle prior must contain per-frame walker-relative handle geometry")
             global_hand_offset = torch.tensor(
                 [prior["hands"][s]["palm_offset_handle_m"] for s in ("left", "right")],
                 dtype=torch.float32, device=device)

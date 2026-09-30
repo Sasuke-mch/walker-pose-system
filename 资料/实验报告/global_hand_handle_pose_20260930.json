@@ -1,10 +1,11 @@
 {
   "schema_version": "global_hand_handle_pose_v1",
-  "status": "engineering_candidate",
+  "status": "invalid_static_world_fallback",
   "assumption": "hand_static_relative_to_walker_for_entire_video",
   "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260927_wilor_smplh_full448_v1\\fit_cuda_vposer_mano_pca12_temporal_reproj015_contact_candidate_full448_v1\\result.npz",
   "handle_source": "static_walker_model_nodes_initial_ground_mm_repeated",
   "handle_trajectory_external_truth": false,
+  "relative_frame": "walker_rigid_frame_per_frame",
   "hands": {
     "left": {
       "status": "engineering_candidate",

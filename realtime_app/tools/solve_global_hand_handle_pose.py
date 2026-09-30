@@ -20,6 +20,8 @@ def main() -> int:
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--handle-ends-ground", type=Path, default=None,
                     help="optional npz/npy/json with (N,2,2,3) metre endpoints")
+    ap.add_argument("--allow-static-diagnostic", action="store_true",
+                    help="explicitly allow static fallback for diagnosing a missing walker trajectory")
     args = ap.parse_args()
     z = np.load(args.result, allow_pickle=False)
     n = int(z["hand_points_left"].shape[0])
@@ -36,17 +38,20 @@ def main() -> int:
             ends = np.asarray(json.loads(q.read_text(encoding="utf-8")), float)
         source = str(q)
     else:
+        if not args.allow_static_diagnostic:
+            raise ValueError("hand pose must be solved relative to a per-frame walker trajectory; provide --handle-ends-ground")
         ends = load_static_handle_ends(args.walker_model, n)
         source = "static_walker_model_nodes_initial_ground_mm_repeated"
     if ends.shape != (n, 2, 2, 3):
         raise ValueError(f"handle endpoints must be (N,2,2,3), got {ends.shape}")
     out = {
         "schema_version": "global_hand_handle_pose_v1",
-        "status": "engineering_candidate",
+        "status": "engineering_candidate" if args.handle_ends_ground else "invalid_static_world_fallback",
         "assumption": "hand_static_relative_to_walker_for_entire_video",
         "source_result": str(args.result.resolve()),
         "handle_source": source,
         "handle_trajectory_external_truth": bool(args.handle_ends_ground),
+        "relative_frame": "walker_rigid_frame_per_frame",
         "hands": {},
     }
     for side, j in (("left", 0), ("right", 1)):
