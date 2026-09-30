@@ -23,10 +23,13 @@ from pose_app.smpl_coco_observation import _install_legacy_smpl_pickle_compatibi
 
 EXPECTED_SEMANTICS = {
     "left_ankle": 7, "right_ankle": 8, "left_foot": 10, "right_foot": 11,
-    "left_wrist": 20, "right_wrist": 21, "left_hand": 22, "right_hand": 23,
+    # SMPL-H appends the complete left hand chain (22..36) before the
+    # complete right hand chain (37..51).  Index 23 is the first left-finger
+    # joint, not the right-hand root.
+    "left_wrist": 20, "right_wrist": 21, "left_hand": 22, "right_hand": 37,
 }
 PARENT = {
-    7: 4, 8: 5, 10: 7, 11: 8, 20: 18, 21: 19, 22: 20, 23: 21,
+    7: 4, 8: 5, 10: 7, 11: 8, 20: 18, 21: 19, 22: 20, 37: 21,
 }
 
 
@@ -49,8 +52,12 @@ def load_smpl_arrays(model_path: Path) -> dict:
         raise ValueError(f"v_template shape {v.shape} != (6890,3)")
     if f.shape[1] != 3 or f.min() < 0 or f.max() > 6889:
         raise ValueError("faces are not valid SMPL 6890 triangles")
-    if w.shape != (6890, 24):
-        raise ValueError(f"weights shape {w.shape} != (6890,24)")
+    # SMPL-H keeps the 24 body joints and appends 28 MANO joints.  The
+    # contact candidates below only use the body/wrist/hand-root columns, but
+    # the source model must therefore be accepted with its full 52-column
+    # skinning matrix.
+    if w.shape[0] != 6890 or w.shape[1] < 24:
+        raise ValueError(f"weights shape {w.shape} is not a SMPL-H-compatible matrix")
     if not (np.isfinite(v).all() and np.isfinite(w).all()):
         raise ValueError("non-finite vertices or weights")
     if np.any(w < -1e-9):
@@ -63,8 +70,8 @@ def load_smpl_arrays(model_path: Path) -> dict:
 def verify_semantics(kintree_table: np.ndarray, joints: np.ndarray) -> dict:
     """Check the 8 contact joints against parents and rest-pose positions."""
     kt = np.asarray(kintree_table)
-    if kt.shape != (2, 24):
-        raise ValueError(f"kintree_table shape {kt.shape} != (2,24)")
+    if kt.ndim != 2 or kt.shape[0] != 2 or kt.shape[1] < 24:
+        raise ValueError(f"kintree_table shape {kt.shape} is not SMPL-H-compatible")
     parent_of = {int(child): int(parent) for parent, child in zip(kt[0].tolist(), kt[1].tolist())}
     checks = {}
     for name, index in EXPECTED_SEMANTICS.items():
@@ -132,7 +139,10 @@ def build_foot_sets(v: np.ndarray, w: np.ndarray, joints: np.ndarray,
 
 def build_hand_sets(v: np.ndarray, w: np.ndarray, joints: np.ndarray,
                     adj: list[set], side: str) -> tuple[dict, dict]:
-    wrist, hand = (20, 22) if side == "left" else (21, 23)
+    # The SMPL-H right hand root is joint 37.  Using 23 here silently selects
+    # the first joint of the left index-finger chain and produces a tiny,
+    # anatomically mixed right-hand surface set.
+    wrist, hand = (20, 22) if side == "left" else (21, 37)
     dominant = np.argmax(w, axis=1)
     cand = np.nonzero((dominant == wrist) | (dominant == hand))[0]
     center = joints[hand]
