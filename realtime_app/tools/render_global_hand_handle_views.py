@@ -10,6 +10,7 @@ import numpy as np
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 from pose_app.global_hand_handle_pose import _frame_from_points, _handle_frame
+from pose_app.global_hand_handle_pose import validate_walker_pose
 
 
 def display(p: np.ndarray) -> np.ndarray:
@@ -55,6 +56,8 @@ def main():
     ap.add_argument("--walker-model", type=Path, required=True)
     ap.add_argument("--handle-ends-ground", type=Path, required=True,
                     help="per-frame walker handle endpoints; static topology is not a valid interaction trajectory")
+    ap.add_argument("--walker-poses", type=Path, required=True,
+                    help="npz with per-frame ground<-walker pose")
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--frame", type=int, default=None)
     args = ap.parse_args(); args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -68,15 +71,24 @@ def main():
     ends_all = q["handle_ends_ground_m"] if isinstance(q, np.lib.npyio.NpzFile) else q
     if ends_all.shape[0] != z["left_palm_ground_m"].shape[0] or ends_all.shape[1:] != (2, 2, 3):
         raise ValueError("handle-ends-ground must contain per-frame (N,2,2,3) handle_ends_ground_m")
+    wp = np.load(args.walker_poses, allow_pickle=False)
+    Rw, tw = wp["rotation_ground_from_walker"], wp["translation_ground_from_walker_m"]
+    validate_walker_pose(Rw, tw, ends_all.shape[0])
     frame = int(args.frame if args.frame is not None else z["left_palm_ground_m"].shape[0]//2)
     clouds = {}
     for side, key in (("left", 0), ("right", 1)):
-        ends = ends_all[frame, key]
-        clouds[side] = solved_cloud(z[f"{side}_palm_ground_m"][frame], ends, pose["hands"][side])
-    walker_edges = [(nodes[a], nodes[b]) for a,b in edges]
+        ends_local = np.asarray([nodes[n] for n in handles[side]])
+        palm_world = z[f"{side}_palm_ground_m"][frame]
+        palm_local = (Rw[frame].T @ (palm_world - tw[frame]).T).T
+        clouds[side] = solved_cloud(palm_local, ends_local, pose["hands"][side])
+    static_nodes = np.asarray([nodes[name] for name in nodes], float)
+    node_names = list(nodes)
+    walker_frame_nodes = (Rw[frame] @ static_nodes.T).T + tw[frame]
+    walker_nodes = {name: walker_frame_nodes[i] for i, name in enumerate(node_names)}
+    walker_edges = [(walker_nodes[a], walker_nodes[b]) for a,b in edges]
     # Local interaction view: include only handle segments and solved palms.
     # Keeping separation visible is intentional for this diagnostic.
-    pts = [nodes[n] for side in handles.values() for n in side] + [p for c in clouds.values() for p in c]
+    pts = [walker_nodes[n] for side in handles.values() for n in side] + [p for c in clouds.values() for p in c]
     lim = display(np.asarray(pts)); lo, hi = lim.min(axis=0), lim.max(axis=0); center=(lo+hi)/2
     span=max(hi-lo)*1.35; center[2]=max(center[2], .75)
     views = {"front": (18, -72), "side": (12, 18), "top": (78, -72)}

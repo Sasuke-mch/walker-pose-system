@@ -1,6 +1,6 @@
 import numpy as np
 
-from pose_app.global_hand_handle_pose import estimate_global_hand_handle_pose
+from pose_app.global_hand_handle_pose import estimate_global_hand_handle_pose, transform_ground_to_walker
 
 
 def test_global_pose_recovers_fixed_offset():
@@ -25,3 +25,14 @@ def test_outlier_is_retained_as_rejected_frame():
     ends = np.zeros((8, 2, 3)); ends[:, 0] = [-.2, 0, 1]; ends[:, 1] = [.2, 0, 1]
     got = estimate_global_hand_handle_pose(palms, ends)
     assert any(x["frame"] == 3 for x in got["rejected_frames"])
+
+
+def test_inverse_walker_pose_removes_world_motion():
+    rng = np.random.default_rng(8)
+    local = rng.normal(size=(6, 20, 3)) * .01
+    n = len(local)
+    R = np.repeat(np.eye(3)[None], n, axis=0)
+    t = np.stack([np.array([.2 * i, -.03 * i, .1]) for i in range(n)])
+    world = local + t[:, None, :]
+    recovered = transform_ground_to_walker(world, R, t)
+    assert np.max(np.abs(recovered - local)) < 1e-8

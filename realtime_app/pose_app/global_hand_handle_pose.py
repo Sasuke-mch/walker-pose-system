@@ -13,6 +13,34 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 
+def validate_walker_pose(rotation_ground_from_walker: np.ndarray,
+                         translation_ground_from_walker_m: np.ndarray,
+                         n: int) -> None:
+    """Validate the per-frame ground<-walker SE(3) trajectory."""
+    R = np.asarray(rotation_ground_from_walker, float)
+    t = np.asarray(translation_ground_from_walker_m, float)
+    if R.shape != (n, 3, 3) or t.shape != (n, 3):
+        raise ValueError(f"walker pose shapes must be {(n,3,3)} and {(n,3)}, got {R.shape} and {t.shape}")
+    if not np.isfinite(R).all() or not np.isfinite(t).all():
+        raise ValueError("walker pose contains non-finite values")
+    ortho = np.einsum("nij,nkj->nik", R, R)
+    det = np.linalg.det(R)
+    if np.max(np.abs(ortho - np.eye(3))) > 2e-3 or np.min(det) < 0.998:
+        raise ValueError("walker rotation is not a proper rotation")
+
+
+def transform_ground_to_walker(points_ground_m: np.ndarray,
+                               rotation_ground_from_walker: np.ndarray,
+                               translation_ground_from_walker_m: np.ndarray) -> np.ndarray:
+    """Apply the inverse of per-frame ground<-walker poses to points."""
+    p = np.asarray(points_ground_m, float)
+    R = np.asarray(rotation_ground_from_walker, float)
+    t = np.asarray(translation_ground_from_walker_m, float)
+    if p.shape[0] != R.shape[0]:
+        raise ValueError("point and walker pose frame counts differ")
+    return np.einsum("nij,n...j->n...i", R.transpose(0, 2, 1), p - t[:, None, ...])
+
+
 def _frame_from_points(points: np.ndarray) -> tuple[np.ndarray, np.ndarray] | None:
     p = np.asarray(points, dtype=float)
     if p.ndim != 2 or p.shape[0] < 3 or not np.isfinite(p).all():
