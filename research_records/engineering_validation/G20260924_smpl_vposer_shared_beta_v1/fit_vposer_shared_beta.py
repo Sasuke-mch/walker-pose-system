@@ -163,6 +163,15 @@ def main() -> int:
     if not math.isfinite(args.obs_3d_base_sigma_mm) or not math.isfinite(args.obs_3d_max_sigma_factor) or args.obs_3d_base_sigma_mm <= 0.0 or args.obs_3d_max_sigma_factor < 1.0:
         raise ValueError("3-D uncertainty scale must be positive and max factor >= 1")
     surface_mode = args.contact_vertex_sets is not None
+    surface_foot_kinematic_enabled = (
+        args.surface_foot_nonpenetration_weight > 0
+        or args.surface_foot_tangential_weight > 0
+    )
+    if surface_foot_kinematic_enabled and (not surface_mode or args.contact_labels is None):
+        raise ValueError(
+            "surface foot nonpenetration/tangential terms require --contact-labels "
+            "and --scene-transforms"
+        )
     eff_foot_w, eff_hand_w = args.surface_foot_contact_weight, args.surface_hand_contact_weight
     if surface_mode and (args.walker_topology is None or args.contact_labels is None or args.scene_transforms is None):
         raise ValueError("surface mode needs --walker-topology, --contact-labels and --scene-transforms together")
@@ -484,7 +493,7 @@ def main() -> int:
             lhand=(robust_scalar(hd,0.050)*hand_w).sum()/(hand_w.sum()+1e-6)
         foot_nonpenetration = torch.zeros((), device=device)
         foot_tangential = torch.zeros((), device=device)
-        if surface_mode and (args.surface_foot_nonpenetration_weight > 0 or args.surface_foot_tangential_weight > 0):
+        if surface_mode and contact_enabled and not args.force_stage_d_no_contact and surface_foot_kinematic_enabled:
             if n < 2:
                 raise ValueError("foot kinematic terms require at least two frames")
             # Fixed sole vertices are used across adjacent frames. This avoids
@@ -498,10 +507,14 @@ def main() -> int:
                                   vg[:-1, surface["sole_idx"]["right"], :]], dim=1)
                 curr = torch.cat([vg[1:, surface["sole_idx"]["left"], :],
                                   vg[1:, surface["sole_idx"]["right"], :]], dim=1)
+                frame_pair = (frame_ok[:-1] & frame_ok[1:]).to(dtype=torch.float32)
                 active = torch.cat([support_mask[:-1, 0:1].expand(-1, 54),
                                     support_mask[:-1, 1:2].expand(-1, 54)], dim=1)
                 active = active * torch.cat([support_mask[1:, 0:1].expand(-1, 54),
                                              support_mask[1:, 1:2].expand(-1, 54)], dim=1)
+                active = active * frame_pair[:, None]
+                surface_audit["foot_tangential_active_point_pairs"] = int(active.sum().detach().cpu())
+                surface_audit["foot_tangential_active_frame_pairs"] = int((active.sum(dim=1) > 0).sum().detach().cpu())
                 foot_tangential = surf.tangential_velocity_loss(curr, prev, 1.0 / 30.0,
                                                                  [0.0, 0.0, 1.0], active)
         tl=torch.zeros((),device=device); tr=torch.zeros((),device=device); tinfo={"local_valid":0,"root_valid":0,"rejected_triplets":0,"gap_triplets":0,"status":"unavailable"}
@@ -660,12 +673,15 @@ def main() -> int:
     beta_frozen_during_stage_d = False
     stage_d = None
     control_d = surface_mode and bool(args.force_stage_d_no_contact)
-    if control_d and (args.surface_foot_contact_weight > 0 or args.surface_hand_contact_weight > 0):
+    if control_d and (args.surface_foot_contact_weight > 0 or args.surface_hand_contact_weight > 0 or surface_foot_kinematic_enabled):
         raise ValueError("--force-stage-d-no-contact requires zero surface contact weights")
     if control_d:
         eff_foot_w, eff_hand_w = 0.0, 0.0
     want_surface_d = surface_mode and (
-        args.surface_foot_contact_weight > 0 or args.surface_hand_contact_weight > 0 or control_d
+        args.surface_foot_contact_weight > 0
+        or args.surface_hand_contact_weight > 0
+        or surface_foot_kinematic_enabled
+        or control_d
     )
     want_ankle_d = (not surface_mode) and args.contact_labels is not None and args.foot_contact_weight > 0
     stage_d_trace = [] if args.stage_d_trace else None
@@ -681,9 +697,13 @@ def main() -> int:
             _res0, _, _jc0, _, _, _l3, _l2, _lp, _lf, _lh, _tl0, _tr0, _tinfo0, _fnp0, _ftv0 = losses(beta)
             _plist = [("latent", latent), ("root", root), ("transl", transl)]
             _zero_attach = 0.0*(latent.sum()+root.sum()+transl.sum())
-            _flat = [(k, (c*v + _zero_attach, c, _plist)) for k, v, c in [
+            _flat = [(k, (v + _zero_attach, c, _plist)) for k, v, c in [
                 ("obs3d", obs3d_d*_l3, obs3d_d), ("obs2d", obs2d_d*_l2, obs2d_d),
                 ("foot", eff_foot_w*_lf, eff_foot_w), ("hand", eff_hand_w*_lh, eff_hand_w),
+                ("foot_nonpenetration", args.surface_foot_nonpenetration_weight*_fnp0,
+                 args.surface_foot_nonpenetration_weight),
+                ("foot_tangential", args.surface_foot_tangential_weight*_ftv0,
+                 args.surface_foot_tangential_weight),
                 ("temporal_local", args.temporal_local_weight*_tl0, args.temporal_local_weight),
                 ("temporal_root", args.temporal_root_weight*_tr0, args.temporal_root_weight)]]
             _rows = gradient_norms(_flat, {"latent": latent, "root": root, "transl": transl})
@@ -729,11 +749,15 @@ def main() -> int:
             # both the vertices and the COCO joints; the probe surface loss is
             # built from those vertices only, then differentiated w.r.t. both.
             with torch.enable_grad():
-                result_probe, _, jc_probe, _, _ = forward(beta)
-                probe_foot, probe_hand, *_rest = surface_terms(result_probe.vertices)
+                probe_vals = losses(beta)
+                result_probe, _, jc_probe = probe_vals[:3]
+                probe_foot, probe_hand = probe_vals[8:10]
+                probe_np, probe_tv = probe_vals[-2:]
                 probe_loss = (
                     args.surface_foot_contact_weight * probe_foot
                     + args.surface_hand_contact_weight * probe_hand
+                    + args.surface_foot_nonpenetration_weight * probe_np
+                    + args.surface_foot_tangential_weight * probe_tv
                 )
                 grad_to_coco = torch.autograd.grad(
                     probe_loss, jc_probe, torch.ones_like(probe_loss),
@@ -762,6 +786,8 @@ def main() -> int:
             _, _, _, _, _, l3_end, l2_end, lp_end, _, _, tl_end, tr_end, _, foot_np_end, foot_tv_end = losses(beta)
             total_end = (obs3d_d*l3_end + obs2d_d*l2_end + 0.02*lp_end
                          + eff_foot_w*lfoot + eff_hand_w*lhand
+                         + args.surface_foot_nonpenetration_weight*foot_np_end
+                         + args.surface_foot_tangential_weight*foot_tv_end
                          + args.temporal_local_weight*tl_end + args.temporal_root_weight*tr_end)
             stage_d_trace.append({"step": int(args.contact_steps), "total": float(total_end),
                                   "obs3d": float(l3_end), "obs2d": float(l2_end),
@@ -796,7 +822,11 @@ def main() -> int:
                "beta_frozen_during_stage_d": bool(beta_frozen_during_stage_d),
                "hand_contact_enabled": bool(args.surface_hand_contact_weight > 0),
                "surface_foot_contact_weight": float(args.surface_foot_contact_weight),
+               "surface_foot_nonpenetration_weight": float(args.surface_foot_nonpenetration_weight),
+               "surface_foot_tangential_weight": float(args.surface_foot_tangential_weight),
                "surface_hand_contact_weight": float(args.surface_hand_contact_weight),
+               "final_foot_nonpenetration": float(foot_np_fin.detach()),
+               "final_foot_tangential": float(foot_tv_fin.detach()),
                "stage_c": stage_c["metrics"], "stage_d_surface": (stage_d["metrics"] if stage_d else None),
                "beta": beta_np.tolist()}
         (out/"surface_contact_metrics.json").write_text(json.dumps(scm, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
