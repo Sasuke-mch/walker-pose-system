@@ -37,6 +37,8 @@ def main():
     ap.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     ap.add_argument("--surface-refine", action="store_true", help="opt-in shared PCA + full-mesh self collision/shape preservation")
     ap.add_argument("--full-body", action="store_true", help="VPoser32 body latent; root released in joint phase, beta fixed")
+    ap.add_argument("--balanced-stages", action="store_true", help="opt-in grouped observations, guarded updates and dedicated leg temporal terms")
+    ap.add_argument("--stage2-static-assumption", action="store_true", help="explicit user assumption: heel/ball patches static within each Stage2 segment")
     ap.add_argument("--vposer-dir", type=Path, help="required for full-body: frozen eval decoder with live latent gradients")
     ap.add_argument("--pose-reference-result", type=Path, help="immutable original VPoser result; required for full-body, including resumed runs")
     ap.add_argument("--vposer-prior-weight", type=float, default=.02)
@@ -48,6 +50,10 @@ def main():
     ap.add_argument("--hand-polish-steps", type=int, default=0, help="full-surface finger refinement with body/wrists frozen")
     ap.add_argument("--lock-grasp-orientation", action="store_true", help="solve local wrists by parent FK to keep palm walker orientation fixed")
     args = ap.parse_args()
+    if args.balanced_stages and not args.full_body:
+        raise ValueError("balanced stages require live VPoser full-body")
+    if args.stage2_static_assumption and not args.balanced_stages:
+        raise ValueError("Stage2 assumption requires balanced stages")
     if args.output_dir.exists():
         raise ValueError("refuse existing output directory")
     # Never silently fall back from the latent body graph to legacy free SO3.
@@ -74,6 +80,8 @@ def main():
         regress_coco17_torch)
     from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_torch
     from pose_app import smpl_surface_contact as surf
+    from pose_app.balanced_grasp import (GROUPS, LEG_ROTATIONS, grouped_observation_loss,
+        observation_guard, leg_temporal_terms, build_stage2_anchors, stage2_terms, guarded_adam_step)
     from pose_app.constructed_grasp_refinement import (
         UPPER_JOINTS, TORSO_JOINTS, load_grasp, validate_rotation, compose_body,
         wrist_rotations, masked_mean, foot_terms, frozen_surface_states,
@@ -261,6 +269,18 @@ def main():
         coefficients.update(pose_anchor=args.body_anchor_weight, vposer_prior=args.vposer_prior_weight,
                             rotation_temporal=args.rotation_temporal_weight)
     active_collision_pairs = [torch.empty((0, 3), dtype=torch.long, device=device) for _ in range(2)]
+    phase = "initial"
+    wrist_ramp = 1.
+    if args.balanced_stages:
+        coefficients.update(leg_rotation_temporal=.2, leg_ground_acceleration=.05, upper_leg_anchor=1.)
+    if args.stage2_static_assumption:
+        anchor_ids, anchor_targets, anchor_segments, anchor_records = build_stage2_anchors(
+            vg_source, scene["stage"], frame_ok_full,
+            [sets[f"{s}_sole_surface_candidate"] for s in ("left", "right")])
+        anchor_ids_t = torch.as_tensor(anchor_ids[sl], dtype=torch.long, device=device)
+        anchor_targets_t = tensor(anchor_targets[sl])
+        anchor_segments_t = torch.as_tensor(anchor_segments[sl], device=device)
+        coefficients.update(stage2_position=1., stage2_velocity=.1)
     args.output_dir.mkdir(parents=True)
     write("run_metadata.json", {"inputs": {k: str(v.resolve()) for k, v in vars(args).items() if isinstance(v, Path)},
         "config": {k: v for k, v in vars(args).items() if not isinstance(v, Path)},
@@ -282,6 +302,13 @@ def main():
     np.savez_compressed(args.output_dir / "body_2d_observation_audit.npz", pair_id=np.arange(args.start, args.stop),
                        left_reason=observation_reasons[0], right_reason=observation_reasons[1],
                        left_weight=obs[0][1].cpu().numpy(), right_weight=obs[1][1].cpu().numpy())
+    if args.stage2_static_assumption:
+        write("stage2_anchor_assumption.json", {"records": anchor_records,
+            "source": "immutable reference sole patches; per-foot rigid Z lift to ground plane",
+            "boundary_source": "frozen automatic scene stage; not independent verification",
+            "measured_contact": False})
+        np.savez_compressed(args.output_dir / "stage2_anchors.npz", pair_id=np.arange(args.start,args.stop),
+            patch_ids=anchor_ids[sl], targets_m=anchor_targets[sl], segment=anchor_segments[sl])
 
     def forward():
         if args.full_body:
@@ -328,6 +355,13 @@ def main():
             terms["body_temporal"] = terms["body_temporal"] / .03 ** 2
             terms["rotation_temporal"] = rotation_temporal_loss(body, frame_ok)
             terms["vposer_prior"] = latent.square().mean()
+        if args.balanced_stages:
+            terms["body_3d"], _ = grouped_observation_loss(coco, target, quality, body_mask, args.body_scale_m)
+            ground_coco = torch.einsum("nij,nkj->nki", Rgt, coco) + tgt[:,None]
+            terms["leg_rotation_temporal"], terms["leg_ground_acceleration"] = leg_temporal_terms(body, ground_coco, frame_ok)
+            terms["upper_leg_anchor"] = rotation_anchor_loss(body[:,LEG_ROTATIONS], reference_body[:,LEG_ROTATIONS]) if phase == "upper_only" else body.sum()*0
+        if args.stage2_static_assumption:
+            terms["stage2_position"], terms["stage2_velocity"] = stage2_terms(vg, anchor_ids_t, anchor_targets_t, anchor_segments_t)
         feet, active = foot_terms(vg, soles, tensor(fw[sl]), support, frame_ok)
         terms.update(feet)
         if args.full_body:
@@ -358,22 +392,32 @@ def main():
             terms["hand_region_contact"] = torch.stack(region_contact).mean()
             terms["hand_palm_contact"] = torch.stack(palm_contact).mean()
             terms["hand_opposition"] = torch.stack(opposition).mean()
-        return sum(coefficients[k] * v for k, v in terms.items()), terms, out, body, wp, wr, vg, active
+        return sum(coefficients[k] * v * (wrist_ramp if k in ("wrist_position", "wrist_rotation", "wrist_bound") else 1.) for k, v in terms.items()), terms, out, body, wp, wr, vg, active
 
     def metrics(state):
         _, terms, out, body, wp, wr, vg, active = state
         pos = torch.linalg.vector_norm(wp - target_p, dim=-1).detach().cpu().numpy() * 1000
         trace = torch.einsum("nsij,sij->ns", wr, target_R)
         angle = torch.rad2deg(torch.acos(((trace - 1) / 2).clamp(-1, 1))).detach().cpu().numpy()
-        return {"terms": {k: float(v.detach()) for k, v in terms.items()},
+        predicted = regress_coco17_torch(out.vertices, reg)
+        error = torch.linalg.vector_norm(predicted-target, dim=-1)
+        groups = {key: {"rms_mm": float(torch.sqrt(error[:,ids][body_mask[:,ids]].square().mean()).detach())*1000,
+                        "max_mm": float(error[:,ids][body_mask[:,ids]].max().detach())*1000} if body_mask[:,ids].any() else None for key,ids in GROUPS.items()}
+        return {"terms": {k: float(v.detach()) for k, v in terms.items()}, "body_groups": groups,
                 "wrist_error_mm": {s: {"median": float(np.median(pos[:, j])), "p95": float(np.percentile(pos[:, j], 95)), "max": float(pos[:, j].max())} for j, s in enumerate(("left", "right"))},
                 "wrist_angle_deg": {s: {"median": float(np.median(angle[:, j])), "p95": float(np.percentile(angle[:, j], 95))} for j, s in enumerate(("left", "right"))},
                 "foot_tangential_active_pairs": active,
-                "body_3d_rms_mm": float(torch.sqrt(terms["body_3d"]).detach()) * args.body_scale_m * 1000,
+                "body_3d_rms_mm": float(torch.sqrt((error.square()*quality)[body_mask].sum()/quality[body_mask].sum().clamp_min(1e-6)).detach()) * 1000,
                 "sole_minimum_z_mm": {s: float(vg[:, idx, 2].min().detach()) * 1000 for s, idx in zip(("left", "right"), soles)},
                 "lower_body_unchanged": bool(torch.equal(body[:, frozen_lower], base[:, frozen_lower]))}
 
     initial = forward()
+    baseline_coco = regress_coco17_torch(initial[2].vertices, reg).detach().clone()
+    baseline_error = torch.linalg.vector_norm(baseline_coco-target, dim=-1)
+    # Every accepted triangulated point is guarded; quality only weights losses.
+    guard_mask = body_mask.clone()
+    np.savez_compressed(args.output_dir / "observation_guard_reference.npz", pair_id=np.arange(args.start,args.stop),
+        baseline_error_m=baseline_error.cpu().numpy(), valid=guard_mask.cpu().numpy(), allowance_m=.01)
     initial_metrics = metrics(initial)
     gradients = {}
     audit_parameters = (latent, root_delta, translation_delta) if args.full_body else (upper, torso)
@@ -381,26 +425,28 @@ def main():
         g = torch.autograd.grad(coefficients[key] * term, audit_parameters, retain_graph=True, allow_unused=True)
         gradients[key] = [None if v is None else float(v.norm().detach()) for v in g]
     write("gradient_audit.json", {"parameters": ["vposer_latent", "root", "translation"] if args.full_body else ["upper", "torso"], "weighted_gradient_norms": gradients})
-    history, checkpoints = [], {"initial": initial_metrics}
+    history, checkpoints, transactions = [], {"initial": initial_metrics}, []
     del initial
     for stage, steps in (("upper_only", args.upper_steps), ("upper_and_torso", args.body_steps),
                          ("body_wrist_polish", args.body_polish_steps), ("hand_surface_polish", args.hand_polish_steps)):
         if steps == 0:
             continue
+        phase = stage
         upper.requires_grad_(not args.full_body and stage != "hand_surface_polish")
         torso.requires_grad_(not args.full_body and stage in ("upper_and_torso", "body_wrist_polish"))
         for p in (root_delta, translation_delta):
             p.requires_grad_(args.full_body and stage in ("upper_and_torso", "body_wrist_polish"))
         for p in hand_coeff.values():
-            p.requires_grad_(args.surface_refine and stage != "body_wrist_polish")
+            p.requires_grad_(args.surface_refine and (stage == "hand_surface_polish" if args.balanced_stages else stage != "body_wrist_polish"))
         if args.full_body:
             latent.requires_grad_(stage != "hand_surface_polish")
             params = ([latent] if latent.requires_grad else []) + [p for p in (root_delta, translation_delta) if p.requires_grad]
         else:
             params = ([upper] if upper.requires_grad else []) + ([torso] if torso.requires_grad else [])
         params += [p for p in hand_coeff.values() if p.requires_grad]
-        optimizer = torch.optim.Adam(params, lr=args.lr)
+        optimizer = torch.optim.Adam(params, lr=args.lr * (.25 if args.balanced_stages and stage == "body_wrist_polish" else 1.))
         for step in range(steps):
+            wrist_ramp = (.1 + .9*(step+1)/steps) if args.balanced_stages and stage == "upper_only" else 1.
             optimizer.zero_grad(set_to_none=True)
             state = forward()
             if args.surface_refine and step % args.collision_refresh == 0:
@@ -419,8 +465,26 @@ def main():
             loss.backward()
             if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in params):
                 raise RuntimeError("nonfinite parameter gradient")
-            optimizer.step()
-            if args.surface_refine:
+            if args.balanced_stages:
+                def evaluate_trial():
+                    trial = forward()
+                    predicted = regress_coco17_torch(trial[2].vertices, reg)
+                    ok, excess = observation_guard(predicted, target, guard_mask, baseline_error)
+                    excess_all = torch.where(guard_mask, torch.linalg.vector_norm(predicted-target,dim=-1)-baseline_error-.01,
+                                             torch.full_like(baseline_error,-float("inf")))
+                    bad = torch.nonzero(excess_all > 1e-6).cpu().tolist()
+                    leg_shift = float(torch.linalg.vector_norm(predicted[:,11:]-baseline_coco[:,11:], dim=-1).max())
+                    if stage == "upper_only":
+                        ok = ok and leg_shift <= .005 + 1e-6
+                    pca_ok = all(bool(((hand_coeff[s]-tensor(grasp["hands"][s]["hand_pca"])).abs() <= 2.).all()) for s in ("left","right"))
+                    return trial[0], ok and pca_ok, {"observation_excess_m": excess, "leg_shift_m": leg_shift,
+                        "pca_ok": pca_ok, "violating_pair_joint": [[i+args.start,j] for i,j in bad],
+                        "upper_leg_shift_guard_passed": stage != "upper_only" or leg_shift <= .005+1e-6}
+                transaction = guarded_adam_step(optimizer, params, evaluate_trial, loss.detach())
+                transactions.append({"stage":stage, "step":step, "wrist_ramp":wrist_ramp, **transaction})
+            else:
+                optimizer.step()
+            if args.surface_refine and not args.balanced_stages:
                 with torch.no_grad():
                     for s in ("left", "right"):
                         reference = tensor(grasp["hands"][s]["hand_pca"])
@@ -474,6 +538,12 @@ def main():
         "scope": "full_body_with_shared_PCA_and_surface_constraints" if args.full_body else "upper_and_torso_refinement",
         "full_body": args.full_body, "shared_PCA_refinement": args.surface_refine,
         "wrist_target_frame": "walker_rigid_local", "beta_fixed": True})
+    if args.balanced_stages:
+        write("update_transactions.json", {"updates": transactions,
+            "observation_allowance_m": .01, "upper_phase_leg_shift_limit_m": .005,
+            "guard": "every accepted current triangulated point vs immutable initial error",
+            "rejected_updates_restore_parameters_and_Adam_moments": True,
+            "accepted_backtracks_keep_proposed_Adam_moments": True})
     return 0
 
 

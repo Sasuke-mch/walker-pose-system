@@ -381,3 +381,34 @@ vposer_body_full448_viewer.html使用当前fit及scene，重新三角化/严格�
 三条5帧真实运行：active_constructed_grip_v2/audit_logic_full_smoke_v1：原source/原reference、60..64，body2步/hand0；audit_logic_legacy_smoke_v1：同窗局部旧诊断upper1/hand0、surface关闭；audit_logic_resume_smoke_v2：full448当前失败VPoser输出作source、原reference不变、body2/hand0。全部执行成功，各command.json/run_metadata与模型参数输出保留。恢复前后support/state/reason/frame_ok逐元素相同。故意scene原始点循环错位一帧，程序在创建输出前拒绝，fault_injection_result.json保存stderr及诊断准备阶段读取object-valued stage缺allow_pickle的原错误说明；没有伪装该准备错误为模型成功。
 
 35项针对性pytest、py_compile/diff通过；新增越界/非有限权重/重排帧ID及第13帧相交梯度隔离回归。修复完成，但短步验证不是新高质量姿态，既有448帧网页数据不变，主拟合仍未通过。本轮不扩全序列重拟合、不用旧网页混充新结果；强腕软界梯度/身体脚冲突、腕朝向、完整人体碰撞未解决，不声明物理一致性通过。无新Markdown，仅更新现有记录。
+
+### 2026-10-01：固定手部拟合的全身权衡策略实现与41帧拒绝实验
+
+本轮是策略包工程比较，不是精度验证或单因素消融。输入：G20261001_fixed_mano_pca448_v1/fit_shared/result.npz同时作为source/不可变VPoser参考；G20261001_annotated_shared_grip_v1/active_constructed_grip_v2/constructed_grasp.json及npz；该目录vposer_body_full448_v1/scene/static_walker_model.json与scene_transforms.npz、current_foot_candidates.npz；本实验contact_surface_sets_smplh_v1/contact_vertex_sets.json；V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/{left,right}/pmpose/raw_predictions.json；官方VPoser/SMPLH/MANO资产与正式双鱼眼标定。所有输入冻结，不调整标定/地面/shape，不拼窗、不补失败帧。
+
+实现：realtime_app/pose_app/balanced_grasp.py封装分组3D损失、逐关节门、腿时序、完整Stage2段锚和事务缩步；tools/refine_body_with_constructed_grasp.py通过--balanced-stages和--stage2-static-assumption显式启用，旧默认路线可直接回退；tools/benchmark_balanced_grasp.py写入运行前protocol并执行对照/候选和全部手帧独立几何审计。VPoser保留32D->21实时解码与最终逐元素断言，未硬覆盖下肢或腕旋转。
+
+具体阶段：upper_only仅latent可训练、根/平移/PCA冻结；腿8个局部旋转有原参考软约束，模型髋膝踝位置最大偏移5mm硬检查，腕位置/朝向/软界系数渐进0.1->1。upper_and_torso释放latent/根/平移；body_wrist_polish同参数但lr乘0.25；hand_surface_polish仅共享PCA。全部阶段原3D/双目2D、姿态、C1/C2/脚非穿透/手表面项仍保留。VPoser存在全身耦合，所以这里是约束驱动的上肢优先，不能称为独立上肢参数优化。
+
+观察约束：COCO17左右臂(5,7,9)/(6,8,10)、躯干(5,6,11,12)、左右腿(11,13,15)/(12,14,16)、头(0..4)各自按本轮quality和valid归一化后平均可用组，距离尺度50mm；肩髋重叠点重复参与。逐帧逐关节硬门对每个当前接受点要求误差<=不可变初始化误差+10mm，低quality只改变软权重不移除硬门。模型回归COCO语义点与SMPLH腕关节点有区别，不把二者当同一点。腿旋转相邻差10度尺度、地面髋膝踝30fps二阶差10m/s²尺度，权重0.2/0.05。它们是优化正则，不能代表真实加速度精度。
+
+Adam一次提出更新，最多alpha=1,1/2,...,1/128八次回退，检查有限/本步目标不增/逐点门/上肢阶段腿偏移/PCA原构造±2范围。全部失败恢复参数和Adam矩/step；接受缩步保留候选矩，此选择明确记录。共享参数及全窗联合接受可能导致某帧阻断其他帧更新，本轮未实现约束投影方向。逐次拒绝的原pairID和COCO jointID保存在update_transactions.json，原始拒绝观测仍在输入/audit中。
+
+Stage2不依赖旧support推断：全448帧按scene精确stage2_feet_static_walker_moving连续段分段，至少3个有效帧，每脚heel/ball各选固定3个参考最低中位数顶点，目标为对应patch段中位数XYZ，每脚Z整体平移让参考最低鞋底中位数到0，记录抬升量及顶点身份。位置10mm/速度0.05m/s尺度，权重1/0.1，相邻项只同段有效帧。stage2_anchor_assumption.json及stage2_anchors.npz保存锚/段/不可用原因。XY为参考、Z为主动设计，不是人工或压力实测；Stage2/地面仍来自踝估计的工程链，无法独立验证该静止假设。旧support未知仍不伪造C2。
+
+执行命令：.venv-cuda/Scripts/python.exe realtime_app/tools/benchmark_balanced_grasp.py --reference-metadata research_records/engineering_validation/G20261001_annotated_shared_grip_v1/active_constructed_grip_v2/vposer_body_full448_v1/fit/run_metadata.json --output-root research_records/engineering_validation/G20261001_annotated_shared_grip_v1/active_constructed_grip_v2/balanced_short60_100_v2 --steps 50。v1保留；v2仅增加拒绝点诊断和指标detach，不改优化数值。两轮每路线60..100共41帧，4阶段各50步，lr0.003、腕20/朝向0.1、碰撞全窗每25步筛查，其他继承当前参考配置。每轮control/balanced命令JSON、日志、各阶段参数、result、观测mask、锚、summary及完整hand_geometry_audit均保存。比较整个新增策略包，不宣称单项贡献。
+
+| 检查 | 未启用策略的对照 | 新策略候选 |
+| --- | --- | --- |
+| 加权身体观测RMS，初始77.064mm | 最终107.994mm | 最终77.133mm |
+| 最大逐点误差增加 | 177.087mm | 9.999mm |
+| 左/右腕median | 7.360/7.257mm | 106.820/73.377mm |
+| 左/右腕P95 | 50.704/54.639mm | 171.847/90.729mm |
+| 左/右脚底全窗最低Z | -88.017/-121.837mm | -56.209/-72.956mm |
+| 全窗手几何通过 | 左0/41、右0/41 | 左0/41、右0/41 |
+
+候选初始化腕median117.711/82.870mm、脚底最低-61.556/-73.865mm。候选上肢/躯干/联合身体各50次更新接受7/4/2次，共13/150；PCA29/50。被拒缩步高频点：pair84/85右肩6（各775次尝试）、pair79左踝15（678）、pair82右肘8（389）、pair81右肘8（293），次数不代表独立帧数。候选腿旋转相邻平方0.091028->0.094777，地面腿加速度平方9.526999->10.007813，Stage2 patch速度平方295.293579->307.050781，位置平方18.395010->17.237753。保护观察误差确实成立，但没有解决抖动/贴地/握持，不能把接近初始化当作有效优化。
+
+预先冻结门：最大逐点退化10mm、腕P95<=10mm、最低脚底>=-3mm、腿加速度不增加、全部手帧几何代理通过。结果仅第一项通过；comparison.json逐项记录false与完整数据。主拟合拒绝，不扩full448、不更换现有网页、不放宽门、不混用旧解。这里是优化方向受强腕项驱动、同时触碰观测上限后的停滞；仅靠调大平滑权重没有充分依据。后续须研究在观测约束下的更新方向/逐帧受限更新和腕语义冲突，本轮并未实现该方向求解器。
+
+42项针对性pytest通过，三个工具/模块py_compile、任务diff检查通过。调试证据：首次数值近零梯度严格==0测试失败（4.6e-14），改为1e-10容差；测试文件名误填导致一次无测试执行；benchmark启动时重复stop参数语法错误，修正后v1/v2完整跑通。没有把这些失败算成正式通过实验。当前代码功能已测试，但候选结果未通过物理/拟合门。
