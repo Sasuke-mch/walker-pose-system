@@ -2861,3 +2861,9 @@ v1(200+100步)腕已接近但朝向约33度，保留调试结果；v2身体3D按
 对完整实际网格全部31帧检查：左31/31几何代理通过，右0/31，有自相交且最坏扶手穿透3.053mm；拒绝原因及所有相交对保存。局部构造表面通过不能直接转移到全身；去掉刚体变换后手表面仍有mm级偏差。当前body_refinement_window60_90_v2/result.npz是工程探针，accepted_for_main_fit=False。下一检查阶段须处理完整身体姿态条件下右手表面碰撞/手形一致性，必要时受限开放共享PCA，再谈448帧。不能粘贴独立手网格冒充连接结果，不用插值/旧结果补齐。
 
 最终接口2步smoke_v3与阶段快照保存通过，31项相关测试、py_compile/diff检查通过。具体输入/权重/输出/停止门详见G20260927_wilor_smplh_full448_v1/EXPERIMENT.md新增记录；结果在active_constructed_grip_v2/body_refinement_window60_90_v1/v2与body_refinement_interface_smoke_v3，回退直接使用旧source-result和旧拟合入口。未推送远端，其他用户改动保留。
+
+## 2026-10-01：自相交差异原因确认（局部抓取刚体假设不充分，精修缺少自碰撞项）
+
+按用户质疑做第60帧受控诊断，新增tools/diagnose_constructed_grasp_deformation.py，输出body_refinement_window60_90_v2/deformation_diagnostic.json。同手指/同beta/同三角面，左/右相交对：中立身体0/0；原身体0/20；精修身体0/59；关闭pose correctives 0/7；精修局部腕归零0/18；仅精修腕+中立其余身体21/17。右原身体在掌/腕与小指，精修新增中指与无名指。对数不是穿透程度，局部 vs world浮点阈值会导致右59 vs57，但有相交结论一致。
+
+确认接入假设不足：局部构造bodyzero前向再刚体放置，完整SMPLH手面受全身pose correctives和混合蒙皮影响，固定PCA不固定皮肤。中立身体两手0相交、源矩阵重放和PCA解码一致，未发现左右参数误映射证据；右手不是因world目标/标定或简单的腕旋转更大。左手只放入局部腕也21对，说明左通过只对当前身体成立。精修目标缺hand_self_collision，只有到扶手的hand_penetration；后验拒绝不等于优化防碰撞。这是需要修正的整体优化逻辑，不归咎数据。下一步在完整身体条件下增加自碰撞和手面形状保持，必要时受限共享PCA修正；不关闭correctives作为修复，脚部约束保留。本次仅诊断，未重新优化或宣称已修复。
