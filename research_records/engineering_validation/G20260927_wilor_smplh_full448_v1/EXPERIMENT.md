@@ -319,3 +319,19 @@ fit_v6从v5初始化，新增--lock-grasp-orientation：给定walker到camera固
 最终audit逐448帧双手，v6通过左257/448、右344/448：screened_triangle_crossings 50手帧，finger_region_gap_exceeds_5mm 286，handle_penetration_exceeds_3mm 8，thumb_opposition_proxy_failed 1（原因可重叠）。最大扶手顶点穿透左7.877/右3.206mm。与v5相比穿透减少、腕更稳，但通过率降低，主要指区间隙变大；不能用一个总损失宣布手形完全修复。相交筛查不覆盖所有共面/擦碰，不等于精确物理接触；区域最小距离不等于真实接触面积/摩擦/承重。结果accepted_for_main_fit=False，保留两轮各自完整输出，当前停止进一步调权，不混合v5身体/v6手面。
 
 当前可观察候选选v6以回答腕基本固定后的全身效果。全帧result.npz、fit_summary.json、参数阶段快照、grasp_geometry_audit.json位于full448_body_v3/fit_v6。body_wrist_fixed_viewer_v2.html使用该同一次网格和fresh scene，原body_wrist_fixed_viewer.html保留初版显示；版本2只调整初始缩放/文字布局，没有数据变化。单页Canvas绘制全部13776真实三角面，含6890顶点/41328索引项，使用X,-Y,Z展示映射。同帧模型COCO17、严格接受点、有限拒绝点/完整骨架含右膝14、实体杆件、双光心与基线、XY地面/Z高度、0.5m标尺、侧相机轨迹、踝拖尾、地下脚面颜色、Stage/地面状态/回投median/拒绝理由/双手审计全部可见；无插值/平滑/手工吸附。浏览器核查0、224、447帧，末帧身体完整可见；控制台无error，截图viewer_frame224.jpg与viewer_validation.json同目录保存。36项相关测试通过，相关py_compile和git diff检查完成。旧fit_smplh_wilor_sequence.py未更改，新模式默认关闭，可直接回原source-result；未把当前候选写为主线物理通过。
+
+### 2026-10-01：用户指出严重姿态异常后的VPoser逻辑审计（撤回上一候选推荐）
+
+本节覆盖前一节的推荐结论：fit/v4/v5/v6均作为失败诊断保留，不作为腕固定后全身效果改善的有效推荐。目标是只读检查身体先验计算图与已保存全448帧，不调权、不拟合新参数、不重建页面。输入原`G20261001_fixed_mano_pca448_v1/fit_shared/result.npz`与当前v4/v5/v6；官方`models/VPoser02_05/V02_05`，代码audit_grasp_body_pose_prior.py，输出full448_body_v3/body_prior_logic_audit.json，逐帧逐关节全部记录。
+
+原入口fit_smplh_wilor_sequence.py逐次decode_body_pose(latent)，加载冻结eval VPoser32D，损失含vposer_prior_weight*latent.square().mean()，导出latent。原保存latent重放21关节body_pose的SO3误差max0.0000274度，说明原链条保持一致。新精修入口根本未加载VPoser，直接base@Rodrigues(delta)更新独立关节；没有身体latent变量/先验/解码或编码重建项。只沿用原身体姿态初始化，无法继续保留训练所得身体先验。MANO12D仅影响手指；SMPL-H模型参数冻结不等于输入姿态冻结或受先验约束。
+
+v6对原姿态的旋转差：右膝median52.306/P9572.646/max104.919度；头median85.811/P95116.978/max167.147度；左膝max171.645度pair329。相邻帧旋转差P95原→最终：左膝9.041→70.412度、右膝8.999→90.466度、头2.993→122.286度。这些是SO3旋转差，不是解剖屈伸角；不以90度阈值冒充临床/物理关节限位。VPoser编码均值再解码旋转差原median1.962/P955.227/max9.459度，v4P9559.592、v5 61.425、v6 61.796度；它不是最近decoder流形距离或姿态有效概率，不能独立定为人体不合法，但与代码已失先验的事实一致。
+
+详细缺项：剩余关节frozen_lower实际1/2/4/5/7/8/10/11/15，头部15也被无条件释放；TORSO中12是neck。pose_anchor仅upper/torso本轮修正平方，lower在root_reference用平方均值，无解剖约束；v4→v5→v6每轮把先前优化结果重当base，initial anchor各回0，掩盖累积偏移。解析锁掌朝向为Rlocal=Rparent.T@Rtarget数学正确，仍保持SO3，但未限制腕相对前臂活动范围，右腕局部旋转max89.935度；不能称为解剖弯曲89.935度。decoder身体包括20/21两个腕，未来decode后再无约束覆盖腕也会破坏完整VPoser参数化。完整身体自碰撞缺失；仅手面碰撞不检查躯干/肢体。body_temporal仅相对髋COCO位置米制二阶差，未除时间步平方且delta30mm，无关节旋转项；最终加权约0.0000295，不能称其已抑制实际旋转抖动，损失数值本身也不是梯度影响证明。pose_anchor最终加权约0.0000464，仅表示相对v5增量，不证明姿态整体近原。
+
+排查边界：当前拟合mask与原始均7534点且完全相同，未找到此次新增观测mask变化；有严格可视化门与工程拟合mask差异，但不能归因为本轮才发生。矩阵源网格重放误差max5.960e-7m，未发现模型矩阵接口/轴角wrap（审计使用SO3）、MANO均值或世界/助步器坐标转置导致本次身体异常的证据；没有因此宣称它们的外部精度已通过。最终模型COCO cam0负深度0。脚C1/非穿透必须保留；C2没有可信支撑相邻帧不能提供活动约束，不能把它当姿态先验替代。
+
+临时修复为停止错误路线：入口--full-body在模型加载及输出创建前显式拒绝，要求活动VPoser身体参数化与先验，不静默改成另一种求解。旧官方入口及全部失败文件/页面保持。新增审计使用旋转矩阵对比，包含轴角2pi等价、90度已知旋转、非法shape/NaN与禁止入口输出副作用测试；3项新测试+14项已有精修测试通过，编译与差异检查通过。短窗自由SO3旧模式同样无VPoser，仍仅用于局部诊断，不作为正式全身方案。
+
+下一阶段正确结构应从原latent而非v6坏姿态出发，固定eval decoder参数并每次forward保留对latent的梯度：latent32→decode_body21→SMPL-H→同帧腕/脚/观测约束；根旋转/平移独立，beta固定，手指共享MANO PCA。加入latent先验、相对原始冻结姿态的SO3限制和适当旋转/位置时序；掌朝向暂用软项，不直接覆盖decoder腕。任何额外腕修正须显式小范围并验证前臂/手腕活动范围，不能伪称全21关节都仍在VPoser流形。维持身体二维/三维、脚C1/C2/非穿透与全部不可用理由；腕目标是构造假设，如与人体姿态先验冲突须如实报告，不用弯曲异常膝/头换毫米级腕误差。本轮只完成审计和阻止继续误跑，未声称新VPoser优化已实现或得到修正全帧结果。

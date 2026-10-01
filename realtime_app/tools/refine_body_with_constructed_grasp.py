@@ -45,6 +45,12 @@ def main():
     args = ap.parse_args()
     if args.output_dir.exists():
         raise ValueError("refuse existing output directory")
+    # This branch optimizes independent SO3 corrections rather than a VPoser
+    # latent. A VPoser-derived initialization does not preserve the body prior.
+    # Retain old artifacts for diagnosis, but prohibit another full-body run
+    # until the decoder and prior are actually in the optimization graph.
+    if args.full_body:
+        raise ValueError("unrestricted full-body refinement is disabled: active VPoser body parameterization and prior are required")
     if args.hand_polish_steps and not args.surface_refine:
         raise ValueError("hand polish requires --surface-refine")
     if args.wrist_bound_m <= 0 or args.collision_refresh <= 0 or min(args.upper_steps, args.body_steps, args.body_polish_steps, args.hand_polish_steps) < 0 or not np.isfinite(
