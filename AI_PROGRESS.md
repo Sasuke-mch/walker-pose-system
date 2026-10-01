@@ -2919,3 +2919,7 @@ vposer_body_full448_viewer.html使用本轮fit真实三角面与本轮scene统�
 ## 2026-10-01：按用户要求统一实线骨架
 
 当前448帧vposer_body_full448_viewer.html骨架所有有限端点连线改为实线，accepted用原正常色、rejected用橙色实线，拒绝点叉号/掩码/原因保留。整页数据载荷逐字一致，未重新拟合/重放或更改几何。build_grasp_body_canvas_viewer.py及build_surface_contact_canvas_viewer.py同步生成逻辑/图例，VISUALIZATION_PIPELINE.md替换旧虚线规则并明确全部骨架实线。浏览器刷新并检查原查看帧105（保留隐藏mesh的查看状态），控制台无error；viewer_solid_bones_frame105.jpg保存。5项相关pytest、双脚本编译及diff检查通过；用户已有改动保留。
+
+## 2026-10-01：骨架进一步统一纯黑色实线
+
+按用户补充要求，当前448帧页面及两个Canvas生成器所有人体骨架边统一#000000实线，不按accepted改变连线颜色。拒绝状态仍由橙色叉号、掩码及诊断栏保留；页面完整数据载荷不变。VISUALIZATION_PIPELINE.md同步替换橙色边规则。浏览器刷新第36帧确认，截图viewer_black_bones_frame36.jpg保存；5项pytest与编译检查通过，仅改变显示，原有其他改动保留。
