@@ -2915,3 +2915,7 @@ v1(200+100步)腕已接近但朝向约33度，保留调试结果；v2身体3D按
 独立CPU重放保存latent得到body_rotation_matrices，最大逐元素误差4.768e-7；最终参数形状448x32、448x6890x3、13776x3及有限性、0..447连续帧身份检查通过。body_prior_audit.json保留全部帧旋转诊断，encoder均值再解码P954.724度仅为模型内部指标，不是物理姿态合格证。
 
 vposer_body_full448_viewer.html使用本轮fit真实三角面与本轮scene统一变换，重新三角化/严格门，保留COCO17含拒绝右膝、实体walker、双相机/基线/轨迹、XY地面Z高度、脚底地下标记、逐帧腕误差/手形/Stage/held及拒绝状态，无平滑/吸附/旧网格替补。浏览器检查0/224/447、播放暂停、自由旋转及重置，末帧人体完整，控制台无error；viewer_frame224.jpg与viewer_validation.json保存。21项相关pytest通过。已有用户改动保留，仅更新现有记录，不修改求解算法。
+
+## 2026-10-01：按用户要求统一实线骨架
+
+当前448帧vposer_body_full448_viewer.html骨架所有有限端点连线改为实线，accepted用原正常色、rejected用橙色实线，拒绝点叉号/掩码/原因保留。整页数据载荷逐字一致，未重新拟合/重放或更改几何。build_grasp_body_canvas_viewer.py及build_surface_contact_canvas_viewer.py同步生成逻辑/图例，VISUALIZATION_PIPELINE.md替换旧虚线规则并明确全部骨架实线。浏览器刷新并检查原查看帧105（保留隐藏mesh的查看状态），控制台无error；viewer_solid_bones_frame105.jpg保存。5项相关pytest、双脚本编译及diff检查通过；用户已有改动保留。
