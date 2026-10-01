@@ -2927,3 +2927,13 @@ vposer_body_full448_viewer.html使用本轮fit真实三角面与本轮scene统�
 ## 2026-10-01：固定手部拟合页面标题简化
 
 按用户要求，当前448帧页面h1与浏览器标题统一“SMPL-H 固定手部约束拟合”，删除侧栏“工程候选”整段说明，build_grasp_body_canvas_viewer.py同步。仅文字展示变化，完整数据载荷逐字不变，拟合未通过的实验结论及逐帧诊断不变。浏览器刷新检查标题/段落并恢复第357帧，viewer_formal_title.jpg保存；脚本编译通过。原有其他改动保留。
+
+## 2026-10-01：固定手部全身拟合逻辑审核与修正
+
+本轮审查范围为refine_body_with_constructed_grasp.py、constructed_grasp_refinement.py、vposer_grasp_body.py及当前观察/接触/可视化接口，非全仓库逐文件安全审计。验证目标是损失有效性、帧身份、固定参考及模式可运行，输入沿用当前448帧冻结scene/原始PMPose/原始VPoser参考/constructed_grasp，不盲目重放模型或扩全片优化；35项针对性测试、真实5帧接口与错位故障注入作为成功门。原失败448帧和网页数据不替换。
+
+确认并修复：①二维损失只检查有限XY/正置信度，原图越界未拒绝且置信度NaN会传播；新增raw_observation_weights使用原1920x1080边界、三通道有限性、逐视图原因，进入残差前清除拒绝坐标防止inf*0。全448帧左73/右9个越界点曾进入原二维损失；不把单目有效点因另一视图失败一并删除。导出body_2d_observation_audit.npz。②full-body恢复优化用source优化后网格重估support，违反不可变参考；改用pose-reference-result网格/观测mask冻结support/state/reason，元数据记录具体参考路径。③身体阶段碰撞只筛首中尾及轮换8帧，300步未覆盖大部分448帧；新增screened_sequence_pairs每次refresh检查全部窗口/全片，保留(frame,faceA,faceB)，避免未筛帧没有碰撞梯度。刷新间隔仍50/100，不宣称逐步连续无碰撞。④零步手阶段仍创建Adam，surface-refine关闭时空参数列表报错；现在跳过零步阶段。⑤仅验证输入长度会接受同长重排/非零起点；新增source/reference/contact pair_id检查（旧原始source/reference无字段时仅按既有0起点约定兼容），本次新三角化与scene保存raw逐点对照，错位时在输出目录创建前拒绝。移除旧source观测的冗余门，验证当前重算3D有效权重。
+
+输出active_constructed_grip_v2/audit_logic_full_smoke_v1（60..64，VPoser2步，PCA0）、audit_logic_legacy_smoke_v1（同窗旧局部诊断1步，surface关闭/手0）、audit_logic_resume_smoke_v2（已有full448 VPoser结果初始化/原参考，2步）。三条实际SMPLH/MANO/VPoser模型前向成功，恢复前后frozen_foot_states的support/state/reason/frame_ok逐元素一致。故意把scene的raw点循环错位1帧，拒绝scene/current source or alignment mismatch且未创建must_not_exist目录，完整stderr保留fault_injection_result.json。故障准备初次读取object-valued stage缺allow_pickle失败，随后仅修正可信本地诊断读取；该准备错误保留记录，不改模型输入。raw_2d_full448_counts.json保留真实越界计数。
+
+35项相关pytest通过，两个工具/模块py_compile通过。新增测试覆盖同长重排/子窗ID拒绝、越界/非有限置信度/零置信度拒绝、稀疏旧筛查范围以外第13帧相交被检出且梯度不影响其他帧。VPoser活跃32D->21关节与mean-once MANO、walker局部刚体回映/FK复核未发现新的解码覆盖或左右转置错误；C1/C2及非穿透损失保留，未知支撑仍不启用C2。脚部nonpenetration当前正3mm margin是离地安全间距，不是允许穿透3mm，未擅自改变其数值。腕10mm外软界初始梯度很强、掌朝向不理想、完整身体自碰撞缺失仍是未解决问题；本轮未调权或保证物理握持。当前正式448帧网页仍是之前失败拟合，不代表修正后重算结果，短步smoke也不升级主拟合。代码/原数据/旧结果及用户已有改动保留。

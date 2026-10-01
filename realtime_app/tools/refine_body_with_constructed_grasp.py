@@ -77,7 +77,8 @@ def main():
     from pose_app.constructed_grasp_refinement import (
         UPPER_JOINTS, TORSO_JOINTS, load_grasp, validate_rotation, compose_body,
         wrist_rotations, masked_mean, foot_terms, frozen_surface_states,
-        triangle_separation_loss, screened_triangle_pairs, align_wrist_rotations)
+        triangle_separation_loss, screened_sequence_pairs, align_wrist_rotations,
+        validate_full_sequence_ids, raw_observation_weights)
 
     torch.set_num_threads(2)
     torch.manual_seed(20261001)
@@ -94,6 +95,12 @@ def main():
     scene = np.load(args.scene_transforms, allow_pickle=True)
     labels = np.load(args.contact_labels, allow_pickle=True)
     total_frames = len(z["body_pose"])
+    validate_full_sequence_ids(z.get("pair_id"), total_frames, "source", allow_legacy=True)
+    validate_full_sequence_ids(labels.get("pair_id"), total_frames, "contact labels")
+    reference = np.load(args.pose_reference_result, allow_pickle=False) if args.full_body else z
+    validate_full_sequence_ids(reference.get("pair_id"), total_frames, "reference", allow_legacy=True)
+    if reference["vertices"].shape != z["vertices"].shape or not np.allclose(reference["betas"], z["betas"], atol=1e-6):
+        raise ValueError("immutable reference frame/beta mismatch")
     if not 0 <= args.start < args.stop <= total_frames or args.stop - args.start < 3:
         raise ValueError("window must contain at least three valid sequence indices")
     sl = slice(args.start, args.stop)
@@ -117,8 +124,9 @@ def main():
     soles = [np.unique(sum(sets[f"{s}_sole_surface_candidate"].values(), [])) for s in ("left", "right")]
     if any(len(ids) == 0 or np.min(ids) < 0 or np.max(ids) >= 6890 for ids in soles):
         raise ValueError("invalid sole surface vertex IDs")
-    frame_ok_full = np.asarray(z["body_accepted"]).any(1) & np.asarray(scene["accepted"]).any(1)
-    vg_source = np.einsum("nij,nvj->nvi", Rg, z["vertices"]) + tg[:, None]
+    frame_ok_full = np.asarray(reference["body_accepted"]).any(1) & np.asarray(scene["accepted"]).any(1)
+    # Resuming must not relabel support using the newly optimized mesh.
+    vg_source = np.einsum("nij,nvj->nvi", Rg, reference["vertices"]) + tg[:, None]
     support_full, states_full, reasons_full = frozen_surface_states(vg_source, soles, frame_ok_full)
     support = torch.as_tensor(support_full[sl], device=device)
     frame_ok = torch.as_tensor(frame_ok_full[sl], device=device)
@@ -145,7 +153,6 @@ def main():
         from pose_app.smplx_fitting import load_vposer_explicit
         from pose_app.vposer_grasp_body import decode_body_rotations, rotation_anchor_loss, rotation_temporal_loss
         vposer, _, vp_checkpoint = load_vposer_explicit(args.vposer_dir, args.device)
-        reference = np.load(args.pose_reference_result, allow_pickle=False)
         if "vposer_latent" not in z.files or "vposer_latent" not in reference.files:
             raise ValueError("source/reference requires original VPoser latent; rejected SO3 fits cannot initialize this route")
         if reference["body_pose"].shape != z["body_pose"].shape or not np.allclose(reference["betas"], z["betas"], atol=1e-6):
@@ -185,24 +192,22 @@ def main():
     target_p = tensor([grasp["hands"][s]["wrist_walker_m"] for s in ("left", "right")])
     target_R = tensor([grasp["hands"][s]["rotation_walker_from_wrist"] for s in ("left", "right")])
     reg = load_coco17_regressor(ROOT / "models/smpl/J_regressor_coco.npy")
-    target = tensor(np.nan_to_num(z["raw_triangulated_points"][sl] / 1000))
-    body_mask = torch.as_tensor(z["body_accepted"][sl] & np.isfinite(z["raw_triangulated_points"][sl]).all(-1), device=device)
-    quality = tensor(z["body_quality"][sl]).clamp_min(0)
-    if not body_mask.any() or not torch.isfinite(quality).all() or quality[body_mask].sum() <= 0:
-        raise ValueError("no valid weighted body observations")
     # Reuse the authoritative raw reader; raw fish-eye pixels, no WiLoR pixels.
     spec = importlib.util.spec_from_file_location("raw_grasp", ROOT / "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py")
     raw = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(raw)
-    obs = []
+    obs, observation_reasons = [], []
+    cal = load_stereo_fisheye(ROOT / "realtime_app/calibration/results")
     for path, side in ((args.left_raw, "left"), (args.right_raw, "right")):
         rows = raw.raw_side(path, side)
         if sorted(rows) != list(range(total_frames)):
             raise ValueError("raw frame identity mismatch")
         points = np.stack([rows[i] for i in range(args.start, args.stop)])
-        valid = np.isfinite(points[..., :2]).all(-1) & (points[..., 2] > 0)
-        obs.append((tensor(np.nan_to_num(points[..., :2])), tensor(np.clip(np.nan_to_num(points[..., 2]), 0, 1)) * tensor(valid)))
-    cal = load_stereo_fisheye(ROOT / "realtime_app/calibration/results")
+        weights, reasons = raw_observation_weights(points, cal.image_width, cal.image_height)
+        observation_reasons.append(reasons)
+        # Mask before tensor conversion: nan_to_num(+inf) can overflow float32,
+        # and multiplying an infinite residual by zero still yields NaN.
+        obs.append((tensor(np.where(weights[..., None] > 0, points[..., :2], 0.)), tensor(weights)))
     # Recompute observations from this run's original paired rows. Source fit
     # supplies initialization only; previous triangulation is never supervision.
     import cv2
@@ -214,6 +219,11 @@ def main():
     target = tensor(np.nan_to_num(np.asarray(current_tri)[sl] / 1000))
     body_mask = torch.as_tensor(np.asarray(current_accepted)[sl] & np.isfinite(np.asarray(current_tri)[sl]).all(-1), device=device)
     quality = tensor(np.asarray(current_quality)[sl]).clamp_min(0)
+    if not body_mask.any() or not torch.isfinite(quality).all() or quality[body_mask].sum() <= 0:
+        raise ValueError("no valid current weighted body observations")
+    scene_raw = np.asarray(scene["raw_triangulated_points_mm"])
+    if scene_raw.shape != np.asarray(current_tri).shape or not np.allclose(scene_raw, current_tri, equal_nan=True, atol=.001):
+        raise ValueError("scene/current observation source or frame alignment mismatch")
     R01, t01 = tensor(cal.R_cam0_to_cam1), tensor(cal.T_cam0_to_cam1_mm / 1000)
     upper = torch.nn.Parameter(torch.zeros(n, len(UPPER_JOINTS), 3, device=device), requires_grad=not args.full_body)
     torso = torch.nn.Parameter(torch.zeros(n, len(TORSO_JOINTS), 3, device=device), requires_grad=not args.full_body)
@@ -264,9 +274,14 @@ def main():
         "body_parameterization": "VPoser32_decode_all21_no_override" if args.full_body else "legacy_SO3_diagnostic_only",
         "vposer_checkpoint": str(vp_checkpoint) if args.full_body else None,
         "support_source": "frozen same-source baseline sole surface state machine; not measured support",
+        "support_reference_result": str((args.pose_reference_result or args.source_result).resolve()),
+        "collision_screen_scope": "all frames in every active optimization stage",
         "foot_tangent_unavailable_reason": None if support_full[sl].any() else "no_sticking_surface_candidates"})
     np.savez_compressed(args.output_dir / "frozen_foot_states.npz", pair_id=np.arange(args.start, args.stop),
         support=support_full[sl], state=states_full[sl], reason=reasons_full[sl], frame_ok=frame_ok_full[sl])
+    np.savez_compressed(args.output_dir / "body_2d_observation_audit.npz", pair_id=np.arange(args.start, args.stop),
+                       left_reason=observation_reasons[0], right_reason=observation_reasons[1],
+                       left_weight=obs[0][1].cpu().numpy(), right_weight=obs[1][1].cpu().numpy())
 
     def forward():
         if args.full_body:
@@ -370,6 +385,8 @@ def main():
     del initial
     for stage, steps in (("upper_only", args.upper_steps), ("upper_and_torso", args.body_steps),
                          ("body_wrist_polish", args.body_polish_steps), ("hand_surface_polish", args.hand_polish_steps)):
+        if steps == 0:
+            continue
         upper.requires_grad_(not args.full_body and stage != "hand_surface_polish")
         torso.requires_grad_(not args.full_body and stage in ("upper_and_torso", "body_wrist_polish"))
         for p in (root_delta, translation_delta):
@@ -389,9 +406,7 @@ def main():
             if args.surface_refine and step % args.collision_refresh == 0:
                 for j, ids in enumerate(hand_indices):
                     points = state[2].vertices[:, ids].detach().cpu().numpy()
-                    offset = (step // args.collision_refresh) * 8
-                    frames_to_screen = list(range(n)) if stage == "hand_surface_polish" else sorted(set([0, n // 2, n - 1] + [(offset + k) % n for k in range(8)]))
-                    pairs = [(f, int(p[0]), int(p[1])) for f in frames_to_screen for p in screened_triangle_pairs(points[f], hand_faces[j].cpu().numpy())]
+                    pairs = screened_sequence_pairs(points, hand_faces[j].cpu().numpy())
                     active_collision_pairs[j] = torch.as_tensor(pairs, dtype=torch.long, device=device).reshape(-1, 3)
                 state = forward()
             loss = state[0]

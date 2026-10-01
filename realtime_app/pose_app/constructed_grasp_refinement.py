@@ -19,6 +19,33 @@ UPPER_JOINTS = (13, 14, 16, 17, 18, 19, 20, 21)
 TORSO_JOINTS = (3, 6, 9, 12)
 
 
+def validate_full_sequence_ids(ids, count, name, allow_legacy=False):
+    """Reject reordered/subset inputs before positional full-sequence slicing."""
+    if ids is None:
+        if allow_legacy:
+            return
+        raise ValueError(f"{name} requires explicit pair_id")
+    ids = np.asarray(ids)
+    if ids.dtype.kind not in "iu" or ids.shape != (count,) or not np.array_equal(ids, np.arange(count)):
+        raise ValueError(f"{name} pair_id must match the full original sequence")
+
+
+def raw_observation_weights(points, image_width, image_height):
+    """Original fisheye pixels only; keep per-view rejection reasons."""
+    points = np.asarray(points)
+    if points.ndim != 3 or points.shape[1:] != (17, 3):
+        raise ValueError("expected raw observations [N,17,3]")
+    finite = np.isfinite(points).all(-1)
+    bounds = ((points[..., 0] >= 0) & (points[..., 0] < image_width)
+              & (points[..., 1] >= 0) & (points[..., 1] < image_height))
+    reasons = np.full(points.shape[:2], "accepted", dtype="U32")
+    reasons[points[..., 2] <= 0] = "nonpositive_confidence"
+    reasons[~bounds] = "out_of_raw_image_bounds"
+    reasons[~finite] = "nonfinite_observation"
+    weights = np.where(reasons == "accepted", np.clip(points[..., 2], 0, 1), 0.)
+    return weights, reasons
+
+
 def screened_triangle_pairs(vertices, faces):
     """Vectorized equivalent of the existing noncoplanar triangle screen.
 
@@ -77,6 +104,16 @@ def triangle_separation_loss(vertices, faces, pairs):
         return torch.minimum(positive, negative)
     values = separation(first, second) + separation(second, first)
     return values.mean() + values.amax(1).mean()
+
+
+def screened_sequence_pairs(vertices, faces):
+    """Screen every frame; retain its identity for collision gradients."""
+    vertices = np.asarray(vertices)
+    if vertices.ndim != 3 or vertices.shape[-1] != 3 or not np.isfinite(vertices).all():
+        raise ValueError("collision screen requires finite [N,V,3] surfaces")
+    pairs = [(frame, a, b) for frame in range(len(vertices))
+             for a, b in screened_triangle_pairs(vertices[frame], faces)]
+    return np.asarray(pairs, dtype=np.int64).reshape(-1, 3)
 
 
 def load_grasp(path: Path) -> dict:

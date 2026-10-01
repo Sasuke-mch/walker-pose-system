@@ -9,6 +9,44 @@ from pose_app.constructed_grasp_refinement import (
     align_wrist_rotations, screened_triangle_pairs)
 
 
+def test_raw_2d_rejects_bounds_nonfinite_confidence_and_keeps_monocular_weight():
+    from pose_app.constructed_grasp_refinement import raw_observation_weights
+    points = np.ones((1, 17, 3))
+    points[0, 0] = [-1, 10, .9]
+    points[0, 1] = [1920, 10, .9]
+    points[0, 2] = [10, 1080, .9]
+    points[0, 3, 2] = np.nan
+    points[0, 4, 2] = 0
+    weights, reasons = raw_observation_weights(points, 1920, 1080)
+    assert np.isfinite(weights).all() and (weights[0, :5] == 0).all()
+    assert (weights[0, 5:] == 1).all()
+    assert reasons[0, 3] == "nonfinite_observation"
+    assert reasons[0, 4] == "nonpositive_confidence"
+    assert reasons[0, 0] == "out_of_raw_image_bounds"
+
+
+def test_full_sequence_mapping_rejects_same_length_reordering_and_subsets():
+    from pose_app.constructed_grasp_refinement import validate_full_sequence_ids
+    validate_full_sequence_ids(np.arange(4), 4, "contact")
+    validate_full_sequence_ids(None, 4, "legacy", allow_legacy=True)
+    for ids in (None, np.array([0, 2, 1, 3]), np.arange(60, 64), np.arange(4, dtype=float)):
+        with pytest.raises(ValueError):
+            validate_full_sequence_ids(ids, 4, "contact")
+
+
+def test_collision_screen_covers_frame_outside_former_sparse_sample():
+    from pose_app.constructed_grasp_refinement import screened_sequence_pairs
+    vertices = np.zeros((30, 6, 3))
+    vertices[13] = [[-.01, -.01, 0], [.01, -.01, 0], [0, .01, 0],
+                    [0, -.01, -.01], [0, .01, -.01], [0, 0, .01]]
+    pairs = screened_sequence_pairs(vertices, np.array([[0, 1, 2], [3, 4, 5]]))
+    assert np.array_equal(pairs, [[13, 0, 1]])
+    tensor = torch.tensor(vertices, requires_grad=True)
+    triangle_separation_loss(tensor, torch.tensor([[0, 1, 2], [3, 4, 5]]), torch.tensor(pairs)).backward()
+    assert tensor.grad[13].abs().sum() > 0
+    assert tensor.grad[:13].abs().sum() == 0 and tensor.grad[14:].abs().sum() == 0
+
+
 def test_upper_updates_leave_lower_rotations_exactly_unchanged():
     base = torch.eye(3).expand(4, 21, 3, 3).clone()
     delta = torch.randn(4, len(UPPER_JOINTS), 3, requires_grad=True)

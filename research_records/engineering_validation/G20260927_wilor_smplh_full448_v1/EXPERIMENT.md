@@ -371,3 +371,13 @@ vposer_body_full448_viewer.html使用当前fit及scene，重新三角化/严格�
 ### 2026-10-01：当前全448帧页面改用实线骨架
 
 用户要求所有骨架实线。修改当前vposer_body_full448_viewer.html及两个Canvas生成器的线型/图例；数据载荷逐字一致，模型/观测/Stage/地面/掩码/拒绝原因无变化，拒绝边仍橙色。VISUALIZATION_PIPELINE.md更新为全部人体骨架实线，覆盖旧虚线要求。浏览器刷新第105帧检查（mesh隐藏状态恢复），控制台无error，截图viewer_solid_bones_frame105.jpg保留。5项pytest与编译/diff检查通过。联合未通过结论不变，只修改显示。
+
+### 2026-10-01：固定手部拟合代码审核与可复现接口修正
+
+审查当前VPoser/constructed_grasp精修链而非全部仓库，冻结原PMPose、原始VPoser参考、constructed_grasp、已有full448 scene/当前脚候选。修正五处逻辑：二维观测原图边界/三通道finite及拒绝坐标安全置零；恢复优化支撑状态用不可变pose-reference-result网格与mask；每次手自碰撞refresh覆盖全部帧并保留帧身份；跳过零步阶段避免Adam空参数列表；完整source/reference/contact帧身份检查及scene/current新三角化逐点一致性校验，当前重算3D权重门替代冗余旧source门。实现位于tools/refine_body_with_constructed_grasp.py与pose_app/constructed_grasp_refinement.py，现有tests扩充；未改权重、VPoser参数化、mean-once或脚C1/C2/非穿透。
+
+原448双目二维数据中左73、右9个点越出原1920x1080边界，原2D损失仍使用；修正逐视图记录原因/置零权重，有效单目仍保留。body_2d_observation_audit.npz及full448计数保存，未宣称排除即准确提升。每次碰撞refresh改全窗/全片，仍是非共面三角形筛查及平面分离代理、非连续碰撞保证；完整人体自碰撞仍缺。full-body的原始参考不会随resume初始化重定，接触状态仍非物理真值。
+
+三条5帧真实运行：active_constructed_grip_v2/audit_logic_full_smoke_v1：原source/原reference、60..64，body2步/hand0；audit_logic_legacy_smoke_v1：同窗局部旧诊断upper1/hand0、surface关闭；audit_logic_resume_smoke_v2：full448当前失败VPoser输出作source、原reference不变、body2/hand0。全部执行成功，各command.json/run_metadata与模型参数输出保留。恢复前后support/state/reason/frame_ok逐元素相同。故意scene原始点循环错位一帧，程序在创建输出前拒绝，fault_injection_result.json保存stderr及诊断准备阶段读取object-valued stage缺allow_pickle的原错误说明；没有伪装该准备错误为模型成功。
+
+35项针对性pytest、py_compile/diff通过；新增越界/非有限权重/重排帧ID及第13帧相交梯度隔离回归。修复完成，但短步验证不是新高质量姿态，既有448帧网页数据不变，主拟合仍未通过。本轮不扩全序列重拟合、不用旧网页混充新结果；强腕软界梯度/身体脚冲突、腕朝向、完整人体碰撞未解决，不声明物理一致性通过。无新Markdown，仅更新现有记录。
