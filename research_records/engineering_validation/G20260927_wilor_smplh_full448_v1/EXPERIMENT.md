@@ -347,3 +347,11 @@ v6对原姿态的旋转差：右膝median52.306/P9572.646/max104.919度；头med
 输出vposer_body_window60_90_v1：upper0/body0/body-polish300/hand-polish100、lr0.003、腕位置20、朝向软项0.1，其它接触权重同上一调试surface设置。不是单变量正式性能消融，多项先验和参数化共同修复；run_metadata.json列完整输入/系数，gradient_audit.json按latent/root/translation记录每项梯度。初始腕外界latent梯度534161、身体3D0.179，表明原10mm软界（1mm尺度、mean+max、权重10）对初始100mm偏差极强；不以两个梯度标量独立证明唯一因果。优化后左/右腕median7.736/8.856mm、P9517.071/16.954、max22.126/22.916mm，初始median122.110/81.073。身体RMS77.283→131.034mm、脚底最小z左-61.556→-75.009、右-73.865→-120.662mm；C2有效0/0未可用。两手几何代理0/31通过，最大穿透14.991/14.533mm；全部记录grasp_geometry_audit.json。身体几何可行与接触/观测出现冲突，accepted_for_main_fit=False，停止扩大，不调低门限或隐藏脚失败。
 
 body_prior_audit.json按真实pair_id把短窗映射原448帧，身体旋转偏移P95左膝5.754/右膝12.260/头5.740度；右腕局部旋转max17.529度。VPoser编码均值再解码P953.938度（非流形最近距离/物理真值）。保存最终latent/21关节矩阵/轴角/实际模型网格与各阶段latent快照，输出前断言当前身体矩阵逐元素等于eval decode。vposer_body_interface_smoke_v2用2步身体/0步手参数验证最终接口及断言，非新的候选解，不覆盖v1。测试包含真实官方解码器21关节、腕部损失对latent非零梯度/模型参数无梯度、非法训练态/维度拒绝、未知时序门控、禁止缺先验fallback及解码后硬覆盖；41项相关单元测试通过，相关py_compile通过。下一阶段应单因素审查腕软界尺度/渐进激活和观测/接触冲突；本轮实现修复已完成，但没有通过的修正版全帧结果。
+
+### 2026-10-01：31帧VPoser结果按固定规范可视化
+
+用户要求展示当前结果。本轮不拟合新参数：网格/面/模型COCO/腕点只来自vposer_body_window60_90_v1/result.npz，不拼入失败448帧、原姿态或smoke。重新运行pipeline/scene/replay_current_run.py，使用原input_448pairs与原左右PMPose、正式标定、静态地面参考和静态walker；输出该窗口目录visualization_scene，Stage完整448行/动态地面448行，123有效更新。保持前序状态再按原pair_id60..90取窗，动态变换全部来自此次重放。旧结果vertices_ground_m仅用于fresh变换等价校验，不用于显示坐标生成。原身体31帧的参数保持，旧优化接触输入不进入当前网页计算；本轮仅展示其既有失败结果，不能称为新的联合求解实验。
+
+修改build_grasp_body_canvas_viewer.py支持非零帧起点、原始frameID边界/连续检查、按frameID映射审计状态、场景原2D来源匹配和几何审计source匹配；新增5项窗口映射/不连续/越界/非整型拒绝测试。重新计算同源三角化及严格q2D/10px门并保留有限拒绝点/右膝14、原拟合候选mask明确区分。ground同时用于真实6890顶点/13776面/模型COCO/原始骨架、拓扑厚杆助步器、双相机与基线，X,-Y,Z显示；地面XY/Z高度和0.5m尺度、当前Stage/held状态、相机YZ侧轨迹/accepted踝拖尾、细小地下鞋底红点保留，render顺序按规范改为walker/原点→mesh→观测骨架/模型点。左右腕目标偏差、身体观测残差、手形拒绝原因、回投median和逐点拒绝原因直接逐帧展示。
+
+最终页面vposer_body_viewer_v2.html，首版vposer_body_viewer.html保留。标题明确第60..90帧/31帧/VPoser修正版/联合未通过；原失败情况不吸附、不插值、不显示平滑。浏览器实际核查60/75/90帧、播放暂停、自由旋转和重置，无console error，表面与骨架/杆件可见。截图viewer_frame75.jpg和viewer_frame75_side.jpg及viewer_validation.json同目录，后者记录31帧Stage统计与各17关节有限/严格接受/有限拒绝和拒绝原因。5项新测试、编译、载荷/渲染顺序检查通过。本轮改变仅限可视化及索引逻辑，联合拟合未通过结论不变，未扩全片求解。

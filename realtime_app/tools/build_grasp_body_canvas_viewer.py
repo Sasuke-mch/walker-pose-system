@@ -24,6 +24,14 @@ def encode(a):
     return base64.b64encode(np.ascontiguousarray(a, dtype=np.float32).tobytes()).decode("ascii")
 
 
+def validate_frame_ids(ids, scene_frames):
+    """Keep original frame identity when selecting a fitted window."""
+    ids = np.asarray(ids)
+    if ids.ndim != 1 or ids.dtype.kind not in 'iu' or len(ids)==0 or np.any(np.diff(ids)!=1) or ids.min()<0 or ids.max()>=scene_frames:
+        raise ValueError('expected contiguous original frame IDs within fresh scene')
+    return ids
+
+
 def main():
     p = argparse.ArgumentParser()
     for name in ("result", "scene", "surface-sets", "geometry-audit", "output"):
@@ -37,15 +45,17 @@ def main():
     source = json.loads((a.scene / "scene_sources.json").read_text(encoding="utf-8"))
     if source["old_dynamic_ground_read"] or source["old_stage_jsonl_read"] or "selected original stereo pair" not in source["image_source"]:
         raise ValueError("viewer requires fresh ordered-image Stage/ground replay")
-    for key in ("scene_transforms",):
-        if Path(metadata["inputs"][key]).resolve() != (a.scene / "scene_transforms.npz").resolve():
-            raise ValueError("fit/viewer scene mismatch")
-    ids = r["pair_id"]
+    ids = validate_frame_ids(r["pair_id"],len(s['rotation_ground_from_left']))
     n = len(ids)
-    if not np.array_equal(ids, np.arange(n)) or r["vertices"].shape != (n, 6890, 3) or r["faces"].shape != (13776, 3):
-        raise ValueError("not a full contiguous same-run male mesh")
-    R = s["rotation_ground_from_left"]
-    tr = s["translation_ground_from_left_mm"] / 1000
+    if r["vertices"].shape != (n, 6890, 3) or r["faces"].shape != (13776, 3):
+        raise ValueError("not a contiguous same-run male mesh with explicit frame IDs")
+    for side in ('left','right'):
+        if Path(source[f'raw_{side}_pmpose']).resolve()!=Path(metadata['inputs'][f'{side}_raw']).resolve():
+            raise ValueError('replay/fit observation source mismatch')
+    # Render only the freshly replayed scene. The fit's stored grounded mesh
+    # below is an audit of equivalence, never a source of viewer coordinates.
+    R = s["rotation_ground_from_left"][ids]
+    tr = s["translation_ground_from_left_mm"][ids] / 1000
     def xf(x):
         return np.einsum("nij,nvj->nvi", R, x) + tr[:, None]
     vg, cg, tg = xf(r["vertices"]), xf(r["predicted_coco"]), xf(r["raw_triangulated_points"] / 1000)
@@ -84,10 +94,18 @@ def main():
     cameras = xf(np.broadcast_to(np.stack([np.zeros(3), c1]), (n, 2, 3)))
     stages = [json.loads(line)["stage"]["operational"] for line in (a.scene / "stage1_stage2.jsonl").read_text(encoding="utf-8").splitlines()]
     poses = [(json.loads(line).get("pose_audit") or {}).get("status", "unknown") for line in (a.scene / "dynamic_ground_pose.jsonl").read_text(encoding="utf-8").splitlines()]
+    stages = [stages[i] for i in ids]
+    poses = [poses[i] for i in ids]
     audit = json.loads(a.geometry_audit.read_text(encoding="utf-8"))
+    if Path(audit['source']).resolve()!=a.result.resolve():
+        raise ValueError('hand geometry audit/result mismatch')
     hand_state = [[None, None] for _ in range(n)]
+    reason_labels = {'screened_triangle_crossings':'表面相交', 'handle_penetration_exceeds_3mm':'扶手穿透>3mm',
+                     'finger_region_gap_exceeds_5mm':'指区间隙>5mm', 'palm_gap_exceeds_5mm':'掌区间隙>5mm',
+                     'thumb_opposition_proxy_failed':'对握代理未通过'}
+    index_by_id = {int(value): i for i,value in enumerate(ids)}
     for row in audit["records"]:
-        hand_state[row["pair_id"]][0 if row["hand"] == "left" else 1] = "通过" if row["passed_geometry_proxy"] else ",".join(row["reject_reasons"])
+        hand_state[index_by_id[row["pair_id"]]][0 if row["hand"] == "left" else 1] = "代理通过" if row["passed_geometry_proxy"] else "、".join(reason_labels.get(x,x) for x in row["reject_reasons"])
     if any(None in row for row in hand_state):
         raise ValueError("incomplete per-frame hand audit")
     residual = np.linalg.norm(cg - tg, axis=-1) * 1000
@@ -104,31 +122,49 @@ def main():
         "acc": strict.ravel().tolist(), "fit_acc": candidate.tolist(), "stage": stages, "pose": poses, "e3": e3,
         "hm": [None] * n, "fm": [float(np.min(vg[i, soles, 2])) for i in range(n)],
         "hand_state": hand_state, "reprojection": projection, "quality": quality.tolist(), "reject_reasons": reasons.tolist()}
+    grasp = json.loads(Path(metadata['inputs']['grasp']).read_text(encoding='utf8'))
+    wrist_target = np.asarray([grasp['hands'][side]['wrist_walker_m'] for side in ('left','right')])
+    data['wrist_mm'] = (np.linalg.norm(r['wrist_walker_m']-wrist_target,axis=-1)*1000).tolist()
     page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":")))
-    page = page.replace('<title>SMPL surface contact Canvas viewer</title>', '<title>SMPL-H 全448帧腕约束优化</title>')
+    page = page.replace('<title>SMPL surface contact Canvas viewer</title>', f'<title>SMPL-H 第{ids[0]}–{ids[-1]}帧拟合诊断</title>')
     page = page.replace('.metrics div{display:flex;', '.metrics div{display:flex;gap:8px;')
     page = page.replace('.metrics dt{color:#65737d}', '.metrics dt{color:#65737d;flex:0 0 90px}')
     page = page.replace('.metrics dd{margin:0;text-align:right}', '.metrics dd{margin:0;text-align:right;min-width:0;overflow-wrap:anywhere}')
     page = page.replace('zoom=1.0', 'zoom=.65').replace('zoom=1;', 'zoom=.65;')
-    page = page.replace('窗口 60..90 · 31 帧 · 无外部库', f'全片0..{n-1} · {n}帧 · 6890顶点 / 13776真实三角面 · 本次重放')
-    page = page.replace('male SMPL 表面手脚接触拟合', 'SMPL-H · 双腕基本固定的全身优化')
+    page = page.replace('const sideX=-3.8;', 'const sideX=-1.8;')
+    page = page.replace('窗口 60..90 · 31 帧 · 无外部库', f'第{ids[0]}..{ids[-1]}帧 · {n}帧 · 6890顶点 / 13776真实三角面 · 本次重放')
+    page = page.replace('male SMPL 表面手脚接触拟合', 'SMPL-H · '+('VPoser修正版 · 联合拟合未通过' if 'vposer_latent' in r.files else '腕约束拟合诊断'))
     page = page.replace('min="0" max="30"', f'min="0" max="{n-1}"')
     page = page.replace('手部 surface 中位', '双手几何状态').replace('脚部 surface 中位', '脚底最低高度')
+    page = page.replace('COCO 3D 误差', '身体观测残差')
+    page = page.replace('<dl class="metrics">', '<dl class="metrics"><div><dt>腕偏差 左/右</dt><dd id="wrist">—</dd></div>')
     page = page.replace("(d.hm[fi]===null?'—':(d.hm[fi]*1000).toFixed(1)+' mm')", "d.hand_state[fi].join(' / ')")
     page = page.replace("unpack(d.a)]).then(([v,w,t,he,c,ankle])", "unpack(d.a),unpack(d.j)]).then(([v,w,t,he,c,ankle,model])")
     page = page.replace('const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;', 'const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;const E=[[0,1],[0,2],[1,3],[2,4],[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];window.viewerAudit={vertices:NV,faces:faces.length,indexEntries:faces.length*3,frames:N,displayMap:"X,-Y,Z",sceneFresh:true};')
     marker = "if(document.getElementById('walker').checked){"
     overlay = """for(const e of E){const[a,b]=e,A=[t[fi*51+a*3],-t[fi*51+a*3+1],t[fi*51+a*3+2]],B=[t[fi*51+b*3],-t[fi*51+b*3+1],t[fi*51+b*3+2]];if(A.every(Number.isFinite)&&B.every(Number.isFinite)){const ok=d.acc[fi*17+a]&&d.acc[fi*17+b];ctx.setLineDash(ok?[]:[5,4]);seg(A,B,ok?'#17212b':'#b36b1e',1.5);ctx.setLineDash([])}}for(let k=0;k<17;k++)dot([model[fi*51+k*3],-model[fi*51+k*3+1],model[fi*51+k*3+2]],'#1678bc',2);seg([c[fi*6],-c[fi*6+1],c[fi*6+2]],[c[fi*6+3],-c[fi*6+4],c[fi*6+5]],'#4b555d',1.5);"""
-    page = page.replace(marker, overlay + marker)
+    # Canvas follows the project's render order: solid walker, raw points,
+    # translucent real mesh, observation bones, model COCO points. Keep the
+    # reusable template but relocate its mesh block rather than redraw a proxy.
+    mesh_start = page.index("if(document.getElementById('mesh').checked){")
+    mesh_end = page.index("if(document.getElementById('contact').checked){", mesh_start)
+    mesh_block = page[mesh_start:mesh_end]
+    page = page[:mesh_start]+page[mesh_end:]
+    contact_start = page.index("if(document.getElementById('contact').checked){")
+    contact_end = page.index(marker,contact_start)
+    contact_block = page[contact_start:contact_end]
+    page = page[:contact_start]+page[contact_end:]
+    page = page.replace("document.getElementById('stage').textContent=d.stage[fi];", mesh_block+contact_block+overlay+"document.getElementById('stage').textContent=d.stage[fi];")
     page = page.replace("p[2]<0?4.5:3.0", "p[2]<0?1.2:1.0")
     ticks = """for(let u=0;u<=4.5;u+=.5){for(const P of [[u,0,0],[0,u,0]]){const q=project(P);ctx.fillStyle='#27332d';ctx.font='12px sans-serif';ctx.fillText(u.toFixed(1)+'m',q[0]+3,q[1]-3)}}"""
     page = page.replace("if(document.getElementById('trails').checked){", ticks + "if(document.getElementById('trails').checked){")
     page = page.replace("pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))", "pitch+=dy*.007")
     page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
+    page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x.toFixed(1)).join(' / ')+' mm';")
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
     page = page.replace('</aside>', '<p>工程候选：蓝点=模型COCO；红点=严格观测；橙叉/虚线=拒绝。双手逐帧几何状态不等于真实握持。前横杆低于相机30mm、杆半径16mm均为假设。无平滑/插值。</p></aside>')
     a.output.write_text(page, encoding="utf-8")
-    joint_audit = {str(j): {"finite": int(np.isfinite(tri[:, j]).all(1).sum()), "strict_accepted": int(strict[:, j].sum()), "finite_rejected": int((np.isfinite(tri[:, j]).all(1) & ~strict[:, j]).sum())} for j in range(17)}
+    joint_audit = {str(j): {"finite": int(np.isfinite(tri[:, j]).all(1).sum()), "strict_accepted": int(strict[:, j].sum()), "finite_rejected": int((np.isfinite(tri[:, j]).all(1) & ~strict[:, j]).sum()), 'rejection_reasons':{str(value):int((reasons[:,j]==value).sum()) for value in set(reasons[:,j]) if value is not None}} for j in range(17)}
     (a.output.parent / "viewer_validation.json").write_text(json.dumps({"status": "file_checks_passed_browser_pending", "vertices": 6890, "faces": 13776, "index_entries": 41328, "frames": n, "joints": joint_audit, "source": str(a.result.resolve()), "scene": str(a.scene.resolve()), "stage_counts": {x: stages.count(x) for x in set(stages)}, "no_display_smoothing": True}, indent=2), encoding="utf-8")
     print(a.output.resolve())
 

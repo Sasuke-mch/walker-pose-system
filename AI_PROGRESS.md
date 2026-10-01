@@ -1,3 +1,10 @@
+# 2026-10-01：VPoser修正版31帧可视化与浏览器验收
+
+- 当前展示`active_constructed_grip_v2/vposer_body_window60_90_v1/vposer_body_viewer_v2.html`，只显示真实结果60..90共31帧；标题明确联合拟合未通过，不拼入旧448帧或接口smoke。输入网格/面/模型COCO/腕点来自该result.npz，同一帧应用本次重放ground；旧vertices_ground_m仅校验重放等价，不作为当前显示坐标。
+- 本次`visualization_scene`从同源原448对有序图重新重放Stage/动态地面，完整前序因果状态保留，再按pair_id截60..90；未读旧动态JSONL。重新三角化原左右PMPose，校验与该结果一致；同样更新walker节点、双光心和基线，统一X,-Y,Z。render顺序修正为walker/原始点→真实半透明面→观测骨架/模型COCO；地下鞋底细红点、左右相机YZ侧面轨迹、严格接受踝拖尾、0.5m坐标尺保持。
+- 网页生成器支持非零起点窗口，mesh第0行映射scene60而非0；手部审计按真实pair_id关联，审核source必须匹配。保留右膝14及所有有限拒绝点/虚线；显示左右腕目标偏差、身体观测残差、脚底最低z、地面状态和手形拒绝原因，不把工程候选mask写作严格10px通过。诊断原因显示中文，原审计记录仍完整。无显示平滑/插值/吸附。
+- 实际浏览器检查60/75/90、播放暂停、自由旋转和重置，真实面可见，双相机侧面轨迹/杆件/原始骨架可见；无控制台error。保留viewer_frame75.jpg、viewer_frame75_side.jpg及viewer_validation.json。5项帧映射/非法索引测试与编译通过；本次没有重新拟合，不改变联合失败结论或扩帧。
+
 # 2026-10-01：接回完整VPoser身体计算图；短窗联合拟合未通过，不扩帧
 
 - 已实现`--full-body --vposer-dir --pose-reference-result`正式身体参数化：优化32维latent，每次forward解码全部21关节，转旋转矩阵后进入原SMPL-H矩阵层；无upper/torso/lower自由关节优化，无解码后覆盖腕。冻结eval VPoser模型权重，梯度继续传回latent。无声明latent、源pose与decode不一致、缺少不可变参考或启用硬锁腕覆盖均拒绝，保留旧诊断入口及旧主拟合。
