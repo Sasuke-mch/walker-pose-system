@@ -2849,3 +2849,15 @@ fit_annotated_shared_grip.py新增--constructive-grasp、--reference-wrists，�
 主动调整腕位置：左wrist_walker_m[0.2239034,-0.0075681,0.8949394]、右[-0.2292971,-0.0087240,0.8914604]，相对旧数据参考偏移11.011/9.804mm。明确左手超过旧10mm范围，因为当前用户授权主动靠近；不能宣称仍满足旧有界实验。原图近似手轮廓IoU左手在左/右相机0.4951/0.3110，右手0.4610/0.4104；原图仅参考，未完全吻合，不把设计姿态写成真实恢复。主拟合尚未接入，不估计逐帧腕运动；后续可将该构造位姿作初始/先验，但腕微调必须同时重新检查握持，不可无条件滑动整个手。
 
 交付同目录constructed_grasp.npz与constructed_grasp.json，左右各PCA(1,12)、轴角(1,45)、walker<-wrist旋转/平移与4x4变换、当前beta、真实局部顶点/面、原始数据参考点、主动偏移和工程检查；pose_constructed=True、observed_pose=False、accepted_for_grasp_initialization=True、accepted_for_main_fit=False。报告report.json、逐起点记录、run_metadata.json及views/左右三视角保留；renderer明确标题actively constructed grasp，非观测恢复。输出数据形状/有限/旋转行列式检查通过，新增反射刚体点等价、旋转保持SO(3)、双反射复原测试；22项相关测试通过、三个工具py_compile与diff检查通过。无新增Markdown，已有用户改动、原数据、旧失败记录均保留。
+
+## 2026-10-01：构造抓取接入全身的可回退实现与短窗验证（右手网格拒绝，未升级全序列）
+
+新增独立realtime_app/tools/refine_body_with_constructed_grasp.py、pose_app/constructed_grasp_refinement.py与audit_constructed_grasp_body.py，旧fit_smplh_wilor_sequence.py完全不变。使用当前constructed_grasp.json/npz与同源448帧source-result，在60–90窗口先限定上肢SO3修正，再开放躯干；冻结beta/根位姿/下肢/共享手指PCA，保持身体3D/原始双鱼眼2D/姿态参考/时序及脚部C1/C2。SMPLHLayer原参数重放最大误差5.364e-7m；外部MANO PCA均值一次与45维姿态一致。明确walker相对目标，不用世界静止目标。
+
+脚部：既有脚底表面接触1、有效全帧非穿透1、support/support有效相邻同顶点切向项0.001保留，状态从同源基线鞋底表面按滞回生成并冻结，全片先估状态后切窗。未知/基线穿透/无有效相邻对均保存原因，本窗C2有效对0/0，不伪造支撑。冻结根/下肢阶段并未解决旧脚面6–7cm穿透，最终左/右最低z=-62.480/-73.797mm；脚约束没有删除，但当前可释放参数对脚项梯度很小。
+
+v1(200+100步)腕已接近但朝向约33度，保留调试结果；v2身体3D按50mm尺度归一化、朝向权重1，600+200步。最终腕median左0.205/右0.436mm，P95 0.272/0.487mm；朝向median0.624/0.617度；身体3D工程RMS77.284->69.209mm。两轮同时改变尺度/朝向权重/步数，不宣称单因素消融。下肢旋转精确冻结，实际表面受全模型姿态修正仍会微变。
+
+对完整实际网格全部31帧检查：左31/31几何代理通过，右0/31，有自相交且最坏扶手穿透3.053mm；拒绝原因及所有相交对保存。局部构造表面通过不能直接转移到全身；去掉刚体变换后手表面仍有mm级偏差。当前body_refinement_window60_90_v2/result.npz是工程探针，accepted_for_main_fit=False。下一检查阶段须处理完整身体姿态条件下右手表面碰撞/手形一致性，必要时受限开放共享PCA，再谈448帧。不能粘贴独立手网格冒充连接结果，不用插值/旧结果补齐。
+
+最终接口2步smoke_v3与阶段快照保存通过，31项相关测试、py_compile/diff检查通过。具体输入/权重/输出/停止门详见G20260927_wilor_smplh_full448_v1/EXPERIMENT.md新增记录；结果在active_constructed_grip_v2/body_refinement_window60_90_v1/v2与body_refinement_interface_smoke_v3，回退直接使用旧source-result和旧拟合入口。未推送远端，其他用户改动保留。

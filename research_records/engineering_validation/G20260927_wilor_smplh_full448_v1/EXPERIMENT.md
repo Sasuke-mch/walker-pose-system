@@ -269,3 +269,23 @@ fit_annotated_shared_grip.py新增--constructive-grasp、--reference-wrists，�
 主动调整腕位置：左wrist_walker_m[0.2239034,-0.0075681,0.8949394]、右[-0.2292971,-0.0087240,0.8914604]，相对旧数据参考偏移11.011/9.804mm。明确左手超过旧10mm范围，因为当前用户授权主动靠近；不能宣称仍满足旧有界实验。原图近似手轮廓IoU左手在左/右相机0.4951/0.3110，右手0.4610/0.4104；原图仅参考，未完全吻合，不把设计姿态写成真实恢复。主拟合尚未接入，不估计逐帧腕运动；后续可将该构造位姿作初始/先验，但腕微调必须同时重新检查握持，不可无条件滑动整个手。
 
 交付同目录constructed_grasp.npz与constructed_grasp.json，左右各PCA(1,12)、轴角(1,45)、walker<-wrist旋转/平移与4x4变换、当前beta、真实局部顶点/面、原始数据参考点、主动偏移和工程检查；pose_constructed=True、observed_pose=False、accepted_for_grasp_initialization=True、accepted_for_main_fit=False。报告report.json、逐起点记录、run_metadata.json及views/左右三视角保留；renderer明确标题actively constructed grasp，非观测恢复。输出数据形状/有限/旋转行列式检查通过，新增反射刚体点等价、旋转保持SO(3)、双反射复原测试；22项相关测试通过、三个工具py_compile与diff检查通过。无新增Markdown，已有用户改动、原数据、旧失败记录均保留。
+
+## 2026-10-01：构造抓取接入全身的隔离短窗口协议
+
+新增独立入口 realtime_app/tools/refine_body_with_constructed_grasp.py 与可复用 pose_app/constructed_grasp_refinement.py；旧 fit_smplh_wilor_sequence.py 不变。输入为 G20261001_fixed_mano_pca448_v1/fit_shared/result.npz、active_constructed_grip_v2/constructed_grasp.json、同源 G20260927 主线静态 walker/scene、contact_candidates_from_v2_geometry.npz 和 SMPLH 表面集合。窗口60–90，先200步仅上肢，再100步上肢+躯干；固定beta/手指PCA/根位姿/下肢/标定/地面。对照为相同新手指且零修正的初始完整模型。唯一新增变量为允许关节的SO(3)旋转修正，不混用旧世界静止手假设。
+
+身体3D/原始鱼眼2D/姿态参考/时序持续生效；脚底表面接触1、全帧有效地面非穿透1、support/support有效相邻表面切向项0.001保留。support从同源基线鞋底表面状态机生成并冻结，基线穿透超过3mm不作为支撑，未知/拒绝原因逐帧保存；不假装旧踝代理为独立接触真值。腕位置5mm归一化、旋转5度chordal归一化；接触几何实际顶点；首轮无硬10mm可行性保证，超过范围须报告。成功门：参数转换一致、真实模型梯度有限、双腕误差下降、下肢旋转精确冻结、脚部状态可追溯；仅短窗口工程探针，不自动晋升全帧主线。失败与未通过抓握几何须保留，禁止旧结果补齐。输出单独 active_constructed_grip_v2/body_refinement_window60_90_v1；当前待执行，不写通过结论。
+
+### 构造抓取接入全身：实现与60–90窗口结果
+
+实现采用独立精修入口，不修改旧SMPL-H拟合文件；矩阵输入使用官方SMPLHLayer，避免SMPLH.forward无条件加入轴角pose_mean造成矩阵输入错误。同源原参数矩阵重放最大顶点分量误差5.364e-7m，PCA12按外部MANO归一化基底解码并与JSON45维姿态核对，均值一次。关节修正为base_R @ exp(delta)，上肢13/14/16/17/18/19/20/21，第二阶段增加躯干3/6/9/12；腕全局朝向由root和parents真实FK计算，随后转换walker系。beta/root/transl/下肢/手指固定。脚部调用既有surface函数，顶点数量由集合推导，不硬编码54；support/support、两帧frame_ok与同一顶点速度共同定义C2，不重新推断优化后的标签。
+
+v1=上肢200/躯干100步，最初朝向权重0.1、身体3D原米制；腕位置median降至3.302/3.664mm但朝向仍32.713/33.456度。梯度发现尺度不匹配，v1保留为调试对照。v2修正身体3D除以0.05m平方，朝向权重1，上肢600/躯干200步；独立输出body_refinement_window60_90_v2，非单变量正式消融，不能把v1/v2解释为单因素收益。
+
+v2初始/上肢阶段/躯干阶段腕median：左122.110/0.188/0.205mm，右81.073/0.399/0.436mm；最终P95左0.272/右0.487mm，max0.310/0.525mm。朝向median从37.640/41.616度降至0.624/0.617度。身体3D工程RMS从77.284降至69.209mm；身体2D鲁棒目标从0.3811降至0.3035，不是像素精度或外部真值。下肢旋转逐元素冻结，但实际脚面受全模型姿态修正可微小变化，不能声称脚部网格完全不动。
+
+脚底最小z初始左-61.556/右-73.865mm，最终-62.480/-73.797mm；原基线地面穿透未解决，不扩大解释为足部物理通过。鞋底表面冻结状态在本窗口support/support有效对0/0，C2=0属于未可用；非穿透全有效帧仍执行，实际模型上肢/躯干对应脚项梯度约1e-5/7e-6，说明冻结根/下肢阶段无法修复既有6–7cm穿透。所有448源帧状态先连续估计，再切窗，窗口开始不重新初始化滞回；输出frozen_foot_states.npz保留窗口状态、拒绝原因及frame_ok。
+
+新增audit_constructed_grasp_body.py复用既有crossing_pairs和capsule算法，检查本次完整SMPLH模型全部31帧/双手，表面集合与strict区域定义一致，不挑帧。左31/31通过当前几何代理，右0/31通过：右手每帧有筛查三角面相交，最大顶点穿透3.053mm；全部相交对和原因保留grasp_geometry_audit.json。腕坐标/朝向接近不保证局部手表面仍相同；去除腕刚体变换后，相对于局部构造网格顶点差异median左3.661/右2.651mm、P95左5.676/右4.707mm、最大12.799/10.620mm，受完整姿态/蒙皮/pose blendshape影响，不能粘贴旧局部网格掩盖。结果accepted_for_main_fit=False，不升级整448帧。下一门为完整身体姿态条件下的右手表面一致性/碰撞精修；需要加入实际网格防相交与原构造手形参考，必要时受限释放共享PCA，而非仅调腕位置权重。
+
+最终代码增加显式--grasp-mesh、输入/维度/有限/SO3/源beta与网格参数一致性检查、逐阶段参数快照；2步body_refinement_interface_smoke_v3检查最终接口与快照，非求解结果。31项相关单元测试通过，三个工具/模块py_compile通过；旧入口未修改，新输出不覆盖source，回退直接使用原source-result。完整网格审计未通过右手是已保留的实验拒绝，不表示程序宣称成功，也不据此删除必要脚部损失。
