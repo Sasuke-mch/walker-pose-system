@@ -412,3 +412,13 @@ Stage2不依赖旧support推断：全448帧按scene精确stage2_feet_static_walk
 预先冻结门：最大逐点退化10mm、腕P95<=10mm、最低脚底>=-3mm、腿加速度不增加、全部手帧几何代理通过。结果仅第一项通过；comparison.json逐项记录false与完整数据。主拟合拒绝，不扩full448、不更换现有网页、不放宽门、不混用旧解。这里是优化方向受强腕项驱动、同时触碰观测上限后的停滞；仅靠调大平滑权重没有充分依据。后续须研究在观测约束下的更新方向/逐帧受限更新和腕语义冲突，本轮并未实现该方向求解器。
 
 42项针对性pytest通过，三个工具/模块py_compile、任务diff检查通过。调试证据：首次数值近零梯度严格==0测试失败（4.6e-14），改为1e-10容差；测试文件名误填导致一次无测试执行；benchmark启动时重复stop参数语法错误，修正后v1/v2完整跑通。没有把这些失败算成正式通过实验。当前代码功能已测试，但候选结果未通过物理/拟合门。
+
+### 2026-10-01：balance实现复审后的逻辑修复验证
+
+冻结输入/验收门沿用上节，限定60..100共41帧。代码涉及pose_app/balanced_grasp.py、constructed_grasp_refinement.py、tools/refine_body_with_constructed_grasp.py及对应测试。明确修复：恢复优化误差预算从source重置改为不可变pose-reference与原构造手重新前向；Stage2质心目标改为每个选定顶点目标及速度，schema2目标[N,4,3,3]，杜绝围绕质心转动漏罚；用段内代表实际参考帧+整体平移产生脚目标，保留相对几何，选定区域顶点去重；Adam候选检查/step抛异常时finally回滚参数/矩，保存失败原因再抛出；balance接地非穿透margin由正3mm改为0，消除与Z=0目标冲突，旧路线默认3mm与原C1/C2/权重保留。先屏蔽无效NaN再平方，不能使用NaN*0。trace标记本步更新前评价及腕系数爬升。
+
+Stage2的实际帧选择：每脚鞋底所有参考顶点求各有效帧中心，计算段中心坐标中位数，选中心离它最近的有效参考帧；整体XY移动至中位数，Z只按该帧整脚最低点抬升至0；heel/ball各3个不同顶点继承这一刚体移动后的XYZ。逐顶点位置/速度仍只在同段有效帧计算。此为主动设计目标，不是接触实测；踝工程地面独立验证仍未完成。选定区域不是整个脚刚性锁定证明，SMPL皮肤形变和未选顶点仍靠其他约束。
+
+执行benchmark_balanced_grasp.py：--reference-metadata .../vposer_body_full448_v1/fit/run_metadata.json --output-root .../active_constructed_grip_v2/balanced_logic_audit60_100_v3 --steps 10。全输入路径/命令见control_command.json、balanced_command.json与run_metadata.json，protocol在运行前保存。四阶段各10步、lr0.003、腕20/朝向0.1、原其余系数；与旧50步记录不能作纯修复性能消融。候选RMS77.064->77.122mm、最大逐点增加9.994mm；上肢/躯干/联合更新接受6/4/2次，各10次；手10/10。最终腕median106.904/73.731mm、P95171.901/90.729mm；脚底最低-56.056/-72.797mm；腿加速度平方9.527->9.978。逐点门通过，腕/脚/腿稳定性/全部手帧几何门失败，仍拒绝候选，未扩448。具体comparison/逐帧几何/参数/事务日志全保存。
+
+恢复故障验证：同一目录resume_command.json把source切换到旧失败全448结果，保留原pose-reference与其他输入，输出resume_must_reject。进程1、FAILURE.reason=resume_outside_immutable_observation_guard、超预算最大255.829mm，训练前拒绝。其baseline_error_m与正常运行逐元素一致，未发放新的10mm预算。失败输出及console完整保留。47项相关pytest通过，覆盖异常恢复Adam状态、静止质心旋转的顶点项、代表帧刚体目标几何、无效NaN损失/梯度隔离和接地0/地下惩罚；py_compile和diff检查通过。全窗统一接受与方向冲突仍未解决，不能把修复验证写成握持或腿抖动已经解决。

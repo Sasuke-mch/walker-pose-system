@@ -194,7 +194,7 @@ def masked_mean(values, mask):
 
 
 def foot_terms(vertices_ground, sole_indices, weights, support, frame_ok,
-               dt_s=1 / 30):
+               dt_s=1 / 30, nonpenetration_margin_m=.003):
     """C1 surface + full-frame nonpenetration; C2 support/support velocity.
 
     Same fixed vertex IDs across time. Unknown support never enables C2.
@@ -208,7 +208,7 @@ def foot_terms(vertices_ground, sole_indices, weights, support, frame_ok,
         contact.append((surface.foot_surface_loss(pts[..., 2]) * w).sum()
                        / w.sum().clamp_min(1e-6))
         penetration.append(masked_mean(
-            surface.nonpenetration_loss(pts[..., 2], margin_m=.003), frame_ok))
+            surface.nonpenetration_loss(pts[..., 2], margin_m=nonpenetration_margin_m), frame_ok))
         active = (support[:-1, s] & support[1:, s]
                   & frame_ok[:-1] & frame_ok[1:])
         mask = active[:, None].expand(-1, len(indices))

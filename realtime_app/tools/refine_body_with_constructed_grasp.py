@@ -288,6 +288,7 @@ def main():
         "scope": "constructed_grasp_body_refinement_engineering_probe", "fps_assumed": 30,
         "frozen": ["beta", "calibration", "scene"] + ([] if args.surface_refine else ["finger_PCA"]) + ([] if args.full_body else ["root", "translation", "lower_limb"]),
         "foot_loss_scale_m": .01 if args.full_body else None,
+        "foot_nonpenetration_margin_m": 0. if args.balanced_stages else .003,
         "source_matrix_replay_max_error_m": replay_max,
         "grasp_mesh_source": str(mesh_path.resolve()),
         "body_3d_scale_m": args.body_scale_m,
@@ -304,7 +305,8 @@ def main():
                        left_weight=obs[0][1].cpu().numpy(), right_weight=obs[1][1].cpu().numpy())
     if args.stage2_static_assumption:
         write("stage2_anchor_assumption.json", {"records": anchor_records,
-            "source": "immutable reference sole patches; per-foot rigid Z lift to ground plane",
+            "source": "immutable reference representative foot frame; individual patch vertices; rigid XY shift and Z lift to plane",
+            "schema_version": 2,
             "boundary_source": "frozen automatic scene stage; not independent verification",
             "measured_contact": False})
         np.savez_compressed(args.output_dir / "stage2_anchors.npz", pair_id=np.arange(args.start,args.stop),
@@ -362,7 +364,8 @@ def main():
             terms["upper_leg_anchor"] = rotation_anchor_loss(body[:,LEG_ROTATIONS], reference_body[:,LEG_ROTATIONS]) if phase == "upper_only" else body.sum()*0
         if args.stage2_static_assumption:
             terms["stage2_position"], terms["stage2_velocity"] = stage2_terms(vg, anchor_ids_t, anchor_targets_t, anchor_segments_t)
-        feet, active = foot_terms(vg, soles, tensor(fw[sl]), support, frame_ok)
+        feet, active = foot_terms(vg, soles, tensor(fw[sl]), support, frame_ok,
+            nonpenetration_margin_m=0. if args.balanced_stages else .003)
         terms.update(feet)
         if args.full_body:
             terms["foot_contact"] = terms["foot_contact"] / .01 ** 2
@@ -412,12 +415,27 @@ def main():
                 "lower_body_unchanged": bool(torch.equal(body[:, frozen_lower], base[:, frozen_lower]))}
 
     initial = forward()
-    baseline_coco = regress_coco17_torch(initial[2].vertices, reg).detach().clone()
+    if args.balanced_stages:
+        # Reconstruct the same immutable baseline even when source is a resume.
+        # Use original constructed PCA, not the resumed optimized fingers.
+        with torch.no_grad():
+            reference_hands = [batch_rodrigues(tensor(grasp['hands'][s]['hand_pose_axis_angle']).reshape(-1,3)).reshape(1,15,3,3).expand(n,-1,-1,-1) for s in ('left','right')]
+            reference_out = model(betas=beta,global_orient=reference_root,body_pose=reference_body,
+                left_hand_pose=reference_hands[0],right_hand_pose=reference_hands[1],transl=reference_translation)
+            baseline_coco = regress_coco17_torch(reference_out.vertices,reg).detach().clone()
+    else:
+        baseline_coco = regress_coco17_torch(initial[2].vertices, reg).detach().clone()
     baseline_error = torch.linalg.vector_norm(baseline_coco-target, dim=-1)
     # Every accepted triangulated point is guarded; quality only weights losses.
     guard_mask = body_mask.clone()
     np.savez_compressed(args.output_dir / "observation_guard_reference.npz", pair_id=np.arange(args.start,args.stop),
-        baseline_error_m=baseline_error.cpu().numpy(), valid=guard_mask.cpu().numpy(), allowance_m=.01)
+        baseline_error_m=baseline_error.cpu().numpy(), predicted_coco_m=baseline_coco.cpu().numpy(),
+        valid=guard_mask.cpu().numpy(), allowance_m=.01)
+    if args.balanced_stages:
+        initial_ok, initial_excess = observation_guard(regress_coco17_torch(initial[2].vertices,reg),target,guard_mask,baseline_error)
+        if not initial_ok:
+            write('FAILURE.json', {'reason':'resume_outside_immutable_observation_guard','maximum_excess_m':initial_excess})
+            raise ValueError('source outside immutable reference observation budget; refusing to reset budget')
     initial_metrics = metrics(initial)
     gradients = {}
     audit_parameters = (latent, root_delta, translation_delta) if args.full_body else (upper, torso)
@@ -480,7 +498,14 @@ def main():
                     return trial[0], ok and pca_ok, {"observation_excess_m": excess, "leg_shift_m": leg_shift,
                         "pca_ok": pca_ok, "violating_pair_joint": [[i+args.start,j] for i,j in bad],
                         "upper_leg_shift_guard_passed": stage != "upper_only" or leg_shift <= .005+1e-6}
-                transaction = guarded_adam_step(optimizer, params, evaluate_trial, loss.detach())
+                try:
+                    transaction = guarded_adam_step(optimizer, params, evaluate_trial, loss.detach())
+                except Exception as exc:
+                    write('FAILURE.json', {'reason':'guarded_update_exception', 'stage':stage,
+                        'step':step, 'exception_type':type(exc).__name__, 'message':str(exc),
+                        'parameters_and_optimizer_restored':True})
+                    write('update_transactions_before_failure.json', {'updates':transactions})
+                    raise
                 transactions.append({"stage":stage, "step":step, "wrist_ramp":wrist_ramp, **transaction})
             else:
                 optimizer.step()
@@ -490,7 +515,9 @@ def main():
                         reference = tensor(grasp["hands"][s]["hand_pca"])
                         hand_coeff[s].copy_(torch.maximum(torch.minimum(hand_coeff[s], reference + 2.), reference - 2.))
             if step % 25 == 0 or step == steps - 1:
-                history.append({"stage": stage, "step": step, "loss": float(loss.detach()), "terms": {k: float(v.detach()) for k, v in state[1].items()}})
+                history.append({"stage": stage, "step": step, "loss": float(loss.detach()),
+                    "evaluation_point": "before_proposed_update", "wrist_ramp": wrist_ramp,
+                    "terms": {k: float(v.detach()) for k, v in state[1].items()}})
                 print(stage, step, float(loss.detach()), flush=True)
         with torch.no_grad():
             state = forward()
@@ -541,7 +568,8 @@ def main():
     if args.balanced_stages:
         write("update_transactions.json", {"updates": transactions,
             "observation_allowance_m": .01, "upper_phase_leg_shift_limit_m": .005,
-            "guard": "every accepted current triangulated point vs immutable initial error",
+            "guard": "every accepted current triangulated point vs immutable pose-reference with original constructed fingers",
+            "reference_result": str(args.pose_reference_result.resolve()),
             "rejected_updates_restore_parameters_and_Adam_moments": True,
             "accepted_backtracks_keep_proposed_Adam_moments": True})
     return 0
