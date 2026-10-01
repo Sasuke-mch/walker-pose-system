@@ -2765,3 +2765,13 @@ C1/C2 是物理逻辑所需的约束，不因当前表面指标暂时不理想�
 左手最终0/4通过（8/2/4/22对相交），保留失败参考但不冻结。较早零相交解的左手轮廓仍明显错位，说明几何门本身不够。不能因此断言真实握持不可能或标定必错；停止继续堆叠权重，下一门是扶手回投与带深度三角面可见性目标审计。源身体/旧共享结果/人工标签未修改。`run_v6/views/fixed_grip_checked.npz`包含共享PCA、局部旋转、walker<-wrist位姿、面/顶点、原生观测mask（左436/448、右448/448），状态left_accepted_geometry=False、right_accepted_geometry=True、accepted_for_main_fit=False；左手不可用于后续强约束，右手仅作为候选。
 
 验证：8项坐标角点、圆柱遮挡、几何梯度、显式标签副本重映射与相交筛查测试通过，两个工具py_compile通过。运行前协议、参数、逐起点trace与完整结论补充在既有 G20260927_wilor_smplh_full448_v1/EXPERIMENT.md；无新增Markdown报告。较早run_v3/v4/v5及调试失败目录全部保留。现有用户未提交改动未夹带。
+
+## 2026-10-01：改为腕部位置优先，抓取形状不得移动腕点
+
+用户明确优先保证腕部位置合理，再给出合适抓取姿态。本轮新增 `realtime_app/tools/solve_annotated_wrist_targets.py`：只读取两图显式left_wrist/right_wrist单点，将正立像素逆旋转回原始鱼眼，通过正式双目标定三角化并仅细化XYZ，独立于手指/接触损失。使用正深度、每视图回投<=10px、射线夹角>=1deg的工程门；缺失、重复、越界、几何失败完整写出，不从多边形质心或旧结果生成腕目标。人工中心点仍是操作性参考，不能当作精确内部腕骨3D真值。全片共享腕位置遵循用户手相对助步器静止假设。
+
+`fit_annotated_shared_grip.py`新增可选`--fixed-wrists`，只接收通过门的annotated_wrist_targets_v1；腕平移为常量、移出优化器，只优化每手PCA12和朝向。结束逐起点检查腕位置逐元素未变，并导出wrist_translation_fixed与报告模式。默认旧联合模式不改变。腕位置正确后，手指不合理只能修手指或朝向/几何假设，不能回退移动腕点掩盖矛盾。全身肩肘拟合仍是后续步骤，腕朝向会影响前臂，不能认为手部朝向对身体完全无影响。
+
+检查现有手轮廓没有显式腕中心，不能宣称已求出新的正确腕部。创建独立标注副本 `research_records/annotation_handoffs/H20261001_people1_wrist_points_pair0000_v2/`，保留原图片和多边形，增加left_wrist/right_wrist标签、Ctrl+Shift+P创建点快捷键，LabelMe窗口已确认打开left_pair_0000.png [1/2]。人体左腕在左图右上、右图右侧；人体右腕在左图左下、右图左侧。待用户各图补两点后继续，当前pending审计输出 `G20261001_annotated_shared_grip_v1/wrist_first_pending.json`左右均unavailable，未替换先前结果。
+
+验证：12项相关测试通过，新增测试覆盖正立逆映射、正式标定下合成点三角化往返、仅轮廓不伪造腕点、重复及越界点拒绝；脚本py_compile通过。当前完成算法接口与标注准备，没有实际新腕解或锁腕握持实验，不宣称腕位置已验证。

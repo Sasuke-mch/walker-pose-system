@@ -105,6 +105,7 @@ def main():
     ap.add_argument('--wrap-prior', action='store_true', help='known enclosing-grip hypothesis; palm surface and opposing thumb/finger regions')
     ap.add_argument('--orientation-noise',type=float,default=.28)
     ap.add_argument('--image-weight',type=float,default=1.)
+    ap.add_argument('--fixed-wrists',type=Path,help='accepted annotated_wrist_targets_v1 JSON; no wrist translation enters optimizer')
     args = ap.parse_args()
     if args.output_dir.exists():
         raise ValueError('refuse_existing_output')
@@ -123,6 +124,13 @@ def main():
         return torch.as_tensor(x, dtype=torch.float32, device=device)
     root = Path(__file__).resolve().parents[2]
     z = np.load(args.result, allow_pickle=False)
+    wrist_targets=json.loads(args.fixed_wrists.read_text(encoding='utf-8')) if args.fixed_wrists else None
+    if wrist_targets is not None:
+        if wrist_targets.get('schema')!='annotated_wrist_targets_v1' or wrist_targets.get('status')!='accepted_manual_reference_geometry':
+            raise ValueError('wrist_targets_not_accepted')
+        for side in ('left','right'):
+            point=np.asarray(wrist_targets['hands'][side]['wrist_walker_m'])
+            if point.shape!=(3,) or not np.isfinite(point).all():raise ValueError('invalid_fixed_wrist')
     initial_grip = np.load(args.initial_grip,allow_pickle=False) if args.initial_grip else None
     walker = json.loads(args.walker_model.read_text(encoding='utf-8'))
     Rc = tensor(walker['rotation_left_camera_from_walker'])
@@ -157,7 +165,8 @@ def main():
     bodyzero = torch.zeros((1, 63), device=device)
     beta = tensor(z['betas'])
     all_report = {'status': 'local_grip_candidate_only', 'source_result': str(args.result.resolve()), 'walker_source': str(args.walker_model.resolve()), 'args': {k: str(v) if isinstance(v,Path) else v for k,v in vars(args).items()}, 'annotation_audit': annotation_audit, 'assumption': 'shared_finger_PCA_and_wrist_SE3_in_walker_frame_all_video', 'body_optimized': False, 'shape_optimized': False, 'radius_m': .016, 'limits': 'two annotated views of one frame; static coarse installation; no external 3D truth; local neutral-body hand surface; upper-limb IK is not solved', 'hands': {}}
-    export = {}
+    all_report['wrist_position_mode']='fixed_explicit_stereo_wrist_reference' if wrist_targets is not None else 'jointly_optimized_with_grip'
+    export = {'wrist_translation_fixed':np.asarray(wrist_targets is not None)}
     for side, start, wrist in [('left',22,20), ('right',37,21)]:
         use = ((dom>=start)&(dom<start+15))|((dom==wrist)&(np.linalg.norm(rest-restj[wrist],axis=1)<.08))
         idx = np.flatnonzero(use)
@@ -309,8 +318,10 @@ def main():
             rv0=Rotation.from_matrix(rotationbase).as_rotvec()
             rv=torch.nn.Parameter(tensor(rv0+rng.normal(0,args.orientation_noise,3)*(run>0)))
             translationbase=tensor(initial_grip[f'{side}_wrist_walker_m']) if initial_grip is not None else t0
-            tr=torch.nn.Parameter(translationbase.clone()+tensor(rng.normal(0,.015,3))*(run>0))
-            opt=torch.optim.Adam([{'params':[coeff,rv],'lr':.015},{'params':[tr],'lr':.0015}])
+            tr=tensor(wrist_targets['hands'][side]['wrist_walker_m']) if wrist_targets is not None else torch.nn.Parameter(translationbase.clone()+tensor(rng.normal(0,.015,3))*(run>0))
+            param_groups=[{'params':[coeff,rv],'lr':.015}]
+            if wrist_targets is None:param_groups.append({'params':[tr],'lr':.0015})
+            opt=torch.optim.Adam(param_groups)
             trace=[]
             for step in range(args.steps):
                 if step%25==0:
@@ -323,7 +334,8 @@ def main():
                 if not torch.isfinite(loss):
                     raise ValueError('nonfinite_loss')
                 loss.backward()
-                if step==0 and any(p.grad is None or not torch.isfinite(p.grad).all() for p in (coeff,rv,tr)):
+                active_parameters=(coeff,rv) if wrist_targets is not None else (coeff,rv,tr)
+                if step==0 and any(p.grad is None or not torch.isfinite(p.grad).all() for p in active_parameters):
                     raise ValueError('invalid_gradient')
                 opt.step()
                 if step in (args.steps//2,3*args.steps//4):
@@ -344,6 +356,8 @@ def main():
                 candidates.append((item,qq,h.cpu().numpy(),local.cpu().numpy()))
                 (args.output_dir/f'{side}_starts.json').write_text(json.dumps([c[0] for c in candidates],indent=2),encoding='utf-8')
             print(json.dumps({'hand':side,'start':run,'objective':item['objective'],'intersections':len(collisions),'min_gap_mm':item['min_gap_mm']}),flush=True)
+            if wrist_targets is not None and not np.array_equal(tr.cpu().numpy(),tensor(wrist_targets['hands'][side]['wrist_walker_m']).cpu().numpy()):
+                raise ValueError('fixed_wrist_changed')
         passing=[c for c in candidates if c[0]['accepted_geometry']]
         best=min(passing or candidates,key=lambda c:c[0]['objective'])
         item,qq,hh,ll=best
