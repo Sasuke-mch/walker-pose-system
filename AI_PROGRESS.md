@@ -2753,3 +2753,15 @@ C1/C2 是物理逻辑所需的约束，不因当前表面指标暂时不理想�
 按用户要求打开 LabelMe，准备 people_1 同源 pair_0000 左右正立原分辨率图片副本。目录 `research_records/annotation_handoffs/H20261001_people1_hand_contours_pair0000_v1/`，`images/left_pair_0000.png`、`images/right_pair_0000.png` 分别对应 input_448pairs/left_ccw90、right_cw90；manifest.json 保存源路径、帧号和旋转约定。标签为 anatomical `left_hand`、`right_hand`、`ignore_uncertain`，只标可见皮肤轮廓，不补画被扶手遮挡的手指。标注保存到 labels/，不覆盖之前的人体/助步器标签。后续用于共享手指PCA与助步器相对SE(3)候选的图像约束，不是独立三维或物理接触真值。
 
 原 .annotation_env 启动失败，原因是 pyvenv.cfg 指向不存在的 D:/profile/anaconda。保留配置备份 pyvenv.cfg.before_hand_launch，安装兼容的 CPython 3.13.12 并更新环境基础解释器路径，复用已有 LabelMe 6.3.1 及依赖；labelme --help 成功，进程窗口标题确认已打开 left_pair_0000.png [1/2]。当前等待用户实际标注，未继续姿态求解，未改变身体/手指参数。图片和本地环境不进入版本管理。
+
+## 2026-10-01：人工双视图手轮廓驱动的共享握持候选（右手可保留，左手拒绝冻结）
+
+按用户“全视频手握扶手且相对不动，位置须符合原图”的要求，新增独立 `realtime_app/tools/fit_annotated_shared_grip.py`：每手共享PCA12与助步器相对腕SE(3)，固定原SMPLH beta/身体/相机/静态安装及16mm半径；全448帧原生局部旋转继续作先验。图像输入 H20261001_people1_hand_contours_pair0000_v1 的左右人工轮廓，左图两个轮廓均标right_hand，经两图、原始检测框与正式鱼眼腕点回投核对，仅在求解副本将右上shape1使用left_hand，原JSON未覆盖。首次错误重映射shape0的调试已中断并保留FAILURE.json；不得消费该输出。
+
+损失包含正式双鱼眼回投、人工轮廓覆盖/外溢、人工轮廓内部弱RGB可见皮肤线索、扶手非穿透、分指/掌面接近、拇指与四指径向对向软先验、指骨代理及实际相交三角面分离。原图/三视角审查发现：只靠指骨代理不能阻止表面交叉；只追求覆盖会让遮挡顶点解释可见皮肤；只追求分指接近会形成指端搭杆而非掌面握持。因此逐步补全，所有失败起点保留，最终验收不放宽。新 `render_annotated_grip_candidate.py`使用同次局部真实三角面并保留失败标题，不混用旧动态地面。此处是独立局部手候选，未做上肢IK，不把刚体移动写成已经连接到全身的姿态。
+
+最终输出 `research_records/engineering_validation/G20261001_annotated_shared_grip_v1/run_v6/`，4起点每手900步、旋转扰动1rad、图像权重3，seed20261001。右手2/4通过，选start0：0对筛查相交、双相机正深度、扶手最大顶点穿透0.525mm、掌面候选最近gap绝对值0.0425mm、对向软先验代价0。近似人工轮廓IoU左/右视图0.4790/0.5557，同源局部初始候选0.1576/0.1667；这仅是图像参考一致性，不是真实3D精度。全片原生旋转残差median/P95为26.06°/55.46°，较旧共享手指姿态平均改变24.72°；不能宣称更接近WiLoR原生输出。
+
+左手最终0/4通过（8/2/4/22对相交），保留失败参考但不冻结。较早零相交解的左手轮廓仍明显错位，说明几何门本身不够。不能因此断言真实握持不可能或标定必错；停止继续堆叠权重，下一门是扶手回投与带深度三角面可见性目标审计。源身体/旧共享结果/人工标签未修改。`run_v6/views/fixed_grip_checked.npz`包含共享PCA、局部旋转、walker<-wrist位姿、面/顶点、原生观测mask（左436/448、右448/448），状态left_accepted_geometry=False、right_accepted_geometry=True、accepted_for_main_fit=False；左手不可用于后续强约束，右手仅作为候选。
+
+验证：8项坐标角点、圆柱遮挡、几何梯度、显式标签副本重映射与相交筛查测试通过，两个工具py_compile通过。运行前协议、参数、逐起点trace与完整结论补充在既有 G20260927_wilor_smplh_full448_v1/EXPERIMENT.md；无新增Markdown报告。较早run_v3/v4/v5及调试失败目录全部保留。现有用户未提交改动未夹带。
