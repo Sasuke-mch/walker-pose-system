@@ -422,3 +422,15 @@ Stage2的实际帧选择：每脚鞋底所有参考顶点求各有效帧中心�
 执行benchmark_balanced_grasp.py：--reference-metadata .../vposer_body_full448_v1/fit/run_metadata.json --output-root .../active_constructed_grip_v2/balanced_logic_audit60_100_v3 --steps 10。全输入路径/命令见control_command.json、balanced_command.json与run_metadata.json，protocol在运行前保存。四阶段各10步、lr0.003、腕20/朝向0.1、原其余系数；与旧50步记录不能作纯修复性能消融。候选RMS77.064->77.122mm、最大逐点增加9.994mm；上肢/躯干/联合更新接受6/4/2次，各10次；手10/10。最终腕median106.904/73.731mm、P95171.901/90.729mm；脚底最低-56.056/-72.797mm；腿加速度平方9.527->9.978。逐点门通过，腕/脚/腿稳定性/全部手帧几何门失败，仍拒绝候选，未扩448。具体comparison/逐帧几何/参数/事务日志全保存。
 
 恢复故障验证：同一目录resume_command.json把source切换到旧失败全448结果，保留原pose-reference与其他输入，输出resume_must_reject。进程1、FAILURE.reason=resume_outside_immutable_observation_guard、超预算最大255.829mm，训练前拒绝。其baseline_error_m与正常运行逐元素一致，未发放新的10mm预算。失败输出及console完整保留。47项相关pytest通过，覆盖异常恢复Adam状态、静止质心旋转的顶点项、代表帧刚体目标几何、无效NaN损失/梯度隔离和接地0/地下惩罚；py_compile和diff检查通过。全窗统一接受与方向冲突仍未解决，不能把修复验证写成握持或腿抖动已经解决。
+
+### 2026-10-01：按用户要求扩展修正后的balance全448帧诊断与可视化
+
+用户明确要求全部帧，扩展授权覆盖上节短窗失败后的范围停止条件；拟合验收标准不变。输出G20261001_annotated_shared_grip_v1/active_constructed_grip_v2/balanced_body_full448_v1。run_full448.py顺序重放同源input_448pairs左右原图、重算脚候选、运行fit、全帧手网格audit、构建viewer，所有命令与日志保存。使用原共享VPoser source/reference、当前constructed_grasp、原PMPose、正式标定与静态ground/walker；只复用静态输入路径，没有旧动态地面/旧接触数据进入本轮。新scene448行，warming5/transition114/Stage2 115/Stage1 214，123动态更新。foot_contact候选按本次参考最低鞋底sigmoid((30mm-abs(min_z))/15mm)重算，非物理支撑标签。
+
+参数：full-body/surface-refine/balanced-stages/stage2-static-assumption，0..447完整448帧，上肢/躯干/联合/PCA各50步，lr0.003（联合乘0.25），腕20、朝向0.1、collision_refresh25全部448帧，其余当前默认。VPoser全21实时解码、shape/scene固定、共享PCA最后释放、C1/C2/非穿透及Stage2固定顶点接口按修正逻辑。result包含448x6890x3真实顶点、13776面、32D latent/21旋转矩阵及当前tri/mask/q、实际ground顶点，不补旧帧。
+
+身体加权RMS83.119->83.096mm，最大单点退化9.993mm；上肢/躯干/联合分别6/6/0次接受（各50），PCA50/50。腕median97.286/84.778mm，P95155.193/110.646mm，max188.367/130.924mm。鞋底全片最低-116.183/-123.660mm。手几何左0/448、右0/448，最大顶点穿透15.714/15.800mm。assess_full448.py及full448_assessment.json保留shape/finite/frameIDs/面索引/逐点预算和门判断：仅observations通过，wrists/feet/leg_temporal/hands失败，主拟合拒绝，不把完整范围可视化解释为解正确。
+
+按VISUALIZATION_PIPELINE构建body_viewer_v2.html：本次scene统一转换模型/原tri/地面/实体助步器/双相机及轨迹，真实面、全部黑色实线COCO骨架、全部有限拒绝点与原因、严格accepted和拟合候选区别、Stage及地面状态、0.5m轴刻度/脚底地下红点/相机YZ侧轨迹/踝拖尾均保留。标题简洁正式，无工程候选段。初始body_viewer.html窄视口裁切，保留失败显示；生成器使用整个序列髋部位置中位数作为固定XY观察中心，所有帧同一中心，不逐帧吸附、不改任何世界坐标。两版嵌入数据逐字相同断言通过。
+
+浏览器检查0/224/447、播放/暂停、旋转/重置，控制台无error，第224帧实际截图viewer_frame224.jpg。tab6断连后重新打开tab7，最终页面保持交付。viewer_validation保存browser完成及输入来源，5项窗口映射pytest/编译/diff通过。一次分析内联命令因shell引号SyntaxError，改独立脚本后完成，正式拟合/审核流程未失败。原448失败网页/旧短窗和所有用户改动保留，不隐藏当前失败结论。

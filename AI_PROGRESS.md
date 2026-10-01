@@ -2967,3 +2967,15 @@ Stage2作为用户静止假设单独启用，不用旧support标签替代：在�
 恢复拒绝测试：用原失败vposer_body_full448_v1/fit/result.npz作source、原始pose-reference不变；resume_must_reject输出reason=resume_outside_immutable_observation_guard、maximum_excess_m=0.255829，进程1，未进入训练。resume_command.json/resume_console.log及FAILURE.json保留，原始运行与拒绝运行的baseline_error_m逐元素完全一致，证实预算没有重置。47项相关pytest通过，新增静止质心下旋转仍受罚、代表帧刚体几何保持、异常回滚、无效NaN隔离、Z=0无非穿透惩罚/地下仍受罚测试；编译和diff检查通过。
 
 本轮修复的是明确逻辑问题，不证明已有停滞由这些问题全部造成。全窗统一缩步/接受造成一帧阻断整窗、强腕项方向与肩踝保护冲突、VPoser跨部位耦合仍是算法局限；本轮未偷偷改成逐帧接受或放宽观测门。物理锚仍是用户静止假设+工程地面，不是独立真值。
+
+## 2026-10-01：修正后的固定手约束全448帧拟合与规范可视化
+
+用户明确要求全帧运行和可视化，本轮据此扩展之前未通过短窗的诊断范围，不放宽验收门、不升级主拟合。输出active_constructed_grip_v2/balanced_body_full448_v1，run_full448.py记录完整命令/步骤，assess_full448.py记录逐点预算/形状/有限/最终门。原共享VPoser448 source同时作为不可变参考，当前constructed_grasp、正式标定、静态地面参考/助步器拓扑和原左右PMPose冻结。448对input_448pairs逆旋转回原鱼眼后重新运行Stage/地面，未读取旧动态变换，Stage warming5/transition114/Stage2 115/Stage1 214，123有效地面更新。脚候选由原参考鞋底与本次变换重算，不使用旧contact目标。
+
+full-body/surface-refine/balanced-stages/stage2-static-assumption全部启用，start0/stop448，四阶段各50步，lr0.003、腕20、朝向0.1、全448帧手碰撞每25步刷新。beta/标定/scene固定，VPoser完整21关节实时解码/最终断言通过；PCA仅最后阶段释放，原C1/C2保留，新balance非穿透margin0，Stage2 schema2逐顶点锚。全部448帧真实6890顶点/13776面、latent/旋转/质量mask及失败原因保存，无拼帧/插值/显示平滑。
+
+身体观测加权RMS83.119->83.096mm，最大逐点退化9.993mm，逐点保护通过。上肢6/50、躯干6/50、联合0/50更新接受，共12/150；PCA50/50。最终腕median左97.286/右84.778mm，P95155.193/110.646mm，max188.367/130.924mm；最低脚底左-116.183/右-123.660mm。完整896手帧几何审计左右均0/448通过，最大扶手顶点穿透15.714/15.800mm。full448_assessment.json记录只观测门true，其余腕/脚/腿加速度不增加/全部手几何门false，accepted_for_main_fit=False，保留所有拒绝更新。此结果再次显示全窗接受及强腕方向冲突导致停滞，不表示腿抖动或抓取已解决。
+
+body_viewer_v2.html为交付页，标题SMPL-H 固定手部约束拟合，黑色#000000实线连接所有有限原始COCO点，拒绝点叉号/状态明确、右膝不永久排除。真实半透明三角面/模型COCO/原始三角化、XY地面Z高/[X,-Y,Z]统一变换、实体walker拓扑、双相机基线/YZ侧轨迹/accepted踝拖尾、0.5m刻度、Stage/held/rejected/质量/腕误差/几何诊断均显示。首次body_viewer.html在窄窗口人体裁切，已保留；Canvas生成器增加全片髋部中位数的固定观察中心，只改相机取景，不逐帧居中、不移动实际坐标。两版嵌入数据逐字相同检查通过。
+
+浏览器实际检查0/224/447帧、播放从447循环到28、暂停、自由旋转与重置，console error为空；第224帧截图viewer_frame224.jpg保留并展示。初始tab6被关闭/失效后重新打开交付tab7，不将断连写成渲染通过。viewer_validation.json记录浏览器完成与同源路径，页面已打开并保留。5项窗口映射测试、生成器/两个运行脚本py_compile/diff通过，数据帧ID0..447/维度/有限与面索引范围通过。分析准备的一次内联命令因PowerShell引号导致SyntaxError，改用独立assess_full448.py后成功，未影响拟合数据。模型/大型HTML/图像及运行产物不纳入Git，仅代码和现有记录提交，其他用户改动保持。

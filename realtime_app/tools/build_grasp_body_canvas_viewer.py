@@ -131,6 +131,12 @@ def main():
     page = page.replace('.metrics dt{color:#65737d}', '.metrics dt{color:#65737d;flex:0 0 90px}')
     page = page.replace('.metrics dd{margin:0;text-align:right}', '.metrics dd{margin:0;text-align:right;min-width:0;overflow-wrap:anywhere}')
     page = page.replace('zoom=1.0', 'zoom=.65').replace('zoom=1;', 'zoom=.65;')
+    # One fixed viewing center for the entire sequence. Camera framing only:
+    # never recenter per frame, or apparent world motion would be hidden.
+    center = np.median(cg[:, [11, 12], :2].reshape(-1, 2), axis=0)
+    center[1] *= -1  # project() receives the common [X,-Y,Z] display map.
+    page = page.replace('let x=p[0]*cy-p[1]*sy,y=p[0]*sy+p[1]*cy,z=p[2];',
+        f'const px=p[0]-({center[0]:.9g}),py=p[1]-({center[1]:.9g});let x=px*cy-py*sy,y=px*sy+py*cy,z=p[2];')
     page = page.replace('const sideX=-3.8;', 'const sideX=-1.8;')
     page = page.replace('窗口 60..90 · 31 帧 · 无外部库', f'第{ids[0]}..{ids[-1]}帧 · {n}帧 · 6890顶点 / 13776真实三角面 · 本次重放')
     page = page.replace('male SMPL 表面手脚接触拟合', 'SMPL-H 固定手部约束拟合')
