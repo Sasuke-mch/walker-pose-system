@@ -19,6 +19,66 @@ UPPER_JOINTS = (13, 14, 16, 17, 18, 19, 20, 21)
 TORSO_JOINTS = (3, 6, 9, 12)
 
 
+def screened_triangle_pairs(vertices, faces):
+    """Vectorized equivalent of the existing noncoplanar triangle screen.
+
+    Shared vertices, coplanar overlap and tangencies retain the old exclusion.
+    Vectorize candidate edge tests, not the model geometry or frame sequence.
+    """
+    tri = np.asarray(vertices)[faces]
+    lo, hi = tri.min(1), tri.max(1)
+    candidate = np.triu(np.ones((len(faces), len(faces)), bool), 1)
+    for axis in range(3):
+        candidate &= (lo[:, axis, None] <= hi[None, :, axis]) & (hi[:, axis, None] >= lo[None, :, axis])
+    i, j = np.nonzero(candidate)
+    shared = (faces[i, :, None] == faces[j, None, :]).any((1, 2))
+    i, j = i[~shared], j[~shared]
+    found = np.zeros(len(i), bool)
+    for source, target in ((tri[i], tri[j]), (tri[j], tri[i])):
+        e1, e2 = target[:, 1] - target[:, 0], target[:, 2] - target[:, 0]
+        for k in range(3):
+            origin, direction = source[:, k], source[:, (k + 1) % 3] - source[:, k]
+            h = np.cross(direction, e2)
+            det = np.einsum("ij,ij->i", e1, h)
+            valid = np.abs(det) >= 1e-12
+            inv = np.divide(1., det, out=np.zeros_like(det), where=valid)
+            s = origin - target[:, 0]
+            u = inv * np.einsum("ij,ij->i", s, h)
+            q = np.cross(s, e1)
+            v = inv * np.einsum("ij,ij->i", direction, q)
+            t = inv * np.einsum("ij,ij->i", e2, q)
+            found |= valid & (u > 1e-7) & (v > 1e-7) & (u + v < 1 - 1e-7) & (t > 1e-7) & (t < 1 - 1e-7)
+    return np.stack([i[found], j[found]], axis=1).tolist()
+
+
+def triangle_separation_loss(vertices, faces, pairs):
+    """Separate screened intersecting triangle pairs, using actual surfaces.
+
+    Pairs are a frozen broad-phase selection, refreshed by the caller. This
+    differentiable plane penalty is a surrogate, requiring a final exact screen.
+    """
+    if pairs.numel() == 0:
+        return vertices.sum() * 0
+    tri = vertices[:, faces]
+    if pairs.shape[1] == 3:
+        # Frame-specific intersections: a pair detected in one pose must not
+        # constrain the same infinite planes in other, nonintersecting poses.
+        first = tri[pairs[:, 0], pairs[:, 1]][None]
+        second = tri[pairs[:, 0], pairs[:, 2]][None]
+    else:
+        first, second = tri[:, pairs[:, 0]], tri[:, pairs[:, 1]]
+    def separation(source, target):
+        normal = torch.nn.functional.normalize(torch.cross(
+            target[..., 1, :] - target[..., 0, :],
+            target[..., 2, :] - target[..., 0, :], dim=-1), dim=-1, eps=1e-10)
+        signed = ((source - target[..., 0:1, :]) * normal[..., None, :]).sum(-1)
+        positive = (torch.relu(.0007 - signed) / .002).square().mean(-1)
+        negative = (torch.relu(.0007 + signed) / .002).square().mean(-1)
+        return torch.minimum(positive, negative)
+    values = separation(first, second) + separation(second, first)
+    return values.mean() + values.amax(1).mean()
+
+
 def load_grasp(path: Path) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
     if (data.get("schema") != "constructed_bilateral_grasp_v1"
@@ -68,6 +128,25 @@ def wrist_rotations(root_rotations, body_rotations, parents):
             raise ValueError("invalid body parent tree")
         chain.append(chain[p] @ body_rotations[:, j - 1])
     return torch.stack((chain[20], chain[21]), dim=1)
+
+
+def align_wrist_rotations(root_rotations, body_rotations, parents, target_camera_rotations):
+    """Differentiably solve each local wrist rotation from its parent FK.
+
+    A firm-grasp mode: forearms may move; palms keep walker-relative orientation.
+    Wrist centers still follow the normal body chain and position constraints.
+    """
+    chain, local = [root_rotations], []
+    for j in range(1, 22):
+        parent = int(parents[j])
+        if not 0 <= parent < j:
+            raise ValueError("invalid body parent tree")
+        rotation = body_rotations[:, j - 1]
+        if j in (20, 21):
+            rotation = chain[parent].transpose(-1, -2) @ target_camera_rotations[j - 20]
+        local.append(rotation)
+        chain.append(chain[parent] @ rotation)
+    return torch.stack(local, dim=1)
 
 
 def masked_mean(values, mask):

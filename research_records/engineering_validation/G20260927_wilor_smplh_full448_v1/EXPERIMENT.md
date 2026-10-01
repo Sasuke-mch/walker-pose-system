@@ -299,3 +299,23 @@ v2初始/上肢阶段/躯干阶段腕median：左122.110/0.188/0.205mm，右81.0
 定位右手原身体20对均在腕/掌21与小指中/末44/45；优化后新增中指41/42与无名指47/48交叉。关闭correctives仍7对腕/掌21与小指44，说明蒙皮与姿态修正共同影响。不能解释成右腕旋转比左大：本帧左轴角[5.353,12.030,47.867]度、右[5.682,-1.125,-42.200]度。左手仅放入局部腕也会出现21对中指/无名指相交，当前左通过不保证对其他身体姿态鲁棒。
 
 根因是局部构造仅在bodyzero下前向，之后当刚体放置；固定手指PCA不固定实际皮肤网格。全身接入时完整pose correctives及多关节蒙皮恢复，实际手面形状改变。不存在已查明的左右PCA误映射证据：中立身体双手仍0相交，之前完整源矩阵重放误差5.364e-7m，PCA/轴角解码核对一致。更直接的接入逻辑缺项：当前精修目标只有hand_penetration到扶手，没有hand_self_collision；后验能拒绝，但优化无从主动避免。需要在完整身体条件下加入手部自相交与表面形状保持约束、重新检查，必要时共享PCA限幅修正；不得关闭模型correctives、清零腕、粘贴旧网格或放宽验收冒充解决。左右都应做同样检查，脚项保持不变。
+
+### 2026-10-01：全帧腕基本固定与完整手表面修正协议（执行前）
+
+用户授权全448帧优化和按可视化规范显示。保留旧入口，新增可选--surface-refine/--full-body：共享PCA参考±2范围，完整实际手面形状保持与筛查相交三角面对称平面分离损失；动态刷新训练筛查对，最终所有帧精确筛查，未通过帧保留。默认不开新模式可回退。先31帧短探针，再全448帧，不拼窗、不补失败、不改标定/模型correctives。最终阶段可释放下肢与根位姿，固定beta；身体3D/双鱼眼2D/姿态/时序持续有效，腕5mm与朝向5度目标保持。脚接触/非穿透按10mm尺度归一化以修复原穿透；切向系数0.001和support/support有效相邻mask保留，记录尺度变化不宣称旧权重实验。
+
+本次全帧目录active_constructed_grip_v2/full448_body_v3，已从原448对图像重新运行Stage1/2和动态地面scene，不读旧动态输入。当前Stage计数warming_up5/transition114/Stage2 115/Stage1 214；独立外部真值仍缺失。原结果只作为身体初始化，二维/三角化与脚部目标重新计算；可视化只读本轮mesh、同轮scene与同轮raw/masks，保留17点及拒绝状态、真实三角面、实体walker、双相机/投影拖尾、地下脚底颜色，不显示平滑。输出工程候选，即使手形未全部通过也显示其状态以供腕约束下身体观察，不升级为物理通过。
+
+### 2026-10-01：全448帧执行结果与停止结论
+
+输入：原初始化`G20261001_fixed_mano_pca448_v1/fit_shared/result.npz`；构造双手`G20261001_annotated_shared_grip_v1/active_constructed_grip_v2/constructed_grasp.json`及npz；原PMPose来自`V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions`，图像来自同目录`input_448pairs`。静态surface集合本实验`contact_surface_sets_smplh_v1/contact_vertex_sets.json`、SMPLH_male及MANO_LEFT/RIGHT资产、正式双鱼眼标定保持。动态scene写入`active_constructed_grip_v2/full448_body_v3/scene`，command.txt与scene_sources.json记录来源，地面接受更新123；原始二维重新三角化，不把旧source的raw点当作当前观测。基线实际鞋底经本次地面变换重新生成current_foot_candidates.npz；冻结支撑状态和拒绝理由随各次结果保存。
+
+实现文件：pose_app/constructed_grasp_refinement.py、tools/refine_body_with_constructed_grasp.py、audit_constructed_grasp_body.py、build_grasp_body_canvas_viewer.py。手surface项权重：扶手非穿透20（3mm尺度，mean及每帧max）、自相交50（面平面分离，0.7mm裕量/2mm尺度）、网格参考0.1（5mm）、PCA参考0.5、各指区域3、掌区域2、对握10。腕位置20（5mm）、朝向3（5度）、10mm外软界10（1mm尺度，mean+max）；身体3D为50mm归一化、双鱼眼2D0.15/100px、姿态0.05、时序0.02，足表面/非穿透各1/10mm尺度、足切向0.001。权重和多个变量曾共同变化，这是调试推进，不能作单因素收益分析；未采用外部力或压力测量。
+
+短窗surface_body_probe_v3先检查梯度/脚约束。首次完整fit为上肢600+身体1200步，腕P95左/右40.596/41.114mm，未满足基本固定；定位筛查三角面对跨帧并集误施加，同一相交对错误作用其他帧，修正为(frame,faceA,faceB)索引并加入独立帧梯度测试，失败结果原样保留。fit_v4为上肢300+身体900步并加10mm软界，腕P95 4.841/4.363mm、max13.540/12.103mm；fit_v5再身体精修300+共享手PCA精修600步，腕P95 0.879/1.008mm、max8.358/7.855mm，双手几何代理通过399/403帧，但最坏扶手穿透15.607/15.724mm。
+
+fit_v6从v5初始化，新增--lock-grasp-orientation：给定walker到camera固定旋转，对每帧真实父关节全局旋转Rp，求局部腕旋转Rp.T@Rtarget；这是抓紧朝向假设，不是新增图像证据。手腕中心仍由标准骨架链和位置损失求解，网格仍由完整SMPL-H生成，未粘贴旧局部手。身体/腕精修200步后固定身体，只精修共享PCA300步；每50步向量化精确筛查全部448帧。最终左/右腕median0.292/0.462mm、P951.035/1.716mm、max3.824/5.515mm；朝向P950.063/0.069度接近浮点误差。身体3D工程RMS由83.119降至71.557mm；beta固定、根和下肢可调整。脚底全片最小z左/右-20.563/-15.188mm，较初始-119.039/-125.551mm改善，仍存在2cm量级穿透。C2有效相邻对0/0，原因是冻结基线不提供可信支撑，函数保留但这次没有主动的切向约束证据。
+
+最终audit逐448帧双手，v6通过左257/448、右344/448：screened_triangle_crossings 50手帧，finger_region_gap_exceeds_5mm 286，handle_penetration_exceeds_3mm 8，thumb_opposition_proxy_failed 1（原因可重叠）。最大扶手顶点穿透左7.877/右3.206mm。与v5相比穿透减少、腕更稳，但通过率降低，主要指区间隙变大；不能用一个总损失宣布手形完全修复。相交筛查不覆盖所有共面/擦碰，不等于精确物理接触；区域最小距离不等于真实接触面积/摩擦/承重。结果accepted_for_main_fit=False，保留两轮各自完整输出，当前停止进一步调权，不混合v5身体/v6手面。
+
+当前可观察候选选v6以回答腕基本固定后的全身效果。全帧result.npz、fit_summary.json、参数阶段快照、grasp_geometry_audit.json位于full448_body_v3/fit_v6。body_wrist_fixed_viewer_v2.html使用该同一次网格和fresh scene，原body_wrist_fixed_viewer.html保留初版显示；版本2只调整初始缩放/文字布局，没有数据变化。单页Canvas绘制全部13776真实三角面，含6890顶点/41328索引项，使用X,-Y,Z展示映射。同帧模型COCO17、严格接受点、有限拒绝点/完整骨架含右膝14、实体杆件、双光心与基线、XY地面/Z高度、0.5m标尺、侧相机轨迹、踝拖尾、地下脚面颜色、Stage/地面状态/回投median/拒绝理由/双手审计全部可见；无插值/平滑/手工吸附。浏览器核查0、224、447帧，末帧身体完整可见；控制台无error，截图viewer_frame224.jpg与viewer_validation.json同目录保存。36项相关测试通过，相关py_compile和git diff检查完成。旧fit_smplh_wilor_sequence.py未更改，新模式默认关闭，可直接回原source-result；未把当前候选写为主线物理通过。

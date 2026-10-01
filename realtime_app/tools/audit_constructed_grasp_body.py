@@ -17,7 +17,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "realtime_app"))
 from pose_app.smpl_coco_observation import _install_legacy_smpl_pickle_compatibility
-from audit_fixed_mano_grip import crossing_pairs, capsule
+from audit_fixed_mano_grip import capsule
+from pose_app.constructed_grasp_refinement import screened_triangle_pairs
 
 
 def main():
@@ -60,7 +61,7 @@ def main():
             radial /= np.linalg.norm(radial, axis=1, keepdims=True).clip(1e-8)
             other = radial[:4].mean(0)
             dot = float(radial[4] @ other / max(np.linalg.norm(other), 1e-8))
-            crossings = crossing_pairs(points, faces)
+            crossings = screened_triangle_pairs(points, faces)
             penetration = float(max(0., -gaps.min()) * 1000)
             reasons = []
             if crossings:

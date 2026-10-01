@@ -35,10 +35,19 @@ def main():
     ap.add_argument("--body-scale-m", type=float, default=.05)
     ap.add_argument("--grasp-mesh", type=Path, help="matching constructed NPZ; default JSON path with .npz suffix")
     ap.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
+    ap.add_argument("--surface-refine", action="store_true", help="opt-in shared PCA + full-mesh self collision/shape preservation")
+    ap.add_argument("--full-body", action="store_true", help="release lower limbs and root only in final phase; beta remains fixed")
+    ap.add_argument("--collision-refresh", type=int, default=100)
+    ap.add_argument("--wrist-bound-m", type=float, default=.01, help="surface-refine tail barrier; not a feasibility certificate")
+    ap.add_argument("--body-polish-steps", type=int, default=0, help="body/wrist refinement with shared fingers frozen and self-collision diagnostic detached")
+    ap.add_argument("--hand-polish-steps", type=int, default=0, help="full-surface finger refinement with body/wrists frozen")
+    ap.add_argument("--lock-grasp-orientation", action="store_true", help="solve local wrists by parent FK to keep palm walker orientation fixed")
     args = ap.parse_args()
     if args.output_dir.exists():
         raise ValueError("refuse existing output directory")
-    if min(args.upper_steps, args.body_steps) < 0 or not np.isfinite(
+    if args.hand_polish_steps and not args.surface_refine:
+        raise ValueError("hand polish requires --surface-refine")
+    if args.wrist_bound_m <= 0 or args.collision_refresh <= 0 or min(args.upper_steps, args.body_steps, args.body_polish_steps, args.hand_polish_steps) < 0 or not np.isfinite(
             [args.lr, args.wrist_weight, args.orientation_weight, args.body_scale_m]).all() or args.lr <= 0 or args.body_scale_m <= 0 or min(
                 args.wrist_weight, args.orientation_weight) < 0:
         raise ValueError("invalid optimizer configuration")
@@ -55,7 +64,8 @@ def main():
     from pose_app import smpl_surface_contact as surf
     from pose_app.constructed_grasp_refinement import (
         UPPER_JOINTS, TORSO_JOINTS, load_grasp, validate_rotation, compose_body,
-        wrist_rotations, masked_mean, foot_terms, frozen_surface_states)
+        wrist_rotations, masked_mean, foot_terms, frozen_surface_states,
+        triangle_separation_loss, screened_triangle_pairs, align_wrist_rotations)
 
     torch.set_num_threads(2)
     torch.manual_seed(20261001)
@@ -127,7 +137,7 @@ def main():
         replay_max = float((replay.vertices - tensor(z["vertices"][sl])).abs().max())
         if replay_max > 1e-5:
             raise ValueError(f"matrix replay differs from source: {replay_max} m")
-    hand_pose, hand_rot = {}, {}
+    hand_pose, hand_rot, hand_bases, hand_coeff = {}, {}, {}, {}
     for side in ("left", "right"):
         h = grasp["hands"][side]
         with (ROOT / f"third_party/WiLoR/mano_data/models/MANO_{side.upper()}.pkl").open("rb") as f:
@@ -138,6 +148,9 @@ def main():
             raise ValueError("PCA/mean convention audit failed")
         hand_pose[side] = tensor(decoded).expand(n, -1)
         hand_rot[side] = batch_rodrigues(hand_pose[side].reshape(-1, 3)).reshape(n, 15, 3, 3)
+        hand_bases[side] = (tensor(np.asarray(mano["hands_mean"])), tensor(comp / np.linalg.norm(comp, axis=1)[:, None]))
+        initial_coeff = z[f"{side}_hand_pca"][0:1] if args.surface_refine and "pose_constructed" in z.files and bool(z["pose_constructed"]) else h["hand_pca"]
+        hand_coeff[side] = torch.nn.Parameter(tensor(initial_coeff).clone(), requires_grad=args.surface_refine)
     target_p = tensor([grasp["hands"][s]["wrist_walker_m"] for s in ("left", "right")])
     target_R = tensor([grasp["hands"][s]["rotation_walker_from_wrist"] for s in ("left", "right")])
     reg = load_coco17_regressor(ROOT / "models/smpl/J_regressor_coco.npy")
@@ -159,29 +172,59 @@ def main():
         valid = np.isfinite(points[..., :2]).all(-1) & (points[..., 2] > 0)
         obs.append((tensor(np.nan_to_num(points[..., :2])), tensor(np.clip(np.nan_to_num(points[..., 2]), 0, 1)) * tensor(valid)))
     cal = load_stereo_fisheye(ROOT / "realtime_app/calibration/results")
+    # Recompute observations from this run's original paired rows. Source fit
+    # supplies initialization only; previous triangulation is never supervision.
+    import cv2
+    raw.cv2 = cv2
+    left_rows, right_rows = raw.raw_side(args.left_raw, "left"), raw.raw_side(args.right_raw, "right")
+    current_tri, _, _, _, _, _, current_accepted, _, current_quality, _ = raw.raw_triangulate(
+        np.stack([left_rows[i] for i in range(total_frames)]).astype(np.float32),
+        np.stack([right_rows[i] for i in range(total_frames)]).astype(np.float32), cal)
+    target = tensor(np.nan_to_num(np.asarray(current_tri)[sl] / 1000))
+    body_mask = torch.as_tensor(np.asarray(current_accepted)[sl] & np.isfinite(np.asarray(current_tri)[sl]).all(-1), device=device)
+    quality = tensor(np.asarray(current_quality)[sl]).clamp_min(0)
     R01, t01 = tensor(cal.R_cam0_to_cam1), tensor(cal.T_cam0_to_cam1_mm / 1000)
     upper = torch.nn.Parameter(torch.zeros(n, len(UPPER_JOINTS), 3, device=device))
     torso = torch.nn.Parameter(torch.zeros(n, len(TORSO_JOINTS), 3, device=device))
     frozen_lower = [j - 1 for j in range(1, 22) if j not in UPPER_JOINTS + TORSO_JOINTS]
+    lower = torch.nn.Parameter(torch.zeros(n, len(frozen_lower), 3, device=device))
+    root_delta = torch.nn.Parameter(torch.zeros(n, 1, 3, device=device))
+    translation_delta = torch.nn.Parameter(torch.zeros(n, 3, device=device))
     mesh_path = args.grasp_mesh or args.grasp.with_suffix(".npz")
     with np.load(mesh_path, allow_pickle=False) as mesh:
         hand_indices = [np.asarray(mesh[f"{s}_vertex_indices"]) for s in ("left", "right")]
+        hand_faces = [torch.as_tensor(mesh[f"{s}_faces"], dtype=torch.long, device=device) for s in ("left", "right")]
+        hand_local_reference = [tensor(mesh[f"{s}_vertices_local_m"]) for s in ("left", "right")]
         for s in ("left", "right"):
             if not np.allclose(mesh[f"{s}_hand_pca"], grasp["hands"][s]["hand_pca"], atol=1e-6):
                 raise ValueError("constructed mesh/JSON parameter mismatch")
     if any(ids.ndim != 1 or len(ids) == 0 or ids.dtype.kind not in "iu" or ids.min() < 0 or ids.max() >= 6890 for ids in hand_indices):
         raise ValueError("invalid hand surface indices")
     ends = [tensor([np.asarray(walker["nodes_walker_mm"][key]) / 1000 for key in walker["handle_segments"][s]]) for s in ("left", "right")]
+    region_groups, palm_groups = [], []
+    dom = np.asarray(asset["weights"]).argmax(1)
+    rest, restj = np.asarray(asset["v_template"]), np.asarray(asset["J"])
+    for idx, start, wrist in zip(hand_indices, (22, 37), (20, 21)):
+        region_groups.append([np.flatnonzero((dom[idx] >= start + 3 * i + 1) & (dom[idx] < start + 3 * i + 3)) for i in range(5)])
+        center = .5 * (restj[wrist] + restj[[start, start + 3, start + 6, start + 9]].mean(0))
+        palm_groups.append(np.flatnonzero((dom[idx] == wrist) & (np.linalg.norm(rest[idx] - center, axis=1) < .03)))
     coefficients = {"body_3d": 1., "body_2d": .15, "pose_anchor": .05,
                     "body_temporal": .02, "wrist_position": args.wrist_weight,
                     "wrist_rotation": args.orientation_weight, "hand_penetration": 20.,
                     "foot_contact": 1., "foot_nonpenetration": 1., "foot_tangential": .001}
+    if args.surface_refine:
+        coefficients.update(hand_self_collision=50., hand_surface_shape=.1, hand_pose_reference=.5,
+                            hand_region_contact=3., hand_palm_contact=2., hand_opposition=10., wrist_bound=10.)
+    if args.full_body:
+        coefficients.update(root_reference=1.)
+    active_collision_pairs = [torch.empty((0, 3), dtype=torch.long, device=device) for _ in range(2)]
     args.output_dir.mkdir(parents=True)
     write("run_metadata.json", {"inputs": {k: str(v.resolve()) for k, v in vars(args).items() if isinstance(v, Path)},
         "config": {k: v for k, v in vars(args).items() if not isinstance(v, Path)},
         "coefficients": coefficients, "coordinate_frame": "camera0 fit; walker-local grip; same-source ground feet",
         "scope": "constructed_grasp_body_refinement_engineering_probe", "fps_assumed": 30,
-        "frozen": ["beta", "finger_PCA", "root", "translation", "lower_limb", "calibration", "scene"],
+        "frozen": ["beta", "calibration", "scene"] + ([] if args.surface_refine else ["finger_PCA"]) + ([] if args.full_body else ["root", "translation", "lower_limb"]),
+        "foot_loss_scale_m": .01 if args.full_body else None,
         "source_matrix_replay_max_error_m": replay_max,
         "grasp_mesh_source": str(mesh_path.resolve()),
         "body_3d_scale_m": args.body_scale_m,
@@ -193,14 +236,25 @@ def main():
     def forward():
         body = compose_body(base, upper, UPPER_JOINTS)
         body = compose_body(body, torso, TORSO_JOINTS)
-        out = model(betas=beta, global_orient=root, body_pose=body,
+        if args.full_body:
+            body = compose_body(body, lower, tuple(j + 1 for j in frozen_lower))
+        current_root = root @ batch_rodrigues(root_delta.reshape(-1, 3)).reshape(n, 1, 3, 3) if args.full_body else root
+        current_translation = transl + translation_delta if args.full_body else transl
+        if args.lock_grasp_orientation:
+            body = align_wrist_rotations(current_root[:, 0], body, model.parents, Rct @ target_R)
+        if args.surface_refine:
+            for s in ("left", "right"):
+                mean, basis = hand_bases[s]
+                hand_pose[s] = (mean + hand_coeff[s] @ basis).expand(n, -1)
+                hand_rot[s] = batch_rodrigues(hand_pose[s].reshape(-1, 3)).reshape(n, 15, 3, 3)
+        out = model(betas=beta, global_orient=current_root, body_pose=body,
                     left_hand_pose=hand_rot["left"], right_hand_pose=hand_rot["right"],
-                    transl=transl, return_verts=True)
+                    transl=current_translation, return_verts=True)
         coco = regress_coco17_torch(out.vertices, reg)
         vg = torch.einsum("nij,nvj->nvi", Rgt, out.vertices) + tgt[:, None]
         vw = (out.vertices - tct) @ Rct
         wp = (out.joints[:, [20, 21]] - tct) @ Rct
-        wr = Rct.T @ wrist_rotations(root[:, 0], body, model.parents)
+        wr = Rct.T @ wrist_rotations(current_root[:, 0], body, model.parents)
         pos = torch.linalg.vector_norm(wp - target_p, dim=-1)
         rot_diff = wr - target_R
         # Frobenius chordal rotation residual ~ angle near zero, no acos gradient.
@@ -208,6 +262,8 @@ def main():
                  "wrist_rotation": (rot_diff.square().sum((-2, -1)) / (2 * np.deg2rad(5) ** 2)).mean(),
                  "pose_anchor": (upper.square().mean() + torso.square().mean()),
                  "body_3d": ((coco - target).square().sum(-1) * quality)[body_mask].sum() / quality[body_mask].sum().clamp_min(1e-6) / args.body_scale_m ** 2}
+        if args.surface_refine:
+            terms["wrist_bound"] = (torch.relu(pos - args.wrist_bound_m) / .001).square().mean() + (torch.relu(pos - args.wrist_bound_m) / .001).square().amax()
         projected = [fisheye_project_torch(coco, cal.K0, cal.D0),
                      fisheye_project_torch(coco @ R01.T + t01, cal.K1, cal.D1)]
         terms["body_2d"] = torch.stack([((surf.robust_scalar(torch.linalg.vector_norm(p - xy, dim=-1) / 100, 1.) * w).sum() / w.sum().clamp_min(1e-6)) for p, (xy, w) in zip(projected, obs)]).mean()
@@ -217,11 +273,34 @@ def main():
         terms["body_temporal"] = masked_mean(surf.robust_scalar(torch.linalg.vector_norm(acceleration, dim=-1), .03), valid3)
         feet, active = foot_terms(vg, soles, tensor(fw[sl]), support, frame_ok)
         terms.update(feet)
-        hand_pen = []
-        for ids, (a, b) in zip(hand_indices, ends):
+        if args.full_body:
+            terms["foot_contact"] = terms["foot_contact"] / .01 ** 2
+            terms["foot_nonpenetration"] = terms["foot_nonpenetration"] / .01 ** 2
+            terms["root_reference"] = (translation_delta / .05).square().mean() + (root_delta / .15).square().mean() + lower.square().mean()
+        hand_pen, region_contact, palm_contact, opposition = [], [], [], []
+        for ids, (a, b), groups, palm_group in zip(hand_indices, ends, region_groups, palm_groups):
             gap = surf.capsule_surface_residual(vw[:, ids], a, b, .016)
-            hand_pen.append((torch.relu(-gap) / .003).square().mean())
+            pen = (torch.relu(-gap) / .003).square()
+            hand_pen.append(pen.mean() + (pen.amax(1).mean() if args.surface_refine else pen.mean() * 0))
+            if args.surface_refine:
+                region_contact.append(torch.stack([gap[:, g].square().amin(1) / .005 ** 2 for g in groups]).mean())
+                palm_contact.append((gap[:, palm_group].square().amin(1) / .005 ** 2).mean())
+                points = vw[:, ids]
+                chosen = torch.stack([points[torch.arange(n, device=device), torch.as_tensor(g, device=device)[gap[:, g].square().argmin(1)]] for g in groups], dim=1)
+                axis = torch.nn.functional.normalize(b - a, dim=0)
+                radial = chosen - a - ((chosen - a) * axis).sum(-1, keepdim=True) * axis
+                radial = torch.nn.functional.normalize(radial, dim=-1)
+                other = torch.nn.functional.normalize(radial[:, :4].mean(1), dim=-1)
+                opposition.append(torch.relu((radial[:, 4] * other).sum(-1) - .2).square().mean())
         terms["hand_penetration"] = torch.stack(hand_pen).mean()
+        if args.surface_refine:
+            local_surfaces = [(vw[:, ids] - wp[:, j, None]) @ wr[:, j] for j, ids in enumerate(hand_indices)]
+            terms["hand_surface_shape"] = torch.stack([((q - ref) / .005).square().mean() for q, ref in zip(local_surfaces, hand_local_reference)]).mean()
+            terms["hand_self_collision"] = torch.stack([triangle_separation_loss(q, faces, pairs) for q, faces, pairs in zip(local_surfaces, hand_faces, active_collision_pairs)]).mean()
+            terms["hand_pose_reference"] = torch.stack([(hand_coeff[s] - tensor(grasp["hands"][s]["hand_pca"])).square().mean() for s in ("left", "right")]).mean()
+            terms["hand_region_contact"] = torch.stack(region_contact).mean()
+            terms["hand_palm_contact"] = torch.stack(palm_contact).mean()
+            terms["hand_opposition"] = torch.stack(opposition).mean()
         return sum(coefficients[k] * v for k, v in terms.items()), terms, out, body, wp, wr, vg, active
 
     def metrics(state):
@@ -245,20 +324,46 @@ def main():
         gradients[key] = [None if v is None else float(v.norm().detach()) for v in g]
     write("gradient_audit.json", {"parameters": ["upper", "torso"], "weighted_gradient_norms": gradients})
     history, checkpoints = [], {"initial": initial_metrics}
-    for stage, steps in (("upper_only", args.upper_steps), ("upper_and_torso", args.body_steps)):
-        torso.requires_grad_(stage == "upper_and_torso")
-        optimizer = torch.optim.Adam([upper] + ([torso] if torso.requires_grad else []), lr=args.lr)
+    del initial
+    for stage, steps in (("upper_only", args.upper_steps), ("upper_and_torso", args.body_steps),
+                         ("body_wrist_polish", args.body_polish_steps), ("hand_surface_polish", args.hand_polish_steps)):
+        upper.requires_grad_(stage != "hand_surface_polish")
+        torso.requires_grad_(stage in ("upper_and_torso", "body_wrist_polish"))
+        for p in (lower, root_delta, translation_delta):
+            p.requires_grad_(args.full_body and stage in ("upper_and_torso", "body_wrist_polish"))
+        for p in hand_coeff.values():
+            p.requires_grad_(args.surface_refine and stage != "body_wrist_polish")
+        params = ([upper] if upper.requires_grad else []) + ([torso] if torso.requires_grad else [])
+        params += [p for p in (lower, root_delta, translation_delta) if p.requires_grad]
+        params += [p for p in hand_coeff.values() if p.requires_grad]
+        optimizer = torch.optim.Adam(params, lr=args.lr)
         for step in range(steps):
             optimizer.zero_grad(set_to_none=True)
             state = forward()
+            if args.surface_refine and step % args.collision_refresh == 0:
+                for j, ids in enumerate(hand_indices):
+                    points = state[2].vertices[:, ids].detach().cpu().numpy()
+                    offset = (step // args.collision_refresh) * 8
+                    frames_to_screen = list(range(n)) if stage == "hand_surface_polish" else sorted(set([0, n // 2, n - 1] + [(offset + k) % n for k in range(8)]))
+                    pairs = [(f, int(p[0]), int(p[1])) for f in frames_to_screen for p in screened_triangle_pairs(points[f], hand_faces[j].cpu().numpy())]
+                    active_collision_pairs[j] = torch.as_tensor(pairs, dtype=torch.long, device=device).reshape(-1, 3)
+                state = forward()
             loss = state[0]
+            if args.surface_refine and stage == "body_wrist_polish":
+                collision = coefficients["hand_self_collision"] * state[1]["hand_self_collision"]
+                loss = loss - collision + collision.detach()
             if not torch.isfinite(loss):
                 write("FAILURE.json", {"reason": "nonfinite_loss", "stage": stage, "step": step})
                 raise RuntimeError("nonfinite refinement loss")
             loss.backward()
-            if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in (upper, torso)):
+            if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in params):
                 raise RuntimeError("nonfinite parameter gradient")
             optimizer.step()
+            if args.surface_refine:
+                with torch.no_grad():
+                    for s in ("left", "right"):
+                        reference = tensor(grasp["hands"][s]["hand_pca"])
+                        hand_coeff[s].copy_(torch.maximum(torch.minimum(hand_coeff[s], reference + 2.), reference - 2.))
             if step % 25 == 0 or step == steps - 1:
                 history.append({"stage": stage, "step": step, "loss": float(loss.detach()), "terms": {k: float(v.detach()) for k, v in state[1].items()}})
                 print(stage, step, float(loss.detach()), flush=True)
@@ -269,26 +374,34 @@ def main():
                 pair_id=np.arange(args.start, args.stop),
                 upper_joint_ids=np.asarray(UPPER_JOINTS), torso_joint_ids=np.asarray(TORSO_JOINTS),
                 upper_corrections=upper.detach().cpu().numpy(), torso_corrections=torso.detach().cpu().numpy(),
-                body_rotation_matrices=state[3].cpu().numpy())
+                body_rotation_matrices=state[3].cpu().numpy(),
+                root_delta=root_delta.detach().cpu().numpy(), translation_delta=translation_delta.detach().cpu().numpy(),
+                lower_corrections=lower.detach().cpu().numpy(),
+                left_hand_pca=hand_coeff["left"].detach().cpu().numpy(), right_hand_pca=hand_coeff["right"].detach().cpu().numpy())
     with torch.no_grad():
         final = forward()
         _, _, out, body, wp, wr, vg, _ = final
         body_aa = Rotation.from_matrix(body.cpu().numpy().reshape(-1, 3, 3)).as_rotvec().reshape(n, 63)
         exported = {"pair_id": np.arange(args.start, args.stop), "vertices": out.vertices.cpu().numpy(),
-            "faces": np.asarray(asset["f"]), "betas": z["betas"], "global_orient": z["global_orient"][sl],
-            "transl": z["transl"][sl], "body_pose": body_aa, "body_rotation_matrices": body.cpu().numpy(),
+            "faces": np.asarray(asset["f"]), "betas": z["betas"], "global_orient": Rotation.from_matrix((root @ batch_rodrigues(root_delta.reshape(-1, 3)).reshape(n, 1, 3, 3) if args.full_body else root).cpu().numpy().reshape(-1, 3, 3)).as_rotvec().astype(np.float32),
+            "transl": (transl + translation_delta if args.full_body else transl).cpu().numpy(), "body_pose": body_aa.astype(np.float32), "body_rotation_matrices": body.cpu().numpy(),
             "predicted_coco": regress_coco17_torch(out.vertices, reg).cpu().numpy(),
             "smplh_joints": out.joints.cpu().numpy(), "wrist_walker_m": wp.cpu().numpy(),
             "wrist_rotation_walker": wr.cpu().numpy(), "vertices_ground_m": vg.cpu().numpy(),
             "pose_constructed": np.asarray(True), "accepted_for_main_fit": np.asarray(False)}
+        from pose_app.smplh_hand_observation import hand21
+        exported.update(raw_triangulated_points=np.asarray(current_tri)[sl], body_accepted=np.asarray(current_accepted)[sl], body_quality=np.asarray(current_quality)[sl],
+                        hand_points_left=hand21(out.joints, out.vertices, "left").cpu().numpy(), hand_points_right=hand21(out.joints, out.vertices, "right").cpu().numpy())
         for side in ("left", "right"):
             exported[f"{side}_hand_pose"] = hand_pose[side].cpu().numpy()
-            exported[f"{side}_hand_pca"] = np.repeat(grasp["hands"][side]["hand_pca"], n, axis=0)
+            exported[f"{side}_hand_pca"] = np.repeat(hand_coeff[side].detach().cpu().numpy(), n, axis=0)
         np.savez_compressed(args.output_dir / "result.npz", **exported)
     write("fit_summary.json", {"status": "engineering_probe_requires_grasp_and_image_review",
         "checkpoints": checkpoints, "trace": history,
         "accepted_for_main_fit": False, "rollback": str(args.source_result.resolve()),
-        "scope": "upper_and_torso_refinement; root/lower/fingers/beta fixed; no world-stationary hand constraint"})
+        "scope": "full_body_with_shared_PCA_and_surface_constraints" if args.full_body else "upper_and_torso_refinement",
+        "full_body": args.full_body, "shared_PCA_refinement": args.surface_refine,
+        "wrist_target_frame": "walker_rigid_local", "beta_fixed": True})
     return 0
 
 

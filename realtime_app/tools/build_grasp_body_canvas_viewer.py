@@ -1,0 +1,137 @@
+"""Build an offline, same-run full-mesh viewer using the existing Canvas renderer.
+
+No old dynamic trajectories, substituted hand meshes or interpolated frames.
+The old Canvas page is a rendering template only; all data are generated here.
+"""
+from __future__ import annotations
+
+import argparse
+import base64
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "realtime_app"))
+from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy
+from build_surface_contact_canvas_viewer import PAGE
+
+
+def encode(a):
+    return base64.b64encode(np.ascontiguousarray(a, dtype=np.float32).tobytes()).decode("ascii")
+
+
+def main():
+    p = argparse.ArgumentParser()
+    for name in ("result", "scene", "surface-sets", "geometry-audit", "output"):
+        p.add_argument("--" + name, type=Path, required=True)
+    a = p.parse_args()
+    if a.output.exists():
+        raise ValueError("refuse existing page")
+    r = np.load(a.result, allow_pickle=False)
+    s = np.load(a.scene / "scene_transforms.npz", allow_pickle=False)
+    metadata = json.loads((a.result.parent / "run_metadata.json").read_text(encoding="utf-8"))
+    source = json.loads((a.scene / "scene_sources.json").read_text(encoding="utf-8"))
+    if source["old_dynamic_ground_read"] or source["old_stage_jsonl_read"] or "selected original stereo pair" not in source["image_source"]:
+        raise ValueError("viewer requires fresh ordered-image Stage/ground replay")
+    for key in ("scene_transforms",):
+        if Path(metadata["inputs"][key]).resolve() != (a.scene / "scene_transforms.npz").resolve():
+            raise ValueError("fit/viewer scene mismatch")
+    ids = r["pair_id"]
+    n = len(ids)
+    if not np.array_equal(ids, np.arange(n)) or r["vertices"].shape != (n, 6890, 3) or r["faces"].shape != (13776, 3):
+        raise ValueError("not a full contiguous same-run male mesh")
+    R = s["rotation_ground_from_left"]
+    tr = s["translation_ground_from_left_mm"] / 1000
+    def xf(x):
+        return np.einsum("nij,nvj->nvi", R, x) + tr[:, None]
+    vg, cg, tg = xf(r["vertices"]), xf(r["predicted_coco"]), xf(r["raw_triangulated_points"] / 1000)
+    if not np.allclose(vg, r["vertices_ground_m"], atol=1e-5):
+        raise ValueError("fit/viewer ground vertex mismatch")
+    # Recompute strict observation audit from original same-run rows, separate
+    # from the engineering fitting mask. Preserve all finite rejected points.
+    spec = importlib.util.spec_from_file_location("viewer_raw", ROOT / "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py")
+    raw = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(raw)
+    import cv2
+    raw.cv2 = cv2
+    left = raw.raw_side(Path(metadata["inputs"]["left_raw"]), "left")
+    right = raw.raw_side(Path(metadata["inputs"]["right_raw"]), "right")
+    cal = load_stereo_fisheye(ROOT / "realtime_app/calibration/results")
+    left, right = np.stack([left[i] for i in ids]), np.stack([right[i] for i in ids])
+    tri, el, er, _, dl, dr, candidate, reasons, quality, components = raw.raw_triangulate(left, right, cal)
+    if not np.allclose(tri, r["raw_triangulated_points"], equal_nan=True, atol=.001):
+        raise ValueError("triangulation is not same-source")
+    strict = candidate & (components[0] >= .25) & ((el + er) / 2 <= 10)
+    reasons = np.asarray(reasons, dtype=object)
+    reasons[candidate & ~strict & (components[0] < .25)] = "q2d_below_0.25"
+    reasons[candidate & ~strict & ((el + er) / 2 > 10)] = "reprojection_above_10px"
+    sets = json.loads(a.surface_sets.read_text(encoding="utf-8"))["sets"]
+    soles = np.unique(sum([sum(sets[f"{side}_sole_surface_candidate"].values(), []) for side in ("left", "right")], []))
+    palms = np.unique(sum([sum(sets[f"{side}_palm_surface_candidate"].values(), []) for side in ("left", "right")], []))
+    w = json.loads((a.scene / "static_walker_model.json").read_text(encoding="utf-8"))
+    names = sorted(set(x for edge in w["edges"] for x in edge))
+    Rc = np.asarray(w["rotation_left_camera_from_walker"])
+    tc = np.asarray(w["translation_left_camera_from_walker_mm"]) / 1000
+    static_nodes = np.asarray([w["nodes_walker_mm"][name] for name in names]) / 1000 @ Rc.T + tc
+    wg = xf(np.broadcast_to(static_nodes, (n, len(names), 3)))
+    handles = np.asarray([[np.asarray(w["nodes_walker_mm"][name]) / 1000 for name in w["handle_segments"][side]] for side in ("left", "right")])
+    he = xf(np.broadcast_to(handles.reshape(4, 3) @ Rc.T + tc, (n, 4, 3))).reshape(n, 2, 2, 3)
+    c1 = -cal.R_cam0_to_cam1.T @ (cal.T_cam0_to_cam1_mm / 1000)
+    cameras = xf(np.broadcast_to(np.stack([np.zeros(3), c1]), (n, 2, 3)))
+    stages = [json.loads(line)["stage"]["operational"] for line in (a.scene / "stage1_stage2.jsonl").read_text(encoding="utf-8").splitlines()]
+    poses = [(json.loads(line).get("pose_audit") or {}).get("status", "unknown") for line in (a.scene / "dynamic_ground_pose.jsonl").read_text(encoding="utf-8").splitlines()]
+    audit = json.loads(a.geometry_audit.read_text(encoding="utf-8"))
+    hand_state = [[None, None] for _ in range(n)]
+    for row in audit["records"]:
+        hand_state[row["pair_id"]][0 if row["hand"] == "left" else 1] = "通过" if row["passed_geometry_proxy"] else ",".join(row["reject_reasons"])
+    if any(None in row for row in hand_state):
+        raise ValueError("incomplete per-frame hand audit")
+    residual = np.linalg.norm(cg - tg, axis=-1) * 1000
+    e3 = [float(np.median(residual[i, candidate[i]])) if candidate[i].any() else None for i in range(n)]
+    projection = []
+    for i in range(n):
+        p0 = fisheye_project_numpy(r["predicted_coco"][i] * 1000, cal.K0, cal.D0)
+        p1 = fisheye_project_numpy(r["predicted_coco"][i] @ cal.R_cam0_to_cam1.T * 1000 + cal.T_cam0_to_cam1_mm, cal.K1, cal.D1)
+        projection.append([float(np.median(np.linalg.norm(p0 - left[i, :, :2], axis=1))), float(np.median(np.linalg.norm(p1 - right[i, :, :2], axis=1)))])
+    data = {"v": encode(vg), "j": encode(cg), "w": encode(wg), "t": encode(tg), "he": encode(he),
+        "c": encode(cameras), "a": encode(tg[:, [15, 16]]), "av": strict[:, [15, 16]].ravel().tolist(),
+        "faces": r["faces"].tolist(), "n": n, "nv": 6890, "ids": ids.tolist(), "wn": names,
+        "we": [[names.index(x), names.index(y)] for x, y in w["edges"]], "si": soles.tolist(), "pi": palms.tolist(),
+        "acc": strict.ravel().tolist(), "fit_acc": candidate.tolist(), "stage": stages, "pose": poses, "e3": e3,
+        "hm": [None] * n, "fm": [float(np.min(vg[i, soles, 2])) for i in range(n)],
+        "hand_state": hand_state, "reprojection": projection, "quality": quality.tolist(), "reject_reasons": reasons.tolist()}
+    page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":")))
+    page = page.replace('<title>SMPL surface contact Canvas viewer</title>', '<title>SMPL-H 全448帧腕约束优化</title>')
+    page = page.replace('.metrics div{display:flex;', '.metrics div{display:flex;gap:8px;')
+    page = page.replace('.metrics dt{color:#65737d}', '.metrics dt{color:#65737d;flex:0 0 90px}')
+    page = page.replace('.metrics dd{margin:0;text-align:right}', '.metrics dd{margin:0;text-align:right;min-width:0;overflow-wrap:anywhere}')
+    page = page.replace('zoom=1.0', 'zoom=.65').replace('zoom=1;', 'zoom=.65;')
+    page = page.replace('窗口 60..90 · 31 帧 · 无外部库', f'全片0..{n-1} · {n}帧 · 6890顶点 / 13776真实三角面 · 本次重放')
+    page = page.replace('male SMPL 表面手脚接触拟合', 'SMPL-H · 双腕基本固定的全身优化')
+    page = page.replace('min="0" max="30"', f'min="0" max="{n-1}"')
+    page = page.replace('手部 surface 中位', '双手几何状态').replace('脚部 surface 中位', '脚底最低高度')
+    page = page.replace("(d.hm[fi]===null?'—':(d.hm[fi]*1000).toFixed(1)+' mm')", "d.hand_state[fi].join(' / ')")
+    page = page.replace("unpack(d.a)]).then(([v,w,t,he,c,ankle])", "unpack(d.a),unpack(d.j)]).then(([v,w,t,he,c,ankle,model])")
+    page = page.replace('const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;', 'const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;const E=[[0,1],[0,2],[1,3],[2,4],[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];window.viewerAudit={vertices:NV,faces:faces.length,indexEntries:faces.length*3,frames:N,displayMap:"X,-Y,Z",sceneFresh:true};')
+    marker = "if(document.getElementById('walker').checked){"
+    overlay = """for(const e of E){const[a,b]=e,A=[t[fi*51+a*3],-t[fi*51+a*3+1],t[fi*51+a*3+2]],B=[t[fi*51+b*3],-t[fi*51+b*3+1],t[fi*51+b*3+2]];if(A.every(Number.isFinite)&&B.every(Number.isFinite)){const ok=d.acc[fi*17+a]&&d.acc[fi*17+b];ctx.setLineDash(ok?[]:[5,4]);seg(A,B,ok?'#17212b':'#b36b1e',1.5);ctx.setLineDash([])}}for(let k=0;k<17;k++)dot([model[fi*51+k*3],-model[fi*51+k*3+1],model[fi*51+k*3+2]],'#1678bc',2);seg([c[fi*6],-c[fi*6+1],c[fi*6+2]],[c[fi*6+3],-c[fi*6+4],c[fi*6+5]],'#4b555d',1.5);"""
+    page = page.replace(marker, overlay + marker)
+    page = page.replace("p[2]<0?4.5:3.0", "p[2]<0?1.2:1.0")
+    ticks = """for(let u=0;u<=4.5;u+=.5){for(const P of [[u,0,0],[0,u,0]]){const q=project(P);ctx.fillStyle='#27332d';ctx.font='12px sans-serif';ctx.fillText(u.toFixed(1)+'m',q[0]+3,q[1]-3)}}"""
+    page = page.replace("if(document.getElementById('trails').checked){", ticks + "if(document.getElementById('trails').checked){")
+    page = page.replace("pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))", "pitch+=dy*.007")
+    page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
+    page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
+    page = page.replace('</aside>', '<p>工程候选：蓝点=模型COCO；红点=严格观测；橙叉/虚线=拒绝。双手逐帧几何状态不等于真实握持。前横杆低于相机30mm、杆半径16mm均为假设。无平滑/插值。</p></aside>')
+    a.output.write_text(page, encoding="utf-8")
+    joint_audit = {str(j): {"finite": int(np.isfinite(tri[:, j]).all(1).sum()), "strict_accepted": int(strict[:, j].sum()), "finite_rejected": int((np.isfinite(tri[:, j]).all(1) & ~strict[:, j]).sum())} for j in range(17)}
+    (a.output.parent / "viewer_validation.json").write_text(json.dumps({"status": "file_checks_passed_browser_pending", "vertices": 6890, "faces": 13776, "index_entries": 41328, "frames": n, "joints": joint_audit, "source": str(a.result.resolve()), "scene": str(a.scene.resolve()), "stage_counts": {x: stages.count(x) for x in set(stages)}, "no_display_smoothing": True}, indent=2), encoding="utf-8")
+    print(a.output.resolve())
+
+
+if __name__ == "__main__":
+    main()
