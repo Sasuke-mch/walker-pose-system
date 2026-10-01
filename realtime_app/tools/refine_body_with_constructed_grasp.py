@@ -38,6 +38,8 @@ def main():
     ap.add_argument("--surface-refine", action="store_true", help="opt-in shared PCA + full-mesh self collision/shape preservation")
     ap.add_argument("--full-body", action="store_true", help="VPoser32 body latent; root released in joint phase, beta fixed")
     ap.add_argument("--balanced-stages", action="store_true", help="opt-in grouped observations, guarded updates and dedicated leg temporal terms")
+    ap.add_argument("--constrained-update", action="store_true", help="project frame-local Adam body increments; exact full-window gates remain authoritative")
+    ap.add_argument("--projection-trust-radius", type=float, default=.2, help="per-frame normalized increment radius; latent/radian scales 1, translation scale .05m")
     ap.add_argument("--stage2-static-assumption", action="store_true", help="explicit user assumption: heel/ball patches static within each Stage2 segment")
     ap.add_argument("--vposer-dir", type=Path, help="required for full-body: frozen eval decoder with live latent gradients")
     ap.add_argument("--pose-reference-result", type=Path, help="immutable original VPoser result; required for full-body, including resumed runs")
@@ -52,6 +54,10 @@ def main():
     args = ap.parse_args()
     if args.balanced_stages and not args.full_body:
         raise ValueError("balanced stages require live VPoser full-body")
+    if args.constrained_update and not args.balanced_stages:
+        raise ValueError("constrained updates require balanced full-body stages")
+    if not np.isfinite(args.projection_trust_radius) or args.projection_trust_radius <= 0:
+        raise ValueError("invalid projection trust radius")
     if args.stage2_static_assumption and not args.balanced_stages:
         raise ValueError("Stage2 assumption requires balanced stages")
     if args.output_dir.exists():
@@ -82,6 +88,7 @@ def main():
     from pose_app import smpl_surface_contact as surf
     from pose_app.balanced_grasp import (GROUPS, LEG_ROTATIONS, grouped_observation_loss,
         observation_guard, leg_temporal_terms, build_stage2_anchors, stage2_terms, guarded_adam_step)
+    from pose_app.constrained_grasp import constrained_adam_step
     from pose_app.constructed_grasp_refinement import (
         UPPER_JOINTS, TORSO_JOINTS, load_grasp, validate_rotation, compose_body,
         wrist_rotations, masked_mean, foot_terms, frozen_surface_states,
@@ -428,6 +435,41 @@ def main():
     baseline_error = torch.linalg.vector_norm(baseline_coco-target, dim=-1)
     # Every accepted triangulated point is guarded; quality only weights losses.
     guard_mask = body_mask.clone()
+    def local_constraints():
+        # Constraints are frame-local even though the objective couples frames.
+        local = forward()
+        predicted = regress_coco17_torch(local[2].vertices, reg)
+        safe_target = torch.where(guard_mask[...,None],target,predicted.detach())
+        error = torch.linalg.vector_norm(predicted-safe_target,dim=-1)
+        observation = torch.where(guard_mask,error-baseline_error-.01-1e-6,-torch.ones_like(error))
+        if phase == "upper_only":
+            leg = torch.linalg.vector_norm(predicted[:,11:]-baseline_coco[:,11:],dim=-1)-.005-1e-6
+            return torch.cat((observation,leg),dim=1)
+        return observation
+
+    def feasibility_diagnostic(state):
+        predicted = regress_coco17_torch(state[2].vertices, reg)
+        joints = state[2].joints
+        target_camera = target_p @ Rct.T + tct
+        records = []
+        for side,ids,coco_id,column in (("left",(16,18,20),9,0),("right",(17,19,21),10,1)):
+            shoulder,elbow,wrist = [joints[:,i] for i in ids]
+            l1 = torch.linalg.vector_norm(elbow-shoulder,dim=-1)
+            l2 = torch.linalg.vector_norm(wrist-elbow,dim=-1)
+            reach = torch.linalg.vector_norm(target_camera[column]-shoulder,dim=-1)
+            semantic = torch.linalg.vector_norm(wrist-predicted[:,coco_id],dim=-1)
+            for i in range(n):
+                records.append(dict(pair_id=i+args.start,side=side,upper_arm_m=float(l1[i]),forearm_m=float(l2[i]),
+                    shoulder_to_target_m=float(reach[i]),outer_reach_excess_m=float(torch.relu(reach[i]-l1[i]-l2[i])),
+                    inner_reach_excess_m=float(torch.relu((l1[i]-l2[i]).abs()-reach[i])),
+                    model_joint_vs_coco_wrist_m=float(semantic[i])))
+        error = torch.linalg.vector_norm(predicted-target,dim=-1)
+        return dict(scope="current-shoulder two-link necessary reach condition; not global infeasibility or anatomical feasibility",
+                    wrist_semantics="SMPL-H joint20/21 vs surface COCO9/10; offsets are diagnostics, not correction labels",
+                    global_feasibility="unknown",records=records,
+                    near_observation_boundary_pair_joint=[[int(i)+args.start,int(j)] for i,j in torch.nonzero(guard_mask & (error-baseline_error>.009)).cpu().tolist()])
+    with torch.no_grad():
+        write("feasibility_initial.json",feasibility_diagnostic(initial))
     np.savez_compressed(args.output_dir / "observation_guard_reference.npz", pair_id=np.arange(args.start,args.stop),
         baseline_error_m=baseline_error.cpu().numpy(), predicted_coco_m=baseline_coco.cpu().numpy(),
         valid=guard_mask.cpu().numpy(), allowance_m=.01)
@@ -499,7 +541,14 @@ def main():
                         "pca_ok": pca_ok, "violating_pair_joint": [[i+args.start,j] for i,j in bad],
                         "upper_leg_shift_guard_passed": stage != "upper_only" or leg_shift <= .005+1e-6}
                 try:
-                    transaction = guarded_adam_step(optimizer, params, evaluate_trial, loss.detach())
+                    if args.constrained_update and stage != "hand_surface_polish":
+                        scales = [(.05 if p is translation_delta else 1.) for p in params]
+                        transaction = constrained_adam_step(optimizer,params,evaluate_trial,loss.detach(),
+                            local_constraints,scales,trust_radius=args.projection_trust_radius)
+                        for record in transaction['projection']['frames']:
+                            record['pair_id'] = record['frame_index']+args.start
+                    else:
+                        transaction = guarded_adam_step(optimizer, params, evaluate_trial, loss.detach())
                 except Exception as exc:
                     write('FAILURE.json', {'reason':'guarded_update_exception', 'stage':stage,
                         'step':step, 'exception_type':type(exc).__name__, 'message':str(exc),
@@ -522,6 +571,7 @@ def main():
         with torch.no_grad():
             state = forward()
             checkpoints[stage] = metrics(state)
+            write(f"feasibility_{stage}.json",feasibility_diagnostic(state))
             np.savez_compressed(args.output_dir / f"{stage}_parameters.npz",
                 pair_id=np.arange(args.start, args.stop),
                 upper_joint_ids=np.asarray(UPPER_JOINTS), torso_joint_ids=np.asarray(TORSO_JOINTS),
@@ -571,7 +621,9 @@ def main():
             "guard": "every accepted current triangulated point vs immutable pose-reference with original constructed fingers",
             "reference_result": str(args.pose_reference_result.resolve()),
             "rejected_updates_restore_parameters_and_Adam_moments": True,
-            "accepted_backtracks_keep_proposed_Adam_moments": True})
+            "accepted_backtracks_keep_proposed_Adam_moments": True,
+            "body_update_rule": "projected_Adam_exact_nonlinear_guard" if args.constrained_update else "guarded_Adam",
+            "projection_constraint_columns": "0..16 COCO observation budget; upper_only 17..22 COCO11..16 leg displacement"})
     return 0
 
 
