@@ -3,8 +3,33 @@ import argparse
 import json
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 import numpy as np
+
+
+def hand_audit_coverage(records, frames):
+    """All-frame/all-hand means exactly one record for each expected identity."""
+    frames = [int(v) for v in frames]
+    expected = {(p,s) for p in frames for s in ('left','right')}
+    actual = Counter()
+    malformed = 0
+    for record in records:
+        try:
+            pair = int(record['pair_id'])
+            side = record['hand']
+            if side not in ('left','right'):
+                raise ValueError('unknown hand')
+            actual[pair,side] += 1
+        except (KeyError,TypeError,ValueError):
+            malformed += 1
+    missing = sorted(expected-set(actual))
+    unexpected = sorted(set(actual)-expected)
+    duplicates = sorted(k for k,v in actual.items() if v!=1)
+    return dict(passed=bool(expected) and len(set(frames))==len(frames) and not
+                (missing or unexpected or duplicates or malformed),
+                expected_records=2*len(frames),actual_records=len(records),
+                missing=missing,unexpected=unexpected,duplicates=duplicates,malformed=malformed)
 
 
 def assess(out):
@@ -16,16 +41,17 @@ def assess(out):
         regression = float((residual-reference['baseline_error_m'])[reference['valid']].max()*1000)
         frames = result['pair_id'].tolist()
     audit = json.loads((out/'hand_geometry_audit.json').read_text(encoding='utf-8'))
+    coverage = hand_audit_coverage(audit['records'],frames)
     updates = json.loads((out/'update_transactions.json').read_text(encoding='utf-8'))['updates']
     gates = dict(observations=regression<=10.002,
                  wrists=all(v['p95']<=10 for v in final['wrist_error_mm'].values()),
                  feet=all(v>=-3 for v in final['sole_minimum_z_mm'].values()),
                  leg_temporal=final['terms']['leg_ground_acceleration']<=initial['terms']['leg_ground_acceleration'],
-                 hands=bool(audit['records']) and all(v['passed_geometry_proxy'] for v in audit['records']))
+                 hands=coverage['passed'] and all(v['passed_geometry_proxy'] for v in audit['records']))
     return dict(initial=initial,final=final,frames=frames,max_observation_regression_mm=regression,
                 updates={stage:dict(accepted=sum(x['accepted'] for x in updates if x['stage']==stage),
                                    total=sum(x['stage']==stage for x in updates)) for stage in sorted({x['stage'] for x in updates})},
-                hand_passed=sum(x['passed_geometry_proxy'] for x in audit['records']),hand_total=len(audit['records']),
+                hand_passed=sum(x['passed_geometry_proxy'] for x in audit['records']),hand_total=len(audit['records']),hand_coverage=coverage,
                 gates=gates,passed=all(gates.values()),accepted_for_main_fit=False)
 
 

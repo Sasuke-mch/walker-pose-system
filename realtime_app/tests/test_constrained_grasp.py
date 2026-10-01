@@ -168,3 +168,47 @@ def test_recovery_radius_includes_correction_not_only_tangent_proposal():
                                   loss.detach(),constraint,[1.],correction_steps=4,trust_radius=.1)
     assert result['attempts'][0]['corrections'][-1]['status']=='recovery_exceeds_radius'
     assert torch.linalg.vector_norm(p-old)<=.1
+
+
+@pytest.mark.parametrize('identities,frames,passed',[
+    ([(7,'left'),(7,'right')],[7],True),
+    ([(7,'left')],[7],False),
+    ([(7,'left'),(7,'left')],[7],False),
+    ([(7,'left'),(7,'right'),(8,'left')],[7],False),
+    ([(7,'left'),(7,'right')],[7,7],False),
+    ([],[],False),
+    ([(7,'unknown')],[7],False),
+])
+def test_hand_audit_requires_exact_all_frame_all_hand_coverage(identities,frames,passed,monkeypatch):
+    from pathlib import Path
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1]/'tools'))
+    from benchmark_constrained_grasp import hand_audit_coverage
+    records=[dict(pair_id=p,hand=s,passed_geometry_proxy=True) for p,s in identities]
+    assert hand_audit_coverage(records,frames)['passed'] is passed
+
+
+def test_missing_hand_cannot_pass_main_hand_gate(tmp_path,monkeypatch):
+    import json
+    from pathlib import Path
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1]/'tools'))
+    from benchmark_constrained_grasp import assess
+    final=dict(wrist_error_mm={s:dict(p95=0.) for s in ('left','right')},
+               sole_minimum_z_mm={s:0. for s in ('left','right')},terms=dict(leg_ground_acceleration=0.))
+    (tmp_path/'fit_summary.json').write_text(json.dumps(dict(checkpoints=dict(initial=final,final=final))))
+    (tmp_path/'update_transactions.json').write_text(json.dumps(dict(updates=[])))
+    (tmp_path/'hand_geometry_audit.json').write_text(json.dumps(dict(records=[dict(pair_id=7,hand='left',passed_geometry_proxy=True)])))
+    np.savez(tmp_path/'result.npz',pair_id=[7],predicted_coco=np.zeros((1,17,3)),raw_triangulated_points=np.zeros((1,17,3)))
+    np.savez(tmp_path/'observation_guard_reference.npz',baseline_error_m=np.zeros((1,17)),valid=np.ones((1,17),dtype=bool))
+    result=assess(tmp_path)
+    assert not result['gates']['hands'] and not result['passed']
+    assert result['hand_coverage']['missing']==[(7,'right')]
+
+
+def test_recovery_counts_distinguish_attempts_from_true_forward_evaluations(monkeypatch):
+    from pathlib import Path
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1]/'tools'))
+    from audit_constrained_grasp_comparison import recovery_counts
+    result=recovery_counts([dict(attempts=[dict(corrections=[dict(status=s) for s in
+        ('evaluated','linear_recovery_not_certified','recovery_exceeds_radius','evaluated')])])])
+    assert result['recovery_attempts']==4 and result['recovery_evaluations']==2
+    assert result['recovery_not_certified']==1 and result['recovery_exceeds_radius']==1
