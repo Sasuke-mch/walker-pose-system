@@ -36,7 +36,12 @@ def main():
     ap.add_argument("--grasp-mesh", type=Path, help="matching constructed NPZ; default JSON path with .npz suffix")
     ap.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     ap.add_argument("--surface-refine", action="store_true", help="opt-in shared PCA + full-mesh self collision/shape preservation")
-    ap.add_argument("--full-body", action="store_true", help="release lower limbs and root only in final phase; beta remains fixed")
+    ap.add_argument("--full-body", action="store_true", help="VPoser32 body latent; root released in joint phase, beta fixed")
+    ap.add_argument("--vposer-dir", type=Path, help="required for full-body: frozen eval decoder with live latent gradients")
+    ap.add_argument("--pose-reference-result", type=Path, help="immutable original VPoser result; required for full-body, including resumed runs")
+    ap.add_argument("--vposer-prior-weight", type=float, default=.02)
+    ap.add_argument("--body-anchor-weight", type=float, default=1.)
+    ap.add_argument("--rotation-temporal-weight", type=float, default=.2)
     ap.add_argument("--collision-refresh", type=int, default=100)
     ap.add_argument("--wrist-bound-m", type=float, default=.01, help="surface-refine tail barrier; not a feasibility certificate")
     ap.add_argument("--body-polish-steps", type=int, default=0, help="body/wrist refinement with shared fingers frozen and self-collision diagnostic detached")
@@ -45,12 +50,13 @@ def main():
     args = ap.parse_args()
     if args.output_dir.exists():
         raise ValueError("refuse existing output directory")
-    # This branch optimizes independent SO3 corrections rather than a VPoser
-    # latent. A VPoser-derived initialization does not preserve the body prior.
-    # Retain old artifacts for diagnosis, but prohibit another full-body run
-    # until the decoder and prior are actually in the optimization graph.
-    if args.full_body:
+    # Never silently fall back from the latent body graph to legacy free SO3.
+    if args.full_body and (args.vposer_dir is None or args.pose_reference_result is None):
         raise ValueError("unrestricted full-body refinement is disabled: active VPoser body parameterization and prior are required")
+    if args.full_body and args.lock_grasp_orientation:
+        raise ValueError("VPoser full-body forbids overriding decoded wrist rotations; use the soft orientation loss")
+    if not np.isfinite([args.vposer_prior_weight, args.body_anchor_weight, args.rotation_temporal_weight]).all() or min(args.vposer_prior_weight, args.body_anchor_weight) <= 0 or args.rotation_temporal_weight < 0:
+        raise ValueError("invalid body prior weights")
     if args.hand_polish_steps and not args.surface_refine:
         raise ValueError("hand polish requires --surface-refine")
     if args.wrist_bound_m <= 0 or args.collision_refresh <= 0 or min(args.upper_steps, args.body_steps, args.body_polish_steps, args.hand_polish_steps) < 0 or not np.isfinite(
@@ -134,6 +140,25 @@ def main():
     base = batch_rodrigues(tensor(z["body_pose"][sl]).reshape(-1, 3)).reshape(n, 21, 3, 3)
     root = batch_rodrigues(tensor(z["global_orient"][sl])).reshape(n, 1, 3, 3)
     transl = tensor(z["transl"][sl])
+    latent = None
+    if args.full_body:
+        from pose_app.smplx_fitting import load_vposer_explicit
+        from pose_app.vposer_grasp_body import decode_body_rotations, rotation_anchor_loss, rotation_temporal_loss
+        vposer, _, vp_checkpoint = load_vposer_explicit(args.vposer_dir, args.device)
+        reference = np.load(args.pose_reference_result, allow_pickle=False)
+        if "vposer_latent" not in z.files or "vposer_latent" not in reference.files:
+            raise ValueError("source/reference requires original VPoser latent; rejected SO3 fits cannot initialize this route")
+        if reference["body_pose"].shape != z["body_pose"].shape or not np.allclose(reference["betas"], z["betas"], atol=1e-6):
+            raise ValueError("immutable pose reference frame/beta mismatch")
+        latent = torch.nn.Parameter(tensor(z["vposer_latent"][sl]).clone())
+        reference_latent = tensor(reference["vposer_latent"][sl])
+        with torch.no_grad():
+            reference_body = decode_body_rotations(vposer, reference_latent)
+            decoded_source = decode_body_rotations(vposer, latent)
+        if not torch.allclose(decoded_source, base, atol=1e-5) or not torch.allclose(reference_body, batch_rodrigues(tensor(reference["body_pose"][sl]).reshape(-1, 3)).reshape(n,21,3,3), atol=1e-5):
+            raise ValueError("saved body pose is not the declared VPoser decode")
+        reference_root = batch_rodrigues(tensor(reference["global_orient"][sl])).reshape(n,1,3,3)
+        reference_translation = tensor(reference["transl"][sl])
     # Matrix layer must reproduce the original axis-angle forward, including
     # mean-once convention, before using any constructed targets.
     with torch.no_grad():
@@ -190,10 +215,10 @@ def main():
     body_mask = torch.as_tensor(np.asarray(current_accepted)[sl] & np.isfinite(np.asarray(current_tri)[sl]).all(-1), device=device)
     quality = tensor(np.asarray(current_quality)[sl]).clamp_min(0)
     R01, t01 = tensor(cal.R_cam0_to_cam1), tensor(cal.T_cam0_to_cam1_mm / 1000)
-    upper = torch.nn.Parameter(torch.zeros(n, len(UPPER_JOINTS), 3, device=device))
-    torso = torch.nn.Parameter(torch.zeros(n, len(TORSO_JOINTS), 3, device=device))
+    upper = torch.nn.Parameter(torch.zeros(n, len(UPPER_JOINTS), 3, device=device), requires_grad=not args.full_body)
+    torso = torch.nn.Parameter(torch.zeros(n, len(TORSO_JOINTS), 3, device=device), requires_grad=not args.full_body)
     frozen_lower = [j - 1 for j in range(1, 22) if j not in UPPER_JOINTS + TORSO_JOINTS]
-    lower = torch.nn.Parameter(torch.zeros(n, len(frozen_lower), 3, device=device))
+    lower = torch.nn.Parameter(torch.zeros(n, len(frozen_lower), 3, device=device), requires_grad=False)
     root_delta = torch.nn.Parameter(torch.zeros(n, 1, 3, device=device))
     translation_delta = torch.nn.Parameter(torch.zeros(n, 3, device=device))
     mesh_path = args.grasp_mesh or args.grasp.with_suffix(".npz")
@@ -223,6 +248,8 @@ def main():
                             hand_region_contact=3., hand_palm_contact=2., hand_opposition=10., wrist_bound=10.)
     if args.full_body:
         coefficients.update(root_reference=1.)
+        coefficients.update(pose_anchor=args.body_anchor_weight, vposer_prior=args.vposer_prior_weight,
+                            rotation_temporal=args.rotation_temporal_weight)
     active_collision_pairs = [torch.empty((0, 3), dtype=torch.long, device=device) for _ in range(2)]
     args.output_dir.mkdir(parents=True)
     write("run_metadata.json", {"inputs": {k: str(v.resolve()) for k, v in vars(args).items() if isinstance(v, Path)},
@@ -234,16 +261,19 @@ def main():
         "source_matrix_replay_max_error_m": replay_max,
         "grasp_mesh_source": str(mesh_path.resolve()),
         "body_3d_scale_m": args.body_scale_m,
+        "body_parameterization": "VPoser32_decode_all21_no_override" if args.full_body else "legacy_SO3_diagnostic_only",
+        "vposer_checkpoint": str(vp_checkpoint) if args.full_body else None,
         "support_source": "frozen same-source baseline sole surface state machine; not measured support",
         "foot_tangent_unavailable_reason": None if support_full[sl].any() else "no_sticking_surface_candidates"})
     np.savez_compressed(args.output_dir / "frozen_foot_states.npz", pair_id=np.arange(args.start, args.stop),
         support=support_full[sl], state=states_full[sl], reason=reasons_full[sl], frame_ok=frame_ok_full[sl])
 
     def forward():
-        body = compose_body(base, upper, UPPER_JOINTS)
-        body = compose_body(body, torso, TORSO_JOINTS)
         if args.full_body:
-            body = compose_body(body, lower, tuple(j + 1 for j in frozen_lower))
+            body = decode_body_rotations(vposer, latent)
+        else:
+            body = compose_body(base, upper, UPPER_JOINTS)
+            body = compose_body(body, torso, TORSO_JOINTS)
         current_root = root @ batch_rodrigues(root_delta.reshape(-1, 3)).reshape(n, 1, 3, 3) if args.full_body else root
         current_translation = transl + translation_delta if args.full_body else transl
         if args.lock_grasp_orientation:
@@ -266,7 +296,7 @@ def main():
         # Frobenius chordal rotation residual ~ angle near zero, no acos gradient.
         terms = {"wrist_position": ((pos / .005) ** 2).mean(),
                  "wrist_rotation": (rot_diff.square().sum((-2, -1)) / (2 * np.deg2rad(5) ** 2)).mean(),
-                 "pose_anchor": (upper.square().mean() + torso.square().mean()),
+                 "pose_anchor": rotation_anchor_loss(body, reference_body) if args.full_body else (upper.square().mean() + torso.square().mean()),
                  "body_3d": ((coco - target).square().sum(-1) * quality)[body_mask].sum() / quality[body_mask].sum().clamp_min(1e-6) / args.body_scale_m ** 2}
         if args.surface_refine:
             terms["wrist_bound"] = (torch.relu(pos - args.wrist_bound_m) / .001).square().mean() + (torch.relu(pos - args.wrist_bound_m) / .001).square().amax()
@@ -277,12 +307,18 @@ def main():
         acceleration = rel[2:] - 2 * rel[1:-1] + rel[:-2]
         valid3 = body_mask[2:] & body_mask[1:-1] & body_mask[:-2] & (frame_ok[2:] & frame_ok[1:-1] & frame_ok[:-2])[:, None]
         terms["body_temporal"] = masked_mean(surf.robust_scalar(torch.linalg.vector_norm(acceleration, dim=-1), .03), valid3)
+        if args.full_body:
+            # Dimensionless 30mm second-difference scale; the old meter-valued
+            # scalar made temporal weight .02 almost ineffective.
+            terms["body_temporal"] = terms["body_temporal"] / .03 ** 2
+            terms["rotation_temporal"] = rotation_temporal_loss(body, frame_ok)
+            terms["vposer_prior"] = latent.square().mean()
         feet, active = foot_terms(vg, soles, tensor(fw[sl]), support, frame_ok)
         terms.update(feet)
         if args.full_body:
             terms["foot_contact"] = terms["foot_contact"] / .01 ** 2
             terms["foot_nonpenetration"] = terms["foot_nonpenetration"] / .01 ** 2
-            terms["root_reference"] = (translation_delta / .05).square().mean() + (root_delta / .15).square().mean() + lower.square().mean()
+            terms["root_reference"] = ((current_translation-reference_translation) / .05).square().mean() + rotation_anchor_loss(current_root, reference_root, scale_rad=.15)
         hand_pen, region_contact, palm_contact, opposition = [], [], [], []
         for ids, (a, b), groups, palm_group in zip(hand_indices, ends, region_groups, palm_groups):
             gap = surf.capsule_surface_residual(vw[:, ids], a, b, .016)
@@ -325,22 +361,26 @@ def main():
     initial = forward()
     initial_metrics = metrics(initial)
     gradients = {}
+    audit_parameters = (latent, root_delta, translation_delta) if args.full_body else (upper, torso)
     for key, term in initial[1].items():
-        g = torch.autograd.grad(coefficients[key] * term, (upper, torso), retain_graph=True, allow_unused=True)
+        g = torch.autograd.grad(coefficients[key] * term, audit_parameters, retain_graph=True, allow_unused=True)
         gradients[key] = [None if v is None else float(v.norm().detach()) for v in g]
-    write("gradient_audit.json", {"parameters": ["upper", "torso"], "weighted_gradient_norms": gradients})
+    write("gradient_audit.json", {"parameters": ["vposer_latent", "root", "translation"] if args.full_body else ["upper", "torso"], "weighted_gradient_norms": gradients})
     history, checkpoints = [], {"initial": initial_metrics}
     del initial
     for stage, steps in (("upper_only", args.upper_steps), ("upper_and_torso", args.body_steps),
                          ("body_wrist_polish", args.body_polish_steps), ("hand_surface_polish", args.hand_polish_steps)):
-        upper.requires_grad_(stage != "hand_surface_polish")
-        torso.requires_grad_(stage in ("upper_and_torso", "body_wrist_polish"))
-        for p in (lower, root_delta, translation_delta):
+        upper.requires_grad_(not args.full_body and stage != "hand_surface_polish")
+        torso.requires_grad_(not args.full_body and stage in ("upper_and_torso", "body_wrist_polish"))
+        for p in (root_delta, translation_delta):
             p.requires_grad_(args.full_body and stage in ("upper_and_torso", "body_wrist_polish"))
         for p in hand_coeff.values():
             p.requires_grad_(args.surface_refine and stage != "body_wrist_polish")
-        params = ([upper] if upper.requires_grad else []) + ([torso] if torso.requires_grad else [])
-        params += [p for p in (lower, root_delta, translation_delta) if p.requires_grad]
+        if args.full_body:
+            latent.requires_grad_(stage != "hand_surface_polish")
+            params = ([latent] if latent.requires_grad else []) + [p for p in (root_delta, translation_delta) if p.requires_grad]
+        else:
+            params = ([upper] if upper.requires_grad else []) + ([torso] if torso.requires_grad else [])
         params += [p for p in hand_coeff.values() if p.requires_grad]
         optimizer = torch.optim.Adam(params, lr=args.lr)
         for step in range(steps):
@@ -355,7 +395,7 @@ def main():
                     active_collision_pairs[j] = torch.as_tensor(pairs, dtype=torch.long, device=device).reshape(-1, 3)
                 state = forward()
             loss = state[0]
-            if args.surface_refine and stage == "body_wrist_polish":
+            if args.surface_refine and stage == "body_wrist_polish" and not args.full_body:
                 collision = coefficients["hand_self_collision"] * state[1]["hand_self_collision"]
                 loss = loss - collision + collision.detach()
             if not torch.isfinite(loss):
@@ -384,9 +424,17 @@ def main():
                 root_delta=root_delta.detach().cpu().numpy(), translation_delta=translation_delta.detach().cpu().numpy(),
                 lower_corrections=lower.detach().cpu().numpy(),
                 left_hand_pca=hand_coeff["left"].detach().cpu().numpy(), right_hand_pca=hand_coeff["right"].detach().cpu().numpy())
+            if args.full_body:
+                np.savez_compressed(args.output_dir / f"{stage}_vposer_parameters.npz",
+                                    pair_id=np.arange(args.start,args.stop), vposer_latent=latent.detach().cpu().numpy(),
+                                    body_rotation_matrices=state[3].cpu().numpy())
     with torch.no_grad():
         final = forward()
         _, _, out, body, wp, wr, vg, _ = final
+        if args.full_body:
+            decoded_final = decode_body_rotations(vposer, latent)
+            if not torch.equal(decoded_final, body):
+                raise RuntimeError("body rotations were modified after VPoser decode")
         body_aa = Rotation.from_matrix(body.cpu().numpy().reshape(-1, 3, 3)).as_rotvec().reshape(n, 63)
         exported = {"pair_id": np.arange(args.start, args.stop), "vertices": out.vertices.cpu().numpy(),
             "faces": np.asarray(asset["f"]), "betas": z["betas"], "global_orient": Rotation.from_matrix((root @ batch_rodrigues(root_delta.reshape(-1, 3)).reshape(n, 1, 3, 3) if args.full_body else root).cpu().numpy().reshape(-1, 3, 3)).as_rotvec().astype(np.float32),
@@ -401,6 +449,9 @@ def main():
         for side in ("left", "right"):
             exported[f"{side}_hand_pose"] = hand_pose[side].cpu().numpy()
             exported[f"{side}_hand_pca"] = np.repeat(hand_coeff[side].detach().cpu().numpy(), n, axis=0)
+        if args.full_body:
+            exported["vposer_latent"] = latent.detach().cpu().numpy()
+            exported["body_parameterization"] = np.asarray("VPoser32_decode_all21_no_override")
         np.savez_compressed(args.output_dir / "result.npz", **exported)
     write("fit_summary.json", {"status": "engineering_probe_requires_grasp_and_image_review",
         "checkpoints": checkpoints, "trace": history,

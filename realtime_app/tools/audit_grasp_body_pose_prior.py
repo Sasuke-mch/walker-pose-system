@@ -66,14 +66,15 @@ def main():
     records = []
     for path in [args.source] + args.results:
         z = np.load(path, allow_pickle=False)
-        if z["body_pose"].shape != source["body_pose"].shape:
-            raise ValueError("audit requires identical full sequence range")
+        ids = np.asarray(z["pair_id"], dtype=int) if "pair_id" in z.files else np.arange(len(z["body_pose"]))
+        if len(ids) != len(z["body_pose"]) or len(np.unique(ids)) != len(ids) or np.any(ids < 0) or np.any(ids >= len(baseline)) or np.any(np.diff(ids) != 1):
+            raise ValueError("audit requires explicit contiguous source frame identity")
         rot = matrices(z["body_pose"])
         with torch.no_grad():
             encoded = vp.encode(torch.as_tensor(z["body_pose"], dtype=torch.float32)).mean
             reconstructed = vp.decode(encoded)["pose_body"].reshape(-1, 63).numpy()
         reconstruction = rotation_degrees(rot, matrices(reconstructed))
-        drift = rotation_degrees(baseline, rot)
+        drift = rotation_degrees(baseline[ids], rot)
         absolute = np.rad2deg(Rotation.from_matrix(rot.reshape(-1, 3, 3)).magnitude()).reshape(-1, 21)
         temporal = rotation_degrees(rot[:-1], rot[1:])
         metadata_path = path.parent / "run_metadata.json"
@@ -85,7 +86,7 @@ def main():
             "local_wrist_rotation_deg": {n: stats(absolute[:, j]) for j, n in enumerate(NAMES) if j >= 19},
             "encoder_mean_reconstruction_rotation_deg": stats(reconstruction),
             "encoder_mean_squared": float(encoded.square().mean()),
-            "frame_records": [{"pair_id": i, "drift_deg": drift[i].tolist(),
+            "frame_records": [{"pair_id": int(ids[i]), "drift_deg": drift[i].tolist(),
                                "reconstruction_deg": reconstruction[i].tolist()} for i in range(len(rot))]})
     audit = {"status": "logic_audit_not_physical_truth", "source": str(args.source.resolve()),
              "checkpoint": str(checkpoint), "source_saved_latent_decode_error_deg": stats(direct_error),

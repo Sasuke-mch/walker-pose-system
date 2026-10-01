@@ -1,3 +1,12 @@
+# 2026-10-01：接回完整VPoser身体计算图；短窗联合拟合未通过，不扩帧
+
+- 已实现`--full-body --vposer-dir --pose-reference-result`正式身体参数化：优化32维latent，每次forward解码全部21关节，转旋转矩阵后进入原SMPL-H矩阵层；无upper/torso/lower自由关节优化，无解码后覆盖腕。冻结eval VPoser模型权重，梯度继续传回latent。无声明latent、源pose与decode不一致、缺少不可变参考或启用硬锁腕覆盖均拒绝，保留旧诊断入口及旧主拟合。
+- 新`pose_app/vposer_grasp_body.py`集中解码、SO3参考和旋转时序逻辑；参考姿态、根和translation来自显式原始reference-result，续算不重置参考到上一轮结果。增加latent平方先验0.02、全部关节15度尺度参考1、相邻旋转10度尺度时序0.2，位置二阶差用30mm归一化。掌朝向走原FK软项；MANO共享PCA/mean-once、腕位置、原身体二维/三维、脚C1/非穿透/C2及拒绝原因继续保留。手自相交在新身体阶段保持梯度，不再detach；尚未实现完整身体碰撞或解剖关节限位，不宣称物理通过。
+- 从原`G20261001_fixed_mano_pca448_v1/fit_shared/result.npz`而非坏v6开始，31帧60..90短窗`active_constructed_grip_v2/vposer_body_window60_90_v1`执行body300+手PCA100步，lr0.003、腕20/朝向0.1，沿用冻结同源scene/脚候选以检查身体算法；本轮没有新Stage重放/可视化，不能称为新的端到端全片验证。先检查源latent一致性、实际梯度/解码/快照，再观察腕误差与身体/足部失败，不用腕误差代替联合通过。
+- 短窗身体偏移P95左膝5.754/右膝12.260/头5.740度，实际右腕局部旋转max17.529度，未重复自由SO3大扭曲；编码均值再解码P953.938度仅诊断。腕median从122.110/81.073降至7.736/8.856mm，P9517.071/16.954、max22.126/22.916mm。身体RMS77.283→131.034mm，脚底最小z左-61.556→-75.009、右-73.865→-120.662mm，手几何代理0/31、0/31通过。C2有效对0/0。联合门未通过，结果accepted_for_main_fit=False；不扩448帧，不替换旧页面，不放宽门限。
+- 梯度审计确认腕位置和脚项分别有对latent/根/translation的梯度；10mm外腕软界初始latent梯度约534161，对比身体3D约0.179，显示仍有极强目标冲突/尺度问题。本轮只完成先验逻辑修复，不声称权重和抓握位置已验证合理。后续单因素检查该外界惩罚的渐进/尺度，不用删除脚项或重新自由关节覆盖换毫米误差。
+- 输出新增vposer_latent和body_parameterization、官方checkpoint、各阶段latent快照；最终断言身体矩阵等于当前decode。2步接口smoke_v2通过最终断言与导出，不作解质量结果。41项相关测试和编译通过，记录见原EXPERIMENT.md；尚无通过的修正版全帧结果。
+
 # 2026-10-01：撤回无VPoser全身精修候选，定位姿态异常
 
 - 用户报告严重异常后逐层核查：旧`fit_smplh_wilor_sequence.py`确实逐次调用VPoser.decode(latent32)，有latent平方先验且保存latent；新`refine_body_with_constructed_grasp.py`没有加载/调用VPoser，改成21关节自由SO3修正。VPoser来源的初值不是持续的姿态约束，MANO PCA只约束手指；完整SMPL-H有效网格也不保证人体姿态合理。撤回下节“当前工程候选”的推荐，仅保留fit/v4/v5/v6和页面作为失败诊断，不能据腕误差改善继续评价身体优化成功。

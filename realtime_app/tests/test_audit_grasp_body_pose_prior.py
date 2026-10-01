@@ -42,3 +42,11 @@ def test_unrestricted_full_body_entry_fails_before_loading_or_writing(tmp_path):
     assert result.returncode != 0
     assert "active VPoser body parameterization and prior are required" in result.stderr
     assert not output.exists()
+
+    overridden = subprocess.run([sys.executable, str(script), *arguments,
+        "--output-dir", str(output), "--full-body", "--vposer-dir", str(tmp_path),
+        "--pose-reference-result", str(tmp_path/'reference.npz'), "--lock-grasp-orientation"],
+        capture_output=True, text=True)
+    assert overridden.returncode != 0
+    assert "forbids overriding decoded wrist rotations" in overridden.stderr
+    assert not output.exists()

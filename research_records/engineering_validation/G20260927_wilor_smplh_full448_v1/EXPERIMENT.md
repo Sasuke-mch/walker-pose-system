@@ -335,3 +335,15 @@ v6对原姿态的旋转差：右膝median52.306/P9572.646/max104.919度；头med
 临时修复为停止错误路线：入口--full-body在模型加载及输出创建前显式拒绝，要求活动VPoser身体参数化与先验，不静默改成另一种求解。旧官方入口及全部失败文件/页面保持。新增审计使用旋转矩阵对比，包含轴角2pi等价、90度已知旋转、非法shape/NaN与禁止入口输出副作用测试；3项新测试+14项已有精修测试通过，编译与差异检查通过。短窗自由SO3旧模式同样无VPoser，仍仅用于局部诊断，不作为正式全身方案。
 
 下一阶段正确结构应从原latent而非v6坏姿态出发，固定eval decoder参数并每次forward保留对latent的梯度：latent32→decode_body21→SMPL-H→同帧腕/脚/观测约束；根旋转/平移独立，beta固定，手指共享MANO PCA。加入latent先验、相对原始冻结姿态的SO3限制和适当旋转/位置时序；掌朝向暂用软项，不直接覆盖decoder腕。任何额外腕修正须显式小范围并验证前臂/手腕活动范围，不能伪称全21关节都仍在VPoser流形。维持身体二维/三维、脚C1/C2/非穿透与全部不可用理由；腕目标是构造假设，如与人体姿态先验冲突须如实报告，不用弯曲异常膝/头换毫米级腕误差。本轮只完成审计和阻止继续误跑，未声称新VPoser优化已实现或得到修正全帧结果。
+
+### 2026-10-01：实现活动VPoser链路与31帧验证，联合结果拒绝
+
+用户授权修改后，在原refine_body_with_constructed_grasp.py显式full-body分支接回官方VPoser32D，新增pose_app/vposer_grasp_body.py管理decode/参考/旋转时序。解码器eval且模型权重冻结，但每次decode不在no_grad中；latent是唯一可训练身体姿态变量，全部21关节直接交给SMPL-H，无upper/torso/lower优化或解码后腕覆盖。full-body要求--vposer-dir及--pose-reference-result，source和reference必须含latent且重放与body_pose一致，frame/beta一致；拒绝来自此前无latent坏结果的初始化。--lock-grasp-orientation与VPoser模式冲突时在加载/写输出前拒绝；正常掌朝向由root/body真实FK计算软损失。beta/标定保持；root/translation在联合阶段释放。原MANO12共享系数、归一化基、mean-once和参考限幅保留，原旧主拟合未改。
+
+身体新项：latent平方0.02；全21关节与显式原始reference的chordal SO3距离按15度尺度归一化、权重1；相邻关节旋转按10度每采样间隔归一化、权重0.2、两端frame_ok共同门控；相对髋COCO二阶位置原pseudo-Huber/30mm再除30mm平方，维持0.02。根SO3/平移对原始reference而非本轮base约束，避免多轮reset。旋转时序是每采样帧差，不伪称SI角加速度；VPoser及SO3参考不等于解剖关节限位。手自相交在该身体分支不detach，最后全片/窗口仍独立审计。完整身体碰撞仍未实现。
+
+冻结输入：原`G20261001_fixed_mano_pca448_v1/fit_shared/result.npz`同时作初始化与原参考；active_constructed_grip_v2/constructed_grasp.json与npz、full448_body_v3/scene和current_foot_candidates.npz、原左右PMPose、当前contact_vertex_sets、官方VPoser及SMPLH/MANO资产。本轮作为身体模块短窗诊断复用已经重放且同源的冻结scene，没重跑Stage/制作新网页，不宣称新端到端当前运行。范围60..90；预检目标为真实latent梯度、完整解码、参考不漂移；解质量仍要求腕接近的同时身体/脚不恶化，否则保留失败停止扩帧。
+
+输出vposer_body_window60_90_v1：upper0/body0/body-polish300/hand-polish100、lr0.003、腕位置20、朝向软项0.1，其它接触权重同上一调试surface设置。不是单变量正式性能消融，多项先验和参数化共同修复；run_metadata.json列完整输入/系数，gradient_audit.json按latent/root/translation记录每项梯度。初始腕外界latent梯度534161、身体3D0.179，表明原10mm软界（1mm尺度、mean+max、权重10）对初始100mm偏差极强；不以两个梯度标量独立证明唯一因果。优化后左/右腕median7.736/8.856mm、P9517.071/16.954、max22.126/22.916mm，初始median122.110/81.073。身体RMS77.283→131.034mm、脚底最小z左-61.556→-75.009、右-73.865→-120.662mm；C2有效0/0未可用。两手几何代理0/31通过，最大穿透14.991/14.533mm；全部记录grasp_geometry_audit.json。身体几何可行与接触/观测出现冲突，accepted_for_main_fit=False，停止扩大，不调低门限或隐藏脚失败。
+
+body_prior_audit.json按真实pair_id把短窗映射原448帧，身体旋转偏移P95左膝5.754/右膝12.260/头5.740度；右腕局部旋转max17.529度。VPoser编码均值再解码P953.938度（非流形最近距离/物理真值）。保存最终latent/21关节矩阵/轴角/实际模型网格与各阶段latent快照，输出前断言当前身体矩阵逐元素等于eval decode。vposer_body_interface_smoke_v2用2步身体/0步手参数验证最终接口及断言，非新的候选解，不覆盖v1。测试包含真实官方解码器21关节、腕部损失对latent非零梯度/模型参数无梯度、非法训练态/维度拒绝、未知时序门控、禁止缺先验fallback及解码后硬覆盖；41项相关单元测试通过，相关py_compile通过。下一阶段应单因素审查腕软界尺度/渐进激活和观测/接触冲突；本轮实现修复已完成，但没有通过的修正版全帧结果。
