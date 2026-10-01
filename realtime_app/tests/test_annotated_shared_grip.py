@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import numpy as np
 import torch
+import pytest
 
 tools = Path(__file__).resolve().parents[1]/'tools'
 sys.path.insert(0, str(tools))
@@ -44,3 +45,36 @@ def test_explicit_remap_preserves_original_and_unions_components(tmp_path):
     assert masks['left'].any() and masks['right'].any()
     assert audit[1]['original_label']=='right_hand' and audit[1]['used_label']=='left_hand'
     assert path.read_bytes()==before
+
+
+def test_wrist_bound_is_euclidean_and_gradient_remains_active():
+    center=torch.tensor([.2,-.1,.9])
+    translation=torch.nn.Parameter(center+torch.tensor([.01,.01,.01]))
+    mod.project_wrist_ball_(translation,center,.01)
+    assert float(torch.linalg.vector_norm(translation.detach()-center))<=.0100001
+    translation.square().sum().backward()
+    assert translation.grad is not None and torch.isfinite(translation.grad).all()
+
+
+def test_wrist_bound_preserves_inside_point():
+    center=torch.zeros(3)
+    point=torch.nn.Parameter(torch.tensor([.002,0.,0.]))
+    before=point.detach().clone()
+    mod.project_wrist_ball_(point,center,.01)
+    assert torch.equal(point,before)
+
+
+def test_diagnostic_reference_requires_bounded_mode():
+    data={'schema':'annotated_wrist_targets_v1','status':'incomplete_or_rejected',
+          'hands':{s:{'diagnostic_wrist_walker_m':[.1,.2,.9]} for s in ('left','right')}}
+    with pytest.raises(ValueError,match='wrist_targets_not_accepted'):
+        mod.wrist_anchor_points(data)
+    assert np.array_equal(mod.wrist_anchor_points(data,bounded=True)['left'],[.1,.2,.9])
+
+
+def test_grasp_requires_every_finger_palm_and_opposing_thumb():
+    assert mod.grasp_region_gate([1,2,3,4,5],2,-.3)
+    assert not mod.grasp_region_gate([1,2,3,4,6],2,-.3)
+    assert not mod.grasp_region_gate([1]*5,6,-.3)
+    assert not mod.grasp_region_gate([1]*5,2,.3)
+    assert not mod.grasp_region_gate([1]*5,2,float('nan'))

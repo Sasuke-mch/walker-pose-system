@@ -90,6 +90,38 @@ def render_mask(uv, faces, size):
     return mask
 
 
+def wrist_anchor_points(data, bounded=False):
+    """Diagnostic anchors require explicit bounded candidate mode, never fixed mode."""
+    if data.get('schema') != 'annotated_wrist_targets_v1':
+        raise ValueError('invalid_wrist_schema')
+    if not bounded and data.get('status') != 'accepted_manual_reference_geometry':
+        raise ValueError('wrist_targets_not_accepted')
+    result = {}
+    for side in ('left', 'right'):
+        hand = data['hands'][side]
+        key = 'diagnostic_wrist_walker_m' if bounded and 'wrist_walker_m' not in hand else 'wrist_walker_m'
+        point = np.asarray(hand[key], dtype=float)
+        if point.shape != (3,) or not np.isfinite(point).all():
+            raise ValueError('invalid_wrist_anchor')
+        result[side] = point
+    return result
+
+
+def project_wrist_ball_(translation, center, radius_m):
+    """Projected optimization: constrain Euclidean displacement, not each axis."""
+    import torch
+    with torch.no_grad():
+        delta = translation-center
+        length = torch.linalg.vector_norm(delta)
+        translation.copy_(center+delta*torch.clamp(radius_m/length.clamp_min(1e-12), max=1.))
+
+
+def grasp_region_gate(finger_gaps_mm, palm_gap_mm, thumb_dot):
+    """Engineering surface-region enclosure gate, not measured physical contact."""
+    values=np.asarray([*finger_gaps_mm,palm_gap_mm,thumb_dot],dtype=float)
+    return bool(np.isfinite(values).all() and max(finger_gaps_mm)<=5 and palm_gap_mm<=5 and thumb_dot<=.2)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--result', type=Path, required=True)
@@ -106,7 +138,13 @@ def main():
     ap.add_argument('--orientation-noise',type=float,default=.28)
     ap.add_argument('--image-weight',type=float,default=1.)
     ap.add_argument('--fixed-wrists',type=Path,help='accepted annotated_wrist_targets_v1 JSON; no wrist translation enters optimizer')
+    ap.add_argument('--bounded-wrists',type=Path,help='explicit engineering wrist anchor JSON; diagnostic anchors remain unvalidated')
+    ap.add_argument('--wrist-radius-mm',type=float,default=10.)
+    ap.add_argument('--strict-grasp-regions',action='store_true',help='mid/distal finger surface proxies; gate five regions, palm and opposing thumb')
     args = ap.parse_args()
+    if args.fixed_wrists and args.bounded_wrists:raise ValueError('conflicting_wrist_modes')
+    if args.strict_grasp_regions and not args.wrap_prior:raise ValueError('strict_grasp_requires_wrap_prior')
+    if not np.isfinite(args.wrist_radius_mm) or args.wrist_radius_mm<=0:raise ValueError('invalid_wrist_radius')
     if args.output_dir.exists():
         raise ValueError('refuse_existing_output')
     args.output_dir.mkdir(parents=True)
@@ -124,13 +162,9 @@ def main():
         return torch.as_tensor(x, dtype=torch.float32, device=device)
     root = Path(__file__).resolve().parents[2]
     z = np.load(args.result, allow_pickle=False)
-    wrist_targets=json.loads(args.fixed_wrists.read_text(encoding='utf-8')) if args.fixed_wrists else None
-    if wrist_targets is not None:
-        if wrist_targets.get('schema')!='annotated_wrist_targets_v1' or wrist_targets.get('status')!='accepted_manual_reference_geometry':
-            raise ValueError('wrist_targets_not_accepted')
-        for side in ('left','right'):
-            point=np.asarray(wrist_targets['hands'][side]['wrist_walker_m'])
-            if point.shape!=(3,) or not np.isfinite(point).all():raise ValueError('invalid_fixed_wrist')
+    wrist_path=args.fixed_wrists or args.bounded_wrists
+    wrist_targets=json.loads(wrist_path.read_text(encoding='utf-8')) if wrist_path else None
+    anchors=wrist_anchor_points(wrist_targets,bool(args.bounded_wrists)) if wrist_targets else None
     initial_grip = np.load(args.initial_grip,allow_pickle=False) if args.initial_grip else None
     walker = json.loads(args.walker_model.read_text(encoding='utf-8'))
     Rc = tensor(walker['rotation_left_camera_from_walker'])
@@ -165,8 +199,12 @@ def main():
     bodyzero = torch.zeros((1, 63), device=device)
     beta = tensor(z['betas'])
     all_report = {'status': 'local_grip_candidate_only', 'source_result': str(args.result.resolve()), 'walker_source': str(args.walker_model.resolve()), 'args': {k: str(v) if isinstance(v,Path) else v for k,v in vars(args).items()}, 'annotation_audit': annotation_audit, 'assumption': 'shared_finger_PCA_and_wrist_SE3_in_walker_frame_all_video', 'body_optimized': False, 'shape_optimized': False, 'radius_m': .016, 'limits': 'two annotated views of one frame; static coarse installation; no external 3D truth; local neutral-body hand surface; upper-limb IK is not solved', 'hands': {}}
-    all_report['wrist_position_mode']='fixed_explicit_stereo_wrist_reference' if wrist_targets is not None else 'jointly_optimized_with_grip'
-    export = {'wrist_translation_fixed':np.asarray(wrist_targets is not None)}
+    all_report['wrist_position_mode']='bounded_engineering_wrist_anchor' if args.bounded_wrists else ('fixed_explicit_stereo_wrist_reference' if wrist_targets is not None else 'jointly_optimized_with_grip')
+    all_report['wrist_anchor_source_status']=wrist_targets.get('status') if wrist_targets else None
+    all_report['wrist_motion_is_estimated']=False
+    if args.bounded_wrists:
+        all_report['assumption']='representative_grip_near_walker_local_wrist_anchor; framewise_micro_motion_not_yet_fitted'
+    export = {'wrist_translation_fixed':np.asarray(bool(args.fixed_wrists)), 'wrist_translation_bounded':np.asarray(bool(args.bounded_wrists)), 'wrist_radius_m':np.asarray(args.wrist_radius_mm/1000), 'wrist_anchor_validated':np.asarray(bool(wrist_targets and wrist_targets.get('status')=='accepted_manual_reference_geometry'))}
     for side, start, wrist in [('left',22,20), ('right',37,21)]:
         use = ((dom>=start)&(dom<start+15))|((dom==wrist)&(np.linalg.norm(rest-restj[wrist],axis=1)<.08))
         idx = np.flatnonzero(use)
@@ -174,7 +212,7 @@ def main():
         local_index = np.full(6890, -1)
         local_index[idx] = np.arange(len(idx))
         local_faces = local_index[hf]
-        groups = [np.flatnonzero((dom[idx]>=start+3*i)&(dom[idx]<start+3*i+3)) for i in range(5)]
+        groups = [np.flatnonzero((dom[idx]>=start+3*i+int(args.strict_grasp_regions))&(dom[idx]<start+3*i+3)) for i in range(5)]
         palm_center = .5*(restj[wrist]+restj[[start,start+3,start+6,start+9]].mean(0))
         palm_group = np.flatnonzero((dom[idx]==wrist)&(np.linalg.norm(rest[idx]-palm_center,axis=1)<.03))
         if len(palm_group)<10:raise ValueError('palm_patch_unavailable')
@@ -192,6 +230,7 @@ def main():
             cumulative.append(rot if parent<0 else cumulative[parent]@rot)
         R0 = Rc.T@tensor(cumulative[wrist])
         t0 = (tensor(z['smplh_joints'][0,wrist])-tc)@Rc
+        anchor_center=tensor(anchors[side]) if anchors else t0
         image_data = []
         for camera in ('left','right'):
             mask = masks[camera][side]
@@ -293,11 +332,24 @@ def main():
             reg = (coeff-z0).square().mean()
             # Weak wrist regularizer only; source absolute wrist is not truth.
             anchor = ((tr-t0)/.15).square().mean()
+            bounded_anchor=((tr-anchor_center)/.005).square().sum() if args.bounded_wrists else q.sum()*0
+            wrist_observation=q.sum()*0
+            if args.bounded_wrists:
+                raw_wrist=tr@Rc.T+tc
+                residuals=[]
+                for observation in wrist_targets['hands'][side].get('observations',[]):
+                    camera=observation['camera']
+                    point=raw_wrist if camera=='left' else raw_wrist@R01.T+t01
+                    uv=fisheye_project_torch(point[None],cal.K0 if camera=='left' else cal.K1,cal.D0 if camera=='left' else cal.D1)[0]
+                    residuals.append((uv-tensor(observation['raw_px']))/15)
+                if residuals:
+                    residuals=torch.stack(residuals)
+                    wrist_observation=F.smooth_l1_loss(residuals,torch.zeros_like(residuals))
             left_camera=q@Rc.T+tc
             right_camera=left_camera@R01.T+t01
             depth=(F.relu(.01-left_camera[:,2])/.01).square().mean()+(F.relu(.01-right_camera[:,2])/.01).square().mean()
-            total = args.image_weight*image_loss+20*penetration+.3*contact+2*palm_contact+2*wrap+8*self_loss+30*mesh_collision+.3*prior+.01*reg+.01*anchor+20*depth
-            return total,{'image':image_loss,'penetration':penetration,'contact':contact,'palm_contact':palm_contact,'wrap':wrap,'self_surrogate':self_loss,'mesh_collision':mesh_collision,'native_prior':prior}
+            total = args.image_weight*image_loss+20*penetration+(3 if args.strict_grasp_regions else .3)*contact+2*palm_contact+(10 if args.strict_grasp_regions else 2)*wrap+8*self_loss+30*mesh_collision+.3*prior+.01*reg+.01*anchor+20*depth+2*bounded_anchor+.3*wrist_observation
+            return total,{'image':image_loss,'penetration':penetration,'contact':contact,'palm_contact':palm_contact,'wrap':wrap,'self_surrogate':self_loss,'mesh_collision':mesh_collision,'native_prior':prior,'bounded_anchor':bounded_anchor,'wrist_observation':wrist_observation}
         with torch.no_grad():
             initial_rv = tensor(Rotation.from_matrix(R0.cpu().numpy()).as_rotvec())
             _, _, initial_q, _ = forward(z0, initial_rv, t0)
@@ -318,9 +370,10 @@ def main():
             rv0=Rotation.from_matrix(rotationbase).as_rotvec()
             rv=torch.nn.Parameter(tensor(rv0+rng.normal(0,args.orientation_noise,3)*(run>0)))
             translationbase=tensor(initial_grip[f'{side}_wrist_walker_m']) if initial_grip is not None else t0
-            tr=tensor(wrist_targets['hands'][side]['wrist_walker_m']) if wrist_targets is not None else torch.nn.Parameter(translationbase.clone()+tensor(rng.normal(0,.015,3))*(run>0))
+            tr=anchor_center.clone() if args.fixed_wrists else torch.nn.Parameter((anchor_center if args.bounded_wrists else translationbase).clone()+tensor(rng.normal(0,.003 if args.bounded_wrists else .015,3))*(run>0))
+            if args.bounded_wrists:project_wrist_ball_(tr,anchor_center,args.wrist_radius_mm/1000)
             param_groups=[{'params':[coeff,rv],'lr':.015}]
-            if wrist_targets is None:param_groups.append({'params':[tr],'lr':.0015})
+            if not args.fixed_wrists:param_groups.append({'params':[tr],'lr':.0015})
             opt=torch.optim.Adam(param_groups)
             trace=[]
             for step in range(args.steps):
@@ -334,10 +387,11 @@ def main():
                 if not torch.isfinite(loss):
                     raise ValueError('nonfinite_loss')
                 loss.backward()
-                active_parameters=(coeff,rv) if wrist_targets is not None else (coeff,rv,tr)
+                active_parameters=(coeff,rv) if args.fixed_wrists else (coeff,rv,tr)
                 if step==0 and any(p.grad is None or not torch.isfinite(p.grad).all() for p in active_parameters):
                     raise ValueError('invalid_gradient')
                 opt.step()
+                if args.bounded_wrists:project_wrist_ball_(tr,anchor_center,args.wrist_radius_mm/1000)
                 if step in (args.steps//2,3*args.steps//4):
                     for group in opt.param_groups:group['lr']*=.4
                 if step%100==0 or step==args.steps-1:
@@ -351,13 +405,26 @@ def main():
                 left_camera=q@Rc.T+tc
                 right_camera=left_camera@R01.T+t01
                 positive_depth=bool((left_camera[:,2]>0).all() and (right_camera[:,2]>0).all())
-                good=len(collisions)==0 and float(gap.min())>=-.003 and positive_depth
+                deviation_mm=float(torch.linalg.vector_norm(tr-anchor_center)*1000)
+                bound_ok=not args.bounded_wrists or deviation_mm<=args.wrist_radius_mm+1e-4
+                geometry_good=len(collisions)==0 and float(gap.min())>=-.003 and positive_depth and bound_ok
+                finger_gaps=[float(np.abs(gap[g]).min()*1000) for g in groups]
+                palm_gap=float(np.abs(gap[palm_group]).min()*1000)
+                contact_points=torch.stack([q[g[torch.argmin(capsule_gap(q[g],a,b).square())]] for g in groups])
+                axis=F.normalize(b-a,dim=0)
+                radial=contact_points-a-((contact_points-a)*axis).sum(-1,keepdim=True)*axis
+                radial=F.normalize(radial,dim=-1)
+                thumb_dot=float(torch.dot(radial[4],F.normalize(radial[:4].mean(0),dim=0)))
+                grasp_good=grasp_region_gate(finger_gaps,palm_gap,thumb_dot)
+                good=geometry_good and (grasp_good or not args.strict_grasp_regions)
                 item={'start':run,'objective':float(final),'accepted_geometry':good,'positive_depth_both_cameras':positive_depth,'triangle_intersections':len(collisions),'intersection_pairs':collisions,'min_gap_mm':float(gap.min()*1000),'trace':trace,'pca':coeff.cpu().numpy().tolist(),'pose':pose.cpu().numpy().tolist(),'rotvec_walker':rv.cpu().numpy().tolist(),'wrist_walker_m':tr.cpu().numpy().tolist(),'terms':{k:float(v) for k,v in terms.items()}}
                 candidates.append((item,qq,h.cpu().numpy(),local.cpu().numpy()))
+                item.update(wrist_anchor_deviation_mm=deviation_mm,wrist_bound_passed=bound_ok,basic_geometry_passed=geometry_good,grasp_region_gate_passed=grasp_good,finger_region_gap_mm=finger_gaps,palm_region_gap_mm=palm_gap,thumb_opposition_dot=thumb_dot)
                 (args.output_dir/f'{side}_starts.json').write_text(json.dumps([c[0] for c in candidates],indent=2),encoding='utf-8')
             print(json.dumps({'hand':side,'start':run,'objective':item['objective'],'intersections':len(collisions),'min_gap_mm':item['min_gap_mm']}),flush=True)
-            if wrist_targets is not None and not np.array_equal(tr.cpu().numpy(),tensor(wrist_targets['hands'][side]['wrist_walker_m']).cpu().numpy()):
+            if args.fixed_wrists and not np.array_equal(tr.cpu().numpy(),anchor_center.cpu().numpy()):
                 raise ValueError('fixed_wrist_changed')
+            if args.bounded_wrists and not bound_ok:raise ValueError('bounded_wrist_escaped')
         passing=[c for c in candidates if c[0]['accepted_geometry']]
         best=min(passing or candidates,key=lambda c:c[0]['objective'])
         item,qq,hh,ll=best
@@ -384,6 +451,7 @@ def main():
             cv2.imwrite(str(args.output_dir/f'{side}_{camera}_overlay.png'),np.concatenate([image[y0:y1,x0:x1],overlay[y0:y1,x0:x1]],axis=1))
         # Explicit actual local candidate faces and local wrist frame, not a detached full-body mesh.
         export.update({f'{side}_vertices_walker_m':qq,f'{side}_joints21_walker_m':hh,f'{side}_vertices_local_m':ll,f'{side}_faces':local_faces,f'{side}_vertex_indices':idx,f'{side}_hand_pca':np.asarray(item['pca']),f'{side}_hand_pose':np.asarray(item['pose']),f'{side}_rotation_walker_from_wrist':Rotation.from_rotvec(item['rotvec_walker']).as_matrix(),f'{side}_wrist_walker_m':np.asarray(item['wrist_walker_m']),f'{side}_accepted_geometry':np.asarray(bool(passing)),f'{side}_native_observation_mask':weights.sum(1).cpu().numpy()>0})
+        if anchors:export[f'{side}_wrist_anchor_walker_m']=anchors[side]
         all_report['hands'][side]={'status':'geometry_gated_candidate' if passing else 'no_geometry_feasible_candidate','selected_start':item['start'],'initial_metrics':initial_metrics,'metrics':metrics,'selected':item,'all_starts':[c[0] for c in candidates]}
     np.savez_compressed(args.output_dir/'fixed_grip.npz',**export,betas=z['betas'],faces_source=np.asarray(asset['f']))
     (args.output_dir/'report.json').write_text(json.dumps(all_report,ensure_ascii=False,indent=2),encoding='utf-8')
