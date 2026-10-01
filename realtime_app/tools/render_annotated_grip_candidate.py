@@ -24,6 +24,8 @@ def main():
         source=np.load(args.source_result,allow_pickle=False)
         report=json.loads((args.result.parent/'report.json').read_text(encoding='utf-8'))
         summary={'scope':'independent_local_grip_candidate_not_whole_body_fit','hands':{}}
+        if report.get('construction_prior'):
+            summary['scope']='actively_constructed_bilateral_grasp_not_observation_reconstruction'
         checked={k:z[k] for k in z.files}
         checked['accepted_for_main_fit']=np.asarray(False)
         checked['scope']=np.asarray('shared_finger_PCA_and_wrist_SE3_in_walker_frame')
@@ -64,7 +66,8 @@ def main():
             ax.set_box_aspect((1,1,1));ax.view_init(elev,azim)
             ax.set_xlabel('X walker (m)');ax.set_ylabel('-Y walker (m)');ax.set_zlabel('Z walker (m)')
         status=report['hands'][side]['status'] if args.source_result else 'candidate_not_validated'
-        fig.suptitle(f'{side} shared PCA + walker-relative wrist SE3 | {status}\nActual SMPL-H hand triangles; radius 16 mm assumption; upper-limb IK not solved')
+        provenance='actively constructed grasp' if args.source_result and report.get('construction_prior') else 'shared PCA + walker-relative wrist SE3'
+        fig.suptitle(f'{side} {provenance} | {status}\nActual SMPL-H hand triangles; radius 16 mm assumption; upper-limb IK not solved')
         fig.tight_layout();fig.savefig(args.output_dir/f'{side}_three_views.png');plt.close(fig)
 
 

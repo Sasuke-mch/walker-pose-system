@@ -141,8 +141,11 @@ def main():
     ap.add_argument('--bounded-wrists',type=Path,help='explicit engineering wrist anchor JSON; diagnostic anchors remain unvalidated')
     ap.add_argument('--wrist-radius-mm',type=float,default=10.)
     ap.add_argument('--strict-grasp-regions',action='store_true',help='mid/distal finger surface proxies; gate five regions, palm and opposing thumb')
+    ap.add_argument('--reference-wrists',type=Path,help='engineering wrist reference only; soft position guidance without hard ball')
+    ap.add_argument('--constructive-grasp',action='store_true',help='actively construct grasp from initial hand; image/native observations are weak references')
     args = ap.parse_args()
-    if args.fixed_wrists and args.bounded_wrists:raise ValueError('conflicting_wrist_modes')
+    if sum(bool(p) for p in (args.fixed_wrists,args.bounded_wrists,args.reference_wrists))>1:raise ValueError('conflicting_wrist_modes')
+    if args.constructive_grasp and (not args.initial_grip or not args.strict_grasp_regions):raise ValueError('constructive_grasp_requires_initial_grip_and_regions')
     if args.strict_grasp_regions and not args.wrap_prior:raise ValueError('strict_grasp_requires_wrap_prior')
     if not np.isfinite(args.wrist_radius_mm) or args.wrist_radius_mm<=0:raise ValueError('invalid_wrist_radius')
     if args.output_dir.exists():
@@ -162,9 +165,9 @@ def main():
         return torch.as_tensor(x, dtype=torch.float32, device=device)
     root = Path(__file__).resolve().parents[2]
     z = np.load(args.result, allow_pickle=False)
-    wrist_path=args.fixed_wrists or args.bounded_wrists
+    wrist_path=args.fixed_wrists or args.bounded_wrists or args.reference_wrists
     wrist_targets=json.loads(wrist_path.read_text(encoding='utf-8')) if wrist_path else None
-    anchors=wrist_anchor_points(wrist_targets,bool(args.bounded_wrists)) if wrist_targets else None
+    anchors=wrist_anchor_points(wrist_targets,bool(args.bounded_wrists or args.reference_wrists)) if wrist_targets else None
     initial_grip = np.load(args.initial_grip,allow_pickle=False) if args.initial_grip else None
     walker = json.loads(args.walker_model.read_text(encoding='utf-8'))
     Rc = tensor(walker['rotation_left_camera_from_walker'])
@@ -204,7 +207,10 @@ def main():
     all_report['wrist_motion_is_estimated']=False
     if args.bounded_wrists:
         all_report['assumption']='representative_grip_near_walker_local_wrist_anchor; framewise_micro_motion_not_yet_fitted'
+    if args.constructive_grasp:
+        all_report.update(assumption='actively_constructed_representative_grasp; observations_are_references_not_reconstruction_truth',wrist_position_mode='soft_reference_active_approach',construction_prior=True)
     export = {'wrist_translation_fixed':np.asarray(bool(args.fixed_wrists)), 'wrist_translation_bounded':np.asarray(bool(args.bounded_wrists)), 'wrist_radius_m':np.asarray(args.wrist_radius_mm/1000), 'wrist_anchor_validated':np.asarray(bool(wrist_targets and wrist_targets.get('status')=='accepted_manual_reference_geometry'))}
+    export['pose_constructed']=np.asarray(bool(args.constructive_grasp))
     for side, start, wrist in [('left',22,20), ('right',37,21)]:
         use = ((dom>=start)&(dom<start+15))|((dom==wrist)&(np.linalg.norm(rest-restj[wrist],axis=1)<.08))
         idx = np.flatnonzero(use)
@@ -220,6 +226,7 @@ def main():
         targets = tensor(z[f'mano_{side}_target_rotations'])
         weights = tensor(z[f'mano_{side}_view_weights'])
         z0 = tensor(z[f'{side}_hand_pca'][0:1])
+        construction_pose=tensor(initial_grip[f'{side}_hand_pca']) if args.constructive_grasp else z0
         ends = tensor([np.asarray(walker['nodes_walker_mm'][k])/1000 for k in walker['handle_segments'][side]])
         a,b = ends
         # Reproduce the source wrist coordinate frame through its FK tree.
@@ -333,8 +340,10 @@ def main():
             # Weak wrist regularizer only; source absolute wrist is not truth.
             anchor = ((tr-t0)/.15).square().mean()
             bounded_anchor=((tr-anchor_center)/.005).square().sum() if args.bounded_wrists else q.sum()*0
+            reference_anchor=((tr-anchor_center)/.03).square().sum() if args.reference_wrists else q.sum()*0
+            construction_regularizer=(coeff-construction_pose).square().mean() if args.constructive_grasp else q.sum()*0
             wrist_observation=q.sum()*0
-            if args.bounded_wrists:
+            if args.bounded_wrists or args.reference_wrists:
                 raw_wrist=tr@Rc.T+tc
                 residuals=[]
                 for observation in wrist_targets['hands'][side].get('observations',[]):
@@ -348,8 +357,8 @@ def main():
             left_camera=q@Rc.T+tc
             right_camera=left_camera@R01.T+t01
             depth=(F.relu(.01-left_camera[:,2])/.01).square().mean()+(F.relu(.01-right_camera[:,2])/.01).square().mean()
-            total = args.image_weight*image_loss+20*penetration+(3 if args.strict_grasp_regions else .3)*contact+2*palm_contact+(10 if args.strict_grasp_regions else 2)*wrap+8*self_loss+30*mesh_collision+.3*prior+.01*reg+.01*anchor+20*depth+2*bounded_anchor+.3*wrist_observation
-            return total,{'image':image_loss,'penetration':penetration,'contact':contact,'palm_contact':palm_contact,'wrap':wrap,'self_surrogate':self_loss,'mesh_collision':mesh_collision,'native_prior':prior,'bounded_anchor':bounded_anchor,'wrist_observation':wrist_observation}
+            total = args.image_weight*image_loss+20*penetration+(3 if args.strict_grasp_regions else .3)*contact+2*palm_contact+(10 if args.strict_grasp_regions else 2)*wrap+8*self_loss+30*mesh_collision+(.03 if args.constructive_grasp else .3)*prior+.01*reg+.01*anchor+20*depth+2*bounded_anchor+(.03 if args.constructive_grasp else .3)*wrist_observation+.1*reference_anchor+.5*construction_regularizer
+            return total,{'image':image_loss,'penetration':penetration,'contact':contact,'palm_contact':palm_contact,'wrap':wrap,'self_surrogate':self_loss,'mesh_collision':mesh_collision,'native_prior':prior,'bounded_anchor':bounded_anchor,'wrist_observation':wrist_observation,'reference_anchor':reference_anchor,'construction_regularizer':construction_regularizer}
         with torch.no_grad():
             initial_rv = tensor(Rotation.from_matrix(R0.cpu().numpy()).as_rotvec())
             _, _, initial_q, _ = forward(z0, initial_rv, t0)
