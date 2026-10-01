@@ -2775,3 +2775,10 @@ C1/C2 是物理逻辑所需的约束，不因当前表面指标暂时不理想�
 检查现有手轮廓没有显式腕中心，不能宣称已求出新的正确腕部。创建独立标注副本 `research_records/annotation_handoffs/H20261001_people1_wrist_points_pair0000_v2/`，保留原图片和多边形，增加left_wrist/right_wrist标签、Ctrl+Shift+P创建点快捷键，LabelMe窗口已确认打开left_pair_0000.png [1/2]。人体左腕在左图右上、右图右侧；人体右腕在左图左下、右图左侧。待用户各图补两点后继续，当前pending审计输出 `G20261001_annotated_shared_grip_v1/wrist_first_pending.json`左右均unavailable，未替换先前结果。
 
 验证：12项相关测试通过，新增测试覆盖正立逆映射、正式标定下合成点三角化往返、仅轮廓不伪造腕点、重复及越界点拒绝；脚本py_compile通过。当前完成算法接口与标注准备，没有实际新腕解或锁腕握持实验，不宣称腕位置已验证。
+
+
+## 2026-10-01：新增5组双目腕点标注交接
+
+用户要求增加5组wrist用于更好判断。准备 `research_records/annotation_handoffs/H20261001_people1_wrist_points_5pairs_v3/`，从同源people_1的448对输入预选89、179、268、358、447帧，每组左右两张，共10张，保留正立原分辨率1080x1920，不按可见性或模型结果挑选。manifest.json记录每张源路径、帧号、相机角色、尺寸与目标；labels/初始为空，未传播旧点或预测点。LabelMe窗口标题已确认g01_pair_0089_left.png [1/10]；Ctrl+Shift+P创建点，标签限定left_wrist/right_wrist，Ctrl+S逐图保存。
+
+保存审查发现pair0000_v2左图两个点均为right_wrist，右图没有显式wrist点；该状态保存在新包previous_pair0_saved_points_audit.json。原标签未自动改写，不能称已完成双目腕目标；需用户更正左右名称并保存右图。跨视图目标定义进一步明确为同一手掌/前臂交界截面的中心投影估计，不是分别可见的皮肤表面点，也不是想象的内部骨点；不可见或出界留空并保留不可用。更多标注用于操作性参考一致性、逐帧几何门与助步器局部固定位置假设检查，不能自动证明真实解剖3D准确，也不能直接在线性世界坐标中平均。当前仅完成标注交接，未运行新腕/手形优化。10张图读取和尺寸检查通过，源数据及用户已有改动保留。
