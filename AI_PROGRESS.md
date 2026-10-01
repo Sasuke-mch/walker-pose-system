@@ -2903,3 +2903,15 @@ v1(200+100步)腕已接近但朝向约33度，保留调试结果；v2身体3D按
 按用户质疑做第60帧受控诊断，新增tools/diagnose_constructed_grasp_deformation.py，输出body_refinement_window60_90_v2/deformation_diagnostic.json。同手指/同beta/同三角面，左/右相交对：中立身体0/0；原身体0/20；精修身体0/59；关闭pose correctives 0/7；精修局部腕归零0/18；仅精修腕+中立其余身体21/17。右原身体在掌/腕与小指，精修新增中指与无名指。对数不是穿透程度，局部 vs world浮点阈值会导致右59 vs57，但有相交结论一致。
 
 确认接入假设不足：局部构造bodyzero前向再刚体放置，完整SMPLH手面受全身pose correctives和混合蒙皮影响，固定PCA不固定皮肤。中立身体两手0相交、源矩阵重放和PCA解码一致，未发现左右参数误映射证据；右手不是因world目标/标定或简单的腕旋转更大。左手只放入局部腕也21对，说明左通过只对当前身体成立。精修目标缺hand_self_collision，只有到扶手的hand_penetration；后验拒绝不等于优化防碰撞。这是需要修正的整体优化逻辑，不归咎数据。下一步在完整身体条件下增加自碰撞和手面形状保持，必要时受限共享PCA修正；不关闭correctives作为修复，脚部约束保留。本次仅诊断，未重新优化或宣称已修复。
+
+## 2026-10-01：用户要求全部帧，完成VPoser修正版448帧诊断与可视化
+
+用户明确要求全部帧，本轮覆盖前一轮“停止扩大”的执行范围限制，但不改变失败验收结论。保留31帧窗口及旧无VPoser失败结果，不拼接、不插值。唯一范围变化为60..90扩至0..447，仍用原始G20261001_fixed_mano_pca448_v1/fit_shared/result.npz初始化和不可变参考；完整21关节由活动VPoser32解码，无腕旋转覆盖，根/平移优化，beta固定，共享MANO12 PCA、身体观测/参考/时序和脚C1/C2/非穿透均保持。身体300步、手指100步、lr0.003及所有权重沿用31帧配置；全片共享PCA和时序边界随范围改变，不能把不同范围视为严格性能A/B。
+
+输出active_constructed_grip_v2/vposer_body_full448_v1。scene从原input_448pairs和左右PMPose重新重放全部448帧，不读取旧动态地面，123有效地面更新，Stage为warming_up5/transition114/Stage2 115/Stage1 214。脚候选重新由原baseline实际鞋底顶点与当前scene计算：min_z逐脚、sigmoid((0.030-abs(min_z))/0.015)，独立current_foot_candidates.npz，不加载旧接触目标；支撑状态/拒绝原因由冻结baseline滞回逻辑保留，C2有效相邻0/0，不声称实际触地或支撑。执行脚本run_full448.py、fit_command.json、fit_console.log和fit/run_metadata.json记录完整参数来源与运行。
+
+结果：左右腕偏差median8.278/8.336mm，P9511.082/11.180mm，max31.141/31.239mm；腕朝向误差P9559.397/66.147度。身体工程RMS83.119->120.684mm，脚底最低高度左-119.039->-142.729mm、右-125.551->-164.995mm。左右手逐帧几何代理均0/448通过，最坏扶手顶点穿透15.176/15.901mm；grasp_geometry_audit.json保留全部896手帧拒绝原因及相交对。结果仍accepted_for_main_fit=False，不升级主拟合，不宣称握持或真实精度。全帧展示要求已完成；本轮未继续调权或重跑其他求解。
+
+独立CPU重放保存latent得到body_rotation_matrices，最大逐元素误差4.768e-7；最终参数形状448x32、448x6890x3、13776x3及有限性、0..447连续帧身份检查通过。body_prior_audit.json保留全部帧旋转诊断，encoder均值再解码P954.724度仅为模型内部指标，不是物理姿态合格证。
+
+vposer_body_full448_viewer.html使用本轮fit真实三角面与本轮scene统一变换，重新三角化/严格门，保留COCO17含拒绝右膝、实体walker、双相机/基线/轨迹、XY地面Z高度、脚底地下标记、逐帧腕误差/手形/Stage/held及拒绝状态，无平滑/吸附/旧网格替补。浏览器检查0/224/447、播放暂停、自由旋转及重置，末帧人体完整，控制台无error；viewer_frame224.jpg与viewer_validation.json保存。21项相关pytest通过。已有用户改动保留，仅更新现有记录，不修改求解算法。

@@ -355,3 +355,15 @@ body_prior_audit.json按真实pair_id把短窗映射原448帧，身体旋转偏�
 修改build_grasp_body_canvas_viewer.py支持非零帧起点、原始frameID边界/连续检查、按frameID映射审计状态、场景原2D来源匹配和几何审计source匹配；新增5项窗口映射/不连续/越界/非整型拒绝测试。重新计算同源三角化及严格q2D/10px门并保留有限拒绝点/右膝14、原拟合候选mask明确区分。ground同时用于真实6890顶点/13776面/模型COCO/原始骨架、拓扑厚杆助步器、双相机与基线，X,-Y,Z显示；地面XY/Z高度和0.5m尺度、当前Stage/held状态、相机YZ侧轨迹/accepted踝拖尾、细小地下鞋底红点保留，render顺序按规范改为walker/原点→mesh→观测骨架/模型点。左右腕目标偏差、身体观测残差、手形拒绝原因、回投median和逐点拒绝原因直接逐帧展示。
 
 最终页面vposer_body_viewer_v2.html，首版vposer_body_viewer.html保留。标题明确第60..90帧/31帧/VPoser修正版/联合未通过；原失败情况不吸附、不插值、不显示平滑。浏览器实际核查60/75/90帧、播放暂停、自由旋转和重置，无console error，表面与骨架/杆件可见。截图viewer_frame75.jpg和viewer_frame75_side.jpg及viewer_validation.json同目录，后者记录31帧Stage统计与各17关节有限/严格接受/有限拒绝和拒绝原因。5项新测试、编译、载荷/渲染顺序检查通过。本轮改变仅限可视化及索引逻辑，联合拟合未通过结论不变，未扩全片求解。
+
+### 2026-10-01：按用户要求完成VPoser修正版全448帧诊断页面
+
+本轮用户要求全部帧，明确扩展前轮失败短窗的范围，不修改验收门。输入原G20261001_fixed_mano_pca448_v1/fit_shared/result.npz同时作为初始化/不可变参考、当前constructed_grasp、同源input_448pairs与原双目PMPose、正式标定、静态ground/walker、官方VPoser和SMPLH/MANO资产。原31帧与此前无VPoser失败结果原样保留。
+
+输出active_constructed_grip_v2/vposer_body_full448_v1：scene是当前新重放448帧（Stage warming5/transition114/Stage2 115/Stage1 214，123更新），脚候选用baseline实际鞋底在本轮地面中重新计算，foot_contact_weight=sigmoid((0.030-abs(min_z))/0.015)，不是压力/支撑标签。run_full448.py、fit_command.json、fit_console.log记录执行；fit/run_metadata.json列完整输入和系数。仅范围改为start0/stop448，继续身体300步/共享PCA100步、lr0.003、腕20/朝向0.1、VPoser0.02/原始SO3参考1/旋转时序0.2及旧身体/脚/手surface各项。范围变化同时影响共享PCA/时序，非独立性能消融。未读取旧动态地面或旧接触目标，无拼窗/补点。
+
+fit/result.npz含448帧VPoser32潜变量及完整21关节矩阵、真实6890顶点/13776面。独立CPU解码与保存矩阵max逐元素误差4.768e-7；帧0..447、形状及有限性通过。fit/body_prior_audit.json为内部诊断，encoder均值重建P954.724度不能判定物理有效。
+
+结果左右腕median8.278/8.336mm、P9511.082/11.180、max31.141/31.239mm，朝向P9559.397/66.147度；身体3D工程RMS83.119->120.684mm；脚底全片最低左-119.039->-142.729mm、右-125.551->-164.995mm，C2有效0/0。fit/grasp_geometry_audit.json全896手帧，左右均0/448通过，最大扶手顶点穿透15.176/15.901mm。accepted_for_main_fit=False，腕位置接近没有同时满足身体/脚/手形门，停止本轮继续调权；不升级任何物理结论。
+
+vposer_body_full448_viewer.html使用当前fit及scene，重新三角化/严格接受门、同帧真实网格与面、实体walker、双相机/基线/侧轨迹、完整原骨架含有限拒绝点、脚底地下标记、腕/手形/质量/Stage等全部诊断。无插值/显示平滑/旧帧补齐，标题明确联合拟合未通过。浏览器0/224/447、播放暂停、自由旋转/重置及控制台检查通过，截图viewer_frame224.jpg与viewer_validation.json保留；21项相关pytest通过。本轮交付是全帧诊断可视化，不是通过的全身物理解。
