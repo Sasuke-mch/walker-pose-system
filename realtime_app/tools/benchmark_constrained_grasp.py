@@ -34,6 +34,7 @@ def main():
     parser.add_argument('--reference-metadata',type=Path,required=True)
     parser.add_argument('--output-root',type=Path,required=True)
     parser.add_argument('--steps',type=int,default=50)
+    parser.add_argument('--include-corrected',action='store_true',help='add one-factor nonlinear recovery route and common read-only wrist probes')
     args = parser.parse_args()
     if args.output_root.exists() or args.steps<=0:
         raise ValueError('new output root and positive steps required')
@@ -48,7 +49,7 @@ def main():
     config = dict(metadata['config'])
     config.update(upper_steps=args.steps,body_steps=args.steps,body_polish_steps=args.steps,hand_polish_steps=args.steps)
     for name,value in config.items():
-        if name in ('start','stop','grasp_mesh','constrained_update','projection_trust_radius'):
+        if name in ('start','stop','grasp_mesh','constrained_update','projection_trust_radius','nonlinear_correction_steps','wrist_direction_diagnostics'):
             continue
         flag = '--'+name.replace('_','-')
         if isinstance(value,bool):
@@ -56,6 +57,8 @@ def main():
                 common.append(flag)
         elif value is not None:
             common += [flag,str(value)]
+    if args.include_corrected:
+        common += ['--wrist-direction-diagnostics']
     protocol = dict(single_variable='body update rule: guarded Adam vs normalized frame-local halfspace projection + exact guard',
         windows=[[270,296],[60,101]],steps_per_phase=args.steps,inputs=metadata['inputs'],config=config,
         scene_scope='frozen existing balanced_full448 scene; algorithm ablation, not new end-to-end replay',
@@ -64,6 +67,12 @@ def main():
                    leg_acceleration_not_increased=True,all_actual_hand_frames_pass=True),
         diagnostic_progress='both wrist P95 at least 10% below same-window control; exact observation gate retained',
         stopping='Any main gate fails: no full448 upgrade. No weights, thresholds or contact targets changed.')
+    if args.include_corrected:
+        protocol.update(routes=['control','projected','corrected'],nonlinear_correction_steps=4,
+            recovery_scope='candidate Jacobian projection, max 4 corrections per alpha, original radius and exact gates',
+            correction_single_variable='corrected vs projected changes only nonlinear feasibility recovery',
+            additional_diagnostic_gate='both wrists P95 >=10% better than Adam; body RMS and every available body-group RMS, each sole minimum, leg acceleration no worse than Adam',
+            sustained_progress_gate='each of 3 body stages has wrist squared-distance reduction >1e-6 m2 in at least 3 distinct 10-step blocks; observational gate required')
     write(args.output_root/'protocol.json',protocol)
     reports = {}
     tool = Path(__file__).with_name('refine_body_with_constructed_grasp.py')
@@ -72,11 +81,13 @@ def main():
         root = args.output_root/key
         root.mkdir()
         reports[key] = {}
-        for route in ('control','projected'):
+        for route in protocol.get('routes',('control','projected')):
             out = root/route
             command = [sys.executable,str(tool),*common,'--start',str(start),'--stop',str(stop),'--output-dir',str(out)]
-            if route=='projected':
+            if route in ('projected','corrected'):
                 command += ['--constrained-update','--projection-trust-radius','.2']
+            if route=='corrected':
+                command += ['--nonlinear-correction-steps','4']
             write(root/(route+'_command.json'),command)
             print(key,route,'started',flush=True)
             with (root/(route+'.log')).open('w',encoding='utf-8') as log:
@@ -95,10 +106,36 @@ def main():
         control,projected = reports[key]['control'],reports[key]['projected']
         reports[key]['diagnostic_progress'] = projected['gates']['observations'] and all(
             projected['final']['wrist_error_mm'][side]['p95'] <= .9*control['final']['wrist_error_mm'][side]['p95'] for side in ('left','right'))
+        if args.include_corrected:
+            corrected = reports[key]['corrected']
+            a,b = corrected['final'],control['final']
+            nonworsening = dict(body=a['body_3d_rms_mm']<=b['body_3d_rms_mm']+.001,
+                body_groups=all(a['body_groups'][g] is not None and a['body_groups'][g]['rms_mm']<=v['rms_mm']+.001
+                                for g,v in b['body_groups'].items() if v is not None),
+                feet=all(a['sole_minimum_z_mm'][s]>=b['sole_minimum_z_mm'][s]-.001 for s in ('left','right')),
+                leg_temporal=a['terms']['leg_ground_acceleration']<=b['terms']['leg_ground_acceleration']+1e-6)
+            transactions=json.loads((root/'corrected/update_transactions.json').read_text(encoding='utf-8'))['updates']
+            blocks={}
+            for stage in ('upper_only','upper_and_torso','body_wrist_polish'):
+                values=[]
+                for start_step in range(0,args.steps,10):
+                    progress=0.
+                    for t in transactions:
+                        if t['stage']==stage and start_step<=t['step']<start_step+10 and t['accepted']:
+                            attempt=next(x for x in t['attempts'] if x['accepted'])
+                            progress+=sum(t['before_wrist_squared_error_sum_m2'])-sum(attempt['wrist_squared_error_sum_m2'])
+                    values.append(progress)
+                blocks[stage]=values
+            sustained=all(sum(v>1e-6 for v in values)>=3 for values in blocks.values())
+            reports[key]['corrected_diagnostics']=dict(nonworsening_vs_adam=nonworsening,
+                wrist_progress=corrected['gates']['observations'] and all(a['wrist_error_mm'][s]['p95']<=.9*b['wrist_error_mm'][s]['p95'] for s in ('left','right')),
+                wrist_progress_blocks_m2=blocks,sustained_progress=sustained)
+            reports[key]['corrected_diagnostics']['passed']=all(nonworsening.values()) and sustained and reports[key]['corrected_diagnostics']['wrist_progress']
     report = dict(protocol=protocol,runs=reports,accepted_for_main_fit=False,full448_started=False,
-                  all_windows_passed=all(r['projected']['passed'] for r in reports.values()))
+                  all_windows_passed=all(r['corrected' if args.include_corrected else 'projected']['passed'] for r in reports.values()))
     write(args.output_root/'comparison.json',report)
-    print(json.dumps({k:dict(progress=r['diagnostic_progress'],gates=r['projected']['gates']) for k,r in reports.items()},indent=2),flush=True)
+    print(json.dumps({k:dict(progress=r['diagnostic_progress'],gates=r['projected']['gates'],
+                            corrected=r.get('corrected_diagnostics')) for k,r in reports.items()},indent=2),flush=True)
 
 
 if __name__=='__main__':

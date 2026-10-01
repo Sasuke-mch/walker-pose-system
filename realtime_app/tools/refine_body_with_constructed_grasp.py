@@ -40,6 +40,8 @@ def main():
     ap.add_argument("--balanced-stages", action="store_true", help="opt-in grouped observations, guarded updates and dedicated leg temporal terms")
     ap.add_argument("--constrained-update", action="store_true", help="project frame-local Adam body increments; exact full-window gates remain authoritative")
     ap.add_argument("--projection-trust-radius", type=float, default=.2, help="per-frame normalized increment radius; latent/radian scales 1, translation scale .05m")
+    ap.add_argument("--nonlinear-correction-steps", type=int, default=0, help="opt-in relinearized feasibility recovery at rejected projected trials")
+    ap.add_argument("--wrist-direction-diagnostics", action="store_true", help="read-only frame-local wrist descent probes at body checkpoints")
     ap.add_argument("--stage2-static-assumption", action="store_true", help="explicit user assumption: heel/ball patches static within each Stage2 segment")
     ap.add_argument("--vposer-dir", type=Path, help="required for full-body: frozen eval decoder with live latent gradients")
     ap.add_argument("--pose-reference-result", type=Path, help="immutable original VPoser result; required for full-body, including resumed runs")
@@ -56,6 +58,10 @@ def main():
         raise ValueError("balanced stages require live VPoser full-body")
     if args.constrained_update and not args.balanced_stages:
         raise ValueError("constrained updates require balanced full-body stages")
+    if args.nonlinear_correction_steps < 0 or (args.nonlinear_correction_steps and not args.constrained_update):
+        raise ValueError("nonlinear correction requires constrained updates and nonnegative steps")
+    if args.wrist_direction_diagnostics and not args.balanced_stages:
+        raise ValueError("wrist direction diagnostics require balanced full-body")
     if not np.isfinite(args.projection_trust_radius) or args.projection_trust_radius <= 0:
         raise ValueError("invalid projection trust radius")
     if args.stage2_static_assumption and not args.balanced_stages:
@@ -88,7 +94,7 @@ def main():
     from pose_app import smpl_surface_contact as surf
     from pose_app.balanced_grasp import (GROUPS, LEG_ROTATIONS, grouped_observation_loss,
         observation_guard, leg_temporal_terms, build_stage2_anchors, stage2_terms, guarded_adam_step)
-    from pose_app.constrained_grasp import constrained_adam_step
+    from pose_app.constrained_grasp import constrained_adam_step, probe_local_goal_descent
     from pose_app.constructed_grasp_refinement import (
         UPPER_JOINTS, TORSO_JOINTS, load_grasp, validate_rotation, compose_body,
         wrist_rotations, masked_mean, foot_terms, frozen_surface_states,
@@ -447,6 +453,26 @@ def main():
             return torch.cat((observation,leg),dim=1)
         return observation
 
+    def wrist_goals():
+        return (forward()[4]-target_p).square().sum(dim=-1)
+
+    def save_direction_probe(name, selected):
+        nonlocal phase
+        if args.wrist_direction_diagnostics:
+            scales = [(.05 if p is translation_delta else 1.) for p in selected]
+            saved_phase = phase
+            if phase == 'initial':
+                phase = 'upper_only'
+            try:
+                probe = probe_local_goal_descent(selected,scales,local_constraints,wrist_goals)
+                probe['constraint_phase'] = phase
+            finally:
+                phase = saved_phase
+            probe['parameter_blocks'] = ['translation' if p is translation_delta else 'root' if p is root_delta else 'latent' for p in selected]
+            for record in probe.get('frames',[]):
+                record['pair_id'] = record['frame_index']+args.start
+            write(f'wrist_direction_{name}.json',probe)
+
     def feasibility_diagnostic(state):
         predicted = regress_coco17_torch(state[2].vertices, reg)
         joints = state[2].joints
@@ -487,6 +513,9 @@ def main():
     write("gradient_audit.json", {"parameters": ["vposer_latent", "root", "translation"] if args.full_body else ["upper", "torso"], "weighted_gradient_norms": gradients})
     history, checkpoints, transactions = [], {"initial": initial_metrics}, []
     del initial
+    # The reversible probe changes tensor version counters. Run only after
+    # all derivatives of the initial graph have been consumed.
+    save_direction_probe('initial',[latent])
     for stage, steps in (("upper_only", args.upper_steps), ("upper_and_torso", args.body_steps),
                          ("body_wrist_polish", args.body_polish_steps), ("hand_surface_polish", args.hand_polish_steps)):
         if steps == 0:
@@ -526,6 +555,7 @@ def main():
             if any(p.grad is not None and not torch.isfinite(p.grad).all() for p in params):
                 raise RuntimeError("nonfinite parameter gradient")
             if args.balanced_stages:
+                before_wrist_squared = (state[4].detach()-target_p).square().sum(dim=-1).sum(dim=0).cpu().tolist()
                 def evaluate_trial():
                     trial = forward()
                     predicted = regress_coco17_torch(trial[2].vertices, reg)
@@ -539,12 +569,14 @@ def main():
                     pca_ok = all(bool(((hand_coeff[s]-tensor(grasp["hands"][s]["hand_pca"])).abs() <= 2.).all()) for s in ("left","right"))
                     return trial[0], ok and pca_ok, {"observation_excess_m": excess, "leg_shift_m": leg_shift,
                         "pca_ok": pca_ok, "violating_pair_joint": [[i+args.start,j] for i,j in bad],
+                        "wrist_squared_error_sum_m2": (trial[4]-target_p).square().sum(dim=-1).sum(dim=0).cpu().tolist(),
                         "upper_leg_shift_guard_passed": stage != "upper_only" or leg_shift <= .005+1e-6}
                 try:
                     if args.constrained_update and stage != "hand_surface_polish":
                         scales = [(.05 if p is translation_delta else 1.) for p in params]
                         transaction = constrained_adam_step(optimizer,params,evaluate_trial,loss.detach(),
-                            local_constraints,scales,trust_radius=args.projection_trust_radius)
+                            local_constraints,scales,trust_radius=args.projection_trust_radius,
+                            correction_steps=args.nonlinear_correction_steps)
                         for record in transaction['projection']['frames']:
                             record['pair_id'] = record['frame_index']+args.start
                     else:
@@ -555,7 +587,8 @@ def main():
                         'parameters_and_optimizer_restored':True})
                     write('update_transactions_before_failure.json', {'updates':transactions})
                     raise
-                transactions.append({"stage":stage, "step":step, "wrist_ramp":wrist_ramp, **transaction})
+                transactions.append({"stage":stage, "step":step, "wrist_ramp":wrist_ramp,
+                                     "before_wrist_squared_error_sum_m2":before_wrist_squared, **transaction})
             else:
                 optimizer.step()
             if args.surface_refine and not args.balanced_stages:
@@ -568,6 +601,8 @@ def main():
                     "evaluation_point": "before_proposed_update", "wrist_ramp": wrist_ramp,
                     "terms": {k: float(v.detach()) for k, v in state[1].items()}})
                 print(stage, step, float(loss.detach()), flush=True)
+        if stage != 'hand_surface_polish':
+            save_direction_probe(stage,params)
         with torch.no_grad():
             state = forward()
             checkpoints[stage] = metrics(state)
@@ -622,7 +657,8 @@ def main():
             "reference_result": str(args.pose_reference_result.resolve()),
             "rejected_updates_restore_parameters_and_Adam_moments": True,
             "accepted_backtracks_keep_proposed_Adam_moments": True,
-            "body_update_rule": "projected_Adam_exact_nonlinear_guard" if args.constrained_update else "guarded_Adam",
+            "body_update_rule": ("projected_Adam_nonlinear_recovery_exact_guard" if args.nonlinear_correction_steps else
+                                 "projected_Adam_exact_nonlinear_guard") if args.constrained_update else "guarded_Adam",
             "projection_constraint_columns": "0..16 COCO observation budget; upper_only 17..22 COCO11..16 leg displacement"})
     return 0
 

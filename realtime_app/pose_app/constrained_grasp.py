@@ -52,8 +52,68 @@ def frame_local_jacobian(constraints, params, scales):
     return torch.stack(blocks, dim=1).detach().cpu().double().numpy()
 
 
+def probe_local_goal_descent(params, scales, constraints, goals, radius=.02, trials=8):
+    """Read-only local wrist probe, never a global feasibility certificate.
+
+    goals must contain frame-local squared distances, one column per wrist.
+    A feasible finite witness certifies only this candidate and this state.
+    Parameter values/gradients are restored, but tensor version counters change;
+    callers must consume/discard prior autograd graphs before this probe.
+    """
+    old = [p.detach().clone() for p in params]
+    try:
+        with torch.enable_grad():
+            c_live, g_live = constraints(), goals()
+            c = c_live.detach().cpu().double().numpy()
+            g = g_live.detach().cpu().double().numpy()
+            jac = frame_local_jacobian(c_live, params, scales)
+            goal_jac = frame_local_jacobian(g_live, params, scales)
+        if not np.isfinite(c).all() or c.max() > 0:
+            return dict(status='initial_not_exactly_feasible', global_feasibility='unknown')
+        gradient = goal_jac.sum(axis=1)
+        proposal = -gradient * (radius / np.maximum(np.linalg.norm(gradient, axis=1), 1e-15))[:, None]
+        direction = np.zeros_like(proposal)
+        frames = []
+        for i in range(len(c)):
+            direction[i], info = project_halfspaces(proposal[i], jac[i], -c[i])
+            direction[i] *= min(1., radius / max(np.linalg.norm(direction[i]), 1e-15))
+            active = np.flatnonzero(c[i] >= -.0005)
+            frames.append(dict(frame_index=i, active_columns=active.tolist(),
+                active_jacobian_rank=int(np.linalg.matrix_rank(jac[i, active])) if len(active) else 0,
+                linear_wrist_squared_distance_derivatives=(goal_jac[i] @ direction[i]).tolist(),
+                projection=info))
+        if not all(f['projection']['passed'] for f in frames):
+            return dict(status='linear_projection_not_certified', frames=frames, global_feasibility='unknown')
+        widths = [p[0].numel() for p in params]
+        attempts = []
+        with torch.no_grad():
+            for trial in range(trials):
+                alpha, cursor = 2.**(-trial), 0
+                for p, a, scale, width in zip(params, old, scales, widths):
+                    delta = torch.as_tensor(direction[:, cursor:cursor+width], device=p.device, dtype=p.dtype).reshape_as(p)
+                    p.copy_(a + alpha * scale * delta)
+                    cursor += width
+                exact_c = constraints().cpu().double().numpy()
+                exact_g = goals().cpu().double().numpy()
+                feasible = bool(np.isfinite(exact_c).all() and exact_c.max() <= 0)
+                decrease = (exact_g - g).sum(axis=0)
+                changed = any(not torch.equal(p, a) for p, a in zip(params, old))
+                witness = feasible and changed and bool(np.isfinite(exact_g).all() and decrease.sum() < -1e-12)
+                attempts.append(dict(alpha=alpha, exact_feasible=feasible,
+                    wrist_squared_distance_change_m2=decrease.tolist(), witness=witness))
+                if witness:
+                    break
+        return dict(status='local_finite_witness' if any(a['witness'] for a in attempts) else 'no_witness_on_this_ray',
+                    frames=frames, attempts=attempts, global_feasibility='unknown',
+                    scope='original observation/upper-leg constraints; feet/objective not certified by this probe')
+    finally:
+        with torch.no_grad():
+            for p, a in zip(params, old):
+                p.copy_(a)
+
+
 def constrained_adam_step(optimizer, params, evaluate, original_loss, constraints,
-                          scales, trust_radius=.2, trials=8):
+                          scales, trust_radius=.2, trials=8, correction_steps=0):
     """Project in normalized coordinates, then check the full coupled objective.
 
     Rejected/exceptional transactions restore both parameters and Adam state.
@@ -67,6 +127,8 @@ def constrained_adam_step(optimizer, params, evaluate, original_loss, constraint
         raise ValueError("only frame-local parameter blocks are supported")
     if any(not np.isfinite(s) or s <= 0 for s in scales):
         raise ValueError("positive finite parameter scales required")
+    if not isinstance(correction_steps, int) or correction_steps < 0:
+        raise ValueError("nonnegative integer correction steps required")
     old = [p.detach().clone() for p in params]
     moments = copy.deepcopy(optimizer.state_dict())
     committed, attempts = False, []
@@ -120,10 +182,51 @@ def constrained_adam_step(optimizer, params, evaluate, original_loss, constraint
                 for p,a,d in zip(params,old,deltas):
                     p.copy_(a+alpha*d)
                 loss, ok, diagnostic = evaluate()
+                corrections = []
+                # Re-linearize at the rejected trial, rather than repeatedly
+                # shrinking a tangent ray outside a curved feasible boundary.
+                for correction in range(correction_steps):
+                    if ok:
+                        break
+                    with torch.enable_grad():
+                        candidate_c = constraints()
+                        values = candidate_c.detach().cpu().double().numpy()
+                        if not np.isfinite(values).all() or values.max() <= 0:
+                            break  # Other exact guards cannot be repaired here.
+                        candidate_jac = frame_local_jacobian(candidate_c, params, scales)
+                    updates = []
+                    certified = True
+                    cursor = 0
+                    correction_u = np.zeros_like(direction)
+                    for frame in range(n):
+                        # 0.1um inward margin is a numerical recovery target,
+                        # never an enlargement of the original 1um guard.
+                        correction_u[frame], info = project_halfspaces(
+                            np.zeros(direction.shape[1]), candidate_jac[frame], -values[frame]-1e-7)
+                        certified = certified and info['passed']
+                    if not certified:
+                        corrections.append(dict(iteration=correction, status='linear_recovery_not_certified'))
+                        break
+                    for p, s, w in zip(params, scales, widths):
+                        updates.append(torch.as_tensor(correction_u[:, cursor:cursor+w], device=p.device,
+                                                       dtype=p.dtype).reshape_as(p)*s)
+                        cursor += w
+                    candidate_u = torch.cat([((p+d-a)/s).reshape(n, -1)
+                                             for p,d,a,s in zip(params,updates,old,scales)],dim=1)
+                    if bool((torch.linalg.vector_norm(candidate_u,dim=1) > trust_radius+1e-8).any()):
+                        corrections.append(dict(iteration=correction, status='recovery_exceeds_radius'))
+                        break
+                    for p,d in zip(params,updates):
+                        p.add_(d)
+                    loss, ok, diagnostic = evaluate()
+                    corrections.append(dict(iteration=correction, status='evaluated',
+                        previous_max_constraint_m=float(values.max()), exact_guard_passed=bool(ok),
+                        loss=float(loss), correction_norm=float(np.linalg.norm(correction_u))))
                 changed = any(not torch.equal(p,a) for p,a in zip(params,old))
                 accepted = bool(changed and ok and torch.isfinite(loss) and float(loss) <= float(original_loss)+1e-6)
                 actual_norm = sum(float(((p-a)/s).square().sum()) for p,a,s in zip(params,old,scales))**.5
                 attempts.append(dict(alpha=alpha,loss=float(loss),accepted=accepted,
+                                     corrections=corrections,
                                      actual_update_norm=actual_norm,
                                      normalized_direction_norm_after_backtrack=float(np.linalg.norm(direction))*alpha, **diagnostic))
                 if accepted:

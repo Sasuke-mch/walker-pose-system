@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import torch
-from pose_app.constrained_grasp import project_halfspaces, frame_local_jacobian, constrained_adam_step
+from pose_app.constrained_grasp import project_halfspaces, frame_local_jacobian, constrained_adam_step, probe_local_goal_descent
 
 
 def test_projection_moves_along_wall_and_satisfies_intersection():
@@ -79,3 +79,92 @@ def test_normalized_radius_limits_translation_in_meters():
     result = constrained_adam_step(opt,[p],lambda:(((p-1)**2).sum(),True,{}),loss.detach(),
                                   lambda:p[:,:1]*0-1,[.05],trust_radius=.2)
     assert result['accepted'] and torch.linalg.vector_norm(p)<=.010001
+
+
+@pytest.mark.parametrize('corrections,accepted',[(0,False),(4,True)])
+def test_curved_boundary_recovery_finds_exact_feasible_descent(corrections,accepted):
+    p = torch.nn.Parameter(torch.tensor([[1.,0.]],dtype=torch.float64))
+    opt = torch.optim.Adam([p],lr=.1)
+    loss = (p[:,1]-1).square().sum(); loss.backward()
+    constraint = lambda:p.square().sum(dim=1,keepdim=True)-1
+    result = constrained_adam_step(opt,[p],lambda:((p[:,1]-1).square().sum(),bool(constraint().max()<=0),{}),
+                                  loss.detach(),constraint,[1.],correction_steps=corrections)
+    assert result['accepted'] is accepted
+    if accepted:
+        assert p[0,1]>.09 and constraint().max()<=0 and (p[:,1]-1).square().sum()<loss
+        assert torch.linalg.vector_norm(p-torch.tensor([[1.,0.]]))<=.2
+    else:
+        assert torch.equal(p,torch.tensor([[1.,0.]],dtype=torch.float64)) and not opt.state
+
+
+def test_recovery_cannot_bypass_other_exact_guard():
+    p = torch.nn.Parameter(torch.tensor([[1.,0.]],dtype=torch.float64))
+    opt = torch.optim.Adam([p],lr=.1)
+    loss = (p[:,1]-1).square().sum(); loss.backward()
+    result = constrained_adam_step(opt,[p],lambda:((p[:,1]-1).square().sum(),False,{}),loss.detach(),
+                                  lambda:p.square().sum(1,keepdim=True)-1,[1.],correction_steps=4)
+    assert not result['accepted'] and not opt.state and p[0,0]==1 and p[0,1]==0
+
+
+def test_probe_is_read_only_and_reports_local_witness():
+    p = torch.nn.Parameter(torch.zeros(2,2,dtype=torch.float64))
+    old=p.detach().clone()
+    p.grad=torch.ones_like(p)
+    report=probe_local_goal_descent([p],[1.],lambda:p[:,0:1]-1,lambda:(p-1).square())
+    assert report['status']=='local_finite_witness' and report['global_feasibility']=='unknown'
+    assert torch.equal(p,old) and torch.equal(p.grad,torch.ones_like(p))
+    assert all(all(v<0 for v in f['linear_wrist_squared_distance_derivatives']) for f in report['frames'])
+
+
+def test_probe_tangent_failure_does_not_claim_global_infeasibility():
+    p = torch.nn.Parameter(torch.tensor([[1.,0.]],dtype=torch.float64))
+    report=probe_local_goal_descent([p],[1.],lambda:p.square().sum(1,keepdim=True)-1,
+                                  lambda:(p[:,1:2]-1).square())
+    assert report['status']=='no_witness_on_this_ray' and report['global_feasibility']=='unknown'
+    assert p[0,0]==1 and p[0,1]==0
+
+
+def test_probe_exception_restores_parameters():
+    p = torch.nn.Parameter(torch.zeros(1,1,dtype=torch.float64))
+    def goals():
+        if p[0,0]>0:
+            raise RuntimeError('probe')
+        return (p-1).square()
+    with pytest.raises(RuntimeError,match='probe'):
+        probe_local_goal_descent([p],[1.],lambda:p-1,goals)
+    assert p[0,0]==0
+
+
+def test_recovery_exception_restores_existing_adam_moments():
+    p = torch.nn.Parameter(torch.tensor([[1.,0.]],dtype=torch.float64))
+    opt = torch.optim.Adam([p],lr=.1)
+    (p[:,1]-1).square().sum().backward(); opt.step(); opt.zero_grad()
+    with torch.no_grad():
+        p.copy_(torch.tensor([[1.,0.]],dtype=torch.float64))
+    old = p.detach().clone(); moments = {k:v.clone() for k,v in opt.state[p].items()}
+    loss = (p[:,1]-1).square().sum(); loss.backward()
+    calls=0
+    def evaluate():
+        nonlocal calls
+        calls+=1
+        if calls>1:
+            raise RuntimeError('after recovery')
+        return (p[:,1]-1).square().sum(),False,{}
+    with pytest.raises(RuntimeError,match='after recovery'):
+        constrained_adam_step(opt,[p],evaluate,loss.detach(),lambda:p.square().sum(1,keepdim=True)-1,
+                              [1.],correction_steps=4)
+    assert torch.equal(p,old) and all(torch.equal(opt.state[p][k],v) for k,v in moments.items())
+
+
+def test_recovery_radius_includes_correction_not_only_tangent_proposal():
+    p = torch.nn.Parameter(torch.zeros(1,1,dtype=torch.float64))
+    old = p.detach().clone()
+    opt = torch.optim.Adam([p],lr=.1)
+    loss = (p-1).square().sum(); loss.backward()
+    # At y=.1 this nonconvex constraint has a negative derivative, so local
+    # recovery points farther out, beyond the original normalized radius.
+    constraint = lambda:torch.sin(20*p).square()
+    result = constrained_adam_step(opt,[p],lambda:((p-1).square().sum(),bool(constraint().max()<=0),{}),
+                                  loss.detach(),constraint,[1.],correction_steps=4,trust_radius=.1)
+    assert result['attempts'][0]['corrections'][-1]['status']=='recovery_exceeds_radius'
+    assert torch.linalg.vector_norm(p-old)<=.1

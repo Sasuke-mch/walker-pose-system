@@ -32,3 +32,13 @@
 独立audit_constrained_grasp_comparison.py验证冻结输入/配置、初始指标与预算数组相同，保存帧身份/网格有限与活动VPoser成立。CPU重解码误差max5.365e-7；engineering_contracts_passed=true不代表拟合通过。第一窗未记录新增半径计数字段，独立审计写null，第二窗记录0；最终区分实际参数增量和理论方向范数，仅完善诊断不改优化数值。一次分析准备命令因布尔值/字典混用报TypeError，修正后完成，未冒充正式实验失败或通过。
 
 详细数值、方法解释、局限、文献和复现命令见主说明及实验报告备份。产物使用原输入/代码/参数/路径追溯，模型输出不能证明真实精度、承重或物理接触。
+
+## 2026-10-02继续A/B：非线性恢复三路线对照
+
+新协议与正式输出在相邻`G20261002_constrained_grasp_recovery_v3`；v2只保存初始诊断旧图版本冲突的启动失败，不能当作拟合。正式v3固定270..295、60..100，同源原始source/reference与既有scene/脚候选，control/projected/corrected三路线四阶段各50步。corrected对projected仅增加最多4次候选点雅可比可行恢复，原Adam、损失、预算、半径、脚锚、共享PCA与碰撞配置不变；三路线共同启用只读腕方向探针。原五门外预注册双腕P95较Adam至少改善10%、身体总体/各组与双脚/腿项不恶化、每个身体阶段至少三个10步块有有效腕进展。
+
+代码：pose_app/constrained_grasp.py、tools/refine_body_with_constructed_grasp.py、benchmark_constrained_grasp.py、audit_constrained_grasp_comparison.py。命令：CUDA Python执行benchmark，--reference-metadata原balanced_body_full448_v1/fit/run_metadata.json，--output-root为v3，--steps 50 --include-corrected。具体六次拟合与网格审计命令在窗口JSON，完整数据范围、输入、参数和停止条件见v3/protocol.json；比较与独立审计见comparison.json、independent_audit.json。详细方法、全部三路线数值及失败分析已更新原docs/FIXED_GRASP_CONSTRAINED_UPDATE_20261002.md，并同步实验报告原备份。
+
+270窗恢复腕P9571.451/78.421mm、接受97/150，脚-101.786/-88.915mm、腿项27.113；60窗127.041/86.257mm、接受59/150，脚-68.440/-77.763mm、腿项14.754。对Adam左腕显著改善，但右腕仅改善8.2%/4.9%；多个身体组RMS退化，两窗腿项恶化，60窗脚底更差。两窗上肢阶段5/5进展块；270联合1/5、精修3/5，60联合1/5、精修0/5，持续门失败。最大观察退化10.000971/10.000991mm沿用原数值容差，手几何0/52、0/82。全部六路线仍只有观察门通过，accepted_for_main_fit=false，未扩448、未进入C-F。
+
+A在两个Adam精修结束状态都找到真实有限、观测保护可行的两腕距离下降步；不认证脚底/完整目标或全局可达。恢复接受步92/97与56/59确实使用非线性修正；270另33次初始线性QP未认证，270/60另20/91次末次候选保护可行却未接受。pair68探针出现solver_success但残差超认证阈值，保留失败且不采用方向。独立审计数值合同通过，冻结输入/初始/预算一致，CPU decode max5.365e-7，接受步原保护失败计数0。56项相关测试、四模块/工具源码编译及任务diff检查通过；无可用配置linter，不声称通过。初始旧图冲突和一个半径测试假设错误已修正，准备失败目录保留。
