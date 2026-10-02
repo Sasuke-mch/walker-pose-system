@@ -3058,3 +3058,14 @@ G20261002_wrist_bound_scale_v1提前冻结两窗270..295、60..100与corrected1m
 - 生成入口为 `tools/build_project_word_explanations.py`，不运行模型；基于当前权威文档、固定路线、源码与 G20261002_wrist_bound_scale_v1 协议/结果生成两份文档，不新建 Markdown 报告。
 - 两份 DOCX 通过 OOXML 结构校验；Word COM 实际导出 PDF，检查逐页缩略图与关键表格、末页和伪代码，修正标题换行、缩进、孤立表头/表注。详细讲解与实验报告目录备份逐字节一致。PDF/PNG 排版检查产物保留在 `资料/实验报告/report_assets/word_logic_20261002/`，不作为新的实验数据。
 - 本次没有改变拟合器、重跑模型或提升候选状态。corrected 仍是继续开发候选；5 mm 两窗相对门失败，默认保留 1 mm，完整腕/脚/腿/手门仍失败。历史 60 项测试与本次文档结构检查明确区分。
+
+
+## 2026-10-02：Sapiens2与当前身体448链同输入完整观测对照
+
+新增compare_sapiens2_mainline工具，沿用当前people_1全448对PNG及原C3全部框/分数，896项float32输入精确核对；调用原Sapiens2-0.4B runner（1024×768、FP32、flip-test），完成896张二维推理。308→17引用既有映射，逆旋转/边界/triangulate_matches/StereoOutputWriter均沿用当前实现，0.25/0.05/10px/max_matches=1不变；两链用现有replay_current_run重新计算Stage/地面和原raw_triangulate身体软权重观测，不复制PMPose场景给候选。输出G20261002_sapiens2_body_mainline448_v2。
+
+PMPose448对严格valid/reason/xyz复现，当前身体scene五数组精确相等，body接收掩码7534点一致，序列化raw点最大差0.000242mm。严格总接收5286→5049/7616；左/右腕278/430→40/6，左/右膝356/84→69/214，左/右踝317/429→437/445。共同左踝317帧重投影中位5.069→1.542px。身体软接收7534→7605但重投影中位6.457→6.726px，不能写成拟合改善；Stage和地面路径有变化，不认证真实地面。保留PMPose主线，Sapiens不能整体替换，没有新SMPL固定抓握拟合或物理验证。
+
+360实时链因未保存完整原YOLO提示、原生运行不能精确复现而在输入门停止；Docker socket修复命令被自动审批拒绝且未执行，支持的restart失败。改用已有完整提示的当前身体448链，不混合两采集/标定。失败360/448_v1目录和标定副本路径加载失败日志保留；float32输入比较及相对路径解析修正后新实验完整完成。原生COCO17与旧31窗容器差最大0.470px，全部308低分非COCO点仍有大差；保留诊断，不声称逐位等价。原生pose中位约1000ms/视图，不是两模型公平实时性能基准。
+
+详细协议、结果、失败与后续门追加已有G20260923_people1_sapiens2_bone_ratio_control_v1/EXPERIMENT.md和VALIDATION_PROTOCOL.md；新目录含protocol、metrics、point_quality、body_observation_comparison、baseline_reproduction_audit、execution_record及两模型全帧输出。22项相关测试和12个subtest通过，源码编译与任务diff检查通过。仅本任务工具、测试和AI_PROGRESS独立本地提交；其他既有改动保留，不推送。
