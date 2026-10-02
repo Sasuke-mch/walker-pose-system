@@ -1,5 +1,7 @@
 # 固定手部全身拟合：约束感知更新实现与短窗实验
 
+从基础概念阅读 corrected 当前实现及下一阶段设计，见 [corrected 详细实现说明](/D:/my_works/walker_pose_system/docs/FIXED_GRASP_CORRECTED_IMPLEMENTATION_GUIDE_20261002.md)。该说明区分已实现的非线性恢复与尚未执行的目标兼容性、腕软界尺度实验；本文件保留历史实验和复审记录。
+
 日期：2026-10-02。仓库：`D:\my_works\walker_pose_system`。
 
 ## 1. 本轮目标与交付范围
