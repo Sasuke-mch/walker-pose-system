@@ -1,4 +1,4 @@
-"""Cold full448 Sapiens fit: reuse solver/settings, never PMPose fitted arrays."""
+"""Cold full448 detector fit: reuse solver/settings, never fitted arrays."""
 import argparse
 import json
 from pathlib import Path
@@ -24,6 +24,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--run', type=Path, required=True)
     ap.add_argument('--output', type=Path, required=True)
+    ap.add_argument('--detector', choices=('sapiens2', 'pmpose'), default='sapiens2')
     ap.add_argument('--joint-steps', type=int, default=30,
                     help='body/shape joint budget; default matches original cold settings')
     a = ap.parse_args()
@@ -32,10 +33,13 @@ def main():
     run, output = a.run.resolve(), a.output.resolve()
     if output.exists():
         raise FileExistsError(output)
-    scene = run / 'sapiens2/scene'
+    scene = run / a.detector / 'scene'
     sources = read(scene/'scene_sources.json')
+    body_paths = {side: Path(sources[f'raw_{side}_pmpose']).resolve() for side in ('left','right')}
     for side in ('left', 'right'):
-        if Path(sources[f'raw_{side}_pmpose']).resolve() != run/f'{side}_sapiens_coco17_model_input.json':
+        expected = (run/f'{side}_sapiens_coco17_model_input.json' if a.detector == 'sapiens2' else
+                    ROOT/f'research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/{side}/pmpose/raw_predictions.json')
+        if body_paths[side] != expected.resolve():
             raise ValueError('scene/body input mismatch')
     if any(sources[k] for k in ('old_stage_jsonl_read', 'old_dynamic_ground_read', 'old_walker_pose_read')):
         raise ValueError('scene contains old dynamic inputs')
@@ -44,8 +48,8 @@ def main():
     spec = spec_from_file_location('cold_raw', ROOT/'research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py')
     raw = module_from_spec(spec); spec.loader.exec_module(raw)
     for side in ('left', 'right'):
-        if sorted(raw.raw_side(run/f'{side}_sapiens_coco17_model_input.json', side)) != list(range(448)):
-            raise ValueError('expected complete Sapiens full448 input')
+        if sorted(raw.raw_side(body_paths[side], side)) != list(range(448)):
+            raise ValueError('expected complete detector full448 input')
     wrist_path = ROOT/'research_records/engineering_validation/G20261001_annotated_shared_grip_v1/wrist10_audit_v2_corrected/wrist_targets.json'
     cal_dir = ROOT/'realtime_app/calibration/results'
     wrist, wrist_audit = load_reference(wrist_path, cal_dir, True)
@@ -58,8 +62,8 @@ def main():
     # Settings only. This JSON is a command list, not a fitted result.
     settings = ROOT/'research_records/engineering_validation/G20261001_fixed_mano_pca448_v1/fit_shared_args.json'
     command = [sys.executable, '-u', *read(settings)]
-    for flag, value in {'--left-raw':run/'left_sapiens_coco17_model_input.json',
-                        '--right-raw':run/'right_sapiens_coco17_model_input.json',
+    for flag, value in {'--left-raw':body_paths['left'],
+                        '--right-raw':body_paths['right'],
                         '--output-dir':output/'fit'}.items():
         command[command.index(flag)+1] = str(value)
     command += ['--wrist-reference', str(wrist_path), '--wrist-reference-weight', '1',
@@ -67,10 +71,10 @@ def main():
     command[command.index('--joint-steps')+1] = str(a.joint_steps)
     output.mkdir(parents=True)
     write(output/'protocol.json', dict(frames=448, settings_source=str(settings), command=command,
-        body_source='Sapiens2 only, existing full448 detections', wrist_reference=wrist_audit,
-        initialization=dict(beta='zeros; optimized B/C', root='current Sapiens shoulder/hip basis',
-            translation='current Sapiens hips minus rotated template hips', body='zero VPoser latent, optimized A/C',
-            hands='native WiLoR local rotations re-associated to Sapiens and re-encoded; optimized shared PCA D1/D2'),
+        body_source=f'{a.detector} only, existing full448 detections', wrist_reference=wrist_audit,
+        initialization=dict(beta='zeros; optimized B/C', root='current detector shoulder/hip basis',
+            translation='current detector hips minus rotated template hips', body='zero VPoser latent, optimized A/C',
+            hands='native WiLoR local rotations re-associated to current detector and re-encoded; optimized shared PCA D1/D2'),
         old_fitted_parameters_consumed=False, old_foot_labels_consumed=False,
         constructed_grasp_consumed=False, wrist_weight=1., wrist_loss='mean squared Euclidean metres',
         stages=f'30 A + 30 B + {a.joint_steps} C + 100 D1 + 100 D2; D3 off as in settings source',
@@ -103,9 +107,9 @@ def main():
         s = np.load(scene/'scene_transforms.npz', allow_pickle=False)
         z['vertices_ground_m'] = np.einsum('nij,nvj->nvi',s['rotation_ground_from_left'],z['vertices']) + s['translation_ground_from_left_mm'][:,None]/1000
         np.savez_compressed(fit/'result.npz', **z)
-        write(fit/'run_metadata.json', dict(cold_start=True, allow_diagnostic_wrist_reference=True,
-            inputs=dict(left_raw=str(run/'left_sapiens_coco17_model_input.json'),
-                        right_raw=str(run/'right_sapiens_coco17_model_input.json'),
+        write(fit/'run_metadata.json', dict(cold_start=True, detector=a.detector, allow_diagnostic_wrist_reference=True,
+            inputs=dict(left_raw=str(body_paths['left']),
+                        right_raw=str(body_paths['right']),
                         wrist_reference=str(wrist_path), calibration_dir=str(cal_dir)),
             old_fitted_parameters_consumed=False, accepted_for_main_fit=False))
         execute('hand_geometry_audit', [sys.executable, str(ROOT/'realtime_app/tools/audit_constructed_grasp_body.py'),

@@ -175,9 +175,10 @@ def main():
     page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x.toFixed(1)).join(' / ')+' mm';")
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
     if metadata.get('cold_start'):
-        page = page.replace('SMPL-H 固定手部约束拟合', 'Sapiens2 · SMPL-H 从零拟合')
+        detector_label = 'PMPose' if metadata.get('detector') == 'pmpose' else 'Sapiens2'
+        page = page.replace('SMPL-H 固定手部约束拟合', detector_label + ' · SMPL-H 从零拟合')
         page = page.replace('腕偏差 左/右', '人工腕参考偏差')
-        page = page.replace('<section><h2>操作</h2>', '<section><h2>本次拟合</h2><p>beta 从零重估；Sapiens2 身体；WiLoR 局部手姿重新求解。人工腕参考未通过原几何门，仅作软约束。未启用手脚接触优化；几何失败完整保留。</p></section><section><h2>操作</h2>')
+        page = page.replace('<section><h2>操作</h2>', '<section><h2>本次拟合</h2><p>beta 从零重估；' + detector_label + ' 身体；WiLoR 局部手姿重新求解。人工腕参考未通过原几何门，仅作软约束。未启用手脚接触优化；几何失败完整保留。</p></section><section><h2>操作</h2>')
         page = page.replace('project([-6,-6,0]),project([6,-6,0]),project([6,6,0]),project([-6,6,0])',
                             'project([-2.5,-2.5,0]),project([2.5,-2.5,0]),project([2.5,2.5,0]),project([-2.5,2.5,0])')
         page = page.replace("for(let k=-6;k<=6;k++){seg([k,-6,0],[k,6,0],'#b9c8c0',1);seg([-6,k,0],[6,k,0],'#b9c8c0',1)}",
