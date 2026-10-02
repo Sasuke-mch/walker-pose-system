@@ -36,6 +36,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 
 import argparse
@@ -1480,7 +1481,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def summary_source_matrix_path() -> str:
     """Absolute path of the read-only task-03 matrix, resolved from the repo root."""
-    repo_root = Path(__file__).resolve().parents[3]  # realtime_app/tools/<file> -> repository root
+    repo_root = _tool_project_root  # realtime_app/tools/<file> -> repository root
     return str(repo_root / SOURCE_MATRIX_PATH)
 
 

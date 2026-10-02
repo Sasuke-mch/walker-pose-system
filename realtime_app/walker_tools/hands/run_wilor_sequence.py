@@ -14,6 +14,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 
 import argparse
@@ -214,7 +215,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.output.exists():
         raise RuntimeError(f"refuse to overwrite existing WiLoR output: {args.output}")
-    root = Path(__file__).resolve().parents[3]
+    root = _tool_project_root
     repo = root / "third_party" / "WiLoR"
     checkpoint = repo / "pretrained_models" / "wilor_final.ckpt"
     if args.device == "cuda":

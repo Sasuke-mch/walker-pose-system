@@ -5,6 +5,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 import argparse
 import json
@@ -108,7 +109,7 @@ def main():
             sustained_progress_gate='each of 3 body stages has wrist squared-distance reduction >1e-6 m2 in at least 3 distinct 10-step blocks; observational gate required')
     write(args.output_root/'protocol.json',protocol)
     reports = {}
-    tool = (Path(__file__).resolve().parents[2] / "tools" / 'refine_body_with_constructed_grasp.py')
+    tool = (_tool_app_root / "tools" / 'refine_body_with_constructed_grasp.py')
     for start,stop in protocol['windows']:
         key = f'window{start}_{stop-1}'
         root = args.output_root/key

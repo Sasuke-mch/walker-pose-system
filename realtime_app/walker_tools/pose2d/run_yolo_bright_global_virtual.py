@@ -12,6 +12,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 
 import argparse
@@ -28,9 +29,8 @@ import cv2
 import numpy as np
 
 
-APP_ROOT = Path(__file__).resolve().parents[2]
+APP_ROOT = _tool_app_root
 PROJECT_ROOT = APP_ROOT.parent
-sys.path.insert(0, str(APP_ROOT))
 
 from pose_app.calibration import StereoCalibration  # noqa: E402
 from pose_app.model_undistort import FisheyeModelInput  # noqa: E402
@@ -185,8 +185,8 @@ def main() -> int:
     if run_dir.exists():
         raise FileExistsError(f"Refusing to overwrite existing output: {run_dir}")
     weights = PROJECT_ROOT / "models" / "yolo26" / "yolo26x-pose.pt"
-    runner = (Path(__file__).resolve().parents[2] / "tools" / "run_yolo_pose_isolated.py")
-    evaluator = (Path(__file__).resolve().parents[2] / "tools" / "evaluate_offline_stereo_predictions.py")
+    runner = (_tool_app_root / "tools" / "run_yolo_pose_isolated.py")
+    evaluator = (_tool_app_root / "tools" / "evaluate_offline_stereo_predictions.py")
     calibration_path = APP_ROOT / "calibration" / "results" / "stereo_fisheye.json"
     dataset = json.loads((selection / "dataset_summary.json").read_text(encoding="utf-8"))
     with (selection / "selection_manifest.csv").open("r", encoding="utf-8", newline="") as handle:

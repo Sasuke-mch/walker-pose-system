@@ -5,6 +5,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 import argparse
 import json
@@ -42,12 +43,12 @@ def main():
     reports = {}
     for name,flags in [('control',[]),('balanced',['--balanced-stages','--stage2-static-assumption'])]:
         out = args.output_root/name
-        command = [sys.executable,str((Path(__file__).resolve().parents[2] / "tools" / 'refine_body_with_constructed_grasp.py')),*common,*flags,'--output-dir',str(out)]
+        command = [sys.executable,str((_tool_app_root / "tools" / 'refine_body_with_constructed_grasp.py')),*common,*flags,'--output-dir',str(out)]
         (args.output_root/(name+'_command.json')).write_text(json.dumps(command,ensure_ascii=False,indent=2),encoding='utf-8')
         with (args.output_root/(name+'.log')).open('w',encoding='utf-8') as log:
             subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,check=True)
         with (args.output_root/(name+'_audit.log')).open('w',encoding='utf-8') as log:
-            subprocess.run([sys.executable,str((Path(__file__).resolve().parents[2] / "tools" / 'audit_constructed_grasp_body.py')),
+            subprocess.run([sys.executable,str((_tool_app_root / "tools" / 'audit_constructed_grasp_body.py')),
                 '--result',str(out/'result.npz'),'--walker-model',metadata['inputs']['walker_model'],
                 '--output',str(out/'hand_geometry_audit.json')],stdout=log,stderr=subprocess.STDOUT,check=True)
         summary = json.loads((out/'fit_summary.json').read_text(encoding='utf-8'))

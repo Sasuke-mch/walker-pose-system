@@ -11,6 +11,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 
 import argparse
@@ -21,8 +22,7 @@ from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "realtime_app"))
+ROOT = _tool_project_root
 from pose_app.smpl_coco_observation import _install_legacy_smpl_pickle_compatibility
 from walker_tools.hands.audit_fixed_mano_grip import capsule
 from pose_app.constructed_grasp_refinement import screened_triangle_pairs

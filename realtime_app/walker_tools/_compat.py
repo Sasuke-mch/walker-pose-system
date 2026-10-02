@@ -7,7 +7,7 @@ import runpy
 import sys
 from typing import Any
 
-from pose_app.project_paths import APP_ROOT
+from pose_app.project_paths import APP_ROOT, PROJECT_ROOT
 
 LEGACY_TOOLS = APP_ROOT / "tools"
 

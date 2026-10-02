@@ -24,6 +24,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import LEGACY_TOOLS as _tool_legacy_tools
 _tool_prepare_imports()
 
 import argparse
@@ -41,7 +42,6 @@ from matplotlib.lines import Line2D  # noqa: E402
 
 # Allow importing the sibling visualization module whose 2-D drawing logic we
 # reuse verbatim.
-sys.path.insert(0, str((Path(__file__).resolve().parents[2] / "tools")))
 import walker_tools.visualization.render_people1_2d_3d_video as rv  # noqa: E402
 
 # COCO-17 adjacency (same as the sibling module).

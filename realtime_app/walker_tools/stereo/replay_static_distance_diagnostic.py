@@ -11,6 +11,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 
 import argparse
@@ -27,13 +28,13 @@ import cv2
 import numpy as np
 
 
-APP_ROOT = Path(__file__).resolve().parents[2]
+APP_ROOT = _tool_app_root
 PROJECT_ROOT = APP_ROOT.parent
 CAPTURE_ROOT = PROJECT_ROOT / "research_records" / "raw_captures" / "R20260826-01_far_to_near_domain_capture"
 CALIBRATION = APP_ROOT / "calibration" / "results" / "stereo_fisheye.json"
 WEIGHTS = PROJECT_ROOT / "models" / "yolo26" / "yolo26x-pose.pt"
-ISOLATED_RUNNER = (Path(__file__).resolve().parents[2] / "tools" / "run_yolo_pose_isolated.py")
-EVALUATOR = (Path(__file__).resolve().parents[2] / "tools" / "evaluate_offline_stereo_predictions.py")
+ISOLATED_RUNNER = (_tool_app_root / "tools" / "run_yolo_pose_isolated.py")
+EVALUATOR = (_tool_app_root / "tools" / "evaluate_offline_stereo_predictions.py")
 SEQUENCES = {
     "far_static": CAPTURE_ROOT / "far_static" / "20260826_195305_083",
     "mid_static": CAPTURE_ROOT / "mid_static" / "20260826_195344_142",

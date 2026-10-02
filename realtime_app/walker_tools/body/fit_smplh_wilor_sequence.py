@@ -12,6 +12,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 
 import argparse
@@ -30,8 +31,7 @@ for _name, _value in {"bool": np.bool_, "int": np.int64, "float": np.float64,
     if not hasattr(np, _name):
         setattr(np, _name, _value)
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(ROOT / "realtime_app"))
+ROOT = _tool_project_root
 from pose_app.fisheye_camera import fisheye_project_torch, load_stereo_fisheye
 from pose_app.smpl_coco_observation import load_coco17_regressor, regress_coco17_torch
 from pose_app.smplx_fitting import load_vposer_explicit

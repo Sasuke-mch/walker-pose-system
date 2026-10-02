@@ -11,6 +11,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 
 import argparse
@@ -19,8 +20,7 @@ from pathlib import Path
 import sys
 
 
-APP_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(APP_ROOT))
+APP_ROOT = _tool_app_root
 
 from pose_app.rotation import model_image_size, model_to_raw_point, raw_to_model_point
 

@@ -12,6 +12,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 
 import argparse
@@ -25,9 +26,8 @@ import cv2
 import numpy as np
 
 
-APP_ROOT = Path(__file__).resolve().parents[2]
+APP_ROOT = _tool_app_root
 PROJECT_ROOT = APP_ROOT.parent
-sys.path.insert(0, str(APP_ROOT))
 
 from pose_app.calibration import StereoCalibration
 from pose_app.local_perspective import LocalPerspectiveModelInput
@@ -46,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--right-rotation", default="ccw90")
     parser.add_argument("--margin", type=float, default=1.35)
     parser.add_argument("--weights", default=PROJECT_ROOT / "models" / "yolo26" / "yolo26x-pose.pt", type=Path)
-    parser.add_argument("--isolated-runner", default=(Path(__file__).resolve().parents[2] / "tools" / "run_yolo_pose_isolated.py"), type=Path)
+    parser.add_argument("--isolated-runner", default=(_tool_app_root / "tools" / "run_yolo_pose_isolated.py"), type=Path)
     parser.add_argument("--device", default="0")
     parser.add_argument("--batch-size", type=int, default=12)
     return parser.parse_args()

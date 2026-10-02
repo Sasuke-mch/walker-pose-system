@@ -8,6 +8,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import LEGACY_TOOLS as _tool_legacy_tools
 _tool_prepare_imports()
 
 import argparse
@@ -22,10 +23,8 @@ import cv2
 import numpy as np
 
 
-TOOLS_DIR = (Path(__file__).resolve().parents[2] / "tools")
+TOOLS_DIR = _tool_legacy_tools
 APP_DIR = TOOLS_DIR.parent
-sys.path.insert(0, str(TOOLS_DIR))
-sys.path.insert(0, str(APP_DIR))
 
 from walker_tools.capture.capture_stereo_charuco import detect_charuco, draw_detection, make_board, put_text, resolve_camera_selection
 from pose_app.stereo_camera import StereoCameraConfig, StereoCameraSource  # noqa: E402

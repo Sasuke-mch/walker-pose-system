@@ -11,6 +11,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 
 import argparse
@@ -24,9 +25,8 @@ import cv2
 import numpy as np
 
 
-APP_ROOT = Path(__file__).resolve().parents[2]
+APP_ROOT = _tool_app_root
 PROJECT_ROOT = APP_ROOT.parent
-sys.path.insert(0, str(APP_ROOT))
 
 from pose_app.calibration import StereoCalibration  # noqa: E402
 from pose_app.local_perspective import LocalPerspectiveModelInput, LocalPerspectiveView  # noqa: E402
@@ -72,7 +72,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--isolated-runner",
         type=Path,
-        default=(Path(__file__).resolve().parents[2] / "tools" / "run_yolo_pose_isolated.py"),
+        default=(_tool_app_root / "tools" / "run_yolo_pose_isolated.py"),
     )
     return parser.parse_args()
 

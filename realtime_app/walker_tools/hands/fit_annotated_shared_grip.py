@@ -10,6 +10,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root, PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 import argparse
 import json
@@ -20,7 +21,6 @@ import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from pose_app.smpl_coco_observation import _install_legacy_smpl_pickle_compatibility
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy, fisheye_project_torch
 from pose_app.smplh_hand_observation import hand21
@@ -170,7 +170,7 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     def tensor(x):
         return torch.as_tensor(x, dtype=torch.float32, device=device)
-    root = Path(__file__).resolve().parents[3]
+    root = _tool_project_root
     z = np.load(args.result, allow_pickle=False)
     wrist_path=args.fixed_wrists or args.bounded_wrists or args.reference_wrists
     wrist_targets=json.loads(wrist_path.read_text(encoding='utf-8')) if wrist_path else None

@@ -7,13 +7,14 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 
 import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = _tool_project_root
 BASE = ROOT / "research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1"
 SURF_RUN = BASE / "surface_contact_window60_90_v5_gradient_audit_surface_run"
 NOSURF_RUN = BASE / "surface_contact_window60_90_v5_gradient_audit_nosurface_run"

@@ -9,6 +9,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 import argparse
 import json
@@ -18,7 +19,7 @@ import sys
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = _tool_project_root
 
 
 def read(path):

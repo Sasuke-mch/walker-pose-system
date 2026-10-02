@@ -5,6 +5,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 import argparse
 import json
@@ -14,7 +15,6 @@ import cv2
 import numpy as np
 from scipy.optimize import least_squares
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from pose_app.fisheye_camera import load_stereo_fisheye,fisheye_project_numpy
 
 

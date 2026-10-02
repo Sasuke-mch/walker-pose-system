@@ -7,6 +7,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 import argparse, base64, gzip, inspect, json, pickle
 from pathlib import Path
@@ -50,7 +51,7 @@ def main():
         calibration_dir = Path(json.loads(sources_path.read_text(encoding='utf8'))['calibration'])
         if calibration_dir.suffix.lower() == '.json':
             calibration_dir = calibration_dir.parent
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    sys.path.insert(0, str(_tool_app_root))
     from pose_app.fisheye_camera import load_stereo_fisheye
     cal = load_stereo_fisheye(calibration_dir)
     c1 = -cal.R_cam0_to_cam1.T @ (cal.T_cam0_to_cam1_mm / 1000.0)

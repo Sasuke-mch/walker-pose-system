@@ -44,6 +44,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import LEGACY_TOOLS as _tool_legacy_tools
 _tool_prepare_imports()
 
 import argparse
@@ -58,12 +59,9 @@ import cv2
 import numpy as np
 
 
-TOOLS_ROOT = (Path(__file__).resolve().parents[2] / "tools")
+TOOLS_ROOT = _tool_legacy_tools
 PROJECT_ROOT = TOOLS_ROOT.parents[1]
 REALTIME_ROOT = PROJECT_ROOT / "realtime_app"
-for candidate in (str(REALTIME_ROOT), str(TOOLS_ROOT)):
-    if candidate not in sys.path:
-        sys.path.insert(0, candidate)
 
 from pose_app import walker_structure_variants as variants  # noqa: E402
 from pose_app.calibration import StereoCalibration  # noqa: E402

@@ -5,6 +5,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 import argparse
 import json
@@ -62,7 +63,7 @@ def main():
                 'failure_rule': 'retain all failures; no full448 or mainline promotion if any final gate fails'}
     args.output_root.mkdir(parents=True)
     write(args.output_root / 'protocol.json', protocol)
-    fit_tool = (Path(__file__).resolve().parents[2] / "tools" / 'refine_body_with_constructed_grasp.py')
+    fit_tool = (_tool_app_root / "tools" / 'refine_body_with_constructed_grasp.py')
     reports = {}
     for start, stop in protocol['windows']:
         key = f'window{start}_{stop-1}'

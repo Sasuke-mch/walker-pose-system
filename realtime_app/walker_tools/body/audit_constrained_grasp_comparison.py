@@ -5,6 +5,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 import argparse
 import json
@@ -15,8 +16,7 @@ import numpy as np
 import torch
 from walker_tools.body.benchmark_constrained_grasp import hand_audit_coverage
 
-ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0,str(ROOT/'realtime_app'))
+ROOT = _tool_project_root
 
 
 def recovery_counts(transactions):

@@ -11,6 +11,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 
 import argparse
@@ -26,9 +27,8 @@ import sys
 import cv2
 import numpy as np
 
-APP = Path(__file__).resolve().parents[2]
+APP = _tool_app_root
 ROOT = APP.parent
-sys.path.insert(0, str(APP))
 from pose_app.calibration import StereoCalibration
 from pose_app.geometry_input import count_out_of_raw_image_bounds
 from pose_app.rotation import rotate_image_for_model, restore_model_result_to_raw

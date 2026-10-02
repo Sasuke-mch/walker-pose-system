@@ -6,6 +6,7 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
+from walker_tools._compat import PROJECT_ROOT as _tool_project_root
 _tool_prepare_imports()
 
 import argparse
@@ -16,7 +17,7 @@ import cv2
 import numpy as np
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = _tool_project_root
 CAPTURE_ROOT = PROJECT_ROOT / "research_records" / "raw_captures" / "R20260826-01_far_to_near_domain_capture"
 SEQUENCES = {
     "far_static": CAPTURE_ROOT / "far_static" / "20260826_195305_083",
