@@ -93,12 +93,13 @@ def main():
     with (output/'paired_wrist_errors.csv').open('w',newline='',encoding='utf-8-sig') as f:
         w=csv.writer(f);w.writerow(['pair_id','sapiens_left_mm','sapiens_right_mm','pmpose_left_mm','pmpose_right_mm'])
         for i in range(448):w.writerow([i,*errors['sapiens2'][i],*errors['pmpose'][i]])
-    page='''<!doctype html><meta charset="utf-8"><title>同流程冷启动：Sapiens2 / PMPose</title>
+    page='''<!doctype html><meta charset="utf-8"><title>SMPL-H 对照</title>
 <style>body{margin:0;font:14px sans-serif;background:white;color:black}header{padding:10px}main{display:flex;height:calc(100vh - 110px)}iframe{width:50%;border:1px solid black}input{width:65%}</style>
-<header><b>同流程冷启动 · 左 Sapiens2 / 右 PMPose · 全448帧</b><p>同一腕参考、WiLoR与优化预算。两边接触门未通过；各自观测残差不是共同真值。</p><button id="play">播放</button> <input id="frame" aria-label="同步帧" type="range" min="0" max="447" value="0"> <span id="number">0 / 447</span><div id="metrics"></div></header>
+<header><b>SMPL-H 对照 · 448 帧</b><p>左：Sapiens2　右：PMPose · 腕参考未验证，接触未通过。</p><button id="play">播放</button> <input id="frame" aria-label="同步帧" type="range" min="0" max="447" value="0"> <span id="number">0 / 447</span><div id="metrics"></div></header>
 <main><iframe id="sap" title="Sapiens2" src="../smplh_cold_start_v2_joint300/body_viewer.html"></iframe><iframe id="pm" title="PMPose" src="../pmpose_cold_start_v1_joint300/body_viewer.html"></iframe></main>
 <script>let timer=null;const slider=document.getElementById('frame');function sync(){const info=[];for(const id of ['sap','pm']){const d=document.getElementById(id).contentDocument,s=d&&d.getElementById('slider');if(s){s.value=slider.value;s.dispatchEvent(new Event('input',{bubbles:true}));info.push((id==='sap'?'Sapiens2':'PMPose')+' 腕 '+d.getElementById('wrist').textContent+'；脚底 '+d.getElementById('fr').textContent);}}document.getElementById('number').textContent=slider.value+' / 447';document.getElementById('metrics').textContent=info.join(' | ');}slider.oninput=sync;for(const id of ['sap','pm'])document.getElementById(id).onload=()=>{const d=document.getElementById(id).contentDocument,style=d.createElement('style');style.textContent='.side,.bottom,.top p{display:none}.main{grid-template-columns:1fr}.top h1{font-size:13px}.top{padding:6px;gap:4px}.badge{font-size:10px}.app{grid-template-rows:auto 1fr}';d.head.append(style);sync();};document.getElementById('play').onclick=()=>{if(timer){clearInterval(timer);timer=null;document.getElementById('play').textContent='播放';}else{timer=setInterval(()=>{slider.value=(Number(slider.value)+1)%448;sync();},1000/30);document.getElementById('play').textContent='暂停';}};</script>'''
     (output/'index.html').write_text(page,encoding='utf8')
+    (output/'compare.html').write_text('<!doctype html><meta charset="utf-8"><title>SMPL-H 对照</title><meta http-equiv="refresh" content="0;url=index.html"><a href="index.html">打开对照</a>',encoding='utf8')
     print(json.dumps(metrics,ensure_ascii=False),flush=True)
 
 

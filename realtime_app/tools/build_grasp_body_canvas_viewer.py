@@ -9,6 +9,7 @@ import argparse
 import base64
 import importlib.util
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -18,6 +19,34 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "realtime_app"))
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy
 from build_surface_contact_canvas_viewer import PAGE
+
+
+def simplify_cold_viewer_text(page, label, frames):
+    """Edit labels around the embedded payload; preserve numerical data exactly."""
+    match = re.search(r'(<script id="data" type="application/json">)(.*?)(</script>)', page, re.S)
+    if match is None:
+        raise ValueError('missing viewer payload')
+    def labels(text):
+        text = re.sub(r'<title>.*?</title>', '<title>'+label+'</title>', text)
+        text = re.sub(r'<h1>.*?</h1>', '<h1>'+label+'</h1>', text)
+        text = re.sub(r'本地离线版 · 第\d+\.\.\d+帧 · .*?本次重放', f'SMPL-H · {frames} 帧', text)
+        text = re.sub(r'<section><h2>本次拟合</h2><p>.*?</p></section>',
+                      '<section><h2>状态</h2><p>腕参考未验证；接触未通过。</p></section>', text)
+        replacements = {'人工腕参考偏差':'腕偏差（左/右）','身体观测残差':'观测残差',
+            '双手几何状态':'手部检查','脚底最低高度':'脚底高度','地面变换':'地面状态',
+            '当前质量与拒绝':'质量检查','SMPL 表面':'人体','助步器实体杆件':'助步器',
+            '扶手 capsule':'扶手范围','脚底/手掌接触点':'手脚采样点',
+            '相机侧面投影轨迹':'相机轨迹','踝关节拖尾':'踝轨迹','长坐标系':'坐标轴',
+            '回投median L/R: ':'回投中位数 左/右：','严格accepted: ':'严格通过：',
+            '；拟合候选: ':'；拟合点：','拒绝原因: ':'拒绝原因：'}
+        for a,b in replacements.items(): text=text.replace(a,b)
+        text = re.sub(r'<section><h2>操作</h2><p>.*?</p></section>',
+            '<section><h2>操作</h2><p>拖动旋转，右键平移，滚轮缩放。黑线：观测骨架；蓝点：模型关节；橙叉：拒绝点；红色脚点：低于地面。</p></section>',text)
+        text=text.replace('d.stage[fi];', "({warming_up:'准备',transition:'过渡',stage1_walker_static_human_moving:'Stage 1',stage2_feet_static_walker_moving:'Stage 2'}[d.stage[fi]]||d.stage[fi]);")
+        text=text.replace('d.pose[fi];', "({held:'保持',accepted:'更新',accepted_rotation_held:'更新（旋转保持）'}[d.pose[fi]]||d.pose[fi]);")
+        text=text.replace("d.hand_state[fi].join(' / ')", "d.hand_state[fi].map(x=>x.replaceAll('扶手穿透','穿透').replaceAll('代理未通过','未通过')).join(' / ')")
+        return text
+    return labels(page[:match.start()])+match.group(0)+labels(page[match.end():])
 
 
 def encode(a):
@@ -176,13 +205,14 @@ def main():
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
     if metadata.get('cold_start'):
         detector_label = 'PMPose' if metadata.get('detector') == 'pmpose' else 'Sapiens2'
-        page = page.replace('SMPL-H 固定手部约束拟合', detector_label + ' · SMPL-H 从零拟合')
-        page = page.replace('腕偏差 左/右', '人工腕参考偏差')
-        page = page.replace('<section><h2>操作</h2>', '<section><h2>本次拟合</h2><p>beta 从零重估；' + detector_label + ' 身体；WiLoR 局部手姿重新求解。人工腕参考未通过原几何门，仅作软约束。未启用手脚接触优化；几何失败完整保留。</p></section><section><h2>操作</h2>')
+        page = page.replace('SMPL-H 固定手部约束拟合', detector_label)
+        page = page.replace('腕偏差 左/右', '腕偏差（左/右）')
+        page = page.replace('<section><h2>操作</h2>', '<section><h2>状态</h2><p>腕参考未验证；接触未通过。</p></section><section><h2>操作</h2>')
         page = page.replace('project([-6,-6,0]),project([6,-6,0]),project([6,6,0]),project([-6,6,0])',
                             'project([-2.5,-2.5,0]),project([2.5,-2.5,0]),project([2.5,2.5,0]),project([-2.5,2.5,0])')
         page = page.replace("for(let k=-6;k<=6;k++){seg([k,-6,0],[k,6,0],'#b9c8c0',1);seg([-6,k,0],[6,k,0],'#b9c8c0',1)}",
                             "for(let k=-2.5;k<=2.5;k+=.5){seg([k,-2.5,0],[k,2.5,0],'#b9c8c0',1);seg([-2.5,k,0],[2.5,k,0],'#b9c8c0',1)}")
+        page = simplify_cold_viewer_text(page, detector_label, n)
     a.output.write_text(page, encoding="utf-8")
     joint_audit = {str(j): {"finite": int(np.isfinite(tri[:, j]).all(1).sum()), "strict_accepted": int(strict[:, j].sum()), "finite_rejected": int((np.isfinite(tri[:, j]).all(1) & ~strict[:, j]).sum()), 'rejection_reasons':{str(value):int((reasons[:,j]==value).sum()) for value in set(reasons[:,j]) if value is not None}} for j in range(17)}
     (a.output.parent / "viewer_validation.json").write_text(json.dumps({"status": "file_checks_passed_browser_pending", "vertices": 6890, "faces": 13776, "index_entries": 41328, "frames": n, "joints": joint_audit, "source": str(a.result.resolve()), "scene": str(a.scene.resolve()), "stage_counts": {x: stages.count(x) for x in set(stages)}, "no_display_smoothing": True}, indent=2), encoding="utf-8")

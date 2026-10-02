@@ -3125,3 +3125,8 @@ WiLoR来源路径完全相同；当前检测器重新关联导致左相机有753
 cold_start_comparison_v1提供comparison.json、逐448帧paired_wrist_errors.csv和同步index.html。左Sapiens右PM，顶层滑条/30fps播放驱动两边同帧，禁止插值；嵌入时仅隐藏原侧栏扩大网格显示，两边原页面仍独立可用。浏览器检查0/224/447、末帧循环、暂停；真实网格完整可见，截图comparison_frame224.png。双50MB页面导致自动AX管道帧上限、iframe只读检查工具不可用，保留限制并改用截图核对。观察到一条MutationObserver无Node控制台错误，来源未定位；生成页面不调用该接口，同步/网格显示继续，未声称控制台完全无错。
 
 PMPose448帧VPoser重新解码与保存body_pose差0，0/224/447新参数网格重建最大坐标差4.172e-7m。18项已有相关测试通过，3项变更工具内存编译及diff检查通过；参数重放/命令/初始化/原生手关联/表面几何全保留。实验记录中不写版本标识。两边accepted_for_main_fit=False，旧结果不覆盖。
+
+
+## 2026-10-02：可视化文字简化
+
+按用户要求简化当前冷启动对照及两份人体页面。对照标题改为“SMPL-H 对照”，子页仅使用“Sapiens2”“PMPose”；缩短指标、图层、状态与操作说明。保留腕参考未验证、接触未通过及逐帧质量/拒绝信息。增加compare.html、sapiens2.html、pmpose.html简短入口，原链接继续可用。生成工具同步修改，不改拟合、几何或播放逻辑。两份既有HTML的内嵌数值数据修改前后逐字一致。两项工具内存编译、diff检查通过，浏览器确认标题、左右模型与状态正常显示；截图保存在cold_start_comparison_v1/简洁版.png。
