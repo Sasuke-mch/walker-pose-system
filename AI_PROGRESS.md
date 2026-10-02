@@ -3069,3 +3069,10 @@ PMPose448对严格valid/reason/xyz复现，当前身体scene五数组精确相�
 360实时链因未保存完整原YOLO提示、原生运行不能精确复现而在输入门停止；Docker socket修复命令被自动审批拒绝且未执行，支持的restart失败。改用已有完整提示的当前身体448链，不混合两采集/标定。失败360/448_v1目录和标定副本路径加载失败日志保留；float32输入比较及相对路径解析修正后新实验完整完成。原生COCO17与旧31窗容器差最大0.470px，全部308低分非COCO点仍有大差；保留诊断，不声称逐位等价。原生pose中位约1000ms/视图，不是两模型公平实时性能基准。
 
 详细协议、结果、失败与后续门追加已有G20260923_people1_sapiens2_bone_ratio_control_v1/EXPERIMENT.md和VALIDATION_PROTOCOL.md；新目录含protocol、metrics、point_quality、body_observation_comparison、baseline_reproduction_audit、execution_record及两模型全帧输出。22项相关测试和12个subtest通过，源码编译与任务diff检查通过。仅本任务工具、测试和AI_PROGRESS独立本地提交；其他既有改动保留，不推送。
+
+
+## 2026-10-02：Sapiens2 全448帧可视化交付
+
+新增build_sapiens_comparison_viewer，仅渲染G20261002_sapiens2_body_mainline448_v2实际输出，不重跑模型/拟合。生成visualization_v1/index.html（四路同帧二维对照、原生308点开关、逐关节质量表、可旋转三维原始骨架/当次地面/实体助步器/双相机）、comparison_448.mp4（448帧30FPS）、896张同源缩略图和预览。原始二维用既有raw_to_model_point回到转正图像；三维用各模型同次scene变换，[X,-Y,Z]仅显示映射；没有SMPL结果，不拼接旧网格。黑色实线连接有限正深度原始点，严格accepted实心绿点，rejected橙叉，非有限不补点；不插值或显示平滑。
+
+浏览器核验0/60/270/447帧、308开关、模型切换、播放推进和视角按钮；截图browser_frame0060.png和manifest保留。修正帧号输入事件及加载新帧时清空旧图，避免质量栏新帧/图像旧帧的临时错位。视频读取首尾和中间帧、448帧数/30FPS、896图、逐关节接收数与原metrics一致及源码语法检查通过。仅工具与本节记录独立本地提交，原有改动保留，不推送。
