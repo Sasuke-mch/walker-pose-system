@@ -122,9 +122,15 @@ def main():
         "acc": strict.ravel().tolist(), "fit_acc": candidate.tolist(), "stage": stages, "pose": poses, "e3": e3,
         "hm": [None] * n, "fm": [float(np.min(vg[i, soles, 2])) for i in range(n)],
         "hand_state": hand_state, "reprojection": projection, "quality": quality.tolist(), "reject_reasons": reasons.tolist()}
-    grasp = json.loads(Path(metadata['inputs']['grasp']).read_text(encoding='utf8'))
-    wrist_target = np.asarray([grasp['hands'][side]['wrist_walker_m'] for side in ('left','right')])
-    data['wrist_mm'] = (np.linalg.norm(r['wrist_walker_m']-wrist_target,axis=-1)*1000).tolist()
+    if metadata['inputs'].get('wrist_reference'):
+        from pose_app.independent_wrist_reference import load_reference
+        wrist_target, _ = load_reference(metadata['inputs']['wrist_reference'],
+            metadata['inputs']['calibration_dir'], metadata['allow_diagnostic_wrist_reference'])
+        data['wrist_mm'] = (np.linalg.norm(r['smplh_joints'][:, [20, 21]]-wrist_target,axis=-1)*1000).tolist()
+    else:
+        grasp = json.loads(Path(metadata['inputs']['grasp']).read_text(encoding='utf8'))
+        wrist_target = np.asarray([grasp['hands'][side]['wrist_walker_m'] for side in ('left','right')])
+        data['wrist_mm'] = (np.linalg.norm(r['wrist_walker_m']-wrist_target,axis=-1)*1000).tolist()
     page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":")))
     page = page.replace('<title>SMPL surface contact Canvas viewer</title>', '<title>SMPL-H 固定手部约束拟合</title>')
     page = page.replace('.metrics div{display:flex;', '.metrics div{display:flex;gap:8px;')
@@ -168,6 +174,14 @@ def main():
     page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
     page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x.toFixed(1)).join(' / ')+' mm';")
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
+    if metadata.get('cold_start'):
+        page = page.replace('SMPL-H 固定手部约束拟合', 'Sapiens2 · SMPL-H 从零拟合')
+        page = page.replace('腕偏差 左/右', '人工腕参考偏差')
+        page = page.replace('<section><h2>操作</h2>', '<section><h2>本次拟合</h2><p>beta 从零重估；Sapiens2 身体；WiLoR 局部手姿重新求解。人工腕参考未通过原几何门，仅作软约束。未启用手脚接触优化；几何失败完整保留。</p></section><section><h2>操作</h2>')
+        page = page.replace('project([-6,-6,0]),project([6,-6,0]),project([6,6,0]),project([-6,6,0])',
+                            'project([-2.5,-2.5,0]),project([2.5,-2.5,0]),project([2.5,2.5,0]),project([-2.5,2.5,0])')
+        page = page.replace("for(let k=-6;k<=6;k++){seg([k,-6,0],[k,6,0],'#b9c8c0',1);seg([-6,k,0],[6,k,0],'#b9c8c0',1)}",
+                            "for(let k=-2.5;k<=2.5;k+=.5){seg([k,-2.5,0],[k,2.5,0],'#b9c8c0',1);seg([-2.5,k,0],[2.5,k,0],'#b9c8c0',1)}")
     a.output.write_text(page, encoding="utf-8")
     joint_audit = {str(j): {"finite": int(np.isfinite(tri[:, j]).all(1).sum()), "strict_accepted": int(strict[:, j].sum()), "finite_rejected": int((np.isfinite(tri[:, j]).all(1) & ~strict[:, j]).sum()), 'rejection_reasons':{str(value):int((reasons[:,j]==value).sum()) for value in set(reasons[:,j]) if value is not None}} for j in range(17)}
     (a.output.parent / "viewer_validation.json").write_text(json.dumps({"status": "file_checks_passed_browser_pending", "vertices": 6890, "faces": 13776, "index_entries": 41328, "frames": n, "joints": joint_audit, "source": str(a.result.resolve()), "scene": str(a.scene.resolve()), "stage_counts": {x: stages.count(x) for x in set(stages)}, "no_display_smoothing": True}, indent=2), encoding="utf-8")

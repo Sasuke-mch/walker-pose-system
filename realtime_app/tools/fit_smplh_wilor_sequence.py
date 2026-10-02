@@ -119,6 +119,10 @@ def main() -> int:
                     help="dual-fisheye body 2-D reprojection term; 0 preserves the audited baseline")
     ap.add_argument("--body-reprojection-scale-px", type=float, default=100.0,
                     help="pixel scale used to make the body reprojection Huber term dimensionless")
+    ap.add_argument("--wrist-reference", type=Path, default=None)
+    ap.add_argument("--wrist-reference-weight", type=float, default=0.0,
+                    help="independent manual wrist mean squared metre residual in body stages A/B/C")
+    ap.add_argument("--allow-diagnostic-wrist-reference", action="store_true")
     ap.add_argument("--mano-left", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl")
     ap.add_argument("--mano-right", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl")
     ap.add_argument("--bone-weight", type=float, default=0.0,
@@ -162,6 +166,20 @@ def main() -> int:
         raise ValueError("shared hand solve requires native MANO init and a positive pose weight")
     if args.body_reprojection_scale_px <= 0:
         raise ValueError("--body-reprojection-scale-px must be positive")
+    if not np.isfinite(args.wrist_reference_weight) or args.wrist_reference_weight < 0:
+        raise ValueError("invalid wrist reference weight")
+    if (args.wrist_reference is not None) != (args.wrist_reference_weight > 0):
+        raise ValueError("wrist reference and positive weight must be supplied together")
+    wrist_target = None
+    wrist_audit = {"enabled": False}
+    if args.wrist_reference is not None:
+        from pose_app.independent_wrist_reference import load_reference, wrist_position_loss
+        wrist_np, wrist_audit = load_reference(args.wrist_reference, args.calibration_dir,
+                                             args.allow_diagnostic_wrist_reference)
+        wrist_target = torch.tensor(wrist_np, device=device)
+        wrist_audit.update(enabled=True, weight=args.wrist_reference_weight, stages=["A", "B", "C"])
+        (args.output_dir / "wrist_reference_audit.json").write_text(
+            json.dumps(wrist_audit, ensure_ascii=False, indent=2), encoding="utf-8")
     contact_args = (args.contact_labels, args.scene_transforms,
                     args.contact_vertex_sets, args.walker_topology)
     if any(v is not None for v in contact_args) and not all(v is not None for v in contact_args):
@@ -176,7 +194,9 @@ def main() -> int:
     reg = load_coco17_regressor(args.regressor)
     left_rows = raw_clean.raw_side(args.left_raw, "left")
     right_rows = raw_clean.raw_side(args.right_raw, "right")
-    ids = sorted(set(left_rows) & set(right_rows))
+    if set(left_rows) != set(right_rows):
+        raise ValueError("left/right raw frame sets differ; refusing silent frame deletion")
+    ids = sorted(left_rows)
     if ids != list(range(len(ids))):
         raise ValueError("raw frame ids are not contiguous")
     left = np.stack([left_rows[i] for i in ids]).astype(np.float32)
@@ -612,6 +632,10 @@ def main() -> int:
         for p in (beta, root, transl, latent, lhand, rhand): p.requires_grad_(False)
         for k in train: param_map[k].requires_grad_(True)
     stage_history = []
+    np.savez_compressed(args.output_dir / "cold_initialization.npz",
+                        betas=beta.detach().cpu().numpy(), global_orient=root.detach().cpu().numpy(),
+                        transl=transl.detach().cpu().numpy(), vposer_latent=latent.detach().cpu().numpy(),
+                        pair_id=np.asarray(ids, dtype=np.int64))
     global_step = 0
     for stage_index, (stage_name, train_names, n_stage) in enumerate(zip(stage_names, stage_train, stage_steps)):
         # Do not let MANO initialization alter A/B/C body or shared-beta fits.
@@ -769,9 +793,15 @@ def main() -> int:
                 contact_total = contact_total + args.global_hand_handle_weight * global_hand_loss
             contact_anchor = (args.root_anchor_weight * root_anchor
                               if contact_enabled and stage_index >= 4 else root_anchor.detach() * 0.0)
+            wrist_loss = (wrist_position_loss(out.joints, wrist_target)
+                          if wrist_target is not None else body_loss.detach() * 0.0)
+            wrist_term = (args.wrist_reference_weight * wrist_loss
+                          if stage_index in (0, 1, 2) else wrist_loss.detach() * 0.0)
             loss = body_term + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
                    args.body_temporal_weight * body_temporal + hand_term + args.mano_pose_weight * mano_pose_loss + pose_reg + 1e-3 * beta.pow(2).mean() + \
-                   (contact_total if stage_index >= 4 else contact_total.detach() * 0.0)
+                   (contact_total if stage_index >= 4 else contact_total.detach() * 0.0) + wrist_term
+            if not torch.isfinite(loss):
+                raise RuntimeError(f"nonfinite loss at {stage_name}:{local_step}")
             loss.backward()
             optim.step()
             if step % 10 == 0 or step == sum(stage_steps) - 1:
@@ -791,7 +821,9 @@ def main() -> int:
                 row["root_anchor"] = float(torch.sqrt(root_anchor.detach()))
                 row["hand_temporal"] = float(torch.sqrt(hand_temporal.detach()))
                 row["body_temporal"] = float(torch.sqrt(body_temporal.detach()))
+                row["wrist_reference_rms_mm"] = float(torch.sqrt(wrist_loss.detach()) * 1000) if wrist_target is not None else None
                 history.append(row)
+                print(json.dumps(row), flush=True)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "hand_3d_term": False,
                               "mano_local_pose_term": bool(args.mano_pose_weight > 0 and stage_index >= 3),
@@ -824,6 +856,7 @@ def main() -> int:
                     vg[:, palm_idx[side], :], a[:, None, :], b[:, None, :], 0.016).cpu().numpy()
             contact_diag["hand_contact_weight"] = contact_hand_weight.cpu().numpy()
     np.savez_compressed(args.output_dir / "result.npz",
+                        pair_id=np.asarray(ids, dtype=np.int64),
                         vertices=final.vertices.cpu().numpy(), faces=np.asarray(model.faces),
                         predicted_coco=regress_coco17_torch(final.vertices, reg).cpu().numpy(),
                         betas=beta.detach().cpu().numpy(), global_orient=root.detach().cpu().numpy(),
@@ -853,6 +886,8 @@ def main() -> int:
                         hand_points_right=final_hand_r.detach().cpu().numpy(), **contact_diag)
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
         "status": "engineering_candidate", "frames": n, "steps": int(sum(stage_steps)),
+        "wrist_reference": wrist_audit,
+        "initial_beta_source": "zeros_reoptimized_in_B_and_C",
         "model": str(args.smplh_model.resolve()), "vertices": 6890,
         "hand_observation_source": "WiLoR_native_MANO_local_rotations" if mano_enabled and args.hand_2d_weight == 0 else "WiLoR_model_projected_MANO_joints",
         "native_mano_prior": {
