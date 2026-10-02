@@ -3076,3 +3076,14 @@ PMPose448对严格valid/reason/xyz复现，当前身体scene五数组精确相�
 新增build_sapiens_comparison_viewer，仅渲染G20261002_sapiens2_body_mainline448_v2实际输出，不重跑模型/拟合。生成visualization_v1/index.html（四路同帧二维对照、原生308点开关、逐关节质量表、可旋转三维原始骨架/当次地面/实体助步器/双相机）、comparison_448.mp4（448帧30FPS）、896张同源缩略图和预览。原始二维用既有raw_to_model_point回到转正图像；三维用各模型同次scene变换，[X,-Y,Z]仅显示映射；没有SMPL结果，不拼接旧网格。黑色实线连接有限正深度原始点，严格accepted实心绿点，rejected橙叉，非有限不补点；不插值或显示平滑。
 
 浏览器核验0/60/270/447帧、308开关、模型切换、播放推进和视角按钮；截图browser_frame0060.png和manifest保留。修正帧号输入事件及加载新帧时清空旧图，避免质量栏新帧/图像旧帧的临时错位。视频读取首尾和中间帧、448帧数/30FPS、896图、逐关节接收数与原metrics一致及源码语法检查通过。仅工具与本节记录独立本地提交，原有改动保留，不推送。
+
+
+## 2026-10-02：Sapiens2评价更正及原逻辑SMPL-H全448帧交付
+
+撤回此前仅凭严格三角化通过率作出Sapiens2不适合固定手全身拟合的确定性结论。原计数仅表征给定标定/配对下双目一致性，不能排名二维定位真值；accepted-only误差存在门限截断与不同样本问题，原身体拟合采用软权重且有独立构造腕目标。未执行全身链就否定适用性证据不足。原二维页面图例补充橙叉不是二维定位错误判定，原数值不改。
+
+按用户要求沿用原balanced_body_full448_v1的完整拟合命令：source/pose-reference均为原WiLoR来源fit_shared，constructed_grasp腕位置/朝向/PCA/形状、接触集合、四阶段50步和所有权重相同；只替换Sapiens二维、本次Sapiens scene、按原公式重算脚候选、输出目录。新增run_sapiens_smplh编排现有拟合/全手审计/查看器入口，未改优化器。输出G20261002_sapiens2_body_mainline448_v2/smplh_fixed_grasp_v1，protocol及reuse_audit核实原config/coefficients/frozen inputs一致。WiLoR通过原参考复用，没有重新推理或重关联；这是相同PMPose初始化下条件替换，不是独立冷启动排名。
+
+全部448帧SMPL-H真实6890顶点/13776面生成，手几何896手帧全部检查。身体观测RMS97.183→97.257mm；双腕P95161.691/114.511→154.489/110.490mm；最低脚底-130.394/-136.213mm；腿项11.542→11.786。上肢/躯干/联合接受7/5/2（各50），手50/50；逐点最大退化9.99986mm，观察门通过，腕/脚/腿/手门未通过，双手均0/448。不把此受原初始化/保护约束的结果作为Sapiens二维质量差的证据。
+
+body_viewer.html直接沿用现有渲染器，标题标明Sapiens，唯一显示修正为有限5m地面边界，模型/场景payload保持不变。所有帧vertices_ground_m和面数组与网页核对通过；浏览器首/中/末帧、末帧循环播放、拖动旋转/重置、真实表面检查通过，无console error；viewer_frame224.png和viewer_validation保存。续接时原HTTP服务已停止，重新启动8770并打开，不重跑拟合。36项已有相关测试在本任务通过、两个改动工具语法及diff检查通过。仅本次工具/图例与本节记录本地提交，其他改动保留，不推送。
