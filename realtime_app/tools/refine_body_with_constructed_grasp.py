@@ -50,6 +50,7 @@ def main():
     ap.add_argument("--rotation-temporal-weight", type=float, default=.2)
     ap.add_argument("--collision-refresh", type=int, default=100)
     ap.add_argument("--wrist-bound-m", type=float, default=.01, help="surface-refine tail barrier; not a feasibility certificate")
+    ap.add_argument("--wrist-bound-scale-m", type=float, default=.001, help="soft wrist-bound residual scale; does not change the bound or final gate")
     ap.add_argument("--body-polish-steps", type=int, default=0, help="body/wrist refinement with shared fingers frozen and self-collision diagnostic detached")
     ap.add_argument("--hand-polish-steps", type=int, default=0, help="full-surface finger refinement with body/wrists frozen")
     ap.add_argument("--lock-grasp-orientation", action="store_true", help="solve local wrists by parent FK to keep palm walker orientation fixed")
@@ -64,6 +65,8 @@ def main():
         raise ValueError("wrist direction diagnostics require balanced full-body")
     if not np.isfinite(args.projection_trust_radius) or args.projection_trust_radius <= 0:
         raise ValueError("invalid projection trust radius")
+    if not np.isfinite(args.wrist_bound_scale_m) or args.wrist_bound_scale_m <= 0:
+        raise ValueError("invalid wrist bound scale")
     if args.stage2_static_assumption and not args.balanced_stages:
         raise ValueError("Stage2 assumption requires balanced stages")
     if args.output_dir.exists():
@@ -94,7 +97,7 @@ def main():
     from pose_app import smpl_surface_contact as surf
     from pose_app.balanced_grasp import (GROUPS, LEG_ROTATIONS, grouped_observation_loss,
         observation_guard, leg_temporal_terms, build_stage2_anchors, stage2_terms, guarded_adam_step)
-    from pose_app.constrained_grasp import constrained_adam_step, probe_local_goal_descent
+    from pose_app.constrained_grasp import constrained_adam_step, probe_local_goal_descent, wrist_bound_loss
     from pose_app.constructed_grasp_refinement import (
         UPPER_JOINTS, TORSO_JOINTS, load_grasp, validate_rotation, compose_body,
         wrist_rotations, masked_mean, foot_terms, frozen_surface_states,
@@ -356,7 +359,7 @@ def main():
                  "pose_anchor": rotation_anchor_loss(body, reference_body) if args.full_body else (upper.square().mean() + torso.square().mean()),
                  "body_3d": ((coco - target).square().sum(-1) * quality)[body_mask].sum() / quality[body_mask].sum().clamp_min(1e-6) / args.body_scale_m ** 2}
         if args.surface_refine:
-            terms["wrist_bound"] = (torch.relu(pos - args.wrist_bound_m) / .001).square().mean() + (torch.relu(pos - args.wrist_bound_m) / .001).square().amax()
+            terms["wrist_bound"] = wrist_bound_loss(pos, args.wrist_bound_m, args.wrist_bound_scale_m)
         projected = [fisheye_project_torch(coco, cal.K0, cal.D0),
                      fisheye_project_torch(coco @ R01.T + t01, cal.K1, cal.D1)]
         terms["body_2d"] = torch.stack([((surf.robust_scalar(torch.linalg.vector_norm(p - xy, dim=-1) / 100, 1.) * w).sum() / w.sum().clamp_min(1e-6)) for p, (xy, w) in zip(projected, obs)]).mean()
@@ -567,9 +570,13 @@ def main():
                     if stage == "upper_only":
                         ok = ok and leg_shift <= .005 + 1e-6
                     pca_ok = all(bool(((hand_coeff[s]-tensor(grasp["hands"][s]["hand_pca"])).abs() <= 2.).all()) for s in ("left","right"))
+                    trial_trace = torch.einsum("nsij,sij->ns", trial[5], target_R)
+                    trial_angle = torch.rad2deg(torch.acos(((trial_trace-1)/2).clamp(-1,1)))
                     return trial[0], ok and pca_ok, {"observation_excess_m": excess, "leg_shift_m": leg_shift,
                         "pca_ok": pca_ok, "violating_pair_joint": [[i+args.start,j] for i,j in bad],
                         "wrist_squared_error_sum_m2": (trial[4]-target_p).square().sum(dim=-1).sum(dim=0).cpu().tolist(),
+                        "wrist_angle_mean_deg": trial_angle.mean(dim=0).cpu().tolist(),
+                        "weighted_terms": {key: float(coefficients[key]*value*(wrist_ramp if key in ("wrist_position","wrist_rotation","wrist_bound") else 1.)) for key,value in trial[1].items()},
                         "upper_leg_shift_guard_passed": stage != "upper_only" or leg_shift <= .005+1e-6}
                 try:
                     if args.constrained_update and stage != "hand_surface_polish":
@@ -588,7 +595,10 @@ def main():
                     write('update_transactions_before_failure.json', {'updates':transactions})
                     raise
                 transactions.append({"stage":stage, "step":step, "wrist_ramp":wrist_ramp,
-                                     "before_wrist_squared_error_sum_m2":before_wrist_squared, **transaction})
+                                     "before_wrist_squared_error_sum_m2":before_wrist_squared,
+                                     "before_loss":float(loss.detach()),
+                                     "before_weighted_terms":{key:float(coefficients[key]*value.detach()*(wrist_ramp if key in ("wrist_position","wrist_rotation","wrist_bound") else 1.)) for key,value in state[1].items()},
+                                     **transaction})
             else:
                 optimizer.step()
             if args.surface_refine and not args.balanced_stages:

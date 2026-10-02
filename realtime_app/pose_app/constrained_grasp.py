@@ -9,6 +9,15 @@ import torch
 from scipy.optimize import minimize
 
 
+def wrist_bound_loss(position_error, bound_m, scale_m):
+    """Dimensionless soft wrist excess; bound is a target, not an exact guard."""
+    if not np.isfinite(bound_m) or bound_m <= 0 or not np.isfinite(scale_m) or scale_m <= 0:
+        raise ValueError("positive finite wrist bound and scale required")
+    residual = torch.relu(position_error - bound_m) / scale_m
+    squared = residual.square()
+    return squared.mean() + squared.amax()
+
+
 def project_halfspaces(proposal, matrix, bound):
     """Euclidean projection onto A u <= b, using a nonnegative dual QP."""
     proposal = np.asarray(proposal, dtype=np.float64)
@@ -223,9 +232,29 @@ def constrained_adam_step(optimizer, params, evaluate, original_loss, constraint
                         previous_max_constraint_m=float(values.max()), exact_guard_passed=bool(ok),
                         loss=float(loss), correction_norm=float(np.linalg.norm(correction_u))))
                 changed = any(not torch.equal(p,a) for p,a in zip(params,old))
-                accepted = bool(changed and ok and torch.isfinite(loss) and float(loss) <= float(original_loss)+1e-6)
+                finite_loss = bool(torch.isfinite(loss))
+                objective_ok = finite_loss and float(loss) <= float(original_loss)+1e-6
+                accepted = bool(changed and ok and objective_ok)
+                reasons = []
+                if not changed:
+                    reasons.append('no_parameter_change')
+                if not finite_loss:
+                    reasons.append('nonfinite')
+                if diagnostic.get('violating_pair_joint'):
+                    reasons.append('nonlinear_observation_violation')
+                if diagnostic.get('upper_leg_shift_guard_passed') is False:
+                    reasons.append('upper_leg_shift_violation')
+                if diagnostic.get('pca_ok') is False:
+                    reasons.append('pca_bound_violation')
+                if not ok and not any(r in reasons for r in ('nonlinear_observation_violation', 'upper_leg_shift_violation', 'pca_bound_violation')):
+                    reasons.append('other_exact_guard_failure')
+                if finite_loss and not objective_ok:
+                    reasons.append('objective_increased')
                 actual_norm = sum(float(((p-a)/s).square().sum()) for p,a,s in zip(params,old,scales))**.5
-                attempts.append(dict(alpha=alpha,loss=float(loss),accepted=accepted,
+                attempts.append(dict(alpha=alpha,loss=float(loss),before_loss=float(original_loss),
+                                     loss_delta=float(loss)-float(original_loss),
+                                     parameters_changed=changed,loss_finite=finite_loss,
+                                     exact_guard_passed=bool(ok),rejection_reasons=reasons,accepted=accepted,
                                      corrections=corrections,
                                      actual_update_norm=actual_norm,
                                      normalized_direction_norm_after_backtrack=float(np.linalg.norm(direction))*alpha, **diagnostic))

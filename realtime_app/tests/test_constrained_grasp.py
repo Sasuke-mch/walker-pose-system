@@ -1,7 +1,67 @@
 import numpy as np
 import pytest
 import torch
-from pose_app.constrained_grasp import project_halfspaces, frame_local_jacobian, constrained_adam_step, probe_local_goal_descent
+from pose_app.constrained_grasp import project_halfspaces, frame_local_jacobian, constrained_adam_step, probe_local_goal_descent, wrist_bound_loss
+
+
+def test_wrist_bound_scale_changes_only_excess_penalty_and_gradient():
+    position = torch.tensor([[.0, .012, .1]], dtype=torch.float64, requires_grad=True)
+    original = wrist_bound_loss(position, .01, .001)
+    grad_original, = torch.autograd.grad(original, position, retain_graph=True)
+    scaled = wrist_bound_loss(position, .01, .005)
+    grad_scaled, = torch.autograd.grad(scaled, position)
+    expected = (torch.relu(position.detach()-.01)/.001).square()
+    assert torch.allclose(original.detach(), expected.mean()+expected.amax())
+    assert torch.allclose(scaled.detach(), original.detach()/25)
+    assert torch.allclose(grad_scaled, grad_original/25)
+    assert grad_original[0, 0] == 0
+    for value in (0, -1, float('nan'), float('inf')):
+        with pytest.raises(ValueError):
+            wrist_bound_loss(position, .01, value)
+
+
+def test_objective_rejection_is_classified_and_restores_adam_state():
+    p = torch.nn.Parameter(torch.tensor([[0.]], dtype=torch.float64))
+    optimizer = torch.optim.Adam([p], lr=.1)
+    old = p.detach().clone()
+    loss = (p-1).square().sum()
+    loss.backward()
+    def evaluate():
+        return (p+1).square().sum(), True, {}
+    result = constrained_adam_step(optimizer, [p], evaluate, loss.detach(),
+                                   lambda: p*0-1, [1.], trials=2)
+    assert not result['accepted']
+    assert all('objective_increased' in attempt['rejection_reasons'] for attempt in result['attempts'])
+    assert all(attempt['exact_guard_passed'] and attempt['parameters_changed'] for attempt in result['attempts'])
+    assert torch.equal(p, old) and not optimizer.state
+
+
+def test_target_anchor_audit_masks_inactive_rows_and_rejects_frame_mismatch(tmp_path, monkeypatch):
+    import json
+    from pathlib import Path
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1]/'tools'))
+    from audit_grasp_target_compatibility import audit_window
+    def write(name, data):
+        (tmp_path/name).write_text(json.dumps(data), encoding='utf-8')
+    hand = dict(wrist_walker_m=[0,0,0], rotation_walker_from_wrist=np.eye(3).tolist(),
+                transform_walker_from_wrist=np.eye(4).tolist())
+    write('grasp.json', dict(coordinate_frame='walker_rigid_local', length_unit='m', hands=dict(left=hand,right=hand)))
+    write('run_metadata.json', dict(inputs=dict(grasp=str(tmp_path/'grasp.json')), coordinate_frame='test'))
+    write('stage2_anchor_assumption.json', dict(records=[], boundary_source='test', measured_contact=False))
+    write('feasibility_initial.json', dict(records=[dict(outer_reach_excess_m=0, inner_reach_excess_m=0, model_joint_vs_coco_wrist_m=0)]))
+    ids=np.array([10,11])
+    np.savez(tmp_path/'result.npz',pair_id=ids,wrist_walker_m=np.zeros((2,2,3)),
+             wrist_rotation_walker=np.broadcast_to(np.eye(3),(2,2,3,3)),vertices_ground_m=np.zeros((2,1,3)))
+    np.savez(tmp_path/'stage2_anchors.npz',pair_id=ids,patch_ids=np.zeros((2,4,3),dtype=int),
+             targets_m=np.zeros((2,4,3,3)),segment=np.array([-1,0]))
+    np.savez(tmp_path/'frozen_foot_states.npz',pair_id=ids,frame_ok=[True,True],support=np.zeros((2,2),bool),
+             state=np.full((2,2),'unknown'),reason=np.full((2,2),'test'))
+    audit=audit_window(tmp_path,ids)
+    assert audit['target_contract_passed'] and audit['stage2_active_frames']==1
+    assert audit['records'][0]['feet']['left']['sole_patch_min_z_mm'] is None
+    assert audit['stage2_velocity_max_m_s'] is None
+    with pytest.raises(ValueError,match='frame identity'):
+        audit_window(tmp_path,np.array([10,12]))
 
 
 def test_projection_moves_along_wall_and_satisfies_intersection():
