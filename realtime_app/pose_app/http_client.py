@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 import cv2
 import numpy as np
 from .schema import InferenceResult, PersonPose
-from tools.build_continuous_foot_inclusive_roi import RULE, foot_inclusive_box
+from .person_roi import RULE, foot_inclusive_box
 
 
 class ServiceError(RuntimeError):

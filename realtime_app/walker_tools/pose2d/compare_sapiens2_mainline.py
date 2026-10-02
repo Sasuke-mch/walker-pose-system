@@ -36,7 +36,7 @@ from pose_app.schema import InferenceResult, PersonPose
 from pose_app.stereo_sources import StereoFramePair
 from pose_app.sources import SourceFrame
 from pose_app.stereo_output import StereoOutputWriter
-from walker_tools.pose2d.build_continuous_foot_inclusive_roi import RULE
+from pose_app.person_roi import RULE
 from walker_tools.stereo.evaluate_offline_stereo_predictions import SAPIENS_TO_COCO17
 from pose_app.triangulation import triangulate_matches
 

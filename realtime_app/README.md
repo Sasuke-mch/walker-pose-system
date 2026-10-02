@@ -73,6 +73,10 @@ realtime_app/
 
 `pose_app/` 保留现有公共模块路径，负责复用的运行逻辑、数据结构和算法；`walker_tools/` 负责参数解析、编排与文件输出；`tests/` 验证这些接口；`research_records/` 保存协议与历史实验。模型文件、采集数据、已生成结果和历史实验目录不随代码归类迁移。
 
+核心依赖方向为 `run.py/run_stereo.py → pose_app`、`walker_tools → pose_app`。核心模块不反向导入离线工具。现有扩框规则集中在 `pose_app/person_roi.py`，在线客户端与离线ROI生成器使用同一个 `RULE` 和 `foot_inclusive_box()`；原工具仍导出这些名称，历史调用不变。身体原始观测集中在 `pose_app/body_observations.py`，不再由当前工具运行时加载历史实验脚本。
+
+工具的应用根、仓库根和兼容目录经 `walker_tools._compat` 统一引用 `pose_app.project_paths`；除了直接启动脚本所需的最小包定位，不再重复推算项目路径。特定第三方运行器仍遵守各自的显式路径配置。
+
 本次迁移只涉及未有本地修改的已跟踪工具。原有未跟踪工具与 `tools/render_raw_visual_handle_interaction_video.py` 的本地修改留在原位，未借整理一并纳入版本。`pose_app` 中既有未跟踪依赖也未被顺带提交；干净环境复现仍需单独核定这些文件的版本归属。
 
 ### 接口约定
@@ -82,6 +86,7 @@ realtime_app/
 | 在线运行 | `run.py`、`run_stereo.py` | 不改变启动参数、检测器选择和服务配置 |
 | 项目路径 | `pose_app.project_paths` | 项目资源以仓库路径为锚；用户相对输入仍按原工具约定解析 |
 | 观测数据 | `pose_app.schema`、`sources`、`stereo_sources` | 不改字段、帧身份、时间语义与相机角色 |
+| 人物ROI | `pose_app.person_roi` | 同一扩框公式、阈值及边界裁剪；坐标回映仍由原调用方负责 |
 | 正式双目几何 | `pose_app.triangulation` | 不改阈值、人物关联、拒绝原因和单位 |
 | 身体软观测 | `pose_app.body_observations` | 原始COCO读取、逆旋转与软权重三角化；保持与正式严格门的区别 |
 | 场景与阶段 | `pose_app.realtime_stage_walker` 等原模块 | 不改阶段判定、状态机和地面估计 |
