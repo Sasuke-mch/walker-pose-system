@@ -14,6 +14,8 @@ import json
 import shutil
 import sys
 import unittest
+from unittest.mock import patch
+from types import SimpleNamespace
 import uuid
 from pathlib import Path
 
@@ -177,12 +179,19 @@ def fake_stage_runner(recorded: list[dict], base_gpu_ms: float = 90.0):
 
 
 def run_main(monkeypatch_target: str, fake, argv: list[str]) -> int:
-    original = getattr(benchmark, monkeypatch_target)
-    setattr(benchmark, monkeypatch_target, fake)
-    try:
+    # These tests exercise file/timing contracts, never real model availability.
+    runtime = {"floor_class_id": 3, "model_load_ms": 1.0,
+               "processor_size": {"height": HEIGHT, "width": WIDTH}, "num_labels": 150}
+    fake_torch = SimpleNamespace(
+        __version__="test", version=SimpleNamespace(cuda=None),
+        cuda=SimpleNamespace(is_available=lambda: False),
+        backends=SimpleNamespace(cudnn=SimpleNamespace(is_available=lambda: False)),
+    )
+    with patch.object(benchmark, monkeypatch_target, fake), \
+         patch.object(benchmark, "load_model", return_value=runtime), \
+         patch.dict(sys.modules, {"torch": fake_torch,
+                                  "transformers": SimpleNamespace(__version__="test")}):
         return benchmark.main(argv)
-    finally:
-        setattr(benchmark, monkeypatch_target, original)
 
 
 def full_argv(dirs: dict[str, Path], output_dir: Path, pair_ids=PAIR_IDS, repeats: int = 1, warmup: int = 1) -> list[str]:
@@ -291,8 +300,10 @@ class OutputDirectoryContractTests(unittest.TestCase):
             output_dir = root / "existing_output"
             output_dir.mkdir()
             (output_dir / "keep_me.txt").write_text("untouched", encoding="utf-8")
-            with self.assertRaises(FileExistsError):
-                benchmark.main(full_argv(dirs, output_dir))
+            with patch.object(benchmark, "load_model", side_effect=AssertionError("model must not load")) as loader:
+                with self.assertRaises(FileExistsError):
+                    benchmark.main(full_argv(dirs, output_dir))
+                loader.assert_not_called()
             self.assertEqual((output_dir / "keep_me.txt").read_text(encoding="utf-8"), "untouched")
             self.assertEqual(sorted(item.name for item in output_dir.iterdir()), ["keep_me.txt"])
 

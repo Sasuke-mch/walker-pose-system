@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import sys
+import subprocess
 import unittest
 
 import numpy as np
@@ -299,22 +300,28 @@ class ReverseFieldTests(unittest.TestCase):
 
 class BenchmarkIsolationTests(unittest.TestCase):
     def test_benchmark_tool_does_not_import_torch(self):
-        self.assertNotIn("torch", sys.modules, "another test polluted this process with torch")
-        import benchmark_learned_stereo_replacements as benchmark
-
-        self.assertTrue(hasattr(benchmark, "main"))
-        self.assertNotIn("torch", sys.modules, "the benchmark tool must never import torch")
+        # Isolation is a property of this tool, independent of pytest order.
+        code = (
+            f"import sys; sys.path[:0] = {[str(REALTIME_ROOT), str(TOOLS_ROOT)]!r}; "
+            "import benchmark_learned_stereo_replacements as benchmark; "
+            "assert hasattr(benchmark, 'main'); "
+            "assert 'torch' not in sys.modules, 'benchmark imported torch'"
+        )
+        result = subprocess.run([sys.executable, "-B", "-c", code],
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_benchmark_and_worker_sources_avoid_torch_in_the_main_process(self):
         import ast
 
-        benchmark_source = (TOOLS_ROOT / "benchmark_learned_stereo_replacements.py").read_text(encoding="utf-8")
+        from walker_tools.catalog import command_path
+        benchmark_source = command_path("benchmark_learned_stereo_replacements.py").read_text(encoding="utf-8")
         self.assertNotIn("import torch", benchmark_source)
         self.assertNotIn("from torch", benchmark_source)
         # The worker is the only place torch may appear, and never at module scope:
         # a module-scope import would break the structured failure path and would
         # make the failure look like a crash instead of a recorded reason.
-        worker_source = (TOOLS_ROOT / "run_learned_stereo_worker.py").read_text(encoding="utf-8")
+        worker_source = command_path("run_learned_stereo_worker.py").read_text(encoding="utf-8")
         module_level_imports = [
             line for line in worker_source.splitlines()
             if line.startswith("import torch") or line.startswith("from torch")
@@ -334,7 +341,8 @@ class BenchmarkIsolationTests(unittest.TestCase):
     def test_worker_does_not_import_plane_fitting_modules_or_linear_algebra(self):
         import ast
 
-        worker_source = (TOOLS_ROOT / "run_learned_stereo_worker.py").read_text(encoding="utf-8")
+        from walker_tools.catalog import command_path
+        worker_source = command_path("run_learned_stereo_worker.py").read_text(encoding="utf-8")
         tree = ast.parse(worker_source)
         imported: set[str] = set()
         for node in ast.walk(tree):

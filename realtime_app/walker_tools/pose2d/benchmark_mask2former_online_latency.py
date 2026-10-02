@@ -1040,6 +1040,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(command_arguments)
     validate_run_parameters(args)
 
+    # Reject a non-runnable request before importing/loading optional models.
+    if not args.probe_only:
+        if args.output_dir is None:
+            raise ValueError("--output-dir is required unless --probe-only is used")
+        ensure_output_dir_absent(args.output_dir)
+
     import torch
 
     device = resolve_device(torch, args.device)
