@@ -420,13 +420,10 @@ def analyze(args):
         writer = csv.DictWriter(handle,fieldnames=list(details[0]));writer.writeheader();writer.writerows(details)
     # The body fit uses the original soft-weight raw triangulation, a distinct
     # contract from the strict live gate. Audit it through the same entry too.
-    import importlib.util
-    entry = ROOT/'research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py'
-    spec = importlib.util.spec_from_file_location('raw_observation_comparison',entry)
-    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-    module.cv2 = cv2
+    from pose_app import body_observations as module
+    from pose_app.fisheye_camera import load_stereo_fisheye
     protocol = json.loads((args.output/'protocol.json').read_text(encoding='utf-8'))
-    calibration = module.load_stereo_fisheye(Path(protocol['calibration']).parent)
+    calibration = load_stereo_fisheye(Path(protocol['calibration']).parent)
     body = {}
     for model in sequences:
         paths = ([args.baseline/'c3_predictions'/s/'pmpose/raw_predictions.json' for s in ('left','right')]

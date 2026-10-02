@@ -51,9 +51,7 @@ def main():
     if any(sources[k] for k in ('old_stage_jsonl_read', 'old_dynamic_ground_read', 'old_walker_pose_read')):
         raise ValueError('scene contains old dynamic inputs')
     from pose_app.fisheye_camera import load_stereo_fisheye
-    from importlib.util import spec_from_file_location, module_from_spec
-    spec = spec_from_file_location('cold_raw', ROOT/'research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py')
-    raw = module_from_spec(spec); spec.loader.exec_module(raw)
+    from pose_app import body_observations as raw
     for side in ('left', 'right'):
         if sorted(raw.raw_side(body_paths[side], side)) != list(range(448)):
             raise ValueError('expected complete detector full448 input')

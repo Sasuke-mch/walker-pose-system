@@ -83,6 +83,7 @@ realtime_app/
 | 项目路径 | `pose_app.project_paths` | 项目资源以仓库路径为锚；用户相对输入仍按原工具约定解析 |
 | 观测数据 | `pose_app.schema`、`sources`、`stereo_sources` | 不改字段、帧身份、时间语义与相机角色 |
 | 正式双目几何 | `pose_app.triangulation` | 不改阈值、人物关联、拒绝原因和单位 |
+| 身体软观测 | `pose_app.body_observations` | 原始COCO读取、逆旋转与软权重三角化；保持与正式严格门的区别 |
 | 场景与阶段 | `pose_app.realtime_stage_walker` 等原模块 | 不改阶段判定、状态机和地面估计 |
 | 身体与手部工具 | `walker_tools.body`、`walker_tools.hands` | 不改共享参数、优化阶段、损失、预算及候选状态 |
 | 可视化 | `walker_tools.visualization` | 保留同源输入、数组格式和显示规则 |

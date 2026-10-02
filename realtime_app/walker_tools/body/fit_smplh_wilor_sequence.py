@@ -15,7 +15,6 @@ from walker_tools._compat import prepare_imports as _tool_prepare_imports
 _tool_prepare_imports()
 
 import argparse
-import importlib.util
 import inspect
 import json
 import sys
@@ -38,10 +37,7 @@ from pose_app.smpl_coco_observation import load_coco17_regressor, regress_coco17
 from pose_app.smplx_fitting import load_vposer_explicit
 from pose_app import smpl_surface_contact as surface_contact
 
-RAW = ROOT / "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py"
-spec = importlib.util.spec_from_file_location("raw_clean", RAW)
-raw_clean = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(raw_clean)
+from pose_app import body_observations as raw_clean
 
 
 def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
@@ -154,7 +150,6 @@ def main() -> int:
     import smplx
     import pickle
     from smplx.utils import Struct
-    import cv2
     from scipy.spatial.transform import Rotation
     device = torch.device(args.device)
     if args.device == "cuda" and not torch.cuda.is_available():
@@ -197,7 +192,6 @@ def main() -> int:
         raise ValueError("global hand-handle prior requires contact inputs")
 
     cal = load_stereo_fisheye(args.calibration_dir)
-    raw_clean.cv2 = cv2
     reg = load_coco17_regressor(args.regressor)
     left_rows = raw_clean.raw_side(args.left_raw, "left")
     right_rows = raw_clean.raw_side(args.right_raw, "right")

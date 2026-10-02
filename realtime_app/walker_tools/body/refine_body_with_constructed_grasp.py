@@ -14,7 +14,6 @@ from walker_tools._compat import prepare_imports as _tool_prepare_imports
 _tool_prepare_imports()
 
 import argparse
-import importlib.util
 import json
 import pickle
 import sys
@@ -224,9 +223,7 @@ def main():
     target_R = tensor([grasp["hands"][s]["rotation_walker_from_wrist"] for s in ("left", "right")])
     reg = load_coco17_regressor(ROOT / "models/smpl/J_regressor_coco.npy")
     # Reuse the authoritative raw reader; raw fish-eye pixels, no WiLoR pixels.
-    spec = importlib.util.spec_from_file_location("raw_grasp", ROOT / "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py")
-    raw = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(raw)
+    from pose_app import body_observations as raw
     obs, observation_reasons = [], []
     cal = load_stereo_fisheye(ROOT / "realtime_app/calibration/results")
     for path, side in ((args.left_raw, "left"), (args.right_raw, "right")):
@@ -241,8 +238,6 @@ def main():
         obs.append((tensor(np.where(weights[..., None] > 0, points[..., :2], 0.)), tensor(weights)))
     # Recompute observations from this run's original paired rows. Source fit
     # supplies initialization only; previous triangulation is never supervision.
-    import cv2
-    raw.cv2 = cv2
     left_rows, right_rows = raw.raw_side(args.left_raw, "left"), raw.raw_side(args.right_raw, "right")
     current_tri, _, _, _, _, _, current_accepted, _, current_quality, _ = raw.raw_triangulate(
         np.stack([left_rows[i] for i in range(total_frames)]).astype(np.float32),

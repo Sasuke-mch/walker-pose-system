@@ -14,7 +14,6 @@ _tool_prepare_imports()
 
 import argparse
 import base64
-import importlib.util
 import json
 import re
 import sys
@@ -100,11 +99,7 @@ def main():
         raise ValueError("fit/viewer ground vertex mismatch")
     # Recompute strict observation audit from original same-run rows, separate
     # from the engineering fitting mask. Preserve all finite rejected points.
-    spec = importlib.util.spec_from_file_location("viewer_raw", ROOT / "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py")
-    raw = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(raw)
-    import cv2
-    raw.cv2 = cv2
+    from pose_app import body_observations as raw
     left = raw.raw_side(Path(metadata["inputs"]["left_raw"]), "left")
     right = raw.raw_side(Path(metadata["inputs"]["right_raw"]), "right")
     cal = load_stereo_fisheye(ROOT / "realtime_app/calibration/results")
