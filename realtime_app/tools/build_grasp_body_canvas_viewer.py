@@ -27,11 +27,12 @@ def simplify_cold_viewer_text(page, label, frames):
     if match is None:
         raise ValueError('missing viewer payload')
     def labels(text):
+        text = text.replace('<section><h2>状态</h2><p>腕参考未验证；接触未通过。</p></section>', '')
         text = re.sub(r'<title>.*?</title>', '<title>'+label+'</title>', text)
         text = re.sub(r'<h1>.*?</h1>', '<h1>'+label+'</h1>', text)
         text = re.sub(r'本地离线版 · 第\d+\.\.\d+帧 · .*?本次重放', f'SMPL-H · {frames} 帧', text)
         text = re.sub(r'<section><h2>本次拟合</h2><p>.*?</p></section>',
-                      '<section><h2>状态</h2><p>腕参考未验证；接触未通过。</p></section>', text)
+                      '', text)
         replacements = {'人工腕参考偏差':'腕偏差（左/右）','身体观测残差':'观测残差',
             '双手几何状态':'手部检查','脚底最低高度':'脚底高度','地面变换':'地面状态',
             '当前质量与拒绝':'质量检查','SMPL 表面':'人体','助步器实体杆件':'助步器',
@@ -207,7 +208,6 @@ def main():
         detector_label = 'PMPose' if metadata.get('detector') == 'pmpose' else 'Sapiens2'
         page = page.replace('SMPL-H 固定手部约束拟合', detector_label)
         page = page.replace('腕偏差 左/右', '腕偏差（左/右）')
-        page = page.replace('<section><h2>操作</h2>', '<section><h2>状态</h2><p>腕参考未验证；接触未通过。</p></section><section><h2>操作</h2>')
         page = page.replace('project([-6,-6,0]),project([6,-6,0]),project([6,6,0]),project([-6,6,0])',
                             'project([-2.5,-2.5,0]),project([2.5,-2.5,0]),project([2.5,2.5,0]),project([-2.5,2.5,0])')
         page = page.replace("for(let k=-6;k<=6;k++){seg([k,-6,0],[k,6,0],'#b9c8c0',1);seg([-6,k,0],[6,k,0],'#b9c8c0',1)}",
