@@ -1,0 +1,2217 @@
+{
+  "date": "2026-10-02",
+  "workspace": "D:\\my_works\\walker_pose_system",
+  "status": "completed",
+  "retire_source_files": [
+    "realtime_app/pose_app/alternative_body_common.py",
+    "realtime_app/pose_app/alternative_body_ik.py",
+    "realtime_app/pose_app/alternative_body_kalman.py",
+    "realtime_app/pose_app/alternative_body_one_euro.py",
+    "realtime_app/pose_app/alternative_body_raw.py",
+    "realtime_app/pose_app/alternative_body_ray_factor.py",
+    "realtime_app/pose_app/alternative_body_rts.py",
+    "realtime_app/pose_app/alternative_body_shape.py",
+    "realtime_app/pose_app/alternative_surface_common.py",
+    "realtime_app/pose_app/alternative_surface_mhr.py",
+    "realtime_app/pose_app/alternative_surface_supr.py",
+    "realtime_app/tests/test_alternative_body_common.py",
+    "realtime_app/tests/test_alternative_body_filters.py",
+    "realtime_app/tests/test_alternative_body_ik.py",
+    "realtime_app/tests/test_alternative_body_ray_factor.py",
+    "realtime_app/tests/test_alternative_surface_models.py",
+    "realtime_app/tests/test_build_smplx_coarse_surface_viewer.py",
+    "realtime_app/tests/test_build_smplx_full_mesh_solid_walker_viewer.py",
+    "realtime_app/tests/test_export_smplx_full_mesh_sequence.py",
+    "realtime_app/tests/test_export_smplx_interactive_viewer.py",
+    "realtime_app/tests/test_smplx_aligned_temporal.py",
+    "realtime_app/tests/test_smplx_asset_gate.py",
+    "realtime_app/tests/test_smplx_corrected_observation_model.py",
+    "realtime_app/tests/test_smplx_fit_state_isolation.py",
+    "realtime_app/tests/test_smplx_fitting.py",
+    "realtime_app/tests/test_smplx_r3_integration.py",
+    "realtime_app/tests/test_smplx_shape_audit.py",
+    "realtime_app/tests/test_smplx_structured_contact.py",
+    "realtime_app/tests/test_smplx_temporal_weight_ablation.py",
+    "realtime_app/tools/audit_contact_surfaces.py",
+    "realtime_app/tools/audit_smplx_clean_initialization.py",
+    "realtime_app/tools/audit_smplx_male_hip_knee_geometry.py",
+    "realtime_app/tools/audit_smplx_structured_contact_effect.py",
+    "realtime_app/tools/benchmark_alternative_body_routes.py",
+    "realtime_app/tools/benchmark_alternative_surface_models.py",
+    "realtime_app/tools/benchmark_smplx_aligned_temporal.py",
+    "realtime_app/tools/benchmark_smplx_clean_aligned_temporal.py",
+    "realtime_app/tools/benchmark_smplx_factorized_temporal.py",
+    "realtime_app/tools/benchmark_smplx_root_gradient_decoupling.py",
+    "realtime_app/tools/benchmark_smplx_staged_ankle_root_control.py",
+    "realtime_app/tools/benchmark_smplx_structured_foot_contact.py",
+    "realtime_app/tools/benchmark_smplx_temporal_weight_ablation.py",
+    "realtime_app/tools/build_smplx_coarse_surface_viewer.py",
+    "realtime_app/tools/build_smplx_full_mesh_solid_walker_viewer.py",
+    "realtime_app/tools/export_smplx_full_mesh_sequence.py",
+    "realtime_app/tools/export_smplx_interactive_viewer.py",
+    "realtime_app/tools/export_smplx_male_contact_mesh.py",
+    "realtime_app/tools/fit_phase1_body.py",
+    "realtime_app/tools/fit_smplx_clean_male_base_2d.py",
+    "realtime_app/tools/fit_smplx_clean_male_shared_shape.py",
+    "realtime_app/tools/fit_smplx_direct_multiview_bundle.py",
+    "realtime_app/tools/fit_smplx_male_full_contact.py",
+    "realtime_app/tools/fit_smplx_male_native_bundle.py",
+    "realtime_app/tools/fit_smplx_male_observation_regressor.py",
+    "realtime_app/tools/fit_smplx_male_structural_beta.py",
+    "realtime_app/tools/fit_smplx_male_temporal_contact.py",
+    "realtime_app/tools/fit_smplx_male_temporal_knots.py",
+    "realtime_app/tools/fit_smplx_overlapping_windows.py",
+    "realtime_app/tools/fit_smplx_single_frame.py",
+    "realtime_app/tools/fit_smplx_structured_full_sequence.py",
+    "realtime_app/tools/fit_smplx_temporal_window.py",
+    "realtime_app/tools/overlay_mhr_coco_mapping.py",
+    "realtime_app/tools/preflight_alternative_surface_models.py",
+    "realtime_app/tools/preflight_smplx_temporal_fit.py",
+    "realtime_app/tools/render_smplx_single_frame_fit.py",
+    "realtime_app/tools/render_smplx_window_2d_audit.py",
+    "realtime_app/tools/render_smplx_window_audit.py",
+    "realtime_app/tools/select_smplx_shape_clips.py",
+    "realtime_app/tools/validate_smplx_boundary_contact_v3.py",
+    "realtime_app/tools/validate_smplx_male_temporal_candidate.py",
+    "realtime_app/tools/validate_smplx_structured_foot_contact.py",
+    "realtime_app/tools/validate_smplx_structured_foot_contact_v2.py"
+  ],
+  "dependency_preserved": [
+    [
+      "realtime_app\\tools\\analyze_smplx_shape_stability.py",
+      "realtime_app\\pose_app\\joint_offset_model.py"
+    ],
+    [
+      "realtime_app\\tools\\benchmark_smplx_r3_integration.py",
+      "realtime_app\\tools\\compare_direct_triangulation_initialization.py"
+    ],
+    [
+      "realtime_app\\tools\\benchmark_smplx_structured_contact.py",
+      "realtime_app\\tools\\compare_direct_triangulation_initialization.py"
+    ],
+    [
+      "realtime_app\\tools\\diagnose_smplx_loss_gradients.py",
+      "realtime_app\\tools\\compare_direct_triangulation_initialization.py"
+    ],
+    [
+      "realtime_app\\tools\\fit_smplx_clean_male_coarse_to_fine.py",
+      "realtime_app\\tools\\compare_direct_triangulation_initialization.py"
+    ],
+    [
+      "realtime_app\\tools\\benchmark_smplx_r3_integration.py",
+      "realtime_app\\tools\\evaluate_male_beta_after_temporal.py"
+    ],
+    [
+      "realtime_app\\tools\\benchmark_smplx_structured_contact.py",
+      "realtime_app\\tools\\evaluate_male_beta_after_temporal.py"
+    ],
+    [
+      "realtime_app\\tools\\diagnose_smplx_loss_gradients.py",
+      "realtime_app\\tools\\evaluate_male_beta_after_temporal.py"
+    ],
+    [
+      "realtime_app\\tools\\fit_smplx_clean_male_coarse_to_fine.py",
+      "realtime_app\\tools\\evaluate_male_beta_after_temporal.py"
+    ],
+    [
+      "realtime_app\\tools\\fit_smplx_window_2d_reproj.py",
+      "realtime_app\\tools\\fit_skeleton_factor_graph.py"
+    ],
+    [
+      "realtime_app\\tools\\benchmark_smplx_r3_integration.py",
+      "realtime_app\\tools\\run_strict_foot_only_window.py"
+    ],
+    [
+      "realtime_app\\tools\\benchmark_smplx_structured_contact.py",
+      "realtime_app\\tools\\run_strict_foot_only_window.py"
+    ],
+    [
+      "realtime_app\\tools\\diagnose_smplx_loss_gradients.py",
+      "realtime_app\\tools\\run_strict_foot_only_window.py"
+    ]
+  ],
+  "retire_asset_directories": [
+    "models/mhr",
+    "models/supr",
+    "external_models/MHR",
+    "external_models/SUPR",
+    "migration_backups"
+  ],
+  "preserved": [
+    "current SMPL-H full448 outputs and inputs",
+    "all experimental failures and research records",
+    "current model/runtime/calibration dependencies",
+    "pre-existing modified tracked files"
+  ],
+  "retire_handoff_files": [
+    "dispatch/handoff_pose_system_20260927.md",
+    "dispatch/handoff_pose_system_20260928.md",
+    "dispatch/handoff_smpl_contact_mainline_20260925.md",
+    "dispatch/plan-20260925-surface-stage-d-redesign.md",
+    "dispatch/task-07-surface-hand-weight-sweep.md",
+    "dispatch/task-08-stage-d-observation-contact-redesign.md",
+    "dispatch/task-09-audit-v5-surface-geometry.md",
+    "dispatch/task-10-audit-sole-mapping.md",
+    "dispatch/task-11-audit-stage-c-gradients.md",
+    "dispatch/task-12-calibrate-contact-coefficients.md",
+    "dispatch/task-13-validate-foot-a1-independent-windows.md"
+  ],
+  "cache_directories": [
+    ".pytest_cache",
+    "external_models/dynamic_stereo/models/core/__pycache__",
+    "external_models/dynamic_stereo/models/core/utils/__pycache__",
+    "external_models/IGEV/IGEV-Stereo/core/__pycache__",
+    "external_models/IGEV/IGEV-Stereo/core/utils/__pycache__",
+    "external_models/MHR/mhr/__pycache__",
+    "external_models/SUPR/supr/__pycache__",
+    "external_models/SUPR/supr/pytorch/__pycache__",
+    "external_models/_tools/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/bs4/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/bs4/builder/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/certifi/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/certifi/tests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/charset_normalizer/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/charset_normalizer/cli/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/colorama/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/colorama/tests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/filelock/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/filelock/_soft_rw/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/gdown/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/gdown/_vendor/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/idna/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/build_env/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/cli/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/commands/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/distributions/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/index/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/locations/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/metadata/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/metadata/importlib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/models/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/network/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/build/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/install/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/req/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/legacy/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/resolvelib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/utils/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/vcs/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/cachecontrol/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/cachecontrol/caches/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/certifi/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/distlib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/distro/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/idna/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/msgpack/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/packaging/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/packaging/licenses/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pkg_resources/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/platformdirs/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/filters/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/formatters/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/lexers/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/styles/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pyproject_hooks/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pyproject_hooks/_in_process/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/requests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/resolvelib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/resolvelib/resolvers/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/rich/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/tomli/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/tomli_w/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/truststore/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/contrib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/contrib/emscripten/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/http2/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/util/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/requests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/soupsieve/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/tqdm/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/tqdm/contrib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/contrib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/contrib/emscripten/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/http2/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/util/__pycache__",
+    "realtime_app/pose_app/__pycache__",
+    "realtime_app/server/__pycache__",
+    "realtime_app/tests/__pycache__",
+    "realtime_app/tools/__pycache__",
+    "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/cfg/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/data/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/engine/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/fastsam/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/nas/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/rtdetr/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/modules/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/sam3/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/utils/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/classify/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/depth/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/detect/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/obb/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/pose/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/segment/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/semantic/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/world/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/yoloe/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/backends/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/modules/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/optim/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/solutions/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/trackers/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/trackers/utils/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/callbacks/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/export/__pycache__",
+    "third_party/InterWild/common/__pycache__",
+    "third_party/InterWild/common/nets/__pycache__",
+    "third_party/InterWild/common/utils/__pycache__",
+    "third_party/InterWild/data/__pycache__",
+    "third_party/InterWild/data/HIC/__pycache__",
+    "third_party/InterWild/data/InterHand26M/__pycache__",
+    "third_party/InterWild/data/MSCOCO/__pycache__",
+    "third_party/InterWild/data/ReInterHand/__pycache__",
+    "third_party/InterWild/main/__pycache__",
+    "third_party/sapiens2/repo/sapiens/__pycache__",
+    "third_party/sapiens2/repo/sapiens/backbones/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/albedo/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/matting/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/normal/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/pointmap/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/seg/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/transforms/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/evaluators/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/core/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/heads/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/losses/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/visualizers/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/datasets/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/datasets/data_preprocessors/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/datasets/transforms/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/evaluators/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/models/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/optim/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/runners/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/visualizers/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/configs/keypoints308/shutterstock_goliath_3po/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/configs/_base_/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/codecs/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/codecs/utils/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/transforms/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/evaluators/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/core/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/heads/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/losses/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/runners/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/visualizers/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/tools/vis/__pycache__",
+    "third_party/WiLoR/wilor/configs/__pycache__",
+    "third_party/WiLoR/wilor/datasets/__pycache__",
+    "third_party/WiLoR/wilor/models/__pycache__",
+    "third_party/WiLoR/wilor/models/backbones/__pycache__",
+    "third_party/WiLoR/wilor/models/heads/__pycache__",
+    "third_party/WiLoR/wilor/utils/__pycache__"
+  ],
+  "entries": [
+    {
+      "path": "realtime_app/pose_app/alternative_body_common.py",
+      "files": 1,
+      "bytes": 18738,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_body_ik.py",
+      "files": 1,
+      "bytes": 12421,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_body_kalman.py",
+      "files": 1,
+      "bytes": 9147,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_body_one_euro.py",
+      "files": 1,
+      "bytes": 4930,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_body_raw.py",
+      "files": 1,
+      "bytes": 2651,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_body_ray_factor.py",
+      "files": 1,
+      "bytes": 24081,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_body_rts.py",
+      "files": 1,
+      "bytes": 6260,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_body_shape.py",
+      "files": 1,
+      "bytes": 13601,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_surface_common.py",
+      "files": 1,
+      "bytes": 7223,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_surface_mhr.py",
+      "files": 1,
+      "bytes": 11004,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/pose_app/alternative_surface_supr.py",
+      "files": 1,
+      "bytes": 16150,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_alternative_body_common.py",
+      "files": 1,
+      "bytes": 7497,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_alternative_body_filters.py",
+      "files": 1,
+      "bytes": 8982,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_alternative_body_ik.py",
+      "files": 1,
+      "bytes": 9878,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_alternative_body_ray_factor.py",
+      "files": 1,
+      "bytes": 14148,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_alternative_surface_models.py",
+      "files": 1,
+      "bytes": 13947,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_build_smplx_coarse_surface_viewer.py",
+      "files": 1,
+      "bytes": 1847,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_build_smplx_full_mesh_solid_walker_viewer.py",
+      "files": 1,
+      "bytes": 2185,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_export_smplx_full_mesh_sequence.py",
+      "files": 1,
+      "bytes": 981,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_export_smplx_interactive_viewer.py",
+      "files": 1,
+      "bytes": 2164,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_aligned_temporal.py",
+      "files": 1,
+      "bytes": 1540,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_asset_gate.py",
+      "files": 1,
+      "bytes": 1291,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_corrected_observation_model.py",
+      "files": 1,
+      "bytes": 5498,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_fit_state_isolation.py",
+      "files": 1,
+      "bytes": 4107,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_fitting.py",
+      "files": 1,
+      "bytes": 1922,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_r3_integration.py",
+      "files": 1,
+      "bytes": 10098,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_shape_audit.py",
+      "files": 1,
+      "bytes": 1650,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_structured_contact.py",
+      "files": 1,
+      "bytes": 1734,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tests/test_smplx_temporal_weight_ablation.py",
+      "files": 1,
+      "bytes": 1405,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/audit_contact_surfaces.py",
+      "files": 1,
+      "bytes": 5836,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/audit_smplx_clean_initialization.py",
+      "files": 1,
+      "bytes": 4020,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/audit_smplx_male_hip_knee_geometry.py",
+      "files": 1,
+      "bytes": 3485,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/audit_smplx_structured_contact_effect.py",
+      "files": 1,
+      "bytes": 2191,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_alternative_body_routes.py",
+      "files": 1,
+      "bytes": 67146,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_alternative_surface_models.py",
+      "files": 1,
+      "bytes": 3420,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_aligned_temporal.py",
+      "files": 1,
+      "bytes": 9559,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_clean_aligned_temporal.py",
+      "files": 1,
+      "bytes": 6069,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_factorized_temporal.py",
+      "files": 1,
+      "bytes": 6730,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_root_gradient_decoupling.py",
+      "files": 1,
+      "bytes": 3720,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_staged_ankle_root_control.py",
+      "files": 1,
+      "bytes": 9758,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_structured_foot_contact.py",
+      "files": 1,
+      "bytes": 3083,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_temporal_weight_ablation.py",
+      "files": 1,
+      "bytes": 8340,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/build_smplx_coarse_surface_viewer.py",
+      "files": 1,
+      "bytes": 10057,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/build_smplx_full_mesh_solid_walker_viewer.py",
+      "files": 1,
+      "bytes": 14862,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/export_smplx_full_mesh_sequence.py",
+      "files": 1,
+      "bytes": 6136,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/export_smplx_interactive_viewer.py",
+      "files": 1,
+      "bytes": 3641,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/export_smplx_male_contact_mesh.py",
+      "files": 1,
+      "bytes": 3344,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_phase1_body.py",
+      "files": 1,
+      "bytes": 9460,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_clean_male_base_2d.py",
+      "files": 1,
+      "bytes": 3347,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_clean_male_shared_shape.py",
+      "files": 1,
+      "bytes": 3922,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_direct_multiview_bundle.py",
+      "files": 1,
+      "bytes": 12369,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_male_full_contact.py",
+      "files": 1,
+      "bytes": 2127,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_male_native_bundle.py",
+      "files": 1,
+      "bytes": 10482,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_male_observation_regressor.py",
+      "files": 1,
+      "bytes": 12798,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_male_structural_beta.py",
+      "files": 1,
+      "bytes": 4317,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_male_temporal_contact.py",
+      "files": 1,
+      "bytes": 8998,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_male_temporal_knots.py",
+      "files": 1,
+      "bytes": 4382,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_overlapping_windows.py",
+      "files": 1,
+      "bytes": 11022,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_single_frame.py",
+      "files": 1,
+      "bytes": 9115,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_structured_full_sequence.py",
+      "files": 1,
+      "bytes": 2046,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_temporal_window.py",
+      "files": 1,
+      "bytes": 15129,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/overlay_mhr_coco_mapping.py",
+      "files": 1,
+      "bytes": 4134,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/preflight_alternative_surface_models.py",
+      "files": 1,
+      "bytes": 5915,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/preflight_smplx_temporal_fit.py",
+      "files": 1,
+      "bytes": 831,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/render_smplx_single_frame_fit.py",
+      "files": 1,
+      "bytes": 3502,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/render_smplx_window_2d_audit.py",
+      "files": 1,
+      "bytes": 7918,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/render_smplx_window_audit.py",
+      "files": 1,
+      "bytes": 4193,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/select_smplx_shape_clips.py",
+      "files": 1,
+      "bytes": 3928,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/validate_smplx_boundary_contact_v3.py",
+      "files": 1,
+      "bytes": 3843,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/validate_smplx_male_temporal_candidate.py",
+      "files": 1,
+      "bytes": 3426,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/validate_smplx_structured_foot_contact.py",
+      "files": 1,
+      "bytes": 3180,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "realtime_app/tools/validate_smplx_structured_foot_contact_v2.py",
+      "files": 1,
+      "bytes": 3342,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/handoff_pose_system_20260927.md",
+      "files": 1,
+      "bytes": 12141,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/handoff_pose_system_20260928.md",
+      "files": 1,
+      "bytes": 20867,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/handoff_smpl_contact_mainline_20260925.md",
+      "files": 1,
+      "bytes": 10326,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/plan-20260925-surface-stage-d-redesign.md",
+      "files": 1,
+      "bytes": 1257,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/task-07-surface-hand-weight-sweep.md",
+      "files": 1,
+      "bytes": 8370,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/task-08-stage-d-observation-contact-redesign.md",
+      "files": 1,
+      "bytes": 14937,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/task-09-audit-v5-surface-geometry.md",
+      "files": 1,
+      "bytes": 7407,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/task-10-audit-sole-mapping.md",
+      "files": 1,
+      "bytes": 7190,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/task-11-audit-stage-c-gradients.md",
+      "files": 1,
+      "bytes": 8739,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/task-12-calibrate-contact-coefficients.md",
+      "files": 1,
+      "bytes": 5797,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "dispatch/task-13-validate-foot-a1-independent-windows.md",
+      "files": 1,
+      "bytes": 6099,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "models/mhr",
+      "files": 19,
+      "bytes": 4966030768,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "models/supr",
+      "files": 3,
+      "bytes": 242367276,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "external_models/MHR",
+      "files": 107,
+      "bytes": 16006592,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "external_models/SUPR",
+      "files": 55,
+      "bytes": 6185234,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": "migration_backups",
+      "files": 6,
+      "bytes": 60607,
+      "action": "recycle_retired_branch"
+    },
+    {
+      "path": ".pytest_cache",
+      "files": 5,
+      "bytes": 12303,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/dynamic_stereo/models/core/__pycache__",
+      "files": 5,
+      "bytes": 33639,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/dynamic_stereo/models/core/utils/__pycache__",
+      "files": 1,
+      "bytes": 1840,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/IGEV/IGEV-Stereo/core/__pycache__",
+      "files": 6,
+      "bytes": 32030,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/IGEV/IGEV-Stereo/core/utils/__pycache__",
+      "files": 2,
+      "bytes": 4057,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/MHR/mhr/__pycache__",
+      "files": 6,
+      "bytes": 23677,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/SUPR/supr/__pycache__",
+      "files": 2,
+      "bytes": 723,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/SUPR/supr/pytorch/__pycache__",
+      "files": 3,
+      "bytes": 20827,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/__pycache__",
+      "files": 2,
+      "bytes": 22051,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/__pycache__",
+      "files": 3,
+      "bytes": 207220,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/bs4/__pycache__",
+      "files": 11,
+      "bytes": 287100,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/bs4/builder/__pycache__",
+      "files": 4,
+      "bytes": 85792,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/certifi/__pycache__",
+      "files": 3,
+      "bytes": 3041,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/certifi/tests/__pycache__",
+      "files": 2,
+      "bytes": 1839,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/charset_normalizer/__pycache__",
+      "files": 10,
+      "bytes": 166559,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/charset_normalizer/cli/__pycache__",
+      "files": 2,
+      "bytes": 14198,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/colorama/__pycache__",
+      "files": 6,
+      "bytes": 42436,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/colorama/tests/__pycache__",
+      "files": 7,
+      "bytes": 49541,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/filelock/__pycache__",
+      "files": 18,
+      "bytes": 332284,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/filelock/_soft_rw/__pycache__",
+      "files": 3,
+      "bytes": 64075,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/gdown/__pycache__",
+      "files": 8,
+      "bytes": 68073,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/gdown/_vendor/__pycache__",
+      "files": 3,
+      "bytes": 92038,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/idna/__pycache__",
+      "files": 10,
+      "bytes": 170503,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/__pycache__",
+      "files": 3,
+      "bytes": 3867,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/__pycache__",
+      "files": 8,
+      "bytes": 109935,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/build_env/__pycache__",
+      "files": 6,
+      "bytes": 36445,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/cli/__pycache__",
+      "files": 13,
+      "bytes": 135902,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/commands/__pycache__",
+      "files": 19,
+      "bytes": 169324,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/distributions/__pycache__",
+      "files": 5,
+      "bytes": 18290,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/index/__pycache__",
+      "files": 4,
+      "bytes": 80251,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/locations/__pycache__",
+      "files": 4,
+      "bytes": 34446,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/metadata/__pycache__",
+      "files": 4,
+      "bytes": 59575,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/metadata/importlib/__pycache__",
+      "files": 4,
+      "bytes": 26079,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/models/__pycache__",
+      "files": 13,
+      "bytes": 62517,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/network/__pycache__",
+      "files": 8,
+      "bytes": 89862,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/__pycache__",
+      "files": 4,
+      "bytes": 51101,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/build/__pycache__",
+      "files": 6,
+      "bytes": 15504,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/install/__pycache__",
+      "files": 2,
+      "bytes": 35388,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/req/__pycache__",
+      "files": 8,
+      "bytes": 135647,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/__pycache__",
+      "files": 2,
+      "bytes": 1449,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/legacy/__pycache__",
+      "files": 2,
+      "bytes": 23058,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/resolvelib/__pycache__",
+      "files": 9,
+      "bytes": 130499,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/utils/__pycache__",
+      "files": 26,
+      "bytes": 172154,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/vcs/__pycache__",
+      "files": 6,
+      "bytes": 74179,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/__pycache__",
+      "files": 1,
+      "bytes": 4612,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/cachecontrol/__pycache__",
+      "files": 9,
+      "bytes": 49665,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/cachecontrol/caches/__pycache__",
+      "files": 3,
+      "bytes": 10465,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/certifi/__pycache__",
+      "files": 3,
+      "bytes": 3106,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/distlib/__pycache__",
+      "files": 5,
+      "bytes": 177483,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/distro/__pycache__",
+      "files": 3,
+      "bytes": 53448,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/idna/__pycache__",
+      "files": 10,
+      "bytes": 165191,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/msgpack/__pycache__",
+      "files": 4,
+      "bytes": 54108,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/packaging/__pycache__",
+      "files": 18,
+      "bytes": 334774,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/packaging/licenses/__pycache__",
+      "files": 2,
+      "bytes": 55524,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pkg_resources/__pycache__",
+      "files": 1,
+      "bytes": 161623,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/platformdirs/__pycache__",
+      "files": 9,
+      "bytes": 138274,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/__pycache__",
+      "files": 15,
+      "bytes": 141392,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/filters/__pycache__",
+      "files": 1,
+      "bytes": 37992,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/formatters/__pycache__",
+      "files": 2,
+      "bytes": 11180,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/lexers/__pycache__",
+      "files": 3,
+      "bytes": 128327,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/styles/__pycache__",
+      "files": 2,
+      "bytes": 6328,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pyproject_hooks/__pycache__",
+      "files": 2,
+      "bytes": 18522,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pyproject_hooks/_in_process/__pycache__",
+      "files": 2,
+      "bytes": 16629,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/requests/__pycache__",
+      "files": 19,
+      "bytes": 243108,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/resolvelib/__pycache__",
+      "files": 4,
+      "bytes": 26094,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/resolvelib/resolvers/__pycache__",
+      "files": 5,
+      "bytes": 36003,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/rich/__pycache__",
+      "files": 77,
+      "bytes": 1135711,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/tomli/__pycache__",
+      "files": 4,
+      "bytes": 35126,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/tomli_w/__pycache__",
+      "files": 2,
+      "bytes": 11147,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/truststore/__pycache__",
+      "files": 6,
+      "bytes": 58134,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/__pycache__",
+      "files": 12,
+      "bytes": 242087,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/contrib/__pycache__",
+      "files": 3,
+      "bytes": 37289,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/contrib/emscripten/__pycache__",
+      "files": 5,
+      "bytes": 54903,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/http2/__pycache__",
+      "files": 3,
+      "bytes": 23046,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/util/__pycache__",
+      "files": 13,
+      "bytes": 107559,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/requests/__pycache__",
+      "files": 19,
+      "bytes": 243281,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/soupsieve/__pycache__",
+      "files": 7,
+      "bytes": 161697,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/tqdm/__pycache__",
+      "files": 22,
+      "bytes": 163256,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/tqdm/contrib/__pycache__",
+      "files": 9,
+      "bytes": 51255,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/urllib3/__pycache__",
+      "files": 12,
+      "bytes": 242086,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/urllib3/contrib/__pycache__",
+      "files": 3,
+      "bytes": 37220,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/urllib3/contrib/emscripten/__pycache__",
+      "files": 5,
+      "bytes": 54863,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/urllib3/http2/__pycache__",
+      "files": 3,
+      "bytes": 23010,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "external_models/_tools/dl_venv/Lib/site-packages/urllib3/util/__pycache__",
+      "files": 13,
+      "bytes": 107540,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "realtime_app/pose_app/__pycache__",
+      "files": 38,
+      "bytes": 588807,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "realtime_app/server/__pycache__",
+      "files": 2,
+      "bytes": 11737,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "realtime_app/tests/__pycache__",
+      "files": 10,
+      "bytes": 164300,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "realtime_app/tools/__pycache__",
+      "files": 14,
+      "bytes": 334829,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/__pycache__",
+      "files": 1,
+      "bytes": 37440,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/__pycache__",
+      "files": 1,
+      "bytes": 2498,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/cfg/__pycache__",
+      "files": 1,
+      "bytes": 56720,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/data/__pycache__",
+      "files": 11,
+      "bytes": 515553,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/engine/__pycache__",
+      "files": 8,
+      "bytes": 463387,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/__pycache__",
+      "files": 2,
+      "bytes": 11801,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/fastsam/__pycache__",
+      "files": 5,
+      "bytes": 21693,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/nas/__pycache__",
+      "files": 4,
+      "bytes": 11126,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/rtdetr/__pycache__",
+      "files": 5,
+      "bytes": 23579,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/__pycache__",
+      "files": 6,
+      "bytes": 235666,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/modules/__pycache__",
+      "files": 9,
+      "bytes": 285133,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/sam3/__pycache__",
+      "files": 11,
+      "bytes": 161091,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/utils/__pycache__",
+      "files": 3,
+      "bytes": 35635,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/__pycache__",
+      "files": 2,
+      "bytes": 34606,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/classify/__pycache__",
+      "files": 4,
+      "bytes": 34472,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/depth/__pycache__",
+      "files": 5,
+      "bytes": 46307,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/detect/__pycache__",
+      "files": 4,
+      "bytes": 67319,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/obb/__pycache__",
+      "files": 4,
+      "bytes": 27939,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/pose/__pycache__",
+      "files": 4,
+      "bytes": 26097,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/segment/__pycache__",
+      "files": 4,
+      "bytes": 29416,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/semantic/__pycache__",
+      "files": 4,
+      "bytes": 28832,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/world/__pycache__",
+      "files": 4,
+      "bytes": 25282,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/yoloe/__pycache__",
+      "files": 5,
+      "bytes": 40448,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/__pycache__",
+      "files": 5,
+      "bytes": 190301,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/backends/__pycache__",
+      "files": 21,
+      "bytes": 146283,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/modules/__pycache__",
+      "files": 7,
+      "bytes": 333171,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/optim/__pycache__",
+      "files": 2,
+      "bytes": 15697,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/solutions/__pycache__",
+      "files": 20,
+      "bytes": 207168,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/trackers/__pycache__",
+      "files": 9,
+      "bytes": 158942,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/trackers/utils/__pycache__",
+      "files": 6,
+      "bytes": 75590,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/__pycache__",
+      "files": 25,
+      "bytes": 902967,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/callbacks/__pycache__",
+      "files": 10,
+      "bytes": 105258,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/export/__pycache__",
+      "files": 19,
+      "bytes": 146974,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/common/__pycache__",
+      "files": 6,
+      "bytes": 19166,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/common/nets/__pycache__",
+      "files": 8,
+      "bytes": 49810,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/common/utils/__pycache__",
+      "files": 12,
+      "bytes": 42901,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/data/__pycache__",
+      "files": 1,
+      "bytes": 1773,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/data/HIC/__pycache__",
+      "files": 1,
+      "bytes": 8254,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/data/InterHand26M/__pycache__",
+      "files": 1,
+      "bytes": 16163,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/data/MSCOCO/__pycache__",
+      "files": 1,
+      "bytes": 10178,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/data/ReInterHand/__pycache__",
+      "files": 2,
+      "bytes": 29076,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/InterWild/main/__pycache__",
+      "files": 6,
+      "bytes": 52668,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/__pycache__",
+      "files": 3,
+      "bytes": 2950,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/backbones/__pycache__",
+      "files": 3,
+      "bytes": 62135,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/__pycache__",
+      "files": 1,
+      "bytes": 680,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/__pycache__",
+      "files": 1,
+      "bytes": 287,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/datasets/__pycache__",
+      "files": 1,
+      "bytes": 331,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/datasets/albedo/__pycache__",
+      "files": 3,
+      "bytes": 7873,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/datasets/matting/__pycache__",
+      "files": 3,
+      "bytes": 10575,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/datasets/normal/__pycache__",
+      "files": 7,
+      "bytes": 21177,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/datasets/pointmap/__pycache__",
+      "files": 3,
+      "bytes": 9193,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/datasets/seg/__pycache__",
+      "files": 6,
+      "bytes": 27624,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/datasets/transforms/__pycache__",
+      "files": 6,
+      "bytes": 134418,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/evaluators/__pycache__",
+      "files": 6,
+      "bytes": 48831,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/models/__pycache__",
+      "files": 2,
+      "bytes": 2768,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/models/core/__pycache__",
+      "files": 6,
+      "bytes": 12027,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/models/heads/__pycache__",
+      "files": 6,
+      "bytes": 45188,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/models/losses/__pycache__",
+      "files": 9,
+      "bytes": 87120,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/dense/src/visualizers/__pycache__",
+      "files": 6,
+      "bytes": 39089,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/__pycache__",
+      "files": 3,
+      "bytes": 23645,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/datasets/__pycache__",
+      "files": 3,
+      "bytes": 8721,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/datasets/data_preprocessors/__pycache__",
+      "files": 3,
+      "bytes": 12913,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/datasets/transforms/__pycache__",
+      "files": 3,
+      "bytes": 27189,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/evaluators/__pycache__",
+      "files": 3,
+      "bytes": 3248,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/models/__pycache__",
+      "files": 2,
+      "bytes": 8881,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/optim/__pycache__",
+      "files": 3,
+      "bytes": 3262,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/runners/__pycache__",
+      "files": 2,
+      "bytes": 47081,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/engine/visualizers/__pycache__",
+      "files": 2,
+      "bytes": 4899,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/__pycache__",
+      "files": 1,
+      "bytes": 679,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/configs/keypoints308/shutterstock_goliath_3po/__pycache__",
+      "files": 1,
+      "bytes": 6744,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/configs/_base_/__pycache__",
+      "files": 1,
+      "bytes": 69637,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/__pycache__",
+      "files": 1,
+      "bytes": 308,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/datasets/__pycache__",
+      "files": 8,
+      "bytes": 47387,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/datasets/codecs/__pycache__",
+      "files": 2,
+      "bytes": 5735,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/datasets/codecs/utils/__pycache__",
+      "files": 6,
+      "bytes": 42309,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/datasets/transforms/__pycache__",
+      "files": 3,
+      "bytes": 38131,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/evaluators/__pycache__",
+      "files": 2,
+      "bytes": 31983,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/models/__pycache__",
+      "files": 2,
+      "bytes": 2766,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/models/core/__pycache__",
+      "files": 2,
+      "bytes": 2765,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/models/heads/__pycache__",
+      "files": 2,
+      "bytes": 9291,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/models/losses/__pycache__",
+      "files": 2,
+      "bytes": 6850,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/runners/__pycache__",
+      "files": 2,
+      "bytes": 5637,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/src/visualizers/__pycache__",
+      "files": 2,
+      "bytes": 22360,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/sapiens2/repo/sapiens/pose/tools/vis/__pycache__",
+      "files": 2,
+      "bytes": 25777,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/WiLoR/wilor/configs/__pycache__",
+      "files": 1,
+      "bytes": 6096,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/WiLoR/wilor/datasets/__pycache__",
+      "files": 2,
+      "bytes": 55732,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/WiLoR/wilor/models/__pycache__",
+      "files": 5,
+      "bytes": 39929,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/WiLoR/wilor/models/backbones/__pycache__",
+      "files": 4,
+      "bytes": 39609,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/WiLoR/wilor/models/heads/__pycache__",
+      "files": 4,
+      "bytes": 20905,
+      "action": "recycle_rebuildable_cache"
+    },
+    {
+      "path": "third_party/WiLoR/wilor/utils/__pycache__",
+      "files": 8,
+      "bytes": 82475,
+      "action": "recycle_rebuildable_cache"
+    }
+  ],
+  "method": "Windows Recycle Bin; recoverable until emptied",
+  "completed_paths": [
+    "realtime_app/pose_app/alternative_body_common.py",
+    "realtime_app/pose_app/alternative_body_ik.py",
+    "realtime_app/pose_app/alternative_body_kalman.py",
+    "realtime_app/pose_app/alternative_body_one_euro.py",
+    "realtime_app/pose_app/alternative_body_raw.py",
+    "realtime_app/pose_app/alternative_body_ray_factor.py",
+    "realtime_app/pose_app/alternative_body_rts.py",
+    "realtime_app/pose_app/alternative_body_shape.py",
+    "realtime_app/pose_app/alternative_surface_common.py",
+    "realtime_app/pose_app/alternative_surface_mhr.py",
+    "realtime_app/pose_app/alternative_surface_supr.py",
+    "realtime_app/tests/test_alternative_body_common.py",
+    "realtime_app/tests/test_alternative_body_filters.py",
+    "realtime_app/tests/test_alternative_body_ik.py",
+    "realtime_app/tests/test_alternative_body_ray_factor.py",
+    "realtime_app/tests/test_alternative_surface_models.py",
+    "realtime_app/tests/test_build_smplx_coarse_surface_viewer.py",
+    "realtime_app/tests/test_build_smplx_full_mesh_solid_walker_viewer.py",
+    "realtime_app/tests/test_export_smplx_full_mesh_sequence.py",
+    "realtime_app/tests/test_export_smplx_interactive_viewer.py",
+    "realtime_app/tests/test_smplx_aligned_temporal.py",
+    "realtime_app/tests/test_smplx_asset_gate.py",
+    "realtime_app/tests/test_smplx_corrected_observation_model.py",
+    "realtime_app/tests/test_smplx_fit_state_isolation.py",
+    "realtime_app/tests/test_smplx_fitting.py",
+    "realtime_app/tests/test_smplx_r3_integration.py",
+    "realtime_app/tests/test_smplx_shape_audit.py",
+    "realtime_app/tests/test_smplx_structured_contact.py",
+    "realtime_app/tests/test_smplx_temporal_weight_ablation.py",
+    "realtime_app/tools/audit_contact_surfaces.py",
+    "realtime_app/tools/audit_smplx_clean_initialization.py",
+    "realtime_app/tools/audit_smplx_male_hip_knee_geometry.py",
+    "realtime_app/tools/audit_smplx_structured_contact_effect.py",
+    "realtime_app/tools/benchmark_alternative_body_routes.py",
+    "realtime_app/tools/benchmark_alternative_surface_models.py",
+    "realtime_app/tools/benchmark_smplx_aligned_temporal.py",
+    "realtime_app/tools/benchmark_smplx_clean_aligned_temporal.py",
+    "realtime_app/tools/benchmark_smplx_factorized_temporal.py",
+    "realtime_app/tools/benchmark_smplx_root_gradient_decoupling.py",
+    "realtime_app/tools/benchmark_smplx_staged_ankle_root_control.py",
+    "realtime_app/tools/benchmark_smplx_structured_foot_contact.py",
+    "realtime_app/tools/benchmark_smplx_temporal_weight_ablation.py",
+    "realtime_app/tools/build_smplx_coarse_surface_viewer.py",
+    "realtime_app/tools/build_smplx_full_mesh_solid_walker_viewer.py",
+    "realtime_app/tools/export_smplx_full_mesh_sequence.py",
+    "realtime_app/tools/export_smplx_interactive_viewer.py",
+    "realtime_app/tools/export_smplx_male_contact_mesh.py",
+    "realtime_app/tools/fit_phase1_body.py",
+    "realtime_app/tools/fit_smplx_clean_male_base_2d.py",
+    "realtime_app/tools/fit_smplx_clean_male_shared_shape.py",
+    "realtime_app/tools/fit_smplx_direct_multiview_bundle.py",
+    "realtime_app/tools/fit_smplx_male_full_contact.py",
+    "realtime_app/tools/fit_smplx_male_native_bundle.py",
+    "realtime_app/tools/fit_smplx_male_observation_regressor.py",
+    "realtime_app/tools/fit_smplx_male_structural_beta.py",
+    "realtime_app/tools/fit_smplx_male_temporal_contact.py",
+    "realtime_app/tools/fit_smplx_male_temporal_knots.py",
+    "realtime_app/tools/fit_smplx_overlapping_windows.py",
+    "realtime_app/tools/fit_smplx_single_frame.py",
+    "realtime_app/tools/fit_smplx_structured_full_sequence.py",
+    "realtime_app/tools/fit_smplx_temporal_window.py",
+    "realtime_app/tools/overlay_mhr_coco_mapping.py",
+    "realtime_app/tools/preflight_alternative_surface_models.py",
+    "realtime_app/tools/preflight_smplx_temporal_fit.py",
+    "realtime_app/tools/render_smplx_single_frame_fit.py",
+    "realtime_app/tools/render_smplx_window_2d_audit.py",
+    "realtime_app/tools/render_smplx_window_audit.py",
+    "realtime_app/tools/select_smplx_shape_clips.py",
+    "realtime_app/tools/validate_smplx_boundary_contact_v3.py",
+    "realtime_app/tools/validate_smplx_male_temporal_candidate.py",
+    "realtime_app/tools/validate_smplx_structured_foot_contact.py",
+    "realtime_app/tools/validate_smplx_structured_foot_contact_v2.py",
+    "dispatch/handoff_pose_system_20260927.md",
+    "dispatch/handoff_pose_system_20260928.md",
+    "dispatch/handoff_smpl_contact_mainline_20260925.md",
+    "dispatch/plan-20260925-surface-stage-d-redesign.md",
+    "dispatch/task-07-surface-hand-weight-sweep.md",
+    "dispatch/task-08-stage-d-observation-contact-redesign.md",
+    "dispatch/task-09-audit-v5-surface-geometry.md",
+    "dispatch/task-10-audit-sole-mapping.md",
+    "dispatch/task-11-audit-stage-c-gradients.md",
+    "dispatch/task-12-calibrate-contact-coefficients.md",
+    "dispatch/task-13-validate-foot-a1-independent-windows.md",
+    "models/mhr",
+    "models/supr",
+    "external_models/MHR",
+    "external_models/SUPR",
+    "migration_backups",
+    ".pytest_cache",
+    "external_models/dynamic_stereo/models/core/__pycache__",
+    "external_models/dynamic_stereo/models/core/utils/__pycache__",
+    "external_models/IGEV/IGEV-Stereo/core/__pycache__",
+    "external_models/IGEV/IGEV-Stereo/core/utils/__pycache__",
+    "external_models/_tools/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/bs4/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/bs4/builder/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/certifi/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/certifi/tests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/charset_normalizer/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/charset_normalizer/cli/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/colorama/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/colorama/tests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/filelock/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/filelock/_soft_rw/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/gdown/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/gdown/_vendor/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/idna/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/build_env/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/cli/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/commands/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/distributions/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/index/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/locations/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/metadata/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/metadata/importlib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/models/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/network/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/build/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/operations/install/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/req/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/legacy/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/resolution/resolvelib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/utils/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_internal/vcs/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/cachecontrol/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/cachecontrol/caches/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/certifi/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/distlib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/distro/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/idna/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/msgpack/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/packaging/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/packaging/licenses/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pkg_resources/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/platformdirs/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/filters/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/formatters/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/lexers/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pygments/styles/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pyproject_hooks/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/pyproject_hooks/_in_process/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/requests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/resolvelib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/resolvelib/resolvers/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/rich/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/tomli/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/tomli_w/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/truststore/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/contrib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/contrib/emscripten/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/http2/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/pip/_vendor/urllib3/util/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/requests/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/soupsieve/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/tqdm/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/tqdm/contrib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/contrib/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/contrib/emscripten/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/http2/__pycache__",
+    "external_models/_tools/dl_venv/Lib/site-packages/urllib3/util/__pycache__",
+    "realtime_app/pose_app/__pycache__",
+    "realtime_app/server/__pycache__",
+    "realtime_app/tests/__pycache__",
+    "realtime_app/tools/__pycache__",
+    "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/cfg/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/data/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/engine/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/fastsam/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/nas/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/rtdetr/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/modules/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/sam/sam3/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/utils/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/classify/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/depth/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/detect/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/obb/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/pose/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/segment/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/semantic/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/world/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/models/yolo/yoloe/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/backends/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/nn/modules/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/optim/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/solutions/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/trackers/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/trackers/utils/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/callbacks/__pycache__",
+    "research_records/engineering_validation/G20261002_sapiens2_mainline360_v1/runtime_packages/ultralytics/utils/export/__pycache__",
+    "third_party/InterWild/common/__pycache__",
+    "third_party/InterWild/common/nets/__pycache__",
+    "third_party/InterWild/common/utils/__pycache__",
+    "third_party/InterWild/data/__pycache__",
+    "third_party/InterWild/data/HIC/__pycache__",
+    "third_party/InterWild/data/InterHand26M/__pycache__",
+    "third_party/InterWild/data/MSCOCO/__pycache__",
+    "third_party/InterWild/data/ReInterHand/__pycache__",
+    "third_party/InterWild/main/__pycache__",
+    "third_party/sapiens2/repo/sapiens/__pycache__",
+    "third_party/sapiens2/repo/sapiens/backbones/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/albedo/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/matting/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/normal/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/pointmap/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/seg/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/datasets/transforms/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/evaluators/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/core/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/heads/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/models/losses/__pycache__",
+    "third_party/sapiens2/repo/sapiens/dense/src/visualizers/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/datasets/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/datasets/data_preprocessors/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/datasets/transforms/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/evaluators/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/models/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/optim/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/runners/__pycache__",
+    "third_party/sapiens2/repo/sapiens/engine/visualizers/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/configs/keypoints308/shutterstock_goliath_3po/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/configs/_base_/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/codecs/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/codecs/utils/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/datasets/transforms/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/evaluators/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/core/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/heads/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/models/losses/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/runners/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/src/visualizers/__pycache__",
+    "third_party/sapiens2/repo/sapiens/pose/tools/vis/__pycache__",
+    "third_party/WiLoR/wilor/configs/__pycache__",
+    "third_party/WiLoR/wilor/datasets/__pycache__",
+    "third_party/WiLoR/wilor/models/__pycache__",
+    "third_party/WiLoR/wilor/models/backbones/__pycache__",
+    "third_party/WiLoR/wilor/models/heads/__pycache__",
+    "third_party/WiLoR/wilor/utils/__pycache__"
+  ],
+  "removed_from_project_bytes": 5246164222,
+  "validation": {
+    "unit_tests_passed": 23,
+    "viewer_frame_pytest_passed": 5,
+    "mainline_files_compiled": 8,
+    "current_full448_results_and_pages_preserved": true,
+    "retired_source_not_referenced_by_remaining_realtime_sequence_tools": true,
+    "models_retrained_or_fits_reexecuted": false
+  },
+  "limits": [
+    "Removed material remains recoverable in Windows Recycle Bin; disk capacity is not released until emptied.",
+    "Historical experiments retain paths to retired tools/assets; restoring them is required to rerun those retired routes.",
+    "Only confirmed isolated branches were retired; remaining referenced SMPL-X helpers and historical research evidence were preserved."
+  ]
+}
