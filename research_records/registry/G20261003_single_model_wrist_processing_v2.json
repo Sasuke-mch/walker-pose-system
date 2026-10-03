@@ -1,0 +1,1259 @@
+{
+  "experiment": "G20261003_single_model_wrist_processing_v2",
+  "date": "2026-10-03",
+  "scope": "Single Sapiens2-0.4B wrist/forearm processing; local DA3 diagnostics only",
+  "accepted_for_main_fit": false,
+  "inputs": {
+    "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2",
+    "manual_evaluation": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2",
+    "model": "Sapiens2-0.4B only",
+    "input_size": [
+      768,
+      1024
+    ],
+    "dtype": "unchanged float32",
+    "frames": [
+      0,
+      50,
+      99,
+      149,
+      199,
+      248,
+      298,
+      348,
+      397,
+      447
+    ],
+    "continuous_windows": [
+      [
+        0,
+        0
+      ],
+      [
+        43,
+        50
+      ],
+      [
+        92,
+        99
+      ],
+      [
+        142,
+        149
+      ],
+      [
+        192,
+        199
+      ],
+      [
+        241,
+        248
+      ],
+      [
+        291,
+        298
+      ],
+      [
+        341,
+        348
+      ],
+      [
+        390,
+        397
+      ],
+      [
+        440,
+        447
+      ]
+    ],
+    "variants": [
+      "full_flip",
+      "upper_flip",
+      "perspective_flip",
+      "full_single",
+      "upper_single",
+      "perspective_single"
+    ],
+    "sparse_roi": "same detector cached previous frame, never current/manual points; frame0 full bootstrap",
+    "continuous_roi": "own previous inference only; each window initializes full, no cached pose",
+    "upper_box": "combined COCO5:11; min confidence .25; padding x .25 ytop .30 ybottom .45; min span200x250",
+    "perspective": "previous6 upper joints as support,1.35span,.95 coverage,768x1024; padded-box background is not a geometric support; inverse mapping to raw",
+    "heatmap": "original UDP DARK versus integer argmax; local stereo candidates max12 raw px, response>=.5",
+    "epipolar_cost": "-log(response_product)+.3*sampson_px_squared/25+.05*movement_squared/64",
+    "causal_filter": "min_cutoff2Hz,beta.015,derivative1Hz; missing reset; actual file timestamps",
+    "geometry": "original solve_point, 10px and1deg; retain bounds, low-confidence and rejected rows",
+    "timing": "CUDA synchronized; 3warmups; includes view construction, preprocessing, forward, CPU transfer, decode and inverse mapping; excludes PNG read, model load, cached person detector, capture/display",
+    "budget": "six variants on20 annotated images; three single-pass variants on10 causal windows; full448 cached single-model filter replay",
+    "success": "compare all28 manual2D slots, same8 stereo references, missing and geometry; report lower-limb coverage cost; no automatic mainline promotion",
+    "stop": "coordinate/frame mismatch, nonfinite active inputs or resource failure; retain failure files",
+    "code": [
+      "realtime_app/experiment_wrist_processing.py",
+      "realtime_app/pose_app/wrist_processing.py"
+    ]
+  },
+  "postprocessing_protocol": "research_records/engineering_validation/G20261003_single_model_wrist_processing_v2/postprocessing_protocol.json",
+  "results": "research_records/engineering_validation/G20261003_single_model_wrist_processing_v2/results.json",
+  "summary": {
+    "sparse": {
+      "full_flip": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 26.33199445880822,
+          "median": 20.31355703797346,
+          "rms": 30.54579349632574,
+          "p95": 65.17804673527421,
+          "max": 73.40919658866427
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 17.177790856836147,
+          "median": 16.042237058018806,
+          "rms": 17.891591660938687,
+          "p95": 25.015756840679614,
+          "max": 25.170354106156942
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 1,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "timing_ms": {
+          "n": 20,
+          "mean": 1059.9651899989112,
+          "median": 1049.7328499986907,
+          "rms": 1060.4100842444404,
+          "p95": 1112.027835000481,
+          "max": 1154.586599994218
+        },
+        "stereo_pair_processing_ms": {
+          "n": 10,
+          "mean": 2119.9303799978225,
+          "median": 2106.4992000028724,
+          "rms": 2120.5815692921005,
+          "p95": 2211.744709991035,
+          "max": 2224.0765999886207
+        },
+        "bootstrap_full": 20,
+        "roundtrip_max_px": 0.0
+      },
+      "full_flip_argmax": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 26.195309564409076,
+          "median": 19.944699425857635,
+          "rms": 30.894205860741934,
+          "p95": 65.80247191163984,
+          "max": 74.5889148359995
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 17.762178415985332,
+          "median": 17.79517882620835,
+          "rms": 18.73451783622451,
+          "p95": 26.191773929381437,
+          "max": 26.209475986055367
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 0,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 17,
+        "elbow_geometry_total": 20
+      },
+      "full_flip_epipolar": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 27.33745235732176,
+          "median": 23.43200618523901,
+          "rms": 30.105765943644723,
+          "p95": 58.557890905793656,
+          "max": 67.48423203328048
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.019862870885937,
+          "median": 15.695256661609136,
+          "rms": 17.049280947075793,
+          "p95": 24.66043456529541,
+          "max": 25.120675258911806
+        },
+        "stereo_both_gates_mm": {
+          "n": 4,
+          "mean": 16.441589852514877,
+          "median": 16.76065686778731,
+          "rms": 17.331297372597643,
+          "p95": 22.888141241288118,
+          "max": 23.80570184857925
+        },
+        "wrist_geometry_passed": 10,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "processing_ms": {
+          "n": 10,
+          "mean": 0.23764999787090346,
+          "median": 0.1657999964663759,
+          "rms": 0.3194616075138381,
+          "p95": 0.5657949914166231,
+          "max": 0.8775999885983765
+        }
+      },
+      "full_single": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.66529611881246,
+          "median": 20.076209371344998,
+          "rms": 29.918620181781865,
+          "p95": 62.71751354340663,
+          "max": 73.2788288558464
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.93004951708967,
+          "median": 16.26475782504563,
+          "rms": 17.803654369590074,
+          "p95": 25.33972383078824,
+          "max": 25.92808825678294
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 1,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "timing_ms": {
+          "n": 20,
+          "mean": 569.3234699981986,
+          "median": 567.3330499994336,
+          "rms": 569.5041297174353,
+          "p95": 595.1024299974961,
+          "max": 597.1683000097983
+        },
+        "stereo_pair_processing_ms": {
+          "n": 10,
+          "mean": 1138.6469399963971,
+          "median": 1140.3049000000465,
+          "rms": 1138.9400890659135,
+          "p95": 1173.3559649925155,
+          "max": 1177.4492999975337
+        },
+        "bootstrap_full": 20,
+        "roundtrip_max_px": 0.0
+      },
+      "full_single_argmax": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.919783189928722,
+          "median": 19.577683414944765,
+          "rms": 30.684257581075748,
+          "p95": 65.80247191163984,
+          "max": 74.5889148359995
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 17.058578894257547,
+          "median": 16.848033948070842,
+          "rms": 18.134911507996605,
+          "p95": 26.191773929381437,
+          "max": 26.209475986055367
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 1,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 16,
+        "elbow_geometry_total": 20
+      },
+      "full_single_epipolar": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 27.63713643010369,
+          "median": 23.43200618523901,
+          "rms": 30.00248079919309,
+          "p95": 55.96450383805676,
+          "max": 65.36637490204969
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 15.521935306031555,
+          "median": 14.746324973752001,
+          "rms": 16.5984208196296,
+          "p95": 24.00587700826721,
+          "max": 24.113663632714573
+        },
+        "stereo_both_gates_mm": {
+          "n": 5,
+          "mean": 17.976004608554817,
+          "median": 17.688631133305055,
+          "rms": 18.883666213218984,
+          "p95": 24.05207127588751,
+          "max": 24.113663632714573
+        },
+        "wrist_geometry_passed": 11,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "processing_ms": {
+          "n": 10,
+          "mean": 0.18516000272938982,
+          "median": 0.16909999976633117,
+          "rms": 0.19130613449548678,
+          "p95": 0.2685750034288502,
+          "max": 0.32550000469200313
+        }
+      },
+      "perspective_flip": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 24.103154848516763,
+          "median": 18.692861491454455,
+          "rms": 28.686931291659057,
+          "p95": 63.07909354628655,
+          "max": 69.40138482502034
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.583582220313012,
+          "median": 15.126342203961356,
+          "rms": 17.209630472054148,
+          "p95": 24.139481259085496,
+          "max": 24.317115113732616
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 1,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 15,
+        "elbow_geometry_total": 20,
+        "timing_ms": {
+          "n": 20,
+          "mean": 1075.3499849990476,
+          "median": 1076.015799997549,
+          "rms": 1075.8171042897648,
+          "p95": 1132.0854050027265,
+          "max": 1147.2038000065368
+        },
+        "stereo_pair_processing_ms": {
+          "n": 10,
+          "mean": 2150.699969998095,
+          "median": 2150.7407000026433,
+          "rms": 2151.2405674669626,
+          "p95": 2216.415690004942,
+          "max": 2224.055700004101
+        },
+        "bootstrap_full": 2,
+        "roundtrip_max_px": 4.547473508864641e-13
+      },
+      "perspective_flip_argmax": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.58052026339072,
+          "median": 19.0956690036426,
+          "rms": 30.75390405792878,
+          "p95": 65.23907670170715,
+          "max": 80.05297654571794
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 18.259584579872005,
+          "median": 17.718338726504207,
+          "rms": 19.158559290198625,
+          "p95": 26.93562800166451,
+          "max": 27.594428502407062
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 0,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 14,
+        "elbow_geometry_total": 20
+      },
+      "perspective_flip_epipolar": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 26.133696021700604,
+          "median": 22.993686190399398,
+          "rms": 28.30120643774677,
+          "p95": 54.036821100713894,
+          "max": 59.84414723013034
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 15.591812061661734,
+          "median": 15.512889580808414,
+          "rms": 16.15231897868719,
+          "p95": 21.591146885611423,
+          "max": 21.654034012577828
+        },
+        "stereo_both_gates_mm": {
+          "n": 5,
+          "mean": 18.099917965772658,
+          "median": 16.345420147709106,
+          "rms": 18.32797399927309,
+          "p95": 21.618098511454168,
+          "max": 21.654034012577828
+        },
+        "wrist_geometry_passed": 15,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 15,
+        "elbow_geometry_total": 20,
+        "processing_ms": {
+          "n": 10,
+          "mean": 0.23570999765070155,
+          "median": 0.22034999710740522,
+          "rms": 0.2381059176773801,
+          "p95": 0.29517499933717767,
+          "max": 0.3215000033378601
+        }
+      },
+      "perspective_single": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 23.743254834901585,
+          "median": 18.550710552121473,
+          "rms": 28.211909248547848,
+          "p95": 60.56018559460164,
+          "max": 70.78940871466696
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.013973557309306,
+          "median": 14.6066115677746,
+          "rms": 16.705747535913037,
+          "p95": 23.94750123707675,
+          "max": 25.543394169416317
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 0,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 15,
+        "elbow_geometry_total": 20,
+        "timing_ms": {
+          "n": 20,
+          "mean": 595.5929499999911,
+          "median": 597.6771999994526,
+          "rms": 595.8846363973405,
+          "p95": 619.9541450085235,
+          "max": 623.2610000006389
+        },
+        "stereo_pair_processing_ms": {
+          "n": 10,
+          "mean": 1191.1858999999822,
+          "median": 1194.274849993235,
+          "rms": 1191.726009898185,
+          "p95": 1235.813345004135,
+          "max": 1239.0775999956531
+        },
+        "bootstrap_full": 2,
+        "roundtrip_max_px": 3.979039320256561e-13
+      },
+      "perspective_single_argmax": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 24.00571806746658,
+          "median": 17.80336077596411,
+          "rms": 28.5063586458909,
+          "p95": 59.46063785111054,
+          "max": 70.97425346751824
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 15.833404711068471,
+          "median": 15.45917897833866,
+          "rms": 16.59977447099525,
+          "p95": 23.709871039083815,
+          "max": 25.712141357428344
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 0,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 16,
+        "elbow_geometry_total": 20
+      },
+      "perspective_single_epipolar": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.93929302283482,
+          "median": 22.739363895779665,
+          "rms": 28.124332100038874,
+          "p95": 53.31437713020724,
+          "max": 59.84414723013034
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 14.799320088038312,
+          "median": 14.170445374199293,
+          "rms": 15.630717801757527,
+          "p95": 22.73091203479734,
+          "max": 23.407518857479236
+        },
+        "stereo_both_gates_mm": {
+          "n": 5,
+          "mean": 17.443983427901962,
+          "median": 14.756898838070043,
+          "rms": 17.938669761382116,
+          "p95": 23.020886387375295,
+          "max": 23.407518857479236
+        },
+        "wrist_geometry_passed": 16,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 15,
+        "elbow_geometry_total": 20,
+        "processing_ms": {
+          "n": 10,
+          "mean": 0.2143699981388636,
+          "median": 0.2091999995172955,
+          "rms": 0.21474404325647067,
+          "p95": 0.23305499125854112,
+          "max": 0.2339999919058755
+        }
+      },
+      "upper_flip": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.999897590242348,
+          "median": 21.02559480142071,
+          "rms": 30.016521958336174,
+          "p95": 61.341029208100224,
+          "max": 74.9426384793066
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.7422055599351,
+          "median": 15.904373105799358,
+          "rms": 17.430528317985782,
+          "p95": 24.539295198025442,
+          "max": 25.134629674558933
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 1,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "timing_ms": {
+          "n": 20,
+          "mean": 1053.125295000791,
+          "median": 1049.1368500006502,
+          "rms": 1053.4767366352785,
+          "p95": 1116.1353900031827,
+          "max": 1127.183700009482
+        },
+        "stereo_pair_processing_ms": {
+          "n": 10,
+          "mean": 2106.250590001582,
+          "median": 2093.840950001322,
+          "rms": 2106.770978427623,
+          "p95": 2185.7002150012704,
+          "max": 2196.13450000179
+        },
+        "bootstrap_full": 2,
+        "roundtrip_max_px": 0.0
+      },
+      "upper_flip_argmax": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 27.14121377674206,
+          "median": 22.240058645402435,
+          "rms": 31.322861163851336,
+          "p95": 63.709811374045515,
+          "max": 78.18162948157064
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 17.7753763246004,
+          "median": 16.609693436858265,
+          "rms": 18.531230578298917,
+          "p95": 25.34345156296192,
+          "max": 25.505434611458938
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 2,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 17,
+        "elbow_geometry_total": 20
+      },
+      "upper_flip_epipolar": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 28.812051165731592,
+          "median": 25.66914280807916,
+          "rms": 31.028071253554327,
+          "p95": 55.842435191233186,
+          "max": 65.76175283998613
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.565985040142856,
+          "median": 15.471323999256345,
+          "rms": 17.466579492466376,
+          "p95": 24.2644133521021,
+          "max": 25.072007340498494
+        },
+        "stereo_both_gates_mm": {
+          "n": 4,
+          "mean": 16.76077266129286,
+          "median": 15.471323999256345,
+          "rms": 17.538043067944155,
+          "p95": 23.756330207672974,
+          "max": 25.072007340498494
+        },
+        "wrist_geometry_passed": 15,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "processing_ms": {
+          "n": 10,
+          "mean": 0.20063999836565927,
+          "median": 0.18360000103712082,
+          "rms": 0.203913975684425,
+          "p95": 0.2684300008695572,
+          "max": 0.2930000046035275
+        }
+      },
+      "upper_single": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.86889303836616,
+          "median": 20.70441565291216,
+          "rms": 29.91140086944632,
+          "p95": 63.183920492636204,
+          "max": 71.70047383655869
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.613599400414337,
+          "median": 16.089505758528425,
+          "rms": 17.40729757918552,
+          "p95": 24.562524037266222,
+          "max": 24.63759229111537
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 1,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "timing_ms": {
+          "n": 20,
+          "mean": 591.5516099987144,
+          "median": 588.4245999986888,
+          "rms": 591.7037167473651,
+          "p95": 610.6861800064507,
+          "max": 613.1786000041757
+        },
+        "stereo_pair_processing_ms": {
+          "n": 10,
+          "mean": 1183.1032199974288,
+          "median": 1182.0855499900063,
+          "rms": 1183.3097115746943,
+          "p95": 1216.440395002428,
+          "max": 1219.008500003838
+        },
+        "bootstrap_full": 2,
+        "roundtrip_max_px": 0.0
+      },
+      "upper_single_argmax": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.9243448872262,
+          "median": 20.383477146819594,
+          "rms": 30.270821649866647,
+          "p95": 63.709811374045515,
+          "max": 73.04101341026917
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 15.965343093668192,
+          "median": 15.086301352380188,
+          "rms": 16.91274732660845,
+          "p95": 24.775647285521266,
+          "max": 25.042625901467456
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 0,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 17,
+        "elbow_geometry_total": 20
+      },
+      "upper_single_epipolar": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 29.10939686409603,
+          "median": 26.103872029026903,
+          "rms": 31.311011639449028,
+          "p95": 57.64792861727377,
+          "max": 65.76175283998613
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.51186470749483,
+          "median": 16.19012805915408,
+          "rms": 17.665636915303995,
+          "p95": 24.758060344127593,
+          "max": 25.072007340498494
+        },
+        "stereo_both_gates_mm": {
+          "n": 5,
+          "mean": 18.09065388919821,
+          "median": 17.87269312890532,
+          "rms": 19.083173693714013,
+          "p95": 24.892609056857978,
+          "max": 25.072007340498494
+        },
+        "wrist_geometry_passed": 16,
+        "wrist_geometry_total": 20,
+        "elbow_geometry_passed": 18,
+        "elbow_geometry_total": 20,
+        "processing_ms": {
+          "n": 10,
+          "mean": 0.22898999886820093,
+          "median": 0.18889999773819,
+          "rms": 0.24336573785244278,
+          "p95": 0.39159999651019456,
+          "max": 0.42039999971166253
+        }
+      }
+    },
+    "continuous": {
+      "full_single": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.66529611881246,
+          "median": 20.076209371344998,
+          "rms": 29.918620181781865,
+          "p95": 62.71751354340663,
+          "max": 73.2788288558464
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.93004951708967,
+          "median": 16.26475782504563,
+          "rms": 17.803654369590074,
+          "p95": 25.33972383078824,
+          "max": 25.92808825678294
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 15,
+        "wrist_geometry_total": 146,
+        "elbow_geometry_passed": 113,
+        "elbow_geometry_total": 146,
+        "timing_ms": {
+          "n": 146,
+          "mean": 573.1036794519017,
+          "median": 571.6674999930547,
+          "rms": 573.2734233300082,
+          "p95": 598.743350001314,
+          "max": 629.5905000006314
+        },
+        "stereo_pair_processing_ms": {
+          "n": 73,
+          "mean": 1146.2073589038034,
+          "median": 1143.7063999910606,
+          "rms": 1146.417040852844,
+          "p95": 1184.5926800044253,
+          "max": 1219.8169000039343
+        },
+        "bootstrap_full": 146,
+        "roundtrip_max_px": 0.0
+      },
+      "perspective_single": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 23.966923057026545,
+          "median": 18.913336166008122,
+          "rms": 28.335233973578113,
+          "p95": 61.88097909195849,
+          "max": 67.77153970886233
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 15.936799146954726,
+          "median": 14.832900197320415,
+          "rms": 16.612959943964526,
+          "p95": 23.541569682374718,
+          "max": 24.352285102095045
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 5,
+        "wrist_geometry_total": 146,
+        "elbow_geometry_passed": 106,
+        "elbow_geometry_total": 146,
+        "timing_ms": {
+          "n": 146,
+          "mean": 586.9670136992569,
+          "median": 588.151050003944,
+          "rms": 587.0630002572142,
+          "p95": 601.4023500028998,
+          "max": 610.1821000047494
+        },
+        "stereo_pair_processing_ms": {
+          "n": 73,
+          "mean": 1173.9340273985138,
+          "median": 1178.5511000052793,
+          "rms": 1174.0867041461117,
+          "p95": 1195.159240005887,
+          "max": 1200.5919000075664
+        },
+        "bootstrap_full": 20,
+        "roundtrip_max_px": 4.547473508864641e-13
+      },
+      "upper_single": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 25.861049275531723,
+          "median": 20.69415725308042,
+          "rms": 29.696594103635128,
+          "p95": 62.50571087944763,
+          "max": 69.24083139288058
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 16.465524957241094,
+          "median": 15.926451407496735,
+          "rms": 17.14568752810484,
+          "p95": 23.82484115354758,
+          "max": 24.123598978021395
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 7,
+        "wrist_geometry_total": 146,
+        "elbow_geometry_passed": 120,
+        "elbow_geometry_total": 146,
+        "timing_ms": {
+          "n": 146,
+          "mean": 569.4633075344091,
+          "median": 566.6082500029006,
+          "rms": 569.5799330017902,
+          "p95": 590.3044000006048,
+          "max": 641.9102000072598
+        },
+        "stereo_pair_processing_ms": {
+          "n": 73,
+          "mean": 1138.9266150688181,
+          "median": 1135.6700000033015,
+          "rms": 1139.08133731811,
+          "p95": 1173.320440002135,
+          "max": 1240.6285000033677
+        },
+        "bootstrap_full": 20,
+        "roundtrip_max_px": 0.0
+      }
+    },
+    "filter": {
+      "cutoff2.0_beta0.015": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 26.796528678727906,
+          "median": 19.887359178983402,
+          "rms": 31.071796021540866,
+          "p95": 65.27742654957285,
+          "max": 74.89557460415888
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 17.392624091111195,
+          "median": 16.060774060485112,
+          "rms": 18.05983977335031,
+          "p95": 25.385464381090454,
+          "max": 26.067547037186458
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 44,
+        "wrist_geometry_total": 896,
+        "elbow_geometry_passed": 723,
+        "elbow_geometry_total": 896,
+        "processing_ms": {
+          "n": 896,
+          "mean": 0.04502220977948517,
+          "median": 0.04300000728107989,
+          "rms": 0.04684319304923254,
+          "p95": 0.053499999921768904,
+          "max": 0.35489999572746456
+        },
+        "observation_shift_px": {
+          "n": 3584,
+          "mean": 3.5709328455858205,
+          "median": 3.0274700261005734,
+          "rms": 4.377562531931222,
+          "p95": 8.533783899935742,
+          "max": 17.84078571014985
+        },
+        "acceleration_px_s2": {
+          "n": 3568,
+          "mean": 1297.2808330010473,
+          "median": 934.183547596573,
+          "rms": 1776.976757897961,
+          "p95": 3691.783524489851,
+          "max": 10833.809161467827
+        },
+        "baseline_acceleration_px_s2": {
+          "n": 3568,
+          "mean": 3913.983434354661,
+          "median": 3153.609132396542,
+          "rms": 4899.7086555677815,
+          "p95": 9656.277463969045,
+          "max": 23546.829547765155
+        },
+        "coordinate_range_ratio": {
+          "n": 8,
+          "mean": 0.93790480608884,
+          "median": 0.9443223426085814,
+          "rms": 0.9384081453916316,
+          "p95": 0.9714020842747082,
+          "max": 0.9721468916269506
+        },
+        "velocity_correlation_lag_frames": [
+          0,
+          0
+        ]
+      },
+      "cutoff5.0_beta0.015": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 26.538716613934394,
+          "median": 20.020095227134824,
+          "rms": 30.784148330802182,
+          "p95": 65.44623519087071,
+          "max": 73.8677077005413
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 17.291756704424355,
+          "median": 16.058777517741177,
+          "rms": 17.972223380241307,
+          "p95": 25.155561934494212,
+          "max": 25.496147152656512
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 48,
+        "wrist_geometry_total": 896,
+        "elbow_geometry_passed": 722,
+        "elbow_geometry_total": 896,
+        "processing_ms": {
+          "n": 896,
+          "mean": 0.04636584805796572,
+          "median": 0.0447999918833375,
+          "rms": 0.04773836650854404,
+          "p95": 0.05289999535307288,
+          "max": 0.23469999723602086
+        },
+        "observation_shift_px": {
+          "n": 3584,
+          "mean": 2.0357751437376974,
+          "median": 1.5700464226496598,
+          "rms": 2.6126578065196444,
+          "p95": 5.411004474217996,
+          "max": 12.589356154409543
+        },
+        "acceleration_px_s2": {
+          "n": 3568,
+          "mean": 1850.9484060947536,
+          "median": 1442.9185293963174,
+          "rms": 2400.337238196366,
+          "p95": 4808.295285653394,
+          "max": 13472.804967448845
+        },
+        "baseline_acceleration_px_s2": {
+          "n": 3568,
+          "mean": 3913.983434354661,
+          "median": 3153.609132396542,
+          "rms": 4899.7086555677815,
+          "p95": 9656.277463969045,
+          "max": 23546.829547765155
+        },
+        "coordinate_range_ratio": {
+          "n": 8,
+          "mean": 0.9682794453403074,
+          "median": 0.9687167104873026,
+          "rms": 0.9683811936565949,
+          "p95": 0.9849505031894071,
+          "max": 0.9862923049925414
+        },
+        "velocity_correlation_lag_frames": [
+          0,
+          0
+        ]
+      },
+      "cutoff2.0_beta0.05": {
+        "manual2d_px": {
+          "n": 28,
+          "mean": 26.65176230545816,
+          "median": 19.892875074660537,
+          "rms": 30.91681154245885,
+          "p95": 65.39260564262936,
+          "max": 74.51331561447779
+        },
+        "manual2d_missing": 0,
+        "stereo_diagnostic_mm": {
+          "n": 8,
+          "mean": 17.316593280308872,
+          "median": 16.07427083340916,
+          "rms": 18.00201037793973,
+          "p95": 25.329296036914986,
+          "max": 25.891239736219234
+        },
+        "stereo_both_gates_mm": {
+          "n": 0,
+          "mean": null,
+          "median": null,
+          "rms": null,
+          "p95": null,
+          "max": null
+        },
+        "wrist_geometry_passed": 47,
+        "wrist_geometry_total": 896,
+        "elbow_geometry_passed": 720,
+        "elbow_geometry_total": 896,
+        "processing_ms": {
+          "n": 896,
+          "mean": 0.04842399539484177,
+          "median": 0.042800005758181214,
+          "rms": 0.06559282398775339,
+          "p95": 0.051700000767596066,
+          "max": 0.6762999983038753
+        },
+        "observation_shift_px": {
+          "n": 3584,
+          "mean": 2.169607966362377,
+          "median": 1.8410924342141195,
+          "rms": 2.584018426823139,
+          "p95": 4.8682847959560664,
+          "max": 9.205034667033482
+        },
+        "acceleration_px_s2": {
+          "n": 3568,
+          "mean": 1815.4173207010806,
+          "median": 1253.5107246234165,
+          "rms": 2545.300337361356,
+          "p95": 5350.156189940356,
+          "max": 17596.142787255834
+        },
+        "baseline_acceleration_px_s2": {
+          "n": 3568,
+          "mean": 3913.983434354661,
+          "median": 3153.609132396542,
+          "rms": 4899.7086555677815,
+          "p95": 9656.277463969045,
+          "max": 23546.829547765155
+        },
+        "coordinate_range_ratio": {
+          "n": 8,
+          "mean": 0.9612856075280567,
+          "median": 0.9680193745579855,
+          "rms": 0.9615798147942521,
+          "p95": 0.9885043440342012,
+          "max": 0.9912082793323581
+        },
+        "velocity_correlation_lag_frames": [
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "da3": {
+    "paired_inference_ms": {
+      "n": 10,
+      "mean": 163.40069999714615,
+      "median": 162.57909999694675,
+      "rms": 163.4565421399551,
+      "p95": 168.99168500094675,
+      "max": 169.92349999782164
+    },
+    "monocular_inference_ms": {
+      "n": 20,
+      "mean": 104.05250500116381,
+      "median": 100.85964999598218,
+      "rms": 105.82304639207726,
+      "p95": 121.48162500088806,
+      "max": 183.05919998965692
+    },
+    "paired_with_view_ms": {
+      "n": 10,
+      "mean": 218.0800299945986,
+      "median": 217.92079999431735,
+      "rms": 218.14788590942905,
+      "p95": 226.2075550024747,
+      "max": 226.9663000042783
+    },
+    "finite_fraction_min": 1.0,
+    "available_samples": 160,
+    "total_samples": 160,
+    "pose_points_modified": 0,
+    "metric_flags": [
+      null
+    ]
+  },
+  "verification": {
+    "sparse_records": 120,
+    "continuous_records": 438,
+    "da3_calls": 30,
+    "baseline_max_difference_px": 0,
+    "coordinate_roundtrip_limit_px": 1e-06,
+    "public_tests": {
+      "passed": 704,
+      "skipped": 9,
+      "subtests_passed": 29,
+      "sequence_passed": 2
+    },
+    "new_unit_tests": 8,
+    "ruff_F": "passed",
+    "compile": "passed",
+    "report_pages": 9,
+    "report_tables": 10,
+    "report_figures": 2,
+    "backup_equal": true,
+    "rendered_pages_checked": [
+      1,
+      4,
+      7,
+      9
+    ],
+    "da3_depth_used_in_pose": false,
+    "accepted_for_main_fit": false
+  },
+  "report": "research_records/engineering_validation/G20261003_single_model_wrist_processing_v2/单模型腕部处理实验报告.docx",
+  "report_backup": "资料/实验报告/单模型腕部处理实验报告_20261003.docx",
+  "failures_preserved": [
+    "G20261003_single_model_wrist_processing_v1",
+    "G20261003_single_model_wrist_processing_v2/da3",
+    "G20261003_single_model_wrist_processing_v2/da3_retry_v2"
+  ],
+  "boundary": "Sparse manual 2D operational reference; accepted shared 3D sample count zero for continuous candidates. DA3 depth excluded from geometry, point filtering and pose fitting."
+}
