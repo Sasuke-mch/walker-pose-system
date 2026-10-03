@@ -211,3 +211,8 @@ docker_logs/
 - WiLoR 手部链使用 `MANO_LEFT.pkl`、`MANO_RIGHT.pkl` 和 `SMPLH_male.pkl`；SMPL-H 拟合显式使用双 MANO PCA 资产。
 - 该链路输出仍属于 WiLoR 模型派生观测的工程候选，不能解释为独立手部真值或真实握持结论。
 
+
+
+## 离线拟合复现
+
+已有双目二维观测与 WiLoR 记录的 SMPL-H 主线，安装与运行步骤见 [realtime_app/README.md](realtime_app/README.md#离线主线的独立安装与验证)。依赖版本、参数模板、资源预检查和公开测试入口均已纳入版本管理；模型和采集数据需按说明另行提供。

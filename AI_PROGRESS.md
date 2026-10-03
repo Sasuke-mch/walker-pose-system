@@ -3216,3 +3216,18 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 复现证据：原版本直接接受joint_steps=-3，调度显示负预算；对真实448帧、A/B/C/D1/D2各1步的原对照与修复版，在第五次（最后一次）Adam更新后向lhand注入NaN。原版退出码0并写出result.npz，其中有9260160个非有限顶点坐标；修复版在D2_hand_refine_no_contact第0步更新后报错lhand，退出码1，没有result.npz。失败日志、初始审计及原始输入保留。这是停止条件验证，不是科研质量实验。
 
 正常输入回归继续使用上一轮同一448帧原PMPose/WiLoR/人工腕和模型输入、随机种子0、相同短预算。最终修复版result的49数组、初始化5数组以及6份JSON与原对照逐项相等。证据保存在本机临时目录walker_smplh_refactor_8smyegfw：bugfix_final_verified、bugfix_parity.json、run_last_update_fault.py、fault_old/fault_new及对应日志；不覆盖原冻结结果，也不将运行产物入库。新增23个故障/契约测试，覆盖早期拒绝、负足底索引/非整数、全局目标广播、反射/缩放、有限损失但无限梯度、无效像素零权重和置信度。realtime_app全量619通过、9跳过、29个subtest通过；sequence_pipeline2通过。修改文件Ruff F规则、所有已跟踪pose_app/walker_tools的F821/F822/F823规则通过；源码编译与diff检查通过。未跟踪fisheye_camera的静态报告来自局部torch导入对应的字符串类型注解，未当作运行时未定义错误擅自改动。原74个已有修改/未跟踪文件保持原样，未更改既有未提交run_tests.py。已有未跟踪核心依赖的版本归属仍是干净环境复现的待处理事项。
+
+
+## 2026-10-03：离线主线源码、环境和独立目录复现
+
+补齐已跟踪主线引用的 fisheye_camera、smpl_coco_observation、smplx_fitting 三个公共源码及 COCO 回归测试。新增 requirements-mainline.txt、requirements-dev.txt 和 Windows/Python3.12 完整环境版本清单；官方 human-body-prior 固定在兼容的源码版本，其 VPoser 解码/组件/旋转转换与原环境数值代码一致。新建独立虚拟环境安装 CUDA PyTorch 后安装全部依赖，依赖一致性检查通过，不继承原虚拟环境包。
+
+新增 smplh_fit.example.json 参数模板、preflight_smplh.py 资源预检查和 run_validation.py 双子项目测试入口。canonical MANO 右手资源改为显式可指定参数，原默认路径不变。预检查缺资源返回非零；提供真实资源后在新环境加载标定、COCO回归矩阵、SMPL-H/MANO链审计与官方 VPoser 解码通过。模板是启动示例，不改变冻结实验参数或方法级别。模型、权重、原始采集和大型产物不入库。
+
+公开测试去掉运行时从私有历史目录提取函数的依赖，冻结纯函数契约放入 tests/fixtures；Mask2Former集成测试用合成27行组合矩阵，继续验证原文件/计时/失败门。依赖私有历史数据和授权模型的测试明确报告跳过。独立克隆目录改名为 checkout 后发现目录名硬编码与 OpenCV 中文路径读取问题：目录测试改按源码实际位置判断；新增 image_io，ASCII路径沿用原OpenCV接口，Unicode路径用同一OpenCV编解码器配合NumPy文件读写，无重采样和像素变换。相关101项检查及8个subtest通过，新增中文路径像素/缺失/空文件/损坏文件检查。
+
+验证目录为本机临时 walker_release_reuhz078/checkout，代码只来自本地已提交 Git 文件，未复制旧源码和私有历史目录。公开 realtime_app 测试571通过、15明确跳过、29个subtest通过，sequence_pipeline 2通过。单独提供授权模型资源后的SMPL CUDA前向、COCO回归和VPoser检查3通过。304个已跟踪相关源码编译通过，名称与新增模块Ruff检查通过。主线模块路径均属于独立checkout，human-body-prior属于新虚拟环境。
+
+实际回归采用与上一轮一致的PMPose/WiLoR/人工腕448帧输入、随机种子0，A/B/C/D1/D2各1步、D3为0，模型和观测通过绝对路径显式提供。新环境独立源码输出的result.npz49数组、cold_initialization.npz5数组与原对照逐项相同，包括NaN位置。输出与命令记录保存在临时目录fit、fit_args.json、fit.log、numeric_parity.json；未覆盖原冻结结果。这是短预算代码回归，不是重新验证完整优化质量、物理接触或三维精度。实时设备和Docker检测器没有在本次复现检查中运行。
+
+安装说明与第三方资源来源更新到已有 README。根README只提交本次新增导航段落，原有未提交改写与其他候选模块、实验文件保持独立，不随本次推送纳入。已记录的既有文件逐字节核对保持原样（本次授权纳入的源码除外）。
