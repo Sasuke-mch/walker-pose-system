@@ -10,8 +10,9 @@ _tool_prepare_imports()
 import argparse
 import csv
 import json
+import os
 from pathlib import Path
-import sys
+from urllib.parse import quote
 
 import numpy as np
 
@@ -28,46 +29,72 @@ def stats(values):
                 max=float(np.max(values)), rms=float(np.sqrt(np.mean(values**2))))
 
 
+def fit_directories(run, sapiens_fit=None, pmpose_fit=None):
+    """Explicit run directories; defaults preserve the frozen comparison."""
+    return {'sapiens2': (sapiens_fit or run/'smplh_cold_start_v2_joint300').resolve(),
+            'pmpose': (pmpose_fit or run/'pmpose_cold_start_v1_joint300').resolve()}
+
+
+def viewer_url(directory, output):
+    return quote(Path(os.path.relpath(directory/'body_viewer.html', output)).as_posix(), safe='/')
+
+
+def require_same_scene_input(metadata, sources):
+    for side in ('left', 'right'):
+        body = Path(metadata['inputs'][f'{side}_raw']).resolve()
+        scene = Path(sources[f'raw_{side}_pmpose']).resolve()
+        if body != scene:
+            raise ValueError('scene/body input mismatch')
+    for key in ('old_stage_jsonl_read', 'old_dynamic_ground_read', 'old_walker_pose_read'):
+        if sources[key] is not False:
+            raise ValueError('scene contains old dynamic inputs')
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--run', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--sapiens-fit-dir', type=Path, help='cold-run directory containing fit/ and fit_command.json')
+    p.add_argument('--pmpose-fit-dir', type=Path, help='cold-run directory containing fit/ and fit_command.json')
     a = p.parse_args()
     run, output = a.run.resolve(), a.output.resolve()
     if output.exists(): raise FileExistsError(output)
-    names = dict(sapiens2='smplh_cold_start_v2_joint300',pmpose='pmpose_cold_start_v1_joint300')
-    commands = {k:read(run/v/'fit_command.json') for k,v in names.items()}
+    directories = fit_directories(run, a.sapiens_fit_dir, a.pmpose_fit_dir)
+    urls = {key: viewer_url(directory, output) for key, directory in directories.items()}
+    commands = {k:read(v/'fit_command.json') for k,v in directories.items()}
     ca, cb = commands.values()
     if len(ca)!=len(cb): raise ValueError('command length differs')
     changes=[dict(argument=ca[i-1],sapiens2=x,pmpose=y) for i,(x,y) in enumerate(zip(ca,cb)) if x!=y]
     if {c['argument'] for c in changes}!={'--left-raw','--right-raw','--output-dir'}:
         raise ValueError('fit controls differ')
-    results = {k:np.load(run/v/'fit/result.npz',allow_pickle=False) for k,v in names.items()}
-    summaries = {k:read(run/v/'fit/fit_summary.json') for k,v in names.items()}
+    results = {k:np.load(v/'fit/result.npz',allow_pickle=False) for k,v in directories.items()}
+    summaries = {k:read(v/'fit/fit_summary.json') for k,v in directories.items()}
     if summaries['sapiens2']['stage_schedule']!=summaries['pmpose']['stage_schedule']:
         raise ValueError('stage schedules differ')
-    metas = {k:read(run/v/'fit/run_metadata.json') for k,v in names.items()}
+    metas = {k:read(v/'fit/run_metadata.json') for k,v in directories.items()}
+    for key in directories:
+        require_same_scene_input(metas[key], read(run/key/'scene/scene_sources.json'))
     target, _ = load_reference(metas['sapiens2']['inputs']['wrist_reference'],
                               metas['sapiens2']['inputs']['calibration_dir'],True)
     if metas['sapiens2']['inputs']['wrist_reference']!=metas['pmpose']['inputs']['wrist_reference']:
         raise ValueError('wrist inputs differ')
     errors, metrics = {}, {}
     sole_sets=read(ROOT/'research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/contact_surface_sets_smplh_v1/contact_vertex_sets.json')['sets']
-    scenes={k:np.load(run/k/'scene/scene_transforms.npz',allow_pickle=False) for k in names}
-    for k,v in names.items():
+    scenes={k:np.load(run/k/'scene/scene_transforms.npz',allow_pickle=False) for k in directories}
+    for k,v in directories.items():
         z=results[k]
-        init=np.load(run/v/'fit/cold_initialization.npz',allow_pickle=False)
+        init=np.load(v/'fit/cold_initialization.npz',allow_pickle=False)
         if not np.array_equal(z['pair_id'],np.arange(448)) or np.any(init['betas']) or np.any(init['vposer_latent']):
             raise ValueError('not full448 cold initialization')
         errors[k]=np.linalg.norm(z['smplh_joints'][:,[20,21]]-target,axis=-1)*1000
         own=np.linalg.norm(z['predicted_coco']-z['raw_triangulated_points']/1000,axis=-1)*1000
-        mano=read(run/v/'fit/wilor_mano_parameter_audit.json')
+        mano=read(v/'fit/wilor_mano_parameter_audit.json')
         metrics[k]=dict(wrist_reference_mm={s:stats(errors[k][:,j]) for j,s in enumerate(('left','right'))},
             own_body_observation_rms_mm=float(np.sqrt(np.mean(own[z['body_accepted']]**2))),
             weighted_body_rms_mm=summaries[k]['history'][-1]['body_m']*1000,
             betas=z['betas'].tolist(),body_observation_count=int(z['body_accepted'].sum()),
             native_mano_coverage=mano['pca_reconstruction'],
-            hand_geometry=read(run/v/'fit/grasp_geometry_audit.json')['summary'])
+            hand_geometry=read(v/'fit/grasp_geometry_audit.json')['summary'])
         metrics[k]['sole_minimum_z_mm_by_transform']={}
         for frame_source,scene in scenes.items():
             grounded=np.einsum('nij,nvj->nvi',scene['rotation_ground_from_left'],z['vertices'])+scene['translation_ground_from_left_mm'][:,None]/1000
@@ -81,7 +108,7 @@ def main():
     output.mkdir(parents=True)
     # Record association differences explicitly instead of assuming same file
     # means same accepted hand hypotheses.
-    associations={k:read(run/v/'fit/wilor_mano_parameter_audit.json') for k,v in names.items()}
+    associations={k:read(v/'fit/wilor_mano_parameter_audit.json') for k,v in directories.items()}
     selected={}
     for camera in ('left_camera','right_camera'):
         def accepted(k):
@@ -96,6 +123,7 @@ def main():
             pmpose_minus_sapiens2_mm=stats(errors['pmpose'][:,j]-errors['sapiens2'][:,j])) for j,s in enumerate(('left','right'))},
         limits='Same algorithm and settings; detector changes initialization, weights, native association and fresh scene. Own observation RMS is not a shared truth. Manual wrist reference failed original geometry gates. No detector accuracy or physical contact conclusion.',
         accepted_for_main_fit=False)
+    report['fit_directories'] = {key: str(value) for key, value in directories.items()}
     (output/'comparison.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8')
     with (output/'paired_wrist_errors.csv').open('w',newline='',encoding='utf-8-sig') as f:
         w=csv.writer(f);w.writerow(['pair_id','sapiens_left_mm','sapiens_right_mm','pmpose_left_mm','pmpose_right_mm'])
@@ -105,6 +133,8 @@ def main():
 <header><b>SMPL-H 对照 · 448 帧</b><p>左：Sapiens2　右：PMPose</p><button id="play">播放</button> <input id="frame" aria-label="同步帧" type="range" min="0" max="447" value="0"> <span id="number">0 / 447</span><div id="metrics"></div></header>
 <main><iframe id="sap" title="Sapiens2" src="../smplh_cold_start_v2_joint300/body_viewer.html"></iframe><iframe id="pm" title="PMPose" src="../pmpose_cold_start_v1_joint300/body_viewer.html"></iframe></main>
 <script>let timer=null;const slider=document.getElementById('frame');function sync(){const info=[];for(const id of ['sap','pm']){const d=document.getElementById(id).contentDocument,s=d&&d.getElementById('slider');if(s){s.value=slider.value;s.dispatchEvent(new Event('input',{bubbles:true}));info.push((id==='sap'?'Sapiens2':'PMPose')+' 腕 '+d.getElementById('wrist').textContent+'；脚底 '+d.getElementById('fr').textContent);}}document.getElementById('number').textContent=slider.value+' / 447';document.getElementById('metrics').textContent=info.join(' | ');}slider.oninput=sync;for(const id of ['sap','pm'])document.getElementById(id).onload=()=>{const d=document.getElementById(id).contentDocument,style=d.createElement('style');style.textContent='.side,.bottom,.top p{display:none}.main{grid-template-columns:1fr}.top h1{font-size:13px}.top{padding:6px;gap:4px}.badge{font-size:10px}.app{grid-template-rows:auto 1fr}';d.head.append(style);sync();};document.getElementById('play').onclick=()=>{if(timer){clearInterval(timer);timer=null;document.getElementById('play').textContent='播放';}else{timer=setInterval(()=>{slider.value=(Number(slider.value)+1)%448;sync();},1000/30);document.getElementById('play').textContent='暂停';}};</script>'''
+    page = page.replace('../smplh_cold_start_v2_joint300/body_viewer.html', urls['sapiens2'])
+    page = page.replace('../pmpose_cold_start_v1_joint300/body_viewer.html', urls['pmpose'])
     (output/'index.html').write_text(page,encoding='utf8')
     (output/'compare.html').write_text('<!doctype html><meta charset="utf-8"><title>SMPL-H 对照</title><meta http-equiv="refresh" content="0;url=index.html"><a href="index.html">打开对照</a>',encoding='utf8')
     print(json.dumps(metrics,ensure_ascii=False),flush=True)

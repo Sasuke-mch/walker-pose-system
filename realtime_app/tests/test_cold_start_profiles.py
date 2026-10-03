@@ -63,3 +63,26 @@ def test_invalid_profile_is_rejected(tmp_path):
     profile.write_text('{}')
     with pytest.raises(ValueError, match='array'):
         fit_command(profile, {}, tmp_path, tmp_path)
+
+
+@pytest.mark.parametrize('extra,message', [
+    (['--joint-steps', '1'], 'duplicate'),
+    (['--contact-labels', 'labels.json'], 'contact inputs'),
+])
+def test_custom_profile_cannot_misrepresent_cold_protocol(tmp_path, extra, message):
+    values = json.loads((PROJECT_ROOT/'realtime_app/configs/cold_smplh_joint300.json').read_text())
+    profile = tmp_path/'profile.json'
+    profile.write_text(json.dumps(values + extra))
+    with pytest.raises(ValueError, match=message):
+        fit_command(profile, {'left': Path('left'), 'right': Path('right')},
+                    tmp_path/'output', Path('wrist'))
+
+
+def test_zero_joint_budget_in_profile_is_rejected(tmp_path):
+    values = json.loads((PROJECT_ROOT/'realtime_app/configs/cold_smplh_joint300.json').read_text())
+    values[values.index('--joint-steps') + 1] = '0'
+    profile = tmp_path/'profile.json'
+    profile.write_text(json.dumps(values))
+    with pytest.raises(ValueError, match='positive'):
+        fit_command(profile, {'left': Path('left'), 'right': Path('right')},
+                    tmp_path/'output', Path('wrist'))

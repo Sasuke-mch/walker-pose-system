@@ -32,6 +32,9 @@ def fit_command(settings, body_paths, output, wrist_path, joint_steps=None):
     values = read(settings)
     if not isinstance(values, list) or not all(isinstance(v, str) for v in values):
         raise ValueError('settings must be a JSON array of CLI strings')
+    flags = [value for value in values if value.startswith('--')]
+    if len(flags) != len(set(flags)):
+        raise ValueError('duplicate options in cold settings')
     command = [sys.executable, '-u', 'realtime_app/tools/fit_smplh_wilor_sequence.py', *values]
     for flag, value in {'--left-raw': body_paths['left'], '--right-raw': body_paths['right'],
                         '--output-dir': output / 'fit'}.items():
@@ -49,6 +52,15 @@ def fit_command(settings, body_paths, output, wrist_path, joint_steps=None):
     from pose_app.smplh_fitting.stages import validate_optimization_options
     options = build_parser().parse_args(command[3:])
     validate_optimization_options(options)
+    if options.joint_steps is None or options.joint_steps <= 0:
+        raise ValueError('joint steps must be positive')
+    if any(getattr(options, name) is not None for name in (
+        'contact_labels', 'scene_transforms', 'contact_vertex_sets',
+        'walker_topology', 'global_hand_handle_pose',
+    )):
+        raise ValueError('cold runner does not support contact inputs; use the general fitter')
+    if not options.mano_pose_init or not options.shared_hand_pose:
+        raise ValueError('cold runner requires native MANO initialization and shared hands')
     return command, options
 
 
