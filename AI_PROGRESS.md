@@ -3364,3 +3364,9 @@ shoulder_diagnostic.png同源叠加pair1177和1198：前者正常，后者右相
 按用户要求，从本次360对有效配对序列按平均host-return相对时间的10个等距目标选最近帧，包含首尾0–17.43秒；内部帧0/42/74/101/139/184/226/268/313/359，每组左右相机两图，共20张。输出原v2目录wrist10及腕标注10组.zip；images为与拟合输入逐字节一致的1080×1920转正PNG，没有检测叠加、裁剪、缩放或镜像。selection.json保留原pair_id、各相机frame_id、源路径与实际/目标时间；说明定义left_wrist/right_wrist为人体自身左右、内部腕中心估计投影，缺失/不确定使用明确flags，未填写不默认不可见。尚无新标注结果，未参与拟合。
 
 复用experiment_repositioned_capture新增annotations入口，不改求解。初次中文目录OpenCV imread不可读已留annotations_failure记录和不完整文件夹，改为跨中文路径imdecode/fromfile并使用简洁wrist10目录后通过；20图逐字节核对、解码尺寸及ZIP完整性通过。只验证对应导出及现有配置测试，不重跑模型。
+
+## 2026-10-03：切换本机 Labelme 腕点标注
+
+用户指定使用已有 Labelme。检查确认仓库 .annotation_env/Scripts/labelme.exe 与 pythonw.exe 环境内已安装 Labelme 6.3.1，未加入 PATH；直接使用既有环境启动，无新增安装。上一步导出包和临时网页方案不再使用，未完成的网页脚本移除。为 Labelme 的目录浏览在 research_records/annotation_handoffs/H20261003_repositioned_wrist10/images 放置选定20张原图，按组号/相机/内部帧命名，逐字节及1080×1920尺寸核对通过；原拟合输入保留，既有标注不覆盖。manifest.json沿用相同10组时间选择、原pair_id/frame_id和来源，新增对应Labelme输入及JSON保存路径。
+
+使用该目录 wrist_config.yaml：限定left_wrist/right_wrist人体自身左右腕点，点大小4，自动保存，关闭上一图标注复制，不嵌入图像数据；提供左右腕不可用图像flags和uncertain点flags。Ctrl+Shift+P创建点，D/A切图，Ctrl+S保存；JSON保存在同目录labels。配置由本机Labelme加载验证，启动日志确认扫描20图并成功加载首张QImage/pixmap。尚未产生人工结果，不改变算法、拟合、几何门和方法级别。已有无关工作区改动保留，不推送。
