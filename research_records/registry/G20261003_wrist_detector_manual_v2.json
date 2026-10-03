@@ -1,0 +1,762 @@
+{
+  "experiment_id": "G20261003_wrist_detector_manual_v2",
+  "status": "completed_sparse_manual_2D_consistency_only",
+  "accepted_for_main_fit": false,
+  "protocol": {
+    "schema": "sparse_manual_wrist_comparison_v1",
+    "annotations": "D:\\my_works\\walker_pose_system\\research_records\\annotation_handoffs\\H20261001_people1_wrist_joint_10pairs_v5_corrected",
+    "frames": [
+      0,
+      50,
+      99,
+      149,
+      199,
+      248,
+      298,
+      348,
+      397,
+      447
+    ],
+    "inputs": {
+      "PMPose": {
+        "left_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+        "right_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+        "wilor_left": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_left.jsonl",
+        "wilor_right": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_right.jsonl",
+        "calibration_dir": "realtime_app\\calibration\\results"
+      },
+      "Sapiens2": {
+        "left_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\left_sapiens_coco17_model_input.json",
+        "right_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\right_sapiens_coco17_model_input.json",
+        "wilor_left": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_left.jsonl",
+        "wilor_right": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_right.jsonl",
+        "calibration_dir": "realtime_app\\calibration\\results"
+      }
+    },
+    "primary_methods": [
+      "PMPose",
+      "Sapiens2",
+      "WiLoR"
+    ],
+    "wilor_primary": "existing read_view using PMPose wrist association; no manual selection",
+    "sensitivity": "same WiLoR pixels with Sapiens2 association, plus unique-side candidates without body association",
+    "coordinates": "raw1920x1080 fisheye; anatomical COCO9/10 versus MANO projected joint0; Euclidean pixels",
+    "criteria": "all available manual points and common-support comparison, retain every unavailable/rejected state",
+    "three_dimensional": "per-pair solve_point with unchanged geometry gate; rejected manual geometry is diagnostic only",
+    "limits": "10 labelled frames in one sequence; visible manual wrist, not anatomical3D truth; no fitted SMPLH or shared wrist target used"
+  },
+  "summary": {
+    "all_available": {
+      "PMPose": {
+        "all": {
+          "count": 28,
+          "mean": 26.404996231641682,
+          "rms": 32.880004164380296,
+          "median": 22.28548754986584,
+          "p95": 46.2422832138266,
+          "max": 116.48485170370003
+        },
+        "eligible_manual_points": 28,
+        "left_camera_left_hand": {
+          "count": 3,
+          "mean": 63.306347602833426,
+          "rms": 74.29265097403997,
+          "median": 48.824594844376435,
+          "p95": 109.71882601776767,
+          "max": 116.48485170370003
+        },
+        "left_camera_right_hand": {
+          "count": 10,
+          "mean": 18.265642474292783,
+          "rms": 18.954416546314604,
+          "median": 16.99001057002379,
+          "p95": 25.590778069609907,
+          "max": 25.80488613548506
+        },
+        "right_camera_left_hand": {
+          "count": 10,
+          "mean": 19.599864055178546,
+          "rms": 20.13205833191196,
+          "median": 17.201616227913362,
+          "p95": 27.00647323614221,
+          "max": 28.120218921394336
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 34.153157276550665,
+          "rms": 34.83320286345192,
+          "median": 35.68219973347763,
+          "p95": 41.4172026032037,
+          "max": 41.446561614234085
+        },
+        "out_of_bounds_compared": 0
+      },
+      "Sapiens2": {
+        "all": {
+          "count": 28,
+          "mean": 26.33199445880822,
+          "rms": 30.54579349632574,
+          "median": 20.31355703797346,
+          "p95": 65.17804673527421,
+          "max": 73.40919658866427
+        },
+        "eligible_manual_points": 28,
+        "left_camera_left_hand": {
+          "count": 3,
+          "mean": 48.67643546251545,
+          "rms": 53.34897718909774,
+          "median": 52.319267621723974,
+          "p95": 71.30020369197024,
+          "max": 73.40919658866427
+        },
+        "left_camera_right_hand": {
+          "count": 10,
+          "mean": 19.22268665562502,
+          "rms": 19.37582777112901,
+          "median": 18.563990726032042,
+          "p95": 23.3762439388745,
+          "max": 24.271144049697213
+        },
+        "right_camera_left_hand": {
+          "count": 10,
+          "mean": 18.80683579376469,
+          "rms": 18.98860937040271,
+          "median": 18.68538775215279,
+          "p95": 22.51053099436619,
+          "max": 23.18137616872979
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 42.19426279303734,
+          "rms": 45.2261739067419,
+          "median": 32.3366075756571,
+          "p95": 67.08993797116915,
+          "max": 72.1020047194936
+        },
+        "out_of_bounds_compared": 0
+      },
+      "WiLoR": {
+        "all": {
+          "count": 26,
+          "mean": 16.520137150251237,
+          "rms": 18.415693103557444,
+          "median": 13.768290501341816,
+          "p95": 32.19600513837385,
+          "max": 34.25555930149482
+        },
+        "eligible_manual_points": 28,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 30.54454946215772,
+          "rms": 30.769158192479953,
+          "median": 30.54454946215772,
+          "p95": 33.88445831756111,
+          "max": 34.25555930149482
+        },
+        "left_camera_right_hand": {
+          "count": 10,
+          "mean": 13.42806453476297,
+          "rms": 14.299427495126565,
+          "median": 11.756477192431198,
+          "p95": 22.38663725826422,
+          "max": 22.509678038607216
+        },
+        "right_camera_left_hand": {
+          "count": 9,
+          "mean": 13.002283987000018,
+          "rms": 13.783585430305724,
+          "median": 13.17529518203274,
+          "p95": 20.07763264050295,
+          "max": 23.903442496535042
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 23.426653150317374,
+          "rms": 25.177283650673633,
+          "median": 26.205751520955506,
+          "p95": 32.205082097639895,
+          "max": 32.24138993470408
+        },
+        "out_of_bounds_compared": 0
+      },
+      "WiLoR_Sapiens2_association": {
+        "all": {
+          "count": 26,
+          "mean": 16.520137150251237,
+          "rms": 18.415693103557444,
+          "median": 13.768290501341816,
+          "p95": 32.19600513837385,
+          "max": 34.25555930149482
+        },
+        "eligible_manual_points": 28,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 30.54454946215772,
+          "rms": 30.769158192479953,
+          "median": 30.54454946215772,
+          "p95": 33.88445831756111,
+          "max": 34.25555930149482
+        },
+        "left_camera_right_hand": {
+          "count": 10,
+          "mean": 13.42806453476297,
+          "rms": 14.299427495126565,
+          "median": 11.756477192431198,
+          "p95": 22.38663725826422,
+          "max": 22.509678038607216
+        },
+        "right_camera_left_hand": {
+          "count": 9,
+          "mean": 13.002283987000018,
+          "rms": 13.783585430305724,
+          "median": 13.17529518203274,
+          "p95": 20.07763264050295,
+          "max": 23.903442496535042
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 23.426653150317374,
+          "rms": 25.177283650673633,
+          "median": 26.205751520955506,
+          "p95": 32.205082097639895,
+          "max": 32.24138993470408
+        },
+        "out_of_bounds_compared": 0
+      },
+      "WiLoR_unique_candidate": {
+        "all": {
+          "count": 20,
+          "mean": 17.198505574774906,
+          "rms": 19.32578054525466,
+          "median": 13.768290501341816,
+          "p95": 32.34209840304362,
+          "max": 34.25555930149482
+        },
+        "eligible_manual_points": 28,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 30.54454946215772,
+          "rms": 30.769158192479953,
+          "median": 30.54454946215772,
+          "p95": 33.88445831756111,
+          "max": 34.25555930149482
+        },
+        "left_camera_right_hand": {
+          "count": 7,
+          "mean": 14.179928374256363,
+          "rms": 15.235731075405639,
+          "median": 12.165188479543287,
+          "p95": 22.427650851711885,
+          "max": 22.509678038607216
+        },
+        "right_camera_left_hand": {
+          "count": 6,
+          "mean": 11.081374699966888,
+          "rms": 11.415363273327456,
+          "median": 11.906337204499266,
+          "p95": 13.853466012798185,
+          "max": 13.938641524254553
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 23.426653150317374,
+          "rms": 25.177283650673633,
+          "median": 26.205751520955506,
+          "p95": 32.205082097639895,
+          "max": 32.24138993470408
+        },
+        "out_of_bounds_compared": 0
+      }
+    },
+    "common_primary": {
+      "PMPose": {
+        "all": {
+          "count": 26,
+          "mean": 26.859275890406277,
+          "rms": 33.62486214954085,
+          "median": 22.28548754986584,
+          "p95": 46.980086536840844,
+          "max": 116.48485170370003
+        },
+        "eligible_manual_points": 26,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 82.65472327403823,
+          "rms": 89.31002669955512,
+          "median": 82.65472327403823,
+          "p95": 113.10183886073385,
+          "max": 116.48485170370003
+        },
+        "left_camera_right_hand": {
+          "count": 10,
+          "mean": 18.265642474292783,
+          "rms": 18.954416546314604,
+          "median": 16.99001057002379,
+          "p95": 25.590778069609907,
+          "max": 25.80488613548506
+        },
+        "right_camera_left_hand": {
+          "count": 9,
+          "mean": 19.956612830756175,
+          "rms": 20.505810304159926,
+          "median": 17.36566058544259,
+          "p95": 27.13022275672578,
+          "max": 28.120218921394336
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 34.153157276550665,
+          "rms": 34.83320286345192,
+          "median": 35.68219973347763,
+          "p95": 41.4172026032037,
+          "max": 41.446561614234085
+        },
+        "out_of_bounds_compared": 0
+      },
+      "Sapiens2": {
+        "all": {
+          "count": 26,
+          "mean": 24.699847659360668,
+          "rms": 27.918756682015967,
+          "median": 19.929487002606372,
+          "p95": 50.99986846076081,
+          "max": 72.1020047194936
+        },
+        "eligible_manual_points": 26,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 36.31005489944103,
+          "rms": 39.68267857375214,
+          "median": 36.31005489944103,
+          "p95": 50.718346349495675,
+          "max": 52.319267621723974
+        },
+        "left_camera_right_hand": {
+          "count": 10,
+          "mean": 19.22268665562502,
+          "rms": 19.37582777112901,
+          "median": 18.563990726032042,
+          "p95": 23.3762439388745,
+          "max": 24.271144049697213
+        },
+        "right_camera_left_hand": {
+          "count": 9,
+          "mean": 18.486416535895383,
+          "rms": 18.664256792226592,
+          "median": 18.42963342259676,
+          "p95": 22.4644374543323,
+          "max": 23.18137616872979
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 42.19426279303734,
+          "rms": 45.2261739067419,
+          "median": 32.3366075756571,
+          "p95": 67.08993797116915,
+          "max": 72.1020047194936
+        },
+        "out_of_bounds_compared": 0
+      },
+      "WiLoR": {
+        "all": {
+          "count": 26,
+          "mean": 16.520137150251237,
+          "rms": 18.415693103557444,
+          "median": 13.768290501341816,
+          "p95": 32.19600513837385,
+          "max": 34.25555930149482
+        },
+        "eligible_manual_points": 26,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 30.54454946215772,
+          "rms": 30.769158192479953,
+          "median": 30.54454946215772,
+          "p95": 33.88445831756111,
+          "max": 34.25555930149482
+        },
+        "left_camera_right_hand": {
+          "count": 10,
+          "mean": 13.42806453476297,
+          "rms": 14.299427495126565,
+          "median": 11.756477192431198,
+          "p95": 22.38663725826422,
+          "max": 22.509678038607216
+        },
+        "right_camera_left_hand": {
+          "count": 9,
+          "mean": 13.002283987000018,
+          "rms": 13.783585430305724,
+          "median": 13.17529518203274,
+          "p95": 20.07763264050295,
+          "max": 23.903442496535042
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 23.426653150317374,
+          "rms": 25.177283650673633,
+          "median": 26.205751520955506,
+          "p95": 32.205082097639895,
+          "max": 32.24138993470408
+        },
+        "out_of_bounds_compared": 0
+      }
+    },
+    "common_all_association_variants": {
+      "PMPose": {
+        "all": {
+          "count": 20,
+          "mean": 29.28581732075302,
+          "rms": 36.83955239501843,
+          "median": 23.486732023657297,
+          "p95": 52.207607687342666,
+          "max": 116.48485170370003
+        },
+        "eligible_manual_points": 20,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 82.65472327403823,
+          "rms": 89.31002669955512,
+          "median": 82.65472327403823,
+          "p95": 113.10183886073385,
+          "max": 116.48485170370003
+        },
+        "left_camera_right_hand": {
+          "count": 7,
+          "mean": 18.178507291721008,
+          "rms": 18.8818419073357,
+          "median": 17.689721481850075,
+          "p95": 24.762935658872884,
+          "max": 25.80488613548506
+        },
+        "right_camera_left_hand": {
+          "count": 6,
+          "mean": 20.398593740363907,
+          "rms": 20.928699950977848,
+          "median": 18.981362732072032,
+          "p95": 27.250600732846614,
+          "max": 28.120218921394336
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 34.153157276550665,
+          "rms": 34.83320286345192,
+          "median": 35.68219973347763,
+          "p95": 41.4172026032037,
+          "max": 41.446561614234085
+        },
+        "out_of_bounds_compared": 0
+      },
+      "Sapiens2": {
+        "all": {
+          "count": 20,
+          "mean": 26.34828437986411,
+          "rms": 29.992541169983856,
+          "median": 19.929487002606372,
+          "p95": 53.308404476612466,
+          "max": 72.1020047194936
+        },
+        "eligible_manual_points": 20,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 36.31005489944103,
+          "rms": 39.68267857375214,
+          "median": 36.31005489944103,
+          "p95": 50.718346349495675,
+          "max": 52.319267621723974
+        },
+        "left_camera_right_hand": {
+          "count": 7,
+          "mean": 19.577247013148302,
+          "rms": 19.689379743788972,
+          "median": 18.826473650746156,
+          "p95": 23.10231498328027,
+          "max": 24.271144049697213
+        },
+        "right_camera_left_hand": {
+          "count": 6,
+          "mean": 17.722255790195884,
+          "rms": 17.7992734168555,
+          "median": 17.523764300958888,
+          "p95": 19.979989444518832,
+          "max": 20.326271898788836
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 42.19426279303734,
+          "rms": 45.2261739067419,
+          "median": 32.3366075756571,
+          "p95": 67.08993797116915,
+          "max": 72.1020047194936
+        },
+        "out_of_bounds_compared": 0
+      },
+      "WiLoR": {
+        "all": {
+          "count": 20,
+          "mean": 17.198505574774906,
+          "rms": 19.32578054525466,
+          "median": 13.768290501341816,
+          "p95": 32.34209840304362,
+          "max": 34.25555930149482
+        },
+        "eligible_manual_points": 20,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 30.54454946215772,
+          "rms": 30.769158192479953,
+          "median": 30.54454946215772,
+          "p95": 33.88445831756111,
+          "max": 34.25555930149482
+        },
+        "left_camera_right_hand": {
+          "count": 7,
+          "mean": 14.179928374256363,
+          "rms": 15.235731075405639,
+          "median": 12.165188479543287,
+          "p95": 22.427650851711885,
+          "max": 22.509678038607216
+        },
+        "right_camera_left_hand": {
+          "count": 6,
+          "mean": 11.081374699966888,
+          "rms": 11.415363273327456,
+          "median": 11.906337204499266,
+          "p95": 13.853466012798185,
+          "max": 13.938641524254553
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 23.426653150317374,
+          "rms": 25.177283650673633,
+          "median": 26.205751520955506,
+          "p95": 32.205082097639895,
+          "max": 32.24138993470408
+        },
+        "out_of_bounds_compared": 0
+      },
+      "WiLoR_Sapiens2_association": {
+        "all": {
+          "count": 20,
+          "mean": 17.198505574774906,
+          "rms": 19.32578054525466,
+          "median": 13.768290501341816,
+          "p95": 32.34209840304362,
+          "max": 34.25555930149482
+        },
+        "eligible_manual_points": 20,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 30.54454946215772,
+          "rms": 30.769158192479953,
+          "median": 30.54454946215772,
+          "p95": 33.88445831756111,
+          "max": 34.25555930149482
+        },
+        "left_camera_right_hand": {
+          "count": 7,
+          "mean": 14.179928374256363,
+          "rms": 15.235731075405639,
+          "median": 12.165188479543287,
+          "p95": 22.427650851711885,
+          "max": 22.509678038607216
+        },
+        "right_camera_left_hand": {
+          "count": 6,
+          "mean": 11.081374699966888,
+          "rms": 11.415363273327456,
+          "median": 11.906337204499266,
+          "p95": 13.853466012798185,
+          "max": 13.938641524254553
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 23.426653150317374,
+          "rms": 25.177283650673633,
+          "median": 26.205751520955506,
+          "p95": 32.205082097639895,
+          "max": 32.24138993470408
+        },
+        "out_of_bounds_compared": 0
+      },
+      "WiLoR_unique_candidate": {
+        "all": {
+          "count": 20,
+          "mean": 17.198505574774906,
+          "rms": 19.32578054525466,
+          "median": 13.768290501341816,
+          "p95": 32.34209840304362,
+          "max": 34.25555930149482
+        },
+        "eligible_manual_points": 20,
+        "left_camera_left_hand": {
+          "count": 2,
+          "mean": 30.54454946215772,
+          "rms": 30.769158192479953,
+          "median": 30.54454946215772,
+          "p95": 33.88445831756111,
+          "max": 34.25555930149482
+        },
+        "left_camera_right_hand": {
+          "count": 7,
+          "mean": 14.179928374256363,
+          "rms": 15.235731075405639,
+          "median": 12.165188479543287,
+          "p95": 22.427650851711885,
+          "max": 22.509678038607216
+        },
+        "right_camera_left_hand": {
+          "count": 6,
+          "mean": 11.081374699966888,
+          "rms": 11.415363273327456,
+          "median": 11.906337204499266,
+          "p95": 13.853466012798185,
+          "max": 13.938641524254553
+        },
+        "right_camera_right_hand": {
+          "count": 5,
+          "mean": 23.426653150317374,
+          "rms": 25.177283650673633,
+          "median": 26.205751520955506,
+          "p95": 32.205082097639895,
+          "max": 32.24138993470408
+        },
+        "out_of_bounds_compared": 0
+      }
+    },
+    "manual_points_present": 28,
+    "manual_points_unavailable": 12,
+    "manual_stereo_accepted": 5,
+    "stereo": {
+      "PMPose": {
+        "all_finite_diagnostic_mm": {
+          "count": 8,
+          "mean": 29.02279677174118,
+          "rms": 36.81637415235967,
+          "median": 21.07289650948438,
+          "p95": 66.64633347710954,
+          "max": 88.15397484000381
+        },
+        "both_geometry_accepted_mm": {
+          "count": 4,
+          "mean": 19.49204939754404,
+          "rms": 20.075154476056344,
+          "median": 18.788650627142992,
+          "p95": 25.767262467928695,
+          "max": 26.703570946020257
+        }
+      },
+      "Sapiens2": {
+        "all_finite_diagnostic_mm": {
+          "count": 8,
+          "mean": 17.177790856836147,
+          "rms": 17.891591660938687,
+          "median": 16.042237058018806,
+          "p95": 25.015756840679614,
+          "max": 25.170354106156942
+        },
+        "both_geometry_accepted_mm": {
+          "count": 0,
+          "mean": null,
+          "rms": null,
+          "median": null,
+          "p95": null,
+          "max": null
+        }
+      },
+      "WiLoR": {
+        "all_finite_diagnostic_mm": {
+          "count": 7,
+          "mean": 19.66756383573326,
+          "rms": 21.947016091809385,
+          "median": 16.70556770860881,
+          "p95": 34.39007383633576,
+          "max": 35.84268421886284
+        },
+        "both_geometry_accepted_mm": {
+          "count": 2,
+          "mean": 10.049192803670088,
+          "rms": 10.327991236387401,
+          "median": 10.049192803670088,
+          "p95": 12.19435313534318,
+          "max": 12.432704283306856
+        }
+      },
+      "WiLoR_Sapiens2_association": {
+        "all_finite_diagnostic_mm": {
+          "count": 7,
+          "mean": 19.66756383573326,
+          "rms": 21.947016091809385,
+          "median": 16.70556770860881,
+          "p95": 34.39007383633576,
+          "max": 35.84268421886284
+        },
+        "both_geometry_accepted_mm": {
+          "count": 2,
+          "mean": 10.049192803670088,
+          "rms": 10.327991236387401,
+          "median": 10.049192803670088,
+          "p95": 12.19435313534318,
+          "max": 12.432704283306856
+        }
+      },
+      "WiLoR_unique_candidate": {
+        "all_finite_diagnostic_mm": {
+          "count": 5,
+          "mean": 21.553145661367257,
+          "rms": 23.74132245390503,
+          "median": 16.70556770860881,
+          "p95": 34.87427729717812,
+          "max": 35.84268421886284
+        },
+        "both_geometry_accepted_mm": {
+          "count": 1,
+          "mean": 12.432704283306856,
+          "rms": 12.432704283306856,
+          "median": 12.432704283306856,
+          "p95": 12.432704283306856,
+          "max": 12.432704283306856
+        }
+      }
+    },
+    "stereo_common_primary_diagnostic_mm": {
+      "PMPose": {
+        "count": 7,
+        "mean": 30.245837106931365,
+        "rms": 38.59106053633043,
+        "median": 21.497029457642792,
+        "p95": 69.7188536718087,
+        "max": 88.15397484000381
+      },
+      "Sapiens2": {
+        "count": 7,
+        "mean": 16.03599610693318,
+        "rms": 16.593138390245336,
+        "median": 15.425188042024349,
+        "p95": 22.656199420247653,
+        "max": 24.728647633364574
+      },
+      "WiLoR": {
+        "count": 7,
+        "mean": 19.66756383573326,
+        "rms": 21.947016091809385,
+        "median": 16.70556770860881,
+        "p95": 34.39007383633576,
+        "max": 35.84268421886284
+      }
+    },
+    "stereo_common_primary_geometry_accepted_pairs": 0
+  },
+  "coordinate_audit": {
+    "status": "passed",
+    "independent_upright_direct_export_comparisons": 56,
+    "max_pixel_error_difference": 1.1013412404281553e-13,
+    "all_label_images_equal_manifest_sources": true,
+    "all40_slots_retained": true
+  },
+  "code": "realtime_app/compare_wrist_annotations.py",
+  "tests": "24 related tests; full public696 passed,9 skipped,29 subtests; sequence2 passed; Ruff F and compile passed",
+  "outputs": "research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2",
+  "analysis": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section20 and identical report backup",
+  "decision": "WiLoR candidate for 2D wrist consistency; no default change or3D accuracy ranking"
+}

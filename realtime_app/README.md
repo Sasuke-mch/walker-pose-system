@@ -363,3 +363,14 @@ $follow = 'research_records/engineering_validation/G20261003_smplh_ablation_foll
 ```
 
 运行追加计划时用--plan realtime_app/configs/smplh_ablation_followup_v1.json指定另一个新目录。输入路径保存在源命令和逐组fit_args/resolved_options；输出含首次FAILURE、执行耗时、阶段检查点、result、指标、逐帧诊断和全帧几何门。读取缓存metrics前仍重新审计输入、掩码、协议、共享参数和冻结状态；--replay-parameters另重建VPoser/PCA/SMPL-H，不能以缓存旧成功跳过检查。缺失本机资源不属于干净克隆自动可运行的公开测试。消融残差、平滑与几何代理不是独立精度，方法级别不因消融改变。
+
+
+## 检测腕点与已有人工标注比较
+
+直接读取current_mainline中的二维源命令和WiLoR，不运行模型、不拟合人体；保留缺失和几何拒绝。人工标注需manifest逐项指明左右帧、标签及图像源；输出目录必须不存在。
+
+```powershell
+.venv-cuda/Scripts/python.exe -B realtime_app/compare_wrist_annotations.py --annotations research_records/annotation_handoffs/H20261001_people1_wrist_joint_10pairs_v5_corrected --output outputs/wrist_manual_next
+```
+
+primary WiLoR使用现有PMPose身体腕关联；另报告Sapiens2关联及唯一同侧候选敏感性，不按人工标签选优。二维评价使用原始鱼眼欧氏像素距离，分别报告所有可用点与共同样本。三维仅沿用原人工几何门诊断，未通过的坐标不当真值。源码/完整指标见算法说明第20节及G20261003_wrist_detector_manual_v2。

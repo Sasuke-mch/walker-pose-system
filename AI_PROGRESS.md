@@ -3295,3 +3295,12 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 工作区公开验证690通过、9跳过、29子测试通过，sequence2通过；独立已提交源码640通过、15明确跳过、29子测试通过，sequence2通过。Ruff F/编译/差异检查通过。主目录G20261003_smplh_ablation_v1含protocol、results_after_fix.json/csv、implementation_audit.json及最终测试日志；追加G20261003_smplh_ablation_followup_v1含独立protocol与results。每组有metrics_v2、diagnostics_v2、检查点、几何审计、controls_replay_audit。紧凑索引research_records/registry/G20261003_smplh_ablation_v1.json；算法说明第19节及实验报告备份逐字同步。应用README增加运行/恢复/评价入口。既有无关修改和未跟踪候选保留，不顺带提交；本轮不推送。下一步优先已有数据的质量权重分段审计，再检验B阶段收敛与beta冻结时机，保持每次一个可核查阶段。
 
 2026-10-03解释当前优化流程时核对raw_triangulate：第19节质量因子名称误写“射线夹角”，现改为“射线间隙”，与qray=exp(-ray_gap_mm/30)一致。算法说明及实验报告备份逐字同步，未改源码、参数或消融结果。
+
+
+## 2026-10-03：PMPose/Sapiens2/WiLoR腕点对纠正人工标注的比较
+
+完成10帧/20图/40槽位的直接检测输出评价，28个可用人工点、12不可用。未使用拟合SMPL-H或共享三维腕目标。坐标统一原始鱼眼；COCO9/10与WiLoR投影0。全部28点PMPose/Sapiens2平均26.40/26.33px，不能宣称后者腕全面更优；WiLoR可用26点。共同26点PMPose/Sapiens2/WiLoR平均26.86/24.70/16.52px，RMS33.62/27.92/18.42px，P95 46.98/51.00/32.20px。WiLoR缺失248右相机左手、348左相机左手。PMPose与Sapiens2关联同WiLoR结果完全相同；唯一候选共同20点仍29.29/26.35/17.20px，不按人工点选最近候选。只支持稀疏人工可见腕二维一致性，不等于全身/跨数据精度。
+
+8个完整人工双目槽位仅5个通过原几何门，PMPose/Sapiens2/WiLoR与人工均通过4/0/2，三者共同通过0；不得可靠三维排名。共同7个有限诊断平均30.25/16.04/19.67mm，包含拒绝几何，仅作诊断保留。完整点、拒绝原因、共同样本、关联和原始指标在G20261003_wrist_detector_manual_v2，首次v1探索保留。24项相关测试、Ruff F/编译通过；56次原始转正导出独立核算与原图口径最大差1.1013e-13px，20图与标注源逐像素一致。新源码compare_wrist_annotations.py沿用现有适配器/人工点读取/鱼眼几何，没有改求解器、门限或方法级别。算法说明第20节与实验报告备份同步；紧凑索引registry/G20261003_wrist_detector_manual_v2.json。主线仍不接受状态，WiLoR仅作为后续腕候选，不直接替换；既有无关修改保留，本轮不推送。
+
+本轮最终公开全量验证696通过、9跳过、29子测试通过；sequence_pipeline另2通过。测试日志归档至G20261003_wrist_detector_manual_v2/tests_final.log。v1/v2三种二维统计口径逐项完全一致，区别仅为补充三维共同集合及显式缺失记录。
