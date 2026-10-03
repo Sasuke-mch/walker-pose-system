@@ -118,7 +118,7 @@ def main():
                 raise ValueError('body frame range mismatch')
             bodies[m][camera] = np.stack([rows[i] for i in range(route['frames'])])
     protocol = {'schema': 'sparse_manual_wrist_comparison_v1', 'annotations': str(args.annotations.resolve()),
-        'frames': manifest['frames'], 'inputs': {m: {k: str(getattr(a, k)) for k in ('left_raw', 'right_raw', 'wilor_left', 'wilor_right', 'calibration_dir')}
+        'frames': manifest['frames'], 'sequence_frames': route['frames'], 'inputs': {m: {k: str(getattr(a, k)) for k in ('left_raw', 'right_raw', 'wilor_left', 'wilor_right', 'calibration_dir')}
                                                for m, a in fit_args.items()},
         'primary_methods': ['PMPose', 'Sapiens2', 'WiLoR'],
         'wilor_primary': 'existing read_view using PMPose wrist association; no manual selection',

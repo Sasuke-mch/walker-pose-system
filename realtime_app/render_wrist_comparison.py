@@ -62,9 +62,10 @@ def main():
         body = {}
         for method in ('PMPose', 'Sapiens2'):
             side = raw_side(Path(protocol['inputs'][method][camera+'_raw']), camera)
-            if sorted(side) != list(range(448)):
+            n = protocol.get('sequence_frames', 448)
+            if sorted(side) != list(range(n)):
                 raise ValueError('source frame range differs')
-            body[method] = np.stack([side[f] for f in range(448)])
+            body[method] = np.stack([side[f] for f in range(n)])
         hand, _, _ = read_view(Path(protocol['inputs']['PMPose']['wilor_'+camera]), body['PMPose'], (1920, 1080), camera)
         points_by_camera[camera] = {'PMPose': body['PMPose'][:, 9:11, :2],
                                   'Sapiens2': body['Sapiens2'][:, 9:11, :2], 'WiLoR': hand[:, :, 0]}
@@ -118,7 +119,9 @@ def main():
         name = f'{f:04d}_{camera}.png'
         image.save(args.output/'images'/name)
         entries.append({'frame': f, 'camera': camera, 'file': 'images/'+name, 'crops': crop_entries, 'points': states})
-    if len(checks) != 82 or len(entries) != 20:
+    expected_checks = sum(r['methods'][m]['state'] == 'compared'
+                          for r in comparison for m in ('PMPose', 'Sapiens2', 'WiLoR'))
+    if len(checks) != expected_checks or len(entries) != len(manifest['images']):
         raise ValueError('visualized evaluated point count differs')
     width = max(p.width for p in preview)
     height = max(p.height for p in preview)
