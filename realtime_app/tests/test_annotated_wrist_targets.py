@@ -48,3 +48,20 @@ def test_ambiguous_or_outside_wrist_rejected(tmp_path):
     result=mod.wrist_points(path)
     assert result['left']['state']=='unavailable'
     assert result['right']['reason']=='invalid_or_out_of_bounds_point'
+
+
+def test_explicit_missing_and_uncertain_are_preserved(tmp_path):
+    path=tmp_path/'annotation.json'
+    data={'imageWidth':1080,'imageHeight':1920,
+          'flags':{'right_wrist_unavailable':True},
+          'shapes':[{'label':'left_wrist','shape_type':'point',
+                     'points':[[10,10]],'flags':{'uncertain':True}}]}
+    path.write_text(json.dumps(data))
+    result=mod.wrist_points(path)
+    assert result['left']['uncertain'] is True
+    assert result['right']=={'state':'unavailable','reason':'explicit_unavailable'}
+    data['flags']['left_wrist_unavailable']=True
+    path.write_text(json.dumps(data))
+    import pytest
+    with pytest.raises(ValueError,match='unavailable_wrist_has_point'):
+        mod.wrist_points(path)

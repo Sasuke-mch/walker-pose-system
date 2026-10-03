@@ -5,11 +5,9 @@ import sys as _tool_sys
 from pathlib import Path as _ToolPath
 _tool_sys.path.insert(0, str(_ToolPath(__file__).resolve().parents[2]))
 from walker_tools._compat import prepare_imports as _tool_prepare_imports
-from walker_tools._compat import APP_ROOT as _tool_app_root
 _tool_prepare_imports()
 import argparse
 import json
-import sys
 from pathlib import Path
 import cv2
 import numpy as np
@@ -30,6 +28,11 @@ def wrist_points(path):
     result={}
     for side in ('left','right'):
         shapes=[s for s in label['shapes'] if s['label']==f'{side}_wrist']
+        if label.get('flags', {}).get(f'{side}_wrist_unavailable', False):
+            if shapes:
+                raise ValueError('unavailable_wrist_has_point')
+            result[side]={'state':'unavailable','reason':'explicit_unavailable'}
+            continue
         if len(shapes)!=1 or shapes[0]['shape_type']!='point' or len(shapes[0]['points'])!=1:
             result[side]={'state':'unavailable','reason':'one_explicit_wrist_point_required'}
             continue
@@ -38,6 +41,8 @@ def wrist_points(path):
             result[side]={'state':'unavailable','reason':'invalid_or_out_of_bounds_point'}
             continue
         result[side]={'state':'present','upright_px':p.tolist()}
+        if shapes[0].get('flags', {}).get('uncertain', False) or label.get('flags', {}).get(f'{side}_wrist_uncertain', False):
+            result[side]['uncertain']=True
     return result
 
 
