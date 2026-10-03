@@ -32,7 +32,7 @@ from .initialization import initialize_rigid_body
 from .stages import (build_stage_schedule, set_trainable_parameters,
                      validate_optimization_options, require_finite_tensors)
 from .losses import (body_reprojection_loss, hand_temporal_loss, body_temporal_loss,
-                     weighted_hand_residual)
+                     weighted_hand_residual, hand_observation_term)
 from .contact import load_surface_targets, surface_contact_losses
 
 
@@ -433,7 +433,11 @@ def run_fit(args) -> int:
             # Pixel residuals are numerically much larger than metre-scale
             # body residuals. Keep hand fitting auxiliary and prevent it from
             # moving the body/root to explain WiLoR's model-derived pixels.
-            hand_term = args.hand_2d_weight * (hand_l_loss + hand_r_loss) if stage_index >= 3 else (hand_l_loss + hand_r_loss).detach() * 0.0
+            # An unused projection may be undefined (e.g. a joint at camera Z=0).
+            # NaN * 0 is NaN: do not route it into a disabled objective branch.
+            hand_term = hand_observation_term(weight=args.hand_2d_weight,
+                stage_index=stage_index, left_loss=hand_l_loss,
+                right_loss=hand_r_loss, body_loss=body_loss)
             mano_pose_loss = (lhand_pose.sum() + rhand_pose.sum()) * 0.0
             if mano_enabled and stage_index >= 3:
                 from pose_app.wilor_mano_prior import rotation_pose_loss
@@ -466,7 +470,12 @@ def run_fit(args) -> int:
                    args.body_temporal_weight * body_temporal + hand_term + args.mano_pose_weight * mano_pose_loss + pose_reg + 1e-3 * beta.pow(2).mean() + \
                    (contact_total if stage_index >= 4 else contact_total.detach() * 0.0) + wrist_term
             if not torch.isfinite(loss):
-                raise RuntimeError(f"nonfinite loss at {stage_name}:{local_step}")
+                terms = {"body": body_term, "hand_2d": hand_term, "pose_reg": pose_reg,
+                         "contact": contact_total, "wrist": wrist_term,
+                         "root": root_term, "temporal": temporal_term,
+                         "body_reprojection": reproj_term, "bone": structure_term}
+                failed_terms = [name for name, value in terms.items() if not bool(torch.isfinite(value))]
+                raise RuntimeError(f"nonfinite loss at {stage_name}:{local_step}; terms={failed_terms}")
             loss.backward()
             require_finite_tensors({name: param_map[name].grad for name in train_names},
                                    f"gradient at {stage_name}:{local_step}")

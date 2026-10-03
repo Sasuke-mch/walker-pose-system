@@ -6,6 +6,13 @@ Stage-level total-loss assembly remains explicit in pipeline.py.
 import torch
 
 
+def hand_observation_term(*, weight, stage_index, left_loss, right_loss, body_loss):
+    """Leave undefined, unused pixel projections outside the fitting graph."""
+    if stage_index < 3 or weight == 0:
+        return body_loss.detach().new_zeros(())
+    return weight * (left_loss + right_loss)
+
+
 def body_reprojection_loss(
     *,
     args,

@@ -229,9 +229,15 @@ def surface_contact_losses(
     *, left_in_cam0, contact_enabled, stage_index, vertices, contact
 ):
     """Surface hand, foot and optional walker-relative hand objectives."""
-    contact_hand_loss = left_in_cam0.sum() * 0.0
-    contact_foot_loss = left_in_cam0.sum() * 0.0
-    global_hand_loss = left_in_cam0.sum() * 0.0
+    # Contact geometry is computed from finite model vertices, not projected
+    # pixels. Disabled losses must not inherit NaNs from an unused projection.
+    source = vertices if vertices is not None else left_in_cam0
+    # An empty reduction supplies a differentiable zero without inspecting any
+    # unused values; callers without vertices retain the original zero gradient.
+    zero = source.reshape(-1)[:0].sum()
+    contact_hand_loss = zero
+    contact_foot_loss = zero
+    global_hand_loss = zero
     if contact_enabled and stage_index >= 4:
         vg = (
             torch.einsum("nij,nvj->nvi", contact.rotation, vertices)
