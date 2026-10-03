@@ -1,0 +1,68 @@
+{
+  "experiment": "G20261003_repositioned360_cold_smplh_v2",
+  "status": "completed_with_sapiens2_fit_rejected",
+  "capture": "realtime_app/outputs/stereo_capture/20260927_201716_220",
+  "frames": 360,
+  "original_pair_ids": [
+    1157,
+    1516
+  ],
+  "protocol": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\protocol.json",
+  "output": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2",
+  "models": [
+    "PMPose-b",
+    "Sapiens2-0.4B"
+  ],
+  "manual_wrist": "disabled_in_both_by_user_confirmation",
+  "accepted_for_main_fit": false,
+  "evidence": "engineering_only_no_new_manual_or_independent_3d_truth",
+  "code": [
+    "realtime_app/experiment_repositioned_capture.py",
+    "realtime_app/evaluate_repositioned_capture.py"
+  ],
+  "checks": {
+    "avi_png_exact": 720,
+    "public_tests_passed": 707,
+    "public_tests_skipped": 9,
+    "public_subtests_passed": 29,
+    "sequence_tests_passed": 2
+  },
+  "failures_retained": [
+    "G20261003_repositioned360_cold_smplh_v1/prepare_failure.json",
+    "detect_failure.json",
+    "detect_console.log",
+    "fit-child_sapiens2_failure.json",
+    "fit_failure.json",
+    "audit_failure.json",
+    "audit_console.log",
+    "sapiens2/strict_stereo.log"
+  ],
+  "methods": {
+    "pmpose": {
+      "fit_status": "fit_completed_and_audited",
+      "frames": 360,
+      "initial_rms_mm": 145.61103284358978,
+      "strict_matched_frames": 342,
+      "strict_valid_points": 3058,
+      "strict_wrists": {
+        "right_wrist": 236,
+        "left_wrist": 150
+      }
+    },
+    "sapiens2": {
+      "fit_status": "fit_failed",
+      "frames": 360,
+      "initial_rms_mm": 493.8473105430603,
+      "strict_matched_frames": 348,
+      "strict_valid_points": 3474,
+      "strict_wrists": {
+        "right_wrist": 11,
+        "left_wrist": 33
+      }
+    }
+  },
+  "results": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\comparison_metrics.json",
+  "diagnostic_image": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\shoulder_diagnostic.png",
+  "next": "separate single-model semantic stability experiment; do not bypass current gates",
+  "interpretation": "Sapiens2 per-frame side/part inconsistency suspected; visual pair1198 crossing. PMPose not truth; no 3D accuracy ranking."
+}
