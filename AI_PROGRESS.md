@@ -3231,3 +3231,5 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 实际回归采用与上一轮一致的PMPose/WiLoR/人工腕448帧输入、随机种子0，A/B/C/D1/D2各1步、D3为0，模型和观测通过绝对路径显式提供。新环境独立源码输出的result.npz49数组、cold_initialization.npz5数组与原对照逐项相同，包括NaN位置。输出与命令记录保存在临时目录fit、fit_args.json、fit.log、numeric_parity.json；未覆盖原冻结结果。这是短预算代码回归，不是重新验证完整优化质量、物理接触或三维精度。实时设备和Docker检测器没有在本次复现检查中运行。
 
 安装说明与第三方资源来源更新到已有 README。根README只提交本次新增导航段落，原有未提交改写与其他候选模块、实验文件保持独立，不随本次推送纳入。已记录的既有文件逐字节核对保持原样（本次授权纳入的源码除外）。
+
+发布后验证：main与master已同步推送GitHub。另从GitHub远端新建depth=1的github_checkout，不使用本地Git对象共享；同一新虚拟环境执行公开测试，realtime_app仍为571通过、15明确跳过、29个subtest通过，sequence_pipeline2通过。发布源码克隆初始工作区为空，远端引用与本地提交一致。日志保存在上述临时目录github_tests.log；未经本次审查的工作区修改、删除和候选文件仍未提交。
