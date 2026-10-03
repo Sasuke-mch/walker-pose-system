@@ -3233,3 +3233,8 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 安装说明与第三方资源来源更新到已有 README。根README只提交本次新增导航段落，原有未提交改写与其他候选模块、实验文件保持独立，不随本次推送纳入。已记录的既有文件逐字节核对保持原样（本次授权纳入的源码除外）。
 
 发布后验证：main与master已同步推送GitHub。另从GitHub远端新建depth=1的github_checkout，不使用本地Git对象共享；同一新虚拟环境执行公开测试，realtime_app仍为571通过、15明确跳过、29个subtest通过，sequence_pipeline2通过。发布源码克隆初始工作区为空，远端引用与本地提交一致。日志保存在上述临时目录github_tests.log；未经本次审查的工作区修改、删除和候选文件仍未提交。
+
+
+## 2026-10-03：修复GitHub CI依赖与测试入口脱节
+
+用户收到云端失败通知后读取实际Actions日志，Python3.11作业在测试阶段发生24个错误，包含缺少torch、scipy与pytest。CI仍只安装旧requirements.txt并调用unittest入口run_tests.py，与上一阶段新独立环境和pytest公开验证入口不同。上一阶段Windows新克隆验证通过没有证明Linux云端CI通过，这一验证遗漏明确纠正。现更新CI安装CPU版同版本PyTorch/torchvision、完整requirements-dev依赖与chumpy构建所需setuptools/wheel，执行pip check及run_validation.py，保留Python3.11/3.12矩阵，不删除失败用例，不修改拟合算法或方法级别。远端通过状态以本次Actions实际结果为准。
