@@ -17,7 +17,6 @@ _tool_prepare_imports()
 import argparse
 import json
 import pickle
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -90,7 +89,8 @@ def main():
     summary = {s: {"passed": sum(r["passed_geometry_proxy"] for r in records if r["hand"] == s),
         "total": len(z["pair_id"]), "max_penetration_mm": max(r["max_vertex_penetration_mm"] for r in records if r["hand"] == s)} for s in ("left", "right")}
     args.output.write_text(json.dumps({"status": "engineering_surface_proxy_audit", "summary": summary,
-        "source": str(args.result.resolve()), "records": records,
+        "source": str(args.result.resolve()), "walker_model_source": str(args.walker_model.resolve()),
+        "walker_installation_scope": "static engineering installation reference; not measured contact", "records": records,
         "limits": "16mm assumed handle; discrete surface regions; noncoplanar triangle screen excludes tangency/coplanar overlap; not force closure or measured contact"}, ensure_ascii=False, indent=2), encoding="utf-8")
     return 0
 

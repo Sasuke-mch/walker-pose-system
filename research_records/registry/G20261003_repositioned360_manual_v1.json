@@ -19,14 +19,15 @@
     "right_hand_pca": 0.0
   },
   "viewers": {
-    "body": "full_view/body_viewer.html",
+    "body": "full_view_rotation_fix_v1/body.html",
     "wrists": "wrists/index.html",
     "body_mode": "same-run full ground/Stage/walker/camera scene; static walker installation is an engineering assumption"
   },
   "boundary": "manual labels under review; target consistency and engineering evidence, not anatomical or physical 3D truth",
-  "scene_replay": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\scene_strict_full",
-  "visualization_validation": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\full_view\\viewer_validation.json",
+  "scene_replay": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\scene_rotation_fix_v1",
+  "visualization_validation": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\full_view_rotation_fix_v1\\validation.json",
   "walker_mount_camera_discrepancy_mm": 26.49152284246695,
   "scene_hand_logic_audit": "scene_hand_logic_audit.json",
-  "ground_rotation_logic_status": "historical increment attenuation and dropped-edge defects reproduced; default unchanged pending controlled correction"
+  "ground_rotation_logic_status": "relative increments applied in full; known edges retained across rejection; missing edges recorded; observed drift remains",
+  "rotation_fix_comparison": "rotation_fix_comparison.json"
 }

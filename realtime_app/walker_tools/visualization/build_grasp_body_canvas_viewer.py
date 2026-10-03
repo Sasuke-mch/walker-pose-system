@@ -39,7 +39,7 @@ def simplify_cold_viewer_text(page, label, frames):
         text = re.sub(r'<section><h2>本次拟合</h2><p>.*?</p></section>',
                       '', text)
         replacements = {'人工腕参考偏差':'腕偏差（左/右）','身体观测残差':'观测残差',
-            '双手几何状态':'手部检查','脚底最低高度':'脚底高度','地面变换':'地面状态',
+            '双手几何状态':'参考扶手几何','脚底最低高度':'脚底高度','地面变换':'地面状态',
             '当前质量与拒绝':'质量检查','SMPL 表面':'人体','助步器实体杆件':'助步器',
             '扶手 capsule':'扶手范围','脚底/手掌接触点':'手脚采样点',
             '相机侧面投影轨迹':'相机轨迹','踝关节拖尾':'踝轨迹','长坐标系':'坐标轴',
@@ -147,12 +147,18 @@ def main():
     c1 = -cal.R_cam0_to_cam1.T @ (cal.T_cam0_to_cam1_mm / 1000)
     cameras = xf(np.broadcast_to(np.stack([np.zeros(3), c1]), (n, 2, 3)))
     stages = [json.loads(line)["stage"]["operational"] for line in (a.scene / "stage1_stage2.jsonl").read_text(encoding="utf-8").splitlines()]
-    poses = [(json.loads(line).get("pose_audit") or {}).get("status", "unknown") for line in (a.scene / "dynamic_ground_pose.jsonl").read_text(encoding="utf-8").splitlines()]
+    ground_records = [json.loads(line) for line in (a.scene / "dynamic_ground_pose.jsonl").read_text(encoding="utf-8").splitlines()]
+    poses = [(row.get("pose_audit") or {}).get("status", "unknown") for row in ground_records]
+    ground_reasons = [(ground_records[i].get("pose_audit") or {}).get("reason") for i in ids]
+    rotation_missing = [(ground_records[i].get("pose_audit") or {}).get("missing_rotation_edges", 0) for i in ids]
     stages = [stages[i] for i in ids]
     poses = [poses[i] for i in ids]
     audit = json.loads(a.geometry_audit.read_text(encoding="utf-8"))
     if Path(audit['source']).resolve()!=a.result.resolve():
         raise ValueError('hand geometry audit/result mismatch')
+    if audit.get("walker_model_source") is not None:
+        if Path(audit["walker_model_source"]).resolve() != Path(source["static_walker_model"]).resolve():
+            raise ValueError("viewer/hand-audit walker reference mismatch")
     hand_state = [[None, None] for _ in range(n)]
     reason_labels = {'screened_triangle_crossings':'表面相交', 'handle_penetration_exceeds_3mm':'扶手穿透>3mm',
                      'finger_region_gap_exceeds_5mm':'指区间隙>5mm', 'palm_gap_exceeds_5mm':'掌区间隙>5mm',
@@ -175,6 +181,7 @@ def main():
         "we": [[names.index(x), names.index(y)] for x, y in w["edges"]], "si": soles.tolist(), "pi": palms.tolist(),
         "acc": strict.ravel().tolist(), "fit_acc": candidate.tolist(), "stage": stages, "pose": poses, "e3": e3,
         "hm": [None] * n, "fm": [float(np.min(vg[i, soles, 2])) for i in range(n)],
+        "ground_reasons": ground_reasons, "rotation_missing": rotation_missing,
         "hand_state": hand_state, "reprojection": projection, "quality": quality.tolist(), "reject_reasons": reasons.tolist()}
     if metadata['inputs'].get('wrist_reference'):
         from pose_app.independent_wrist_reference import load_reference
@@ -188,6 +195,10 @@ def main():
     else:
         data['wrist_mm'] = [[None, None] for _ in range(n)]
     page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":")))
+    notes = "助步器采用静态安装参考，未认证本次机位的实物对齐。"
+    if metadata.get("hand_position_source") == "body_fit_native_finger_rotation_only":
+        notes += "腕位置由身体拟合得到；WiLoR仅约束手指旋转。"
+    page = page.replace('<section><h2>操作</h2>', '<section><h2>参考来源</h2><p>'+notes+'</p></section><section><h2>操作</h2>')
     page = page.replace('<button id="play" class="play">播放</button>', '<button id="play" class="play">播放</button><select id="rate" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>')
     page = page.replace('t-lastT>33', "t-lastT>=1000/(30*Number(document.getElementById('rate').value))")
     page = page.replace('pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))', 'pitch+=dy*.007')
@@ -233,6 +244,8 @@ def main():
     page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
     page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x===null?'—':x.toFixed(1)+' mm').join(' / ');")
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
+    page = page.replace(".filter(Boolean).join(';');window.viewerAudit.frame=fi;",
+                        ".filter(Boolean).join(';')+'\\n地面拒绝: '+(d.ground_reasons[fi]||'—')+'\\n未观测旋转边: '+d.rotation_missing[fi];window.viewerAudit.frame=fi;")
     if metadata.get('cold_start'):
         detector_label = 'PMPose' if metadata.get('detector') == 'pmpose' else 'Sapiens2'
         page = page.replace('SMPL-H 固定手部约束拟合', detector_label)
