@@ -17,7 +17,6 @@ import argparse
 import base64
 import json
 import re
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -68,10 +67,31 @@ def validate_frame_ids(ids, scene_frames):
     return ids
 
 
+def recorded_strict_gate(path, ids):
+    rows = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines()]
+    if [row['index'] for row in rows] != list(range(len(rows))):
+        raise ValueError('strict records have invalid frame order')
+    accepted = np.zeros((len(ids), 17), dtype=bool)
+    reasons = np.full((len(ids), 17), 'association_failed', dtype=object)
+    for i, frame in enumerate(ids):
+        people = rows[int(frame)]['persons_3d']
+        if len(people) > 1:
+            raise ValueError('strict viewer requires max_matches=1')
+        for person in people:
+            if (person['left_person_id'], person['right_person_id']) != (0, 0):
+                raise ValueError('strict viewer must use fitter first instances')
+            for point in person['keypoints_3d']:
+                j = point['index']
+                accepted[i, j] = point['valid']
+                reasons[i, j] = point.get('reason')
+    return accepted, reasons
+
+
 def main():
     p = argparse.ArgumentParser()
     for name in ("result", "scene", "surface-sets", "geometry-audit", "output"):
         p.add_argument("--" + name, type=Path, required=True)
+    p.add_argument('--strict-jsonl', type=Path)
     a = p.parse_args()
     if a.output.exists():
         raise ValueError("refuse existing page")
@@ -102,7 +122,7 @@ def main():
     from pose_app import body_observations as raw
     left = raw.raw_side(Path(metadata["inputs"]["left_raw"]), "left")
     right = raw.raw_side(Path(metadata["inputs"]["right_raw"]), "right")
-    cal = load_stereo_fisheye(ROOT / "realtime_app/calibration/results")
+    cal = load_stereo_fisheye(Path(metadata['inputs']['calibration_dir']))
     left, right = np.stack([left[i] for i in ids]), np.stack([right[i] for i in ids])
     tri, el, er, _, dl, dr, candidate, reasons, quality, components = raw.raw_triangulate(left, right, cal)
     if not np.allclose(tri, r["raw_triangulated_points"], equal_nan=True, atol=.001):
@@ -111,6 +131,8 @@ def main():
     reasons = np.asarray(reasons, dtype=object)
     reasons[candidate & ~strict & (components[0] < .25)] = "q2d_below_0.25"
     reasons[candidate & ~strict & ((el + er) / 2 > 10)] = "reprojection_above_10px"
+    if a.strict_jsonl:
+        strict, reasons = recorded_strict_gate(a.strict_jsonl, ids)
     sets = json.loads(a.surface_sets.read_text(encoding="utf-8"))["sets"]
     soles = np.unique(sum([sum(sets[f"{side}_sole_surface_candidate"].values(), []) for side in ("left", "right")], []))
     palms = np.unique(sum([sum(sets[f"{side}_palm_surface_candidate"].values(), []) for side in ("left", "right")], []))
@@ -159,11 +181,16 @@ def main():
         wrist_target, _ = load_reference(metadata['inputs']['wrist_reference'],
             metadata['inputs']['calibration_dir'], metadata['allow_diagnostic_wrist_reference'])
         data['wrist_mm'] = (np.linalg.norm(r['smplh_joints'][:, [20, 21]]-wrist_target,axis=-1)*1000).tolist()
-    else:
+    elif metadata['inputs'].get('grasp'):
         grasp = json.loads(Path(metadata['inputs']['grasp']).read_text(encoding='utf8'))
         wrist_target = np.asarray([grasp['hands'][side]['wrist_walker_m'] for side in ('left','right')])
         data['wrist_mm'] = (np.linalg.norm(r['wrist_walker_m']-wrist_target,axis=-1)*1000).tolist()
+    else:
+        data['wrist_mm'] = [[None, None] for _ in range(n)]
     page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":")))
+    page = page.replace('<button id="play" class="play">播放</button>', '<button id="play" class="play">播放</button><select id="rate" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>')
+    page = page.replace('t-lastT>33', "t-lastT>=1000/(30*Number(document.getElementById('rate').value))")
+    page = page.replace('pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))', 'pitch+=dy*.007')
     page = page.replace('<title>SMPL surface contact Canvas viewer</title>', '<title>SMPL-H 固定手部约束拟合</title>')
     page = page.replace('.metrics div{display:flex;', '.metrics div{display:flex;gap:8px;')
     page = page.replace('.metrics dt{color:#65737d}', '.metrics dt{color:#65737d;flex:0 0 90px}')
@@ -204,7 +231,7 @@ def main():
     page = page.replace("if(document.getElementById('trails').checked){", ticks + "if(document.getElementById('trails').checked){")
     page = page.replace("pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))", "pitch+=dy*.007")
     page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
-    page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x.toFixed(1)).join(' / ')+' mm';")
+    page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x===null?'—':x.toFixed(1)+' mm').join(' / ');")
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
     if metadata.get('cold_start'):
         detector_label = 'PMPose' if metadata.get('detector') == 'pmpose' else 'Sapiens2'
