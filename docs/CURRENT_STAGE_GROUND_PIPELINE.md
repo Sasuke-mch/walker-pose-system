@@ -1,6 +1,6 @@
 # 当前两阶段与动态地面主线
 
-本文只描述当前保留、可运行和可复现的主线。历史平面 XY、完整平面 SE(2)、稠密背景 SE(3)、平滑展示和刚性助步器接触原型均不再作为当前入口。
+本文描述保留主线及末节单独列出的实验候选。下述旧采集数量和路径保留为历史记录；2026-10-03换机位360帧的当前展示使用`scene_rotation_fix_v1`。历史平面 XY、完整平面 SE(2)、稠密背景 SE(3)、平滑展示和刚性助步器接触原型均不再作为当前入口。
 
 ## 1. 目标与物理约束
 
@@ -84,7 +84,7 @@ Stage 2 已稳定进入后，位姿层允许最多 2 帧低于 0.5 的阶段投�
 “无视频平滑”不等于“估计器无滤波”：
 
 - 位姿估计保留 5 帧脚点因果中位数。
-- 接受的旋转和平移使用 0.45 更新增益。
+- 接受的相对旋转完整累计，不能乘0.45；平移使用0.45更新增益。活动段脚点缺失或求解拒绝时保留已接受的旋转边，缺失旋转边另记链完整性。
 - 最终显示不做骨架跨帧平均、缺失点保持或 Stage 2 踝吸附。
 
 最终渲染器：`realtime_app/tools/render_raw_visual_handle_interaction_video.py`。
@@ -139,3 +139,16 @@ Git 不提交原始数据、JSONL和视频。当前本地只保留以下主线�
 - 当前 360 帧只有内部工程诊断，没有外部刚体轨迹或 IMU，因此 Stage 2 仍是工程估计；内部诊断输出见 `资料/实验报告/stage2_internal_diagnostic_20260930.json`。
 - 第四优先级保留 SMPL 固定鞋底 54 点/脚的 heel、ball、toe 分区。接触面积当前只能报告顶点覆盖代理，不能写成物理接触面积；必须用压力鞋垫或人工逐帧标签验证 precision、recall 和事件时序误差。
 - C1/C2 逻辑保留，当前权重冻结为 surface=1、nonpenetration=1、tangential=0.001；不因内部指标直接删除。
+
+
+## 9. 2026-10-04：连续交接候选与当前决策
+
+当前换机位360帧默认展示仍为`G20261003_repositioned360_manual_v1/full_view_rotation_fix_v1/body.html`。新实验不替换原`RealtimeDynamicGroundWriter`默认参数；方法级别仍是工程候选。
+
+同源回放新增可选`--frames-metadata <frames.json>`与`--foot-observation-mode current`。前者校验保存图身份、双侧主机时间和偏差，输出配对及左右时间；host_return不是曝光时间。360对实际主机跨度17.4267秒，旧30fps名义时间只有11.9667秒。后者改变当前严格踝观测的因果滤波方式，未改变人体检测与严格三角化门。
+
+`--continuous-stage --frames-metadata <frames.json>`启用`pose_app/continuous_stage_ground.py`。相机静止保持当前R/t；相机运动/交接持续处理当前脚点和旋转，独立建立左右锚，支撑权重按时间渐进激活。缺测最多0.2秒预测，之后显式不可用。首帧单独初始化；缺失旋转链不因重新静止而恢复绝对世界认证。Stage2脚锚是操作性COCO踝参考，不能称鞋底接触。连续策略已逐帧运行，但每帧处理不等于每帧都有可靠测量。
+
+背景VO用`--background-vo-diagnostic`只输出审计；可追加`--background-vo-rectified`比较固定局部校正前端。均直接沿用现有背景前端和标定。20链接/12训练内点及留出重投影门未通过时不能注入地面；人体排除不能认证助步器排除。
+
+最终证据目录：`research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_continuous_final_v1/`。控制协议`protocol.json`、完整比较`comparison.json`、验证`validation.json`；最终连续运行`continuous_checked/`，其他continuous目录为保留的中间运行。当前点策略仅部分区间改善并增加拒绝；连续候选69帧不可用、123–136区间偏移退化，背景两种前端全片未达匹配门。所有候选`accepted_for_mainline=False`。上游门未通过，身体踝约束和短窗口联合求解尚未执行，不以平滑代替缺失证据。更完整结果见`AI_PROGRESS.md`本阶段记录。

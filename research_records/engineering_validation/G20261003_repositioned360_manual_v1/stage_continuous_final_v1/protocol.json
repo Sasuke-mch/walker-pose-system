@@ -1,0 +1,68 @@
+{
+  "scope": "360 original selected stereo pairs; same strict first-person observations and static calibration",
+  "control": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\scene_rotation_fix_v1",
+  "method_level": "engineering_candidate; not promoted",
+  "variants": [
+    "nominal_current: only current ankles instead of causal median",
+    "host_current: only host timestamps compared with nominal_current",
+    "continuous: only continuous state/anchor policy compared with host_current, plus required all-frame rotation"
+  ],
+  "frozen": {
+    "processing_width": 480,
+    "translation_gain": 0.45,
+    "rotation_step_deg": 5,
+    "translation_step_mm": 120,
+    "two_foot_disagreement_mm": 60
+  },
+  "candidate": {
+    "anchor_window_frames": 5,
+    "anchor_max_age_sec": 0.25,
+    "anchor_min_samples": 2,
+    "anchor_max_spread_mm": 20,
+    "support_ramp_up_sec": 0.15,
+    "support_ramp_down_sec": 0.25,
+    "prediction_horizon_sec": 0.2,
+    "prediction_speed_limit_mm_s": 600
+  },
+  "background_vo": "diagnostic only; no metric injection before walker mask and withheld gates",
+  "success": "all frame identity retained; proper rotations; no landing reset; no missing rotation labelled accepted; assess drift and jumps without promoting circular ankle residuals to accuracy",
+  "stop": "failed Stage/geometry gates prevent downstream body constraint fitting and sliding-window promotion; no relaxation",
+  "intermediate_evidence": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_continuous_v1",
+  "final_code_notes": "ramp multiplies translation gain; missing rotation permanently invalidates absolute world chain; paired host timestamps and selected image identity checked; VO diagnostic never injected",
+  "background_rectification": {
+    "focal_fraction_width": 0.65,
+    "seed_fraction_xy": [
+      0.5,
+      0.25
+    ],
+    "only_frontend_changed": true
+  },
+  "inputs": {
+    "frames": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\frames.json",
+    "strict": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\first_instance_strict.jsonl",
+    "body_fit_frozen": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz",
+    "images": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\input",
+    "calibration": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\calibration\\stereo_fisheye.json",
+    "ground_reference": "realtime_app/calibration/results/static_ground_20260927_201028/ground_reference.json"
+  },
+  "code": [
+    "realtime_app/pose_app/replay_pair_timing.py",
+    "realtime_app/pose_app/continuous_stage_ground.py",
+    "realtime_app/pose_app/causal_stereo_background_pose.py",
+    "realtime_app/walker_tools/scene/replay_fitted_body_scene.py",
+    "realtime_app/walker_tools/scene/audit_continuous_stage_replay.py"
+  ],
+  "final_continuous_output": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_continuous_final_v1\\continuous_checked",
+  "intermediate_outputs": [
+    "continuous",
+    "continuous_rectified"
+  ],
+  "continuous_is_bundled_candidate_not_individual_component_ablation": true,
+  "decision": {
+    "accepted_for_mainline": false,
+    "body_anchor_fit_executed": false,
+    "fixed_lag_solver_executed": false,
+    "reason": "no globally chain-complete accepted ankle constraint frames; background VO unavailable on all 360 frames; worsened interval 123..136",
+    "current_viewer_retained": "full_view_rotation_fix_v1/body.html"
+  }
+}

@@ -1,0 +1,742 @@
+{
+  "evidence": "frozen body and internal operational stage intervals; not physical or 3D accuracy",
+  "variants": {
+    "control": {
+      "frame_count": 360,
+      "status": {
+        "held": 255,
+        "landed_support_reanchored": 10,
+        "accepted": 43,
+        "unavailable": 25,
+        "accepted_rotation_held": 17,
+        "rejected": 10
+      },
+      "reasons": {
+        "None": 325,
+        "strict_two_foot_input_missing": 25,
+        "stage2_vote_confidence_below_gate": 3,
+        "rotation_foot_pose_step_exceeds_realtime_limit": 1,
+        "two_foot_translation_disagreement": 6
+      },
+      "stage_counts": {
+        "warming_up": 3,
+        "stage1_walker_static_human_moving": 223,
+        "transition": 64,
+        "stage2_feet_static_walker_moving": 70
+      },
+      "camera_translation_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 17.429091151752623,
+        "maximum": 79.43356572685232
+      },
+      "baseline_stage_switch_translation_mm": {
+        "count": 43,
+        "median": 0.0,
+        "p95": 28.272203962834173,
+        "maximum": 55.35540040712954
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 213,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_stage2_intervals": [
+        {
+          "first": 87,
+          "last": 94,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            51.51504903680583,
+            31.395088242376566
+          ],
+          "fitted_pelvis_excursion_mm": 76.04594237157016,
+          "unavailable": 1
+        },
+        {
+          "first": 123,
+          "last": 136,
+          "frames": 14,
+          "fitted_ankle_excursion_mm": [
+            126.78910852740061,
+            135.44643240848666
+          ],
+          "fitted_pelvis_excursion_mm": 59.67372933058662,
+          "unavailable": 3
+        },
+        {
+          "first": 138,
+          "last": 143,
+          "frames": 6,
+          "fitted_ankle_excursion_mm": [
+            141.16418109472352,
+            91.43407366631592
+          ],
+          "fitted_pelvis_excursion_mm": 51.83472251328206,
+          "unavailable": 1
+        },
+        {
+          "first": 200,
+          "last": 206,
+          "frames": 7,
+          "fitted_ankle_excursion_mm": [
+            122.5473527199383,
+            128.27752801636365
+          ],
+          "fitted_pelvis_excursion_mm": 106.74726782779457,
+          "unavailable": 2
+        },
+        {
+          "first": 269,
+          "last": 272,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            52.31694892830298,
+            51.96251931319171
+          ],
+          "fitted_pelvis_excursion_mm": 66.48780647480095,
+          "unavailable": 1
+        },
+        {
+          "first": 275,
+          "last": 284,
+          "frames": 10,
+          "fitted_ankle_excursion_mm": [
+            27.32147054305905,
+            46.50183168418284
+          ],
+          "fitted_pelvis_excursion_mm": 67.00428598229077,
+          "unavailable": 1
+        },
+        {
+          "first": 288,
+          "last": 291,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            41.276178271521324,
+            65.61955183908677
+          ],
+          "fitted_pelvis_excursion_mm": 21.883673441076244,
+          "unavailable": 2
+        },
+        {
+          "first": 294,
+          "last": 296,
+          "frames": 3,
+          "fitted_ankle_excursion_mm": [
+            25.9220619961061,
+            46.7844724283545
+          ],
+          "fitted_pelvis_excursion_mm": 27.147038831931702,
+          "unavailable": 0
+        },
+        {
+          "first": 346,
+          "last": 353,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            104.51780351788851,
+            93.19433801843816
+          ],
+          "fitted_pelvis_excursion_mm": 46.423301015226386,
+          "unavailable": 8
+        },
+        {
+          "first": 356,
+          "last": 359,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            111.9938300576451,
+            89.54448525431674
+          ],
+          "fitted_pelvis_excursion_mm": 59.19831932642835,
+          "unavailable": 1
+        }
+      ],
+      "world_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.853573948045405,
+        "p95": 56.44586236601806,
+        "maximum": 246.34354222247538
+      },
+      "estimate_processing_ms": {
+        "count": 360,
+        "median": 0.0731999971321784,
+        "p95": 0.331000002915971,
+        "maximum": 1.0271999926771969
+      }
+    },
+    "nominal_current": {
+      "frame_count": 360,
+      "status": {
+        "held": 255,
+        "landed_support_reanchored": 10,
+        "accepted": 41,
+        "unavailable": 25,
+        "accepted_rotation_held": 15,
+        "rejected": 14
+      },
+      "reasons": {
+        "None": 321,
+        "strict_two_foot_input_missing": 25,
+        "two_foot_translation_disagreement": 8,
+        "stage2_vote_confidence_below_gate": 3,
+        "foot_separation_inconsistent": 2,
+        "rotation_foot_pose_step_exceeds_realtime_limit": 1
+      },
+      "stage_counts": {
+        "warming_up": 3,
+        "stage1_walker_static_human_moving": 223,
+        "transition": 64,
+        "stage2_feet_static_walker_moving": 70
+      },
+      "camera_translation_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 17.73265712108287,
+        "maximum": 79.94677470939544
+      },
+      "baseline_stage_switch_translation_mm": {
+        "count": 43,
+        "median": 0.0,
+        "p95": 32.540429578502334,
+        "maximum": 50.16887934651902
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 213,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_stage2_intervals": [
+        {
+          "first": 87,
+          "last": 94,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            55.79293807642519,
+            32.14992762364139
+          ],
+          "fitted_pelvis_excursion_mm": 78.32906390511532,
+          "unavailable": 1
+        },
+        {
+          "first": 123,
+          "last": 136,
+          "frames": 14,
+          "fitted_ankle_excursion_mm": [
+            126.78910852740061,
+            135.44643240848666
+          ],
+          "fitted_pelvis_excursion_mm": 59.67372933058662,
+          "unavailable": 3
+        },
+        {
+          "first": 138,
+          "last": 143,
+          "frames": 6,
+          "fitted_ankle_excursion_mm": [
+            131.90771720929087,
+            107.9975260001903
+          ],
+          "fitted_pelvis_excursion_mm": 50.612618385080786,
+          "unavailable": 1
+        },
+        {
+          "first": 200,
+          "last": 206,
+          "frames": 7,
+          "fitted_ankle_excursion_mm": [
+            122.54735271993808,
+            120.9644639733759
+          ],
+          "fitted_pelvis_excursion_mm": 99.84381372965538,
+          "unavailable": 2
+        },
+        {
+          "first": 269,
+          "last": 272,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            44.75560070018564,
+            40.8818745373818
+          ],
+          "fitted_pelvis_excursion_mm": 57.01365075994314,
+          "unavailable": 1
+        },
+        {
+          "first": 275,
+          "last": 284,
+          "frames": 10,
+          "fitted_ankle_excursion_mm": [
+            24.41472505484281,
+            34.44560470181063
+          ],
+          "fitted_pelvis_excursion_mm": 55.63847127883741,
+          "unavailable": 1
+        },
+        {
+          "first": 288,
+          "last": 291,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            43.32999551175858,
+            67.58518880782054
+          ],
+          "fitted_pelvis_excursion_mm": 23.79119115473545,
+          "unavailable": 2
+        },
+        {
+          "first": 294,
+          "last": 296,
+          "frames": 3,
+          "fitted_ankle_excursion_mm": [
+            24.787424583522103,
+            45.82511280914311
+          ],
+          "fitted_pelvis_excursion_mm": 22.64029083903637,
+          "unavailable": 0
+        },
+        {
+          "first": 346,
+          "last": 353,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            104.51780351788845,
+            93.19433801843817
+          ],
+          "fitted_pelvis_excursion_mm": 46.42330101522642,
+          "unavailable": 8
+        },
+        {
+          "first": 356,
+          "last": 359,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            111.9938300576451,
+            89.54448525431674
+          ],
+          "fitted_pelvis_excursion_mm": 59.1983193264284,
+          "unavailable": 1
+        }
+      ],
+      "world_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.6196214827917,
+        "p95": 55.39344704381406,
+        "maximum": 246.3435422224754
+      },
+      "estimate_processing_ms": {
+        "count": 360,
+        "median": 0.06860000576125458,
+        "p95": 0.2586400019936264,
+        "maximum": 1.757299993187189
+      }
+    },
+    "host_current": {
+      "frame_count": 360,
+      "status": {
+        "held": 255,
+        "landed_support_reanchored": 10,
+        "accepted": 41,
+        "unavailable": 25,
+        "accepted_rotation_held": 15,
+        "rejected": 14
+      },
+      "reasons": {
+        "None": 321,
+        "strict_two_foot_input_missing": 25,
+        "two_foot_translation_disagreement": 8,
+        "stage2_vote_confidence_below_gate": 3,
+        "foot_separation_inconsistent": 2,
+        "rotation_foot_pose_step_exceeds_realtime_limit": 1
+      },
+      "stage_counts": {
+        "warming_up": 3,
+        "stage1_walker_static_human_moving": 223,
+        "transition": 64,
+        "stage2_feet_static_walker_moving": 70
+      },
+      "camera_translation_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 17.73265712108287,
+        "maximum": 79.94677470939544
+      },
+      "baseline_stage_switch_translation_mm": {
+        "count": 43,
+        "median": 0.0,
+        "p95": 32.540429578502334,
+        "maximum": 50.16887934651902
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 213,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_stage2_intervals": [
+        {
+          "first": 87,
+          "last": 94,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            55.79293807642519,
+            32.14992762364139
+          ],
+          "fitted_pelvis_excursion_mm": 78.32906390511532,
+          "unavailable": 1
+        },
+        {
+          "first": 123,
+          "last": 136,
+          "frames": 14,
+          "fitted_ankle_excursion_mm": [
+            126.78910852740061,
+            135.44643240848666
+          ],
+          "fitted_pelvis_excursion_mm": 59.67372933058662,
+          "unavailable": 3
+        },
+        {
+          "first": 138,
+          "last": 143,
+          "frames": 6,
+          "fitted_ankle_excursion_mm": [
+            131.90771720929087,
+            107.9975260001903
+          ],
+          "fitted_pelvis_excursion_mm": 50.612618385080786,
+          "unavailable": 1
+        },
+        {
+          "first": 200,
+          "last": 206,
+          "frames": 7,
+          "fitted_ankle_excursion_mm": [
+            122.54735271993808,
+            120.9644639733759
+          ],
+          "fitted_pelvis_excursion_mm": 99.84381372965538,
+          "unavailable": 2
+        },
+        {
+          "first": 269,
+          "last": 272,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            44.75560070018564,
+            40.8818745373818
+          ],
+          "fitted_pelvis_excursion_mm": 57.01365075994314,
+          "unavailable": 1
+        },
+        {
+          "first": 275,
+          "last": 284,
+          "frames": 10,
+          "fitted_ankle_excursion_mm": [
+            24.41472505484281,
+            34.44560470181063
+          ],
+          "fitted_pelvis_excursion_mm": 55.63847127883741,
+          "unavailable": 1
+        },
+        {
+          "first": 288,
+          "last": 291,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            43.32999551175858,
+            67.58518880782054
+          ],
+          "fitted_pelvis_excursion_mm": 23.79119115473545,
+          "unavailable": 2
+        },
+        {
+          "first": 294,
+          "last": 296,
+          "frames": 3,
+          "fitted_ankle_excursion_mm": [
+            24.787424583522103,
+            45.82511280914311
+          ],
+          "fitted_pelvis_excursion_mm": 22.64029083903637,
+          "unavailable": 0
+        },
+        {
+          "first": 346,
+          "last": 353,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            104.51780351788845,
+            93.19433801843817
+          ],
+          "fitted_pelvis_excursion_mm": 46.42330101522642,
+          "unavailable": 8
+        },
+        {
+          "first": 356,
+          "last": 359,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            111.9938300576451,
+            89.54448525431674
+          ],
+          "fitted_pelvis_excursion_mm": 59.1983193264284,
+          "unavailable": 1
+        }
+      ],
+      "world_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.6196214827917,
+        "p95": 55.39344704381406,
+        "maximum": 246.3435422224754
+      },
+      "estimate_processing_ms": {
+        "count": 360,
+        "median": 0.07165000715758651,
+        "p95": 0.23427999331033791,
+        "maximum": 1.144099995144643
+      }
+    },
+    "continuous_checked": {
+      "frame_count": 360,
+      "status": {
+        "held": 250,
+        "predicted": 27,
+        "unavailable": 69,
+        "accepted": 14
+      },
+      "reasons": {
+        "None": 269,
+        "support_or_strict_ankles_unavailable": 28,
+        "incomplete_rotation_chain": 63
+      },
+      "stage_counts": {
+        "warming_up": 3,
+        "stage1_walker_static_human_moving": 223,
+        "transition": 64,
+        "stage2_feet_static_walker_moving": 70
+      },
+      "camera_translation_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 7.078587580223108,
+        "maximum": 30.149452308027428
+      },
+      "baseline_stage_switch_translation_mm": {
+        "count": 43,
+        "median": 0.0,
+        "p95": 10.109569801907591,
+        "maximum": 19.18669687572688
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 213,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_stage2_intervals": [
+        {
+          "first": 87,
+          "last": 94,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            45.852062238349774,
+            60.82551670646616
+          ],
+          "fitted_pelvis_excursion_mm": 47.00644242838543,
+          "unavailable": 8
+        },
+        {
+          "first": 123,
+          "last": 136,
+          "frames": 14,
+          "fitted_ankle_excursion_mm": [
+            224.64111361824106,
+            254.53526240817547
+          ],
+          "fitted_pelvis_excursion_mm": 157.8070458496048,
+          "unavailable": 14
+        },
+        {
+          "first": 138,
+          "last": 143,
+          "frames": 6,
+          "fitted_ankle_excursion_mm": [
+            162.6675629797022,
+            77.35862981975735
+          ],
+          "fitted_pelvis_excursion_mm": 60.17235409453792,
+          "unavailable": 6
+        },
+        {
+          "first": 200,
+          "last": 206,
+          "frames": 7,
+          "fitted_ankle_excursion_mm": [
+            122.54735271993832,
+            66.34173292036988
+          ],
+          "fitted_pelvis_excursion_mm": 51.31874316090554,
+          "unavailable": 7
+        },
+        {
+          "first": 269,
+          "last": 272,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            36.63660082754121,
+            26.279123357048064
+          ],
+          "fitted_pelvis_excursion_mm": 42.54630564384774,
+          "unavailable": 0
+        },
+        {
+          "first": 275,
+          "last": 284,
+          "frames": 10,
+          "fitted_ankle_excursion_mm": [
+            65.92112402503567,
+            67.30560837668685
+          ],
+          "fitted_pelvis_excursion_mm": 34.569790285881396,
+          "unavailable": 6
+        },
+        {
+          "first": 288,
+          "last": 291,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            63.171093823182744,
+            87.70635697760865
+          ],
+          "fitted_pelvis_excursion_mm": 35.00862366170673,
+          "unavailable": 0
+        },
+        {
+          "first": 294,
+          "last": 296,
+          "frames": 3,
+          "fitted_ankle_excursion_mm": [
+            26.24147943127433,
+            47.13264549655895
+          ],
+          "fitted_pelvis_excursion_mm": 24.429533923718065,
+          "unavailable": 3
+        },
+        {
+          "first": 346,
+          "last": 353,
+          "frames": 8,
+          "fitted_ankle_excursion_mm": [
+            59.059635318060295,
+            47.48108932832136
+          ],
+          "fitted_pelvis_excursion_mm": 26.712623367171073,
+          "unavailable": 1
+        },
+        {
+          "first": 356,
+          "last": 359,
+          "frames": 4,
+          "fitted_ankle_excursion_mm": [
+            111.99383005764494,
+            89.54448525431665
+          ],
+          "fitted_pelvis_excursion_mm": 59.19831932642828,
+          "unavailable": 4
+        }
+      ],
+      "world_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.570411032757704,
+        "p95": 55.39344704381408,
+        "maximum": 246.34354222247524
+      },
+      "estimate_processing_ms": {
+        "count": 360,
+        "median": 0.08449999586446211,
+        "p95": 0.2421150078589563,
+        "maximum": 0.7814999989932403
+      },
+      "world_chain_complete_frames": 91,
+      "world_valid_ankle_constraint_frames": 0,
+      "sources": {
+        "measured_static_reference_initialization": 1,
+        "static_background_rigid_walker_hold": 249,
+        "bounded_prediction": 27,
+        "prediction_horizon_exhausted": 69,
+        "current_strict_two_ankles": 8,
+        "single_ankle_with_rotation_and_motion_gate": 6
+      }
+    }
+  },
+  "timing": {
+    "nominal_span_sec": 11.966666666666667,
+    "host_span_sec": 17.426697150003747,
+    "host_interval_ms": {
+      "count": 359,
+      "median": 44.8848999949405,
+      "p95": 82.61487000418128,
+      "maximum": 113.9575999986846
+    },
+    "host_skew_ms": {
+      "count": 360,
+      "median": 10.182549999999999,
+      "p95": 16.571005,
+      "maximum": 24.068
+    },
+    "exposure_sync_verified": false
+  },
+  "background_vo": {
+    "status": {
+      "unavailable": 360
+    },
+    "reasons": {
+      "first_frame": 1,
+      "fewer_than_twenty_links": 359
+    },
+    "processing_ms": {
+      "count": 360,
+      "median": 16.78485000593355,
+      "p95": 19.912984997790772,
+      "maximum": 518.39270000346
+    },
+    "withheld_p95_normalized": {
+      "count": 0
+    },
+    "injected_into_ground": false,
+    "mask_certified": false,
+    "accepted_for_mainline": false,
+    "maximum_correspondence_count": 5,
+    "geometry_inlier_count": {
+      "count": 360,
+      "median": 1.0,
+      "p95": 3.0,
+      "maximum": 5.0
+    }
+  },
+  "accepted_for_mainline": false,
+  "experiment_root": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_continuous_final_v1",
+  "background_vo_rectified": {
+    "status": {
+      "unavailable": 360
+    },
+    "reasons": {
+      "first_frame": 1,
+      "fewer_than_twenty_links": 359
+    },
+    "maximum_correspondence_count": 2,
+    "processing_ms": {
+      "count": 360,
+      "median": 14.34664999396773,
+      "p95": 16.83664001102443,
+      "maximum": 448.4717000013916
+    },
+    "injected_into_ground": false,
+    "accepted_for_mainline": false
+  }
+}

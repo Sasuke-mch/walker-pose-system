@@ -1,0 +1,31 @@
+{
+  "tests": {
+    "new_boundary_tests": 12,
+    "related_unit_tests_passed": 51,
+    "modules": [
+      "test_continuous_stage_ground",
+      "test_dynamic_ground_live",
+      "test_dynamic_ground_pose",
+      "test_static_background_rotation",
+      "test_realtime_stage_walker",
+      "test_static_background_stereo_frontend",
+      "test_static_background_vo"
+    ]
+  },
+  "cache_free_compile_files": 6,
+  "all_frames_preserved": true,
+  "input_raw_geometry_and_accepted_mask_unchanged": true,
+  "frame_images_and_host_timing_identity_checked": true,
+  "final_output": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_continuous_final_v1\\continuous_checked",
+  "code_logic_tests_passed": true,
+  "candidate_performance_gate_passed": false,
+  "accepted_for_mainline": false,
+  "downstream_stop_reason": "no globally chain-complete accepted ankle constraint frames; background VO unavailable on all 360 frames; worsened interval 123..136",
+  "default_replay_regression": {
+    "rotation_ground_from_left": 0.0,
+    "translation_ground_from_left_mm": 0.0,
+    "raw_triangulated_points_mm": 0.0,
+    "stage_equal": true,
+    "accepted_equal": true
+  }
+}
