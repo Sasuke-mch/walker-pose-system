@@ -1,0 +1,68 @@
+{
+  "schema": "walker_current_route_v1",
+  "frames": 448,
+  "frame_ids": "0..447",
+  "body_candidate": {
+    "detector": "sapiens2",
+    "result": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/smplh_cold_start_v2_joint300",
+    "accepted_for_main_fit": false
+  },
+  "matched_control": {
+    "detector": "pmpose",
+    "result": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/pmpose_cold_start_v1_joint300",
+    "accepted_for_main_fit": false
+  },
+  "profile": "realtime_app/configs/cold_smplh_joint300.json",
+  "legacy_profile": "realtime_app/configs/cold_smplh_legacy30.json",
+  "run_root": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2",
+  "frozen_scalar_options": {
+    "steps": 180,
+    "base_steps": 30,
+    "beta_steps": 30,
+    "joint_steps": 300,
+    "hand_steps": 100,
+    "contact_steps": 100,
+    "contact_refine_steps": 0,
+    "vposer_prior_weight": 0.02,
+    "root_anchor_weight": 0.01,
+    "max_init_body_rms_mm": 300.0,
+    "hand_pca_comps": 12,
+    "hand_pca_profile": "pca12",
+    "hand_pca_prior_weight": 0.001,
+    "hand_temporal_weight": 0.02,
+    "mano_pose_weight": 0.1,
+    "mano_pose_init": true,
+    "shared_hand_pose": true,
+    "hand_2d_weight": 0.0,
+    "body_temporal_weight": 0.0,
+    "body_reprojection_weight": 0.0,
+    "body_reprojection_scale_px": 100.0,
+    "wrist_reference_weight": 1.0,
+    "allow_diagnostic_wrist_reference": true,
+    "bone_weight": 0.0,
+    "surface_hand_contact_weight": 0.0,
+    "surface_foot_contact_weight": 0.0,
+    "global_hand_handle_weight": 0.0,
+    "lr": 0.02,
+    "device": "cuda"
+  },
+  "fit_entry": "body.run_sapiens_cold_smplh",
+  "solver_entry": "body.fit_smplh_wilor_sequence",
+  "evaluation_entry": "body.compare_cold_detector_fits",
+  "test_entry": "realtime_app/run_validation.py",
+  "evidence": "engineering_candidate; diagnostic_wrist_reference; no accepted physical contact",
+  "historical_methods": [
+    {
+      "name": "fixed_grasp_corrected",
+      "status": "historical_candidate_not_current_cold_route"
+    },
+    {
+      "name": "free_joint_full_body_v3",
+      "status": "withdrawn_recommendation_failure_evidence"
+    },
+    {
+      "name": "wrist_scale_5mm",
+      "status": "tradeoff_candidate_not_default"
+    }
+  ]
+}

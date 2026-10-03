@@ -27,15 +27,42 @@ def write(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False)+'\n', encoding='utf-8')
 
 
+def fit_command(settings, body_paths, output, wrist_path, joint_steps=None):
+    """Resolve versioned arguments without consuming historical fitted arrays."""
+    values = read(settings)
+    if not isinstance(values, list) or not all(isinstance(v, str) for v in values):
+        raise ValueError('settings must be a JSON array of CLI strings')
+    command = [sys.executable, '-u', 'realtime_app/tools/fit_smplh_wilor_sequence.py', *values]
+    for flag, value in {'--left-raw': body_paths['left'], '--right-raw': body_paths['right'],
+                        '--output-dir': output / 'fit'}.items():
+        command[command.index(flag)+1] = str(value)
+    for flag, value in {'--wrist-reference': wrist_path, '--wrist-reference-weight': '1'}.items():
+        if flag in command:
+            command[command.index(flag)+1] = str(value)
+        else:
+            command.extend([flag, str(value)])
+    if '--allow-diagnostic-wrist-reference' not in command:
+        command.append('--allow-diagnostic-wrist-reference')
+    if joint_steps is not None:
+        command[command.index('--joint-steps')+1] = str(joint_steps)
+    from walker_tools.body.fit_smplh_wilor_sequence import build_parser
+    from pose_app.smplh_fitting.stages import validate_optimization_options
+    options = build_parser().parse_args(command[3:])
+    validate_optimization_options(options)
+    return command, options
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--run', type=Path, required=True)
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--detector', choices=('sapiens2', 'pmpose'), default='sapiens2')
-    ap.add_argument('--joint-steps', type=int, default=30,
-                    help='body/shape joint budget; default matches original cold settings')
+    ap.add_argument('--settings', type=Path, default=ROOT/'realtime_app/configs/cold_smplh_legacy30.json',
+                    help='versioned fitter CLI strings; default preserves the original 30-step profile')
+    ap.add_argument('--joint-steps', type=int, default=None,
+                    help='override the profile joint budget; omitted uses its saved value')
     a = ap.parse_args()
-    if a.joint_steps <= 0:
+    if a.joint_steps is not None and a.joint_steps <= 0:
         raise ValueError('joint steps must be positive')
     run, output = a.run.resolve(), a.output.resolve()
     if output.exists():
@@ -65,15 +92,10 @@ def main():
     if np.any((wrist @ cal.R_cam0_to_cam1.T + cal.T_cam0_to_cam1_mm/1000)[:,2] <= 0):
         raise ValueError('manual wrist reference behind camera1')
     # Settings only. This JSON is a command list, not a fitted result.
-    settings = ROOT/'research_records/engineering_validation/G20261001_fixed_mano_pca448_v1/fit_shared_args.json'
-    command = [sys.executable, '-u', *read(settings)]
-    for flag, value in {'--left-raw':body_paths['left'],
-                        '--right-raw':body_paths['right'],
-                        '--output-dir':output/'fit'}.items():
-        command[command.index(flag)+1] = str(value)
-    command += ['--wrist-reference', str(wrist_path), '--wrist-reference-weight', '1',
-                '--allow-diagnostic-wrist-reference']
-    command[command.index('--joint-steps')+1] = str(a.joint_steps)
+    settings = a.settings.resolve()
+    command, fit_options = fit_command(settings, body_paths, output, wrist_path, a.joint_steps)
+    from pose_app.smplh_fitting.stages import build_stage_schedule
+    schedule = build_stage_schedule(fit_options, contact_enabled=False)
     output.mkdir(parents=True)
     write(output/'protocol.json', dict(frames=448, settings_source=str(settings), command=command,
         body_source=f'{a.detector} only, existing full448 detections', wrist_reference=wrist_audit,
@@ -82,7 +104,7 @@ def main():
             hands='native WiLoR local rotations re-associated to current detector and re-encoded; optimized shared PCA D1/D2'),
         old_fitted_parameters_consumed=False, old_foot_labels_consumed=False,
         constructed_grasp_consumed=False, wrist_weight=1., wrist_loss='mean squared Euclidean metres',
-        stages=f'30 A + 30 B + {a.joint_steps} C + 100 D1 + 100 D2; D3 off as in settings source',
+        stages=' + '.join(f'{steps} {name}' for name, steps in zip(schedule[0], schedule[2])),
         scope='first cold body/shape/hand stage; no surface contact optimization or PMPose pose guards',
         comparison='Not a one-factor comparison with the previous frozen-beta refinement; initialization and wrist reference differ.',
         stopping='original initialization gate; stop on missing frames, nonfinite loss/output or failed input audit; retain all geometry failures',

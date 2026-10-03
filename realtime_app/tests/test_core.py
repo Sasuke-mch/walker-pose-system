@@ -21,7 +21,7 @@ def write_image(path: Path, image: np.ndarray) -> None:
 class Tests(unittest.TestCase):
     def test_config(self):
         root = Path(__file__).resolve().parents[1]
-        config = load_config(root / "config.example.json")
+        config = load_config(root / "camera_config.example.json")
         self.assertEqual(config.project_root, root.parent.resolve())
         self.assertEqual(config.model.pose_threshold, 0.40)
         self.assertEqual(config.pmpose.pose_threshold, 0.30)
@@ -90,4 +90,3 @@ class Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
