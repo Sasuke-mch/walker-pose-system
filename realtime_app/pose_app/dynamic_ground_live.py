@@ -85,6 +85,9 @@ class RealtimeDynamicGroundWriter:
         self.stage2_pose_latched = False
         self.stage2_transition_carry_frames = 0
         self.previous_pose_active = False
+        self.pending_rotation = np.eye(3)
+        self.pending_rotation_edges = 0
+        self.pending_rotation_missing = 0
 
     @staticmethod
     def _strict_points(payload: dict[str, Any]) -> dict[int, np.ndarray]:
@@ -134,6 +137,9 @@ class RealtimeDynamicGroundWriter:
         points = self._strict_points(payload)
         feet = {"left": points[15], "right": points[16]} if 15 in points and 16 in points else None
         if not pose_active:
+            self.pending_rotation = np.eye(3)
+            self.pending_rotation_edges = 0
+            self.pending_rotation_missing = 0
             self.stage2_low_vote_streak = 0
             self.frames_since_pose_update = 0
             self.accepted_translation_history.clear()
@@ -186,6 +192,21 @@ class RealtimeDynamicGroundWriter:
                     self.anchors = self.latest_stationary_feet_world
                 if self.pose_mode != "full_se3" and self.anchors is None and feet is not None:
                     self.anchors = {name: self.pose.transform(point) for name, point in feet.items()}
+            if self.pose_mode == "full_se3":
+                edge = None
+                if rotation_status is not None and rotation_status.get("status") == "accepted":
+                    value = np.asarray(rotation_status.get("R_to_from"), dtype=np.float64)
+                    if (value.shape == (3, 3) and np.isfinite(value).all()
+                            and np.linalg.norm(value.T @ value - np.eye(3), ord="fro") <= 1e-3
+                            and np.linalg.det(value) >= .999):
+                        edge = value
+                if edge is not None:
+                    # Compose current<-previous on the LEFT, including frames
+                    # whose translation/foot solve will be rejected below.
+                    self.pending_rotation = edge @ self.pending_rotation
+                    self.pending_rotation_edges += 1
+                else:
+                    self.pending_rotation_missing += 1
             if feet is not None:
                 self.recent_feet.append(feet)
             filtered = None
@@ -219,11 +240,8 @@ class RealtimeDynamicGroundWriter:
                     "minimum_stage2_vote_confidence": self.minimum_stage2_vote_confidence,
                 }
             elif self.pose_mode == "full_se3":
-                accepted_rotation = rotation_status is not None and rotation_status.get("status") == "accepted"
-                relative_rotation = (
-                    np.asarray(rotation_status["R_to_from"], dtype=np.float64)
-                    if accepted_rotation else np.eye(3, dtype=np.float64)
-                )
+                accepted_rotation = self.pending_rotation_edges > 0
+                relative_rotation = self.pending_rotation.copy()
                 translation_prediction = None
                 pair_id = int(payload["pair_id"])
                 if len(self.accepted_translation_history) == 2:
@@ -238,6 +256,9 @@ class RealtimeDynamicGroundWriter:
                     translation_prediction_world_mm=translation_prediction,
                     allow_single_foot_recovery=self.allow_single_foot_recovery,
                 )
+                audit["accumulated_rotation_edges"] = self.pending_rotation_edges
+                audit["missing_rotation_edges"] = self.pending_rotation_missing
+                audit["rotation_chain_complete"] = self.pending_rotation_missing == 0
                 audit["causal_foot_window_frames"] = len(self.recent_feet)
                 audit["foot_observation_mode"] = self.foot_observation_mode
                 audit["current_frame_two_feet_required"] = True
@@ -250,6 +271,9 @@ class RealtimeDynamicGroundWriter:
                 )
                 if solved is not None:
                     self.pose = solved
+                    self.pending_rotation = np.eye(3)
+                    self.pending_rotation_edges = 0
+                    self.pending_rotation_missing = 0
                     self.accepted_updates += 1
                     self.frames_since_pose_update = 0
                     self.accepted_translation_history.append(
@@ -273,6 +297,10 @@ class RealtimeDynamicGroundWriter:
                     self.frames_since_pose_update = 0
             if audit.get("status") in {"unavailable", "rejected"}:
                 self.frames_since_pose_update += 1
+        if self.pose_mode == "full_se3" and pose_active:
+            audit.setdefault("accumulated_rotation_edges", self.pending_rotation_edges)
+            audit.setdefault("missing_rotation_edges", self.pending_rotation_missing)
+            audit.setdefault("rotation_chain_complete", self.pending_rotation_missing == 0)
         transformed = {str(index): self.pose.transform(point).tolist() for index, point in points.items()}
         constrained = {index: list(point) for index, point in transformed.items()}
         projection = {"applied": False, "type": None}

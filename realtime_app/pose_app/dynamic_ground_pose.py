@@ -217,10 +217,9 @@ def solve_pose_from_relative_rotation_and_feet(
             **single_foot_audit,
         }
     gain = criteria.smoothing_gain
-    relative_world = candidate_rotation @ previous_pose.rotation_world_from_camera.T
-    relative_vector, _ = cv2.Rodrigues(relative_world)
-    filtered_delta, _ = cv2.Rodrigues(gain * relative_vector)
-    filtered_rotation = filtered_delta @ previous_pose.rotation_world_from_camera
+    # This is a relative motion edge, not an absolute noisy attitude target.
+    # Scaling each edge permanently discards rotation during sustained motion.
+    filtered_rotation = candidate_rotation
     filtered_translation = previous_pose.translation_world_from_camera_mm + gain * (
         candidate_translation - previous_pose.translation_world_from_camera_mm
     )

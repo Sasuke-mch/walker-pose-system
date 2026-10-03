@@ -163,3 +163,70 @@ class DynamicGroundLiveTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_rotation_edges_survive_missing_feet_in_noncommutative_order(tmp_path):
+    import cv2
+    reference = tmp_path / "ground.json"
+    DynamicGroundLiveTests.ground_reference(reference)
+    writer = RealtimeDynamicGroundWriter(tmp_path / "out.jsonl", reference,
+                                        pose_mode="full_se3", foot_window=1)
+    def payload(i, points):
+        return {"pair_id": i, "persons_3d": [{"keypoints_3d": points}]}
+    feet = [dict(index=j, valid=True, xyz=x) for j, x in
+            [(15, [-120., 0., -700.]), (16, [120., 0., -700.])]]
+    writer.consume(payload(0, feet), {"stage": {"operational": "stage1_walker_static_human_moving"}})
+    stage = {"stage": {"operational": "stage2_feet_static_walker_moving", "vote_confidence": 1.}}
+    e1 = cv2.Rodrigues(np.array([.01, 0., 0.]))[0]
+    e2 = cv2.Rodrigues(np.array([0., .02, 0.]))[0]
+    held = writer.consume(payload(1, []), stage, dict(status="accepted", R_to_from=e1.tolist()))
+    assert held["pose_audit"]["status"] == "unavailable"
+    observed = [dict(index=x["index"], valid=True, xyz=(e2 @ e1 @ np.array(x["xyz"])).tolist()) for x in feet]
+    row = writer.consume(payload(2, observed), stage, dict(status="accepted", R_to_from=e2.tolist()))
+    np.testing.assert_allclose(row["rotation_world_from_left_camera"], (e2 @ e1).T, atol=1e-10)
+    assert row["pose_audit"]["accumulated_rotation_edges"] == 2
+    assert row["pose_audit"]["rotation_chain_complete"]
+    assert writer.pending_rotation_edges == 0
+    writer.close(completed=True)
+
+
+def test_relative_rotation_does_not_decay_under_default_gain():
+    import cv2
+    from pose_app.dynamic_ground_pose import solve_pose_from_relative_rotation_and_feet, RotationFootPoseCriteria
+    from pose_app.two_stage_motion import WorldPose
+    pose = WorldPose(np.eye(3), np.zeros(3))
+    anchors = dict(left=np.array([-150., 0., 1000.]), right=np.array([150., 0., 1000.]))
+    edge = cv2.Rodrigues(np.array([0., 0., np.deg2rad(1.)]))[0]
+    for i in range(1, 11):
+        truth = cv2.Rodrigues(np.array([0., 0., -np.deg2rad(i)]))[0]
+        observed = {k: truth.T @ v for k, v in anchors.items()}
+        pose, audit = solve_pose_from_relative_rotation_and_feet(pose, edge, observed, anchors,
+                                                                RotationFootPoseCriteria())
+        assert audit["status"] == "accepted"
+    np.testing.assert_allclose(pose.rotation_world_from_camera, truth, atol=1e-10)
+
+
+def test_rejected_vote_preserves_edge_and_inactive_stage_resets_it(tmp_path):
+    import cv2
+    reference = tmp_path / "ground.json"
+    DynamicGroundLiveTests.ground_reference(reference)
+    writer = RealtimeDynamicGroundWriter(tmp_path / "out.jsonl", reference, pose_mode="full_se3")
+    def consume(i, stage, vote, edge):
+        points = [dict(index=15, valid=True, xyz=[-120., 0., -700.]),
+                  dict(index=16, valid=True, xyz=[120., 0., -700.])]
+        return writer.consume(dict(pair_id=i, persons_3d=[dict(keypoints_3d=points)]),
+                              dict(stage=dict(operational=stage, vote_confidence=vote)), edge)
+    s1 = "stage1_walker_static_human_moving"
+    s2 = "stage2_feet_static_walker_moving"
+    consume(0, s1, 1., None)
+    edge = cv2.Rodrigues(np.array([0., 0., .01]))[0]
+    row = consume(1, s2, 0., dict(status="accepted", R_to_from=edge.tolist()))
+    assert row["pose_audit"]["reason"] == "stage2_vote_confidence_below_gate"
+    assert writer.pending_rotation_edges == 1
+    consume(2, s1, 1., None)
+    assert writer.pending_rotation_edges == 0
+    np.testing.assert_allclose(writer.pending_rotation, np.eye(3))
+    row = consume(3, s2, 1., dict(status="accepted", R_to_from=[[1.]]))
+    assert not row["pose_audit"]["rotation_chain_complete"]
+    np.testing.assert_allclose(writer.pose.rotation_world_from_camera, np.eye(3))
+    writer.close(completed=True)
