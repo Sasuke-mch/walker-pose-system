@@ -252,3 +252,194 @@ def test_cli_retains_mainline_defaults():
     assert args.steps == 180 and args.lr == 0.02
     assert args.body_temporal_weight == args.body_reprojection_weight == 0
     assert args.hand_pca_comps == 12 and not args.shared_hand_pose
+
+
+@pytest.mark.parametrize(
+    "flag,value",
+    [
+        ("--joint-steps", "-1"),
+        ("--contact-refine-steps", "-1"),
+        ("--steps", "-1"),
+        ("--lr", "nan"),
+        ("--lr", "0"),
+        ("--body-temporal-weight", "nan"),
+        ("--surface-foot-contact-weight", "inf"),
+        ("--max-init-body-rms-mm", "nan"),
+        ("--bone-weight", "-1"),
+    ],
+)
+def test_invalid_options_stop_before_creating_output_or_loading_assets(
+    tmp_path, flag, value
+):
+    from pose_app.smplh_fitting.pipeline import run_fit
+
+    parser = build_parser()
+    required = [a.option_strings[0] for a in parser._actions if a.required]
+    argv = [item for f in required for item in (f, "nonexistent")]
+    argv += ["--output-dir", str(tmp_path / "fit"), flag, value]
+    with pytest.raises(ValueError, match="finite|non-negative"):
+        run_fit(parser.parse_args(argv))
+    assert not (tmp_path / "fit").exists()
+
+
+@pytest.fixture
+def surface_input_files(tmp_path):
+    import json
+
+    args = options(
+        contact_labels=tmp_path / "labels.npz",
+        scene_transforms=tmp_path / "scene.npz",
+        contact_vertex_sets=tmp_path / "sets.json",
+        walker_topology=tmp_path / "topology.json",
+        global_hand_handle_pose=None,
+    )
+    labels = dict(
+        handle_ends_ground_m=np.zeros((2, 2, 2, 3)),
+        hand_contact_weight=np.ones((2, 2)),
+        foot_contact_weight=np.ones((2, 2)),
+    )
+    scene = dict(
+        rotation_ground_from_left=np.tile(np.eye(3), (2, 1, 1)),
+        translation_ground_from_left_mm=np.zeros((2, 3)),
+    )
+    sets = {
+        f"{side}_{part}_surface_candidate": {"vertices": [0, 1]}
+        for side in ("left", "right")
+        for part in ("palm", "sole")
+    }
+    topology = dict(
+        handle_segments={"left": [0, 1], "right": [2, 3]},
+        rotation_left_camera_from_walker=np.eye(3).tolist(),
+        translation_left_camera_from_walker_mm=[0, 0, 0],
+    )
+    np.savez(args.contact_labels, **labels)
+    np.savez(args.scene_transforms, **scene)
+    args.contact_vertex_sets.write_text(json.dumps({"sets": sets}), encoding="utf-8")
+    args.walker_topology.write_text(json.dumps(topology), encoding="utf-8")
+    return args, labels, scene, sets
+
+
+@pytest.mark.parametrize("indices", [[-1], [6890], [1.2], []])
+def test_sole_indices_do_not_wrap_or_truncate(surface_input_files, indices):
+    import json
+
+    args, _, _, sets = surface_input_files
+    sets["left_sole_surface_candidate"]["vertices"] = indices
+    args.contact_vertex_sets.write_text(json.dumps({"sets": sets}), encoding="utf-8")
+    with pytest.raises(ValueError, match="left sole vertices"):
+        load_surface_targets(args, 2, "cpu")
+
+
+def test_surface_transform_rejects_nonfinite_translation(surface_input_files):
+    args, _, scene, _ = surface_input_files
+    scene["translation_ground_from_left_mm"][0, 0] = np.nan
+    np.savez(args.scene_transforms, **scene)
+    with pytest.raises(ValueError, match="translation_ground_from_left_mm"):
+        load_surface_targets(args, 2, "cpu")
+
+
+def test_valid_surface_inputs_preserve_units_and_vertex_order(surface_input_files):
+    args, _, scene, _ = surface_input_files
+    scene["translation_ground_from_left_mm"][:] = [1000.0, 2000.0, 3000.0]
+    np.savez(args.scene_transforms, **scene)
+    target = load_surface_targets(args, 2, "cpu")
+    torch.testing.assert_close(target.translation, torch.tensor([[1.0, 2.0, 3.0]] * 2))
+    assert target.sole_indices["left"].tolist() == [0, 1]
+    assert target.hand_weight.shape == (2, 2)
+
+
+@pytest.mark.parametrize("diagonal", [[-1.0, 1.0, 1.0], [2.0, 1.0, 1.0]])
+def test_surface_transform_rejects_reflection_and_scale(surface_input_files, diagonal):
+    args, _, scene, _ = surface_input_files
+    scene["rotation_ground_from_left"][0] = np.diag(diagonal)
+    np.savez(args.scene_transforms, **scene)
+    with pytest.raises(ValueError, match="invalid proper rotation"):
+        load_surface_targets(args, 2, "cpu")
+
+
+@pytest.mark.parametrize("defect", ["broadcast", "index", "nonfinite"])
+def test_global_surface_targets_require_exact_vertex_correspondence(
+    surface_input_files, defect
+):
+    import json
+
+    args, _, _, _ = surface_input_files
+    prior = dict(
+        assumption="hand_static_relative_to_walker_for_entire_video",
+        status="engineering_candidate",
+        geometry_source="camera_rigid_mount_assumption",
+        hands={
+            side: dict(
+                vertex_indices=[0, 1],
+                shared_surface_walker_m=[[0, 0, 0], [0, 0, 0]],
+                palm_offset_handle_m=[0, 0, 0],
+            )
+            for side in ("left", "right")
+        },
+    )
+    if defect == "broadcast":
+        prior["hands"]["left"]["shared_surface_walker_m"] = [[0, 0, 0]]
+    elif defect == "index":
+        prior["hands"]["left"]["vertex_indices"] = [-1, 1]
+    else:
+        prior["hands"]["left"]["shared_surface_walker_m"][0][0] = float("inf")
+    args.global_hand_handle_pose = args.contact_labels.parent / "prior.json"
+    args.global_hand_handle_pose.write_text(json.dumps(prior), encoding="utf-8")
+    with pytest.raises(ValueError, match="left global palm|left shared_surface"):
+        load_surface_targets(args, 2, "cpu")
+
+
+def test_finite_loss_with_infinite_gradient_is_rejected():
+    from pose_app.smplh_fitting.stages import require_finite_tensors
+
+    parameter = torch.nn.Parameter(torch.tensor(0.0))
+    loss = torch.sqrt(parameter)
+    assert torch.isfinite(loss)
+    loss.backward()
+    with pytest.raises(RuntimeError, match="gradient.*beta"):
+        require_finite_tensors({"beta": parameter.grad, "inactive": None}, "gradient")
+    with pytest.raises(RuntimeError, match="final output.*vertices"):
+        require_finite_tensors(
+            {"vertices": torch.tensor([float("nan")])}, "final output"
+        )
+
+
+def test_nonfinite_pixels_do_not_poison_zero_weight_residuals():
+    from pose_app.smplh_hand_observation import finite_pixel_values
+    from pose_app.smplh_fitting.losses import weighted_hand_residual
+
+    raw = np.asarray([[[1.0, 2.0], [float("inf"), float("nan")]]], np.float32)
+    prediction = torch.ones(1, 2, 2, requires_grad=True)
+    mask = torch.tensor(np.isfinite(raw).all(-1))
+    residual = (prediction - torch.tensor(finite_pixel_values(raw))).pow(2).sum(-1)
+    loss = weighted_hand_residual(residual, mask.float(), mask)
+    assert loss.item() == 1
+    gradient = torch.autograd.grad(loss, prediction)[0]
+    assert torch.isfinite(gradient).all() and torch.count_nonzero(gradient[:, 1]) == 0
+    assert np.isinf(raw[0, 1, 0]) and np.isnan(raw[0, 1, 1])
+
+
+def test_selected_hand_confidence_cannot_poison_weights(tmp_path):
+    import json
+    from pose_app.smplh_hand_observation import read_view
+
+    body = np.zeros((1, 17, 3), np.float32)
+    body[0, 9] = [10, 20, 0.9]
+    row = dict(
+        frame_index=0,
+        image="pair_0000.jpg",
+        records=[
+            dict(
+                side="left",
+                pixel_frame="raw_fisheye",
+                detector_confidence=float("nan"),
+                keypoints_2d_raw_fisheye=[[10, 20]] * 21,
+            )
+        ],
+    )
+    path = tmp_path / "wilor.jsonl"
+    path.write_text(json.dumps(row) + "\n", encoding="utf-8")
+    with pytest.raises(
+        ValueError, match="nonfinite detector confidence.*frame 0 hand left"
+    ):
+        read_view(path, body, (1920, 1080), "left")

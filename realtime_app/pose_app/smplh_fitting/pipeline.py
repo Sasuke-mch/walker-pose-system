@@ -27,16 +27,18 @@ from pose_app import smpl_surface_contact as surface_contact
 from pose_app import body_observations as raw_clean
 
 
-from ..smplh_hand_observation import read_wilor
+from ..smplh_hand_observation import read_wilor, finite_pixel_values
 from ..project_paths import PROJECT_ROOT as ROOT
 from .initialization import initialize_rigid_body
-from .stages import build_stage_schedule, set_trainable_parameters
+from .stages import (build_stage_schedule, set_trainable_parameters,
+                     validate_optimization_options, require_finite_tensors)
 from .losses import (body_reprojection_loss, hand_temporal_loss, body_temporal_loss,
                      weighted_hand_residual)
 from .contact import load_surface_targets, surface_contact_losses
 
 
 def run_fit(args) -> int:
+    validate_optimization_options(args)
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise RuntimeError(f"refuse non-empty output: {args.output_dir}")
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -309,16 +311,16 @@ def run_fit(args) -> int:
     if init_report["valid_root_basis_frames"] != n:
         raise RuntimeError("rigid initialization lacks accepted shoulder/hip basis on some frames")
     target = torch.tensor(tri_m, device=device)
-    raw_left_2d = torch.tensor(np.nan_to_num(left[:, :, :2], nan=0.0), device=device)
-    raw_right_2d = torch.tensor(np.nan_to_num(right[:, :, :2], nan=0.0), device=device)
-    raw_left_conf = torch.tensor(np.clip(np.nan_to_num(left[:, :, 2], nan=0.0), 0.0, 1.0), device=device)
-    raw_right_conf = torch.tensor(np.clip(np.nan_to_num(right[:, :, 2], nan=0.0), 0.0, 1.0), device=device)
+    raw_left_2d = torch.tensor(finite_pixel_values(left[:, :, :2]), device=device)
+    raw_right_2d = torch.tensor(finite_pixel_values(right[:, :, :2]), device=device)
+    raw_left_conf = torch.tensor(np.clip(finite_pixel_values(left[:, :, 2]), 0.0, 1.0), device=device)
+    raw_right_conf = torch.tensor(np.clip(finite_pixel_values(right[:, :, 2]), 0.0, 1.0), device=device)
     raw_left_valid = torch.isfinite(torch.tensor(left[:, :, :2], device=device)).all(dim=-1) & (raw_left_conf > 0)
     raw_right_valid = torch.isfinite(torch.tensor(right[:, :, :2], device=device)).all(dim=-1) & (raw_right_conf > 0)
-    obs_ll = torch.tensor(np.nan_to_num(hand_ll, nan=0.0), device=device)
-    obs_lr = torch.tensor(np.nan_to_num(hand_lr, nan=0.0), device=device)
-    obs_rl = torch.tensor(np.nan_to_num(hand_rl, nan=0.0), device=device)
-    obs_rr = torch.tensor(np.nan_to_num(hand_rr, nan=0.0), device=device)
+    obs_ll = torch.tensor(finite_pixel_values(hand_ll), device=device)
+    obs_lr = torch.tensor(finite_pixel_values(hand_lr), device=device)
+    obs_rl = torch.tensor(finite_pixel_values(hand_rl), device=device)
+    obs_rr = torch.tensor(finite_pixel_values(hand_rr), device=device)
     mask_body = torch.tensor(body_mask, device=device)
     mask_ll = torch.tensor(hand_ll_valid, device=device); mask_lr = torch.tensor(hand_lr_valid, device=device)
     mask_rl = torch.tensor(hand_rl_valid, device=device); mask_rr = torch.tensor(hand_rr_valid, device=device)
@@ -467,7 +469,11 @@ def run_fit(args) -> int:
             if not torch.isfinite(loss):
                 raise RuntimeError(f"nonfinite loss at {stage_name}:{local_step}")
             loss.backward()
+            require_finite_tensors({name: param_map[name].grad for name in train_names},
+                                   f"gradient at {stage_name}:{local_step}")
             optim.step()
+            require_finite_tensors({name: param_map[name] for name in train_names},
+                                   f"parameters after {stage_name}:{local_step}")
             if step % 10 == 0 or step == sum(stage_steps) - 1:
                 row = {"stage": stage_name, "stage_step": local_step, "step": step, "loss": float(loss.detach()),
                             "body_m": float(torch.sqrt(body_loss.detach())),
@@ -505,6 +511,11 @@ def run_fit(args) -> int:
                       right_hand_pose=rhand_pose, transl=transl, return_verts=True)
         final_hand_l = hand21(final.joints, final.vertices, "left")
         final_hand_r = hand21(final.joints, final.vertices, "right")
+        final_coco = regress_coco17_torch(final.vertices, reg)
+        require_finite_tensors({**param_map, "vertices": final.vertices,
+                               "joints": final.joints, "predicted_coco": final_coco,
+                               "left_hand_pose": lhand_pose, "right_hand_pose": rhand_pose},
+                              "final output")
         contact_diag = {}
         if mano_enabled:
             for side in ("left", "right"):
@@ -522,7 +533,7 @@ def run_fit(args) -> int:
     np.savez_compressed(args.output_dir / "result.npz",
                         pair_id=np.asarray(ids, dtype=np.int64),
                         vertices=final.vertices.cpu().numpy(), faces=np.asarray(model.faces),
-                        predicted_coco=regress_coco17_torch(final.vertices, reg).cpu().numpy(),
+                        predicted_coco=final_coco.cpu().numpy(),
                         betas=beta.detach().cpu().numpy(), global_orient=root.detach().cpu().numpy(),
                         transl=transl.detach().cpu().numpy(),
                         body_pose=body_pose.detach().cpu().numpy(),

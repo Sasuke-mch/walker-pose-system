@@ -7,6 +7,7 @@ import json
 import numpy as np
 import torch
 from .. import smpl_surface_contact as surface_contact
+from ..constructed_grasp_refinement import validate_rotation
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,28 @@ class SurfaceTargets:
     camera_translation: torch.Tensor | None
 
 
+def _vertex_indices(values, name: str, device):
+    indices = np.asarray(values)
+    if indices.ndim != 1 or indices.size == 0:
+        raise ValueError(f"{name} must contain a non-empty vertex index vector")
+    if indices.dtype.kind not in "iu" or np.any(indices < 0) or np.any(indices >= 6890):
+        raise ValueError(f"{name} must contain integer indices in SMPL-H range 0..6889")
+    return torch.tensor(indices, dtype=torch.long, device=device)
+
+
+def _finite_array(values, shape, name: str):
+    array = np.asarray(values)
+    if array.shape != shape or not np.isfinite(array).all():
+        raise ValueError(f"{name} must be finite with shape {shape}")
+    return array
+
+
+def _archive_arrays(path, names):
+    # Materialize only the consumed fields, then close the NPZ file handle.
+    with np.load(path, allow_pickle=True) as archive:
+        return {name: archive[name] for name in names if name in archive.files}
+
+
 def load_surface_targets(args, n: int, device) -> SurfaceTargets:
     """Read the existing contact protocol; keep validation order and units."""
     contact_enabled = args.contact_labels is not None
@@ -33,8 +56,14 @@ def load_surface_targets(args, n: int, device) -> SurfaceTargets:
     global_hand_offset = None
     global_hand_surface = global_camera_R = global_camera_t = None
     if contact_enabled:
-        labels = np.load(args.contact_labels, allow_pickle=True)
-        scene = np.load(args.scene_transforms, allow_pickle=True)
+        labels = _archive_arrays(
+            args.contact_labels,
+            ("handle_ends_ground_m", "hand_contact_weight", "foot_contact_weight"),
+        )
+        scene = _archive_arrays(
+            args.scene_transforms,
+            ("rotation_ground_from_left", "translation_ground_from_left_mm"),
+        )
         if int(labels["handle_ends_ground_m"].shape[0]) != n:
             raise ValueError("contact labels frame count does not match raw input")
         if tuple(labels["hand_contact_weight"].shape) != (n, 2):
@@ -59,6 +88,15 @@ def load_surface_targets(args, n: int, device) -> SurfaceTargets:
             raise ValueError("foot_contact_weight must be finite and non-negative")
         if not np.isfinite(labels["handle_ends_ground_m"]).all():
             raise ValueError("handle_ends_ground_m contains non-finite values")
+        _finite_array(
+            scene["rotation_ground_from_left"], (n, 3, 3), "rotation_ground_from_left"
+        )
+        _finite_array(
+            scene["translation_ground_from_left_mm"],
+            (n, 3),
+            "translation_ground_from_left_mm",
+        )
+        validate_rotation(scene["rotation_ground_from_left"])
         contact_handle = torch.tensor(
             labels["handle_ends_ground_m"], dtype=torch.float32, device=device
         )
@@ -86,29 +124,21 @@ def load_surface_targets(args, n: int, device) -> SurfaceTargets:
                 "walker topology must expose exactly two endpoints for left/right handles"
             )
         palm_idx = {
-            s: torch.tensor(
+            s: _vertex_indices(
                 sum(sets[f"{s}_palm_surface_candidate"].values(), []),
-                dtype=torch.long,
-                device=device,
+                f"{s} palm vertices",
+                device,
             )
             for s in ("left", "right")
         }
         sole_idx = {
-            s: torch.tensor(
+            s: _vertex_indices(
                 sum(sets[f"{s}_sole_surface_candidate"].values(), []),
-                dtype=torch.long,
-                device=device,
+                f"{s} sole vertices",
+                device,
             )
             for s in ("left", "right")
         }
-        if any(int(v.numel()) == 0 for v in palm_idx.values()):
-            raise ValueError("contact vertex sets contain no palm vertices")
-        if any(int(v.numel()) == 0 for v in sole_idx.values()):
-            raise ValueError("contact vertex sets contain no sole vertices")
-        if any(int(v.min()) < 0 or int(v.max()) >= 6890 for v in palm_idx.values()):
-            raise ValueError(
-                "contact vertex index is outside the 6890-vertex SMPL-H topology"
-            )
         if (
             float(
                 np.asarray(labels["hand_contact_weight"]).sum()
@@ -132,29 +162,51 @@ def load_surface_targets(args, n: int, device) -> SurfaceTargets:
                     "global prior requires validated camera-rigid solver provenance"
                 )
             global_camera_R = torch.tensor(
-                topology["rotation_left_camera_from_walker"],
+                _finite_array(
+                    topology["rotation_left_camera_from_walker"],
+                    (3, 3),
+                    "rotation_left_camera_from_walker",
+                ),
                 dtype=torch.float32,
                 device=device,
             )
             global_camera_t = (
                 torch.tensor(
-                    topology["translation_left_camera_from_walker_mm"],
+                    _finite_array(
+                        topology["translation_left_camera_from_walker_mm"],
+                        (3,),
+                        "translation_left_camera_from_walker_mm",
+                    ),
                     dtype=torch.float32,
                     device=device,
                 )
                 / 1000
             )
+            validate_rotation(np.asarray(topology["rotation_left_camera_from_walker"]))
             global_hand_surface = {}
             for s in ("left", "right"):
                 indices = prior["hands"][s]["vertex_indices"]
-                palm_idx[s] = torch.tensor(indices, dtype=torch.long, device=device)
+                palm_idx[s] = _vertex_indices(
+                    indices, f"{s} global palm vertices", device
+                )
                 global_hand_surface[s] = torch.tensor(
-                    prior["hands"][s]["shared_surface_walker_m"],
+                    _finite_array(
+                        prior["hands"][s]["shared_surface_walker_m"],
+                        (len(indices), 3),
+                        f"{s} shared_surface_walker_m",
+                    ),
                     dtype=torch.float32,
                     device=device,
                 )
             global_hand_offset = torch.tensor(
-                [prior["hands"][s]["palm_offset_handle_m"] for s in ("left", "right")],
+                _finite_array(
+                    [
+                        prior["hands"][s]["palm_offset_handle_m"]
+                        for s in ("left", "right")
+                    ],
+                    (2, 3),
+                    "palm_offset_handle_m",
+                ),
                 dtype=torch.float32,
                 device=device,
             )

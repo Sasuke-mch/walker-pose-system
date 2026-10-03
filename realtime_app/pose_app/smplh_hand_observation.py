@@ -148,7 +148,6 @@ def validate_smplh(model):
         distal = [ids[3], ids[6], ids[9], ids[12], ids[15]]
         tips = TIP_VERTICES[side]
         for finger, (distal_joint, tip_vertex) in enumerate(zip(distal, tips)):
-            distances = torch.linalg.vector_norm(rest_joints[distal] - v_template[tip_vertex])
             all_distances = torch.stack([torch.linalg.vector_norm(rest_joints[j] - v_template[tip_vertex]) for j in distal])
             if int(torch.argmin(all_distances)) != finger:
                 raise ValueError(f"SMPL-H {side} fingertip order check failed at finger {finger}")
@@ -196,6 +195,8 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
                         selected = ranked[0][1]; reason = "selected"
                         c, p = ranked[0][2:]
                         conf = c.get("detector_confidence")
+                        if conf is not None and not np.isfinite(conf):
+                            raise ValueError(f"nonfinite detector confidence: {camera} frame {i} hand {side}")
                         weight = 1.0 if conf is None else float(np.clip(conf, 0, 1))
                         points[i,h] = p
                         finite = np.isfinite(p).all(-1)
@@ -215,6 +216,11 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
                 audit.append({"frame_index":i,"camera":camera,"hand":side,"selected":False,"reason":"no_candidate"})
     if seen != set(range(n)): raise ValueError(f"{camera} frame range differs from body")
     return points, weights, audit
+
+
+def finite_pixel_values(points: np.ndarray) -> np.ndarray:
+    """Arithmetic copy only; original observations and validity stay unchanged."""
+    return np.nan_to_num(points, nan=0.0, posinf=0.0, neginf=0.0)
 
 
 def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
