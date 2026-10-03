@@ -136,6 +136,7 @@
   "scene.offline_full_se3_dynamic_ground": "offline_full_se3_dynamic_ground.py",
   "scene.propagate_audited_floor_masks": "propagate_audited_floor_masks.py",
   "scene.propagate_local_plane": "propagate_local_plane.py",
+  "scene.replay_fitted_body_scene": "replay_fitted_body_scene.py",
   "scene.replay_realtime_full_se3_branch": "replay_realtime_full_se3_branch.py",
   "scene.replay_realtime_stage_walker": "replay_realtime_stage_walker.py",
   "scene.validate_ground_plane_tracks": "validate_ground_plane_tracks.py",

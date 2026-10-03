@@ -19,9 +19,12 @@
     "right_hand_pca": 0.0
   },
   "viewers": {
-    "body": "body.html",
+    "body": "full_view/body_viewer.html",
     "wrists": "wrists/index.html",
-    "body_mode": "camera-coordinate diagnostic; ground/stage/walker unavailable and not rendered"
+    "body_mode": "same-run full ground/Stage/walker/camera scene; static walker installation is an engineering assumption"
   },
-  "boundary": "manual labels under review; target consistency and engineering evidence, not anatomical or physical 3D truth"
+  "boundary": "manual labels under review; target consistency and engineering evidence, not anatomical or physical 3D truth",
+  "scene_replay": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\scene_strict_full",
+  "visualization_validation": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\full_view\\viewer_validation.json",
+  "walker_mount_camera_discrepancy_mm": 26.49152284246695
 }
