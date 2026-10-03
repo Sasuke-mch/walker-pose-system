@@ -13,6 +13,7 @@ from check_mainline_regression import fit_arguments
 from pose_app.independent_wrist_reference import load_reference
 from pose_app.mainline_regression import observation_snapshot, load_archive, compare_archives
 from pose_app.smplh_ablation_metrics import evaluate, leg_diagnostics
+from run_smplh_ablations import modified_options
 
 
 def read(path):
@@ -23,12 +24,58 @@ def write(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def audit_case_controls(directory, case, plan, observations):
+    """Check protocol, source data and freezing even when metrics are cached."""
+    from walker_tools.body.fit_smplh_wilor_sequence import build_parser
+    from pose_app.smplh_fitting.stages import build_stage_schedule
+
+    expected = build_parser().parse_args(modified_options(
+        read(plan["source_commands"][case["detector"]]), case["changes"], directory / "fit"))
+    expected_options = {key: str(value) if isinstance(value, Path) else value for key, value in vars(expected).items()}
+    if read(directory / "resolved_options.json") != expected_options:
+        raise ValueError("case controls differ from protocol")
+    result = load_archive(directory / "fit/result.npz")
+    initial = load_archive(directory / "fit/cold_initialization.npz")
+    if (not np.array_equal(result["pair_id"], np.arange(plan["frames"]))
+            or not np.array_equal(initial["pair_id"], result["pair_id"])
+            or result["betas"].shape != (1, 10)):
+        raise ValueError("frame/shared beta contract changed")
+    if np.any(initial["betas"]) or np.any(initial["vposer_latent"]):
+        raise ValueError("not cold initialization")
+    for key in ("vertices", "body_pose", "vposer_latent", "betas", "transl", "global_orient",
+                "left_hand_pose", "right_hand_pose", "predicted_coco", "smplh_joints"):
+        if not np.isfinite(result[key]).all():
+            raise ValueError("nonfinite " + key)
+    if (not np.array_equal(result["raw_triangulated_points"], observations["triangulated_mm"], equal_nan=True)
+            or not np.array_equal(result["body_quality"], observations["quality"])
+            or not np.array_equal(result["body_accepted"], observations["accepted"] & np.isfinite(observations["triangulated_mm"]).all(-1))):
+        raise ValueError("source observations differ")
+    names, train, steps = build_stage_schedule(expected, False)
+    recorded = read(directory / "fit/fit_summary.json")["stage_schedule"]
+    if [(row["stage"], row["trainable"], row["steps"]) for row in recorded] != list(zip(names, train, steps)):
+        raise ValueError("stage policy differs")
+    after_b = load_archive(directory / "checkpoint_B_shared_beta_30.npz")
+    if expected.beta_policy == "freeze_after_b" and not np.array_equal(after_b["betas"], result["betas"]):
+        raise ValueError("beta changed after frozen stage B")
+    after_c = load_archive(directory / "checkpoint_C_body_vposer_refine_300.npz")
+    if (not np.array_equal(after_c["betas"], result["betas"])
+            or not np.array_equal(after_c["smplh_joints"][:, :22], result["smplh_joints"][:, :22])):
+        raise ValueError("body parameters/joints changed in hand stages")
+    if expected.shared_hand_pose:
+        for side in ("left", "right"):
+            coeff = result[side + "_hand_pca"]
+            if not np.array_equal(coeff, np.broadcast_to(coeff[:1], coeff.shape)):
+                raise ValueError("shared hand PCA changed across frames")
+    return expected, result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--watch", action="store_true")
     parser.add_argument("--retries", type=Path, help="explicit bug-fix retry root; first failure stays in records")
     parser.add_argument("--baseline-run", type=Path, help="external reference for a preregistered follow-up family")
+    parser.add_argument("--replay-parameters", action="store_true", help="redecode VPoser/PCA and reconstruct every frame")
     cli = parser.parse_args()
     plan = read(cli.run / "protocol.json")
     root = Path("research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2")
@@ -60,6 +107,20 @@ def main():
                 rows.append({"id": case["id"], "status": "pending"})
                 continue
             output = directory / "metrics_v2.json"
+            try:
+                expected, audited_result = audit_case_controls(directory, case, plan, sources[case["detector"]]["observations"])
+                control_report = {"status": "passed", "controls": True, "source_observations": True,
+                                  "shared_beta_and_stage_freezing": True}
+                if cli.replay_parameters:
+                    from pose_app.mainline_regression import replay_parameters
+                    control_report["parameter_replay"] = replay_parameters(audited_result, expected, 32)
+                    if not all(row["passed"] for row in control_report["parameter_replay"].values()):
+                        raise ValueError("parameter replay differs")
+                write(directory / ("controls_replay_audit.json" if cli.replay_parameters else "controls_audit.json"), control_report)
+            except Exception as error:
+                write(directory / "CONTROL_FAILURE.json", {"error": str(error), "traceback": traceback.format_exc()})
+                rows.append({"id": case["id"], "status": "control_failed"})
+                continue
             if not output.exists():
                 try:
                     source = sources[case["detector"]]
