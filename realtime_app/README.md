@@ -305,6 +305,14 @@ $runDir = 'research_records/engineering_validation/G20261002_sapiens2_body_mainl
 .venv-mainline/Scripts/python.exe -B realtime_app/run_tool.py body.compare_cold_detector_fits --run $runDir --output "$runDir/comparison_reaudit"
 ```
 
-这个入口固定读取 current_mainline.json 所列的两份历史结果目录名，不会自动评价上面两个新 reproduction 目录；新运行应先核查其 protocol.json、fit_command.json、fit/fit_summary.json、assessment.json 和 FAILURE.json（如存在）。不要通过重命名或覆盖冻结结果让旧对照器读取新结果。可视化生成属于实验编排的独立输出步骤，页面播放帧率不代表拟合速度。
+不指定结果目录时，该入口仍读取 current_mainline.json 所列的两份冻结结果。比较新复现目录时显式指定：
+
+```powershell
+.venv-mainline/Scripts/python.exe -B realtime_app/run_tool.py body.compare_cold_detector_fits --run $runDir --sapiens-fit-dir "$runDir/sapiens_reproduction" --pmpose-fit-dir "$runDir/pmpose_reproduction" --output "$runDir/reproduction_comparison"
+```
+
+参数指向包含fit/、fit_command.json和body_viewer.html的冷启动运行目录，不能只指向fit/。--run仍提供对应的Sapiens2/PMPose场景；两组身体必须使用这些同源场景输入。评价继续执行原命令差异、阶段一致性与全448帧冷启动检查，不放宽控制。页面链接按实际输出位置生成，记录实际结果目录；应从包含结果和页面的共同父目录启动HTTP服务。跨Windows盘符无法构建同源相对页面链接，应把报告输出选在与输入相同盘符。新运行先核查protocol.json、fit_command.json、fit/fit_summary.json、assessment.json及FAILURE.json（如存在）。不重命名或覆盖冻结结果。
+
+冷启动--settings拒绝重复选项、零联合预算、接触输入和非共享/非原生初始化手姿，防止运行与“无接触冷启动”记录不一致。需要这些旁路设置时使用通用求解器并另立协议。可视化生成是独立输出步骤，页面播放帧率不代表拟合速度。
 
 实现职责：CLI与数据/场景编排在 walker_tools/body；观测转换在 pose_app/body_observations.py；初始化、损失、接触接口、调度和主体分别在 pose_app/smplh_fitting/{initialization,losses,contact,stages,pipeline}.py；人工腕和原生手姿分别在 independent_wrist_reference.py、wilor_mano_prior.py。scene地面分支独立重放，不进入当前身体损失。详见 ../docs/CURRENT_SMPLH_ALGORITHM_20261002.md。

@@ -79,3 +79,5 @@ Build and evaluate a foot-inclusive upright person-box rule using only current-f
 ## Repository boundaries
 
 The public repository contains source code, test code, portable configuration templates, compact experiment registry metadata, and small qualitative examples. It deliberately excludes model weights, third-party source trees, raw captures, videos, JSONL outputs, and local device bindings. See [`third_party/README.md`](../third_party/README.md) and [`realtime_app/docs/CAMERA_REGISTRY.md`](../realtime_app/docs/CAMERA_REGISTRY.md).
+
+评价入口已支持--sapiens-fit-dir和--pmpose-fit-dir，不指定时保持原冻结目录；新目录必须与--run的场景同源，原控制检查继续保留。冷启动配置拒绝与记录冲突的接触输入、重复参数、零联合预算及非共享/非原生初始化手姿。

@@ -3257,3 +3257,16 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 更新根README、CLAUDE、PROJECT_STATUS、应用README和现有算法说明；原算法说明备份同步更新，逐字一致，旧Word报告作为历史资料保留。根README/CLAUDE/PROJECT_STATUS原有未提交改写单独保留，只提交本次核验的导航/纠错段落。docs/code_inventory.json逐项记录本轮开始的63项待处理归属及186个工具的职责数量；词法引用仅供定位，不当作依赖认证。未跟踪的骨架、SMPL-X、时序prefit、查看器与手脚候选，已有标定资产、本地链接、实验注册表和渲染器修改全部保留；本轮未删除/移动这些成果，未将未经验证候选纳入发布。
 
 新增6项配置/阶段/默认覆盖/失败契约检查，包括当前标量快照防漂移。相关入口、配置和旧路径检查24通过；工作区全量627通过、9跳过、29个subtest通过，sequence_pipeline2通过。只含已提交源码的独立checkout使用上一阶段全新环境验证：公开577通过、15明确跳过、29个subtest通过，sequence_pipeline2通过。相关Ruff与编译通过。证据保存在本机临时walker_mainline_docs_2gb_nm4_中的profile_parity.json、workspace_tests.log、clean_tests.log；没有重新声称人体质量或物理精度通过。
+
+
+## 2026-10-03：主线整理完成复查与接口补缺
+
+复查上一轮发现两处尚未闭合：评价工具虽统一入口但只支持固定结果名；新增--settings允许配置接触输入，而编排protocol仍声明无接触。现compare_cold_detector_fits增加--sapiens-fit-dir/--pmpose-fit-dir，指向包含fit/和fit_command.json的冷启动运行目录，未指定保持旧冻结目录。页面相对链接按实际输入/输出位置计算并编码空格等字符，comparison记录实际结果路径。评价验证两组拟合的二维输入路径与各自scene_sources一致，并拒绝复用旧Stage/动态地面/助步器输入，防止新结果误接旧场景。原命令差异、阶段、冷启动、全448帧检查与数值公式不变。
+
+冷启动配置拒绝重复选项、未设或非正联合预算、接触标签/场景接触/表面目标输入，以及非共享或非原生MANO初始化，避免实际流程与无接触冷启动记录冲突；需要旁路配置使用通用求解器单独记录。默认C30与当前C300配置通过原阶段和标量快照检查，未更改原拟合公式、质量门或方法接受级别。
+
+用已有两份448帧结果实际执行默认目录、显式目录和增加来源门后的评价，metrics、association_differences、paired_wrist_comparison、control_audit逐项等于原cold_start_comparison_v1/comparison.json；没有重新拟合。新页面两条iframe路径均能解析到所选实际页面；未声称新增浏览器渲染验收。评价输出和日志保留在outputs/mainline_completion_audit_20261003，不覆盖原冻结结果。
+
+新增7项目录、相对链接编码、场景错配/旧动态输入、重复配置、接触配置和零预算检查。完整工作区634通过、9跳过、29个subtest通过，sequence_pipeline2通过；独立已提交源码checkout使用上一阶段新环境584通过、15明确跳过、29个subtest通过，sequence_pipeline2通过。Ruff、源码编译和差异检查通过；独立测试日志在本机临时walker_completion_8mb7zuv7。应用README、导航及算法说明/实验报告备份同步更新，既有无关文件逐字节核对保持不变。
+
+当前主线身份、固定参数、安装/测试/拟合/评价入口已闭合；63项本地待处理归属清单中的历史候选仍保留，不等于已把全部候选认证、纳入发布或删除。既有未提交修改/删除不随本轮提交，模型/数据不入库，本轮未推送远端。

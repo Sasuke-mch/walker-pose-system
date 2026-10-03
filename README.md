@@ -12,7 +12,7 @@
 | 测试 | realtime_app/run_validation.py | 两个子项目；CI同源；run_tests.py为旧入口 |
 | 固定流程拟合 | realtime_app/run_tool.py body.run_sapiens_cold_smplh | 显式指定configs/cold_smplh_joint300.json；不指定仍为旧C30 |
 | 自备资源拟合 | realtime_app/run_tool.py body.fit_smplh_wilor_sequence | 通用求解器；参数模板不等于冻结实验配置 |
-| 冻结对照评价 | realtime_app/run_tool.py body.compare_cold_detector_fits | 读取两份固定命名的历史结果，保留失败 |
+| 冻结对照评价 | realtime_app/run_tool.py body.compare_cold_detector_fits | 默认冻结结果；可显式指定新冷启动目录，保留失败 |
 
 目录职责不表示验收等级。research_records保存原协议/输出，configs保存可复用参数，pose_app保存算法，walker_tools保存CLI和编排，tools保留兼容入口。历史结果不搬移、不覆盖。下文较早的阶段结论只作背景，当前身份以本节、AI_PROGRESS和实验协议为准。
 

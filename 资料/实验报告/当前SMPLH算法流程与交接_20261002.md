@@ -461,6 +461,6 @@ $runDir = 'research_records/engineering_validation/G20261002_sapiens2_body_mainl
 .venv-mainline/Scripts/python.exe -B realtime_app/run_tool.py body.run_sapiens_cold_smplh --run $runDir --settings realtime_app/configs/cold_smplh_joint300.json --detector sapiens2 --output "$runDir/cold_reproduction_candidate"
 ```
 
-$runDir 使用第15节既有路径。省略配置仍为C30，保留历史默认，不能称为当前C300复现。通用smplh_fit.example.json是自行配置资源的模板，缺少本实验人工腕设置，不是冻结实验配置。评价工具固定读取第15节两份冻结结果，不会自动比较任意新目录。完整安装、参数、输出及预检查说明统一见 realtime_app/README.md。
+$runDir 使用第15节既有路径。省略配置仍为C30，保留历史默认，不能称为当前C300复现。通用smplh_fit.example.json是自行配置资源的模板，缺少本实验人工腕设置，不是冻结实验配置。评价工具默认读取第15节两份冻结结果；显式--sapiens-fit-dir与--pmpose-fit-dir可选择新的冷启动运行目录，--run仍提供同源scene。完整安装、参数、输出及预检查说明统一见 realtime_app/README.md。
 
 源码结构和已有待处理文件归属见 docs/PROJECT_STATUS.md 与 docs/code_inventory.json。该清单只记录保留/归属，词法引用不代表已经认证的调用依赖；不因名称或目录调整升降方法级别。报告备份同步更新本节，旧Word报告继续作为其编写时的历史说明，不改写旧实验结果。
