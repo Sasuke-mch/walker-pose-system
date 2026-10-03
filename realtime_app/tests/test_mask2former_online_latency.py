@@ -181,6 +181,11 @@ def fake_stage_runner(recorded: list[dict], base_gpu_ms: float = 90.0):
 
 def run_main(monkeypatch_target: str, fake, argv: list[str]) -> int:
     # These tests exercise file/timing contracts, never real model availability.
+    matrix_path = Path(argv[argv.index("--left-image-dir") + 1]).parent / "synthetic_matrix.json"
+    if "--probe-only" not in argv:
+        matrix_path.write_text(json.dumps(synthetic_matrix([
+            synthetic_matrix_row(f"synthetic_{index}", 10.0, 20.0) for index in range(27)
+        ])), encoding="utf-8")
     runtime = {"floor_class_id": 3, "model_load_ms": 1.0,
                "processor_size": {"height": HEIGHT, "width": WIDTH}, "num_labels": 150}
     fake_torch = SimpleNamespace(
@@ -189,6 +194,7 @@ def run_main(monkeypatch_target: str, fake, argv: list[str]) -> int:
         backends=SimpleNamespace(cudnn=SimpleNamespace(is_available=lambda: False)),
     )
     with patch.object(benchmark, monkeypatch_target, fake), \
+         patch.object(benchmark, "summary_source_matrix_path", return_value=str(matrix_path)), \
          patch.object(benchmark, "load_model", return_value=runtime), \
          patch.dict(sys.modules, {"torch": fake_torch,
                                   "transformers": SimpleNamespace(__version__="test")}):
