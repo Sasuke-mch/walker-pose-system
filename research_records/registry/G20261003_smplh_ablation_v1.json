@@ -1,0 +1,1001 @@
+{
+  "experiment_id": "G20261003_smplh_ablation_v1",
+  "status": "completed_engineering_ablation_only",
+  "accepted_for_main_fit": false,
+  "input_range": "existing full448 pair_id0..447, no new labels/data",
+  "plans": [
+    "realtime_app/configs/smplh_ablation_v1.json",
+    "realtime_app/configs/smplh_ablation_followup_v1.json"
+  ],
+  "source_commands": {
+    "sapiens2": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/smplh_cold_start_v2_joint300/fit_command.json",
+    "pmpose": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/pmpose_cold_start_v1_joint300/fit_command.json"
+  },
+  "controls": "seed0; A30/B30/C300/D1_100/D2_100/D3_0; cold shared beta/latent; fixed observations/WiLoR/calibration/assets per detector",
+  "design": "21 main cases, 5 exploratory follow-ups including repeat baseline; no full interaction grid or multi-subject inference",
+  "code": [
+    "realtime_app/run_smplh_ablations.py",
+    "realtime_app/evaluate_smplh_ablations.py",
+    "realtime_app/pose_app/smplh_ablation_metrics.py",
+    "realtime_app/pose_app/smplh_fitting/pipeline.py",
+    "realtime_app/pose_app/smplh_fitting/losses.py",
+    "realtime_app/pose_app/smplh_fitting/contact.py",
+    "realtime_app/pose_app/smplh_fitting/stages.py"
+  ],
+  "stop_condition": "original input/initialization/nonfinite gates; retain failures; never relax thresholds or change per-case budget",
+  "bug": "pre-refactor inherited NaN times zero in disabled hand projection/contact branch; fixed only inactive branches, first failure retained and explicit same-budget retry",
+  "default_parity": "both short49 result+5 initial arrays exact; both full baselines49 exact; post-fix Sapiens repeat49 exact",
+  "all26_replay": {
+    "passed": true,
+    "geometry_absolute_tolerance_m": 2e-06,
+    "axis_angle_absolute_tolerance_rad": 2e-06,
+    "max_vertex_coordinate_difference_m": 8.344650268554688e-07,
+    "faces": "exact"
+  },
+  "validation": {
+    "workspace": "690 passed,9 skipped,29 subtests; sequence2 passed",
+    "independent_tracked_checkout": "640 passed,15 skipped,29 subtests; sequence2 passed",
+    "lint": "Ruff F passed"
+  },
+  "decision": "default route unchanged; investigate quality-weight/leg/foot tradeoffs before promotion; shared beta remains one vector; all hand geometry gates failed",
+  "limitations": "no independent3D/contact truth; wrist/native errors are reference satisfaction; acceleration contains motion; runtime not isolated benchmark; one existing sequence",
+  "analysis": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section19; identical experiment-report backup",
+  "cases": [
+    {
+      "id": "sapiens2_baseline",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_baseline",
+      "body_rms_mm": 69.28365326952465,
+      "reference_quality_weighted_body_rms_mm": 64.08689106987401,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 54.706374900008086,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_wrist",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_retry_v1/sapiens2_no_wrist",
+      "first_attempt_failure": {
+        "status": "failed",
+        "seconds": 19.344495900004404,
+        "case": {
+          "id": "sapiens2_no_wrist",
+          "detector": "sapiens2",
+          "factor": "no_wrist",
+          "changes": {
+            "wrist_reference": null,
+            "wrist_reference_weight": 0
+          },
+          "kind": "one_factor"
+        },
+        "error": "nonfinite loss at C_body_vposer_refine:86",
+        "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\run_smplh_ablations.py\", line 71, in main\n    run_fit(args, observer=observe)\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\pose_app\\smplh_fitting\\pipeline.py\", line 478, in run_fit\n    raise RuntimeError(f\"nonfinite loss at {stage_name}:{local_step}\")\nRuntimeError: nonfinite loss at C_body_vposer_refine:86\n"
+      },
+      "body_rms_mm": 74.16854822643239,
+      "reference_quality_weighted_body_rms_mm": 58.779446261095146,
+      "wrist_p95_mm": {
+        "left": 159.2353515625,
+        "right": 141.14376831054688
+      },
+      "leg_acceleration_rms_m_s2": 24.730228424072266,
+      "leg_motion_rms_mm": 47.70394515991211,
+      "sole_minimum_mm": {
+        "left": -37.7440935403085,
+        "right": -47.175351169739145
+      },
+      "beta_norm": 1.581257939338684,
+      "seconds": 89.42346550000366,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_beta_freeze",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_beta_freeze",
+      "body_rms_mm": 81.06061440648128,
+      "reference_quality_weighted_body_rms_mm": 74.55211863191333,
+      "wrist_p95_mm": {
+        "left": 26.203567504882812,
+        "right": 15.073126792907715
+      },
+      "leg_acceleration_rms_m_s2": 24.989173889160156,
+      "leg_motion_rms_mm": 47.760986328125,
+      "sole_minimum_mm": {
+        "left": -71.50170719608806,
+        "right": -85.8655386842243
+      },
+      "beta_norm": 0.1861279308795929,
+      "seconds": 64.93176040000981,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_wrist_beta_freeze",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_wrist_beta_freeze",
+      "body_rms_mm": 85.00832899834583,
+      "reference_quality_weighted_body_rms_mm": 67.48239383115839,
+      "wrist_p95_mm": {
+        "left": 174.63841247558594,
+        "right": 160.58060455322263
+      },
+      "leg_acceleration_rms_m_s2": 31.049713134765625,
+      "leg_motion_rms_mm": 51.25858688354492,
+      "sole_minimum_mm": {
+        "left": -71.30458895320024,
+        "right": -82.97587247349425
+      },
+      "beta_norm": 0.18698330223560333,
+      "seconds": 63.91224439999496,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_vposer_prior",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_vposer_prior",
+      "body_rms_mm": 63.69391821134279,
+      "reference_quality_weighted_body_rms_mm": 55.94774771874446,
+      "wrist_p95_mm": {
+        "left": 17.83476305007934,
+        "right": 11.191944408416745
+      },
+      "leg_acceleration_rms_m_s2": 25.372573852539062,
+      "leg_motion_rms_mm": 51.956016540527344,
+      "sole_minimum_mm": {
+        "left": -62.42387621845491,
+        "right": -81.32489570292346
+      },
+      "beta_norm": 1.7381657361984253,
+      "seconds": 65.27314969999134,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_root_anchor",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_root_anchor",
+      "body_rms_mm": 69.34893714001583,
+      "reference_quality_weighted_body_rms_mm": 64.01892208119094,
+      "wrist_p95_mm": {
+        "left": 27.27311201095581,
+        "right": 15.549253892898559
+      },
+      "leg_acceleration_rms_m_s2": 23.64829444885254,
+      "leg_motion_rms_mm": 49.13609313964844,
+      "sole_minimum_mm": {
+        "left": -53.27370067712389,
+        "right": -60.18072710737865
+      },
+      "beta_norm": 1.6573779582977295,
+      "seconds": 74.79491979999875,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_beta_prior",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_beta_prior",
+      "body_rms_mm": 66.32573777745858,
+      "reference_quality_weighted_body_rms_mm": 61.12527192540067,
+      "wrist_p95_mm": {
+        "left": 28.38840608596802,
+        "right": 17.22365274429321
+      },
+      "leg_acceleration_rms_m_s2": 22.838930130004883,
+      "leg_motion_rms_mm": 48.859718322753906,
+      "sole_minimum_mm": {
+        "left": -47.20567890698779,
+        "right": -54.43649149156027
+      },
+      "beta_norm": 3.514465570449829,
+      "seconds": 123.94108340000093,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_uniform_body",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_uniform_body",
+      "body_rms_mm": 67.023629446952,
+      "reference_quality_weighted_body_rms_mm": 69.11248680651747,
+      "wrist_p95_mm": {
+        "left": 24.604995727539062,
+        "right": 14.4456284046173
+      },
+      "leg_acceleration_rms_m_s2": 14.950518608093262,
+      "leg_motion_rms_mm": 51.80060958862305,
+      "sole_minimum_mm": {
+        "left": -64.62758515909172,
+        "right": -66.389330379662
+      },
+      "beta_norm": 1.6476190090179443,
+      "seconds": 70.55450649998966,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_body_3d",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_body_3d",
+      "body_rms_mm": 133.845140743641,
+      "reference_quality_weighted_body_rms_mm": 142.34864352457137,
+      "wrist_p95_mm": {
+        "left": 7.217879772186279,
+        "right": 7.278799366950989
+      },
+      "leg_acceleration_rms_m_s2": 12.757406234741211,
+      "leg_motion_rms_mm": 56.76553726196289,
+      "sole_minimum_mm": {
+        "left": -114.24495855904348,
+        "right": -139.4722583386311
+      },
+      "beta_norm": 0.7079935669898987,
+      "seconds": 63.28194670000812,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_mano_loss",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_mano_loss",
+      "body_rms_mm": 69.28365434694719,
+      "reference_quality_weighted_body_rms_mm": 64.08689993284128,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 90.11319730000105,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        25.556616588884783,
+        26.885837567094367
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        8.248237042533143e-07,
+        8.248237042533143e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_mano_init",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_mano_init",
+      "body_rms_mm": 69.28365241651643,
+      "reference_quality_weighted_body_rms_mm": 64.08689104879238,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 62.841610300005414,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.889244280082204,
+        13.945944825872772
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        9.35262170110868e-07,
+        7.63638364166569e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_mano_all",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_mano_all",
+      "body_rms_mm": 69.28365448118956,
+      "reference_quality_weighted_body_rms_mm": 64.08690027963958,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 57.39501100000052,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        25.687686744371394,
+        27.175998259053262
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        8.817736302301881e-07,
+        8.817736302301881e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_pca_prior",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_pca_prior",
+      "body_rms_mm": 69.2836551045707,
+      "reference_quality_weighted_body_rms_mm": 64.0868909410714,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 61.76497810000728,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.84757482726656,
+        13.858447896747185
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_unshared_hand",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_unshared_hand",
+      "body_rms_mm": 69.28368559195599,
+      "reference_quality_weighted_body_rms_mm": 64.08690042791717,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 60.857958799999324,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        9.238169683402218,
+        12.664414834170044
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.142111696396074,
+        1.5807366140270755
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_pca24",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_pca24",
+      "body_rms_mm": 69.2836164074474,
+      "reference_quality_weighted_body_rms_mm": 64.08688444137483,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 59.950538500008406,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.467316272580243,
+        13.194853008066117
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        6.235081134072453e-07,
+        4.4088681511509406e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_pca45",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_pca45",
+      "body_rms_mm": 69.28371731660728,
+      "reference_quality_weighted_body_rms_mm": 64.08690522379182,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 59.38102670000808,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        9.929218454528968,
+        12.293146759538455
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        7.636383641665689e-07,
+        6.971032630506242e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_hand_temporal",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/sapiens2_no_hand_temporal",
+      "body_rms_mm": 69.28365326952465,
+      "reference_quality_weighted_body_rms_mm": 64.08689106987401,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 60.69482049999351,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "pmpose_baseline",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/pmpose_baseline",
+      "body_rms_mm": 75.86708113727697,
+      "reference_quality_weighted_body_rms_mm": 65.20845454090173,
+      "wrist_p95_mm": {
+        "left": 26.746768951416016,
+        "right": 17.84250345230102
+      },
+      "leg_acceleration_rms_m_s2": 40.689762115478516,
+      "leg_motion_rms_mm": 64.15465545654297,
+      "sole_minimum_mm": {
+        "left": -64.34617945987142,
+        "right": -67.43960012530637
+      },
+      "beta_norm": 1.3638821840286255,
+      "seconds": 61.66904000000795,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.891674459560685,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        7.636383641665689e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "pmpose_no_wrist",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/pmpose_no_wrist",
+      "body_rms_mm": 74.67084013777882,
+      "reference_quality_weighted_body_rms_mm": 62.66805822608905,
+      "wrist_p95_mm": {
+        "left": 139.3453285217285,
+        "right": 80.39568328857416
+      },
+      "leg_acceleration_rms_m_s2": 43.175907135009766,
+      "leg_motion_rms_mm": 60.2622184753418,
+      "sole_minimum_mm": {
+        "left": -56.58006480102118,
+        "right": -63.73594203153399
+      },
+      "beta_norm": 1.4410184621810913,
+      "seconds": 58.94424280000385,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.891674459560685,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        7.636383641665689e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "pmpose_beta_freeze",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/pmpose_beta_freeze",
+      "body_rms_mm": 89.17810538273915,
+      "reference_quality_weighted_body_rms_mm": 76.56304603250686,
+      "wrist_p95_mm": {
+        "left": 25.371979999542233,
+        "right": 19.06256675720215
+      },
+      "leg_acceleration_rms_m_s2": 47.285911560058594,
+      "leg_motion_rms_mm": 69.85639190673828,
+      "sole_minimum_mm": {
+        "left": -101.68510415188182,
+        "right": -110.3644225481416
+      },
+      "beta_norm": 0.18020890653133392,
+      "seconds": 59.343960099999094,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.891674459560685,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        7.636383641665689e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "pmpose_no_wrist_beta_freeze",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_v1/pmpose_no_wrist_beta_freeze",
+      "body_rms_mm": 87.80703255493783,
+      "reference_quality_weighted_body_rms_mm": 73.67675058084788,
+      "wrist_p95_mm": {
+        "left": 143.17027282714844,
+        "right": 90.04330940246578
+      },
+      "leg_acceleration_rms_m_s2": 51.61064529418945,
+      "leg_motion_rms_mm": 66.82402801513672,
+      "sole_minimum_mm": {
+        "left": -113.48354705599517,
+        "right": -121.63763384341586
+      },
+      "beta_norm": 0.18679535388946533,
+      "seconds": 58.70619670000451,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.891674459560685,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        7.636383641665689e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_baseline",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_followup_v1/sapiens2_baseline",
+      "body_rms_mm": 69.28365326952465,
+      "reference_quality_weighted_body_rms_mm": 64.08689106987401,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 58.76081739999063,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_confidence",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_followup_v1/sapiens2_no_confidence",
+      "body_rms_mm": 69.06596957530402,
+      "reference_quality_weighted_body_rms_mm": 64.24699015645253,
+      "wrist_p95_mm": {
+        "left": 30.426862716674805,
+        "right": 17.78954515457153
+      },
+      "leg_acceleration_rms_m_s2": 23.138032913208008,
+      "leg_motion_rms_mm": 49.75630187988281,
+      "sole_minimum_mm": {
+        "left": -59.71597380812388,
+        "right": -61.10373736516106
+      },
+      "beta_norm": 1.673014521598816,
+      "seconds": 59.733749000006355,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_ray",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_followup_v1/sapiens2_no_ray",
+      "body_rms_mm": 68.1815094915715,
+      "reference_quality_weighted_body_rms_mm": 64.21660773814399,
+      "wrist_p95_mm": {
+        "left": 27.74729795455932,
+        "right": 15.237684106826782
+      },
+      "leg_acceleration_rms_m_s2": 21.354223251342773,
+      "leg_motion_rms_mm": 49.08833694458008,
+      "sole_minimum_mm": {
+        "left": -53.582947771833034,
+        "right": -60.397988243947374
+      },
+      "beta_norm": 1.6768368482589722,
+      "seconds": 60.74209780000092,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_no_reprojection",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_followup_v1/sapiens2_no_reprojection",
+      "body_rms_mm": 67.56814568333351,
+      "reference_quality_weighted_body_rms_mm": 66.69209645584591,
+      "wrist_p95_mm": {
+        "left": 22.9890079498291,
+        "right": 12.497360277175902
+      },
+      "leg_acceleration_rms_m_s2": 16.131183624267578,
+      "leg_motion_rms_mm": 50.11712646484375,
+      "sole_minimum_mm": {
+        "left": -63.13245430532666,
+        "right": -67.33211870536582
+      },
+      "beta_norm": 1.6715682744979858,
+      "seconds": 61.814655800000764,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        10.888258549174164,
+        13.932800341411914
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        4.4088681511509406e-07,
+        7.636383641665689e-07
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    },
+    {
+      "id": "sapiens2_unshared_no_temporal",
+      "status": "completed",
+      "output": "research_records/engineering_validation/G20261003_smplh_ablation_followup_v1/sapiens2_unshared_no_temporal",
+      "body_rms_mm": 69.28368764002431,
+      "reference_quality_weighted_body_rms_mm": 64.08690115357626,
+      "wrist_p95_mm": {
+        "left": 27.084359550476062,
+        "right": 15.948971128463743
+      },
+      "leg_acceleration_rms_m_s2": 23.193754196166992,
+      "leg_motion_rms_mm": 49.4892578125,
+      "sole_minimum_mm": {
+        "left": -54.101833309103455,
+        "right": -59.65618255947691
+      },
+      "beta_norm": 1.6657464504241943,
+      "seconds": 60.02047240000684,
+      "controls_replay": "passed",
+      "native_rotation_rms_left_right_deg": [
+        9.048082384908978,
+        12.510897112995917
+      ],
+      "finger_frame_change_rms_left_right_deg": [
+        5.578920540474904,
+        4.113987479403772
+      ],
+      "hand_geometry_pass_left_right": [
+        0,
+        0
+      ],
+      "hand_geometry_total_left_right": [
+        448,
+        448
+      ]
+    }
+  ],
+  "native_reference_supported_view_frames_left_right": [
+    683,
+    807
+  ]
+}

@@ -341,3 +341,25 @@ $baselineSapiens = 'research_records/engineering_validation/G20261003_mainline_r
 short不自动生成或更新golden；--reference必填，缺少其中的observations.npz返回不可用。可用--observation-reference显式指向独立观测基准。audit未给观测基准只能检查当前输入自洽，不表示历史拒绝原因不变。compare不能替代audit。输出report.json、observations.npz；short另有fit/和实际解析参数记录。大数组不打印、不入库。0=所请求检查通过，1=不一致/执行失败，2=资源不可用；资源缺失不会当作通过。
 
 当前本机基准和最终报告位于research_records/engineering_validation/G20261003_mainline_regression_v1；开发期日志和初版报告保留于outputs/mainline_regression_20261003，原模型、数据和冻结结果未覆盖。干净克隆可运行公开单元测试；完整回归需要恢复本机基准、已有数据和授权模型。详见算法说明第18节。通过只证明本次实现保持一致，不证明真实三维精度、触地或接触。
+
+
+## 全序列受控消融
+
+仅使用已有数据和授权模型。独立运行器读取已保存的冷启动源命令、同一内核及固定预算，输出目录首次必须不存在；已有目录仅在协议完全相同时使用--resume恢复。不要与冻结主线输出混用，算法说明第19节列出完整变量与结论边界。标准冷启动编排拒绝非默认beta策略、先验/身体权重、质量模式和手消融开关；旁路实验通过本入口明确记录。
+
+```powershell
+# 新实验；计划固定seed0、448帧及A30/B30/C300/D1 100/D2 100/D3 0。
+.venv-cuda/Scripts/python.exe -B realtime_app/run_smplh_ablations.py --output outputs/ablation_next
+# 中断恢复；失败证据保留，不改变参数或追加步数。
+.venv-cuda/Scripts/python.exe -B realtime_app/run_smplh_ablations.py --output outputs/ablation_next --resume
+# 普通评价及全帧参数重建；控制失败或缺失结果返回非零。
+.venv-cuda/Scripts/python.exe -B realtime_app/evaluate_smplh_ablations.py --run outputs/ablation_next --replay-parameters
+# 本轮既有结果复核：只读拟合，生成审计及汇总，显式引用修复后重试。
+$main = 'research_records/engineering_validation/G20261003_smplh_ablation_v1'
+$retry = 'research_records/engineering_validation/G20261003_smplh_ablation_retry_v1'
+.venv-cuda/Scripts/python.exe -B realtime_app/evaluate_smplh_ablations.py --run $main --retries $retry --replay-parameters
+$follow = 'research_records/engineering_validation/G20261003_smplh_ablation_followup_v1'
+.venv-cuda/Scripts/python.exe -B realtime_app/evaluate_smplh_ablations.py --run $follow --baseline-run $main --replay-parameters
+```
+
+运行追加计划时用--plan realtime_app/configs/smplh_ablation_followup_v1.json指定另一个新目录。输入路径保存在源命令和逐组fit_args/resolved_options；输出含首次FAILURE、执行耗时、阶段检查点、result、指标、逐帧诊断和全帧几何门。读取缓存metrics前仍重新审计输入、掩码、协议、共享参数和冻结状态；--replay-parameters另重建VPoser/PCA/SMPL-H，不能以缓存旧成功跳过检查。缺失本机资源不属于干净克隆自动可运行的公开测试。消融残差、平滑与几何代理不是独立精度，方法级别不因消融改变。
