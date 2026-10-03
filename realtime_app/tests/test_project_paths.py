@@ -8,7 +8,7 @@ class ProjectPathTests(unittest.TestCase):
     def test_root_is_anchored_to_module_location(self) -> None:
         self.assertEqual(repo_root(), PROJECT_ROOT)
         self.assertEqual(APP_ROOT.name, "realtime_app")
-        self.assertEqual(PROJECT_ROOT.name, "walker_pose_system")
+        self.assertEqual(PROJECT_ROOT, Path(__file__).resolve().parents[2])
 
     def test_project_path_does_not_depend_on_current_directory(self) -> None:
         expected = PROJECT_ROOT / "research_records" / "registry"

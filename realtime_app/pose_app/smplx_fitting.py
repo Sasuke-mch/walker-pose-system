@@ -111,4 +111,3 @@ def load_vposer_explicit(vposer_dir: str | Path, device: str = "cpu"):
     for parameter in model.parameters():
         parameter.requires_grad = False
     return model, config, checkpoint_path
-

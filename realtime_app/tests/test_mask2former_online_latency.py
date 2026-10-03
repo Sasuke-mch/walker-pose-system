@@ -29,6 +29,7 @@ for _candidate in (str(ROOT), str(ROOT / "tools")):
         sys.path.insert(0, _candidate)
 
 import benchmark_mask2former_online_latency as benchmark  # noqa: E402
+from pose_app.image_io import read_image  # noqa: E402
 
 
 HEIGHT, WIDTH = 8, 6
@@ -152,7 +153,7 @@ def fake_stage_runner(recorded: list[dict], base_gpu_ms: float = 90.0):
     """Stand-in for the real forward that keeps every stage field non-trivial."""
 
     def runner(image_path, cached_mask_path, runtime, torch, device, measure_cache_read=True, measure_mask_write=False):
-        cached = cv2.imread(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
+        cached = read_image(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
         if cached is None:
             raise benchmark.OnlineLatencyError(f"cannot read cached candidate mask: {cached_mask_path}")
         candidate = synthetic_mask("lower_half")
@@ -797,7 +798,7 @@ class ArtifactIntegrationTests(unittest.TestCase):
             output_dir = root / "mismatch_output"
 
             def mismatching_runner(image_path, cached_mask_path, runtime, torch, device, measure_cache_read=True, measure_mask_write=False):
-                cached = cv2.imread(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
+                cached = read_image(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
                 candidate = synthetic_mask("one_pixel_different")
                 stage = {field: 1.0 for field in benchmark.STAGE_FIELDS}
                 record = dict(stage)

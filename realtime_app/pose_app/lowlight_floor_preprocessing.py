@@ -31,6 +31,8 @@ from typing import Any, Iterable, Mapping
 import cv2
 import numpy as np
 
+from .image_io import read_image
+
 
 RAW = "raw"
 GAMMA_0P6 = "gamma_0p6"
@@ -202,7 +204,7 @@ def load_binary_mask_exact(path: str | Any, expected_shape: tuple[int, int]) -> 
     different grid is a contract violation, not something to be silently
     resampled onto the original coordinates.
     """
-    image = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+    image = read_image(path, cv2.IMREAD_GRAYSCALE)
     if image is None:
         raise TransformContractError(f"cannot read mask: {path}")
     if image.shape != tuple(expected_shape):

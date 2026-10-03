@@ -47,6 +47,8 @@ import time
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
+from pose_app.image_io import read_image, write_image
+
 import cv2
 import numpy as np
 
@@ -196,7 +198,7 @@ def ensure_output_dir_absent(output_dir: Path) -> None:
 
 
 def _read_gray(path: Path) -> np.ndarray:
-    image = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+    image = read_image(str(path), cv2.IMREAD_GRAYSCALE)
     if image is None:
         raise OnlineLatencyError(f"cannot read image: {path}")
     return image
@@ -231,8 +233,8 @@ def resolve_pair_inputs(
             detail = ", ".join(f"{key}={paths[key]}" for key in missing)
             raise FileNotFoundError(f"pair {name}: missing required input(s): {detail}")
 
-        left_image = cv2.imread(str(paths["left_image"]), cv2.IMREAD_COLOR)
-        right_image = cv2.imread(str(paths["right_image"]), cv2.IMREAD_COLOR)
+        left_image = read_image(str(paths["left_image"]), cv2.IMREAD_COLOR)
+        right_image = read_image(str(paths["right_image"]), cv2.IMREAD_COLOR)
         if left_image is None:
             raise OnlineLatencyError(f"cannot read left image: {paths['left_image']}")
         if right_image is None:
@@ -346,17 +348,17 @@ def run_single_image_online(
     cache_mask_read_ms: float | None = None
     if measure_cache_read:
         cache_start = time.perf_counter()
-        cached = cv2.imread(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
+        cached = read_image(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
         cache_mask_read_ms = (time.perf_counter() - cache_start) * 1000.0
     else:
-        cached = cv2.imread(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
+        cached = read_image(str(cached_mask_path), cv2.IMREAD_GRAYSCALE)
     if cached is None:
         raise OnlineLatencyError(f"cannot read cached candidate mask: {cached_mask_path}")
 
     stage: dict[str, float] = {}
 
     start = time.perf_counter()
-    bgr = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
+    bgr = read_image(str(image_path), cv2.IMREAD_COLOR)
     stage["image_decode_ms"] = (time.perf_counter() - start) * 1000.0
     if bgr is None:
         raise OnlineLatencyError(f"cannot read input image: {image_path}")
@@ -398,7 +400,7 @@ def run_single_image_online(
     candidate_png_write_ms: float | None = None
     if measure_mask_write:
         write_start = time.perf_counter()
-        cv2.imwrite(str(runtime["candidate_mask_path"]), candidate * 255)
+        write_image(str(runtime["candidate_mask_path"]), candidate * 255)
         candidate_png_write_ms = (time.perf_counter() - write_start) * 1000.0
 
     record: dict[str, Any] = dict(stage)
@@ -871,7 +873,7 @@ def build_experiment_markdown(summary: dict[str, Any], timing: dict[str, Any], a
     lines.append("单张图的固定在线推理流程（未改 processor resize / normalize / label 映射 / floor 类判定）：")
     lines.append("")
     lines.append("```text")
-    lines.append("cv2.imread(BGR) -> cv2.cvtColor(RGB) -> AutoImageProcessor(return_tensors='pt')")
+    lines.append("read_image(BGR) -> cv2.cvtColor(RGB) -> AutoImageProcessor(return_tensors='pt')")
     lines.append("  -> tensor.to(device) -> Mask2FormerForUniversalSegmentation forward (no_grad)")
     lines.append("  -> post_process_semantic_segmentation(target_sizes=[原始图高宽])")
     lines.append("  -> semantic_map == floor_class_id -> uint8 二值候选掩膜")
@@ -1143,7 +1145,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 }
                 if first_contact:
                     write_start = time.perf_counter()
-                    cv2.imwrite(str(mask_path), (result["candidate_mask"] * 255).astype(np.uint8))
+                    write_image(str(mask_path), (result["candidate_mask"] * 255).astype(np.uint8))
                     record["candidate_png_write_ms"] = (time.perf_counter() - write_start) * 1000.0
                 record["candidate_mask_path"] = str(mask_path.resolve())
                 inference_records.append(record)
@@ -1184,12 +1186,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 if not parity["exact_match"]:
                     difference = np.logical_xor(candidate_bool, cached_bool)
                     difference_path = visualization_dir / f"{view}_{Path(entry['name']).stem}_difference.png"
-                    cv2.imwrite(str(difference_path), (difference.astype(np.uint8) * 255))
+                    write_image(str(difference_path), (difference.astype(np.uint8) * 255))
                     parity_record["difference_mask"] = str(difference_path.resolve())
                     parity_record["difference_pixel_count"] = int(difference.sum())
                 parity_records.append(parity_record)
 
-                image = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
+                image = read_image(str(image_path), cv2.IMREAD_COLOR)
                 overlay = render_parity_overlay(
                     image,
                     candidate_bool,
@@ -1197,9 +1199,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                     parity,
                     f"{view} {entry['name']} online Mask2Former floor candidate",
                 )
-                cv2.imwrite(str(visualization_dir / f"{view}_{stem}_parity.png"), overlay)
+                write_image(str(visualization_dir / f"{view}_{stem}_parity.png"), overlay)
                 if entry["pair_id"] in (0, 160, 320):
-                    cv2.imwrite(str(visualization_dir / f"{view}_{stem}_overlay.png"), overlay)
+                    write_image(str(visualization_dir / f"{view}_{stem}_overlay.png"), overlay)
 
     timing = timing_summary_from_records(all_views_records)
     timing["warmup_count"] = int(args.warmup_count)
