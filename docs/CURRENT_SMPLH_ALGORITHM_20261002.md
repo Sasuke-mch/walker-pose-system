@@ -498,7 +498,7 @@ $runDir 使用第15节既有路径。省略配置仍为C30，保留历史默认�
 
 源命令为 G20261002_sapiens2_body_mainline448_v2 下的 smplh_cold_start_v2_joint300/fit_command.json 与 pmpose_cold_start_v1_joint300/fit_command.json。每组实际输入路径在 fit_args.json，解析后的全部参数在 resolved_options.json。源码计划在 realtime_app/configs/smplh_ablation_v1.json 与 smplh_ablation_followup_v1.json。运行入口直接调用 pose_app/smplh_fitting/pipeline.py 的原拟合内核，未复制求解器。
 
-活动量覆盖：人工腕位置软项；共享beta在B后冻结或在C继续优化；VPoser latent先验；根朝向初始锚；beta先验；身体三维观测项；身体质量权重整体及置信度/射线夹角/重投影因子；WiLoR原生旋转损失及其初始化；手PCA先验；共享/逐帧手姿；PCA12/24/45；手时序项。腕×beta做两个检测器各自的2×2对照，其他组以Sapiens2为主。完全关闭身体观测和完全关闭原生手信息属于必要性探查，不是待发布替代方法。
+活动量覆盖：人工腕位置软项；共享beta在B后冻结或在C继续优化；VPoser latent先验；根朝向初始锚；beta先验；身体三维观测项；身体质量权重整体及置信度/射线间隙/重投影因子；WiLoR原生旋转损失及其初始化；手PCA先验；共享/逐帧手姿；PCA12/24/45；手时序项。腕×beta做两个检测器各自的2×2对照，其他组以Sapiens2为主。完全关闭身体观测和完全关闭原生手信息属于必要性探查，不是待发布替代方法。
 
 共享手姿下的手时序项是零，关闭它属于负对照。随后在非共享手姿条件下只关闭手时序，才检验其实际影响。已为0的身体时序、接触等不重复做无效“关闭消融”；本轮也没有把它们新增到优化。没有完成所有因素的全组合、权重扫描、不同B阶段收敛预算、多随机种子或VPoser解码器替换；“覆盖重要活动量”不等于穷尽所有算法设计。
 

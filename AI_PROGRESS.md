@@ -3293,3 +3293,5 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 默认短预算两套49结果+5初始化数组精确等于整理前基准；全部观测等于历史函数参考。本轮两份完整基线及修复后Sapiens2重复基线49数组精确等于冻结结果。26组全帧控制/参数重建通过，几何2e-6m/轴角2e-6rad绝对容差，最大顶点坐标差8.34465027e-7m，面索引精确。默认公式、预算、角色、质量门及accepted_for_main_fit=False未改。不能保证不存在任何未知bug，也不能据此证明真实三维精度、物理接触或跨数据泛化。
 
 工作区公开验证690通过、9跳过、29子测试通过，sequence2通过；独立已提交源码640通过、15明确跳过、29子测试通过，sequence2通过。Ruff F/编译/差异检查通过。主目录G20261003_smplh_ablation_v1含protocol、results_after_fix.json/csv、implementation_audit.json及最终测试日志；追加G20261003_smplh_ablation_followup_v1含独立protocol与results。每组有metrics_v2、diagnostics_v2、检查点、几何审计、controls_replay_audit。紧凑索引research_records/registry/G20261003_smplh_ablation_v1.json；算法说明第19节及实验报告备份逐字同步。应用README增加运行/恢复/评价入口。既有无关修改和未跟踪候选保留，不顺带提交；本轮不推送。下一步优先已有数据的质量权重分段审计，再检验B阶段收敛与beta冻结时机，保持每次一个可核查阶段。
+
+2026-10-03解释当前优化流程时核对raw_triangulate：第19节质量因子名称误写“射线夹角”，现改为“射线间隙”，与qray=exp(-ray_gap_mm/30)一致。算法说明及实验报告备份逐字同步，未改源码、参数或消融结果。
