@@ -1,0 +1,660 @@
+{
+  "scope": "源码和入口归属检查；词法引用只用于定位，不证明运行依赖或方法验收",
+  "current_body_route": "Sapiens2优先身体候选；PMPose同流程冻结对照；两者完整接触未通过",
+  "command_domains": {
+    "body": 23,
+    "calibration": 8,
+    "capture": 7,
+    "hands": 11,
+    "lower_limb": 23,
+    "pose2d": 39,
+    "scene": 32,
+    "stereo": 12,
+    "visualization": 31
+  },
+  "pending_files": [
+    {
+      "path": "AGENTS.md",
+      "status": " M",
+      "disposition": "保留已有修改，未核验内容不提交",
+      "tracked_lexical_references": [
+        "CLAUDE.md",
+        "README.md",
+        "docs/CURRENT_SMPLH_ALGORITHM_20261002.md",
+        "docs/CURSOR_FIX_SMPLH_WILOR_PEOPLE1_PROMPT.md",
+        "docs/PROJECT_STATUS.md",
+        "research_records/registry/cleanup_20261002.json",
+        "tools/build_project_word_explanations.py",
+        "资料/实验报告/HANDOFF_FIXED_GRASP_FULL_BODY_20261001.md",
+        "资料/实验报告/当前SMPLH算法流程与交接_20261002.md"
+      ],
+      "reference_count": 9
+    },
+    {
+      "path": "CLAUDE.md",
+      "status": " M",
+      "disposition": "保留已有修改，未核验内容不提交",
+      "tracked_lexical_references": [
+        "AGENTS.md",
+        "AI_PROGRESS.md",
+        "README.md",
+        "research_records/registry/cleanup_20261002.json",
+        "资料/实验报告/HANDOFF_FIXED_GRASP_FULL_BODY_20261001.md"
+      ],
+      "reference_count": 5
+    },
+    {
+      "path": "README.md",
+      "status": " M",
+      "disposition": "保留已有修改，未核验内容不提交",
+      "tracked_lexical_references": [
+        "AGENTS.md",
+        "AI_PROGRESS.md",
+        "CLAUDE.md",
+        "docs/PROJECT_STATUS.md",
+        "realtime_app/tests/test_project_paths.py",
+        "realtime_app/walker_tools/lower_limb/analyze_sapiens2_lower_limb_kinematics.py",
+        "realtime_app/walker_tools/lower_limb/build_sapiens2_lower_foot_candidate_sequence.py",
+        "realtime_app/walker_tools/lower_limb/evaluate_short_window_sapiens2_filter.py",
+        "realtime_app/walker_tools/lower_limb/validate_lower_limb_candidate_structure.py",
+        "realtime_app/walker_tools/lower_limb/validate_temporal_bridge_candidates.py",
+        "realtime_app/walker_tools/pose2d/build_foot_evaluation_set.py",
+        "realtime_app/walker_tools/pose2d/evaluate_sapiens2_temporal_optical_flow.py",
+        "realtime_app/walker_tools/scene/experiment_ground_plane_local_rectification.py",
+        "realtime_app/walker_tools/scene/experiment_ground_plane_ransac.py",
+        "realtime_app/walker_tools/scene/validate_ground_plane_tracks.py",
+        "realtime_app/walker_tools/stereo/experiment_single_person_jointwise_geometry.py",
+        "realtime_app/walker_tools/visualization/export_da3_pointcloud_gallery.py",
+        "realtime_app/walker_tools/visualization/render_da3_depth_diagnostics.py",
+        "realtime_app/walker_tools/visualization/render_da3_single_view_pointclouds.py",
+        "realtime_app/walker_tools/visualization/render_sapiens2_candidate_sequence_video.py",
+        "research_records/registry/cleanup_20261002.json",
+        "资料/实验报告/HANDOFF_FIXED_GRASP_FULL_BODY_20261001.md"
+      ],
+      "reference_count": 22
+    },
+    {
+      "path": "docs/PROJECT_STATUS.md",
+      "status": " M",
+      "disposition": "保留已有修改，未核验内容不提交",
+      "tracked_lexical_references": [
+        "AGENTS.md",
+        "AI_PROGRESS.md",
+        "README.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 4
+    },
+    {
+      "path": "realtime_app/run_tests.py",
+      "status": " M",
+      "disposition": "保留已有修改，未核验内容不提交",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "CLAUDE.md",
+        "README.md",
+        "realtime_app/README.md",
+        "realtime_app/walker_tools/scene/benchmark_temporal_ground_modules.py",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 6
+    },
+    {
+      "path": "realtime_app/tools/render_raw_visual_handle_interaction_video.py",
+      "status": " M",
+      "disposition": "保留已有修改，未核验内容不提交",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "docs/CURRENT_STAGE_GROUND_PIPELINE.md",
+        "realtime_app/README.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 4
+    },
+    {
+      "path": "research_records/registry/experiment_registry.csv",
+      "status": " M",
+      "disposition": "保留已有修改，未核验内容不提交",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/learning_camera_geometry",
+      "status": "??",
+      "disposition": "保留本地路径或链接，不跟随链接清理",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/pose_app/causal_skeleton_tracker.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/pose_app/joint_offset_model.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 3
+    },
+    {
+      "path": "realtime_app/pose_app/pose_observation_partition.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/pose_app/reprojection_common.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/pose_app/skeleton_factor_graph.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 3
+    },
+    {
+      "path": "realtime_app/pose_app/smplx_asset_gate.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/pose_app/smplx_r3_integration.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 3
+    },
+    {
+      "path": "realtime_app/pose_app/temporal_body_prefit.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tests/test_audit_foot_support_labels.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_build_standalone_walker_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_causal_skeleton_tracker.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_export_interactive_walker_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_extract_annotated_walker_evidence.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_fit_coarse_walker_model.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_fit_smpl_coco_prefit_trajectory.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_fit_smpl_coco_temporal_guardrail.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_parametric_walker_model.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_pose_observation_partition.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_reprojection_observation_validity.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tests/test_temporal_body_prefit.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/analyze_smplx_shape_stability.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/audit_foot_support_labels.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "realtime_app/walker_tools/body/audit_v6_373_403_contact_labels.py",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 3
+    },
+    {
+      "path": "realtime_app/tools/audit_smpl_coco_window_geometry.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_r3_integration.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 3
+    },
+    {
+      "path": "realtime_app/tools/benchmark_smplx_structured_contact.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/build_clean_male_mesh_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/build_smpl_single_frame_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/build_smpl_window_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/build_standalone_walker_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/compare_direct_triangulation_initialization.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/compare_pose_model_bone_ratios.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "realtime_app/walker_tools/pose2d/compare_sapiens2_mainline.py",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/diagnose_smplx_loss_gradients.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/estimate_frozen_skeleton_bones.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/evaluate_male_beta_after_temporal.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/export_interactive_walker_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/export_smpl_coco_window_comparable_viewer.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/extract_annotated_walker_evidence.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/fit_coarse_walker_model.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/EXPERIMENT.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/fit_skeleton_factor_graph.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/fit_smpl_coco_prefit_trajectory.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/fit_smpl_coco_single_frame.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/fit_smpl_coco_temporal_guardrail.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/fit_smpl_coco_window.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_clean_male_coarse_to_fine.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/fit_smplx_window_2d_reproj.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/fit_temporal_body_prefit.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/preflight_smpl_coco_mainline.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/prepare_pose_window_detections.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/prepare_pose_window_selection.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/prepare_smpl_coco_prefit_full_initialization.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 2
+    },
+    {
+      "path": "realtime_app/tools/render_phase1_overlays.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/render_temporal_body_prefit_comparison.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/replay_causal_skeleton_tracker.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    },
+    {
+      "path": "realtime_app/tools/run_strict_foot_only_window.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "AI_PROGRESS.md",
+        "research_records/registry/cleanup_20261002.json",
+        "research_records/registry/cleanup_mainline_20261002.json"
+      ],
+      "reference_count": 3
+    },
+    {
+      "path": "realtime_app/tools/viz_wilor_2d_overlay.py",
+      "status": "??",
+      "disposition": "保留本地候选；不因存在于目录中升级主线或纳入发布",
+      "tracked_lexical_references": [
+        "research_records/registry/cleanup_20261002.json"
+      ],
+      "reference_count": 1
+    }
+  ],
+  "policy": "不删除、不搬移已有未提交成果；未经独立验证的候选保留本地，必要源码已单独纳入Git"
+}

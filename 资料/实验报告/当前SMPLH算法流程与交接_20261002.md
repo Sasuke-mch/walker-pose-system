@@ -447,3 +447,20 @@ $runDir = 'research_records/engineering_validation/G20261002_sapiens2_body_mainl
 6. 每次只改一个因素、保留全帧失败、记录额外计算量；通过窗口门后再扩全序列。旧 1/5 mm 腕软界实验未成为当前默认优化。
 
 本次工作范围为核对并记录现有算法，未改拟合参数、优化代码或结果状态。说明正文保存在 docs，逐字备份在 `资料/实验报告/当前SMPLH算法流程与交接_20261002.md`，AI_PROGRESS.md 提供最新导航。
+
+
+## 17. 2026-10-03：代码整理后的入口与参数来源
+
+算法与本说明前述路线一致，未重新拟合或升级接受状态。当前标量参数及候选/对照身份见 realtime_app/configs/current_mainline.json；当前C300配置为 configs/cold_smplh_joint300.json，旧默认C30配置为 configs/cold_smplh_legacy30.json。编排器改为 --settings 显式读取版本管理内的配置，不再依赖历史 fit_shared_args.json。原参数和原命令等价已核对；已有 protocol.json 和 fit_command.json 不回写、不覆盖。
+
+统一离线工具入口为 realtime_app/run_tool.py，主流程选择 body.run_sapiens_cold_smplh，基础求解选择 body.fit_smplh_wilor_sequence，冻结对照评估选择 body.compare_cold_detector_fits。tools/*.py 历史路径继续兼容；修改算法应编辑 walker_tools 或 pose_app，不能在兼容壳另写算法。公共验证使用 realtime_app/run_validation.py，CI与独立克隆调用同一入口；run_tests.py 是旧入口。
+
+使用C300配置的命令为：
+
+```powershell
+.venv-mainline/Scripts/python.exe -B realtime_app/run_tool.py body.run_sapiens_cold_smplh --run $runDir --settings realtime_app/configs/cold_smplh_joint300.json --detector sapiens2 --output "$runDir/cold_reproduction_candidate"
+```
+
+$runDir 使用第15节既有路径。省略配置仍为C30，保留历史默认，不能称为当前C300复现。通用smplh_fit.example.json是自行配置资源的模板，缺少本实验人工腕设置，不是冻结实验配置。评价工具固定读取第15节两份冻结结果，不会自动比较任意新目录。完整安装、参数、输出及预检查说明统一见 realtime_app/README.md。
+
+源码结构和已有待处理文件归属见 docs/PROJECT_STATUS.md 与 docs/code_inventory.json。该清单只记录保留/归属，词法引用不代表已经认证的调用依赖；不因名称或目录调整升降方法级别。报告备份同步更新本节，旧Word报告继续作为其编写时的历史说明，不改写旧实验结果。

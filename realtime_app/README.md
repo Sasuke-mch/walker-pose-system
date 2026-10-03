@@ -25,9 +25,11 @@ realtime_app/
 ├─ run.py                       单路 2D Pose 入口
 ├─ run_stereo.py                双目 2D Pose + 三角化入口（需真实标定文件）
 ├─ run_tool.py                  离线工具目录与统一调用入口
-├─ run_tests.py                 全部单元测试 + 编译检查
+├─ run_validation.py            公开测试统一入口（两个子项目；CI同源）
+├─ run_tests.py                 旧测试入口，当前验证使用run_validation.py
 ├─ check_environment.py         Docker/模型/路径检查
-├─ config.example.json          配置模板
+├─ camera_config.example.json   实时服务配置模板
+├─ configs/                     冷启动配置和当前路线索引
 ├─ camera_registry.example.json 物理相机身份模板（本机注册表不提交）
 ├─ calibration.example.json     双目标定 JSON 结构示例，不能直接用于实验
 ├─ pose_app/
@@ -131,14 +133,14 @@ cd D:\my_works\walker_pose_system\realtime_app
 如果本地还没有配置文件：
 
 ```powershell
-Copy-Item .\config.example.json .\config.json
+Copy-Item .\camera_config.example.json .\config.json
 Copy-Item .\camera_registry.example.json .\camera_registry.json
 ```
 
 然后根据你电脑上的模型工程和权重位置修改 `config.json`，并将已标定相机的
 完整 PnP `instance_id` 写入 `camera_registry.json`。
 
-安装主机 Python 依赖：
+仅运行实时采集基础模块的主机依赖：
 
 ```powershell
 pip install -r .\requirements.txt
@@ -146,8 +148,10 @@ pip install -r .\requirements.txt
 
 ## 先跑测试
 
+测试前须按下方“离线主线的独立安装与验证”安装完整requirements-dev依赖；只安装requirements.txt不足以运行全部测试。
+
 ```powershell
-python .\run_tests.py
+python -B .\run_validation.py
 ```
 
 所有测试必须通过后再继续。
@@ -276,3 +280,31 @@ $fitArgs = Get-Content my_fit.json -Raw | ConvertFrom-Json
 预检查缺少资源时返回非零状态；--load-models 还验证标定、回归矩阵、原生 MANO/SMPL-H 接口和 VPoser 解码。正式拟合继续执行原有观测、关联、约束和有限数值检查，预检查不能替代这些检查。输出目录必须为空。人工腕参考只有在显式提供时才启用，不会从旧结果自动读取。
 
 公开测试使用小型合成数据和冻结的历史函数契约，不再要求私有历史脚本。未提供授权模型或历史采集数据的测试会明确跳过；跳过不代表模型前向或实测精度通过。只有实际配置这些资源后才能完成对应验证。
+
+
+## 当前身体路线、固定配置和评价入口
+
+当前推进的是离线整段 SMPL-H 冷启动，Sapiens2 为优先身体候选，PMPose 为完全同流程对照。早期实时三角化的 PMPose 基线继续保留，两种身份不要混用。普通 SMPL 和旧固定抓握精修仍是历史/诊断路线，不是当前冷启动的后续必经步骤。方法级别未改变：两套冷启动均 accepted_for_main_fit=False，人工腕为诊断参考，手部几何未通过，脚底负高度未解决。
+
+`configs/current_mainline.json` 记录候选、对照、输出范围、调用入口和当前标量参数快照；`configs/cold_smplh_joint300.json` 固定当前拟合参数；`configs/cold_smplh_legacy30.json` 保留原入口默认参数。冷启动编排不再从旧 fit_shared_args.json 取参数，仍读取必要的同源观测、WiLoR、腕参考、模型和场景资产。SET_BY_COLD_RUNNER 的三个路径由编排器替换，不能直接把该配置当通用拟合 args JSON 运行。`smplh_fit.example.json` 是自备资源的通用模板，未包含本实验人工腕，不能冒充当前冻结流程。
+
+从仓库根目录复现当前候选，输出选择不存在的新目录：
+
+```powershell
+$runDir = 'research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2'
+.venv-mainline/Scripts/python.exe -B realtime_app/run_tool.py body.run_sapiens_cold_smplh --run $runDir --settings realtime_app/configs/cold_smplh_joint300.json --detector sapiens2 --output "$runDir/sapiens_reproduction"
+# 同一配置，仅改detector和输出目录，复现PMPose对照。
+.venv-mainline/Scripts/python.exe -B realtime_app/run_tool.py body.run_sapiens_cold_smplh --run $runDir --settings realtime_app/configs/cold_smplh_joint300.json --detector pmpose --output "$runDir/pmpose_reproduction"
+```
+
+两份命令继续调用同一拟合内核。A30/B30/C300/D1 100/D2 100/D3 0；beta和latent从零，B/C优化同一个共享beta，D阶段冻结身体与体型；每手共享PCA12，腕位置软项1，原生MANO项0.1，身体直接二维项/身体时序项/手二维项为0。未启用表面接触优化，不接回旧脚锚或构造手形。省略 --settings 和 --joint-steps 仍为旧30步配置；--joint-steps 显式覆盖所选配置，覆盖后必须单独记录，不能标作冻结300步复现。
+
+评价已有冻结对照使用：
+
+```powershell
+.venv-mainline/Scripts/python.exe -B realtime_app/run_tool.py body.compare_cold_detector_fits --run $runDir --output "$runDir/comparison_reaudit"
+```
+
+这个入口固定读取 current_mainline.json 所列的两份历史结果目录名，不会自动评价上面两个新 reproduction 目录；新运行应先核查其 protocol.json、fit_command.json、fit/fit_summary.json、assessment.json 和 FAILURE.json（如存在）。不要通过重命名或覆盖冻结结果让旧对照器读取新结果。可视化生成属于实验编排的独立输出步骤，页面播放帧率不代表拟合速度。
+
+实现职责：CLI与数据/场景编排在 walker_tools/body；观测转换在 pose_app/body_observations.py；初始化、损失、接触接口、调度和主体分别在 pose_app/smplh_fitting/{initialization,losses,contact,stages,pipeline}.py；人工腕和原生手姿分别在 independent_wrist_reference.py、wilor_mano_prior.py。scene地面分支独立重放，不进入当前身体损失。详见 ../docs/CURRENT_SMPLH_ALGORITHM_20261002.md。

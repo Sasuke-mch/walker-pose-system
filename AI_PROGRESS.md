@@ -1,3 +1,7 @@
+# 当前导航（2026-10-03）
+
+当前身体研究推进为448帧SMPL-H冷启动：Sapiens2优先身体候选，PMPose同流程冻结对照；接受级别和失败边界未改变。路线与入口索引见 `docs/PROJECT_STATUS.md`、`realtime_app/configs/current_mainline.json`；完整算法见 `docs/CURRENT_SMPLH_ALGORITHM_20261002.md`；安装、测试、拟合与评价命令统一见 `realtime_app/README.md`。下方按历史追加保留各阶段记录，旧日期条目不自动代表当前状态。
+
 # 2026-10-01：VPoser修正版31帧可视化与浏览器验收
 
 - 当前展示`active_constructed_grip_v2/vposer_body_window60_90_v1/vposer_body_viewer_v2.html`，只显示真实结果60..90共31帧；标题明确联合拟合未通过，不拼入旧448帧或接口smoke。输入网格/面/模型COCO/腕点来自该result.npz，同一帧应用本次重放ground；旧vertices_ground_m仅校验重放等价，不作为当前显示坐标。
@@ -3240,3 +3244,16 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 用户收到云端失败通知后读取实际Actions日志，Python3.11作业在测试阶段发生24个错误，包含缺少torch、scipy与pytest。CI仍只安装旧requirements.txt并调用unittest入口run_tests.py，与上一阶段新独立环境和pytest公开验证入口不同。上一阶段Windows新克隆验证通过没有证明Linux云端CI通过，这一验证遗漏明确纠正。现更新CI安装CPU版同版本PyTorch/torchvision、完整requirements-dev依赖与chumpy构建所需setuptools/wheel，执行pip check及run_validation.py，保留Python3.11/3.12矩阵，不删除失败用例，不修改拟合算法或方法级别。远端通过状态以本次Actions实际结果为准。
 
 云端实际确认：修复后的main和master两次CI运行均成功（Actions运行37088229197、37088228492），各自Python3.11与3.12作业全部通过。成功日志独立下载到上述临时目录ci_success_*.log。失败原日志保留为github_ci_failure.log；本次没有修改人体拟合公式、观测、门限或实验结果。
+
+
+## 2026-10-03：核对主线身份、固定参数、调用入口及待处理文件
+
+审查依据为实验报告备份“当前SMPLH算法流程与交接_20261002.md”、原始冷启动源码、两份已保存的C300 fit_command/protocol、同流程对照记录及仓库结构。修正概览将旧PMPose二维基线、普通SMPL和当前离线SMPL-H候选混写的问题：Sapiens2仍是优先身体候选，PMPose仍是相同流程对照；二者accepted_for_main_fit=False，腕参考仍诊断状态，手部几何失败和脚负高度保留，旧corrected/约束感知/5mm与撤回方法不升降级。
+
+新增源码配置realtime_app/configs/cold_smplh_legacy30.json与cold_smplh_joint300.json；current_mainline.json保存结果定位、四类入口和47项解析参数中的标量快照。run_sapiens_cold_smplh改从这些配置取设置，新增--settings，省略仍为原C30，显式--joint-steps仍覆盖对应预算。消除对历史fit_shared_args.json的参数读取依赖，必要观测、腕、WiLoR、模型和当前scene路径继续沿用。默认配置产生的整条命令与原实现逐元素相同；两份C300已保存命令与新配置各47个解析参数一致（路径按实际解析比较）。没有执行新拟合、重新生成页面或覆盖冻结结果。阶段记录改由实际调度生成，不用硬编码的阶段说明冒充配置。
+
+已处于删除状态的旧实时配置未恢复或提交删除；新增camera_config.example.json沿用已发布模板内容和应用根路径语义，配置测试和文档指向它。公开验证统一为run_validation.py，与CI一致；既有未提交run_tests.py保留为旧入口，不擅自提交其修改。应用README明确基础requirements不足以运行完整测试，避免再将旧基础安装与新完整测试拼接。拟合/评价使用现有run_tool分发，同一内核不复制算法。明确通用smplh_fit.example缺少本实验腕参考，以及对照评价工具只读固定结果名，不自动评价任意新目录。
+
+更新根README、CLAUDE、PROJECT_STATUS、应用README和现有算法说明；原算法说明备份同步更新，逐字一致，旧Word报告作为历史资料保留。根README/CLAUDE/PROJECT_STATUS原有未提交改写单独保留，只提交本次核验的导航/纠错段落。docs/code_inventory.json逐项记录本轮开始的63项待处理归属及186个工具的职责数量；词法引用仅供定位，不当作依赖认证。未跟踪的骨架、SMPL-X、时序prefit、查看器与手脚候选，已有标定资产、本地链接、实验注册表和渲染器修改全部保留；本轮未删除/移动这些成果，未将未经验证候选纳入发布。
+
+新增6项配置/阶段/默认覆盖/失败契约检查，包括当前标量快照防漂移。相关入口、配置和旧路径检查24通过；工作区全量627通过、9跳过、29个subtest通过，sequence_pipeline2通过。只含已提交源码的独立checkout使用上一阶段全新环境验证：公开577通过、15明确跳过、29个subtest通过，sequence_pipeline2通过。相关Ruff与编译通过。证据保存在本机临时walker_mainline_docs_2gb_nm4_中的profile_parity.json、workspace_tests.log、clean_tests.log；没有重新声称人体质量或物理精度通过。

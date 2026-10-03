@@ -1,5 +1,13 @@
 # Walker Pose System - Claude 工作指南
 
+## 当前身体研究路线与导航（2026-10-03）
+
+当前离线身体路线为SMPL-H冷启动：Sapiens2优先候选，PMPose同流程冻结对照。两者accepted_for_main_fit=False；人工腕是诊断参考、手部几何未通过、脚底负高度未解决。实时PMPose三角化基线与这一离线身体候选是不同层面的身份。旧SMPL/SMPL-X与固定抓握方法保留历史级别，不接回旧beta、手形或脚锚。
+
+开始身体任务应读 docs/CURRENT_SMPLH_ALGORITHM_20261002.md 和 realtime_app/configs/current_mainline.json，再读实际protocol/fit_command/assessment；实验报告备份辅助核对，不覆盖更新的源码和实际协议。结构和待处理文件见 docs/PROJECT_STATUS.md、docs/code_inventory.json。
+
+公开测试与CI使用 realtime_app/run_validation.py；run_tests.py为旧入口。离线调用统一用 realtime_app/run_tool.py。当前候选用 body.run_sapiens_cold_smplh --settings realtime_app/configs/cold_smplh_joint300.json，省略配置保留C30，不能误称C300复现。安装、资源检查、完整命令与评价入口统一见 realtime_app/README.md，避免在多个指南中维护另一组默认值。
+
 ## 项目概述
 
 面向助步器场景的人体姿态估计与实时可视化研究代码。核心任务是在鱼眼双目立体视觉系统中准确识别下肢关节点，特别是脚部关键点，用于步态分析。

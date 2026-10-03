@@ -1,8 +1,26 @@
 # Walker Pose System
 
+## 当前路线与入口（2026-10-03）
+
+当前研究推进的是 **448帧离线SMPL-H冷启动身体候选**。Sapiens2为优先身体候选，PMPose为同算法、同预算、同腕参考和WiLoR输入的冻结对照。两套结果仍是工程候选，均未通过完整手部接触门；人工腕参考保持原诊断状态。PMPose实时双目基线继续保留，不能把早期二维基线身份当作当前离线身体选择。普通SMPL、SMPL-X及固定抓握精修是历史/旁路方法，不因整理改级别。
+
+当前路线索引：[docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)；详细算法：[docs/CURRENT_SMPLH_ALGORITHM_20261002.md](docs/CURRENT_SMPLH_ALGORITHM_20261002.md)；唯一安装和调用说明：[realtime_app/README.md](realtime_app/README.md#当前身体路线固定配置和评价入口)。本地资料/实验报告中的同名算法说明为备份，旧Word报告为其编写时的历史说明。
+
+| 工作 | 当前入口 | 范围 |
+|---|---|---|
+| 安装 | realtime_app/requirements-dev.txt；Windows固定环境清单见应用README | 离线拟合和公开测试；不含实时设备/Docker验收 |
+| 测试 | realtime_app/run_validation.py | 两个子项目；CI同源；run_tests.py为旧入口 |
+| 固定流程拟合 | realtime_app/run_tool.py body.run_sapiens_cold_smplh | 显式指定configs/cold_smplh_joint300.json；不指定仍为旧C30 |
+| 自备资源拟合 | realtime_app/run_tool.py body.fit_smplh_wilor_sequence | 通用求解器；参数模板不等于冻结实验配置 |
+| 冻结对照评价 | realtime_app/run_tool.py body.compare_cold_detector_fits | 读取两份固定命名的历史结果，保留失败 |
+
+目录职责不表示验收等级。research_records保存原协议/输出，configs保存可复用参数，pose_app保存算法，walker_tools保存CLI和编排，tools保留兼容入口。历史结果不搬移、不覆盖。下文较早的阶段结论只作背景，当前身份以本节、AI_PROGRESS和实验协议为准。
+
 面向助步器场景的人体姿态估计与实时可视化研究代码。
 
 当前两阶段识别、Stage 2完整SE(3)、实时入口、离线复现顺序和结论边界见 [当前Stage与动态地面主线](docs/CURRENT_STAGE_GROUND_PIPELINE.md)。
+
+完整测试必须使用应用README中的requirements-dev安装流程；旧基础依赖仅覆盖实时基础模块，不能用于完整测试。
 
 ## 当前完成情况
 
@@ -165,7 +183,7 @@ python .\run_stereo.py --model yolo26x_pose --camera-registry .\camera_registry.
 
 ```powershell
 cd .\realtime_app
-python .\run_tests.py
+python -B .\run_validation.py
 ```
 
 ## 输出
@@ -210,6 +228,7 @@ docker_logs/
 
 - WiLoR 手部链使用 `MANO_LEFT.pkl`、`MANO_RIGHT.pkl` 和 `SMPLH_male.pkl`；SMPL-H 拟合显式使用双 MANO PCA 资产。
 - 该链路输出仍属于 WiLoR 模型派生观测的工程候选，不能解释为独立手部真值或真实握持结论。
+
 
 
 
