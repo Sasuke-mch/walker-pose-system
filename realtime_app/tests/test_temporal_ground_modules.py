@@ -258,6 +258,8 @@ class TemporalGroundModulesTests(unittest.TestCase):
 
     def test_dynamicstereo_cross_region_failure_never_reaches_vo(self):
         upstream_path = benchmark.PROJECT_ROOT / "research_records/engineering_validation/G20260912_learned_stereo_replacement_benchmark_v1"
+        if not (upstream_path / "summary.json").is_file():
+            self.skipTest("private learned-stereo archive not provisioned")
         summary = json.loads((upstream_path / "summary.json").read_text(encoding="utf-8"))
         dynamic = [
             combination for combination in summary["combinations"]
@@ -404,6 +406,8 @@ class TemporalGroundModulesTests(unittest.TestCase):
     def test_upstream_archives_are_untouched_by_a_read_only_pass(self):
         task01 = benchmark.PROJECT_ROOT / "research_records/engineering_validation/G20260912_modular_ground_benchmark_v1"
         task02 = benchmark.PROJECT_ROOT / "research_records/engineering_validation/G20260912_learned_stereo_replacement_benchmark_v1"
+        if not (task01 / "summary.json").is_file() or not (task02 / "summary.json").is_file():
+            self.skipTest("private ground/stereo archives not provisioned")
         before = {"task01": benchmark.snapshot_tree(task01), "task02": benchmark.snapshot_tree(task02)}
         upstream = benchmark.Upstream(task01, task02)
         for matcher in benchmark.MATCHERS:

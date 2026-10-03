@@ -8,6 +8,9 @@ from pose_app.smplx_fitting import load_vposer_explicit
 
 def test_real_frozen_vposer_decodes_all21_with_live_gradients():
     root = Path(__file__).resolve().parents[2]
+    folder = root/'models/VPoser02_05/V02_05'
+    if not list(folder.glob('*.yaml')) or not list((folder/'snapshots').glob('*.ckpt')):
+        pytest.skip('licensed VPoser checkpoint not provisioned; run the asset-enabled lane')
     vp, _, _ = load_vposer_explicit(root/'models/VPoser02_05/V02_05', 'cpu')
     z = torch.zeros(3,32,requires_grad=True)
     pose = decode_body_rotations(vp,z)

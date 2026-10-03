@@ -82,6 +82,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--allow-diagnostic-wrist-reference", action="store_true")
     ap.add_argument("--mano-left", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl")
     ap.add_argument("--mano-right", type=Path, default=ROOT / "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl")
+    ap.add_argument("--canonical-mano-right", type=Path,
+                    default=ROOT / "third_party/WiLoR/mano_data/MANO_RIGHT.pkl",
+                    help="canonical WiLoR right MANO asset used by native-pose audit")
     ap.add_argument("--bone-weight", type=float, default=0.0,
                     help="optional beta-zero bone-length prior; default off because it biases shared beta")
     ap.add_argument("--contact-labels", type=Path, default=None)

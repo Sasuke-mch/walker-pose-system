@@ -1,29 +1,19 @@
 """Protect the existing soft observation contract during helper extraction."""
 
-import ast
 import json
-import math
-from pathlib import Path
 from types import SimpleNamespace
 
-import cv2
 import numpy as np
 import pytest
 
 from pose_app import body_observations as observations
 from pose_app.fisheye_camera import fisheye_project_numpy
-from pose_app.project_paths import PROJECT_ROOT
+from tests.fixtures import historical_contracts
 
 
 def historical_functions():
-    path = PROJECT_ROOT / "research_records/engineering_validation/G20260923_smpl_clean_full_sequence_v1/run_clean_full_sequence.py"
-    tree = ast.parse(path.read_text(encoding="utf-8"))
-    nodes = [node for node in tree.body if isinstance(node, ast.FunctionDef)
-             and node.name in {"raw_side", "raw_triangulate"}]
-    namespace = dict(np=np, cv2=cv2, math=math, json=json, Path=Path,
-                     fisheye_project_numpy=fisheye_project_numpy)
-    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(path), "exec"), namespace)
-    return namespace
+    return {"raw_side": historical_contracts.raw_side,
+            "raw_triangulate": historical_contracts.raw_triangulate}
 
 
 @pytest.mark.parametrize("side", ["left", "right"])

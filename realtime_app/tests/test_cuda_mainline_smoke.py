@@ -10,6 +10,7 @@ from pose_app.smpl_coco_observation import (
     load_coco17_regressor,
     load_smpl_male,
     regress_coco17_torch,
+    resolve_smpl_male_model,
 )
 
 
@@ -20,6 +21,8 @@ class CudaMainlineSmokeTest(unittest.TestCase):
             raise unittest.SkipTest("CUDA PyTorch is unavailable")
         cls.root = Path(__file__).resolve().parents[2]
         cls.smpl_root = cls.root / "models" / "smpl"
+        if resolve_smpl_male_model(cls.smpl_root) is None or not (cls.smpl_root / "J_regressor_coco.npy").is_file():
+            raise unittest.SkipTest("licensed SMPL model/regressor not provisioned; run the asset-enabled lane")
         cls.regressor = load_coco17_regressor(cls.smpl_root / "J_regressor_coco.npy")
 
     def test_smpl_forward_and_coco_regressor_stay_on_cuda(self) -> None:

@@ -1,36 +1,16 @@
 from __future__ import annotations
 
-"""Fail-closed scene-accepted mask tests for the Stage D temporal loss.
+"""Fail-closed contract of the archived Stage D temporal-mask resolver."""
 
-The resolver lives in the frozen-route fit script
-``research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/fit_vposer_shared_beta.py``.
-Importing that module pulls cv2/SMPL/VPoser weights, so the tests extract the
-single pure-numpy function by AST and execute it in isolation. This still
-tests the shipped code: any edit to the resolver changes what is executed.
-"""
-
-import ast
 import unittest
-from pathlib import Path
 
 import numpy as np
 
-FIT = (
-    Path(__file__).resolve().parents[2]
-    / "research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/fit_vposer_shared_beta.py"
-)
+from tests.fixtures.historical_contracts import resolve_scene_frame_mask
 
 
 def load_resolver():
-    tree = ast.parse(FIT.read_text(encoding="utf-8"))
-    node = next(
-        n
-        for n in tree.body
-        if isinstance(n, ast.FunctionDef) and n.name == "resolve_scene_frame_mask"
-    )
-    namespace: dict = {"np": np}
-    exec(compile(ast.Module(body=[node], type_ignores=[]), str(FIT), "exec"), namespace)
-    return namespace["resolve_scene_frame_mask"]
+    return resolve_scene_frame_mask
 
 
 class ResolveSceneFrameMaskTests(unittest.TestCase):

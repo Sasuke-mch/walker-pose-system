@@ -1,0 +1,16 @@
+# Python 3.12. Install matching PyTorch wheels first (see README).
+-r requirements.txt
+numpy==1.26.4
+opencv-python==4.11.0.86; platform_system == "Windows"
+opencv-python-headless==4.11.0.86; platform_system != "Windows"
+matplotlib==3.11.2
+scipy==1.17.1
+torch==2.11.0
+torchvision==0.26.0
+smplx==0.1.28
+omegaconf==2.3.1
+PyYAML==6.0.3
+# Official inference code; this revision has no incompatible Torch upper bound.
+human-body-prior @ git+https://github.com/nghorbani/human_body_prior.git@4c246d8a83ce16d3cff9c79dcf04d81fa440a6bc
+chumpy==0.70
+setuptools==78.1.0

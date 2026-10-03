@@ -247,3 +247,32 @@ python .\run_stereo.py `
 
 当前标定和真实 CSV 配对回放已具备。下一阶段是建立下肢/脚部的可解释
 质量评估，以及脚尖、脚跟等非 COCO-17 关键点的专项模型与数据。
+
+
+## 离线主线的独立安装与验证
+
+以下配置面向 Windows、Python 3.12、已有双目二维观测和 WiLoR 输出的 SMPL-H 拟合。实时相机、Docker 检测器另按对应部署说明配置；安装此配置不等于完成这些设备的验证。请在仓库根目录执行：
+
+```powershell
+uv venv --python 3.12 --seed .venv-mainline
+uv pip install --python .venv-mainline/Scripts/python.exe torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
+uv pip install --python .venv-mainline/Scripts/python.exe -r realtime_app/requirements-dev.txt --no-build-isolation
+uv pip check --python .venv-mainline/Scripts/python.exe
+.venv-mainline/Scripts/python.exe -B realtime_app/run_validation.py
+```
+
+`requirements-mainline.txt` 固定直接依赖；`requirements-mainline-lock.txt` 保存本次 Windows 环境的完整版本清单。严格复装可在安装 CUDA PyTorch 后用该清单替代 requirements-dev.txt。安装需要 Git，以获取固定版本的官方 human-body-prior 源码；该版本的 VPoser 解码代码与本项目原环境一致，避免原环境中包元数据与 PyTorch 版本不一致的问题。旧 chumpy 安装需要预先存在的 setuptools，因此使用 --seed 和 --no-build-isolation。
+
+模型、采集数据及历史实验目录不随代码分发。SMPL-H、MANO、VPoser 应通过各自授权来源取得；COCO 网格回归矩阵也须独立提供。路径全部通过现有拟合参数指定，新增 --canonical-mano-right 允许将 WiLoR 标准右手 MANO 资源放在仓库外，默认路径与原代码一致。
+
+复制 `realtime_app/smplh_fit.example.json`，修改其中观测、标定、模型和输出路径。它是参数模板，不是新的实验协议；实际步数、权重、腕参考和接触设置继续服从对应实验协议。原始二维坐标必须处于原始鱼眼图像坐标系，左右相机和 WiLoR 记录必须来自同一序列；不要用转正图坐标直接进入几何。
+
+```powershell
+.venv-mainline/Scripts/python.exe -B realtime_app/preflight_smplh.py --args-json my_fit.json --load-models
+$fitArgs = Get-Content my_fit.json -Raw | ConvertFrom-Json
+.venv-mainline/Scripts/python.exe -B realtime_app/tools/fit_smplh_wilor_sequence.py @fitArgs
+```
+
+预检查缺少资源时返回非零状态；--load-models 还验证标定、回归矩阵、原生 MANO/SMPL-H 接口和 VPoser 解码。正式拟合继续执行原有观测、关联、约束和有限数值检查，预检查不能替代这些检查。输出目录必须为空。人工腕参考只有在显式提供时才启用，不会从旧结果自动读取。
+
+公开测试使用小型合成数据和冻结的历史函数契约，不再要求私有历史脚本。未提供授权模型或历史采集数据的测试会明确跳过；跳过不代表模型前向或实测精度通过。只有实际配置这些资源后才能完成对应验证。

@@ -28,7 +28,6 @@ from pose_app import body_observations as raw_clean
 
 
 from ..smplh_hand_observation import read_wilor, finite_pixel_values
-from ..project_paths import PROJECT_ROOT as ROOT
 from .initialization import initialize_rigid_body
 from .stages import (build_stage_schedule, set_trainable_parameters,
                      validate_optimization_options, require_finite_tensors)
@@ -220,7 +219,7 @@ def run_fit(args) -> int:
     mano_targets = mano_weights = mano_initial = None
     if mano_enabled:
         from pose_app.wilor_mano_prior import audit_assets, read_parameter_view, encode_pca
-        with (ROOT / "third_party/WiLoR/mano_data/MANO_RIGHT.pkl").open("rb") as handle:
+        with args.canonical_mano_right.open("rb") as handle:
             canonical_right = pickle.load(handle, encoding="latin1")
         asset_audit = audit_assets(model_data, mano_left_data, mano_right_data, canonical_right)
         rotations0, weights0, audit0 = read_parameter_view(args.wilor_left, left, image_size)
