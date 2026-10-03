@@ -1,0 +1,27 @@
+{
+  "experiment_id": "G20261003_repositioned360_manual_v1",
+  "status": "completed_to_original_gates",
+  "accepted_for_main_fit": false,
+  "source_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2",
+  "output": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1",
+  "protocol": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\protocol.json",
+  "assessment": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\assessment.json",
+  "manual_fitting_weight": 0,
+  "pmpose_frames": 360,
+  "sapiens2_status": "original_initialization_gate_rejection",
+  "annotation_status": "review_required; 21 unique points, 1 stereo slot",
+  "same_body_rerun": {
+    "vertices": 0.0,
+    "betas": 0.0,
+    "smplh_joints": 0.0,
+    "vposer_latent": 0.0,
+    "left_hand_pca": 0.0,
+    "right_hand_pca": 0.0
+  },
+  "viewers": {
+    "body": "body.html",
+    "wrists": "wrists/index.html",
+    "body_mode": "camera-coordinate diagnostic; ground/stage/walker unavailable and not rendered"
+  },
+  "boundary": "manual labels under review; target consistency and engineering evidence, not anatomical or physical 3D truth"
+}

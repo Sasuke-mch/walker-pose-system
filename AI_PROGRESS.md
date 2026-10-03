@@ -3370,3 +3370,13 @@ shoulder_diagnostic.png同源叠加pair1177和1198：前者正常，后者右相
 用户指定使用已有 Labelme。检查确认仓库 .annotation_env/Scripts/labelme.exe 与 pythonw.exe 环境内已安装 Labelme 6.3.1，未加入 PATH；直接使用既有环境启动，无新增安装。上一步导出包和临时网页方案不再使用，未完成的网页脚本移除。为 Labelme 的目录浏览在 research_records/annotation_handoffs/H20261003_repositioned_wrist10/images 放置选定20张原图，按组号/相机/内部帧命名，逐字节及1080×1920尺寸核对通过；原拟合输入保留，既有标注不覆盖。manifest.json沿用相同10组时间选择、原pair_id/frame_id和来源，新增对应Labelme输入及JSON保存路径。
 
 使用该目录 wrist_config.yaml：限定left_wrist/right_wrist人体自身左右腕点，点大小4，自动保存，关闭上一图标注复制，不嵌入图像数据；提供左右腕不可用图像flags和uncertain点flags。Ctrl+Shift+P创建点，D/A切图，Ctrl+S保存；JSON保存在同目录labels。配置由本机Labelme加载验证，启动日志确认扫描20图并成功加载首张QImage/pixmap。尚未产生人工结果，不改变算法、拟合、几何门和方法级别。已有无关工作区改动保留，不推送。
+
+## 2026-10-03：换机位360帧复跑与新人工腕评估
+
+沿用用户此前对这批数据的明确控制：两模型统一关闭人工腕项，其他流程保持一致。本轮使用既有完整360帧PMPose/Sapiens2检测和新采集WiLoR缓存，不重新推理、不读取旧拟合参数；解析后全部参数与前轮相同，仅输出目录改变，seed=0。在G20261003_repositioned360_manual_v1重新执行A30/B30/C300/D1=100/D2=100/D3=0，共享beta从零求解、VPoser和手形沿原策略。PMPose完成，Sapiens2仍在493.8mm超过300mm原初始化门停止，失败证据保留，无旧网格补位。PMPose相对原运行顶点、beta、关节、latent和手PCA最大差均0；参数重建与阶段冻结审计通过，加权身体RMS51.0965mm、未加权92.4740mm为内部观测一致性，非独立精度。
+
+20份Labelme原文件快照与同源1080×1920图核查通过；21个可唯一解析的腕点、1个完整双目槽位。首组右相机两个left_wrist重复、首组左相机左右点近重合、缺失腕未显式标不可用，待用户核对，原标注不改、不猜标签。全部21点与共同19点分别保留。共同19点PMPose/Sapiens2/WiLoR均值24.6855/58.0929/12.3164px、中位21.4020/14.4158/11.7815px；Sapiens2第139帧右相机左腕误差830.43px，其对侧标签点15.64px，仅支持逐帧语义诊断，不自动交换或剔除。完整双目仅第74帧右腕：人工通过，PMPose相距9.96mm，Sapiens2几何拒绝，WiLoR缺失，无法三维排名。原多帧腕参考求解器也运行审计，左腕不可用、右腕因少于3通过双目对及共享回投超过10px拒绝；仅以camera0单位坐标变换报告，不将该变换当物理助步器模型。新人工点没有进入本轮拟合，相关指标为尚待复核人工参考的一致性。
+
+修正腕覆盖脚本硬编码448帧及82点，改读sequence_frames和实际比较数量，旧协议保留448回退。修正人工点读取忽略unavailable/uncertain flags的问题，点与不可用标志冲突明确报错。最终53项相关测试（包括入口布局和主线回归）、Ruff F、编译和diff检查通过；最初Ruff缺失改用本机已有缓存二进制，旧未用imports清理。首版覆盖硬编码点数失败保留，修复后20图/21局部图/61个被评价预测坐标核对通过。评价初次缺少input目录失败保留，后以明确同源input目录junction恢复，不改变图像或帧顺序。
+
+新增visualization.build_camera_body_viewer入口及兼容工具，作为相机坐标诊断，不替换地面主线、不改变任何方法级别。使用本次新结果真实6890顶点/13776面、重新计算观测和原接受掩码、同标定相机中心；固定显示中心和转正视角，不做逐帧居中、插值或平滑。缺少本轮地面/Stage/助步器重放时明确不显示，不能据此判断脚底高度或接触。body.html浏览器核验0/359帧、播放进度和180帧、13776面、无页面错误，截图body_preview.png。入口index.html、腕覆盖wrists/index.html、assessment.json、参数及语义审计同目录；索引registry/G20261003_repositioned360_manual_v1.json。无关既有改动保留，不推送。

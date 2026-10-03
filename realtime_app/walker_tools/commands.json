@@ -154,6 +154,7 @@
   "stereo.summarize_paired_stereo_replay": "summarize_paired_stereo_replay.py",
   "stereo.summarize_stereo_reprojection": "summarize_stereo_reprojection.py",
   "stereo.validate_saved_prediction_coordinate_regression": "validate_saved_prediction_coordinate_regression.py",
+  "visualization.build_camera_body_viewer": "build_camera_body_viewer.py",
   "visualization.build_full448_contact_formal_viewer": "build_full448_contact_formal_viewer.py",
   "visualization.build_grasp_body_canvas_viewer": "build_grasp_body_canvas_viewer.py",
   "visualization.build_sapiens2_pseudolabel_visual_audit": "build_sapiens2_pseudolabel_visual_audit.py",
