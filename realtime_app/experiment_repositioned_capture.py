@@ -218,6 +218,63 @@ def wilor(out):
              '--orientation', folder, '--device', 'cuda'], out/f'wilor_{side}.log')
 
 
+def annotations(out):
+    """Ten unmarked stereo pairs sampled uniformly in recorded host time."""
+    import zipfile
+    frames = read(out/'frames.json')
+    times = np.array([(int(r['left_host_return_timestamp_ns']) +
+                       int(r['right_host_return_timestamp_ns']))/2e9 for r in frames])
+    times -= times[0]
+    if len(times) < 10 or np.any(np.diff(times) <= 0):
+        raise ValueError('need at least ten ordered paired timestamps')
+    targets = np.linspace(times[0], times[-1], 10)
+    indices = [int(np.argmin(np.abs(times-t))) for t in targets]
+    if len(set(indices)) != 10 or indices[0] != 0 or indices[-1] != len(frames)-1:
+        raise ValueError('annotation sampling must cover ten distinct pairs and both endpoints')
+    package = out/'wrist10'
+    package.mkdir()
+    images = package/'images'
+    images.mkdir()
+    selection = []
+    for group, i in enumerate(indices, 1):
+        frame = frames[i]
+        row = {'group': group, 'index': i, 'original_pair_id': int(frame['pair_id']),
+               'host_relative_seconds': float(times[i]), 'target_seconds': float(targets[group-1]),
+               'coordinate_space': 'upright_model_input_pixels', 'images': {}}
+        for side in ('left', 'right'):
+            source = Path(frame[side+'_image'])
+            name = f'{side}_pair_{i:04d}.png'
+            destination = images/name
+            shutil.copyfile(source, destination)
+            if source.read_bytes() != destination.read_bytes():
+                raise ValueError('annotation image copy changed')
+            image = cv2.imdecode(np.fromfile(destination, dtype=np.uint8), cv2.IMREAD_COLOR)
+            if image is None or image.shape != (1920, 1080, 3):
+                raise ValueError('annotation upright size differs')
+            row['images'][side] = {'file': 'images/'+name, 'source': str(source),
+                                   'frame_id': int(frame[side+'_frame_id'])}
+        selection.append(row)
+    write(package/'selection.json', {'sampling': 'ten nearest uniformly spaced host-time targets including endpoints',
+        'labels': ['left_wrist', 'right_wrist'], 'width': 1080, 'height': 1920,
+        'reference_semantics': 'estimated internal wrist joint center projection; uncertainty retained',
+        'records': selection})
+    (package/'标注说明.txt').write_text(
+        '共10组、20张原图，按记录时间均匀取样，包含首尾。图像已转正，未叠加模型点。\n'
+        '用LabelMe打开images，每张图用point标注left_wrist和right_wrist，JSON保存到图片旁边。\n'
+        '左右指被拍摄者自己的左手、右手，不是画面左右；文件名前缀left/right指相机。\n'
+        '标注腕关节内部中心的估计投影，不标手指、袖口或握把接触点。可放大观察，不裁剪、不缩放或镜像原图。\n'
+        '无法辨认时不强行猜点：该腕不画point，JSON顶层flags增加left_wrist_unavailable或right_wrist_unavailable=true。\n'
+        '遮挡但仍作估计时，flags增加left_wrist_uncertain或right_wrist_uncertain=true，并在description说明。\n'
+        '未标注不能默认视为不可见；每张图都保存JSON，未画点的腕请明确填不可用标志。\n'
+        'selection.json保存原帧号、内部帧号及时间。标注完成后返回整个文件夹或压缩包。\n', encoding='utf-8')
+    with zipfile.ZipFile(out/'腕标注10组.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+        for path in sorted(package.rglob('*')):
+            if path.is_file():
+                archive.write(path, str(path.relative_to(out)))
+    print(json.dumps({'package': str(package), 'pairs': 10, 'images': 20,
+                      'indices': indices}, ensure_ascii=False))
+
+
 def fit_commands(out):
     commands, controls = {}, {}
     from walker_tools.body.fit_smplh_wilor_sequence import build_parser
@@ -356,7 +413,7 @@ def audit(out):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('stage', choices=('prepare', 'detect', 'pmpose', 'sapiens', 'wilor', 'fit', 'fit-child', 'audit'))
+    ap.add_argument('stage', choices=('prepare', 'detect', 'pmpose', 'sapiens', 'wilor', 'annotations', 'fit', 'fit-child', 'audit'))
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--method', choices=('pmpose', 'sapiens2'))
     args = ap.parse_args()

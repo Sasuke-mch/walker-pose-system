@@ -84,5 +84,30 @@
   "next": "separate single-model semantic stability experiment; do not bypass current gates",
   "interpretation": "Sapiens2 per-frame side/part inconsistency suspected; visual pair1198 crossing. PMPose not truth; no 3D accuracy ranking.",
   "logic_review": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\logic_review.json",
-  "strict_statistics_scope": "Earlier strict_wrists are all-instance automatic association; strict_first_fitter_instances is aligned with first-instance body fitting. Neither is accuracy."
+  "strict_statistics_scope": "Earlier strict_wrists are all-instance automatic association; strict_first_fitter_instances is aligned with first-instance body fitting. Neither is accuracy.",
+  "manual_annotation_package": {
+    "directory": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\wrist10",
+    "archive": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\腕标注10组.zip",
+    "images": 20,
+    "pairs": 10,
+    "indices": [
+      0,
+      42,
+      74,
+      101,
+      139,
+      184,
+      226,
+      268,
+      313,
+      359
+    ],
+    "sampling": "uniform host-relative time targets including first and last paired frames",
+    "coordinate_space": "upright 1080x1920 original PNG; byte-identical copies",
+    "labels": [
+      "left_wrist",
+      "right_wrist"
+    ],
+    "state": "awaiting_user_annotations"
+  }
 }
