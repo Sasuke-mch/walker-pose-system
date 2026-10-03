@@ -3238,3 +3238,5 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 ## 2026-10-03：修复GitHub CI依赖与测试入口脱节
 
 用户收到云端失败通知后读取实际Actions日志，Python3.11作业在测试阶段发生24个错误，包含缺少torch、scipy与pytest。CI仍只安装旧requirements.txt并调用unittest入口run_tests.py，与上一阶段新独立环境和pytest公开验证入口不同。上一阶段Windows新克隆验证通过没有证明Linux云端CI通过，这一验证遗漏明确纠正。现更新CI安装CPU版同版本PyTorch/torchvision、完整requirements-dev依赖与chumpy构建所需setuptools/wheel，执行pip check及run_validation.py，保留Python3.11/3.12矩阵，不删除失败用例，不修改拟合算法或方法级别。远端通过状态以本次Actions实际结果为准。
+
+云端实际确认：修复后的main和master两次CI运行均成功（Actions运行37088229197、37088228492），各自Python3.11与3.12作业全部通过。成功日志独立下载到上述临时目录ci_success_*.log。失败原日志保留为github_ci_failure.log；本次没有修改人体拟合公式、观测、门限或实验结果。
