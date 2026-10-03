@@ -215,3 +215,32 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
                 audit.append({"frame_index":i,"camera":camera,"hand":side,"selected":False,"reason":"no_candidate"})
     if seen != set(range(n)): raise ValueError(f"{camera} frame range differs from body")
     return points, weights, audit
+
+
+def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
+               image_size: tuple[int, int], camera: str, consume_pixels: bool = True) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict]]:
+    """Use the single audited WiLoR association implementation.
+
+    The shared reader validates frame/image identity, duplicate frames and
+    same-camera wrist association.  ``valid`` remains finite-only so rejected
+    or out-of-bounds points are preserved for diagnostics and soft weighting.
+    """
+    from pose_app.smplh_hand_observation import read_view
+
+    if not consume_pixels:
+        # Native-MANO-only runs must not require projected points at all.
+        # Original records remain in the input JSONL, not replaced with zero
+        # observations. The unavailable arrays preserve downstream shapes.
+        return (np.full((n,21,2), np.nan, np.float32), np.zeros((n,21), bool),
+                np.zeros((n,21), bool), np.zeros((n,21), np.float32),
+                [{"source": str(path), "camera": camera, "hand": side,
+                  "reason": "hand_2d_disabled_not_consumed", "selected": False}])
+
+    points, weights, audit = read_view(path, body_points, image_size, camera)
+    hand_index = 0 if side == "left" else 1
+    obs = points[:, hand_index]
+    valid = np.isfinite(obs).all(axis=-1)
+    width, height = image_size
+    bounds_ok = (valid & (obs[:, :, 0] >= 0) & (obs[:, :, 0] < width)
+                 & (obs[:, :, 1] >= 0) & (obs[:, :, 1] < height))
+    return obs, valid, bounds_ok, weights[:, hand_index], audit

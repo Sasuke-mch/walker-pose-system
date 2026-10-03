@@ -3190,3 +3190,18 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 将现有唯一RULE、expansion_fraction、foot_inclusive_box从离线ROI工具原样提取到pose_app/person_roi.py。http_client改为调用公共模块，不再反向导入tools；离线工具重导出原名称，检测器对照也直接读取同一RULE。没有第二套扩框实现，没有修改0.37/0.75或0.20/0.08/1.30、边界裁剪、输入坐标及返回诊断。旧工具路径仍经兼容入口可调用。README补充运行层→公共模块、工具层→公共模块的依赖规则。
 
 提取前后函数AST一致，固定随机种子的10000组不同分辨率/边界框，输出及诊断逐项相等。新增9项ROI/依赖检查，包括边界连续、裁剪、同一函数/规则对象、独立进程在线导入不加载工具、公共模块不反向依赖工具。28项相关检查通过；最终realtime_app全量578通过、9跳过、29个subtest通过，sequence_pipeline此前2项通过；源码编译和diff检查通过。原74个已有修改或未跟踪文件逐字节保留。未改实验状态、运行预算、拟合参数、结果数组或现有页面。
+
+
+## 2026-10-03：按算法职责拆分 SMPL-H 拟合器
+
+本轮深入检查已归类工具的函数规模和依赖，优先处理原960行、main占885行的fit_smplh_wilor_sequence。命令行入口保留原参数定义，调用pose_app/smplh_fitting/pipeline.py的run_fit(args)；初始化、阶段预算/冻结、观测/时序损失、接触输入与表面损失分别归入initialization.py、stages.py、losses.py、contact.py。使用RigidInitialization与SurfaceTargets明确结果字段，不通过locals或动态命名空间传递状态。read_wilor并入既有smplh_hand_observation，旧工具保留同名导出。README补充模块职责及测试启动目录。
+
+没有改变方法级别、原始输入、共享beta语义、六阶段顺序、学习率倍率、参数预算、损失公式、质量门、失败诊断、产物字段或现有页面。平衡抓握、约束感知更新和构造抓握仍各自保留；没有按名字相似强行合并。场景benchmark和标定大函数尚未拆分；pipeline仍保留模型装载、总损失组装及输出编排，本轮不宣称完成全仓库架构重写。
+
+验证目标是拆分前后行为等价，唯一变量为代码组织。对照为拆分前脚本，输入为fit_shared_args.json中原PMPose左右448帧检测及同目录WiLoR原生参数、既有SMPL-H/MANO/VPoser资产、wrist10_audit_v2_corrected/wrist_targets.json。两版固定随机种子0，并采用完全相同的A/B/C/D1/D2各1步、D3为0的回归预算，人工腕权重1且保留allow-diagnostic开关。此预算只用于结构回归，不替代原300步实验，不评价姿态质量。所有448帧均保留。result.npz的49个数组、cold_initialization.npz的5个数组逐项相等（NaN位置相同）；fit_summary及初始化、关联、手部几何摘要、原生MANO、腕参考6份JSON均相等。
+
+另用固定种子123，对原脚本抽出的四类损失块与新函数做6阶段×4配置共96组对照，覆盖二维权重开关、原生手支持、共享手、接触关闭/开启和全局手表面项；损失值及可导输入梯度逐项相等。新增18项长期组件测试，包含共享beta身份与阶段冻结、显式零预算、刚性基退化、时序缺帧、像素尺度、接触顶点梯度、接触帧数拒绝及旧读取接口。
+
+实际运行首先暴露拆分后漏导入ROOT和Rotation，均已修复并重新完成同输入回归；失败目录保留。最初从仓库根目录运行测试暴露既有子进程的工作目录依赖，未修改这些未提交测试，按各子项目目录重跑。最终realtime_app为596通过、9跳过、29个subtest通过；sequence_pipeline为2通过；新包、入口及新测试的Ruff F规则检查通过。已有74个修改或未跟踪文件逐字节保持不变。
+
+回归脚本、对照源码、运行命令、失败日志及数值核对结果保存在Windows临时目录walker_smplh_refactor_8smyegfw中（run_pair.py、old_command.json、new_command.json、parity.json、gradient_parity.json；成功新版输出为new_verified）。这些是本地代码回归证据，不是新的科研结果，不写入原冻结实验目录，也不将模型产物纳入版本。长期可重复检查由tests/test_smplh_fitting_components.py及现有入口测试承担。已有未跟踪核心依赖的版本归属仍未解决，不能据此声称干净克隆已可复现。

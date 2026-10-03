@@ -77,6 +77,31 @@ realtime_app/
 
 工具的应用根、仓库根和兼容目录经 `walker_tools._compat` 统一引用 `pose_app.project_paths`；除了直接启动脚本所需的最小包定位，不再重复推算项目路径。特定第三方运行器仍遵守各自的显式路径配置。
 
+### SMPL-H 拟合代码
+
+`walker_tools/body/fit_smplh_wilor_sequence.py` 负责命令行参数，调用 `pose_app/smplh_fitting/pipeline.py` 的 `run_fit(args)`。历史入口和统一调度入口继续使用相同参数；共享 beta、阶段预算、损失权重、失败门和输出字段不变。
+
+| 模块 | 职责 |
+|---|---|
+| `smplh_fitting/pipeline.py` | 输入审计、模型建立、优化循环、总损失组装及结果保存 |
+| `smplh_fitting/initialization.py` | 肩髋刚性坐标基、根旋转和同一旋转模板下的平移初始化；返回 `RigidInitialization` |
+| `smplh_fitting/stages.py` | A/B/C/D1/D2/D3 的预算、可训练参数及冻结操作 |
+| `smplh_fitting/losses.py` | 二维重投影、身体/手部时序及手部加权残差 |
+| `smplh_fitting/contact.py` | 接触输入校验、`SurfaceTargets` 数据结构和手掌/足底表面损失 |
+| `smplh_hand_observation.py` | WiLoR 关联、手部观测适配和几何审计；原工具重导出 `read_wilor` |
+
+修改单项损失时，从对应模块进入；修改阶段可训练参数时，从 `stages.py` 进入；查看各损失何时参与总目标，仍读 `pipeline.py`。初始化只计算几何并更新根旋转/平移，审计文件的保存和停止门保留在编排层。接触量通过有字段名的数据结构传递，不使用 `locals()` 注入或无约定的全局字典。导入拟合包本身不加载模型，命令行帮助也不加载求解器。
+
+这不是对所有大文件的机械拆分。抓握的平衡目标、约束感知更新和构造抓握保留各自模块，以免混淆方法边界。场景 benchmark、标定工具的大函数尚未在本轮拆分；拟合编排层也仍包含模型装载与产物组装，后续应按输入/输出契约继续提取，而不是为降低行数切成任意小文件。
+
+回归检查从各自子项目目录运行，部分既有测试的子进程依赖该目录：
+
+```powershell
+# 当前目录为 realtime_app
+..\.venv-cuda\Scripts\python.exe -B -m pytest tests -q -p no:cacheprovider
+# sequence_pipeline 的测试同样从 sequence_pipeline 目录执行。
+```
+
 本次迁移只涉及未有本地修改的已跟踪工具。原有未跟踪工具与 `tools/render_raw_visual_handle_interaction_video.py` 的本地修改留在原位，未借整理一并纳入版本。`pose_app` 中既有未跟踪依赖也未被顺带提交；干净环境复现仍需单独核定这些文件的版本归属。
 
 ### 接口约定
