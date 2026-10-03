@@ -1255,5 +1255,181 @@
     "G20261003_single_model_wrist_processing_v2/da3",
     "G20261003_single_model_wrist_processing_v2/da3_retry_v2"
   ],
-  "boundary": "Sparse manual 2D operational reference; accepted shared 3D sample count zero for continuous candidates. DA3 depth excluded from geometry, point filtering and pose fitting."
+  "boundary": "Sparse manual 2D operational reference; accepted shared 3D sample count zero for continuous candidates. DA3 depth excluded from geometry, point filtering and pose fitting.",
+  "bias_followup": {
+    "result": "research_records/engineering_validation/G20261003_single_model_wrist_processing_v2/bias_diagnosis_v2.json",
+    "code": "realtime_app/diagnose_wrist_bias.py",
+    "read_only": true,
+    "no_model_rerun": true,
+    "axis": "Sapiens2 elbow to manual wrist; own elbow sensitivity; not independent annotated elbow",
+    "methods": {
+      "PMPose": {
+        "all": {
+          "n": 28,
+          "toward_elbow": 15,
+          "error_px": 26.404996231641682,
+          "along_px": 1.7596771447748003,
+          "absolute_across_px": 14.790162469406072,
+          "extension_fraction": -0.023962244220212713
+        },
+        "own_elbow_axis_toward_count": 15,
+        "radial_pooled": 0.558128619208892,
+        "radial_within_camera_hand": 0.09769978306523737,
+        "size_within_camera_hand": 0.21834301128751235
+      },
+      "WiLoR": {
+        "all": {
+          "n": 26,
+          "toward_elbow": 22,
+          "error_px": 16.520137150251237,
+          "along_px": -6.993395224121565,
+          "absolute_across_px": 9.549471882114794,
+          "extension_fraction": 0.025562189327334357
+        },
+        "own_elbow_axis_toward_count": 22,
+        "radial_pooled": 0.5996111197057069,
+        "radial_within_camera_hand": -0.1518146902218935,
+        "size_within_camera_hand": 0.046072767607926925
+      },
+      "full_flip": {
+        "all": {
+          "n": 28,
+          "toward_elbow": 28,
+          "error_px": 26.33199445880822,
+          "along_px": -25.79130987128217,
+          "absolute_across_px": 4.241366874306314,
+          "extension_fraction": 0.12219654006489974
+        },
+        "own_elbow_axis_toward_count": 28,
+        "radial_pooled": 0.6795495251301501,
+        "radial_within_camera_hand": -0.3054377131481629,
+        "size_within_camera_hand": -0.10566359429078064
+      },
+      "full_single": {
+        "all": {
+          "n": 28,
+          "toward_elbow": 28,
+          "error_px": 25.66529611881246,
+          "along_px": -25.019158396365675,
+          "absolute_across_px": 4.581976830576665,
+          "extension_fraction": 0.11821954128036309
+        },
+        "own_elbow_axis_toward_count": 28,
+        "radial_pooled": 0.6672292412850949,
+        "radial_within_camera_hand": -0.31554872014526697,
+        "size_within_camera_hand": -0.07533413112999689
+      },
+      "perspective_flip": {
+        "all": {
+          "n": 28,
+          "toward_elbow": 28,
+          "error_px": 24.103154848516763,
+          "along_px": -23.31575915792026,
+          "absolute_across_px": 4.917739549794407,
+          "extension_fraction": 0.1113009031331941
+        },
+        "own_elbow_axis_toward_count": 28,
+        "radial_pooled": 0.7008447050839501,
+        "radial_within_camera_hand": -0.2912956368323987,
+        "size_within_camera_hand": -0.11751277148136738
+      },
+      "perspective_single": {
+        "all": {
+          "n": 28,
+          "toward_elbow": 28,
+          "error_px": 23.743254834901585,
+          "along_px": -22.9368335056107,
+          "absolute_across_px": 5.148654485424318,
+          "extension_fraction": 0.10903657831433951
+        },
+        "own_elbow_axis_toward_count": 28,
+        "radial_pooled": 0.6511854389089313,
+        "radial_within_camera_hand": -0.3987675018930032,
+        "size_within_camera_hand": -0.11803388713800884
+      },
+      "upper_flip": {
+        "all": {
+          "n": 28,
+          "toward_elbow": 28,
+          "error_px": 25.999897590242348,
+          "along_px": -25.40932796623136,
+          "absolute_across_px": 4.3785008215856065,
+          "extension_fraction": 0.12043801065196806
+        },
+        "own_elbow_axis_toward_count": 28,
+        "radial_pooled": 0.6725372631573381,
+        "radial_within_camera_hand": -0.19241081801963816,
+        "size_within_camera_hand": -0.1302400555725244
+      },
+      "upper_single": {
+        "all": {
+          "n": 28,
+          "toward_elbow": 28,
+          "error_px": 25.86889303836616,
+          "along_px": -25.25891053227715,
+          "absolute_across_px": 4.42800629699435,
+          "extension_fraction": 0.11936205604946566
+        },
+        "own_elbow_axis_toward_count": 28,
+        "radial_pooled": 0.6553351277492174,
+        "radial_within_camera_hand": -0.23101841546675167,
+        "size_within_camera_hand": -0.10737304108411835
+      }
+    },
+    "native_vs_coco": {
+      "body_candidate": {
+        "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\smplh_cold_start_v2_joint300\\fit\\result.npz",
+        "offset_mm_mean": [
+          3.9990222454071045,
+          2.292612075805664
+        ],
+        "offset_mm_p95": [
+          4.9756739854812615,
+          3.0644133806228635
+        ],
+        "offset_mm_max": [
+          5.240747451782227,
+          3.404381036758423
+        ],
+        "left_projection_offset_px_mean": [
+          4.5967986620724846,
+          3.3332023403733793
+        ],
+        "right_projection_offset_px_mean": [
+          6.153347387339641,
+          4.316230524464964
+        ]
+      },
+      "matched_control": {
+        "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\pmpose_cold_start_v1_joint300\\fit\\result.npz",
+        "offset_mm_mean": [
+          4.451914310455322,
+          2.6386542320251465
+        ],
+        "offset_mm_p95": [
+          5.304849624633789,
+          3.4327247977256774
+        ],
+        "offset_mm_max": [
+          5.9455037117004395,
+          4.023054122924805
+        ],
+        "left_projection_offset_px_mean": [
+          5.114945140693876,
+          3.9372329939111155
+        ],
+        "right_projection_offset_px_mean": [
+          6.813477957201402,
+          4.793410505549657
+        ]
+      }
+    },
+    "interpretation": "Sapiens2 proximal bias persists across variants; wrist definition and view-specific learned localization remain plausible. Pooled radial and scale correlations are confounded by camera/hand groups, not causal evidence. Internal wrist vs surface COCO regressor differs but is not in direct detector-manual 2D error chain.",
+    "validation": {
+      "compile": "passed",
+      "ruff_F": "passed",
+      "wrist_processing_tests_passed": 8,
+      "fixed_artifact_records": 222
+    }
+  }
 }
