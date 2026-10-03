@@ -758,5 +758,26 @@
   "tests": "24 related tests; full public696 passed,9 skipped,29 subtests; sequence2 passed; Ruff F and compile passed",
   "outputs": "research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2",
   "analysis": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section20 and identical report backup",
-  "decision": "WiLoR candidate for 2D wrist consistency; no default change or3D accuracy ranking"
+  "decision": "WiLoR candidate for 2D wrist consistency; no default change or3D accuracy ranking",
+  "visualization": {
+    "code": "realtime_app/render_wrist_comparison.py",
+    "output": "research_records/engineering_validation/G20261003_wrist_detector_manual_v2/wrist_points",
+    "original_images": 20,
+    "manual_crops": 28,
+    "marker_radius_display_px": 2,
+    "crop_magnification": 2,
+    "colors": {
+      "manual": "red",
+      "PMPose": "yellow",
+      "Sapiens2": "green",
+      "WiLoR": "blue"
+    },
+    "evaluated_prediction_coordinates_verified": 82,
+    "points_moved": false,
+    "missing_points_filled": false,
+    "browser_images_loaded": 48,
+    "png_validation": "passed",
+    "zip_validation": "passed",
+    "archive": "腕点.zip"
+  }
 }
