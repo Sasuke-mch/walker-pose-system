@@ -19,6 +19,7 @@ import numpy as np
 
 from pose_app.person_roi import RULE, foot_inclusive_box
 from walker_tools.pose2d.compare_sapiens2_mainline import infer, sapiens_points
+from walker_tools.pose2d.compare_sapiens2_mainline import assert_frozen_prompts
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPTURE = ROOT/'realtime_app/outputs/stereo_capture/20260927_201716_220'
@@ -183,17 +184,30 @@ def pmpose(out):
         run(command, out/f'{side}_pmpose.log')
 
 
+def checked_sapiens_rows(rows, prompts):
+    """Validate source order before assigning the fitter's contiguous IDs."""
+    if len(rows) != len(prompts):
+        raise ValueError('Sapiens frame count differs from prompts')
+    images = []
+    for i, (row, entry) in enumerate(zip(rows, prompts)):
+        if row['pair_id'] != entry['pair_id'] or row['file_name'] != entry['file_name']:
+            raise ValueError(f'Sapiens source frame mismatch at {i}')
+        if not row['instances']:
+            raise ValueError(f'no Sapiens person at {i}')
+        assert_frozen_prompts(entry, {
+            'boxes_from_yolo26x': [x['bbox'] for x in row['instances']],
+            'bbox_scores_from_yolo26x': [x['bbox_score'] for x in row['instances']]})
+        images.append({'image_id': i, 'file_name': entry['file_name'],
+            'keypoints': [sapiens_points(instance).tolist() for instance in row['instances']]})
+    return images
+
+
 def sapiens(out):
     infer(SimpleNamespace(output=out))
     for side in ('left', 'right'):
         rows = [json.loads(s) for s in (out/f'{side}_sapiens_raw.jsonl').read_text().splitlines()]
         assert len(rows) == 360
-        images = []
-        for i, row in enumerate(rows):
-            if not row['instances']:
-                raise ValueError(f'no Sapiens person at {side}/{i}')
-            images.append({'image_id': i, 'file_name': f'pair_{i:04d}.png',
-                'keypoints': [sapiens_points(instance).tolist() for instance in row['instances']]})
+        images = checked_sapiens_rows(rows, read(out/f'{side}_detections.json')['images'])
         write(out/f'{side}_sapiens_coco17_model_input.json', {'images': images})
 
 
@@ -255,13 +269,26 @@ def fit(out):
 def fit_child(out, method):
     import torch
     from check_mainline_regression import fit_arguments
+    from pose_app.mainline_regression import observation_snapshot
     from pose_app.smplh_fitting.pipeline import run_fit
     options = fit_arguments(out/method/'fit_command.json')
+    validate_saved_fit_controls(out, method, options)
+    snapshot = observation_snapshot(options)
+    if not np.array_equal(snapshot['pair_id'], np.arange(360)):
+        raise ValueError('fit input must contain the mapped 360 frames')
     np.random.seed(0)
     torch.manual_seed(0)
     def observe(stage, step, arrays):
         np.savez_compressed(options.output_dir/f'checkpoint_{stage}_{step}.npz', **arrays)
     run_fit(options, observer=observe)
+
+
+def validate_saved_fit_controls(out, method, options):
+    current = {k: str(v) if isinstance(v, Path) else v for k, v in vars(options).items()
+               if k not in ('left_raw', 'right_raw', 'output_dir')}
+    saved = read(out/'fit_controls.json')['controls'][method]
+    if current != saved:
+        raise ValueError('resolved fit controls changed from recorded experiment; inspect CLI defaults')
 
 
 def audit(out):
@@ -293,6 +320,7 @@ def audit(out):
     for method in ('pmpose', 'sapiens2'):
         target = out/method
         options = fit_arguments(target/'fit_command.json')
+        validate_saved_fit_controls(out, method, options)
         observed = observation_snapshot(options)
         np.savez_compressed(target/'body_input_diagnostics.npz', **observed)
         paths = {s: out/(f'{s}_pmpose_raw.json' if method == 'pmpose' else f'{s}_sapiens_stereo_adapter.json')

@@ -22,7 +22,7 @@
   ],
   "checks": {
     "avi_png_exact": 720,
-    "public_tests_passed": 707,
+    "public_tests_passed": 710,
     "public_tests_skipped": 9,
     "public_subtests_passed": 29,
     "sequence_tests_passed": 2
@@ -47,6 +47,15 @@
       "strict_wrists": {
         "right_wrist": 236,
         "left_wrist": 150
+      },
+      "strict_first_fitter_instances": {
+        "matched_pairs": 331,
+        "valid_points": 3031,
+        "wrists": {
+          "right_wrist": 229,
+          "left_wrist": 149
+        },
+        "all_instance_nonfirst_selections": 49
       }
     },
     "sapiens2": {
@@ -58,11 +67,22 @@
       "strict_wrists": {
         "right_wrist": 11,
         "left_wrist": 33
+      },
+      "strict_first_fitter_instances": {
+        "matched_pairs": 348,
+        "valid_points": 3571,
+        "wrists": {
+          "right_wrist": 8,
+          "left_wrist": 33
+        },
+        "all_instance_nonfirst_selections": 43
       }
     }
   },
   "results": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\comparison_metrics.json",
   "diagnostic_image": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\shoulder_diagnostic.png",
   "next": "separate single-model semantic stability experiment; do not bypass current gates",
-  "interpretation": "Sapiens2 per-frame side/part inconsistency suspected; visual pair1198 crossing. PMPose not truth; no 3D accuracy ranking."
+  "interpretation": "Sapiens2 per-frame side/part inconsistency suspected; visual pair1198 crossing. PMPose not truth; no 3D accuracy ranking.",
+  "logic_review": "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\logic_review.json",
+  "strict_statistics_scope": "Earlier strict_wrists are all-instance automatic association; strict_first_fitter_instances is aligned with first-instance body fitting. Neither is accuracy."
 }

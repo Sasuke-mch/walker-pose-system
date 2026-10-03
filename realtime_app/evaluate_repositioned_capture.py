@@ -13,7 +13,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from check_mainline_regression import fit_arguments
-from experiment_repositioned_capture import read, write
+from experiment_repositioned_capture import read, write, validate_saved_fit_controls
 from pose_app.mainline_regression import load_archive, observation_snapshot
 from pose_app.smplh_ablation_metrics import stats, leg_diagnostics
 from pose_app.fisheye_camera import fisheye_project_numpy
@@ -33,6 +33,92 @@ def host_time_diagnostics(joints, times):
             'leg_relative_speed_m_s': stats(np.linalg.norm(velocity, axis=-1)),
             'leg_relative_acceleration_m_s2': stats(np.linalg.norm(acceleration, axis=-1)),
             'time_basis': 'mean of paired host-return times; not exposure timestamps'}
+
+
+def strict_first_instances(left, right, calibration):
+    from pose_app.triangulation import triangulate_matches
+    # Keep the original geometric gates, restrict only the diagnostic scope.
+    return triangulate_matches(left[:1], right[:1], calibration,
+                               .25, .05, 10., max_matches=1)
+
+
+def first_instance_diagnostics(out, method, observed, frames):
+    from pose_app.calibration import StereoCalibration
+    from walker_tools.stereo.evaluate_offline_stereo_predictions import _records, _result
+    calibration = StereoCalibration.load(out/'calibration/stereo_fisheye.json')
+    paths = {s: out/(f'{s}_pmpose_raw.json' if method == 'pmpose' else f'{s}_sapiens_stereo_adapter.json')
+             for s in ('left', 'right')}
+    records = {s: _records(path, method, 'raw_keypoint') for s, path in paths.items()}
+    if any(len(rows) != len(frames) for rows in records.values()):
+        raise ValueError('strict diagnostic frame count changed')
+    cached = [json.loads(line) for line in
+              (out/method/'strict_stereo/offline_stereo_results.jsonl').read_text().splitlines()]
+    if len(cached) != len(frames):
+        raise ValueError('cached strict frame count changed')
+    summary = read(out/method/'strict_stereo/offline_stereo_summary.json')
+    expected = {'model': method, 'processed_pairs': len(frames), 'keypoint_threshold': .25,
+                'max_association_cost': .05, 'max_reprojection_error_px': 10.,
+                'max_matches': 1, 'triangulation_mode': 'strict', 'topdown_score_source': 'raw_keypoint'}
+    if any(summary.get(key) != value for key, value in expected.items()):
+        raise ValueError('cached strict controls differ from experiment')
+    matched, counts, reasons, selection = 0, Counter(), Counter(), Counter()
+    changed, diagnostics = [], []
+    for i, frame in enumerate(frames):
+        views = {}
+        for s, size, rotation in (('left', calibration.left_image_size, 'ccw90'),
+                                  ('right', calibration.right_image_size, 'cw90')):
+            record = records[s][i]
+            if record['id'] != i or record['name'] != Path(frame[s+'_image']).name:
+                raise ValueError(f'strict diagnostic frame mismatch {s}/{i}')
+            views[s] = _result(record, method, size, rotation, i/30)
+            points = np.asarray(views[s].persons[0].keypoints)
+            if not np.allclose(points, observed[s+'_raw_pixels'][i], atol=2e-4, rtol=0):
+                raise ValueError(f'first strict instance differs from fitter {s}/{i}')
+            # A saved summary alone cannot establish that a cached replay is current.
+            value = cached[i]
+            if value['pair_id'] != i or value['file_name'] != record['name']:
+                raise ValueError('cached strict frame order changed')
+            saved_people = value[s]['persons']
+            if len(saved_people) != len(views[s].persons):
+                raise ValueError('cached strict person count changed')
+            for saved, current in zip(saved_people, views[s].persons):
+                if (saved['person_id'] != current.person_id or
+                        not np.array_equal(saved['keypoints'], current.keypoints) or
+                        not np.array_equal(saved['bbox'], current.bbox) or
+                        saved['bbox_score'] != current.bbox_score):
+                    raise ValueError('cached strict prediction source changed')
+        from pose_app.triangulation import triangulate_matches
+        replay = triangulate_matches(views['left'].persons, views['right'].persons, calibration,
+                                     .25, .05, 10., max_matches=1)
+        if [person.to_dict() for person in replay] != cached[i]['persons_3d']:
+            raise ValueError('cached strict geometry differs from current calibration or predictions')
+        people = strict_first_instances(views['left'].persons, views['right'].persons, calibration)
+        matched += bool(people)
+        for person in people:
+            for point in person.keypoints_3d:
+                if point['valid']:
+                    counts[point['name']] += 1
+                else:
+                    reasons[point['reason']] += 1
+        diagnostics.append({'index': i, 'original_pair_id': int(frame['pair_id']),
+            'pair_outcome': 'matched' if people else 'association_failed',
+            'persons_3d': [p.to_dict() for p in people]})
+        for person in cached[i]['persons_3d']:
+            pair = (person['left_person_id'], person['right_person_id'])
+            selection[f'{pair[0]}:{pair[1]}'] += 1
+            if pair != (0, 0):
+                changed.append(int(frame['pair_id']))
+    target = out/method/'first_instance_strict.jsonl'
+    target.write_text(''.join(json.dumps(r, allow_nan=False)+'\n' for r in diagnostics), encoding='utf-8')
+    return {'frames': len(frames), 'matched_pairs': matched,
+        'association_failed_pairs': len(frames)-matched,
+        'total_valid_3d_keypoints': sum(counts.values()),
+        'valid_3d_keypoints_by_name': dict(counts), 'rejection_reasons': dict(reasons),
+        'original_all_instance_selected_pairs': dict(selection),
+        'original_replay_nonfirst_pair_frames': len(changed),
+        'original_replay_nonfirst_original_pair_ids': changed,
+        'scope': 'same first left/right predictions as fitter; original strict gates; no optimization change',
+        'cached_prediction_sources_checked': True}
 
 
 def image_diagnostics(out):
@@ -104,13 +190,17 @@ def main():
     for method in ('pmpose', 'sapiens2'):
         directory = out/method
         audit = read(directory/'implementation_audit.json')
-        observed[method] = obs = observation_snapshot(fit_arguments(directory/'fit_command.json'))
+        options = fit_arguments(directory/'fit_command.json')
+        validate_saved_fit_controls(out, method, options)
+        observed[method] = obs = observation_snapshot(options)
+        primary_geometry = first_instance_diagnostics(out, method, obs, frames)
         if audit.get('status') == 'fit_failed':
             report['methods'][method] = {'status': 'fit_failed', 'failure': audit['failure'],
                 'initialization': audit['initialization'], 'frames': len(obs['pair_id']),
                 'accepted_body_points': int(obs['accepted'].sum()),
                 'body_rejection_reasons': dict(Counter(obs['reason'][~obs['accepted']].tolist())),
                 'strict_stereo': read(directory/'strict_stereo/offline_stereo_summary.json'),
+                'strict_first_fitter_instances': primary_geometry,
                 'fitted_metrics': 'unavailable; do not substitute older results'}
             continue
         assert all(c['passed'] for c in audit['controls'].values())
@@ -134,6 +224,7 @@ def main():
                    'hand_geometry': read(directory/'fit/wilor_hand_geometry_summary.json'),
                    'native_mano_input_audit': read(directory/'fit/wilor_mano_parameter_audit.json'),
                    'strict_stereo': read(directory/'strict_stereo/offline_stereo_summary.json'),
+                   'strict_first_fitter_instances': primary_geometry,
                    'body_frozen_during_hand_stages': audit['body_frozen_during_hand_stages']}
         available = z['root_init_source'] == 'shoulder_hip_rigid_basis'
         metrics['initialization_support'] = {
