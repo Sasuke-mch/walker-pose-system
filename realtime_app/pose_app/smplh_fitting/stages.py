@@ -6,6 +6,14 @@ from numbers import Integral
 
 def validate_optimization_options(args):
     """Reject invalid budgets/scales before loading assets or creating outputs."""
+    for name, default in (("beta_prior_weight", 1e-3), ("body_3d_weight", 1.0)):
+        value = getattr(args, name, default)
+        if not math.isfinite(value) or value < 0:
+            raise ValueError(f"--{name.replace('_', '-')} must be finite and non-negative")
+    if getattr(args, "beta_policy", "joint") not in ("joint", "freeze_after_b"):
+        raise ValueError("unknown beta policy")
+    if getattr(args, "body_weighting", "quality") not in ("quality", "uniform", "no_confidence", "no_ray", "no_reprojection"):
+        raise ValueError("unknown body weighting")
     for name in (
         "steps",
         "base_steps",
@@ -88,6 +96,8 @@ def build_stage_schedule(args, contact_enabled: bool):
         ["lhand", "rhand"] + contact_body_train,
         ["lhand", "rhand"] + contact_body_train,
     ]
+    if getattr(args, "beta_policy", "joint") == "freeze_after_b":
+        stage_train[2] = ["root", "transl", "latent"]
     return stage_names, stage_train, stage_steps
 
 

@@ -1,0 +1,222 @@
+{
+  "schema": "smplh_full_sequence_ablation_v1",
+  "seed": 0,
+  "frames": 448,
+  "fps": 30.0,
+  "source_commands": {
+    "sapiens2": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/smplh_cold_start_v2_joint300/fit_command.json",
+    "pmpose": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/pmpose_cold_start_v1_joint300/fit_command.json"
+  },
+  "budget": "A30/B30/C300/D1_100/D2_100/D3_0 for every case",
+  "fixed_inputs": "existing detector observations, WiLoR, calibration, independent diagnostic wrist, assets; same initialization rules; no old fits reused",
+  "primary_detector": "sapiens2",
+  "control_detector": "pmpose wrist x beta 2x2 factorial",
+  "inactive_controls": [
+    "body temporal=0",
+    "body2D=0",
+    "bone=0",
+    "surface contact=0",
+    "shared-hand temporal identically zero"
+  ],
+  "criteria": "mechanism attribution using raw-unit residuals, motion retention, leg temporal diagnostics, foot geometry and wall time; no independent3D truth",
+  "stop": "existing input/initialization/nonfinite gates; retain failed cases; no reweighting or extra steps after seeing outcomes",
+  "cases": [
+    {
+      "id": "sapiens2_baseline",
+      "detector": "sapiens2",
+      "factor": "baseline",
+      "changes": {},
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_wrist",
+      "detector": "sapiens2",
+      "factor": "no_wrist",
+      "changes": {
+        "wrist_reference": null,
+        "wrist_reference_weight": 0
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_beta_freeze",
+      "detector": "sapiens2",
+      "factor": "beta_freeze",
+      "changes": {
+        "beta_policy": "freeze_after_b"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_wrist_beta_freeze",
+      "detector": "sapiens2",
+      "factor": "no_wrist_beta_freeze",
+      "changes": {
+        "wrist_reference": null,
+        "wrist_reference_weight": 0,
+        "beta_policy": "freeze_after_b"
+      },
+      "kind": "interaction"
+    },
+    {
+      "id": "sapiens2_no_vposer_prior",
+      "detector": "sapiens2",
+      "factor": "no_vposer_prior",
+      "changes": {
+        "vposer_prior_weight": 0
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_root_anchor",
+      "detector": "sapiens2",
+      "factor": "no_root_anchor",
+      "changes": {
+        "root_anchor_weight": 0
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_beta_prior",
+      "detector": "sapiens2",
+      "factor": "no_beta_prior",
+      "changes": {
+        "beta_prior_weight": 0
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_uniform_body",
+      "detector": "sapiens2",
+      "factor": "uniform_body",
+      "changes": {
+        "body_weighting": "uniform"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_body_3d",
+      "detector": "sapiens2",
+      "factor": "no_body_3d",
+      "changes": {
+        "body_3d_weight": 0
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_mano_loss",
+      "detector": "sapiens2",
+      "factor": "no_mano_loss",
+      "changes": {
+        "mano_pose_weight": 0,
+        "allow_hand_prior_ablation": true
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_mano_init",
+      "detector": "sapiens2",
+      "factor": "no_mano_init",
+      "changes": {
+        "mano_pose_init": false,
+        "allow_hand_prior_ablation": true
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_mano_all",
+      "detector": "sapiens2",
+      "factor": "no_mano_all",
+      "changes": {
+        "mano_pose_init": false,
+        "mano_pose_weight": 0,
+        "allow_hand_prior_ablation": true
+      },
+      "kind": "interaction"
+    },
+    {
+      "id": "sapiens2_no_pca_prior",
+      "detector": "sapiens2",
+      "factor": "no_pca_prior",
+      "changes": {
+        "hand_pca_prior_weight": 0
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_unshared_hand",
+      "detector": "sapiens2",
+      "factor": "unshared_hand",
+      "changes": {
+        "shared_hand_pose": false
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_pca24",
+      "detector": "sapiens2",
+      "factor": "pca24",
+      "changes": {
+        "hand_pca_comps": 24,
+        "hand_pca_profile": "pca24"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_pca45",
+      "detector": "sapiens2",
+      "factor": "pca45",
+      "changes": {
+        "hand_pca_comps": 45,
+        "hand_pca_profile": "full45"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_hand_temporal",
+      "detector": "sapiens2",
+      "factor": "no_hand_temporal",
+      "changes": {
+        "hand_temporal_weight": 0
+      },
+      "kind": "negative_control"
+    },
+    {
+      "id": "pmpose_baseline",
+      "detector": "pmpose",
+      "factor": "baseline",
+      "changes": {},
+      "kind": "one_factor"
+    },
+    {
+      "id": "pmpose_no_wrist",
+      "detector": "pmpose",
+      "factor": "no_wrist",
+      "changes": {
+        "wrist_reference": null,
+        "wrist_reference_weight": 0
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "pmpose_beta_freeze",
+      "detector": "pmpose",
+      "factor": "beta_freeze",
+      "changes": {
+        "beta_policy": "freeze_after_b"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "pmpose_no_wrist_beta_freeze",
+      "detector": "pmpose",
+      "factor": "no_wrist_beta_freeze",
+      "changes": {
+        "wrist_reference": null,
+        "wrist_reference_weight": 0,
+        "beta_policy": "freeze_after_b"
+      },
+      "kind": "interaction"
+    }
+  ]
+}

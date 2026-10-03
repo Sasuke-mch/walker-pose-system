@@ -40,6 +40,12 @@ def build_parser() -> argparse.ArgumentParser:
                     help="Stage A body/VPoser steps; defaults to steps//6")
     ap.add_argument("--beta-steps", type=int, default=None,
                     help="Stage B shared-beta steps; defaults to steps//6")
+    ap.add_argument("--beta-policy", choices=("joint", "freeze_after_b"), default="joint",
+                    help="explicit ablation; both policies retain one sequence-shared beta")
+    ap.add_argument("--beta-prior-weight", type=float, default=1e-3)
+    ap.add_argument("--body-3d-weight", type=float, default=1.0)
+    ap.add_argument("--body-weighting", choices=("quality", "uniform", "no_confidence", "no_ray", "no_reprojection"), default="quality",
+                    help="same accepted mask; uniform removes only soft quality weights")
     ap.add_argument("--joint-steps", type=int, default=None,
                     help="Stage C VPoser/body refinement steps; defaults to steps//6")
     ap.add_argument("--hand-steps", type=int, default=None,
@@ -68,6 +74,8 @@ def build_parser() -> argparse.ArgumentParser:
                     help="initialize hand PCA at the start of D1 from accepted native MANO poses")
     ap.add_argument("--shared-hand-pose", action="store_true",
                     help="one PCA vector per anatomical hand shared by all frames; local articulation only")
+    ap.add_argument("--allow-hand-prior-ablation", action="store_true",
+                    help="experiment-only opt-in for shared hands without native initialization or loss")
     ap.add_argument("--hand-2d-weight", type=float, default=1e-7,
                     help="WiLoR model-derived 2D auxiliary weight; set 0 for native-MANO-only hand information")
     ap.add_argument("--body-temporal-weight", type=float, default=0.0,

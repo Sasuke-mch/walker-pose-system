@@ -4,6 +4,19 @@ Stage-level total-loss assembly remains explicit in pipeline.py.
 """
 
 import torch
+import numpy as np
+
+
+def observation_weights(quality, terms, accepted, mode):
+    """Change soft weighting only; rejected observations remain rejected."""
+    if mode == "quality":
+        return quality
+    if mode == "uniform":
+        return np.ones_like(quality)
+    excluded = {"no_confidence": 0, "no_ray": 1, "no_reprojection": 2}[mode]
+    weights = np.clip(np.prod(np.stack([term for index, term in enumerate(terms) if index != excluded]), axis=0), 0, 1)
+    weights[~accepted] = 0
+    return weights
 
 
 def hand_observation_term(*, weight, stage_index, left_loss, right_loss, body_loss):

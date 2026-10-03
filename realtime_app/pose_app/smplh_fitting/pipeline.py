@@ -32,11 +32,11 @@ from .initialization import initialize_rigid_body
 from .stages import (build_stage_schedule, set_trainable_parameters,
                      validate_optimization_options, require_finite_tensors)
 from .losses import (body_reprojection_loss, hand_temporal_loss, body_temporal_loss,
-                     weighted_hand_residual, hand_observation_term)
+                     weighted_hand_residual, hand_observation_term, observation_weights)
 from .contact import load_surface_targets, surface_contact_losses
 
 
-def run_fit(args) -> int:
+def run_fit(args, observer=None) -> int:
     validate_optimization_options(args)
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise RuntimeError(f"refuse non-empty output: {args.output_dir}")
@@ -60,7 +60,8 @@ def run_fit(args) -> int:
         raise ValueError("body temporal/reprojection weights must be non-negative")
     if not np.isfinite([args.mano_pose_weight, args.hand_2d_weight]).all() or min(args.mano_pose_weight, args.hand_2d_weight) < 0:
         raise ValueError("MANO pose and hand 2D weights must be finite and non-negative")
-    if args.shared_hand_pose and not (args.mano_pose_init and args.mano_pose_weight > 0):
+    if (args.shared_hand_pose and not (args.mano_pose_init and args.mano_pose_weight > 0)
+            and not getattr(args, "allow_hand_prior_ablation", False)):
         raise ValueError("shared hand solve requires native MANO init and a positive pose weight")
     if args.body_reprojection_scale_px <= 0:
         raise ValueError("--body-reprojection-scale-px must be positive")
@@ -98,10 +99,11 @@ def run_fit(args) -> int:
         raise ValueError("raw frame ids are not contiguous")
     left = np.stack([left_rows[i] for i in ids]).astype(np.float32)
     right = np.stack([right_rows[i] for i in ids]).astype(np.float32)
-    tri, _, _, _, _, _, accepted, _, quality, _ = raw_clean.raw_triangulate(left, right, cal)
+    tri, _, _, _, _, _, accepted, _, quality, quality_terms = raw_clean.raw_triangulate(left, right, cal)
     n = len(ids)
     tri_m = np.nan_to_num(np.asarray(tri, np.float32) / 1000.0)
     body_mask = np.asarray(accepted, bool) & np.isfinite(tri).all(axis=-1)
+    fit_quality = observation_weights(quality, quality_terms, body_mask, getattr(args, "body_weighting", "quality"))
     if not np.isfinite(np.asarray(quality, dtype=np.float32)).all():
         raise ValueError("body quality contains non-finite values")
     # Each camera file contains both anatomical sides. Fit each hand from both
@@ -383,8 +385,14 @@ def run_fit(args) -> int:
                         body_pose=body_pose, left_hand_pose=lhand_pose,
                         right_hand_pose=rhand_pose, transl=transl, return_verts=True)
             coco = regress_coco17_torch(out.vertices, reg)
+            if observer is not None and stage_index == 2 and local_step in (0, 30, 100):
+                observer(stage_name, local_step, {
+                    "pair_id": np.asarray(ids, dtype=np.int64),
+                    "betas": beta.detach().cpu().numpy().copy(),
+                    "smplh_joints": out.joints.detach().cpu().numpy(),
+                    "predicted_coco": coco.detach().cpu().numpy()})
             body_res = (coco - target).pow(2).sum(-1)
-            body_w = torch.tensor(np.asarray(quality, np.float32), device=device).clamp_min(0.0)
+            body_w = torch.tensor(np.asarray(fit_quality, np.float32), device=device).clamp_min(0.0)
             body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
             model_cam1 = (R01 @ coco.transpose(1, 2)).transpose(1, 2) + T01
             proj_cam0 = fisheye_project_torch(coco, K0, D0)
@@ -466,8 +474,8 @@ def run_fit(args) -> int:
                           if wrist_target is not None else body_loss.detach() * 0.0)
             wrist_term = (args.wrist_reference_weight * wrist_loss
                           if stage_index in (0, 1, 2) else wrist_loss.detach() * 0.0)
-            loss = body_term + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
-                   args.body_temporal_weight * body_temporal + hand_term + args.mano_pose_weight * mano_pose_loss + pose_reg + 1e-3 * beta.pow(2).mean() + \
+            loss = getattr(args, "body_3d_weight", 1.0) * body_term + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
+                   args.body_temporal_weight * body_temporal + hand_term + args.mano_pose_weight * mano_pose_loss + pose_reg + getattr(args, "beta_prior_weight", 1e-3) * beta.pow(2).mean() + \
                    (contact_total if stage_index >= 4 else contact_total.detach() * 0.0) + wrist_term
             if not torch.isfinite(loss):
                 terms = {"body": body_term, "hand_2d": hand_term, "pose_reg": pose_reg,
@@ -509,6 +517,18 @@ def run_fit(args) -> int:
                               "hand_priority": "wrist_to_distal_fixed_weights" if stage_index >= 3 else "inactive",
                               "contact_term": bool(contact_enabled and stage_index >= 4),
                               "contact_weights_independent": True})
+        if observer is not None and stage_index <= 2:
+            with torch.no_grad():
+                observed = model(betas=beta.expand(n, -1), global_orient=root,
+                    body_pose=decode_body_pose(latent),
+                    left_hand_pose=decode_hand_pose(lhand, mano_l_components, mano_l_mean, mano_l_scale),
+                    right_hand_pose=decode_hand_pose(rhand, mano_r_components, mano_r_mean, mano_r_scale),
+                    transl=transl, return_verts=True)
+                observer(stage_name, n_stage, {
+                    "pair_id": np.asarray(ids, dtype=np.int64),
+                    "betas": beta.detach().cpu().numpy().copy(),
+                    "smplh_joints": observed.joints.detach().cpu().numpy(),
+                    "predicted_coco": regress_coco17_torch(observed.vertices, reg).cpu().numpy()})
 
     with torch.no_grad():
         body_pose = decode_body_pose(latent)
@@ -568,11 +588,20 @@ def run_fit(args) -> int:
                         hand_points_left=final_hand_l.detach().cpu().numpy(),
                         hand_points_right=final_hand_r.detach().cpu().numpy(), **contact_diag)
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
+        "ablation_controls": {"beta_policy": getattr(args, "beta_policy", "joint"),
+            "beta_prior_weight": getattr(args, "beta_prior_weight", 1e-3),
+            "body_3d_weight": getattr(args, "body_3d_weight", 1.0),
+            "body_weighting": getattr(args, "body_weighting", "quality"),
+            "allow_hand_prior_ablation": getattr(args, "allow_hand_prior_ablation", False)},
         "status": "engineering_candidate", "frames": n, "steps": int(sum(stage_steps)),
         "wrist_reference": wrist_audit,
-        "initial_beta_source": "zeros_reoptimized_in_B_and_C",
+        "initial_beta_source": ("zeros_optimized_in_B_frozen_C"
+            if getattr(args, "beta_policy", "joint") == "freeze_after_b"
+            else "zeros_reoptimized_in_B_and_C"),
         "model": str(args.smplh_model.resolve()), "vertices": 6890,
-        "hand_observation_source": "WiLoR_native_MANO_local_rotations" if mano_enabled and args.hand_2d_weight == 0 else "WiLoR_model_projected_MANO_joints",
+        "hand_observation_source": ("none_prior_only" if not mano_enabled and args.hand_2d_weight == 0
+            else "WiLoR_native_MANO_local_rotations" if mano_enabled and args.hand_2d_weight == 0
+            else "WiLoR_model_projected_MANO_joints"),
         "native_mano_prior": {
             "enabled": bool(mano_enabled), "weight": args.mano_pose_weight,
             "initialization": args.mano_pose_init, "hand_2d_weight": args.hand_2d_weight,

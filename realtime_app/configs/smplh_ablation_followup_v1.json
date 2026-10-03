@@ -1,0 +1,74 @@
+{
+  "schema": "smplh_full_sequence_ablation_followup_v1",
+  "seed": 0,
+  "frames": 448,
+  "fps": 30.0,
+  "source_commands": {
+    "sapiens2": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/smplh_cold_start_v2_joint300/fit_command.json",
+    "pmpose": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/pmpose_cold_start_v1_joint300/fit_command.json"
+  },
+  "budget": "A30/B30/C300/D1_100/D2_100/D3_0 for every case",
+  "fixed_inputs": "existing detector observations, WiLoR, calibration, independent diagnostic wrist, assets; same initialization rules; no old fits reused",
+  "primary_detector": "sapiens2",
+  "control_detector": "pmpose wrist x beta 2x2 factorial",
+  "inactive_controls": [
+    "body temporal=0",
+    "body2D=0",
+    "bone=0",
+    "surface contact=0",
+    "shared-hand temporal identically zero"
+  ],
+  "criteria": "mechanism attribution using raw-unit residuals, motion retention, leg temporal diagnostics, foot geometry and wall time; no independent3D truth",
+  "stop": "existing input/initialization/nonfinite gates; retain failed cases; no reweighting or extra steps after seeing outcomes",
+  "cases": [
+    {
+      "id": "sapiens2_baseline",
+      "detector": "sapiens2",
+      "factor": "baseline",
+      "changes": {},
+      "kind": "baseline_repeat"
+    },
+    {
+      "id": "sapiens2_no_confidence",
+      "detector": "sapiens2",
+      "factor": "no_confidence",
+      "changes": {
+        "body_weighting": "no_confidence"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_ray",
+      "detector": "sapiens2",
+      "factor": "no_ray",
+      "changes": {
+        "body_weighting": "no_ray"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_no_reprojection",
+      "detector": "sapiens2",
+      "factor": "no_reprojection",
+      "changes": {
+        "body_weighting": "no_reprojection"
+      },
+      "kind": "one_factor"
+    },
+    {
+      "id": "sapiens2_unshared_no_temporal",
+      "detector": "sapiens2",
+      "factor": "unshared_no_temporal",
+      "changes": {
+        "shared_hand_pose": false,
+        "hand_temporal_weight": 0
+      },
+      "kind": "conditional_one_factor",
+      "contrast": "sapiens2_unshared_hand",
+      "changes_relative_to_contrast": {
+        "hand_temporal_weight": 0
+      }
+    }
+  ],
+  "preregistration_reason": "exploratory mechanism follow-up: uniform weights reduced measured leg acceleration; split all three nonconstant quality factors, plus conditional hand temporal control; baseline repeated after inactive-projection bug fix"
+}

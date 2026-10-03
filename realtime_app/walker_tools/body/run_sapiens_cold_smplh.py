@@ -61,6 +61,11 @@ def fit_command(settings, body_paths, output, wrist_path, joint_steps=None):
         raise ValueError('cold runner does not support contact inputs; use the general fitter')
     if not options.mano_pose_init or not options.shared_hand_pose:
         raise ValueError('cold runner requires native MANO initialization and shared hands')
+    expected = {'beta_policy': 'joint', 'beta_prior_weight': .001,
+                'body_3d_weight': 1., 'body_weighting': 'quality',
+                'allow_hand_prior_ablation': False}
+    if any(getattr(options, name) != value for name, value in expected.items()):
+        raise ValueError('ablation controls require the general fitter or ablation runner')
     return command, options
 
 

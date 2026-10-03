@@ -68,6 +68,11 @@ def test_invalid_profile_is_rejected(tmp_path):
 @pytest.mark.parametrize('extra,message', [
     (['--joint-steps', '1'], 'duplicate'),
     (['--contact-labels', 'labels.json'], 'contact inputs'),
+    (['--beta-policy', 'freeze_after_b'], 'ablation controls'),
+    (['--body-weighting', 'uniform'], 'ablation controls'),
+    (['--body-3d-weight', '0'], 'ablation controls'),
+    (['--beta-prior-weight', '0'], 'ablation controls'),
+    (['--allow-hand-prior-ablation'], 'ablation controls'),
 ])
 def test_custom_profile_cannot_misrepresent_cold_protocol(tmp_path, extra, message):
     values = json.loads((PROJECT_ROOT/'realtime_app/configs/cold_smplh_joint300.json').read_text())

@@ -44,7 +44,12 @@
     "surface_foot_contact_weight": 0.0,
     "global_hand_handle_weight": 0.0,
     "lr": 0.02,
-    "device": "cuda"
+    "device": "cuda",
+    "beta_policy": "joint",
+    "beta_prior_weight": 0.001,
+    "body_3d_weight": 1.0,
+    "body_weighting": "quality",
+    "allow_hand_prior_ablation": false
   },
   "fit_entry": "body.run_sapiens_cold_smplh",
   "solver_entry": "body.fit_smplh_wilor_sequence",
