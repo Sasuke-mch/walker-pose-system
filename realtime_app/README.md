@@ -316,3 +316,28 @@ $runDir = 'research_records/engineering_validation/G20261002_sapiens2_body_mainl
 冷启动--settings拒绝重复选项、零联合预算、接触输入和非共享/非原生初始化手姿，防止运行与“无接触冷启动”记录不一致。需要这些旁路设置时使用通用求解器并另立协议。可视化生成是独立输出步骤，页面播放帧率不代表拟合速度。
 
 实现职责：CLI与数据/场景编排在 walker_tools/body；观测转换在 pose_app/body_observations.py；初始化、损失、接触接口、调度和主体分别在 pose_app/smplh_fitting/{initialization,losses,contact,stages,pipeline}.py；人工腕和原生手姿分别在 independent_wrist_reference.py、wilor_mano_prior.py。scene地面分支独立重放，不进入当前身体损失。详见 ../docs/CURRENT_SMPLH_ALGORITHM_20261002.md。
+
+## 主线回归检查
+
+使用已有数据和已安装的CUDA拟合环境，从仓库根目录运行；每次输出选一个不存在的新目录。检查入口与求解入口分开，直接调用现有拟合内核，不改主线预算或默认参数。
+
+```powershell
+$runDir = 'research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2'
+$baseline = 'research_records/engineering_validation/G20261003_mainline_regression_v1/baseline'
+# 全448帧的短预算回归：五个活动阶段各一步，seed0，与整理前PMPose基准精确比较。
+.venv-cuda/Scripts/python.exe -B realtime_app/check_mainline_regression.py short --command "$baseline/fit_args.json" --reference $baseline --output outputs/regression_short_next
+# Sapiens2短预算基准由保留的整理前求解器在本阶段计算，来源见manifest，不能称为旧已保存结果。
+$baselineSapiens = 'research_records/engineering_validation/G20261003_mainline_regression_v1/baseline_sapiens'
+.venv-cuda/Scripts/python.exe -B realtime_app/check_mainline_regression.py short --command "$baselineSapiens/fit_args.json" --reference $baselineSapiens --output outputs/regression_short_sapiens_next
+# 当前Sapiens2冻结结果：原始输入、阶段/共享参数、全448帧VPoser与SMPL-H重建。
+.venv-cuda/Scripts/python.exe -B realtime_app/check_mainline_regression.py audit --command "$runDir/smplh_cold_start_v2_joint300/fit_command.json" --fit "$runDir/smplh_cold_start_v2_joint300/fit" --observation-reference "$baseline/sapiens_observations.npz" --output outputs/regression_sapiens_next
+# PMPose冻结结果使用pmpose_cold_start_v1_joint300和pmpose_observations.npz。
+# 仅比较两个已有短预算结果，不拟合、不重建模型。
+.venv-cuda/Scripts/python.exe -B realtime_app/check_mainline_regression.py compare --reference $baseline --fit research_records/engineering_validation/G20261003_mainline_regression_v1/short_pmpose/fit --output outputs/regression_compare_next
+```
+
+--command支持冻结fit_command.json完整命令列表或fit_args.json选项列表；不支持带SET_BY_COLD_RUNNER占位路径的配置直接求解。--fit/--reference指向直接含result.npz和cold_initialization.npz的目录。--route默认configs/current_mainline.json；audit核查全部冻结标量，short仅将五个活动预算改为1、D3改为0，其余标量仍核查。--chunk-size默认32，必须正数。
+
+short不自动生成或更新golden；--reference必填，缺少其中的observations.npz返回不可用。可用--observation-reference显式指向独立观测基准。audit未给观测基准只能检查当前输入自洽，不表示历史拒绝原因不变。compare不能替代audit。输出report.json、observations.npz；short另有fit/和实际解析参数记录。大数组不打印、不入库。0=所请求检查通过，1=不一致/执行失败，2=资源不可用；资源缺失不会当作通过。
+
+当前本机基准和最终报告位于research_records/engineering_validation/G20261003_mainline_regression_v1；开发期日志和初版报告保留于outputs/mainline_regression_20261003，原模型、数据和冻结结果未覆盖。干净克隆可运行公开单元测试；完整回归需要恢复本机基准、已有数据和授权模型。详见算法说明第18节。通过只证明本次实现保持一致，不证明真实三维精度、触地或接触。

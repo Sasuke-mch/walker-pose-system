@@ -464,3 +464,23 @@ $runDir = 'research_records/engineering_validation/G20261002_sapiens2_body_mainl
 $runDir 使用第15节既有路径。省略配置仍为C30，保留历史默认，不能称为当前C300复现。通用smplh_fit.example.json是自行配置资源的模板，缺少本实验人工腕设置，不是冻结实验配置。评价工具默认读取第15节两份冻结结果；显式--sapiens-fit-dir与--pmpose-fit-dir可选择新的冷启动运行目录，--run仍提供同源scene。完整安装、参数、输出及预检查说明统一见 realtime_app/README.md。
 
 源码结构和已有待处理文件归属见 docs/PROJECT_STATUS.md 与 docs/code_inventory.json。该清单只记录保留/归属，词法引用不代表已经认证的调用依赖；不因名称或目录调整升降方法级别。报告备份同步更新本节，旧Word报告继续作为其编写时的历史说明，不改写旧实验结果。
+
+## 18. 2026-10-03：主线数值回归
+
+统一检查入口为 realtime_app/check_mainline_regression.py，从仓库根目录执行。它调用现有求解器，不复制拟合算法；audit只读复核冻结结果，short执行全448帧、A1/B1/C1/D1_1/D2_1/D3_0、NumPy/Torch seed0的五步回归，compare逐项比较两个保存结果。没有重新跑二维检测器。输出目录必须不存在，冻结结果和基准不覆盖。
+
+检查包括：帧号/左右帧集合/连续性及源文件重复帧；转回原始鱼眼的左右像素；cam0=LEFT、cam1=RIGHT及标定矩阵；三角化毫米、模型米；接受掩码、拒绝原因、NaN位置、质量权重；beta的1×10共享形状与零初始化；latent的全帧零初始化；每手共享PCA12；A/B/C/D的可训练参数和预算；当前标量配置；所有关键输出有限性。结果中的body_quality本来保存float64，转换float32仅用于计算权重，审计保持原保存类型。零步D3仍有阶段记录，审计保留这一记录。
+
+参数重建不读取保存的body_pose作为身体输入：先由保存latent重新VPoser解码，再由保存手PCA与原MANO均值/分量重建局部手姿，使用共享beta、root、transl经过同一SMPL-H模型生成网格、关节、COCO回归点和手点。全部帧分块32帧重建；面索引必须精确一致，几何绝对容差2e-6米（0.002毫米），轴角容差2e-6弧度，以覆盖float32分块矩阵运算差异。历史数组回归不使用这一容差，要求精确相等，包含键集合、形状、类型和无效位置。
+
+本机基准固定在 research_records/engineering_validation/G20261003_mainline_regression_v1/baseline。result.npz和cold_initialization.npz复制自整理前的五步全448帧PMPose对照；fit_args.json保存同源资源路径。两份*_observations.npz由tests/fixtures/historical_contracts.py中整理前纯函数参考实现计算，已与当前两套观测逐项精确比较，包含拒绝原因。manifest.json记录来源和检查结果。它是本机数据基准，不纳入Git；不要自动覆盖基准来消除失败。Sapiens2短预算基准单独放在baseline_sapiens：使用保留的整理前original_fitter.py在本轮计算，seed0及相同五步预算；不是此前已经保存的Sapiens2结果。保留旧代码、运行包装、原命令及manifest，当前求解器与其49个结果数组及5个初始化数组精确一致。旧代码不接受新增canonical-mano-right选项，旧命令按原默认路径读取，同当前显式路径一致；首次接口失败日志保留，没有改写旧代码算法。
+
+实际结果：PMPose和Sapiens2五步回归各49个result数组、5个初始化数组精确一致；两套观测各448帧精确一致；两套冻结全448帧参数重建通过。最大网格坐标差PMPose5.96046448e-7米、Sapiens2 6.55651093e-7米；VPoser轴角最大差均4.76837158e-7弧度。报告见research_records/engineering_validation/G20261003_mainline_regression_v1/{short_pmpose,short_sapiens_verified,audit_pmpose,audit_sapiens}/report.json。初版审计误按float32比较保存quality并漏计零步D3，造成两项误报；已修正审计，原误报report.json保留，未修改求解器或冻结结果。
+
+退出码0表示所请求检查通过，1表示不一致/执行失败，2表示缺少数据、依赖或CUDA。报告保留每项失败与异常。audit未指定观测基准时只能声明输入对保存结果的自洽，不能声明历史拒绝原因一致；short必须显式提供基准，并默认要求其中有observations.npz。compare仅检查两份归档相等和关键输出有限，不能代替参数重建。
+
+新增18项公开单元测试，包含故意改变帧序/类型/单位、掩码、拒绝原因、面索引、共享beta、共享手PCA、冻结阶段、初始beta和有限性，以及缺失资源/重复帧/覆盖输出/返回码检查。CI的run_validation.py自动收集这些测试。完整本机数据和模型审计需在有原始数据及授权模型的环境运行，不把资源缺失标成成功。严格实时双目质量门属于另一条路线，由原有公开测试覆盖；本入口明确只复核离线软权重身体候选，未升级为严格几何认证。
+
+运行方式和每个参数的示例统一见realtime_app/README.md的“主线回归检查”。算法参数、方法级别及accepted_for_main_fit=False均不改变。
+
+本轮最终工作区验证652通过、9跳过、29个subtest通过；sequence_pipeline 2通过。独立已提交源码checkout使用此前全新依赖环境验证602通过、15明确跳过、29个subtest通过；sequence_pipeline 2通过。新增源码Ruff F规则、无缓存编译通过。日志归档在G20261003_mainline_regression_v1/{tests_final.log,clean_tests.log}，紧凑记录纳入research_records/registry/G20261003_mainline_regression_v1.json。既有未提交内容保持原样，本轮不推送。

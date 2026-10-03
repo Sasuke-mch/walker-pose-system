@@ -3270,3 +3270,13 @@ Mask2Former离线计时入口原先在检查输出目录冲突前加载模型，
 新增7项目录、相对链接编码、场景错配/旧动态输入、重复配置、接触配置和零预算检查。完整工作区634通过、9跳过、29个subtest通过，sequence_pipeline2通过；独立已提交源码checkout使用上一阶段新环境584通过、15明确跳过、29个subtest通过，sequence_pipeline2通过。Ruff、源码编译和差异检查通过；独立测试日志在本机临时walker_completion_8mb7zuv7。应用README、导航及算法说明/实验报告备份同步更新，既有无关文件逐字节核对保持不变。
 
 当前主线身份、固定参数、安装/测试/拟合/评价入口已闭合；63项本地待处理归属清单中的历史候选仍保留，不等于已把全部候选认证、纳入发布或删除。既有未提交修改/删除不随本轮提交，模型/数据不入库，本轮未推送远端。
+
+## 2026-10-03：固定输入回归与全帧参数重建
+
+新增check_mainline_regression.py统一audit/short/compare入口及pose_app/mainline_regression.py。沿用同一拟合内核，主线公式、预算默认、保护门和方法级别不改。检查帧号/重复帧/左右原始鱼眼像素、标定及单位、三角化接受掩码/拒绝原因/NaN位置/质量项、共享beta与零初始latent、共享手PCA和阶段冻结参数；由保存latent/PCA重新解码后全448帧SMPL-H重建，面索引精确、几何2e-6米/轴角2e-6弧度绝对容差。历史归档比较49个结果数组及5个初始化数组要求精确相同。资源缺失退出2，失败/不一致退出1，不自动更新golden。
+
+固定本机基准在research_records/engineering_validation/G20261003_mainline_regression_v1：PMPose来自整理前已保存五步448帧结果；Sapiens2来自本轮用保留的整理前求解器计算的五步结果，来源单独明确，不冒充旧已保存结果。两者当前五步拟合与各自基准49+5数组精确相同。两套448帧观测同整理前纯函数参考精确一致，含拒绝原因。两套冻结448帧参数重建通过，最大网格坐标差PMPose5.96046448e-7米、Sapiens2 6.55651093e-7米。四份最终报告在short_pmpose、short_sapiens_verified、audit_pmpose、audit_sapiens/report.json。初版审计误判quality类型/零步D3，以及旧求解器不接受新增canonical选项的失败证据保留，均修正审计/调用，没有改变求解算法或旧结果。
+
+新增18项正反例公开测试，CI的原run_validation入口自动收集。工作区652通过、9跳过、29个subtest通过，sequence2通过；独立已提交源码checkout使用此前全新环境602通过、15明确跳过、29个subtest通过，sequence2通过。Ruff F、无缓存编译、差异检查通过。日志在上述档案tests_final.log/clean_tests.log；紧凑记录纳入research_records/registry/G20261003_mainline_regression_v1.json。应用README、算法第18节及实验报告备份同步更新。
+
+结论只支持整理前后实现一致与保存参数/网格自洽，不证明原算法正确、真实三维精度或物理接触。实时严格三角化属于单独路线，本工具未冒充其质量门认证。既有未提交内容、模型/原始数据及旧冻结输出保留，不随本阶段提交；本轮不推送远端。后续改代码先运行公开验证和相应短预算回归，重要阶段再audit两套全448帧；更换设备/依赖或更新基准需保留原对照与差异，不能靠扩大容差消除失败。

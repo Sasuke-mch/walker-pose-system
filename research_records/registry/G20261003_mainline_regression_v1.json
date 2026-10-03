@@ -1,0 +1,64 @@
+{
+  "experiment_id": "G20261003_mainline_regression_v1",
+  "category": "engineering_validation",
+  "status": "passed_implementation_checks_only",
+  "input_range": "both detectors full448 pair_id0..447; existing observations/WiLoR/wrist/assets",
+  "current_route": "realtime_app/configs/current_mainline.json",
+  "input_commands": [
+    "research_records\\engineering_validation\\G20261003_mainline_regression_v1\\baseline\\fit_args.json",
+    "research_records\\engineering_validation\\G20261003_mainline_regression_v1\\baseline_sapiens\\fit_args.json"
+  ],
+  "code": [
+    "realtime_app/check_mainline_regression.py",
+    "realtime_app/pose_app/mainline_regression.py",
+    "realtime_app/tests/test_mainline_regression.py"
+  ],
+  "unique_change": "regression/audit infrastructure; optimization logic and method grades unchanged",
+  "controls": "existing cold-start configuration; short budget five active stages1 step each; D3=0; NumPy/Torch seed0",
+  "criteria": "all49 result arrays and5 initial arrays exactly equal; masks/reasons/NaN locations exact; replay geometry2e-6m/axis-angle2e-6rad; faces exact",
+  "stop_condition": "any mismatch exit1; missing resource exit2; preserve evidence; never auto-update golden",
+  "baseline_sources": {
+    "pmpose": "preexisting pre-refactor short result copied, original path in baseline/manifest.json",
+    "sapiens": "computed this stage by retained pre-refactor fitter; not a preexisting Sapiens short artifact",
+    "observations": "pre-refactor historical_contracts.py pure function oracle; both full448 exact"
+  },
+  "reports": {
+    "short_pmpose": {
+      "path": "research_records\\engineering_validation\\G20261003_mainline_regression_v1\\short_pmpose\\report.json",
+      "status": "passed",
+      "frames": 448,
+      "max_vertex_coordinate_error_m": 6.556510925292969e-07
+    },
+    "short_sapiens_verified": {
+      "path": "research_records\\engineering_validation\\G20261003_mainline_regression_v1\\short_sapiens_verified\\report.json",
+      "status": "passed",
+      "frames": 448,
+      "max_vertex_coordinate_error_m": 7.152557373046875e-07
+    },
+    "audit_pmpose": {
+      "path": "research_records\\engineering_validation\\G20261003_mainline_regression_v1\\audit_pmpose\\report.json",
+      "status": "passed",
+      "frames": 448,
+      "max_vertex_coordinate_error_m": 5.960464477539062e-07
+    },
+    "audit_sapiens": {
+      "path": "research_records\\engineering_validation\\G20261003_mainline_regression_v1\\audit_sapiens\\report.json",
+      "status": "passed",
+      "frames": 448,
+      "max_vertex_coordinate_error_m": 6.556510925292969e-07
+    }
+  },
+  "tests": {
+    "workspace": "652passed9skipped29subtests; sequence2passed",
+    "clean_tracked_checkout": "602passed15skipped29subtests; sequence2passed",
+    "new_tests": 18,
+    "lint": "Ruff F passed; compile passed"
+  },
+  "failure_evidence": [
+    "outputs/mainline_regression_20261003/pmpose_full/report.json",
+    "research_records/engineering_validation/G20261003_mainline_regression_v1/baseline_sapiens/reference_run.log",
+    "research_records/engineering_validation/G20261003_mainline_regression_v1/short_sapiens/report.json"
+  ],
+  "evidence_boundary": "engineering implementation consistency; accepted_for_main_fit remains false; no independent3D/physical/contact certification; strict live stereo separate",
+  "archive": "research_records\\engineering_validation\\G20261003_mainline_regression_v1"
+}
