@@ -1,0 +1,37 @@
+{
+  "frames": 360,
+  "source_body": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz",
+  "source_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\mainline_alias_review",
+  "scene_profile": "mainline -> baseline",
+  "body_parameters_changed": false,
+  "detectors_rerun": false,
+  "comparison_datasets": [
+    "old 448-frame capture",
+    "new 360-frame repositioned capture"
+  ],
+  "comparison_controls": "Both frozen PMPose/Sapiens2 detections; body PMPose old wrist prior enabled vs new disabled, not controlled A/B. No Sapiens2 new body result.",
+  "success": "same-run scene/body/strict gate exported; browser mesh and controls work; report all label/geometry failures and distinguish residuals from independent truth",
+  "stop": "missing source or inconsistent arrays blocks viewer; no relabeling, deletion, relaxed gate, or substituted body result",
+  "outputs": [
+    "body.html",
+    "arm_comparison.json",
+    "arm_records.json",
+    "arm_review.html",
+    "viewer_validation.json"
+  ],
+  "implementation": [
+    "realtime_app/compare_capture_arm_bias.py",
+    "realtime_app/walker_tools/visualization/build_grasp_body_canvas_viewer.py"
+  ],
+  "additional_readonly_control": "Existing pmpose_baseline vs pmpose_no_wrist from G20261003_smplh_ablation_v1; resolved options differ only output_dir,wrist_reference,wrist_reference_weight",
+  "analysis_command": [
+    ".venv-cuda/Scripts/python.exe",
+    "-B",
+    "realtime_app/compare_capture_arm_bias.py",
+    "--output",
+    "research_records\\engineering_validation\\G20261004_mainline_arm_review_v1"
+  ],
+  "anomaly_policy": "100px diagnostic flags only; no exclusion. Labels/points/failed geometry retained.",
+  "report_only_inputs": "Existing detector-manual comparison JSONs, actual raw detector sources/calibrations, frozen old/new body results, existing old wrist ablations",
+  "interpretation": "Elbow has no manual truth; report only fit-observation disagreement. Camera/extrinsics and manual wrist prior differ across captures."
+}

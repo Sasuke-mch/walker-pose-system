@@ -387,3 +387,8 @@ primary WiLoR使用现有PMPose身体腕关联；另报告Sapiens2关联及唯�
 身体参数复现使用360帧自己的`pmpose/fit_command.json`；该命令关闭人工腕项。本文前述冷启动回归和消融命令专用于448帧冻结对照，不能自动改用360帧manifest。WiLoR仅提供局部手指旋转先验，不提供米制腕平移；身体共享beta与逐帧姿态求解之后才应用当前场景变换。
 
 实时Stage/地面沿用`run_stereo.py`，选择full SE(3)需要显式`--enable-stage-walker --dynamic-ground-full-se3`，同时提供`--dynamic-ground-reference`和当前标定等既有输入。离线SMPL-H整段拟合没有接入这一实时入口。候选分别显式使用`landing_fixed_lag`或`joint_stage_window`；不能根据页面播放或更平滑就替代主线。严格输入及最终发布流导出修复共享，候选算法等级保持不变。
+
+
+## 两次采集腕肘诊断
+
+`python -B realtime_app/compare_capture_arm_bias.py --output outputs/arm_review_next`只读已有448/360帧检测、标注对照和冻结身体，并复用旧PMPose有/无腕约束消融。输出目录不能含旧arm_comparison.json。需要本机历史数据；缺失资源报不可用/失败，不运行模型或复用其他采集填补。报告输出arm_comparison.json、arm_records.json和arm_review.html，保留分组、缺失、异常点和三维拒绝状态。统计是人工操作性参考或拟合内部一致性，肘没有独立真值。当前最新主线页面与完整分析位于G20261004_mainline_arm_review_v1，准确构建命令及同源验证见其protocol、viewer_command和viewer_validation。body.html与人体参数bundle由现有visualization.build_grasp_body_canvas_viewer导出，诊断工具不改变身体或场景算法。详细结论见算法说明第21节。

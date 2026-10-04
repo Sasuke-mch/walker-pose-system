@@ -3525,3 +3525,20 @@ current_mainline.json新增mainline_selection明确换机位360帧、原始pair1
 验证：52项场景契约、交接、落地、联合窗口及身体回归测试通过；本次代码Ruff通过。使用原baseline_profile_review命令仅改profile名称及新输出目录，完整重放360帧于stage_landing_recovery_v1/mainline_alias_review。10个NPZ字段（R/t、Stage、strict点/mask、诊断点及双方时间）与原baseline逐值相同；Stage与最终动态地面JSONL除processing_ms外完全一致，strict仍3031点。准确命令mainline_alias_command.json、协议和mainline_alias_validation.json保存输入、唯一变量和检查。首次数值核查因本机生成的Stage object数组禁用pickle而失败，改为显式可信本机数组读取后完成；失败原因保留。缺少授权资源时不可宣称通过。
 
 基线仍有硬恢复跳变、背景/脚缺测和本次扶手安装未认证等限制；不将正式主线标签写成科学问题解决。后续必须在原脚锚保护和活动门内同时通过落地闭合、跳变与总延迟门，才可替换Stage/地面部分。既有工作区改动保留；根导航仅隔离本次新增块提交，不顺带提交此前清理或其他代码。没有推送远端。
+
+
+## 2026-10-04 最新主线可视化与两采集腕肘偏差复查
+
+输出G20261004_mainline_arm_review_v1。body.html明确mainline→baseline，使用当前mainline_alias_review和360帧冻结PMPosefit，不使用落地候选或旧网页顶点。身体全部原数组精确不变，真实6890顶点/13776面，strict3031点；相机、人体和助步器共用当前T_G<-C。仅重建grounded数组。相机系手审计因网格/面/静态扶手完全相同而复用，来源保留；不认证新实物接触。浏览器核对0/136/333帧、timeline与网格；333帧association_failed、strict0/17保留，无consoleerror，preview136.png保存。服务127.0.0.1:8784仅本机提供engineering_validation根目录，主线body和arm_review报告均可打开，旧viewer不覆盖。
+
+新只读compare_capture_arm_bias复用raw_side/raw_triangulate/fisheye_project，核对全帧XYZ和原工程mask；报告逐点像素、公共/自有肘轴、相机×手别分组、工程深度/重投影、拟合残差、内部关节/COCO差、前臂长度。旧448帧人工腕开启、新360关闭，不当严格A/B；进一步复用旧pmpose_baseline/no_wrist消融，确认解析选项仅腕输入/权重和输出不同。结果及源路径在protocol、arm_comparison、arm_records，完整讲解更新已有CURRENT_SMPLH_ALGORITHM第21节。
+
+关键结果：Sapiens2左相机右手各10点均朝肘侧，均值偏差19.22→11.39px、沿轴−18.86→−9.61px；WiLoR该组方向−11.61→+11.40px，不支持统一固定腕延长。原图确认新frame0左图两人工腕标签在同一只手附近、相距约3.4px；frame74右图Sapiens2双腕在同一只手附近；另139右图左腕大偏差。所有异常/缺失/失败保留，100px仅诊断标志，未删点或修改标签。不能用整体均值给模型或采集排名。
+
+PMPose肘/腕左右中位残差mm：旧带腕110.31/114.64、23.60/26.18；旧关腕100.50/99.82、62.50/48.62；新关腕65.86/77.08、70.42/45.87。关腕确实改变取舍，但不能解释全部肘残差。观测前臂旧约190/193mm、新203/180mm，模型约248/251及244/247mm，明显兼容性冲突；内部/COCO差仅数mm。肘没有人工真值，只报告内部残差，不称检测肘精度。地面同帧刚体变换不改变残差，实测最大差4.55e−13mm；Stage运动问题与腕肘相机系误差分开处理。
+
+三维人工参考旧5组通过、新1组；模型与人工均通过旧4/0/2、新1/0/0(PMPose/Sapiens2/WiLoR)。新PMPose唯一点9.96mm不代表三维精度；新Sapiens2继续无身体网格，未借旧结果补齐。后续优先单模型左右/前臂链及双目对应诊断与局部腕定位验证，再研究有观测保护的上肢取舍，不放宽门或通过页面补偿。
+
+27项相关pytest通过、Ruff通过、语法检查通过；在outputs/arm_review_reproduce_20261004重算最终JSON完全一致。初始过严float32容差、元组mask索引错误及整数轴casting由核查/测试发现，诊断代码均修正，失败日志和validation history保留；不改拟合器或主线算法。代码、已有说明与小型协议/报告本地提交；原有无关工作区改动保持，不推送。
+
+补充：PMPose腕距左相机光心中位，raw左右320.86/517.34→395.09/544.71mm，fit301.99/494.69→412.29/558.14mm；证明新结果未沿用旧腕位置，但相机布置及动作不同，不能称为世界系真实抓握后移量。最终报告加入相机距离，数值重算目录outputs/arm_review_final_reproduce_20261004。

@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "source_body": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz",
+  "scene": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\mainline_alias_review",
+  "all_body_arrays_unchanged": true,
+  "frames": 360,
+  "vertices": 6890,
+  "faces": 13776,
+  "strict_count": 3031,
+  "rigid_residual_norm_max_change_mm": 4.547473508864641e-13,
+  "browser": {
+    "frame0_rendered": true,
+    "frame136_stage": "Stage 2",
+    "frame333_stage": "Stage 1",
+    "frame333_strict_count": 0,
+    "errors": [],
+    "screenshot": "preview136.png"
+  },
+  "tests": {
+    "passed": 27,
+    "ruff": "passed"
+  },
+  "failure_history": [
+    "0.001mm existing float32 replay tolerance restored after overstrict1e-6 audit failed",
+    "new analysis tuple index typo caught by full archive comparison and corrected",
+    "integer axis casting caught by new metric test and corrected"
+  ],
+  "scope": "same frozen body, mainline baseline scene; no display smoothing or model inference; contact/accuracy levels unchanged",
+  "analysis_reproduction": "Final reports regenerated from source in outputs/arm_review_final_reproduce_20261004; previous numeric diagnostics unchanged, wrist radial distances added"
+}
