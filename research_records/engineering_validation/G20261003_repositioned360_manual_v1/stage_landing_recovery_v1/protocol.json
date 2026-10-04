@@ -1,0 +1,50 @@
+{
+  "inputs": {
+    "images": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\input",
+    "strict": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\first_instance_strict.jsonl",
+    "frozen_body": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz",
+    "frames": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\frames.json"
+  },
+  "frozen_no_recovery_control": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_transition_diagnosis_v1\\stage_final",
+  "new_matched_variants": [
+    "hard_restore",
+    "lag_lowerbody",
+    "causal_lowerbody"
+  ],
+  "constant_controls": "same current strict ankles, latest static anchors, single ankle fallback, stage handoff; all three fresh image replays use OpenCV one thread",
+  "landing_prior": "flat_ground_supported_after_motion; protocol assumption, not contact measurement",
+  "support_gate": {
+    "preceding_motion_sec": 0.1,
+    "minimum_motion_samples": 2,
+    "continuous_stop_sec": 0.12,
+    "human_resume_samples": 2,
+    "human_resume_compensated_motion_px_at_480": 1.2,
+    "maximum_height_correction_mm": 150,
+    "maximum_tilt_correction_deg": 8,
+    "ankle_background_residual_px_at_480": 1.2
+  },
+  "lag": {
+    "buffer_sec": 0.5,
+    "pre_stop_correction_window_sec": 0.3,
+    "note": "timestamp release delay can exceed nominal buffer by one sample; tail released without future data"
+  },
+  "causal_limits": {
+    "height_rate_mm_per_sec": 200,
+    "tilt_rate_deg_per_sec": 20,
+    "time_constant_sec": 0.12
+  },
+  "success": "close height/tilt after supported stops without static walker creeping in lag output; compare full-frame step, pelvis, sole and strict-ankle evidence; preserve rejected corrections and unfinished motion",
+  "level": "offline engineering candidate; no physical contact or realtime throughput certification",
+  "final_variants": [
+    "hard_restore",
+    "lag_lowerbody",
+    "causal_lowerbody"
+  ],
+  "implementation": [
+    "realtime_app/pose_app/landing_pose_recovery.py",
+    "realtime_app/pose_app/stage_handoff.py",
+    "realtime_app/walker_tools/scene/replay_fitted_body_scene.py",
+    "realtime_app/walker_tools/scene/audit_stage_handoff.py"
+  ],
+  "decision": "fixed-lag protocol-supported recovery resolves accumulated supported-stop height and tilt in this replay; retain candidate level because corrected-window ankle-anchor residual worsens and physical support is not independently certified"
+}

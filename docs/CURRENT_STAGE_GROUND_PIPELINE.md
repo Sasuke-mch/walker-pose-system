@@ -166,3 +166,10 @@ Git 不提交原始数据、JSONL和视频。当前本地只保留以下主线�
 ### 补充纠正：取消恢复候选不满足跨阶段闭合
 
 同日进一步核查发现：仅取消恢复时，静止frame333高度累计偏差182.7mm、倾角8.46度；最新锚+单踝候选达到302.7mm、14.07度。因此段内骨盆偏移变小不足以支持整体改善，候选仍未通过，不替换默认。详见现有validation.json的height_tilt_closure_audit。正确修正方向是有落地依据的高度/roll/pitch约束及连续交接，保留XY/yaw，不把背景静止直接等同落地，不在显示层分别下移人体或助步器。下一轮尚待实施。
+
+
+### 协议支持的落地恢复已实现（工程候选）
+
+`landing_pose_recovery.py`由现有StageHandoffGroundWriter消费，现有场景重放入口显式选择`--landing-recovery causal|fixed_lag --landing-protocol flat_ground_supported_after_motion`。原默认不变。要求前序运动、持续停止和人体/下肢恢复运动，按受控平地协议施加高度/倾角先验，保留XY/yaw，并重建脚锚；静止、手臂动或短暂停顿都不自动等同落地。缓冲候选0.5秒，仅修改未发布位姿，JSONL/NPZ同源且causal=False；实际样本延迟和流尾状态记录齐全。它是确定性支撑先验投影，尚非完整联合窗口优化。
+
+stage_landing_recovery_v1的最终lag_lowerbody在98/147/219/300确认恢复，frame333累计高度/倾角闭合，避免原硬恢复97.3mm瞬时相机跳变（降至47.1mm），静止段没有因果恢复的持续相机下移。285–286短暂停止保留未确认状态。修正踝残差P95从23增至63mm，鞋底最小-52.3mm未解决，因此保留工程候选，不升级主线或物理接触证据；完整数字见comparison/validation和AI_PROGRESS。

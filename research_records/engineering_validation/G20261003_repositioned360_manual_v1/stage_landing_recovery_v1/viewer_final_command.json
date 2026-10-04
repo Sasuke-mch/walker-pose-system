@@ -1,0 +1,17 @@
+[
+  "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+  "-B",
+  "realtime_app/walker_tools/visualization/build_grasp_body_canvas_viewer.py",
+  "--result",
+  "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\view_final\\result.npz",
+  "--scene",
+  "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\lag_lowerbody",
+  "--surface-sets",
+  "research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/contact_surface_sets_smplh_v1/contact_vertex_sets.json",
+  "--geometry-audit",
+  "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\view_final\\grasp_geometry_audit.json",
+  "--strict-jsonl",
+  "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\first_instance_strict.jsonl",
+  "--output",
+  "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\view_final\\body.html"
+]

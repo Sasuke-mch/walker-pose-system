@@ -73,7 +73,17 @@ def args() -> argparse.Namespace:
     p.add_argument("--ankle-bearing-fallback", action="store_true")
     p.add_argument("--single-ankle-fallback", action="store_true")
     p.add_argument("--latest-anchor", action="store_true")
+    p.add_argument(
+        "--landing-recovery", choices=["none", "causal", "fixed_lag"], default="none"
+    )
+    p.add_argument("--landing-protocol", choices=["flat_ground_supported_after_motion"])
     parsed = p.parse_args()
+    if parsed.landing_recovery != "none" and (
+        not parsed.stage_handoff or parsed.landing_protocol is None
+    ):
+        p.error(
+            "landing recovery requires --stage-handoff and explicit --landing-protocol"
+        )
     if parsed.stage_handoff and (
         parsed.frames_metadata is None or parsed.continuous_stage
     ):
@@ -193,6 +203,8 @@ def main() -> int:
             bearing_fallback=a.ankle_bearing_fallback,
             single_ankle_fallback=a.single_ankle_fallback,
             latest_anchor=a.latest_anchor,
+            recovery_mode=a.landing_recovery,
+            landing_protocol=a.landing_protocol,
         )
         if a.stage_handoff
         else ContinuousStageGroundWriter(
@@ -384,7 +396,10 @@ def main() -> int:
                 "single_ankle_fallback": a.single_ankle_fallback,
                 "latest_stationary_anchor": a.latest_anchor,
                 "ankle_bearing_fallback": a.ankle_bearing_fallback,
-                "stage1_reanchor": not a.disable_stage1_reanchor,
+                "stage1_reanchor": not a.disable_stage1_reanchor
+                and a.landing_recovery == "none",
+                "landing_recovery": a.landing_recovery,
+                "landing_protocol": a.landing_protocol,
                 "dropout_prediction": a.predict_camera_dropout,
                 "frames_metadata": str(a.frames_metadata.resolve())
                 if a.frames_metadata
@@ -399,6 +414,7 @@ def main() -> int:
                 "fps_right": fps_r,
                 "video_frame_counts_before_truncation": video_truncated,
                 "frames": len(ids),
+                "opencv_threads": cv2.getNumThreads(),
                 "image_source": image_source,
                 "stage_summary": stage_summary,
                 "ground_summary": ground_summary,

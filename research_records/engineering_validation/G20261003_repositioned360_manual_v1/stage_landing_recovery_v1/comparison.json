@@ -1,0 +1,496 @@
+{
+  "evidence": "protocol-qualified support consistency; no contact or external trajectory truth",
+  "variants": {
+    "no_restore": {
+      "ground_status": {
+        "held": 261,
+        "accepted": 52,
+        "accepted_single_ankle": 17,
+        "accepted_rotation_held": 13,
+        "unavailable": 13,
+        "rejected": 4
+      },
+      "static_ends": [
+        {
+          "frame": 82,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 117,
+          "height_bias_mm": 21.598807125684175,
+          "tilt_deg": 2.723973390072408
+        },
+        {
+          "frame": 119,
+          "height_bias_mm": 21.598807125684175,
+          "tilt_deg": 2.723973390072408
+        },
+        {
+          "frame": 188,
+          "height_bias_mm": 73.07642886338454,
+          "tilt_deg": 5.777337647367392
+        },
+        {
+          "frame": 266,
+          "height_bias_mm": 197.53005669616198,
+          "tilt_deg": 10.870861944425164
+        },
+        {
+          "frame": 286,
+          "height_bias_mm": 289.50614114134873,
+          "tilt_deg": 13.8100854577394
+        },
+        {
+          "frame": 333,
+          "height_bias_mm": 302.7250549035624,
+          "tilt_deg": 14.074362916764905
+        },
+        {
+          "frame": 342,
+          "height_bias_mm": 302.7250549035624,
+          "tilt_deg": 14.074362916764905
+        }
+      ],
+      "camera_height_mm": {
+        "count": 360,
+        "median": 788.8196447655821,
+        "p95": 1008.9136921418118,
+        "maximum": 1067.6873850666145
+      },
+      "maximum_tilt_deg": 16.894439492599705,
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.572343338918062,
+        "p95": 29.98624225013037,
+        "maximum": 62.90049540436675
+      },
+      "fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.565894334815809,
+        "p95": 51.922608300194646,
+        "maximum": 246.34354222247532
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 19.459102283254428,
+        "maximum": 47.134193761237334
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "rotation_step_deg": {
+        "count": 359,
+        "median": 1.7075472925031877e-06,
+        "p95": 0.6672388206010907,
+        "maximum": 2.238651860576214
+      },
+      "sole_minimum_z_mm": {
+        "count": 360,
+        "median": 37.804699323337275,
+        "p95": 194.63055400836916,
+        "maximum": 224.6451142342163
+      },
+      "segments": {
+        "85-94": 59.18177173129281,
+        "123-136": 50.17871818979997,
+        "189-206": 55.295458896021955,
+        "268-284": 74.89851428706591,
+        "288-295": 48.10959667797869,
+        "346-359": 46.16193347248751
+      },
+      "support_ankle_residual_mm": {
+        "count": 0
+      },
+      "same_corrected_frames_before_support_ankle_residual_mm": {
+        "count": 0
+      },
+      "sole_minimum_over_sequence_mm": -52.29250374600599,
+      "support_two_foot_disagreement_mm": {
+        "count": 0
+      },
+      "support_rejection_reasons": {},
+      "release_delay_sec": {
+        "count": 0
+      },
+      "all_rows_causal": true
+    },
+    "hard_restore": {
+      "ground_status": {
+        "held": 252,
+        "landed_support_reanchored": 9,
+        "accepted": 52,
+        "accepted_single_ankle": 17,
+        "accepted_rotation_held": 13,
+        "unavailable": 13,
+        "rejected": 4
+      },
+      "static_ends": [
+        {
+          "frame": 82,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 117,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 119,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 188,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 0.0
+        },
+        {
+          "frame": 266,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 0.0
+        },
+        {
+          "frame": 286,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 0.0
+        },
+        {
+          "frame": 333,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 0.0
+        },
+        {
+          "frame": 342,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 0.0
+        }
+      ],
+      "camera_height_mm": {
+        "count": 360,
+        "median": 706.1886372382494,
+        "p95": 778.2842658477857,
+        "maximum": 809.8639236394837
+      },
+      "maximum_tilt_deg": 6.092080203949814,
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.604487716635104,
+        "p95": 29.98624225013042,
+        "maximum": 62.9004954043667
+      },
+      "fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.639779392393631,
+        "p95": 55.3303221964766,
+        "maximum": 246.34354222247518
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 21.728070683621358,
+        "maximum": 97.30260506422792
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "rotation_step_deg": {
+        "count": 359,
+        "median": 2.091309789151873e-06,
+        "p95": 0.7154017101141509,
+        "maximum": 5.607440264950422
+      },
+      "sole_minimum_z_mm": {
+        "count": 360,
+        "median": -10.922644221170742,
+        "p95": 20.333456486548478,
+        "maximum": 44.259238313458354
+      },
+      "segments": {
+        "85-94": 59.18177173129281,
+        "123-136": 50.17871818979992,
+        "189-206": 55.29545889602234,
+        "268-284": 74.89851428706574,
+        "288-295": 48.10959667797877,
+        "346-359": 46.16193347248743
+      },
+      "support_ankle_residual_mm": {
+        "count": 0
+      },
+      "same_corrected_frames_before_support_ankle_residual_mm": {
+        "count": 0
+      },
+      "sole_minimum_over_sequence_mm": -52.29250374600599,
+      "support_two_foot_disagreement_mm": {
+        "count": 0
+      },
+      "support_rejection_reasons": {},
+      "release_delay_sec": {
+        "count": 0
+      },
+      "all_rows_causal": true
+    },
+    "causal_restore": {
+      "ground_status": {
+        "held": 189,
+        "accepted": 52,
+        "accepted_single_ankle": 17,
+        "accepted_rotation_held": 13,
+        "support_restored": 72,
+        "unavailable": 13,
+        "rejected": 4
+      },
+      "static_ends": [
+        {
+          "frame": 82,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 117,
+          "height_bias_mm": 0.05475464013647979,
+          "tilt_deg": 0.006905482971915807
+        },
+        {
+          "frame": 119,
+          "height_bias_mm": 0.05475464013647979,
+          "tilt_deg": 0.006905482971915807
+        },
+        {
+          "frame": 188,
+          "height_bias_mm": 0.13284603406930273,
+          "tilt_deg": 0.009812487943041723
+        },
+        {
+          "frame": 266,
+          "height_bias_mm": 0.10018346963352087,
+          "tilt_deg": 0.0051463086689604995
+        },
+        {
+          "frame": 286,
+          "height_bias_mm": 58.57285306213271,
+          "tilt_deg": 3.1057540647784054
+        },
+        {
+          "frame": 333,
+          "height_bias_mm": 0.10424909009361727,
+          "tilt_deg": 0.004846420065466648
+        },
+        {
+          "frame": 342,
+          "height_bias_mm": 0.10424909009361727,
+          "tilt_deg": 0.004846420065466648
+        }
+      ],
+      "camera_height_mm": {
+        "count": 360,
+        "median": 706.3214832723187,
+        "p95": 803.0188248193526,
+        "maximum": 810.0381794124506
+      },
+      "maximum_tilt_deg": 6.098302560995251,
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.572343338918062,
+        "p95": 30.36194149051406,
+        "maximum": 62.900495404366744
+      },
+      "fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.343018935801076,
+        "p95": 51.38968405064085,
+        "maximum": 246.3435422224751
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 19.459102283254296,
+        "maximum": 47.134193761237306
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 8.042425000166986,
+        "maximum": 13.749753469570805
+      },
+      "rotation_step_deg": {
+        "count": 359,
+        "median": 2.9575586669421963e-06,
+        "p95": 0.7131820518528291,
+        "maximum": 2.2386518605771912
+      },
+      "sole_minimum_z_mm": {
+        "count": 360,
+        "median": -4.733889075727234,
+        "p95": 23.07977826773762,
+        "maximum": 44.317269385010604
+      },
+      "segments": {
+        "85-94": 59.18177173129281,
+        "123-136": 50.17871818980003,
+        "189-206": 55.29545889602233,
+        "268-284": 74.89851428706582,
+        "288-295": 48.109596677978516,
+        "346-359": 46.16193347248755
+      },
+      "support_ankle_residual_mm": {
+        "count": 0
+      },
+      "same_corrected_frames_before_support_ankle_residual_mm": {
+        "count": 0
+      },
+      "sole_minimum_over_sequence_mm": -52.29250374600599,
+      "support_two_foot_disagreement_mm": {
+        "count": 0
+      },
+      "support_rejection_reasons": {},
+      "release_delay_sec": {
+        "count": 360,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "all_rows_causal": true
+    },
+    "lag_restore": {
+      "ground_status": {
+        "held": 248,
+        "accepted": 52,
+        "accepted_single_ankle": 17,
+        "accepted_rotation_held": 13,
+        "support_restored": 13,
+        "unavailable": 13,
+        "rejected": 4
+      },
+      "static_ends": [
+        {
+          "frame": 82,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 117,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 119,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 188,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 266,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 286,
+          "height_bias_mm": 58.45595134412156,
+          "tilt_deg": 3.1008818864185685
+        },
+        {
+          "frame": 333,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        },
+        {
+          "frame": 342,
+          "height_bias_mm": 0.0,
+          "tilt_deg": 2.4148365394514667e-06
+        }
+      ],
+      "camera_height_mm": {
+        "count": 360,
+        "median": 706.1886372382494,
+        "p95": 785.1740248430981,
+        "maximum": 809.863923639484
+      },
+      "maximum_tilt_deg": 6.092080203949454,
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.60448771663508,
+        "p95": 29.716806838331483,
+        "maximum": 62.90049540436675
+      },
+      "fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.799027806460105,
+        "p95": 51.44418661098197,
+        "maximum": 246.34354222247524
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 21.30174379945471,
+        "maximum": 47.134193761237306
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "rotation_step_deg": {
+        "count": 359,
+        "median": 2.9575586669421963e-06,
+        "p95": 0.8374706787571816,
+        "maximum": 2.734340242481049
+      },
+      "sole_minimum_z_mm": {
+        "count": 360,
+        "median": -9.487886458612309,
+        "p95": 20.503864590666957,
+        "maximum": 44.25923831345847
+      },
+      "segments": {
+        "85-94": 62.4812197371224,
+        "123-136": 50.17871818979992,
+        "189-206": 55.295458896022,
+        "268-284": 74.8985142870657,
+        "288-295": 49.74094524176655,
+        "346-359": 46.16193347248746
+      },
+      "support_ankle_residual_mm": {
+        "count": 33,
+        "median": 28.500101501109835,
+        "p95": 62.55280892725381,
+        "maximum": 72.507545207138
+      },
+      "same_corrected_frames_before_support_ankle_residual_mm": {
+        "count": 33,
+        "median": 10.56251785787371,
+        "p95": 22.955626511012373,
+        "maximum": 33.07330970281295
+      },
+      "sole_minimum_over_sequence_mm": -52.29250374600599,
+      "support_two_foot_disagreement_mm": {
+        "count": 16,
+        "median": 19.54933814091305,
+        "p95": 40.4423533131913,
+        "maximum": 41.65864788962644
+      },
+      "support_rejection_reasons": {},
+      "release_delay_sec": {
+        "count": 360,
+        "median": 0.5271321250002075,
+        "p95": 0.5626563874993735,
+        "maximum": 0.6091411000015796
+      },
+      "all_rows_causal": false
+    }
+  },
+  "strict_masks_and_stage_sequences_equal": true
+}

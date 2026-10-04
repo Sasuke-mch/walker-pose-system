@@ -12,6 +12,7 @@ import numpy as np
 
 from .anchored_ankle_translation import solve_ankle_bearing_translation
 from .dynamic_ground_live import STAGE1, STAGE2, TRANSITION, RealtimeDynamicGroundWriter
+from .landing_pose_recovery import LandingPoseRecovery
 from .two_stage_motion import WorldPose
 
 
@@ -94,6 +95,8 @@ class StageHandoffGroundWriter:
         bearing_fallback=False,
         single_ankle_fallback=False,
         latest_anchor=False,
+        recovery_mode="none",
+        landing_protocol=None,
     ):
         output = Path(output)
         self.estimator = RealtimeDynamicGroundWriter(
@@ -101,7 +104,16 @@ class StageHandoffGroundWriter:
             reference,
             pose_mode="full_se3",
             foot_observation_mode=foot_observation_mode,
-            stage1_landed_support_reanchor=reanchor,
+            stage1_landed_support_reanchor=reanchor and recovery_mode == "none",
+        )
+        self.recovery = (
+            LandingPoseRecovery(
+                self.estimator.initial_pose,
+                mode=recovery_mode,
+                protocol=landing_protocol,
+            )
+            if recovery_mode != "none"
+            else None
         )
         self.file = output.open("x", encoding="utf-8")
         self.prediction = prediction
@@ -298,13 +310,33 @@ class StageHandoffGroundWriter:
             row["constrained_points_ground_mm"] = dict(row["strict_points_ground_mm"])
             row["constraint_projection"] = {"applied": False, "type": None}
         row["pose_audit"]["world_pose_certified"] = False
-        self.file.write(json.dumps(row, ensure_ascii=False) + "\n")
+        if self.recovery:
+            row["operational_ankle_anchors_mm"] = (
+                {s: p.tolist() for s, p in self.estimator.anchors.items()}
+                if self.estimator.anchors
+                else None
+            )
+            if self.recovery.update(self.estimator, row, payload, stage_status):
+                self.velocity *= 0
+                self.last_time = self.last_measured_translation = None
+            self.recovery.flush(self.file, time)
+        else:
+            self.file.write(json.dumps(row, ensure_ascii=False) + "\n")
         self.previous_time = time
         return row
 
     def close(self, *, completed):
+        if self.recovery:
+            self.recovery.flush(self.file)
         self.file.close()
-        return self.estimator.close(completed=completed)
+        summary = self.estimator.close(completed=completed)
+        if self.recovery:
+            summary["landing_recovery"] = {
+                "mode": self.recovery.mode,
+                "events": self.recovery.events,
+                "support_source": "explicit_capture_protocol_not_contact_truth",
+            }
+        return summary
 
     def _commit_fallback(self, row, pose, status, payload):
         self.estimator.pose = pose

@@ -1,0 +1,61 @@
+{
+  "tests_passed": 65,
+  "test_modules": [
+    "test_landing_pose_recovery",
+    "test_stage_handoff",
+    "test_continuous_stage_ground",
+    "test_dynamic_ground_live",
+    "test_realtime_stage_walker",
+    "test_two_stage_motion",
+    "test_static_background_vo",
+    "test_static_background_stereo_frontend",
+    "test_static_background_rotation"
+  ],
+  "ruff": "passed",
+  "compile_without_cache_files": 5,
+  "supported_stop_height_tilt_closure": "passed under explicit protocol prior",
+  "supported_stop_confirmation_frames": [
+    98,
+    147,
+    219,
+    300
+  ],
+  "strict_masks_stage_order_and_raw_points_equal": true,
+  "frozen_camera_model_arrays_exactly_equal": true,
+  "lower_body_gate_hardening_world_transforms_equal": false,
+  "all_lag_rows_causal_false": true,
+  "frame286_support_not_confirmed": true,
+  "viewer": {
+    "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\view_final\\body.html",
+    "frames": 360,
+    "real_faces": 13776,
+    "world_vertex_maximum_difference_m": 0.0,
+    "browser_checked_frames": [
+      286,
+      333
+    ],
+    "console_errors": 0,
+    "preview": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\view_final\\preview.png",
+    "hand_audit_reused_only_for_identical_camera_mesh_and_walker": true
+  },
+  "accepted_for_mainline": false,
+  "implementation_failures_corrected": [
+    "initial wrapper incorrectly passed Python -B to argparse; failed command/log retained",
+    "initial lag rows inherited causal=True; fixed and full replay repeated",
+    "zero correction weight falsely counted as applied; fixed and full replay repeated",
+    "landing gate hardened to require lower-body evidence; arm-only case rejects"
+  ],
+  "remaining_limitations": [
+    "support is capture-protocol prior, not contact truth",
+    "fixed lag adds about 0.5s sample-buffer delay; no end-to-end live benchmark",
+    "corrected ankle-anchor residual P95 worsens; full foot/body consistency remains unresolved",
+    "short stop at285-286 retains unconfirmed support and height bias",
+    "sole minimum remains about -52.3mm; body parameters were not refitted"
+  ],
+  "lower_body_gate_hardening_difference": {
+    "maximum_rotation_element_difference": 4.385380947269368e-15,
+    "maximum_translation_difference_mm": 0.0,
+    "numerically_equal_at_1e-10": true
+  },
+  "diff_check": "passed"
+}
