@@ -34,7 +34,8 @@
     "many links below six",
     "bearing anchor reprojection failures",
     "directional negative-step sum worsened",
-    "frame274 residual body/camera disagreement"
+    "frame274 residual body/camera disagreement",
+    "cross-stage height and tilt drift: final candidate static frame333 +302.7mm and 14.07deg"
   ],
   "accepted_for_mainline": false,
   "candidate_final_replay": {
@@ -58,5 +59,158 @@
     "no_body_refit": true
   },
   "ruff": "passed",
-  "diff_check": "passed"
+  "diff_check": "passed",
+  "height_tilt_closure_audit": {
+    "definition": "camera height and ground-normal deviation relative to the initial measured reference; static endpoints identify accumulated bias, not measured physical lifting",
+    "inputs": {
+      "policy_reanchor": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_transition_diagnosis_v1\\stage_policy\\scene_transforms.npz",
+      "policy_no_reanchor": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_transition_diagnosis_v1\\stage_no_reanchor\\scene_transforms.npz",
+      "final": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_transition_diagnosis_v1\\stage_final\\scene_transforms.npz"
+    },
+    "variants": {
+      "policy_reanchor": {
+        "initial_height_mm": 706.1886372382494,
+        "final_height_mm": 706.1886372382494,
+        "maximum_tilt_deg": 6.092080203949873,
+        "static_segment_ends": [
+          {
+            "frame": 82,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 2.4148365394514667e-06
+          },
+          {
+            "frame": 117,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 2.561320938754782e-06
+          },
+          {
+            "frame": 119,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 2.561320938754782e-06
+          },
+          {
+            "frame": 188,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 0.0
+          },
+          {
+            "frame": 266,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 0.0
+          },
+          {
+            "frame": 286,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 1.7075472925031877e-06
+          },
+          {
+            "frame": 333,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 8.537736462515939e-07
+          },
+          {
+            "frame": 342,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 8.537736462515939e-07
+          }
+        ]
+      },
+      "policy_no_reanchor": {
+        "initial_height_mm": 706.1886372382494,
+        "final_height_mm": 888.8425100554828,
+        "maximum_tilt_deg": 8.871193628743102,
+        "static_segment_ends": [
+          {
+            "frame": 82,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 2.4148365394514667e-06
+          },
+          {
+            "frame": 117,
+            "height_bias_mm": 28.575510561788406,
+            "tilt_deg": 2.723973390072542
+          },
+          {
+            "frame": 119,
+            "height_bias_mm": 28.575510561788406,
+            "tilt_deg": 2.723973390072542
+          },
+          {
+            "frame": 188,
+            "height_bias_mm": 89.89077992208547,
+            "tilt_deg": 5.777337647367581
+          },
+          {
+            "frame": 266,
+            "height_bias_mm": 89.93306882287857,
+            "tilt_deg": 5.2806069510918485
+          },
+          {
+            "frame": 286,
+            "height_bias_mm": 166.52834713997186,
+            "tilt_deg": 8.199745619211946
+          },
+          {
+            "frame": 333,
+            "height_bias_mm": 182.65387281723338,
+            "tilt_deg": 8.462431636811681
+          },
+          {
+            "frame": 342,
+            "height_bias_mm": 182.65387281723338,
+            "tilt_deg": 8.462431636811681
+          }
+        ]
+      },
+      "final": {
+        "initial_height_mm": 706.1886372382494,
+        "final_height_mm": 1067.6873850666145,
+        "maximum_tilt_deg": 16.894439492599705,
+        "static_segment_ends": [
+          {
+            "frame": 82,
+            "height_bias_mm": 0.0,
+            "tilt_deg": 2.4148365394514667e-06
+          },
+          {
+            "frame": 117,
+            "height_bias_mm": 21.598807125684175,
+            "tilt_deg": 2.723973390072408
+          },
+          {
+            "frame": 119,
+            "height_bias_mm": 21.598807125684175,
+            "tilt_deg": 2.723973390072408
+          },
+          {
+            "frame": 188,
+            "height_bias_mm": 73.07642886338454,
+            "tilt_deg": 5.777337647367392
+          },
+          {
+            "frame": 266,
+            "height_bias_mm": 197.53005669616198,
+            "tilt_deg": 10.870861944425164
+          },
+          {
+            "frame": 286,
+            "height_bias_mm": 289.50614114134873,
+            "tilt_deg": 13.8100854577394
+          },
+          {
+            "frame": 333,
+            "height_bias_mm": 302.7250549035624,
+            "tilt_deg": 14.074362916764905
+          },
+          {
+            "frame": 342,
+            "height_bias_mm": 302.7250549035624,
+            "tilt_deg": 14.074362916764905
+          }
+        ]
+      }
+    },
+    "matched_reanchor_ablation_stage_equal": true,
+    "decision": "final candidate fails cross-stage height/tilt closure; segment-relative drift improvements are insufficient; restore support-informed height/tilt correction before promotion"
+  }
 }

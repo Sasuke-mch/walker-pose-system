@@ -55,5 +55,5 @@
     "translation_gain": 0.45,
     "two_foot_consistency_original_mm": 60
   },
-  "decision": "offline candidate; no default replacement; no phase or contact truth; directional sum is a diagnostic and not anatomical backward motion"
+  "decision": "final candidate fails cross-stage static height/tilt closure; retain as failed diagnostic candidate; do not promote based on segment-relative drift"
 }
