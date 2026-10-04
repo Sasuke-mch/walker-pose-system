@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "frames": 360,
+  "old_fixed_lag_R_t_masks_points_times": "exactly_unchanged",
+  "control": "lag_review",
+  "rerun": "lag_window_compatibility",
+  "scope": "shared writer changes preserve old fixed-lag numerics; does not validate physical accuracy"
+}

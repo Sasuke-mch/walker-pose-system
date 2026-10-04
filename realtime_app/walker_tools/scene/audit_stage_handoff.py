@@ -442,6 +442,142 @@ def audit_review(root, experiment):
     return report
 
 
+def audit_joint_window(root, experiment):
+    fit = np.load(root / "pmpose/fit/result.npz", allow_pickle=False)
+    reference = np.load(
+        experiment / "lag_review/scene_transforms.npz", allow_pickle=True
+    )
+    report = {
+        "evidence": "engineering_only_no_independent_motion_or_contact_truth",
+        "variants": {},
+    }
+    for name in (
+        "lag_review",
+        "joint_window_review",
+        "joint_window_checked",
+        "joint_window_gated",
+    ):
+        data = np.load(experiment / name / "scene_transforms.npz", allow_pickle=True)
+        rows = read(experiment / name / "dynamic_ground_pose.jsonl")
+        np.testing.assert_array_equal(data["accepted"], reference["accepted"])
+        np.testing.assert_array_equal(data["stage"], reference["stage"])
+        np.testing.assert_allclose(
+            data["raw_triangulated_points_mm"],
+            reference["raw_triangulated_points_mm"],
+            rtol=0,
+            atol=0,
+            equal_nan=True,
+        )
+        if [r["pair_id"] for r in rows] != fit["pair_id"].tolist():
+            raise ValueError("joint-window frame identity mismatch")
+        R, t, times = (
+            data["rotation_ground_from_left"],
+            data["translation_ground_from_left_mm"],
+            data["pair_timestamp_sec"],
+        )
+        np.testing.assert_allclose(
+            R, [r["rotation_world_from_left_camera"] for r in rows], rtol=0, atol=0
+        )
+        np.testing.assert_allclose(
+            t,
+            [r["translation_world_from_left_camera_mm"] for r in rows],
+            rtol=0,
+            atol=0,
+        )
+        np.testing.assert_allclose(
+            R @ R.transpose(0, 2, 1), np.broadcast_to(np.eye(3), R.shape), atol=1e-8
+        )
+        np.testing.assert_allclose(np.linalg.det(R), 1, atol=1e-8)
+        for i, row in enumerate(rows):
+            observation = row["pose_audit"].get("window_observation", {})
+            if (
+                name == "joint_window_gated"
+                and observation.get("ground_stage")
+                != "stage1_walker_static_human_moving"
+                and not observation.get("pose_update_active")
+                and "joint_window_solution" in row["pose_audit"]
+            ):
+                raise ValueError("inactive transition modified by window solver")
+            valid = np.flatnonzero(data["accepted"][i])
+            if set(row["strict_points_ground_mm"]) != {str(j) for j in valid}:
+                raise ValueError("joint-window published strict points mismatch")
+            for j in valid:
+                np.testing.assert_allclose(
+                    row["strict_points_ground_mm"][str(j)],
+                    R[i] @ data["raw_triangulated_points_mm"][i, j] + t[i],
+                    atol=1e-8,
+                )
+        dt = np.diff(times)
+        speed = np.diff(t, axis=0) / dt[:, None]
+        acceleration = np.diff(speed, axis=0) / ((dt[:-1] + dt[1:]) * 0.5)[:, None]
+        static = data["stage"] == "stage1_walker_static_human_moving"
+        pelvis = (
+            np.einsum("fij,fkj->fki", R, fit["predicted_coco"][:, [11, 12]] * 1000)
+            + t[:, None]
+        ).mean(axis=1)
+        attempts = [
+            r["pose_audit"]["joint_window_attempt"]
+            for r in rows
+            if "joint_window_attempt" in r["pose_audit"]
+        ]
+        accepted = [a for a in attempts if a["status"] == "accepted"]
+        for a in accepted:
+            if (
+                a["foot_p95_after_mm"] > a["foot_p95_before_mm"] + 2.000001
+                or a["maximum_step_mm"] > 120.000001
+                or a["maximum_rotation_step_deg"] > 5.000001
+            ):
+                raise ValueError("accepted window violates registered guard")
+        metadata = json.loads(
+            (experiment / name / "scene_sources.json").read_text(encoding="utf-8")
+        )
+        report["variants"][name] = {
+            "strict_and_published_stream_checks_passed": True,
+            "camera_step_mm": stats(np.linalg.norm(np.diff(t, axis=0), axis=1)),
+            "camera_speed_mm_per_sec": stats(np.linalg.norm(speed, axis=1)),
+            "camera_acceleration_mm_per_sec2": stats(
+                np.linalg.norm(acceleration, axis=1)
+            ),
+            "pelvis_step_mm": stats(np.linalg.norm(np.diff(pelvis, axis=0), axis=1)),
+            "static_camera_step_mm": stats(
+                np.linalg.norm(np.diff(t, axis=0), axis=1)[static[1:] & static[:-1]]
+            ),
+            "frame333_height_bias_mm": float(t[333, 2] - t[0, 2]),
+            "frame333_tilt_deg": float(
+                np.degrees(np.arccos(np.clip(R[333, 2] @ R[0, 2], -1, 1)))
+            ),
+            "window_attempt_status": dict(Counter(a["status"] for a in attempts)),
+            "window_rejection_reasons": dict(
+                Counter(a.get("reason") for a in attempts if a.get("reason"))
+            ),
+            "support_rejection_reasons": dict(
+                Counter(
+                    r["pose_audit"]["landing_recovery"]["reason"]
+                    for r in rows
+                    if r["pose_audit"].get("landing_recovery", {}).get("reason")
+                )
+            ),
+            "accepted_window_foot_p95_before_mm": stats(
+                [a["foot_p95_before_mm"] for a in accepted]
+            ),
+            "accepted_window_foot_p95_after_mm": stats(
+                [a["foot_p95_after_mm"] for a in accepted]
+            ),
+            "window_processing_ms": stats(
+                [a["processing_ms"] for a in attempts if "processing_ms" in a]
+            ),
+            "release_delay_sec": stats(
+                [r["pose_audit"]["landing_recovery"]["release_delay_sec"] for r in rows]
+            ),
+            "support_events": metadata["ground_summary"]["landing_recovery"]["events"],
+        }
+    report["full_replacement_accepted"] = False
+    (experiment / "joint_window_validation.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return report
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--root", type=Path, required=True)
@@ -449,12 +585,19 @@ if __name__ == "__main__":
     mode = p.add_mutually_exclusive_group()
     mode.add_argument("--landing", action="store_true")
     mode.add_argument("--review", action="store_true")
+    mode.add_argument("--joint-window", action="store_true")
     a = p.parse_args()
     print(
         json.dumps(
-            (audit_review if a.review else audit_landing if a.landing else audit)(
-                a.root, a.experiment
-            ),
+            (
+                audit_joint_window
+                if a.joint_window
+                else audit_review
+                if a.review
+                else audit_landing
+                if a.landing
+                else audit
+            )(a.root, a.experiment),
             ensure_ascii=False,
             indent=2,
         )

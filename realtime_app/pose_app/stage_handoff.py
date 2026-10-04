@@ -311,6 +311,24 @@ class StageHandoffGroundWriter:
             row["constraint_projection"] = {"applied": False, "type": None}
         row["pose_audit"]["world_pose_certified"] = False
         if self.recovery:
+            edge = None
+            if rotation_status and rotation_status.get("status") == "accepted":
+                value = np.asarray(rotation_status.get("R_to_from"), dtype=float)
+                if (
+                    value.shape == (3, 3)
+                    and np.isfinite(value).all()
+                    and np.linalg.norm(value.T @ value - np.eye(3)) <= 1e-3
+                    and np.linalg.det(value) >= 0.999
+                ):
+                    edge = value.tolist()
+            row["pose_audit"]["window_observation"] = {
+                "ground_stage": handoff["ground_stage"],
+                "pose_update_active": bool(self.estimator.previous_pose_active),
+                "rotation_to_from": edge,
+                "rotation_status": rotation_status.get("status")
+                if rotation_status
+                else "unavailable",
+            }
             row["operational_ankle_anchors_mm"] = (
                 {s: p.tolist() for s, p in self.estimator.anchors.items()}
                 if self.estimator.anchors

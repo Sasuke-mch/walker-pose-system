@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "wall_time_sec": 61.52254169998923,
+  "timing_scope": "full replay with I/O; not detector inference"
+}

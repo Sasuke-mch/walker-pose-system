@@ -83,6 +83,13 @@
     "body_route_unchanged": true,
     "live_landing_integrated": false,
     "decision": "Support restoration conflicts with ankle anchors; retain as explicit offline candidate.",
-    "validation_dataset": "G20261003_repositioned360_manual_v1; scene replay independent of the frozen 448-frame body comparison above"
+    "validation_dataset": "G20261003_repositioned360_manual_v1; scene replay independent of the frozen 448-frame body comparison above",
+    "joint_window_candidate": {
+      "profile": "joint_stage_window",
+      "level": "offline_engineering_candidate_not_default",
+      "experiment": "G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/joint_window_gated",
+      "decision": "Speed/acceleration improve; support closure and real-time compute budget fail.",
+      "full_replacement_accepted": false
+    }
   }
 }

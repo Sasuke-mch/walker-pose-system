@@ -3498,3 +3498,15 @@ view_final/body.html使用当前lag_lowerbody同帧变换、原6890顶点/13776�
 - 后续优先级：同一求解窗口中联合处理脚锚、支撑姿态与背景旋转；用残差与可观性明确区分冲突、遮挡和真实脚运动，保留失败。不能先平地投影再把重建脚锚当作通过；不能放宽门换取高度闭合。缺少新安装几何、曝光同步和独立三维/接触真值，当前仍只能报告工程一致性。
 
 - 本阶段验证：59项相关unittest与14项冷启动配置pytest通过，Ruff及5文件无缓存编译通过；三份360帧重放完成，默认baseline配置与scene_rotation_fix_v1的R/t逐值一致，交接硬恢复对照亦逐值一致。相关代码以本地提交交付；不推送远端。原有无关工作区改动不纳入。
+
+
+## 2026-10-04 连续SE(3)窗口实现完成，保持候选级别
+
+- 新增pose_app/joint_stage_window.py，原场景入口配置joint_stage_window。0.5秒未发布窗口联合相机XYZ和SO(3)增量，脚锚、原始接受背景旋转、真实时间加速度、弱先验和证据确认后的支撑共同参与；停止行共享位姿，不再按固定0.3秒曲线压回地面。身体、beta、WiLoR、严格质量掩码与阶段标签不变。
+- 保护：原活动/四帧carry门退出时不求解；窗口含inactive非Stage1行整体不可用。原脚间距/双脚分歧拒绝不被重新引入脚因子。原120mm/5度/60mm门、150mm/8度恢复门、足残差不超过原测量P95+2mm、目标下降和支撑5mm/.5度验收保留。重复窗口使用未修改measurement pose参照，拒绝不可观测输入、非法R与非递增时间；不修改已发布帧。
+- 中断前pilot/checked保留，最终完整360帧为stage_landing_recovery_v1/joint_window_gated。接受34个窗口提案，拒绝14、不可用64，其中53为inactive transition。仅150帧确认支撑，18次超限拒绝；333帧仍+183.41mm、8.69度，未解决累计漂移。
+- 相对lag_review：相机速度max835.93→691.69mm/s，加速度P95 6635.18→2430.77mm/s²，静止相机位移max均0。相机帧步长max47.13→53.00mm反而变差，骨盆步长P95 29.99→28.95mm。窗口求解P95约598.63ms，不适合当前实时目标；缓冲样本延迟不含求解耗时。
+- 独立核查scene.audit_stage_handoff --joint-window验证strict点/掩码、所有ID、Stage序列、合法R、最终JSONL/NPZ和活动门。joint_window_validation.json与protocol/全部准确command JSON保存数据、参数、实现、失败和时序；详细残差定义与复现方式更新docs/CURRENT_STAGE_GROUND_PIPELINE.md。原viewer未修改，仍是冻结旧候选。
+- 不替代默认主线。后续优先连续可观测窗口分段/边界约束、脚锚与绝对支撑兼容性及稀疏/解析Jacobian。不能以调权或放宽恢复门获得假闭合。源码可提交为已验证工程候选，不宣称科研目标或实时部署通过。
+
+- 验收完成：68项相关unittest、14项冷启动配置pytest、Ruff和6文件无缓存编译通过；旧fixed_lag全360帧重放R/t、mask、XYZ和时间逐值不变（joint_window_compatibility.json）。本次仅本地提交，原有其他修改/删除/未跟踪内容保留，不推送。

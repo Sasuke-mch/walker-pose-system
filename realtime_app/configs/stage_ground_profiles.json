@@ -36,6 +36,24 @@
         "background_vo_diagnostic": false,
         "background_vo_rectified": false
       }
+    },
+    "joint_stage_window": {
+      "level": "experimental_candidate_not_default",
+      "options": {
+        "processing_width": 480,
+        "foot_observation_mode": "current",
+        "continuous_stage": false,
+        "stage_handoff": true,
+        "disable_stage1_reanchor": true,
+        "predict_camera_dropout": false,
+        "ankle_bearing_fallback": false,
+        "single_ankle_fallback": true,
+        "latest_anchor": true,
+        "landing_recovery": "joint_window",
+        "landing_protocol": "flat_ground_supported_after_motion",
+        "background_vo_diagnostic": false,
+        "background_vo_rectified": false
+      }
     }
   }
 }

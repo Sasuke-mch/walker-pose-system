@@ -78,7 +78,9 @@ def args() -> argparse.Namespace:
     p.add_argument("--single-ankle-fallback", action="store_true")
     p.add_argument("--latest-anchor", action="store_true")
     p.add_argument(
-        "--landing-recovery", choices=["none", "causal", "fixed_lag"], default="none"
+        "--landing-recovery",
+        choices=["none", "causal", "fixed_lag", "joint_window"],
+        default="none",
     )
     p.add_argument("--landing-protocol", choices=["flat_ground_supported_after_motion"])
     parsed = p.parse_args()

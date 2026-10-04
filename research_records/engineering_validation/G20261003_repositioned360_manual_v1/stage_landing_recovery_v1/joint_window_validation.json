@@ -1,0 +1,324 @@
+{
+  "evidence": "engineering_only_no_independent_motion_or_contact_truth",
+  "variants": {
+    "lag_review": {
+      "strict_and_published_stream_checks_passed": true,
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 20.406959115193246,
+        "maximum": 47.13419376123727
+      },
+      "camera_speed_mm_per_sec": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 399.95771174467785,
+        "maximum": 835.9333683516172
+      },
+      "camera_acceleration_mm_per_sec2": {
+        "count": 358,
+        "median": 0.0,
+        "p95": 6635.175960736797,
+        "maximum": 23451.30837967535
+      },
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.572343338918062,
+        "p95": 29.986242250130392,
+        "maximum": 62.90049540436671
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "frame333_height_bias_mm": 187.13302647388832,
+      "frame333_tilt_deg": 8.347153481974011,
+      "window_attempt_status": {},
+      "window_rejection_reasons": {},
+      "support_rejection_reasons": {
+        "support_correction_exceeds_150mm_or_8deg": 18
+      },
+      "accepted_window_foot_p95_before_mm": {
+        "count": 0
+      },
+      "accepted_window_foot_p95_after_mm": {
+        "count": 0
+      },
+      "window_processing_ms": {
+        "count": 0
+      },
+      "release_delay_sec": {
+        "count": 360,
+        "median": 0.5271321250002075,
+        "p95": 0.5626563874993735,
+        "maximum": 0.6091411000015796
+      },
+      "support_events": [
+        {
+          "pair_id": 98,
+          "motion_window_start_sec": 5.059432350004499,
+          "stop_start_sec": 5.296482000005199,
+          "confirmation_sec": 5.539120650002587,
+          "height_error_mm": 21.598807125684175,
+          "tilt_error_deg": 2.7241471258637233
+        },
+        {
+          "pair_id": 150,
+          "motion_window_start_sec": 7.730538500003604,
+          "stop_start_sec": 7.936757550003676,
+          "confirmation_sec": 8.226922700003342,
+          "height_error_mm": 43.74597089787278,
+          "tilt_error_deg": 3.230665638992974
+        }
+      ]
+    },
+    "joint_window_review": {
+      "strict_and_published_stream_checks_passed": true,
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 18.107817664276553,
+        "maximum": 47.26963789766682
+      },
+      "camera_speed_mm_per_sec": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 369.4757333188344,
+        "maximum": 478.3240417016767
+      },
+      "camera_acceleration_mm_per_sec2": {
+        "count": 358,
+        "median": 0.0,
+        "p95": 2194.867359090872,
+        "maximum": 15151.902347934774
+      },
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 12.839476082268162,
+        "p95": 28.95327982057988,
+        "maximum": 62.90049540436682
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "frame333_height_bias_mm": 264.7521751493873,
+      "frame333_tilt_deg": 13.719216734045258,
+      "window_attempt_status": {
+        "unavailable": 31,
+        "accepted": 41,
+        "rejected": 61
+      },
+      "window_rejection_reasons": {
+        "window_too_short": 1,
+        "insufficient_strict_feet_or_rotation": 9,
+        "foot_anchor_residual_worsened": 42,
+        "solver_failed_or_budget_exhausted": 14,
+        "no_unreleased_motion": 21,
+        "original_step_or_two_foot_gate_failed": 5
+      },
+      "support_rejection_reasons": {
+        "support_correction_exceeds_150mm_or_8deg": 18
+      },
+      "accepted_window_foot_p95_before_mm": {
+        "count": 41,
+        "median": 30.88143912253242,
+        "p95": 56.19144727507569,
+        "maximum": 67.5067218642563
+      },
+      "accepted_window_foot_p95_after_mm": {
+        "count": 41,
+        "median": 27.39269225172928,
+        "p95": 38.64302817400729,
+        "maximum": 55.75400402045755
+      },
+      "window_processing_ms": {
+        "count": 0
+      },
+      "release_delay_sec": {
+        "count": 360,
+        "median": 0.5271321250002075,
+        "p95": 0.5626563874993735,
+        "maximum": 0.6091411000015796
+      },
+      "support_events": [
+        {
+          "pair_id": 98,
+          "confirmation_sec": 5.539120650002587,
+          "solver": "joint_stage_window"
+        }
+      ]
+    },
+    "joint_window_checked": {
+      "strict_and_published_stream_checks_passed": true,
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 17.008800271463695,
+        "maximum": 50.04944814382676
+      },
+      "camera_speed_mm_per_sec": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 363.46193583431767,
+        "maximum": 487.4128090533713
+      },
+      "camera_acceleration_mm_per_sec2": {
+        "count": 358,
+        "median": 0.0,
+        "p95": 1888.0741503892123,
+        "maximum": 7441.275575172191
+      },
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 12.869862984320864,
+        "p95": 28.767266406526165,
+        "maximum": 62.90049540436678
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "frame333_height_bias_mm": 198.92347072851192,
+      "frame333_tilt_deg": 10.063221877074156,
+      "window_attempt_status": {
+        "unavailable": 10,
+        "accepted": 67,
+        "rejected": 34
+      },
+      "window_rejection_reasons": {
+        "window_too_short": 1,
+        "insufficient_strict_feet_or_rotation": 9,
+        "foot_anchor_residual_worsened": 24,
+        "solver_failed_or_budget_exhausted": 10
+      },
+      "support_rejection_reasons": {
+        "support_correction_exceeds_150mm_or_8deg": 18
+      },
+      "accepted_window_foot_p95_before_mm": {
+        "count": 67,
+        "median": 44.79311192068034,
+        "p95": 134.46382632018023,
+        "maximum": 136.00560813866267
+      },
+      "accepted_window_foot_p95_after_mm": {
+        "count": 67,
+        "median": 32.41446943534646,
+        "p95": 67.14108948846476,
+        "maximum": 82.19332854534893
+      },
+      "window_processing_ms": {
+        "count": 111,
+        "median": 212.24520000396296,
+        "p95": 598.9495000103489,
+        "maximum": 703.1114000128582
+      },
+      "release_delay_sec": {
+        "count": 360,
+        "median": 0.5271321250002075,
+        "p95": 0.5626563874993735,
+        "maximum": 0.6091411000015796
+      },
+      "support_events": [
+        {
+          "pair_id": 98,
+          "confirmation_sec": 5.539120650002587,
+          "solver": "joint_stage_window"
+        },
+        {
+          "pair_id": 150,
+          "confirmation_sec": 8.226922700003342,
+          "solver": "joint_stage_window"
+        }
+      ]
+    },
+    "joint_window_gated": {
+      "strict_and_published_stream_checks_passed": true,
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 18.4399616447336,
+        "maximum": 52.99507553159199
+      },
+      "camera_speed_mm_per_sec": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 393.1123312031088,
+        "maximum": 691.6939117967851
+      },
+      "camera_acceleration_mm_per_sec2": {
+        "count": 358,
+        "median": 0.0,
+        "p95": 2430.769358563384,
+        "maximum": 10236.886461915135
+      },
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 12.869862984320864,
+        "p95": 28.953279820579887,
+        "maximum": 62.90049540436678
+      },
+      "static_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "frame333_height_bias_mm": 183.41440957386612,
+      "frame333_tilt_deg": 8.689563029318974,
+      "window_attempt_status": {
+        "unavailable": 64,
+        "accepted": 34,
+        "rejected": 14
+      },
+      "window_rejection_reasons": {
+        "window_contains_inactive_transition": 53,
+        "foot_anchor_residual_worsened": 5,
+        "insufficient_strict_feet_or_rotation": 2,
+        "no_unreleased_motion": 9,
+        "solver_failed_or_budget_exhausted": 9
+      },
+      "support_rejection_reasons": {
+        "support_correction_exceeds_150mm_or_8deg": 18
+      },
+      "accepted_window_foot_p95_before_mm": {
+        "count": 34,
+        "median": 53.828643618233,
+        "p95": 136.2595026126728,
+        "maximum": 137.29686988907076
+      },
+      "accepted_window_foot_p95_after_mm": {
+        "count": 34,
+        "median": 35.612737013293895,
+        "p95": 68.171785887975,
+        "maximum": 83.03423023694813
+      },
+      "window_processing_ms": {
+        "count": 112,
+        "median": 0.18694998288992792,
+        "p95": 598.6294249989439,
+        "maximum": 686.7184999864548
+      },
+      "release_delay_sec": {
+        "count": 360,
+        "median": 0.5271321250002075,
+        "p95": 0.5626563874993735,
+        "maximum": 0.6091411000015796
+      },
+      "support_events": [
+        {
+          "pair_id": 150,
+          "confirmation_sec": 8.226922700003342,
+          "solver": "joint_stage_window"
+        }
+      ]
+    }
+  },
+  "full_replacement_accepted": false
+}

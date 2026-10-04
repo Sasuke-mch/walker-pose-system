@@ -117,5 +117,87 @@
       "failed_candidate_preserved": true,
       "initial_audit_entry_failure": "scene.audit_stage_handoff was missing from tool catalog; registered and rerun successfully"
     }
+  },
+  "joint_window_revision": {
+    "objective": "continuous unreleased-window pose estimation rather than endpoint support projection",
+    "inputs": "same 360 raw pairs, strict JSONL, host timestamps and calibration; frozen body",
+    "control": "lag_review with consecutive evidence",
+    "variable": "joint_window replaces restoration kernel and adds active-window solve; stage/strict gates unchanged",
+    "window_sec": 0.5,
+    "factors": [
+      "accepted raw relative rotations",
+      "original strict ankle anchors during motion only",
+      "real-time acceleration regularization",
+      "weak trust region",
+      "protocol-qualified support endpoint"
+    ],
+    "acceptance": "finite proper SE3; original 120mm/5deg step and 60mm two-foot guards; foot p95 worsens by no more than 2mm; support endpoint within 5mm/.5deg; cost decreases",
+    "stop": "do not promote on failed gates; no mask interpolation or detector/body refit",
+    "outputs": [
+      "joint_window_review",
+      "joint_window_validation.json",
+      "joint_window_checked",
+      "joint_window_gated",
+      "joint_window_compatibility.json",
+      "lag_window_compatibility"
+    ],
+    "suspension_diagnosis": "85-100 and 123-150 include accepted updates, missing strict feet and held stops;189-220 also includes rejected foot disagreement/separation. Original support kernel distributes correction over fixed pre-stop .3s.",
+    "pilot_result": "speed and acceleration decrease, but frame333 height264.75mm and tilt13.72deg; not promoted",
+    "final_review": "Repeated windows compare foot residuals to immutable pre-window measurement poses, not already-corrected rows; solver processing time recorded separately.",
+    "final_activity_guard": "No solve at inactive transition and no window containing one; original bounded carry is preserved.",
+    "implementation": [
+      "realtime_app/pose_app/joint_stage_window.py",
+      "realtime_app/pose_app/landing_pose_recovery.py",
+      "realtime_app/pose_app/stage_handoff.py",
+      "realtime_app/walker_tools/scene/replay_fitted_body_scene.py",
+      "realtime_app/walker_tools/scene/audit_stage_handoff.py"
+    ],
+    "profile_snapshot": {
+      "level": "experimental_candidate_not_default",
+      "options": {
+        "processing_width": 480,
+        "foot_observation_mode": "current",
+        "continuous_stage": false,
+        "stage_handoff": true,
+        "disable_stage1_reanchor": true,
+        "predict_camera_dropout": false,
+        "ankle_bearing_fallback": false,
+        "single_ankle_fallback": true,
+        "latest_anchor": true,
+        "landing_recovery": "joint_window",
+        "landing_protocol": "flat_ground_supported_after_motion",
+        "background_vo_diagnostic": false,
+        "background_vo_rectified": false
+      }
+    },
+    "residual_scales": {
+      "foot_mm": 20,
+      "rotation_deg": 0.5,
+      "translation_acceleration_mm_sec2": 1000,
+      "rotation_acceleration_deg_sec2": 100,
+      "weak_translation_mm": 50,
+      "weak_rotation_deg": 10,
+      "support_height_mm": 2,
+      "support_normal_deg": 0.2
+    },
+    "solver": {
+      "max_nfev": 20,
+      "ftol": 1e-05,
+      "xtol": 1e-05,
+      "gtol": 1e-05,
+      "method": "scipy least_squares finite difference Jacobian; no real-time certification"
+    },
+    "final_variant": "joint_window_gated",
+    "decision": "not promoted: smoothing improves, but absolute supported pose fails and solver p95 about599ms",
+    "implementation_checks": {
+      "joint_window_tests": 9,
+      "body_configuration_pytest": 14,
+      "full_candidate_replays": 3,
+      "accepted_windows_are_not_independent_samples": true,
+      "related_unittest_passed": 68,
+      "ruff": "passed",
+      "source_compile_without_cache": 6,
+      "old_fixed_lag_full360_compatibility": "exactly unchanged"
+    }
   }
 }

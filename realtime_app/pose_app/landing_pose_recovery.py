@@ -7,6 +7,7 @@ are required, together with an explicit flat-ground capture-protocol prior.
 
 import json
 from collections import deque
+from time import perf_counter
 
 import cv2
 import numpy as np
@@ -43,7 +44,7 @@ def blend_support(pose, initial, weight):
 
 class LandingPoseRecovery:
     def __init__(self, initial, *, mode, protocol, lag_sec=0.5):
-        if mode not in ("causal", "fixed_lag"):
+        if mode not in ("causal", "fixed_lag", "joint_window"):
             raise ValueError("invalid landing recovery mode")
         if protocol != "flat_ground_supported_after_motion":
             raise ValueError(
@@ -65,14 +66,14 @@ class LandingPoseRecovery:
         if not np.isfinite(time) or (self.previous_time is not None and dt <= 0):
             raise ValueError("landing timestamps must increase")
         self.previous_time = time
-        row["causal"] = self.mode != "fixed_lag"
+        row["causal"] = self.mode == "causal"
         self.buffer.append((row, payload))
         action = stage["stage"]["handoff"]["ground_stage"]
         audit = {
             "applied": False,
             "mode": self.mode,
             "support_source": "capture_protocol_with_motion_stop_human_resume_not_contact_truth",
-            "nominal_output_lag_sec": self.lag if self.mode == "fixed_lag" else 0.0,
+            "nominal_output_lag_sec": self.lag if self.mode != "causal" else 0.0,
         }
         row["pose_audit"]["landing_recovery"] = audit
         if action == STAGE2:
@@ -124,6 +125,17 @@ class LandingPoseRecovery:
                 )
                 if abs(height_error) > 150 or tilt_error > 8:
                     audit["reason"] = "support_correction_exceeds_150mm_or_8deg"
+                elif self.mode == "joint_window":
+                    if self._joint_update(estimator, support=True):
+                        self.events.append(
+                            {
+                                "pair_id": payload["pair_id"],
+                                "confirmation_sec": time,
+                                "solver": "joint_stage_window",
+                            }
+                        )
+                        self.motion_start = None
+                        return True
                 elif self.mode == "fixed_lag":
                     start = max(self.motion_start, self.stop_start - 0.3)
                     eligible = [
@@ -194,7 +206,46 @@ class LandingPoseRecovery:
             self.stop_start = None
             self.human_samples = 0
             self.recovering = False
+        if (
+            self.mode == "joint_window"
+            and action != STAGE1
+            and row["pose_audit"]["window_observation"]["pose_update_active"]
+        ):
+            return self._joint_update(estimator, support=False)
         return False
+
+    def _joint_update(self, estimator, *, support):
+        from .joint_stage_window import solve_stage_window
+
+        entries = list(self.buffer)
+        started = perf_counter()
+        poses, audit = solve_stage_window(entries, self.initial, support=support)
+        audit["processing_ms"] = (perf_counter() - started) * 1000
+        entries[-1][0]["pose_audit"]["joint_window_attempt"] = audit
+        if poses is None:
+            return False
+        for (saved, source), pose in zip(entries[1:], poses[1:]):
+            self._replace(saved, source, pose, 1.0)
+            saved["pose_audit"]["landing_recovery"]["correction_type"] = (
+                "joint_protocol_support" if support else "joint_motion_estimate"
+            )
+            if not support:
+                saved["pose_audit"]["status"] = "joint_window_updated"
+            saved["pose_audit"]["joint_window_solution"] = audit
+        estimator.pose = poses[-1]
+        estimator.pending_rotation = np.eye(3)
+        estimator.pending_rotation_edges = estimator.pending_rotation_missing = 0
+        estimator.frames_since_pose_update = 0
+        estimator.accepted_translation_history.clear()
+        estimator.accepted_translation_history.append(
+            (
+                int(entries[-1][1]["pair_id"]),
+                poses[-1].translation_world_from_camera_mm.copy(),
+            )
+        )
+        if support:
+            self._reanchor(estimator, entries[-1][1])
+        return True
 
     @staticmethod
     def _replace(row, payload, pose, weight):
@@ -274,7 +325,7 @@ class LandingPoseRecovery:
             )
 
     def flush(self, file, now=None):
-        delay = self.lag if self.mode == "fixed_lag" else 0
+        delay = self.lag if self.mode != "causal" else 0
         while self.buffer and (
             now is None or now - self.buffer[0][1]["pair_timestamp_sec"] >= delay
         ):

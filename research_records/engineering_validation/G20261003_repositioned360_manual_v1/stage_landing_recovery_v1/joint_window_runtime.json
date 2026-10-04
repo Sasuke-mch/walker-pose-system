@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "wall_time_sec": 69.74054009999963,
+  "timing_scope": "full image replay including disk reads and scene export; not model inference"
+}

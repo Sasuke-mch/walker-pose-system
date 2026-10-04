@@ -12,6 +12,7 @@
 | 配置 | 行为 | 级别 |
 |---|---|---|
 | `baseline` | 原阶段识别、完整SE(3)、因果踝中值、原Stage 1硬恢复 | 保留工程基线，仍有跳变与落地假设问题 |
+| `joint_stage_window` | 未发布窗口内联合SE(3)，原阶段/严格点/有限carry门保留 | 离线候选；累计漂移和实时耗时未通过 |
 | `landing_fixed_lag` | 交接状态机、当前踝、最近脚锚、单踝回退、0.5秒未发布缓冲中的支撑恢复 | 离线实验候选，不能称为实时已验证或真实接触 |
 
 `--scene-profile` 固定算法开关，输入路径由实验提供。冲突的显式参数报错；不支持缩写参数。候选必须传入真实 `--frames-metadata`。不传配置仍保留原入口的默认算法，避免历史脚本静默换方法。`baseline_review` 实验是旧 `hard_restore` 的**交接硬恢复对照**，不是 `baseline` 配置，勿混用其结果。
@@ -240,3 +241,36 @@ Git 不提交原始数据、JSONL和视频。当前本地只保留以下主线�
 `landing_pose_recovery.py`由现有StageHandoffGroundWriter消费，现有场景重放入口显式选择`--landing-recovery causal|fixed_lag --landing-protocol flat_ground_supported_after_motion`。原默认不变。要求前序运动、持续停止和人体/下肢恢复运动，按受控平地协议施加高度/倾角先验，保留XY/yaw，并重建脚锚；静止、手臂动或短暂停顿都不自动等同落地。缓冲候选0.5秒，仅修改未发布位姿，JSONL/NPZ同源且causal=False；实际样本延迟和流尾状态记录齐全。它是确定性支撑先验投影，尚非完整联合窗口优化。
 
 stage_landing_recovery_v1的最终lag_lowerbody在98/147/219/300确认恢复，frame333累计高度/倾角闭合，避免原硬恢复97.3mm瞬时相机跳变（降至47.1mm），静止段没有因果恢复的持续相机下移。285–286短暂停止保留未确认状态。修正踝残差P95从23增至63mm，鞋底最小-52.3mm未解决，因此保留工程候选，不升级主线或物理接触证据；完整数字见comparison/validation和AI_PROGRESS。
+
+
+### 2026-10-04 连续联合窗口：实现与验收
+
+入口仍为 `scene.replay_fitted_body_scene`，新增配置 `--scene-profile joint_stage_window`，对应 `--landing-recovery joint_window`。其他输入沿用本文件完整命令；输出另选非空不存在的目录。窗口求解实现拆入 `realtime_app/pose_app/joint_stage_window.py`，现有landing controller负责缓冲和发布，StageHandoffGroundWriter负责提供未经补齐的原始背景旋转与严格踝点/原脚锚。SciPy已在现有requirements-mainline中固定，不新增模型或重拟合身体。
+
+算法不再将落地修正按固定0.3秒曲线集中到末尾。活动运动帧到达时即尝试联合估计0.5秒未发布窗口中的相机XYZ与三轴旋转；连续停止帧共享末个运动帧的同一位姿。窗口首个状态固定，作为已发布历史和新窗口之间的边界；已发布帧不修改。原ground writer退出活动期后不启动求解，窗口含已退出活动期的非Stage1过渡行时整体拒绝，不能借窗口优化延长原四帧carry。静止可发生在空中，只有原有运动/停止/人体下肢恢复连续证据加显式平地协议满足后才加入支撑先验。
+
+优化采用SO(3)增量 `R_i=Exp(delta_r_i) R_i_base` 和平移增量 `t_i=t_i_base+delta_t_i`。停止共享同一组参数。目标是以下归一化残差的平方和：
+
+- 运动帧严格踝点的世界脚锚偏差，尺度20mm；Stage1人体恢复行不再使用脚静止因子。被双脚间距或平移一致性门拒绝的行不重新用作脚因子。
+- 已接受背景旋转边 `R_i≈R_(i-1) R_to_from^T` 的SO(3)残差，尺度0.5度；缺边不填identity，旋转可观性不因此升级。
+- 相邻真实时间间隔的速度差除以平均间隔，构成平移/旋转加速度项，尺度分别1000mm/s²、100deg/s²。这是工程正则，并非人体或助步器动力学模型。
+- 防止自由变量偏离当前估计过多的弱先验，平移50mm、旋转10度。它不冒充独立观测。
+- 仅在落地证据确认时加入末端相机高度残差（2mm尺度）和地面法向残差（0.2度尺度）；不固定XY/yaw，不用末端直接投影覆盖解。
+
+至少3行、2个严格脚因子及1条接受旋转边才求解。`scipy.optimize.least_squares`使用最多20次函数评估、ftol/xtol/gtol=1e-5；此上限不是20次总矩阵计算，也不是墙钟实时限额。预算耗尽、完整目标未下降、原120mm/5度/60mm门失败、脚锚P95比原测量位姿恶化超过2mm，均拒绝整个提案。要求支撑时，末端还必须在5mm高度/0.5度倾角内。外层原150mm/8度恢复幅度门保留。失败不裁剪成成功，不插值严格点。
+
+重复窗口的脚保护始终参照第一次修改前的 `measurement_pose_before_support`，不参照已被上一窗口修改的位姿，避免每次容忍2mm而逐次漂移。被接受的窗口只修改未发布行，另记录`joint_window_attempt/solution`、factor数、目标前后值、残差、求解耗时和修正类型；原measurement/status/reason、严格掩码、world_pose_certified=False保留。当前变量名沿用旧恢复接口，`correction_type=joint_motion_estimate`与`joint_protocol_support`明确区分运动修正和协议落地。
+
+冻结对照 `lag_review`，保留首次 `joint_window_review`、原测量残差保护后的 `joint_window_checked` 与活动门保护后的 `joint_window_gated`。不以中间版本较好看的指标代替最终版本。审查统一命令：
+
+```powershell
+.\.venv-cuda\Scripts\python.exe -B realtime_app/run_tool.py scene.audit_stage_handoff --joint-window `
+  --root research_records/engineering_validation/G20261003_repositioned360_manual_v1 `
+  --experiment research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1
+```
+
+各完整重放命令为实验目录中的 `joint_window_*_command.json`。核查输出 `joint_window_validation.json`；包含全部360帧、严格mask和同源XYZ、发布JSONL/NPZ、合法旋转、阶段序列、静止段位移、人体变化、真实时间速度/加速度及窗口计时。计时不包含检测器推理，不将整次离线重放平均帧耗时当实时部署能力。
+
+最终活动门版本相对lag_review：速度峰值835.93→691.69mm/s，加速度P95 6635.18→2430.77mm/s²；相机最大帧步长47.13→53.00mm（此项反而变差），骨盆步长P95 29.99→28.95mm，静止段最大相机位移均为0。第333帧高度偏差187.13→183.41mm，倾角8.35→8.69度，仍没有闭合。34次窗口提案接受、14次拒绝、64次不可用，其中53次因窗口含 inactive transition；只在150确认一次协议恢复，18次后续恢复仍超限。窗口求解耗时P95约598.63ms、最大686.72ms，名义缓冲0.5s的样本时间延迟P95约0.563s（不含上述计算耗时）。
+
+决定：实现通过工程回归，但科研目标尚未通过，不替代默认主线，也不把中间checked的487mm/s峰值写成最终版本指标。下一阶段先精确划分连续可观测窗口与不可观测边界，避免一个失效过渡帧让整窗长期不可用；保持该边界位姿与拒绝证据。随后检查脚锚来源及绝对支撑姿态之间的兼容性，并优化稀疏/解析Jacobian。不能增加末端恢复力度或放宽150mm/8度门来获得假闭合。现有viewer仍为旧冻结候选，没有冒充新窗口结果。
