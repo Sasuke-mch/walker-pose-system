@@ -1,0 +1,41 @@
+{
+  "schema": "stage_ground_profiles_v1",
+  "profiles": {
+    "baseline": {
+      "level": "retained_engineering_baseline_not_physical_validation",
+      "options": {
+        "processing_width": 480,
+        "foot_observation_mode": "causal_median",
+        "continuous_stage": false,
+        "stage_handoff": false,
+        "disable_stage1_reanchor": false,
+        "predict_camera_dropout": false,
+        "ankle_bearing_fallback": false,
+        "single_ankle_fallback": false,
+        "latest_anchor": false,
+        "landing_recovery": "none",
+        "landing_protocol": null,
+        "background_vo_diagnostic": false,
+        "background_vo_rectified": false
+      }
+    },
+    "landing_fixed_lag": {
+      "level": "experimental_candidate_not_default",
+      "options": {
+        "processing_width": 480,
+        "foot_observation_mode": "current",
+        "continuous_stage": false,
+        "stage_handoff": true,
+        "disable_stage1_reanchor": true,
+        "predict_camera_dropout": false,
+        "ankle_bearing_fallback": false,
+        "single_ankle_fallback": true,
+        "latest_anchor": true,
+        "landing_recovery": "fixed_lag",
+        "landing_protocol": "flat_ground_supported_after_motion",
+        "background_vo_diagnostic": false,
+        "background_vo_rectified": false
+      }
+    }
+  }
+}

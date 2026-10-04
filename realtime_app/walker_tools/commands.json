@@ -186,5 +186,6 @@
   "visualization.render_upright_skeleton_camera_rays": "render_upright_skeleton_camera_rays.py",
   "visualization.render_upright_skeleton_camera_rays_detail": "render_upright_skeleton_camera_rays_detail.py",
   "visualization.visualize_offline_stereo_models": "visualize_offline_stereo_models.py",
-  "visualization.visualize_wilor_2d": "visualize_wilor_2d.py"
+  "visualization.visualize_wilor_2d": "visualize_wilor_2d.py",
+  "scene.audit_stage_handoff": "audit_stage_handoff.py"
 }

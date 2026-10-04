@@ -1,6 +1,73 @@
 # 当前两阶段与动态地面主线
 
-本文描述保留主线及末节单独列出的实验候选。下述旧采集数量和路径保留为历史记录；2026-10-03换机位360帧的当前展示使用`scene_rotation_fix_v1`。历史平面 XY、完整平面 SE(2)、稠密背景 SE(3)、平滑展示和刚性助步器接触原型均不再作为当前入口。
+当前入口、等级和复现参数以本节及 `realtime_app/configs/current_mainline.json` 的 `scene_route` 为准。`scene_rotation_fix_v1` 是冻结工程基线；浏览器中的 `stage_landing_recovery_v1/view_final` 是落地恢复候选的历史展示，不能因展示更新自动升级为主线。下面较早的采集数量保留为历史证据。
+
+
+## 2026-10-04 审查后的调用与等级
+
+采用部分替换：严格输入导出和最终发布流导出修正进入共用场景入口；落地恢复不替代默认阶段算法。身体冷启动路线、检测器候选等级和优化参数没有改变。实时 `run_stereo.py` 没有接入固定延迟落地恢复；以下候选入口是离线重放。
+
+场景参数统一保存在 `realtime_app/configs/stage_ground_profiles.json`：
+
+| 配置 | 行为 | 级别 |
+|---|---|---|
+| `baseline` | 原阶段识别、完整SE(3)、因果踝中值、原Stage 1硬恢复 | 保留工程基线，仍有跳变与落地假设问题 |
+| `landing_fixed_lag` | 交接状态机、当前踝、最近脚锚、单踝回退、0.5秒未发布缓冲中的支撑恢复 | 离线实验候选，不能称为实时已验证或真实接触 |
+
+`--scene-profile` 固定算法开关，输入路径由实验提供。冲突的显式参数报错；不支持缩写参数。候选必须传入真实 `--frames-metadata`。不传配置仍保留原入口的默认算法，避免历史脚本静默换方法。`baseline_review` 实验是旧 `hard_restore` 的**交接硬恢复对照**，不是 `baseline` 配置，勿混用其结果。
+
+### 输入如何进入计算
+
+1. 读取左右检测帧，要求帧集合相同且从0连续编号；不截断到公共前缀。读取选定图像的 `left_ccw90/right_cw90/pair_XXXX.png`，逆旋转回原始鱼眼像素。标定始终cam0=LEFT、cam1=RIGHT。
+2. 读取同次拟合的严格JSONL。每帧最多一对人物，人物编号必须(0,0)；有效关节需正双侧深度、有限XYZ、不重复索引。空人物帧完整保留。接受掩码和导出XYZ直接来自此文件，拒绝点填NaN。独立重算的点仅存为 `detector_only_*` 诊断，不参与有效点导出或地面求解。右膝索引14不被省略。
+3. 左右host-return时间取均值作配对时间，分别保存两侧时间和偏差。它们不是曝光同步证明。交接候选禁止用名义FPS代替真实记录。
+4. 背景KLT和人体补偿运动进入原阶段识别；旋转跟踪器从当前图像求当前相机←上一相机的旋转。未通过背景质量门的旋转不冒充测量。稀疏背景平移诊断与阶段跟踪分开运行，不能作为可信VO注入。
+5. 基线按原规则确认Stage 1/2；交接候选以背景运动/停止证据决定地面动作，两帧确认阶段，但首个运动帧即尝试严格脚约束更新、首个停止帧即保持位姿。未知帧采取有限carry或hold，有动作但不保证能成功测量。Stage 2脚静止来自受控动作协议，没有被独立证明。
+6. Stage 1保持相机位姿并更新下一次运动所用脚锚候选。Stage 2取脚世界锚 `a` 和相机坐标踝 `p`，在旋转已知的条件下用 `t=a-Rp` 求平移。双脚结果需通过60mm一致性、120mm步幅、5度旋转等原门；0.45增益更新平移。候选用当前踝和最新锚避免跨走路段的中值滞后。单踝回退需恰有一个严格踝、锚存在、当前累计旋转无缺边，预测偏差≤80mm，并仍过步幅/角度门。它只是降级工程估计。
+7. 旋转按当前←上一方向左乘累计，世界旋转使用逆旋转更新。失败帧保留原原因、位姿保持和缺边状态。现有缺边审计只描述局部累计窗，不能认证全片绝对旋转可观性；`world_pose_certified=False` 始终保留。
+8. 严格点/人体模型通过 `P_ground=R*P_camera+t` 进入同一地面坐标系。模型顶点由米转毫米后计算；beta、身体姿态和手姿不会因本次场景重放重新优化。助步器只采用静态相机安装模型随同一变换计算；旧机位安装几何不是本次测量真值。
+9. 固定延迟候选只在未发布缓冲中修正位姿。关闭writer后重新读取最终JSONL导出NPZ，检查360个ID顺序，禁止将consume返回的临时可变对象作为已发布结果。可视化读取最终同源R/t及真实三角面，不再增加展示平滑或踝点吸附。
+
+### 落地恢复内部如何做
+
+先观察至少两个连续运动样本、运动起止跨度至少0.1秒，再观察至少0.12秒连续停止和至少两个连续的人体/下肢恢复运动样本。人体证据要求同一视图上半身至少3点且补偿运动≥1.2px，踝至少1点且背景残差≥1.2px。单纯背景静止、只有手臂动、短暂停止均不等于落地。本次修正：未知/不明确动作切断这条证据链；停止后再运动重建运动起点；人体恢复票必须连续，不再累计零散票。
+
+显式协议 `flat_ground_supported_after_motion` 提供“落架后回到同一平地支撑姿态”的先验。目标保持XY和平面yaw，恢复初始高度与相对roll/pitch；不是所有姿态归零。高度差>150mm或旋转差>8度拒绝恢复，不裁剪成成功。
+
+固定延迟模式保留0.5秒未发布行，取停止前最多0.3秒的缓冲窗，按真实时间计算 `u` 并以 `3u²-2u³` 混合高度和SO(3)旋转。已经发布的行不修改。确认后重建锚并清空旧平移历史。actual release delay逐行记录，流尾有专门标记；非因果输出明确 `causal=False`。这是确定性协议先验投影，**不是联合优化、接触认证或闭环三维定位**。
+
+因果对照以时间常数0.12秒渐进恢复，限制200mm/s、20deg/s，但因此静止段仍有相机下移；不能把它称为严格助步器静止。固定延迟模式减少此冲突，但会增加可见延迟。
+
+每条修正行保留恢复前R/t、原状态/拒绝原因和原脚锚，另计算恢复后的踝残差；测量质量门的审计范围标为 `before_support_restoration`。通过旧门不代表恢复后仍通过，重新建锚也不等于误差消失。
+
+### 可复现入口
+
+在仓库根目录使用现有环境；以下输入共同对应换机位360帧，不得换入448帧旧腕参考：
+
+```powershell
+$src = 'research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2'
+$r = 'research_records/engineering_validation/G20261003_repositioned360_manual_v1'
+.\.venv-cuda\Scripts\python.exe -B realtime_app/run_tool.py scene.replay_fitted_body_scene `
+  --scene-profile landing_fixed_lag `
+  --left-video unused_left --right-video unused_right `
+  --input-pair-dir "$src/input" `
+  --left-pmpose "$src/left_pmpose_raw.json" --right-pmpose "$src/right_pmpose_raw.json" `
+  --calibration "$r/calibration/stereo_fisheye.json" `
+  --ground-reference realtime_app/calibration/results/static_ground_20260927_201028/ground_reference.json `
+  --walker-model research_records/engineering_validation/G20260918_offline_walker_frame_evidence_v1/coarse_complete_model_v2_camera_rail/coarse_walker_model.json `
+  --strict-jsonl "$r/pmpose/first_instance_strict.jsonl" --frames-metadata "$r/frames.json" `
+  --output "$r/stage_landing_recovery_v1/your_new_output"
+```
+
+基线替换为 `--scene-profile baseline`；不得把这一变化称为只切换落地恢复，因为候选还改变了交接、踝输入与回退。严格单变量对照使用已有 `hard_restore_command.json`，本次准确命令保存在 `baseline_review_command.json`、`lag_review_command.json`。输出目录非空即拒绝覆盖。底层JSON/图像、静态标定与模型需本机提供，源码仓库本身不含全部原始数据/模型资源。已有可视化 `view_final` 固定对应旧 `lag_lowerbody`，不能直接配新重放R/t而仍引用旧结果。
+
+独立审查命令：`python -B realtime_app/run_tool.py scene.audit_stage_handoff --review --root research_records/engineering_validation/G20261003_repositioned360_manual_v1 --experiment research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1`。它要求本次三份重放目录与冻结对照均存在，不会自动重跑拟合。
+
+复现检查：严格输入mask/XYZ与NPZ逐点对应、最终JSONL与NPZ位姿一致、R正交且det=1、所有帧顺序完整、重放不修改冻结身体参数。关键指标同时报相机跳变、人体变化、恢复前后踝残差、鞋底高度和实际发布延迟。审查结果保存在本实验 `review_validation.json`，以其数值为准。
+
+### 替换决定与尚未解决的冲突
+
+冻结旧候选恢复后踝残差P95约63mm，恢复前约23mm；鞋底最小约-52.3mm。本次360帧修订候选仅在98/150确认两次恢复，后续18次超限拒绝，第333帧高度偏差187.13mm、倾角8.35度；两次恢复的相同12个踝样本残差P95从22.99增至41.07mm。它没有通过闭合和脚锚兼容性要求。旧导出5949个有效点中有2918个不属于严格接受集，修正后3031；硬恢复对照R/t逐值不变。高度归零是施加先验的结果，不是独立精度证据。frame333严格点全部不可用，不能用该帧闭合作为观测验证。缺少物理支撑状态和新安装测量，整套算法暂不能替换基线。当前只采用共用入口的数据来源与发布修正，并给候选明确、可重复的调用位置。下一项科研修正应在同一窗口内同时检查脚锚与支撑姿态兼容性，失败时保留冲突原因；不能通过放宽门或直接更新锚消除报告中的残差。
 
 ## 1. 目标与物理约束
 

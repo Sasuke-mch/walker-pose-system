@@ -2,10 +2,13 @@
 
 import argparse
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
 import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
 def read(path):
@@ -325,15 +328,133 @@ def audit_landing(root, experiment):
     return report
 
 
+def audit_review(root, experiment):
+    from walker_tools.scene.replay_fitted_body_scene import strict_scene_arrays
+
+    strict = read(root / "pmpose/first_instance_strict.jsonl")
+    ids = [r["index"] for r in strict]
+    xyz, mask = strict_scene_arrays(strict, ids)
+    fit = np.load(root / "pmpose/fit/result.npz", allow_pickle=False)
+    report = {"evidence": "engineering_regression_not_physical_truth", "variants": {}}
+    for name, control in [
+        ("baseline_review", "hard_restore"),
+        ("lag_review", "lag_lowerbody"),
+        ("baseline_profile_review", "../scene_rotation_fix_v1"),
+    ]:
+        path = experiment / name
+        data = np.load(path / "scene_transforms.npz", allow_pickle=True)
+        old = np.load(experiment / control / "scene_transforms.npz", allow_pickle=True)
+        rows = read(path / "dynamic_ground_pose.jsonl")
+        if [r["pair_id"] for r in rows] != ids:
+            raise ValueError("published frame IDs changed")
+        np.testing.assert_array_equal(data["accepted"], mask)
+        np.testing.assert_allclose(
+            data["raw_triangulated_points_mm"], xyz, atol=0, rtol=0, equal_nan=True
+        )
+        R, t = (
+            data["rotation_ground_from_left"],
+            data["translation_ground_from_left_mm"],
+        )
+        if name in ("baseline_review", "baseline_profile_review"):
+            np.testing.assert_allclose(
+                R, old["rotation_ground_from_left"], atol=0, rtol=0
+            )
+            np.testing.assert_allclose(
+                t, old["translation_ground_from_left_mm"], atol=0, rtol=0
+            )
+        np.testing.assert_allclose(
+            R, [r["rotation_world_from_left_camera"] for r in rows], atol=0, rtol=0
+        )
+        np.testing.assert_allclose(
+            t,
+            [r["translation_world_from_left_camera_mm"] for r in rows],
+            atol=0,
+            rtol=0,
+        )
+        np.testing.assert_allclose(
+            R @ R.transpose(0, 2, 1), np.broadcast_to(np.eye(3), R.shape), atol=1e-8
+        )
+        np.testing.assert_allclose(np.linalg.det(R), 1, atol=1e-8)
+        post, pre, reasons = [], [], Counter()
+        for i, row in enumerate(rows):
+            expected = {
+                str(j): R[i] @ xyz[i, j] + t[i] for j in np.flatnonzero(mask[i])
+            }
+            if set(row["strict_points_ground_mm"]) != set(expected):
+                raise ValueError("published strict points do not match source mask")
+            for j, point in expected.items():
+                np.testing.assert_allclose(
+                    row["strict_points_ground_mm"][j], point, atol=1e-8
+                )
+            recovery = row["pose_audit"].get("landing_recovery", {})
+            if recovery.get("reason"):
+                reasons[recovery["reason"]] += 1
+            if recovery.get("applied"):
+                previous = row["pose_audit"]["measurement_pose_before_support"]
+                anchors = row.get("operational_ankle_anchors_mm") or {}
+                for side, j in [("left", 15), ("right", 16)]:
+                    if mask[i, j] and side in anchors:
+                        pre.append(
+                            np.linalg.norm(
+                                np.asarray(previous["rotation_world_from_left_camera"])
+                                @ xyz[i, j]
+                                + previous["translation_world_from_left_camera_mm"]
+                                - anchors[side]
+                            )
+                        )
+                        post.append(np.linalg.norm(expected[str(j)] - anchors[side]))
+        pelvis = (
+            np.einsum("fij,fkj->fki", R, fit["predicted_coco"][:, [11, 12]] * 1000)
+            + t[:, None]
+        ).mean(axis=1)
+        source = json.loads((path / "scene_sources.json").read_text(encoding="utf-8"))
+        report["variants"][name] = {
+            "strict_export_passed": True,
+            "published_pose_export_passed": True,
+            "strict_accepted_points": int(mask.sum()),
+            "detector_only_accepted_points": int(data["detector_only_accepted"].sum()),
+            "old_export_mask_difference_count": int(
+                np.count_nonzero(mask != old["accepted"])
+            ),
+            "maximum_rotation_change_vs_control": float(
+                np.max(np.abs(R - old["rotation_ground_from_left"]))
+            ),
+            "maximum_translation_change_vs_control_mm": float(
+                np.max(np.abs(t - old["translation_ground_from_left_mm"]))
+            ),
+            "camera_step_mm": stats(np.linalg.norm(np.diff(t, axis=0), axis=1)),
+            "pelvis_step_mm": stats(np.linalg.norm(np.diff(pelvis, axis=0), axis=1)),
+            "frame333_height_bias_mm": float(t[333, 2] - t[0, 2]),
+            "frame333_tilt_deg": float(
+                np.degrees(np.arccos(np.clip(R[333, 2] @ R[0, 2], -1, 1)))
+            ),
+            "same_modified_points_before_residual_mm": stats(pre),
+            "post_support_ankle_residual_mm": stats(post),
+            "support_rejection_reasons": dict(reasons),
+            "support_events": source["ground_summary"]
+            .get("landing_recovery", {})
+            .get("events", []),
+        }
+    report["full_replacement_accepted"] = False
+    (experiment / "review_validation.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return report
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--root", type=Path, required=True)
     p.add_argument("--experiment", type=Path, required=True)
-    p.add_argument("--landing", action="store_true")
+    mode = p.add_mutually_exclusive_group()
+    mode.add_argument("--landing", action="store_true")
+    mode.add_argument("--review", action="store_true")
     a = p.parse_args()
     print(
         json.dumps(
-            (audit_landing if a.landing else audit)(a.root, a.experiment),
+            (audit_review if a.review else audit_landing if a.landing else audit)(
+                a.root, a.experiment
+            ),
             ensure_ascii=False,
             indent=2,
         )

@@ -46,5 +46,76 @@
     "realtime_app/walker_tools/scene/replay_fitted_body_scene.py",
     "realtime_app/walker_tools/scene/audit_stage_handoff.py"
   ],
-  "decision": "fixed-lag protocol-supported recovery resolves accumulated supported-stop height and tilt in this replay; retain candidate level because corrected-window ankle-anchor residual worsens and physical support is not independently certified"
+  "decision": "fixed-lag protocol-supported recovery resolves accumulated supported-stop height and tilt in this replay; retain candidate level because corrected-window ankle-anchor residual worsens and physical support is not independently certified",
+  "review_revision": {
+    "objective": "strict export provenance and consecutive landing evidence regression",
+    "inputs": "same 360 images, calibration, strict JSONL, host timestamps; no body refit",
+    "control": "hard_restore and lag_lowerbody frozen runs",
+    "variables": "export provenance repair; landing consecutive evidence repair",
+    "success": "all IDs and strict masks exact; NPZ poses equal published JSONL; baseline poses unchanged; candidate deviations reported",
+    "stop": "do not promote if foot-anchor conflict remains; do not overwrite frozen outputs",
+    "outputs": [
+      "baseline_review",
+      "lag_review",
+      "review_validation.json",
+      "baseline_profile_review"
+    ],
+    "candidate_result": "Only two consecutive-evidence recoveries; 18 later attempts rejected, frame333 remains +187.13mm and 8.35deg. Do not promote.",
+    "code": [
+      "realtime_app/pose_app/landing_pose_recovery.py",
+      "realtime_app/walker_tools/scene/replay_fitted_body_scene.py",
+      "realtime_app/walker_tools/scene/audit_stage_handoff.py"
+    ],
+    "profile_snapshot": {
+      "schema": "stage_ground_profiles_v1",
+      "profiles": {
+        "baseline": {
+          "level": "retained_engineering_baseline_not_physical_validation",
+          "options": {
+            "processing_width": 480,
+            "foot_observation_mode": "causal_median",
+            "continuous_stage": false,
+            "stage_handoff": false,
+            "disable_stage1_reanchor": false,
+            "predict_camera_dropout": false,
+            "ankle_bearing_fallback": false,
+            "single_ankle_fallback": false,
+            "latest_anchor": false,
+            "landing_recovery": "none",
+            "landing_protocol": null,
+            "background_vo_diagnostic": false,
+            "background_vo_rectified": false
+          }
+        },
+        "landing_fixed_lag": {
+          "level": "experimental_candidate_not_default",
+          "options": {
+            "processing_width": 480,
+            "foot_observation_mode": "current",
+            "continuous_stage": false,
+            "stage_handoff": true,
+            "disable_stage1_reanchor": true,
+            "predict_camera_dropout": false,
+            "ankle_bearing_fallback": false,
+            "single_ankle_fallback": true,
+            "latest_anchor": true,
+            "landing_recovery": "fixed_lag",
+            "landing_protocol": "flat_ground_supported_after_motion",
+            "background_vo_diagnostic": false,
+            "background_vo_rectified": false
+          }
+        }
+      }
+    },
+    "checks": {
+      "related_unittest_passed": 59,
+      "cold_start_profile_pytest_passed": 14,
+      "ruff": "passed",
+      "source_compile_without_cache": 5,
+      "full_replays": 3,
+      "baseline_and_hard_restore_control_pose_change": "exactly_zero",
+      "failed_candidate_preserved": true,
+      "initial_audit_entry_failure": "scene.audit_stage_handoff was missing from tool catalog; registered and rerun successfully"
+    }
+  }
 }

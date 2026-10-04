@@ -69,5 +69,20 @@
       "name": "wrist_scale_5mm",
       "status": "tradeoff_candidate_not_default"
     }
-  ]
+  ],
+  "scene_route": {
+    "entry": "scene.replay_fitted_body_scene",
+    "profile_file": "realtime_app/configs/stage_ground_profiles.json",
+    "default_profile": "baseline",
+    "experimental_profile": "landing_fixed_lag",
+    "full_replacement_accepted": false,
+    "promoted_implementation_repairs": [
+      "strict_input_mask_and_points_export",
+      "published_ground_stream_export"
+    ],
+    "body_route_unchanged": true,
+    "live_landing_integrated": false,
+    "decision": "Support restoration conflicts with ankle anchors; retain as explicit offline candidate.",
+    "validation_dataset": "G20261003_repositioned360_manual_v1; scene replay independent of the frozen 448-frame body comparison above"
+  }
 }

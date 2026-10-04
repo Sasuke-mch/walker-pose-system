@@ -374,3 +374,8 @@ $follow = 'research_records/engineering_validation/G20261003_smplh_ablation_foll
 ```
 
 primary WiLoR使用现有PMPose身体腕关联；另报告Sapiens2关联及唯一同侧候选敏感性，不按人工标签选优。二维评价使用原始鱼眼欧氏像素距离，分别报告所有可用点与共同样本。三维仅沿用原人工几何门诊断，未通过的坐标不当真值。源码/完整指标见算法说明第20节及G20261003_wrist_detector_manual_v2。
+
+
+## 场景重放与落地候选（2026-10-04）
+
+`configs/current_mainline.json` 的 `scene_route` 导航到 `configs/stage_ground_profiles.json`。通过 `run_tool.py scene.replay_fitted_body_scene --scene-profile baseline|landing_fixed_lag` 调用；必须同时提供同源图像、严格JSONL、标定和地面参考。完整命令、阈值、时序、发布语义及等级见 [阶段与地面实现](../docs/CURRENT_STAGE_GROUND_PIPELINE.md)。落地固定延迟仅为离线候选，尚未接入实时采集入口。其高度闭合不能证明脚锚或接触成立；严格导出掩码和最终发布流修正适用于共用入口。

@@ -35,7 +35,11 @@ from pose_app.stereo_sources import StereoFramePair
 
 
 def args() -> argparse.Namespace:
-    p = argparse.ArgumentParser()
+    p = argparse.ArgumentParser(allow_abbrev=False)
+    profiles = json.loads(
+        (APP / "configs" / "stage_ground_profiles.json").read_text(encoding="utf-8")
+    )
+    p.add_argument("--scene-profile", choices=list(profiles["profiles"]))
     p.add_argument("--left-video", type=Path, required=True)
     p.add_argument("--right-video", type=Path, required=True)
     p.add_argument(
@@ -78,6 +82,14 @@ def args() -> argparse.Namespace:
     )
     p.add_argument("--landing-protocol", choices=["flat_ground_supported_after_motion"])
     parsed = p.parse_args()
+    if parsed.scene_profile:
+        options = profiles["profiles"][parsed.scene_profile]["options"]
+        supplied = {v.split("=", 1)[0] for v in sys.argv[1:] if v.startswith("--")}
+        for key, value in options.items():
+            flag = "--" + key.replace("_", "-")
+            if flag in supplied and getattr(parsed, key) != value:
+                p.error(f"{flag} conflicts with --scene-profile {parsed.scene_profile}")
+            setattr(parsed, key, value)
     if parsed.landing_recovery != "none" and (
         not parsed.stage_handoff or parsed.landing_protocol is None
     ):
@@ -142,6 +154,42 @@ def person(points: np.ndarray, width: int, height: int) -> PersonPose:
     )
 
 
+def strict_scene_arrays(rows, ids):
+    """Export exactly the accepted first-instance input consumed by the writer."""
+    if [r["index"] for r in rows] != ids:
+        raise ValueError("strict frame order differs from fit")
+    points = np.full((len(ids), 17, 3), np.nan, dtype=np.float64)
+    mask = np.zeros((len(ids), 17), dtype=bool)
+    for i, row in enumerate(rows):
+        people = row["persons_3d"]
+        if len(people) > 1:
+            raise ValueError("strict replay requires max_matches=1")
+        for person3d in people:
+            if (person3d["left_person_id"], person3d["right_person_id"]) != (0, 0):
+                raise ValueError("strict replay must match fitter first instances")
+            seen = set()
+            for point in person3d["keypoints_3d"]:
+                j = point["index"]
+                if not isinstance(j, int) or j not in range(17) or j in seen:
+                    raise ValueError("invalid or duplicate strict joint index")
+                seen.add(j)
+                if point["valid"]:
+                    xyz = np.asarray(point["xyz"], dtype=float)
+                    if (
+                        xyz.shape != (3,)
+                        or not np.isfinite(xyz).all()
+                        or not np.isfinite(
+                            [point["depth_left"], point["depth_right"]]
+                        ).all()
+                        or point["depth_left"] <= 0
+                        or point["depth_right"] <= 0
+                    ):
+                        raise ValueError("invalid accepted strict point")
+                    points[i, j] = xyz
+                    mask[i, j] = True
+    return points, mask
+
+
 def main() -> int:
     a = args()
     out = a.output.resolve()
@@ -161,15 +209,23 @@ def main() -> int:
         raise ValueError("raw PMPose frame ids must be contiguous from zero")
     left_points = np.stack([left_rows[i] for i in ids]).astype(np.float32)
     right_points = np.stack([right_rows[i] for i in ids]).astype(np.float32)
-    raw, _el, _er, _gap, _dl, _dr, accepted, _reason, _confidence, _parts = (
-        raw_clean.raw_triangulate(left_points, right_points, cal_geo)
-    )
+    (
+        detector_raw,
+        _el,
+        _er,
+        _gap,
+        _dl,
+        _dr,
+        detector_accepted,
+        _reason,
+        _confidence,
+        _parts,
+    ) = raw_clean.raw_triangulate(left_points, right_points, cal_geo)
     strict_rows = [
         json.loads(line)
         for line in a.strict_jsonl.read_text(encoding="utf-8").splitlines()
     ]
-    if [r["index"] for r in strict_rows] != ids:
-        raise ValueError("strict frame order differs from fit")
+    raw, accepted = strict_scene_arrays(strict_rows, ids)
     if a.input_pair_dir is not None:
         left_frames, right_frames, fps_l = read_selected_pairs(
             a.input_pair_dir, len(ids)
@@ -319,6 +375,16 @@ def main() -> int:
             )
     stage_summary = stage_writer.close(completed=True)
     ground_summary = ground_writer.close(completed=True)
+    # The fixed-lag writer returns provisional mutable rows during consume().
+    # Only the closed, published stream is authoritative for every export mode.
+    ground_rows = [
+        json.loads(line)
+        for line in (out / "dynamic_ground_pose.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+    if [row["pair_id"] for row in ground_rows] != ids:
+        raise ValueError("published ground frame order differs from input")
     if handoff_policy:
         stage_summary = {
             "legacy_summary": stage_summary,
@@ -354,6 +420,8 @@ def main() -> int:
         stage=stages,
         accepted=accepted,
         raw_triangulated_points_mm=raw,
+        detector_only_triangulated_points_mm=detector_raw,
+        detector_only_accepted=detector_accepted,
         pair_timestamp_sec=np.asarray(timing).mean(axis=1),
         left_timestamp_sec=np.asarray(timing)[:, 0],
         right_timestamp_sec=np.asarray(timing)[:, 1],
@@ -378,6 +446,9 @@ def main() -> int:
                 "static_walker_model": str(a.walker_model.resolve()),
                 "strict_input": str(a.strict_jsonl.resolve()),
                 "strict_scope": "same first instances as fitter; original association and per-point gates",
+                "export_mask_source": "strict_input_not_detector_only_retriangulation",
+                "ground_export_source": "closed_published_dynamic_ground_pose_jsonl",
+                "scene_profile": a.scene_profile,
                 "old_stage_jsonl_read": False,
                 "old_dynamic_ground_read": False,
                 "old_dynamic_walker_pose_read": False,

@@ -223,3 +223,8 @@ Three.js `OrbitControls` 必须支持：
 
 
 动态地面旋转增量修正（2026-10-03）：背景旋转为相邻图像的 current<-previous 边，须完整应用，不能乘平移滤波的0.45增益。足点或投票门拒绝期间的已接受旋转边按时间顺序左乘累计，恢复后相对于最后已提交地面位姿求解；成功提交后清空累计边，离开活动Stage2/有限transition后重置。原旋转/平移/双脚门保持；背景旋转缺失不伪造，输出missing_rotation_edges和rotation_chain_complete。显示应保留地面拒绝原因和旋转缺口，Stage2标签不代表地面或人体已静止。静态助步器参考下的几何检查须明确参考来源，不作为本次物理接触认证。
+
+
+### 2026-10-04 场景缓冲与有效点来源
+
+固定延迟候选的 `consume()` 返回行尚可被缓冲恢复修改，不是已发布帧。导出只能读取writer关闭后的 `dynamic_ground_pose.jsonl`，与 `scene_transforms.npz` 的ID、R/t逐帧一致。NPZ的 `accepted` 与 `raw_triangulated_points_mm` 必须来自本次严格JSONL；独立检测重三角化字段 `detector_only_*` 只能用于诊断，不能恢复被关联拒绝的点。展示必须区分协议支撑恢复与有效观测，不以恢复后高度为零标记真实落地。旧 `stage_landing_recovery_v1/view_final` 属于冻结 `lag_lowerbody`，不是本次修订候选。重建新页面时须将冻结拟合顶点及新场景位姿一起重新导出，禁止只换标签。

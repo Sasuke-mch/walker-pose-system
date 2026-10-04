@@ -492,5 +492,13 @@
       "all_rows_causal": false
     }
   },
-  "strict_masks_and_stage_sequences_equal": true
+  "strict_masks_and_stage_sequences_equal": true,
+  "review_warning": {
+    "historical_results_frozen": true,
+    "export_mask_is_detector_only_not_strict": true,
+    "correct_strict_accepted_count": 3031,
+    "historical_export_accepted_count": 5949,
+    "superseding_review": "review_validation.json",
+    "old_landing_evidence_not_consecutive": true
+  }
 }

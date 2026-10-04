@@ -1,0 +1,124 @@
+{
+  "evidence": "engineering_regression_not_physical_truth",
+  "variants": {
+    "baseline_review": {
+      "strict_export_passed": true,
+      "published_pose_export_passed": true,
+      "strict_accepted_points": 3031,
+      "detector_only_accepted_points": 5949,
+      "old_export_mask_difference_count": 2918,
+      "maximum_rotation_change_vs_control": 0.0,
+      "maximum_translation_change_vs_control_mm": 0.0,
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 21.728070683621358,
+        "maximum": 97.30260506422792
+      },
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.604487716635104,
+        "p95": 29.98624225013042,
+        "maximum": 62.9004954043667
+      },
+      "frame333_height_bias_mm": 0.0,
+      "frame333_tilt_deg": 0.0,
+      "same_modified_points_before_residual_mm": {
+        "count": 0
+      },
+      "post_support_ankle_residual_mm": {
+        "count": 0
+      },
+      "support_rejection_reasons": {},
+      "support_events": []
+    },
+    "lag_review": {
+      "strict_export_passed": true,
+      "published_pose_export_passed": true,
+      "strict_accepted_points": 3031,
+      "detector_only_accepted_points": 5949,
+      "old_export_mask_difference_count": 2918,
+      "maximum_rotation_change_vs_control": 0.1407894960971068,
+      "maximum_translation_change_vs_control_mm": 202.91073769168668,
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 20.406959115193246,
+        "maximum": 47.13419376123727
+      },
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.572343338918062,
+        "p95": 29.986242250130392,
+        "maximum": 62.90049540436671
+      },
+      "frame333_height_bias_mm": 187.13302647388832,
+      "frame333_tilt_deg": 8.347153481974011,
+      "same_modified_points_before_residual_mm": {
+        "count": 12,
+        "median": 14.659309412834808,
+        "p95": 22.989180619579713,
+        "maximum": 23.358275813818693
+      },
+      "post_support_ankle_residual_mm": {
+        "count": 12,
+        "median": 23.903581132717513,
+        "p95": 41.07359749343937,
+        "maximum": 42.81194947190341
+      },
+      "support_rejection_reasons": {
+        "support_correction_exceeds_150mm_or_8deg": 18
+      },
+      "support_events": [
+        {
+          "pair_id": 98,
+          "motion_window_start_sec": 5.059432350004499,
+          "stop_start_sec": 5.296482000005199,
+          "confirmation_sec": 5.539120650002587,
+          "height_error_mm": 21.598807125684175,
+          "tilt_error_deg": 2.7241471258637233
+        },
+        {
+          "pair_id": 150,
+          "motion_window_start_sec": 7.730538500003604,
+          "stop_start_sec": 7.936757550003676,
+          "confirmation_sec": 8.226922700003342,
+          "height_error_mm": 43.74597089787278,
+          "tilt_error_deg": 3.230665638992974
+        }
+      ]
+    },
+    "baseline_profile_review": {
+      "strict_export_passed": true,
+      "published_pose_export_passed": true,
+      "strict_accepted_points": 3031,
+      "detector_only_accepted_points": 5949,
+      "old_export_mask_difference_count": 2918,
+      "maximum_rotation_change_vs_control": 0.0,
+      "maximum_translation_change_vs_control_mm": 0.0,
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 17.429091151752623,
+        "maximum": 79.43356572685232
+      },
+      "pelvis_step_mm": {
+        "count": 359,
+        "median": 13.909587937498458,
+        "p95": 34.564702254288036,
+        "maximum": 66.23860577013912
+      },
+      "frame333_height_bias_mm": 0.0,
+      "frame333_tilt_deg": 0.0,
+      "same_modified_points_before_residual_mm": {
+        "count": 0
+      },
+      "post_support_ankle_residual_mm": {
+        "count": 0
+      },
+      "support_rejection_reasons": {},
+      "support_events": []
+    }
+  },
+  "full_replacement_accepted": false
+}
