@@ -12,7 +12,16 @@ from pose_app.two_stage_motion import WorldPose
 
 
 class RecoveryTests(unittest.TestCase):
-    def simulate(self, mode="fixed_lag", human=True, height=64, tilt=0.05, ankles=True):
+    def simulate(
+        self,
+        mode="fixed_lag",
+        human=True,
+        height=64,
+        tilt=0.05,
+        ankles=True,
+        actions=None,
+        human_frames=None,
+    ):
         initial = WorldPose(np.eye(3), np.array([0.0, 0.0, 700.0]))
         recovery = LandingPoseRecovery(
             initial, mode=mode, protocol="flat_ground_supported_after_motion"
@@ -38,6 +47,8 @@ class RecoveryTests(unittest.TestCase):
                     rotation, np.array([50.0, 20.0, 700.0 + height])
                 )
             moving = 1 <= i <= 8
+            action = (actions or {}).get(i, STAGE2 if moving else STAGE1)
+            human_now = human if human_frames is None else i in human_frames
             payload = {
                 "pair_id": i,
                 "pair_timestamp_sec": i * 0.05,
@@ -52,13 +63,13 @@ class RecoveryTests(unittest.TestCase):
             }
             stage = {
                 "stage": {
-                    "handoff": {"ground_stage": STAGE2 if moving else STAGE1},
+                    "handoff": {"ground_stage": action},
                     "pose_motion": {
                         "left": {
                             "upper_body_keypoints": 8,
-                            "upper_body_compensated_motion_px": 2 if human else 0,
-                            "ankle_count":2,
-                            "ankle_background_residual_median_px":2 if ankles else 0,
+                            "upper_body_compensated_motion_px": 2 if human_now else 0,
+                            "ankle_count": 2,
+                            "ankle_background_residual_median_px": 2 if ankles else 0,
                         }
                     },
                 }
@@ -194,6 +205,19 @@ class RecoveryTests(unittest.TestCase):
         initial = WorldPose(np.eye(3), np.zeros(3))
         with self.assertRaises(ValueError):
             LandingPoseRecovery(initial, mode="fixed_lag", protocol=None)
+
+    def test_unknown_stage_breaks_landing_evidence(self):
+        _, estimator, recovery, _, _ = self.simulate(actions={10: "transition"})
+        self.assertFalse(recovery.events)
+        self.assertEqual(estimator.pose.translation_world_from_camera_mm[2], 764)
+
+    def test_restart_does_not_count_previous_motion_and_stop_as_motion(self):
+        _, _, recovery, _, _ = self.simulate(actions={10: STAGE2})
+        self.assertFalse(recovery.events)
+
+    def test_nonconsecutive_human_resume_does_not_qualify(self):
+        _, _, recovery, _, _ = self.simulate(human_frames={9, 11, 13, 15, 17})
+        self.assertFalse(recovery.events)
 
 
 if __name__ == "__main__":

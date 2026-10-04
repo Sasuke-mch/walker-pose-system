@@ -76,7 +76,7 @@ class LandingPoseRecovery:
         }
         row["pose_audit"]["landing_recovery"] = audit
         if action == STAGE2:
-            if self.motion_start is None:
+            if self.motion_start is None or self.stop_start is not None:
                 self.motion_start = time
                 self.motion_samples = 0
             self.motion_samples += 1
@@ -95,7 +95,7 @@ class LandingPoseRecovery:
                 and p["ankle_background_residual_median_px"] >= 1.2
                 for p in stage["stage"].get("pose_motion", {}).values()
             )
-            self.human_samples += int(human)
+            self.human_samples = self.human_samples + 1 if human else 0
             qualified = (
                 self.motion_samples >= 2
                 and self.stop_start - self.motion_start >= 0.1
@@ -187,6 +187,10 @@ class LandingPoseRecovery:
                         self.recovering = False
                     return True
         else:
+            # An unavailable/ambiguous action breaks the landing evidence chain.
+            # Do not use elapsed wall time across a gap as observed motion.
+            self.motion_start = None
+            self.motion_samples = 0
             self.stop_start = None
             self.human_samples = 0
             self.recovering = False
