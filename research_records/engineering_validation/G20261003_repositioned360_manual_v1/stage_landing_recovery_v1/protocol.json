@@ -199,5 +199,19 @@
       "source_compile_without_cache": 6,
       "old_fixed_lag_full360_compatibility": "exactly unchanged"
     }
+  },
+  "formal_mainline_decision_20261004": {
+    "scene_profile": "baseline",
+    "alias": "mainline",
+    "candidate_promoted": false,
+    "body_result_unchanged": true,
+    "method_levels_unchanged": true,
+    "reason": "Landing closure failed for fixed-lag and joint-window; joint-window compute budget also failed. Select retained baseline, retain its limitations.",
+    "validation": "mainline_alias_validation.json",
+    "command": "mainline_alias_command.json",
+    "output": "mainline_alias_review",
+    "unique_variable": "profile name mainline instead of baseline; all algorithm options and inputs unchanged",
+    "success": "all 360 transforms, strict masks/XYZ, stage records and published pose records equal baseline_profile_review; metadata resolves mainline to baseline",
+    "stop": "any mismatch or unavailable input blocks completed selection validation; do not refit or relax gates"
   }
 }

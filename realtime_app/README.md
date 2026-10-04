@@ -376,8 +376,14 @@ $follow = 'research_records/engineering_validation/G20261003_smplh_ablation_foll
 primary WiLoR使用现有PMPose身体腕关联；另报告Sapiens2关联及唯一同侧候选敏感性，不按人工标签选优。二维评价使用原始鱼眼欧氏像素距离，分别报告所有可用点与共同样本。三维仅沿用原人工几何门诊断，未通过的坐标不当真值。源码/完整指标见算法说明第20节及G20261003_wrist_detector_manual_v2。
 
 
-## 场景重放与落地候选（2026-10-04）
+## 正式场景主线与落地候选（2026-10-04）
 
-`configs/current_mainline.json` 的 `scene_route` 导航到 `configs/stage_ground_profiles.json`。通过 `run_tool.py scene.replay_fitted_body_scene --scene-profile baseline|landing_fixed_lag` 调用；必须同时提供同源图像、严格JSONL、标定和地面参考。完整命令、阈值、时序、发布语义及等级见 [阶段与地面实现](../docs/CURRENT_STAGE_GROUND_PIPELINE.md)。落地固定延迟仅为离线候选，尚未接入实时采集入口。其高度闭合不能证明脚锚或接触成立；严格导出掩码和最终发布流修正适用于共用入口。
+`configs/current_mainline.json` 的 `scene_route` 导航到 `configs/stage_ground_profiles.json`。通过 `run_tool.py scene.replay_fitted_body_scene --scene-profile mainline` 调用；必须同时提供同源图像、严格JSONL、标定和地面参考。完整命令、阈值、时序、发布语义及等级见 [阶段与地面实现](../docs/CURRENT_STAGE_GROUND_PIPELINE.md)。落地固定延迟仅为离线候选，尚未接入实时采集入口。其高度闭合不能证明脚锚或接触成立；严格导出掩码和最终发布流修正适用于共用入口。
 
 连续窗口候选：同一场景入口使用 `--scene-profile joint_stage_window`；独立审查使用 `scene.audit_stage_handoff --joint-window`。最终实验为joint_window_gated；速度变化改善但落地闭合和实时耗时未通过，保留离线候选级别。完整残差定义与门见阶段实现文档。
+
+正式选择读取 `current_mainline.json/mainline_selection`：360帧PMPose身体候选、strict3031点及baseline场景。`mainline`仅为场景配置别名，实际参数与`baseline`完全一致，不把任何候选开关打开。源图像、标定、地面和严格JSONL必须由同次实验提供；完整命令在`G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review_command.json`，重放时仅把scene-profile改为mainline，并把output改到未存在目录。绝不覆盖冻结输出。
+
+身体参数复现使用360帧自己的`pmpose/fit_command.json`；该命令关闭人工腕项。本文前述冷启动回归和消融命令专用于448帧冻结对照，不能自动改用360帧manifest。WiLoR仅提供局部手指旋转先验，不提供米制腕平移；身体共享beta与逐帧姿态求解之后才应用当前场景变换。
+
+实时Stage/地面沿用`run_stereo.py`，选择full SE(3)需要显式`--enable-stage-walker --dynamic-ground-full-se3`，同时提供`--dynamic-ground-reference`和当前标定等既有输入。离线SMPL-H整段拟合没有接入这一实时入口。候选分别显式使用`landing_fixed_lag`或`joint_stage_window`；不能根据页面播放或更平滑就替代主线。严格输入及最终发布流导出修复共享，候选算法等级保持不变。

@@ -97,8 +97,18 @@ class SceneReplayContractTests(unittest.TestCase):
     def test_baseline_keeps_algorithm_defaults(self):
         original, profile = self.parse([]), self.parse(["--scene-profile", "baseline"])
         for key in vars(original):
-            if key != "scene_profile":
+            if key not in {"scene_profile", "resolved_scene_profile"}:
                 self.assertEqual(getattr(original, key), getattr(profile, key))
+
+    def test_mainline_resolves_to_frozen_baseline(self):
+        selected = self.parse(["--scene-profile", "mainline"])
+        baseline = self.parse(["--scene-profile", "baseline"])
+        self.assertEqual(selected.resolved_scene_profile, "baseline")
+        for key in vars(baseline):
+            if key != "scene_profile":
+                self.assertEqual(getattr(selected, key), getattr(baseline, key))
+        with self.assertRaises(SystemExit):
+            self.parse(["--scene-profile", "mainline", "--stage-handoff"])
 
     def test_candidate_requires_real_timing_and_rejects_conflicting_flag(self):
         with self.assertRaises(SystemExit):

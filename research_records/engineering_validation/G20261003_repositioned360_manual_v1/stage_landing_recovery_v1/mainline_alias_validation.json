@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "checks": {
+    "archive_keys_equal": true,
+    "array_rotation_ground_from_left": true,
+    "array_translation_ground_from_left_mm": true,
+    "array_stage": true,
+    "array_accepted": true,
+    "array_raw_triangulated_points_mm": true,
+    "array_detector_only_triangulated_points_mm": true,
+    "array_detector_only_accepted": true,
+    "array_pair_timestamp_sec": true,
+    "array_left_timestamp_sec": true,
+    "array_right_timestamp_sec": true,
+    "strict_count_3031": true,
+    "all_360_frames": true,
+    "stage1_stage2.jsonl": true,
+    "dynamic_ground_pose.jsonl": true,
+    "mainline_resolves_baseline": true,
+    "448_frozen_fields_unchanged": true,
+    "no_candidate_promotion": true,
+    "body_path_result": true,
+    "body_path_source_command": true,
+    "body_path_audit": true,
+    "shared_options_baseline_unchanged": true
+  },
+  "control": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\baseline_profile_review",
+  "candidate": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\mainline_alias_review",
+  "unique_variable": "scene-profile alias only",
+  "excluded_from_exact_comparison": [
+    "wall-clock processing_ms"
+  ],
+  "tests": {
+    "selected_pytest_passed": 52,
+    "ruff": "passed"
+  },
+  "diagnostic_attempts": [
+    {
+      "status": "failed",
+      "reason": "Initial audit loaded the locally generated object stage array with allow_pickle=False; reran with explicit trusted local archive loading."
+    }
+  ],
+  "evidence": "implementation equality only; no physical-contact/accuracy promotion"
+}

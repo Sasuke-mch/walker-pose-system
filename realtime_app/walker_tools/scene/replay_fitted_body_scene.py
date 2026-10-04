@@ -39,7 +39,7 @@ def args() -> argparse.Namespace:
     profiles = json.loads(
         (APP / "configs" / "stage_ground_profiles.json").read_text(encoding="utf-8")
     )
-    p.add_argument("--scene-profile", choices=list(profiles["profiles"]))
+    p.add_argument("--scene-profile", choices=["mainline", *profiles["profiles"]])
     p.add_argument("--left-video", type=Path, required=True)
     p.add_argument("--right-video", type=Path, required=True)
     p.add_argument(
@@ -84,8 +84,16 @@ def args() -> argparse.Namespace:
     )
     p.add_argument("--landing-protocol", choices=["flat_ground_supported_after_motion"])
     parsed = p.parse_args()
+    parsed.resolved_scene_profile = parsed.scene_profile
+    if parsed.scene_profile == "mainline":
+        route = json.loads(
+            (APP / "configs" / "current_mainline.json").read_text(encoding="utf-8")
+        )
+        parsed.resolved_scene_profile = route["scene_route"]["default_profile"]
+        if parsed.resolved_scene_profile not in profiles["profiles"]:
+            p.error("mainline refers to an unknown scene profile")
     if parsed.scene_profile:
-        options = profiles["profiles"][parsed.scene_profile]["options"]
+        options = profiles["profiles"][parsed.resolved_scene_profile]["options"]
         supplied = {v.split("=", 1)[0] for v in sys.argv[1:] if v.startswith("--")}
         for key, value in options.items():
             flag = "--" + key.replace("_", "-")
@@ -451,6 +459,7 @@ def main() -> int:
                 "export_mask_source": "strict_input_not_detector_only_retriangulation",
                 "ground_export_source": "closed_published_dynamic_ground_pose_jsonl",
                 "scene_profile": a.scene_profile,
+                "resolved_scene_profile": a.resolved_scene_profile,
                 "old_stage_jsonl_read": False,
                 "old_dynamic_ground_read": False,
                 "old_dynamic_walker_pose_read": False,

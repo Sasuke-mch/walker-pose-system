@@ -82,7 +82,7 @@
     ],
     "body_route_unchanged": true,
     "live_landing_integrated": false,
-    "decision": "Support restoration conflicts with ankle anchors; retain as explicit offline candidate.",
+    "decision": "Formal scene mainline remains baseline. Strict-input and published-stream export repairs are shared; fixed-lag and joint-window landing algorithms remain explicit offline candidates.",
     "validation_dataset": "G20261003_repositioned360_manual_v1; scene replay independent of the frozen 448-frame body comparison above",
     "joint_window_candidate": {
       "profile": "joint_stage_window",
@@ -90,6 +90,64 @@
       "experiment": "G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/joint_window_gated",
       "decision": "Speed/acceleration improve; support closure and real-time compute budget fail.",
       "full_replacement_accepted": false
-    }
+    },
+    "default_alias": "mainline"
+  },
+  "legacy_fields_scope": "frames, frame_ids, body_candidate, matched_control, profile, frozen_scalar_options and body entries describe the unchanged frozen 448-frame comparison, not the current 360-frame scene selection.",
+  "mainline_selection": {
+    "decision_date": "2026-10-04",
+    "level": "selected_engineering_route_not_physical_validation",
+    "detector": "pmpose",
+    "frames": 360,
+    "frame_ids": "0..359",
+    "source_pair_ids": "1157..1516",
+    "dataset": "research_records/engineering_validation/G20261003_repositioned360_manual_v1",
+    "detector_inputs": {
+      "left": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/left_pmpose_raw.json",
+      "right": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/right_pmpose_raw.json",
+      "images": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input"
+    },
+    "strict_scene_input": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/first_instance_strict.jsonl",
+    "strict_scene_accepted_points": 3031,
+    "scene_profile_alias": "mainline",
+    "resolved_scene_profile": "baseline",
+    "scene_reference": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review",
+    "scene_reproduction_command": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review_command.json",
+    "body": {
+      "result": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz",
+      "source_command": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json",
+      "audit": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/implementation_audit.json",
+      "level": "engineering_candidate",
+      "accepted_for_main_fit": false,
+      "wrist_reference_enabled": false,
+      "beta_policy": "joint_shared_sequence",
+      "native_mano_pose_prior": true,
+      "contact_enabled": false,
+      "body_temporal_weight": 0.0
+    },
+    "live": {
+      "entry": "realtime_app/run_stereo.py",
+      "required_stage_flags": [
+        "--enable-stage-walker",
+        "--dynamic-ground-full-se3"
+      ],
+      "ground_reference_option": "--dynamic-ground-reference",
+      "landing_candidate_integrated": false,
+      "full_body_fit_is_offline": true,
+      "end_to_end_realtime_certified": false
+    },
+    "known_limits": [
+      "Original Stage 1 support restoration can jump; unsupported flat-ground assumption remains.",
+      "Missing background rotation and strict foot points retain unavailable/rejected states.",
+      "Body fitting and strict scene triangulation have distinct accepted masks; do not relabel body inputs as strict scene points.",
+      "Historical walker installation is a display reference, not this capture physical-contact truth.",
+      "No independent metric 3D truth, validated hand/sole contact, or end-to-end real-time body fit."
+    ],
+    "retained_comparison_scope": "448-frame Sapiens2 body candidate and PMPose matched control retain their existing levels and all frozen options.",
+    "candidate_promotion": {
+      "landing_fixed_lag": false,
+      "joint_stage_window": false
+    },
+    "decision_reason": "Retain the reproducible baseline; candidates improve some motion metrics but fail landing closure, with joint window also exceeding the compute budget. Sapiens2 360-frame cold initialization failed the unchanged 300 mm gate."
   }
 }

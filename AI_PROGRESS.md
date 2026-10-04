@@ -3510,3 +3510,18 @@ view_final/body.html使用当前lag_lowerbody同帧变换、原6890顶点/13776�
 - 不替代默认主线。后续优先连续可观测窗口分段/边界约束、脚锚与绝对支撑兼容性及稀疏/解析Jacobian。不能以调权或放宽恢复门获得假闭合。源码可提交为已验证工程候选，不宣称科研目标或实时部署通过。
 
 - 验收完成：68项相关unittest、14项冷启动配置pytest、Ruff和6文件无缓存编译通过；旧fixed_lag全360帧重放R/t、mask、XYZ和时间逐值不变（joint_window_compatibility.json）。本次仅本地提交，原有其他修改/删除/未跟踪内容保留，不推送。
+
+
+## 2026-10-04 正式工程主线冻结与导航统一
+
+按用户要求决定当前正式路线并更新项目相关文件。选择为PMPose原始鱼眼观测、严格双目几何、原Stage 1/2识别、完整SE(3)地面baseline、同源SMPL-H冷启动与WiLoR原生局部手姿；不将落地固定延迟或连续联合窗口提升为默认。后两者部分运动指标改善，但落地闭合未通过，联合窗口还超出耗时预算。正式选择是可复现工程版本，不代表独立精度、物理接触或整套实时部署认证。
+
+current_mainline.json新增mainline_selection明确换机位360帧、原始pair1157..1516、图像/检测/strict输入、身体结果和准确命令、实时入口要求及局限。配置顶层448帧body_candidate/matched_control/frozen_scalar_options原样保留并明确legacy_fields_scope；Sapiens2身体候选/PMPose同流程对照等级不变。360帧Sapiens2初始化失败结果不用于网格；360帧PMPose身体仍为工程候选，fit_summary实际wrist_reference.enabled=False，不能因目录manual名称写成已启用人工腕约束。WiLoR只提供局部手指旋转，身体beta全片共享，B/C优化同一个beta，之后冻结。严格场景3031点与身体重三角化观测的mask区分记录，不混称。
+
+场景入口新增--scene-profile mainline别名，从scene_route/default_profile解析为baseline；baseline具体开关仍只维护在stage_ground_profiles.json。冲突开关报错、候选显式调用、未传配置的历史行为均保留。scene_sources保存请求名称与实际解析名称；算法、阈值、carry、接触/身体优化没有改变。实时run_stereo选择完整SE(3)需显式stage/ground开关，离线整段身体拟合没有接入实时入口。
+
+相关导航README、CLAUDE、PROJECT_STATUS增加最新决定及历史范围；CURRENT_STAGE_GROUND_PIPELINE详述逐步数据处理、两条观测分支、准确优化阶段集合、共用坐标变换、输入/发布接口、复现资源与停止条件。CURRENT_SMPLH_ALGORITHM及realtime_app/README明确448与360配置边界。只修改现有文档，历史方法/结果不删除，不改viewer，不重新检测或拟合人体。
+
+验证：52项场景契约、交接、落地、联合窗口及身体回归测试通过；本次代码Ruff通过。使用原baseline_profile_review命令仅改profile名称及新输出目录，完整重放360帧于stage_landing_recovery_v1/mainline_alias_review。10个NPZ字段（R/t、Stage、strict点/mask、诊断点及双方时间）与原baseline逐值相同；Stage与最终动态地面JSONL除processing_ms外完全一致，strict仍3031点。准确命令mainline_alias_command.json、协议和mainline_alias_validation.json保存输入、唯一变量和检查。首次数值核查因本机生成的Stage object数组禁用pickle而失败，改为显式可信本机数组读取后完成；失败原因保留。缺少授权资源时不可宣称通过。
+
+基线仍有硬恢复跳变、背景/脚缺测和本次扶手安装未认证等限制；不将正式主线标签写成科学问题解决。后续必须在原脚锚保护和活动门内同时通过落地闭合、跳变与总延迟门，才可替换Stage/地面部分。既有工作区改动保留；根导航仅隔离本次新增块提交，不顺带提交此前清理或其他代码。没有推送远端。

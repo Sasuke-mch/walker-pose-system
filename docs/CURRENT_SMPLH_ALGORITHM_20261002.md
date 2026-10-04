@@ -1,5 +1,9 @@
 # 当前 SMPL-H 算法流程与交接记录
 
+## 本文范围与当前选择（2026-10-04）
+
+本文主体记录448帧冷启动身体内核和冻结对照；不应将其中的人工腕权重、数据路径或默认Sapiens2候选套到360帧换机位实验。正式场景路线选用PMPose和baseline，360帧身体仍为工程候选，未启用人工腕参考。全片共享beta在B/C阶段优化同一个参数，随后冻结；不存在逐帧beta。身体源命令为 `research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json`，场景与身体分支的接受掩码不同，不可混称。完整选择及调用见 `CURRENT_STAGE_GROUND_PIPELINE.md` 和 `realtime_app/configs/current_mainline.json` 的 `mainline_selection`；顶层旧字段保留448帧语义。
+
 更新时间：2026-10-02。仓库根目录：`D:\my_works\walker_pose_system`。
 
 本文记录当前 448 帧冷启动身体与手部拟合的实际计算，不按二维检测器品牌组织，也不把历史固定抓握精修误写成当前步骤。依据为实际入口、拟合源码、保存的运行命令、结果及审计文件。它是当前实验的实现说明；长期规则仍以 AGENTS.md、AI_PROGRESS.md 和 VISUALIZATION_PIPELINE.md 为准。

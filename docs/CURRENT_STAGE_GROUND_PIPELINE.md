@@ -1,7 +1,39 @@
 # 当前两阶段与动态地面主线
 
+## 2026-10-04 正式工程主线决定
+
+当前正式工程路线固定为 **PMPose 原始鱼眼观测 → 严格双目几何 → 原 Stage 1/2 识别 → 完整 SE(3) 动态地面基线 → 同源 SMPL-H 冷启动身体及 WiLoR 原生局部手姿**。选择清单位于 `realtime_app/configs/current_mainline.json` 的 `mainline_selection`，场景调用使用 `--scene-profile mainline`，实际解析为 `baseline`。这是一项可复现版本决定，不是物理接触、独立三维精度或整套实时部署认证。
+
+本次场景数据为换机位 360 帧（0..359，原始配对1157..1516）；身体使用 `G20261003_repositioned360_manual_v1/pmpose/fit/result.npz`。该结果**未启用人工腕软参考**，身体仍为工程候选。人工标注目录名称不能用来推断损失是否启用。448 帧 Sapiens2 身体候选与 PMPose 同流程对照保持原等级和参数；配置顶层的 `frames/body_candidate/frozen_scalar_options` 仍专用于这组冻结对照，不代表360帧运行参数。
+
+`landing_fixed_lag` 与 `joint_stage_window` 保留为显式离线候选：运动指标有部分改善，但落地闭合未通过，联合窗口还未满足耗时预算。只将严格点/掩码导出和最终发布流导出修复纳入共用入口。原基线的硬恢复跳变、缺失测量及静态扶手参考局限继续记录，不用候选或显示平滑掩盖。
+
+详细数据流、参数、命令及停止条件见 `docs/CURRENT_STAGE_GROUND_PIPELINE.md`；身体内核及448帧历史实现见 `docs/CURRENT_SMPLH_ALGORITHM_20261002.md`。后文较早的“当前”判断按其数据集和日期理解；最新选择以本节、`AI_PROGRESS.md` 和选择清单为准。
+
+
 当前入口、等级和复现参数以本节及 `realtime_app/configs/current_mainline.json` 的 `scene_route` 为准。`scene_rotation_fix_v1` 是冻结工程基线；浏览器中的 `stage_landing_recovery_v1/view_final` 是落地恢复候选的历史展示，不能因展示更新自动升级为主线。下面较早的采集数量保留为历史证据。
 
+
+
+### 正式版本的处理顺序与接口边界
+
+1. **输入与观测**：物理相机身份仍由instance_id注册表解析；cam0=LEFT、cam1=RIGHT。已有检测输入可转正，但进入几何前逆旋转回原始鱼眼像素。人物关联和逐点几何质量门不改变，最多匹配一对人物；失败帧、拒绝原因及NaN保持可见。
+2. **身体分支**：按该数据集保存的fit_command重新构造观测，在相机坐标系求SMPL-H。A30步只优化逐帧transl与VPoser latent，root冻结；B30步只优化全片同一个共享beta；C300步优化共享beta以及逐帧root、transl、latent；D1/D2各100步只优化共享lhand/rhand PCA，身体和beta冻结；D3为0。准确可训练集合来自源码stage plan，不把预算名称当变量集合。WiLoR原生MANO局部旋转以0.1权重提供手指先验，不使用它的global_orient/transl/beta作为人体或腕的绝对位置。360帧人工腕、身体二维重投影、身体时序和表面接触项未启用。冻结结果用于场景对照，不在此阶段重新求解身体。
+3. **场景严格点分支**：地面入口实际消费360帧strict JSONL的3031个接受点。身体拟合保存的观测和场景严格点是两个明确的数据产品；源命令可能独立重三角化，不能仅因来自同一检测器就认为接受掩码相同。scene NPZ中的有效XYZ/mask必须与strict文件逐项相同；detector_only重算仅为诊断，不能补充脚锚或填失败点。
+4. **Stage识别**：原背景/人体运动证据经原TwoStageRecognizer产生Stage状态和不可用原因。Stage1表达助步器/相机静止、人体可动；Stage2表达人体脚锚静止、助步器/相机可动。它们是工程动作协议，不是逐帧独立真值；保留原状态确认与活动carry，不引入候选交接状态机。
+5. **地面位姿**：使用当前原始图像估计被质量门接受的背景旋转；Stage2按严格脚点和因果中值观测估计完整SE(3)地面增量。Stage1仍使用原支撑恢复，缺测保留状态及原因。姿态定义为相机点映射到地面系的T_G<-C_t；场景显示和指标共同消费最终关闭/发布的位姿流。原硬恢复的跳变是已知缺陷，不能凭主线选择消除。
+6. **人体、地面、助步器共用变换**：身体相机系网格乘当前T_G<-C_t；地面来自当前位姿；相机刚性连接的助步器使用同一变换及既有结构参考。没有单独抬降人体、脚或助步器的显示补偿。静态助步器安装尚未在本次布置重新认证，只能作为结构/显示参考。
+7. **审计与发布**：保留360帧编号、实际配对时间、严格点、阶段、R/t及原始拒绝原因。时间是host-return，不能声称曝光同步。结果生成后核对JSONL/NPZ发布一致性、参数重建和真实模型面。离线整段拟合、实时Stage/地面和页面播放是三个不同接口，不能互相替代耗时验证。
+
+### 复现版本、资源与验证入口
+
+`current_mainline.json/mainline_selection`保存当前选择，`scene_route/default_profile`是场景别名解析的唯一来源；`stage_ground_profiles.json/baseline/options`是场景算法开关来源。未传scene-profile时保留历史调用行为；显式mainline时固定baseline开关，冲突参数直接报错。输出同时保存请求的scene_profile和resolved_scene_profile。别名不会改身体manifest中的448帧冻结参数。
+
+360帧准确身体命令：`G20261003_repositioned360_manual_v1/pmpose/fit_command.json`。准确场景命令：同目录`stage_landing_recovery_v1/mainline_alias_command.json`。这些路径均位于`research_records/engineering_validation`下。命令列表记录实际输入和输出；复跑必须将output/output-dir换到不存在的新目录，不能覆盖对照。图像、标定、测量地面、WiLoR缓存及授权SMPL-H/VPoser资源均需本地恢复；缺失时报告不可用，不从旧动态场景或其他采集填补。
+
+公开检查使用`realtime_app/run_validation.py`；本次针对路由、严格观测和保留候选运行`test_scene_replay_contract.py`、`test_stage_handoff.py`、`test_landing_pose_recovery.py`、`test_joint_stage_window.py`和`test_mainline_regression.py`。448帧身体回归仍使用该数据集原冻结命令，不自动读取360帧路径。mainline_alias_validation记录360帧别名重放与baseline的逐值对照，通过仅说明路由没有改变计算。
+
+后续改变Stage/落地算法必须另列输入、唯一变量、成功门和停止条件；至少同时检查静止持有、活动carry、原严格脚锚保护、落地高度/倾角闭合、位置/速度/加速度跳变以及测量加计算的总延迟。联合窗口目前只能通过部分运动指标，不能替代基线。若基线也未达到科研目标，应明确两者都未通过，而不是把主线标签当成功判定。
 
 ## 2026-10-04 审查后的调用与等级
 
