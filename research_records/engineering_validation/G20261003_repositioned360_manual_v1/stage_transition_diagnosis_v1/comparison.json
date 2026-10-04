@@ -1,0 +1,2174 @@
+{
+  "evidence": "internal frozen-body diagnostics, no stage/contact/external trajectory truth",
+  "backward_axis": "negative horizontal projection of initial left-camera optical forward",
+  "variants": {
+    "control": {
+      "stages": {
+        "warming_up": 3,
+        "stage1_walker_static_human_moving": 223,
+        "transition": 64,
+        "stage2_feet_static_walker_moving": 70
+      },
+      "ground_status": {
+        "held": 255,
+        "landed_support_reanchored": 10,
+        "accepted": 43,
+        "unavailable": 25,
+        "accepted_rotation_held": 17,
+        "rejected": 10
+      },
+      "moving_transition_backward_sum_mm": 47.056586091971255,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 17.680347559614518,
+        "p95": 39.89885630432165,
+        "maximum": 40.94433761887979
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 13.777148647375846,
+        "p95": 36.73660157756994,
+        "maximum": 42.37944141196861
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.909587937498458,
+        "p95": 34.564702254288036,
+        "maximum": 66.23860577013912
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.853573948045405,
+        "p95": 56.44586236601806,
+        "maximum": 246.34354222247538
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 17.429091151752623,
+        "maximum": 79.43356572685232
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 213,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 2,
+      "actions": {
+        "legacy": 360
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.371594790337573,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 22.54882955071561,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 9.15152983184957,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 11.548686601842183,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 15.216706842850435,
+          "backward_step_mm": 7.23784360591069,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 24.429089531214675,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 13.952810979844614,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 17.680347559614518,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.94433761887979,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.990714440785116,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.96211069726122,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 19.486187007270892,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.926122319375514,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 7.071185683945673,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 31.577058770180425,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 18.847165519283667,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 39.89885630432165,
+          "backward_step_mm": 39.818742486060565,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.909598975978968,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 8.218238942536194,
+          "backward_step_mm": 0.0,
+          "status": "held",
+          "reason": null
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498458,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 23.772943298405917,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        }
+      ]
+    },
+    "stage_policy": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 252,
+        "landed_support_reanchored": 9,
+        "accepted": 43,
+        "unavailable": 30,
+        "accepted_rotation_held": 11,
+        "rejected": 15
+      },
+      "moving_transition_backward_sum_mm": 64.39860430057888,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 15.92612231937555,
+        "p95": 40.94433761887979,
+        "maximum": 44.33926938711654
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 13.863102822503269,
+        "p95": 33.81309327087506,
+        "maximum": 44.33926938711654
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.79918550092394,
+        "p95": 32.461788642444695,
+        "maximum": 62.90049540436675
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.795441058177147,
+        "p95": 56.98755539609581,
+        "maximum": 246.34354222247543
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 15.68085537689745,
+        "maximum": 59.29006710099941
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 8,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.587039043648511,
+          "backward_step_mm": 6.430728307330634,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 17.909206446288803,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 3.130044491314736,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 5.570259569711939,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 15.216706842850417,
+          "backward_step_mm": 7.306155339754975,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 24.42908953121461,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 13.95281097984457,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 17.680347559614525,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.94433761887979,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.990714440785137,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.962110697261203,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 19.486187007270978,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.92612231937555,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 13.450619342699952,
+          "backward_step_mm": 6.336420279084472,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 27.999633136417433,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 14.89392707183522,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 44.33926938711654,
+          "backward_step_mm": 44.3253003744088,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.909598975978973,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 8.218238942536205,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498477,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 23.772943298405917,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        }
+      ]
+    },
+    "stage_no_reanchor": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 43,
+        "unavailable": 30,
+        "accepted_rotation_held": 11,
+        "rejected": 15
+      },
+      "moving_transition_backward_sum_mm": 64.46144732704235,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 15.926122319375486,
+        "p95": 40.944337618879814,
+        "maximum": 44.34423506145778
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 13.777148647375784,
+        "p95": 33.82421652675417,
+        "maximum": 44.34423506145778
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.74062132578514,
+        "p95": 32.46041474035307,
+        "maximum": 62.90049540436686
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.670757494451856,
+        "p95": 56.42198455512645,
+        "maximum": 246.34354222247546
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 13.41092793705789,
+        "maximum": 32.81534301004517
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 8,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.587039043648511,
+          "backward_step_mm": 6.430728307330634,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 17.909206446288803,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 3.130044491314736,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 5.5720565783483265,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 15.216706842850478,
+          "backward_step_mm": 8.30638445168418,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 24.429089531214686,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 13.952810979844479,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 17.680347559614596,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.944337618879814,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.99071444078516,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.96211069726126,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 19.48618700727091,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.926122319375486,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 13.569989528252533,
+          "backward_step_mm": 5.535854525214341,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 27.98348562894433,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 14.885642560723232,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 44.34423506145778,
+          "backward_step_mm": 44.1884800428132,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.909598975979016,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 8.21823894253614,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.90958793749854,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 23.77294329840595,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        }
+      ]
+    },
+    "stage_current": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 42,
+        "unavailable": 30,
+        "accepted_rotation_held": 11,
+        "rejected": 16
+      },
+      "moving_transition_backward_sum_mm": 70.81898948110978,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 15.926122319375532,
+        "p95": 40.94433761887976,
+        "maximum": 43.15559768728645
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 13.777148647375775,
+        "p95": 33.475620313712575,
+        "maximum": 43.15559768728645
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.74062132578514,
+        "p95": 30.80573989036017,
+        "maximum": 62.90049540436684
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.05914920194446,
+        "p95": 55.39344704381408,
+        "maximum": 246.3435422224755
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 12.859729643419346,
+        "maximum": 41.19581542027696
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 8,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.587039043648511,
+          "backward_step_mm": 6.430728307330634,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 16.337447269416604,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 8.625900204427031,
+          "backward_step_mm": 8.220981277584526,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 5.5720565783483265,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 15.2167068428505,
+          "backward_step_mm": 8.306384451684202,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 24.429089531214686,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 13.952810979844493,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 17.680347559614596,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.94433761887976,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.990714440785162,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.96211069726115,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 19.486187007270917,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.926122319375532,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 13.569989528252533,
+          "backward_step_mm": 5.535854525214341,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 24.95666887912242,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 15.864882523046566,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 43.15559768728645,
+          "backward_step_mm": 42.32504091929607,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.909598975978898,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 8.218238942536155,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498502,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 23.77294329840595,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        }
+      ],
+      "vo": {
+        "status": {
+          "unavailable": 360
+        },
+        "reasons": {
+          "first_frame": 1,
+          "fewer_than_six_links": 359
+        },
+        "max_links": 5,
+        "max_solver_points": 0,
+        "processing_ms": {
+          "count": 360,
+          "median": 110.78199998883065,
+          "p95": 128.20387998654041,
+          "maximum": 153.3497000054922
+        },
+        "pose_injected": false
+      }
+    },
+    "stage_predict": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 42,
+        "predicted": 9,
+        "accepted_rotation_held": 11,
+        "unavailable": 22,
+        "rejected": 15
+      },
+      "moving_transition_backward_sum_mm": 70.08233737157849,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 16.337447269416604,
+        "p95": 40.94433761887976,
+        "maximum": 42.317553004206445
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 13.777148647375775,
+        "p95": 33.47562031371254,
+        "maximum": 42.379441411968564
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.667763129925637,
+        "p95": 30.67065860786873,
+        "maximum": 62.90049540436684
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.13538668174035,
+        "p95": 53.97819625039843,
+        "maximum": 246.3435422224755
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 14.74285961452824,
+        "maximum": 30.275576827741105
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 8,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.587039043648511,
+          "backward_step_mm": 6.430728307330634,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 16.337447269416604,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 8.625900204427031,
+          "backward_step_mm": 8.220981277584526,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 5.5720565783483265,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 15.2167068428505,
+          "backward_step_mm": 8.306384451684202,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 24.429089531214686,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 13.952810979844587,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 17.6803475596146,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.94433761887976,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.99071444078518,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.962110697261227,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 19.486187007270967,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.926122319375532,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 13.569989528252531,
+          "backward_step_mm": 5.535854525214358,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 24.95666887912242,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 17.34828896505448,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 42.317553004206445,
+          "backward_step_mm": 41.58838880976477,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.909598975978898,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 8.218238942536155,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498502,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 23.77294329840595,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        }
+      ],
+      "vo": {
+        "status": {
+          "unavailable": 261,
+          "accepted": 76,
+          "rejected": 23
+        },
+        "reasons": {
+          "first_frame": 1,
+          "fewer_than_six_links": 260,
+          "null": 76,
+          "withheld_reprojection_failed": 16,
+          "relative_motion_limit": 7
+        },
+        "max_links": 20,
+        "max_solver_points": 20,
+        "processing_ms": {
+          "count": 360,
+          "median": 112.63989999133628,
+          "p95": 157.70439000189074,
+          "maximum": 210.78510000370443
+        },
+        "pose_injected": false
+      }
+    },
+    "stage_bearing": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 42,
+        "unavailable": 29,
+        "accepted_rotation_held": 11,
+        "rejected": 16,
+        "accepted_ankle_bearings": 1
+      },
+      "moving_transition_backward_sum_mm": 69.76695232790621,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 16.337447269416604,
+        "p95": 40.94433761887976,
+        "maximum": 42.061406693212014
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 13.777148647375775,
+        "p95": 33.47562031371265,
+        "maximum": 42.379441411968564
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.737679587243433,
+        "p95": 30.80573989036017,
+        "maximum": 62.900495404366836
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.964202226327004,
+        "p95": 55.393447043814064,
+        "maximum": 246.3435422224755
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 14.741480560651683,
+        "maximum": 41.19581542027696
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 8,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.587039043648511,
+          "backward_step_mm": 6.430728307330634,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 16.337447269416604,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 8.625900204427031,
+          "backward_step_mm": 8.220981277584526,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 5.5720565783483265,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 15.2167068428505,
+          "backward_step_mm": 8.306384451684202,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 24.429089531214686,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 13.952810979844493,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 17.680347559614596,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.94433761887976,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.990714440785162,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.96211069726115,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 19.486187007270917,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.926122319375532,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 13.569989528252533,
+          "backward_step_mm": 5.535854525214341,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 24.95666887912242,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 17.716347101800153,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 42.061406693212014,
+          "backward_step_mm": 41.2730037660925,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.909598975978898,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 8.218238942536155,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498474,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 23.772943298405927,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        }
+      ]
+    },
+    "stage_single": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 52,
+        "accepted_single_ankle": 14,
+        "accepted_rotation_held": 13,
+        "unavailable": 16,
+        "rejected": 4
+      },
+      "moving_transition_backward_sum_mm": 110.20334902599572,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 15.926122319375558,
+        "p95": 40.944337618879736,
+        "maximum": 43.1573276824996
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 12.427487117903285,
+        "p95": 32.38882688891696,
+        "maximum": 43.1573276824996
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.73767958724342,
+        "p95": 31.31928491108972,
+        "maximum": 62.900495404366765
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.860042133535273,
+        "p95": 53.56988886461671,
+        "maximum": 246.34354222247532
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 18.544869520646547,
+        "maximum": 61.52437037026905
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 16,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.587039043648511,
+          "backward_step_mm": 6.430728307330634,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 16.337447269416604,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 8.625900204427031,
+          "backward_step_mm": 8.220981277584526,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 5.572056578348316,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 18.400619564143973,
+          "backward_step_mm": 14.935706178519556,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 17.987781015925453,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 12.64090119571128,
+          "backward_step_mm": 3.980604830450604,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 7.48795732625725,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.944337618879736,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.990714440785165,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.962110697261203,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 23.184535241440166,
+          "backward_step_mm": 14.37672833476327,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.926122319375558,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 13.595415920433098,
+          "backward_step_mm": 4.795961384196359,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 24.949191824395385,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 15.861182182974758,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 43.1573276824996,
+          "backward_step_mm": 41.613621014344616,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 10.447130818762954,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 4.064456314364796,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498529,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 32.43421891946002,
+          "backward_step_mm": 15.849017698806147,
+          "status": "accepted",
+          "reason": null
+        }
+      ]
+    },
+    "stage_latest_single": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 52,
+        "accepted_single_ankle": 17,
+        "accepted_rotation_held": 13,
+        "unavailable": 13,
+        "rejected": 4
+      },
+      "moving_transition_backward_sum_mm": 117.88717009535844,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 13.909587937498527,
+        "p95": 30.802282018608185,
+        "maximum": 42.88074953256102
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 11.76521843848031,
+        "p95": 29.418424551309105,
+        "maximum": 42.88074953256102
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.572343338918062,
+        "p95": 29.98624225013037,
+        "maximum": 62.90049540436675
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.565894334815809,
+        "p95": 51.922608300194646,
+        "maximum": 246.34354222247532
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 19.459102283254428,
+        "maximum": 47.134193761237334
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 20,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 6.342730523234521,
+          "backward_step_mm": 5.904600532242261,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 17.587442857758415,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 8.601880666831699,
+          "backward_step_mm": 8.061827625620268,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 10.552585689138368,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 19.896338991211177,
+          "backward_step_mm": 17.67766440281453,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 22.979508592138977,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 11.339142683033291,
+          "backward_step_mm": 5.969551193406686,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 7.716302149688929,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 15.294772547658393,
+          "backward_step_mm": 1.336040898117476,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 13.86326078952782,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 16.349691025498714,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 14.363360290411318,
+          "backward_step_mm": 12.90816997453295,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 10.464890171068737,
+          "backward_step_mm": 9.476941554252383,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 4.44500140308239,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 23.75000324456463,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 16.245980958182287,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 42.88074953256102,
+          "backward_step_mm": 41.21647118015085,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.73299286357457,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 3.1026492217214794,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498527,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 30.802282018608185,
+          "backward_step_mm": 15.335902734221031,
+          "status": "accepted",
+          "reason": null
+        }
+      ]
+    },
+    "background_wide": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 42,
+        "unavailable": 30,
+        "accepted_rotation_held": 11,
+        "rejected": 16
+      },
+      "moving_transition_backward_sum_mm": 70.81898948110978,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 15.926122319375532,
+        "p95": 40.94433761887976,
+        "maximum": 43.15559768728645
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 13.777148647375775,
+        "p95": 33.475620313712575,
+        "maximum": 43.15559768728645
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.74062132578514,
+        "p95": 30.80573989036017,
+        "maximum": 62.90049540436684
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 16.05914920194446,
+        "p95": 55.39344704381408,
+        "maximum": 246.3435422224755
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 12.859729643419346,
+        "maximum": 41.19581542027696
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 8,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 8.587039043648511,
+          "backward_step_mm": 6.430728307330634,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 16.337447269416604,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 8.625900204427031,
+          "backward_step_mm": 8.220981277584526,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 5.5720565783483265,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 15.2167068428505,
+          "backward_step_mm": 8.306384451684202,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 24.429089531214686,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 13.952810979844493,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 17.680347559614596,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 40.94433761887976,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 27.990714440785162,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 22.96211069726115,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 19.486187007270917,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 15.926122319375532,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 13.569989528252533,
+          "backward_step_mm": 5.535854525214341,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 24.95666887912242,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 15.864882523046566,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 43.15559768728645,
+          "backward_step_mm": 42.32504091929607,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.909598975978898,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 8.218238942536155,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498502,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 23.77294329840595,
+          "backward_step_mm": 0.0,
+          "status": "rejected",
+          "reason": "two_foot_translation_disagreement"
+        }
+      ],
+      "vo": {
+        "status": {
+          "unavailable": 242,
+          "accepted": 106,
+          "rejected": 12
+        },
+        "reasons": {
+          "first_frame": 1,
+          "fewer_than_six_links": 241,
+          "null": 106,
+          "withheld_reprojection_failed": 5,
+          "spatially_degenerate_links": 2,
+          "relative_motion_limit": 3,
+          "pnp_inliers_insufficient": 2
+        },
+        "max_links": 37,
+        "max_solver_points": 20,
+        "processing_ms": {
+          "count": 360,
+          "median": 707.7759999810951,
+          "p95": 766.166310000699,
+          "maximum": 860.9285999846179
+        },
+        "pose_injected": false
+      }
+    },
+    "stage_final": {
+      "stages": {
+        "warming_up": 1,
+        "transition": 35,
+        "stage1_walker_static_human_moving": 244,
+        "stage2_feet_static_walker_moving": 80
+      },
+      "ground_status": {
+        "held": 261,
+        "accepted": 52,
+        "accepted_single_ankle": 17,
+        "accepted_rotation_held": 13,
+        "unavailable": 13,
+        "rejected": 4
+      },
+      "moving_transition_backward_sum_mm": 117.88717009535844,
+      "moving_transition_pelvis_step_mm": {
+        "count": 21,
+        "median": 13.909587937498527,
+        "p95": 30.802282018608185,
+        "maximum": 42.88074953256102
+      },
+      "all_transition_pelvis_step_mm": {
+        "count": 64,
+        "median": 11.76521843848031,
+        "p95": 29.418424551309105,
+        "maximum": 42.88074953256102
+      },
+      "all_pelvis_step_mm": {
+        "count": 359,
+        "median": 13.572343338918062,
+        "p95": 29.98624225013037,
+        "maximum": 62.90049540436675
+      },
+      "all_fitted_ankle_step_mm": {
+        "count": 718,
+        "median": 15.565894334815809,
+        "p95": 51.922608300194646,
+        "maximum": 246.34354222247532
+      },
+      "camera_step_mm": {
+        "count": 359,
+        "median": 0.0,
+        "p95": 19.459102283254428,
+        "maximum": 47.134193761237334
+      },
+      "consecutive_stage1_camera_step_mm": {
+        "count": 236,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "baseline_moving_transition_treated": 20,
+      "actions": {
+        "uncertain_pose_hold": 9,
+        "stop_confirmation_pose_hold": 9,
+        "walker_pose_hold": 242,
+        "motion_onset_strict_foot_pose_update": 11,
+        "strict_foot_pose_update": 80,
+        "bounded_support_carry": 9
+      },
+      "moving_transition_frames": [
+        {
+          "frame": 84,
+          "pelvis_step_mm": 6.342730523234521,
+          "backward_step_mm": 5.904600532242261,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 85,
+          "pelvis_step_mm": 17.587442857758415,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 86,
+          "pelvis_step_mm": 8.601880666831699,
+          "backward_step_mm": 8.061827625620268,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 122,
+          "pelvis_step_mm": 10.552585689138368,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 190,
+          "pelvis_step_mm": 19.896338991211177,
+          "backward_step_mm": 17.67766440281453,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 191,
+          "pelvis_step_mm": 22.979508592138977,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 192,
+          "pelvis_step_mm": 11.339142683033291,
+          "backward_step_mm": 5.969551193406686,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 193,
+          "pelvis_step_mm": 7.716302149688929,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 195,
+          "pelvis_step_mm": 15.294772547658393,
+          "backward_step_mm": 1.336040898117476,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 196,
+          "pelvis_step_mm": 13.86326078952782,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 197,
+          "pelvis_step_mm": 16.349691025498714,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 198,
+          "pelvis_step_mm": 14.363360290411318,
+          "backward_step_mm": 12.90816997453295,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 199,
+          "pelvis_step_mm": 10.464890171068737,
+          "backward_step_mm": 9.476941554252383,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 267,
+          "pelvis_step_mm": 4.44500140308239,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 268,
+          "pelvis_step_mm": 23.75000324456463,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 273,
+          "pelvis_step_mm": 16.245980958182287,
+          "backward_step_mm": 0.0,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 274,
+          "pelvis_step_mm": 42.88074953256102,
+          "backward_step_mm": 41.21647118015085,
+          "status": "accepted",
+          "reason": null
+        },
+        {
+          "frame": 344,
+          "pelvis_step_mm": 12.73299286357457,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 345,
+          "pelvis_step_mm": 3.1026492217214794,
+          "backward_step_mm": 0.0,
+          "status": "accepted_single_ankle",
+          "reason": null
+        },
+        {
+          "frame": 354,
+          "pelvis_step_mm": 13.909587937498527,
+          "backward_step_mm": 0.0,
+          "status": "unavailable",
+          "reason": "strict_two_foot_input_missing"
+        },
+        {
+          "frame": 355,
+          "pelvis_step_mm": 30.802282018608185,
+          "backward_step_mm": 15.335902734221031,
+          "status": "accepted",
+          "reason": null
+        }
+      ]
+    }
+  }
+}

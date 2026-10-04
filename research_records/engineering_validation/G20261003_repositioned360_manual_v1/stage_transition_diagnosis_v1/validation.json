@@ -1,0 +1,62 @@
+{
+  "default_360_frame_regression": {
+    "rotation_ground_from_left": {
+      "equal": true,
+      "maximum_difference": 0.0
+    },
+    "translation_ground_from_left_mm": {
+      "equal": true,
+      "maximum_difference": 0.0
+    },
+    "raw_triangulated_points_mm": {
+      "equal": true,
+      "maximum_difference": 0.0
+    },
+    "accepted": {
+      "equal": true
+    },
+    "stage": {
+      "equal": true
+    }
+  },
+  "tests": {
+    "passed": 57,
+    "command": "PYTHONPATH=realtime_app;realtime_app/tests python -B -m unittest test_stage_handoff test_continuous_stage_ground test_dynamic_ground_live test_realtime_stage_walker test_two_stage_motion test_static_background_vo test_static_background_stereo_frontend test_static_background_rotation"
+  },
+  "compile_without_cache_files": 8,
+  "failures_corrected": [
+    "synthetic bearing fixture integer OpenCV translation changed to float",
+    "Ruff C401 rewritten as set comprehension",
+    "auxiliary surface-set read used Windows GBK; corrected explicit UTF-8"
+  ],
+  "scientific_failures_preserved": [
+    "mask membership not certified; background VO isolated",
+    "many links below six",
+    "bearing anchor reprojection failures",
+    "directional negative-step sum worsened",
+    "frame274 residual body/camera disagreement"
+  ],
+  "accepted_for_mainline": false,
+  "candidate_final_replay": {
+    "rotation_ground_from_left": true,
+    "translation_ground_from_left_mm": true,
+    "accepted": true,
+    "stage": true
+  },
+  "viewer": {
+    "path": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_transition_diagnosis_v1\\view\\body.html",
+    "browser_frame_verified": 195,
+    "transition_action_visible": "single ankle update",
+    "console_errors": 0,
+    "world_vertices_maximum_difference_m": 0.0,
+    "frozen_camera_arrays_exactly_equal": true,
+    "real_mesh_faces": 13776,
+    "frames": 360,
+    "surface_indices_same_as_control": true,
+    "relative_hand_audit_reused_with_provenance": true,
+    "preview": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_transition_diagnosis_v1\\view\\preview.png",
+    "no_body_refit": true
+  },
+  "ruff": "passed",
+  "diff_check": "passed"
+}

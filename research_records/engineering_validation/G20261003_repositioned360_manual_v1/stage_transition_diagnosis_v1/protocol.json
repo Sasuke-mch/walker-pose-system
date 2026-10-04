@@ -1,0 +1,59 @@
+{
+  "inputs": {
+    "images": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\input",
+    "strict": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\first_instance_strict.jsonl",
+    "frozen_body": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz",
+    "frames": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\frames.json"
+  },
+  "control": "research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\scene_rotation_fix_v1",
+  "variants": [
+    "stage_policy",
+    "stage_no_reanchor",
+    "stage_current",
+    "stage_predict",
+    "stage_bearing",
+    "stage_single",
+    "stage_latest_single",
+    "background_wide",
+    "stage_final"
+  ],
+  "variables": [
+    "camera-regime hysteresis and motion-onset action",
+    "disable initial-height/tilt reanchor",
+    "current strict foot points",
+    "bounded 0.15s dropout prediction",
+    "fixed R two-view ankle bearing translation with 10px check",
+    "single strict ankle with complete R chain and 80mm prediction check",
+    "latest stationary ankle anchors versus median of last walking frames",
+    "960px fixed local rectification focal fraction 0.45 diagnostic only"
+  ],
+  "background_vo": {
+    "widths": [
+      480,
+      960
+    ],
+    "maximum_solver_points": 20,
+    "minimum_links": 6,
+    "geometry_and_residual_gates_retained": true,
+    "diagnostic_only": true
+  },
+  "stop": "no promotion from fewer transition labels alone; preserve failures, compare whole-sequence backward drift, steps and stage1 walker movement; no new annotation",
+  "implementation": [
+    "realtime_app/pose_app/stage_handoff.py",
+    "realtime_app/pose_app/causal_stereo_background_pose.py",
+    "realtime_app/pose_app/anchored_ankle_translation.py",
+    "realtime_app/walker_tools/scene/replay_fitted_body_scene.py"
+  ],
+  "thresholds": {
+    "static_instantaneous_px": 0.2,
+    "reliable_background_inlier_fraction": 0.35,
+    "confirmation_consecutive_frames": 2,
+    "moving_threshold_original_px": 1.5,
+    "single_ankle_prediction_error_mm": 80,
+    "rotation_max_deg": 5,
+    "translation_max_mm": 120,
+    "translation_gain": 0.45,
+    "two_foot_consistency_original_mm": 60
+  },
+  "decision": "offline candidate; no default replacement; no phase or contact truth; directional sum is a diagnostic and not anatomical backward motion"
+}

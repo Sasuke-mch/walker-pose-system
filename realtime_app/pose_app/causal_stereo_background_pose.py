@@ -20,6 +20,20 @@ from .static_background_stereo_frontend import (
 )
 
 
+def _spread_indexes(points, indexes, limit):
+    if len(indexes) <= limit:
+        return indexes
+    pool = points[indexes]
+    picked = [int(np.argmax(np.linalg.norm(pool - pool.mean(axis=0), axis=1)))]
+    while len(picked) < limit:
+        distance = np.min(
+            np.linalg.norm(pool[:, None] - pool[picked][None], axis=2), axis=1
+        )
+        distance[picked] = -1
+        picked.append(int(np.argmax(distance)))
+    return indexes[picked]
+
+
 def estimate_background_edge(xyz, normalized):
     xyz = np.asarray(xyz, float).reshape(-1, 3)
     normalized = np.asarray(normalized, float).reshape(-1, 2)
@@ -29,14 +43,34 @@ def estimate_background_edge(xyz, normalized):
         or not np.isfinite(normalized).all()
     ):
         raise ValueError("invalid background correspondences")
-    if len(xyz) < 20:
+    available_count = len(xyz)
+    if len(xyz) < 6:
         return {
             "status": "unavailable",
-            "reason": "fewer_than_twenty_links",
+            "reason": "fewer_than_six_links",
             "correspondence_count": len(xyz),
         }
-    hold = np.arange(len(xyz)) % 5 == 0
+    original_indexes = np.arange(len(xyz))
+    held_indexes = _spread_indexes(
+        normalized, original_indexes[original_indexes % 5 == 0], 4
+    )
+    train_indexes = _spread_indexes(
+        normalized, original_indexes[original_indexes % 5 != 0], 16
+    )
+    selected = np.sort(np.concatenate((held_indexes, train_indexes)))
+    xyz, normalized = xyz[selected], normalized[selected]
+    hold = selected % 5 == 0
     train = ~hold
+    if (
+        np.linalg.svd(normalized - normalized.mean(axis=0), compute_uv=False)[1] < 0.01
+        or np.linalg.svd(xyz - xyz.mean(axis=0), compute_uv=False)[1] < 20
+    ):
+        return {
+            "status": "rejected",
+            "reason": "spatially_degenerate_links",
+            "correspondence_count": len(xyz),
+            "available_count": available_count,
+        }
     # Normalized camera coordinates: thresholds are dimensionless, not raw pixels.
     ok, rv, tv, inliers = cv2.solvePnPRansac(
         xyz[train],
@@ -53,9 +87,11 @@ def estimate_background_edge(xyz, normalized):
         "correspondence_count": len(xyz),
         "training_inliers": count,
         "withheld_count": int(hold.sum()),
+        "available_count": available_count,
+        "selected_original_indexes": selected.tolist(),
     }
-    if not ok or count < 12:
-        return dict(base, status="rejected", reason="pnp_inliers_below_twelve")
+    if not ok or count < max(4, int(np.ceil(0.6 * train.sum()))):
+        return dict(base, status="rejected", reason="pnp_inliers_insufficient")
     idx = np.flatnonzero(train)[inliers.ravel()]
     ok, rv, tv = cv2.solvePnP(
         xyz[idx],
@@ -78,6 +114,35 @@ def estimate_background_edge(xyz, normalized):
     base["translation_step_mm"] = float(np.linalg.norm(tv))
     if np.any(moved[:, 2] <= 0) or base["withheld_p95_normalized"] > 0.008:
         return dict(base, status="rejected", reason="withheld_reprojection_failed")
+    # After the independent check passes, use every accepted point, capped at 20.
+    all_valid = np.sort(np.concatenate((idx, np.flatnonzero(hold))))
+    ok, rv, tv = cv2.solvePnP(
+        xyz[all_valid],
+        normalized[all_valid],
+        np.eye(3),
+        None,
+        rv,
+        tv,
+        True,
+        flags=cv2.SOLVEPNP_ITERATIVE,
+    )
+    if not ok:
+        return dict(base, status="rejected", reason="all_point_refinement_failed")
+    rot = cv2.Rodrigues(rv)[0]
+    base["final_solver_point_count"] = len(all_valid)
+    base["withheld_check_before_all_point_refinement"] = True
+    angle = float(np.degrees(np.arccos(np.clip((np.trace(rot) - 1) / 2, -1, 1))))
+    base["rotation_step_deg"] = angle
+    base["translation_step_mm"] = float(np.linalg.norm(tv))
+    final_moved = xyz[all_valid] @ rot.T + tv.reshape(3)
+    if not np.isfinite(final_moved).all() or np.any(final_moved[:, 2] <= 0):
+        return dict(base, status="rejected", reason="all_point_nonpositive_depth")
+    final_error = np.linalg.norm(
+        final_moved[:, :2] / final_moved[:, 2:3] - normalized[all_valid], axis=1
+    )
+    base["final_maximum_reprojection_normalized"] = float(final_error.max())
+    if final_error.max() > 0.008:
+        return dict(base, status="rejected", reason="all_point_reprojection_failed")
     if angle > 5 or np.linalg.norm(tv) > 120:
         return dict(base, status="rejected", reason="relative_motion_limit")
     return dict(
@@ -90,13 +155,20 @@ def estimate_background_edge(xyz, normalized):
 
 
 class CausalStereoBackgroundPose:
-    def __init__(self, calibration, processing_width=480, *, rectified=False):
+    def __init__(
+        self, calibration, processing_width=480, *, rectified=False, focal_fraction=0.65
+    ):
         if calibration.length_unit not in ("mm", "millimeter"):
             raise ValueError("background VO requires millimeter calibration")
+        if processing_width <= 0:
+            raise ValueError("processing width must be positive")
         self.calibration = calibration
         self.width = processing_width
         self.previous = None
         self.rectified = rectified
+        if not 0 < focal_fraction <= 1:
+            raise ValueError("invalid virtual focal fraction")
+        self.focal_fraction = focal_fraction
         self.rectification = None
         self.criteria = StereoFrontendCriteria()
 
@@ -126,7 +198,7 @@ class CausalStereoBackgroundPose:
         if self.rectified:
             if self.rectification is None:
                 self.rectification = make_local_rectification(
-                    cal, cal.left_image_size, focal_px=self.width * 0.65
+                    cal, cal.left_image_size, focal_px=self.width * self.focal_fraction
                 )
             current = extract_rectified_frame_features(
                 images["left"],
@@ -180,6 +252,7 @@ class CausalStereoBackgroundPose:
             processing_ms=(time.perf_counter() - started) * 1000,
             mask_certified=False,
             rectified_frontend=self.rectified,
+            focal_fraction=self.focal_fraction if self.rectified else None,
             metric_pose_usable=False,
             evidence="person mask only; walker/background static membership unverified",
         )

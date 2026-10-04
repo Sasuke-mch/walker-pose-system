@@ -29,6 +29,7 @@ from pose_app.realtime_stage_walker import STAGE_TWO, RealtimeStageWalkerWriter
 from pose_app.replay_pair_timing import load_pair_timing
 from pose_app.schema import InferenceResult, PersonPose
 from pose_app.sources import SourceFrame
+from pose_app.stage_handoff import StageHandoffGroundWriter, StageHandoffPolicy
 from pose_app.static_background_rotation import RealtimeStereoRotationTracker
 from pose_app.stereo_sources import StereoFramePair
 
@@ -64,13 +65,44 @@ def args() -> argparse.Namespace:
     )
     p.add_argument("--background-vo-diagnostic", action="store_true")
     p.add_argument("--background-vo-rectified", action="store_true")
+    p.add_argument("--stage-handoff", action="store_true")
+    p.add_argument("--disable-stage1-reanchor", action="store_true")
+    p.add_argument("--predict-camera-dropout", action="store_true")
+    p.add_argument("--background-processing-width", type=int, default=None)
+    p.add_argument("--background-focal-fraction", type=float, default=0.65)
+    p.add_argument("--ankle-bearing-fallback", action="store_true")
+    p.add_argument("--single-ankle-fallback", action="store_true")
+    p.add_argument("--latest-anchor", action="store_true")
     parsed = p.parse_args()
+    if parsed.stage_handoff and (
+        parsed.frames_metadata is None or parsed.continuous_stage
+    ):
+        p.error(
+            "--stage-handoff requires frames metadata and cannot combine with --continuous-stage"
+        )
     if parsed.continuous_stage and parsed.frames_metadata is None:
-        p.error('--continuous-stage requires actual --frames-metadata for prediction horizons')
+        p.error(
+            "--continuous-stage requires actual --frames-metadata for prediction horizons"
+        )
     if parsed.background_vo_rectified and not parsed.background_vo_diagnostic:
-        p.error('--background-vo-rectified requires --background-vo-diagnostic')
+        p.error("--background-vo-rectified requires --background-vo-diagnostic")
+    if (
+        parsed.ankle_bearing_fallback
+        or parsed.single_ankle_fallback
+        or parsed.latest_anchor
+        or parsed.disable_stage1_reanchor
+        or parsed.predict_camera_dropout
+    ) and not parsed.stage_handoff:
+        p.error("handoff controls require --stage-handoff")
+    if (
+        parsed.background_processing_width is not None
+        and parsed.background_processing_width <= 0
+    ):
+        p.error("background processing width must be positive")
+    if not 0 < parsed.background_focal_fraction <= 1:
+        p.error("background focal fraction must be in (0, 1]")
     if parsed.processing_width <= 0:
-        p.error('--processing-width must be positive')
+        p.error("--processing-width must be positive")
     return parsed
 
 
@@ -151,7 +183,19 @@ def main() -> int:
         cal, processing_width=a.processing_width
     )
     ground_writer = (
-        ContinuousStageGroundWriter(
+        StageHandoffGroundWriter(
+            out / "dynamic_ground_pose.jsonl",
+            a.ground_reference,
+            foot_observation_mode=a.foot_observation_mode,
+            reanchor=not a.disable_stage1_reanchor,
+            prediction=a.predict_camera_dropout,
+            calibration=cal,
+            bearing_fallback=a.ankle_bearing_fallback,
+            single_ankle_fallback=a.single_ankle_fallback,
+            latest_anchor=a.latest_anchor,
+        )
+        if a.stage_handoff
+        else ContinuousStageGroundWriter(
             out / "dynamic_ground_pose.jsonl", a.ground_reference
         )
         if a.continuous_stage
@@ -159,10 +203,11 @@ def main() -> int:
             out / "dynamic_ground_pose.jsonl",
             a.ground_reference,
             pose_mode="full_se3",
-            stage1_landed_support_reanchor=True,
+            stage1_landed_support_reanchor=not a.disable_stage1_reanchor,
             foot_observation_mode=a.foot_observation_mode,
         )
     )
+    handoff_policy = StageHandoffPolicy() if a.stage_handoff else None
     timing = (
         load_pair_timing(a.frames_metadata, len(ids), input_pair_dir=a.input_pair_dir)
         if a.frames_metadata
@@ -170,12 +215,16 @@ def main() -> int:
     )
     visual_tracker = (
         CausalStereoBackgroundPose(
-            cal, a.processing_width, rectified=a.background_vo_rectified
+            cal,
+            a.background_processing_width or a.processing_width,
+            rectified=a.background_vo_rectified,
+            focal_fraction=a.background_focal_fraction,
         )
         if a.background_vo_diagnostic
         else None
     )
     visual_rows = []
+    inference_pairs = []
     stage_rows: list[dict] = []
     ground_rows: list[dict] = []
     for i, (lf, rf) in enumerate(zip(left_frames, right_frames)):
@@ -188,6 +237,7 @@ def main() -> int:
         right_result = InferenceResult(
             i, tr, w, h, "raw_pmpose_replay", 0.0, 0.0, [person(right_points[i], w, h)]
         )
+        inference_pairs.append((left_result, right_result))
         pair = StereoFramePair(
             pair_id=i,
             left=SourceFrame(i, tl, lf),
@@ -198,6 +248,8 @@ def main() -> int:
             else "video_frame_index_over_fps",
         )
         stage_row = stage_writer.consume(pair, left_result, right_result)
+        if handoff_policy:
+            stage_row = handoff_policy.update(stage_row)
         stage_rows.append(stage_row)
         points = []
         people = strict_rows[i]["persons_3d"]
@@ -228,18 +280,46 @@ def main() -> int:
             rf,
             left_result,
             right_result,
-            estimate=a.continuous_stage or stage_name in {STAGE_TWO, "transition"},
+            estimate=a.continuous_stage
+            or a.stage_handoff
+            or stage_name in {STAGE_TWO, "transition"},
         )
-        if visual_tracker:
+        ground_rows.append(
+            ground_writer.consume(
+                payload,
+                stage_row,
+                rotation,
+                {"left": left_points[i], "right": right_points[i]},
+            )
+            if a.stage_handoff
+            else ground_writer.consume(payload, stage_row, rotation)
+        )
+    # Diagnostic OpenCV RANSAC must not consume the stage tracker's RNG stream.
+    if visual_tracker:
+        for i, (lf, rf, (left_result, right_result)) in enumerate(
+            zip(left_frames, right_frames, inference_pairs)
+        ):
             visual_rows.append(
                 dict(
                     pair_id=i,
                     **visual_tracker.update(lf, rf, left_result, right_result),
                 )
             )
-        ground_rows.append(ground_writer.consume(payload, stage_row, rotation))
     stage_summary = stage_writer.close(completed=True)
     ground_summary = ground_writer.close(completed=True)
+    if handoff_policy:
+        stage_summary = {
+            "legacy_summary": stage_summary,
+            "candidate_stage_counts": {
+                s: sum(r["stage"]["operational"] == s for r in stage_rows)
+                for s in {r["stage"]["operational"] for r in stage_rows}
+            },
+        }
+        (out / "stage1_stage2.jsonl").rename(out / "legacy_stage1_stage2.jsonl")
+        (out / "stage1_stage2.jsonl").write_text(
+            "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in stage_rows),
+            encoding="utf-8",
+        )
     if visual_tracker:
         (out / "background_vo_diagnostic.jsonl").write_text(
             "".join(json.dumps(r) + "\n" for r in visual_rows), encoding="utf-8"
@@ -290,10 +370,22 @@ def main() -> int:
                 "old_dynamic_ground_read": False,
                 "old_dynamic_walker_pose_read": False,
                 "static_installation_pose_assumption_consumed": True,
-                "stage_algorithm": "RealtimeStageWalkerWriter / TwoStageRecognizer",
+                "stage_algorithm": "StageHandoffPolicy / RealtimeStageWalkerWriter evidence"
+                if a.stage_handoff
+                else "RealtimeStageWalkerWriter / TwoStageRecognizer",
                 "ground_algorithm": "ContinuousStageGroundWriter candidate"
                 if a.continuous_stage
-                else "RealtimeDynamicGroundWriter full_se3 with current-run Stage 1/2",
+                else (
+                    "StageHandoffGroundWriter candidate"
+                    if a.stage_handoff
+                    else "RealtimeDynamicGroundWriter full_se3 with current-run Stage 1/2"
+                ),
+                "stage_handoff_candidate": a.stage_handoff,
+                "single_ankle_fallback": a.single_ankle_fallback,
+                "latest_stationary_anchor": a.latest_anchor,
+                "ankle_bearing_fallback": a.ankle_bearing_fallback,
+                "stage1_reanchor": not a.disable_stage1_reanchor,
+                "dropout_prediction": a.predict_camera_dropout,
                 "frames_metadata": str(a.frames_metadata.resolve())
                 if a.frames_metadata
                 else None,

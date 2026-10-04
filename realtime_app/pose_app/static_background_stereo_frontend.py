@@ -233,6 +233,13 @@ def triangulate_indexed_matches(
         "stereo_match_count": len(matches),
         "epipolar_inliers": int(keep_epi.sum()),
         "geometry_inliers": len(result),
+        "geometry_reject_counts_overlapping": {
+            "nonfinite": int((~np.isfinite(xyz).all(axis=1)).sum()),
+            "left_depth_below_minimum": int((xyz[:, 2] < criteria.minimum_depth_mm).sum()),
+            "right_depth_below_minimum": int((right_xyz[:, 2] < criteria.minimum_depth_mm).sum()),
+            "range_above_maximum": int((np.linalg.norm(xyz,axis=1)>criteria.maximum_range_mm).sum()),
+            "reprojection_above_maximum": int((reprojection>criteria.maximum_reprojection_error_px).sum()),
+        },
         "sampson_median": float(np.median(epipolar)),
         "reprojection_median_px": (
             float(np.median(accepted_reprojection)) if len(accepted_reprojection) else None

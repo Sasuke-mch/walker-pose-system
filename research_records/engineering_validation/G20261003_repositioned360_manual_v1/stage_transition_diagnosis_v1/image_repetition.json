@@ -1,0 +1,1807 @@
+{
+  "left_repeated_edges": 25,
+  "right_repeated_edges": 2,
+  "both_repeated_edges": 2,
+  "records": [
+    {
+      "frame": 0,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 1,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 2,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 3,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 4,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 5,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 6,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 7,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 8,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 9,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 10,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 11,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 12,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 13,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 14,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 15,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 16,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 17,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 18,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 19,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 20,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 21,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 22,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 23,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 24,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 25,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 26,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 27,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 28,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 29,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 30,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 31,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 32,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 33,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 34,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 35,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 36,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 37,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 38,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 39,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 40,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 41,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 42,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 43,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 44,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 45,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 46,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 47,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 48,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 49,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 50,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 51,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 52,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 53,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 54,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 55,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 56,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 57,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 58,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 59,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 60,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 61,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 62,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 63,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 64,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 65,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 66,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 67,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 68,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 69,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 70,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 71,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 72,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 73,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 74,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 75,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 76,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 77,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 78,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 79,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 80,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 81,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 82,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 83,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 84,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 85,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 86,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 87,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 88,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 89,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 90,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 91,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 92,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 93,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 94,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 95,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 96,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 97,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 98,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 99,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 100,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 101,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 102,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 103,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 104,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 105,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 106,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 107,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 108,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 109,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 110,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 111,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 112,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 113,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 114,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 115,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 116,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 117,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 118,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 119,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": true
+    },
+    {
+      "frame": 120,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 121,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 122,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 123,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 124,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 125,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 126,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 127,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 128,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 129,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 130,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 131,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 132,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 133,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 134,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 135,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 136,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 137,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 138,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 139,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 140,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 141,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 142,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 143,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 144,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 145,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 146,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 147,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 148,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 149,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 150,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 151,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 152,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 153,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 154,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 155,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 156,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 157,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 158,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 159,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 160,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 161,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 162,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 163,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 164,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 165,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 166,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 167,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 168,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 169,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 170,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 171,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 172,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 173,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 174,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 175,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 176,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 177,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 178,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 179,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 180,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 181,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 182,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 183,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 184,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 185,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 186,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 187,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 188,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 189,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 190,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 191,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 192,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 193,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 194,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 195,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 196,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 197,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 198,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 199,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 200,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 201,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 202,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 203,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 204,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 205,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 206,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 207,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 208,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 209,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": true
+    },
+    {
+      "frame": 210,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 211,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 212,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 213,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 214,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 215,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 216,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 217,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 218,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 219,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 220,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 221,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 222,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 223,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 224,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 225,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 226,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 227,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 228,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 229,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 230,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 231,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 232,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 233,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 234,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 235,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 236,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 237,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 238,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 239,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 240,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 241,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 242,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 243,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 244,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 245,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 246,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 247,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 248,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 249,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 250,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 251,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 252,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 253,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 254,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 255,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 256,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 257,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 258,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 259,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 260,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 261,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 262,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 263,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 264,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 265,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 266,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 267,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 268,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 269,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 270,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 271,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 272,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 273,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 274,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 275,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 276,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 277,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 278,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 279,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 280,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 281,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 282,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 283,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 284,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 285,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 286,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 287,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 288,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 289,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 290,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 291,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 292,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 293,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 294,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 295,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 296,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 297,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 298,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 299,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 300,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 301,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 302,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 303,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 304,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 305,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 306,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 307,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 308,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 309,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 310,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 311,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 312,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 313,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 314,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 315,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 316,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 317,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 318,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 319,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 320,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 321,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 322,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 323,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 324,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 325,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 326,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 327,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 328,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 329,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 330,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 331,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 332,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 333,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 334,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 335,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 336,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 337,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 338,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 339,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 340,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 341,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 342,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 343,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 344,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 345,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 346,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 347,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 348,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 349,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 350,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 351,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 352,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 353,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 354,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 355,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 356,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 357,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 358,
+      "left_identical_to_previous": false,
+      "right_identical_to_previous": false
+    },
+    {
+      "frame": 359,
+      "left_identical_to_previous": true,
+      "right_identical_to_previous": false
+    }
+  ]
+}

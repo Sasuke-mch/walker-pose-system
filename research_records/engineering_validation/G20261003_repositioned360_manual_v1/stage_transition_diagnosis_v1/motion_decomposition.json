@@ -1,0 +1,132 @@
+{
+  "control": [
+    {
+      "frame": 189,
+      "body_fitting_forward_mm": 31.169896306912694,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 31.169896306912694
+    },
+    {
+      "frame": 190,
+      "body_fitting_forward_mm": -7.237843694443798,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": -7.237843694443798
+    },
+    {
+      "frame": 191,
+      "body_fitting_forward_mm": 20.00051564544718,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 20.00051564544718
+    },
+    {
+      "frame": 194,
+      "body_fitting_forward_mm": 35.723901216439344,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 35.723901216439344
+    },
+    {
+      "frame": 195,
+      "body_fitting_forward_mm": 29.88695158058464,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 29.88695158058464
+    },
+    {
+      "frame": 196,
+      "body_fitting_forward_mm": 27.690778014746776,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 27.690778014746776
+    },
+    {
+      "frame": 268,
+      "body_fitting_forward_mm": 19.058707374888773,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 19.058707374888773
+    },
+    {
+      "frame": 274,
+      "body_fitting_forward_mm": -24.842582283501862,
+      "rotation_forward_mm": -0.019846671328578584,
+      "camera_translation_forward_mm": -14.956313569771055,
+      "world_forward_mm": -39.8187425246015
+    },
+    {
+      "frame": 355,
+      "body_fitting_forward_mm": 16.49799170817866,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 16.49799170817866
+    }
+  ],
+  "candidate": [
+    {
+      "frame": 189,
+      "body_fitting_forward_mm": 30.262096155745823,
+      "rotation_forward_mm": 0.0,
+      "camera_translation_forward_mm": 0.0,
+      "world_forward_mm": 30.262096155745823
+    },
+    {
+      "frame": 190,
+      "body_fitting_forward_mm": -8.320564570532875,
+      "rotation_forward_mm": 0.1012656156115041,
+      "camera_translation_forward_mm": -9.458365365123479,
+      "world_forward_mm": -17.67766432004485
+    },
+    {
+      "frame": 191,
+      "body_fitting_forward_mm": 21.424641680918853,
+      "rotation_forward_mm": 0.3784521338125766,
+      "camera_translation_forward_mm": -7.336352914344865,
+      "world_forward_mm": 14.466740900386565
+    },
+    {
+      "frame": 194,
+      "body_fitting_forward_mm": 37.447359631399934,
+      "rotation_forward_mm": -0.24609407721703835,
+      "camera_translation_forward_mm": -30.617089403300717,
+      "world_forward_mm": 6.58417615088218
+    },
+    {
+      "frame": 195,
+      "body_fitting_forward_mm": 28.83873390784192,
+      "rotation_forward_mm": -0.18404384430943632,
+      "camera_translation_forward_mm": -29.990715575028503,
+      "world_forward_mm": -1.3360255114960244
+    },
+    {
+      "frame": 196,
+      "body_fitting_forward_mm": 27.012531153300362,
+      "rotation_forward_mm": -0.29945652268780015,
+      "camera_translation_forward_mm": -25.397144974900336,
+      "world_forward_mm": 1.3159296557122273
+    },
+    {
+      "frame": 268,
+      "body_fitting_forward_mm": 22.749975180964103,
+      "rotation_forward_mm": -0.27496741607663844,
+      "camera_translation_forward_mm": -6.198086219562004,
+      "world_forward_mm": 16.27692154532546
+    },
+    {
+      "frame": 274,
+      "body_fitting_forward_mm": -25.414243822381906,
+      "rotation_forward_mm": 0.07249735509841797,
+      "camera_translation_forward_mm": -15.874724407301276,
+      "world_forward_mm": -41.21647087458476
+    },
+    {
+      "frame": 355,
+      "body_fitting_forward_mm": 12.90820725310989,
+      "rotation_forward_mm": -0.23864595515136866,
+      "camera_translation_forward_mm": -28.00544888993993,
+      "world_forward_mm": -15.335887591981411
+    }
+  ]
+}
