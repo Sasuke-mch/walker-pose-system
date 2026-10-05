@@ -1,0 +1,94 @@
+{
+  "frames": [
+    321,
+    322
+  ],
+  "joint": "COCO right knee index14",
+  "coordinates": "left camera XYZ, mm",
+  "raw_step_vector_mm": [
+    12.572036743164062,
+    -12.951505184173584,
+    -20.14324951171875
+  ],
+  "model_step_vector_mm": [
+    46.380072832107544,
+    -121.36219069361687,
+    -103.80461812019348
+  ],
+  "raw_step_mm": 27.04714578839143,
+  "model_step_mm": 166.29880104482,
+  "step_ratio_not_accuracy_ratio": 6.148478746921794,
+  "quality": [
+    0.0019095835881822888,
+    4.0442263816349744E-05
+  ],
+  "strict_accepted": [
+    false,
+    false
+  ],
+  "body_candidate_accepted": [
+    true,
+    true
+  ],
+  "stage": [
+    "stage1_walker_static_human_moving",
+    "stage1_walker_static_human_moving"
+  ],
+  "ground_rotation_equal": true,
+  "ground_translation_equal": true,
+  "pose_step_vector_mm": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "inputs": {
+    "code": "realtime_app/audit_limb_chain.py",
+    "fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz",
+    "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\baseline_profile_review",
+    "detector_inputs": {
+      "left": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/left_pmpose_raw.json",
+      "right": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/right_pmpose_raw.json",
+      "images": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input"
+    },
+    "frames": 360,
+    "objective": "Locate observation, geometry, fit and ground-transform contributions before any method changes",
+    "controls": "Frozen current input, calibration, masks, body parameters and archived baseline scene; no inference/refit/replay",
+    "diagnostic_variable": "Algebraic removal of ground transform; isolated within-valid-triple kernel as explicit counterfactual only",
+    "success": "Recomputed raw XYZ/mask/quality match saved body; exact world-step decomposition and same-frame residual invariance; visual audit of preset and ranked frames",
+    "stop": "Frame/mask/source mismatch, non-rigid scene, unavailable images; preserve failures and do not substitute",
+    "units": "2D px; 3D mm; indexed step mm/frame and second difference mm/frame^2, not physical acceleration",
+    "limits": "No anatomical 3D or stage truth; motion includes actual movement; pose component is an algebraic term, not a percentage of error",
+    "scene_usage": "Saved scene is an audited input, not a newly replayed scene or new 3D visualization",
+    "visual_selection": "Preset 0,42,74,101,136,139,184,226,268,313,359 plus maximum arm residual, raw knee second difference, model pelvis-relative knee second difference, and five largest world pose steps; include ranked-event neighbours",
+    "execution_command": [
+      ".venv-cuda/Scripts/python.exe",
+      "-B",
+      "realtime_app/audit_limb_chain.py",
+      "--output",
+      "research_records\\engineering_validation\\G20261005_limb_chain_audit_v3"
+    ],
+    "visual_supplement": "contact_sheet from same module, existing overlays, 201/202/203; camera-space original-image comparison only",
+    "fit_source_command": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit_command.json",
+    "calibration": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\calibration"
+  },
+  "code": "realtime_app/visualize_knee_jump.py",
+  "scope": "Frozen historical audit only; no new inference, fitting, triangulation or stage replay",
+  "success": "Exact source/ID alignment and unchanged ground R/t, zero pose term, visual legibility",
+  "limits": "Real movement included; no anatomical truth; arrows compare displacement vectors from their own starting positions",
+  "validation": {
+    "syntax": "passed",
+    "source_equality": "passed",
+    "png_visual_review": "passed",
+    "ruff": "passed",
+    "exact_ground_hold_and_zero_pose": "passed"
+  },
+  "execution_command": [
+    ".venv-cuda/Scripts/python.exe",
+    "-B",
+    "realtime_app/visualize_knee_jump.py",
+    "--audit",
+    "research_records/engineering_validation/G20261005_limb_chain_audit_v3",
+    "--output",
+    "research_records/engineering_validation/G20261005_right_knee_jump_visual_v1"
+  ]
+}
