@@ -1,0 +1,15 @@
+{
+  "inputs": {
+    "old_pmpose_wrist_on": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_smplh_ablation_v1\\pmpose_baseline\\fit\\result.npz",
+    "old_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_smplh_ablation_v1\\pmpose_no_wrist\\fit\\result.npz",
+    "old_sapiens_wrist_on": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\smplh_cold_start_v2_joint300\\fit\\result.npz",
+    "new_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz"
+  },
+  "code": "realtime_app/experiment_body_translation_audit.py",
+  "variable": "Analytic per-frame rigid translation minimizing same weighted body observation SSE",
+  "formula": "delta=-sum_j(w_j*(model_j-observed_j))/sum_j(w_j)",
+  "controls": "Frozen shape, root, pose, detector, mask and quality. No coordinates exported or changed",
+  "success": "Nonincrease of data SSE; show whether residual center shift is globally correctable",
+  "stop": "Nonfinite accepted observations or negative weights abort; zero-weight frames explicit",
+  "limits": "Body-data term only. Wrist-on cases have additional objective; no physical geometry/contact claim"
+}
