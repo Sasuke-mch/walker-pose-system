@@ -1,0 +1,6 @@
+{
+  "tests": "3 semantic plus 4 triangulation tests passed",
+  "no_observations_changed": true,
+  "visual_review": "0139_right.png and numeric shoulders/elbows/wrists: complete bilateral arm swap, not wrist-only offset",
+  "warning": "Frame74 collapse flagged, frame139 sustained whole-arm swap missed; no threshold selected"
+}

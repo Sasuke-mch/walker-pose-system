@@ -1,0 +1,23 @@
+{
+  "inputs": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2\\protocol.json",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\comparison\\protocol.json"
+  },
+  "code": "realtime_app/experiment_arm_semantics.py",
+  "variable": "diagnostic-only same-model wrist separation and one-frame jump",
+  "separation_ratios": [
+    0.1,
+    0.2,
+    0.3
+  ],
+  "jump_ratios": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "success": "Report all-frame flags and sparse-label disagreement without choosing tuned thresholds",
+  "stop": "frame mismatch abort; missing/invalid states retained",
+  "controls": "No future, smoothing, other model, manual input or image inference used for features",
+  "limits": "Close hands and rapid real motion may be legitimate; flags are not semantic error truth",
+  "reference": "All original sparse labels retained including known anomalous labels; 100px report-only split"
+}
