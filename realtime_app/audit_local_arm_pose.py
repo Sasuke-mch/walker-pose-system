@@ -51,7 +51,8 @@ def main():
                     "second_difference_after": stats(second_difference(coco1[:, joints]))}
             for side in ("left", "right"):
                 for part in ("sole", "palm"):
-                    indices = sorted(set(sum(sets[f"{side}_{part}_surface_candidate"].values(), [])))
+                    indices = sorted({index for group in sets[f"{side}_{part}_surface_candidate"].values()
+                                      for index in group})
                     movement = np.linalg.norm(candidate["vertices"][:, indices] - source["vertices"][:, indices], axis=-1) * 1000
                     row["surfaces"][side + "_" + part + "_movement_mm"] = stats(movement)
             row["decision"] = "research_candidate_not_accepted"
