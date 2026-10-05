@@ -12,8 +12,15 @@ def validate_optimization_options(args):
             raise ValueError(f"--{name.replace('_', '-')} must be finite and non-negative")
     if getattr(args, "beta_policy", "joint") not in ("joint", "freeze_after_b"):
         raise ValueError("unknown beta policy")
-    if getattr(args, "body_weighting", "quality") not in ("quality", "uniform", "no_confidence", "no_ray", "no_reprojection"):
+    if getattr(args, "body_weighting", "quality") not in ("quality", "uniform", "no_confidence", "no_ray", "no_reprojection", "reference"):
         raise ValueError("unknown body weighting")
+    for name, default in (("body_reference_reprojection_px", 25.0), ("body_reference_ray_gap_mm", 80.0)):
+        value = getattr(args, name, default)
+        if not math.isfinite(value) or value <= 0:
+            raise ValueError(f"--{name.replace('_', '-')} must be finite and positive")
+    floor = getattr(args, "body_reference_confidence_floor", 0.6)
+    if not math.isfinite(floor) or not 0 <= floor <= 1:
+        raise ValueError("--body-reference-confidence-floor must be in [0,1]")
     for name in (
         "steps",
         "base_steps",

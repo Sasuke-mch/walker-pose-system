@@ -7,12 +7,32 @@ import torch
 import numpy as np
 
 
-def observation_weights(quality, terms, accepted, mode):
+def observation_weights(quality, terms, accepted, mode, *, reference_reprojection_px=25.0,
+                        reference_ray_gap_mm=80.0, reference_confidence_floor=0.6):
     """Change soft weighting only; rejected observations remain rejected."""
     if mode == "quality":
         return quality
     if mode == "uniform":
         return np.ones_like(quality)
+    if mode == "reference":
+        if (not np.isfinite(reference_reprojection_px) or reference_reprojection_px <= 0
+                or not np.isfinite(reference_ray_gap_mm) or reference_ray_gap_mm <= 0
+                or not np.isfinite(reference_confidence_floor) or not 0 <= reference_confidence_floor <= 1):
+            raise ValueError("invalid reference weighting scales/floor")
+        confidence, ray, reprojection, sync, depth = (np.asarray(t, dtype=float) for t in terms)
+        stacked = np.stack([confidence, ray, reprojection, sync, depth])
+        if not np.isfinite(stacked).all() or np.any((stacked < 0) | (stacked > 1)):
+            raise ValueError("quality terms must be finite and in [0,1]")
+        # Recover source geometry diagnostics from the unchanged legacy terms.
+        # Do not use model residuals to decide whether an observation is valid.
+        gap_mm = -30.0 * np.log(np.maximum(ray, 1e-300))
+        error_px = -8.0 * np.log(np.maximum(reprojection, 1e-300))
+        severity = np.maximum(gap_mm / reference_ray_gap_mm, error_px / reference_reprojection_px)
+        tail = 1.0 / (1.0 + np.maximum(severity - 1.0, 0.0) ** 4)
+        confidence_reference = reference_confidence_floor + (1-reference_confidence_floor) * confidence
+        weights = confidence_reference * np.maximum(tail, 1e-4) * sync * depth
+        weights[~accepted] = 0.0
+        return weights
     excluded = {"no_confidence": 0, "no_ray": 1, "no_reprojection": 2}[mode]
     weights = np.clip(np.prod(np.stack([term for index, term in enumerate(terms) if index != excluded]), axis=0), 0, 1)
     weights[~accepted] = 0

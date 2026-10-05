@@ -103,7 +103,13 @@ def run_fit(args, observer=None) -> int:
     n = len(ids)
     tri_m = np.nan_to_num(np.asarray(tri, np.float32) / 1000.0)
     body_mask = np.asarray(accepted, bool) & np.isfinite(tri).all(axis=-1)
-    fit_quality = observation_weights(quality, quality_terms, body_mask, getattr(args, "body_weighting", "quality"))
+    reference_options = {
+        "reference_reprojection_px": getattr(args, "body_reference_reprojection_px", 25.0),
+        "reference_ray_gap_mm": getattr(args, "body_reference_ray_gap_mm", 80.0),
+        "reference_confidence_floor": getattr(args, "body_reference_confidence_floor", 0.6),
+    }
+    fit_quality = observation_weights(quality, quality_terms, body_mask,
+                                      getattr(args, "body_weighting", "quality"), **reference_options)
     if not np.isfinite(np.asarray(quality, dtype=np.float32)).all():
         raise ValueError("body quality contains non-finite values")
     # Each camera file contains both anatomical sides. Fit each hand from both
@@ -579,6 +585,7 @@ def run_fit(args, observer=None) -> int:
                         wilor_left_valid_full=hand_l_full_valid, wilor_right_valid_full=hand_r_full_valid,
                         wilor_left_bounds_ok_full=hand_l_full_bounds, wilor_right_bounds_ok_full=hand_r_full_bounds,
                         body_quality=quality,
+                        body_fit_weights=fit_quality,
                         translation_init_source=np.asarray(init_source, dtype="U32"),
                         root_init=root_init_np,
                         root_init_source=root_init_source,
@@ -592,6 +599,9 @@ def run_fit(args, observer=None) -> int:
             "beta_prior_weight": getattr(args, "beta_prior_weight", 1e-3),
             "body_3d_weight": getattr(args, "body_3d_weight", 1.0),
             "body_weighting": getattr(args, "body_weighting", "quality"),
+            "body_reference_weighting": {**reference_options, "tail_power": 4, "tail_minimum": 1e-4,
+                "severity": "max(mean_reprojection/px_scale, ray_gap/mm_scale)",
+                "tail": "1/(1+max(severity-1,0)^4)", "uses_model_residual": False},
             "allow_hand_prior_ablation": getattr(args, "allow_hand_prior_ablation", False)},
         "status": "engineering_candidate", "frames": n, "steps": int(sum(stage_steps)),
         "wrist_reference": wrist_audit,

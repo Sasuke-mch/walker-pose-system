@@ -44,8 +44,14 @@ def build_parser() -> argparse.ArgumentParser:
                     help="explicit ablation; both policies retain one sequence-shared beta")
     ap.add_argument("--beta-prior-weight", type=float, default=1e-3)
     ap.add_argument("--body-3d-weight", type=float, default=1.0)
-    ap.add_argument("--body-weighting", choices=("quality", "uniform", "no_confidence", "no_ray", "no_reprojection"), default="quality",
+    ap.add_argument("--body-weighting", choices=("quality", "uniform", "no_confidence", "no_ray", "no_reprojection", "reference"), default="quality",
                     help="same accepted mask; uniform removes only soft quality weights")
+    ap.add_argument("--body-reference-reprojection-px", type=float, default=25.0,
+                    help="reference mode plateau for mean two-view reprojection error")
+    ap.add_argument("--body-reference-ray-gap-mm", type=float, default=80.0,
+                    help="reference mode plateau for calibrated ray gap")
+    ap.add_argument("--body-reference-confidence-floor", type=float, default=0.6,
+                    help="reference mode: confidence contribution floor, before extreme-geometry tail")
     ap.add_argument("--joint-steps", type=int, default=None,
                     help="Stage C VPoser/body refinement steps; defaults to steps//6")
     ap.add_argument("--hand-steps", type=int, default=None,

@@ -1,0 +1,44 @@
+{
+  "cases": [
+    {
+      "id": "quality_replay",
+      "detector": "new",
+      "changes": {}
+    },
+    {
+      "id": "reference25",
+      "detector": "new",
+      "changes": {
+        "body_weighting": "reference"
+      }
+    },
+    {
+      "id": "reference40",
+      "detector": "new",
+      "changes": {
+        "body_reference_reprojection_px": 40.0,
+        "body_weighting": "reference"
+      }
+    },
+    {
+      "id": "uniform_stress",
+      "detector": "new",
+      "changes": {
+        "body_weighting": "uniform"
+      }
+    }
+  ],
+  "control_results": {
+    "new": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz"
+  },
+  "budget": "Original A30/B30/C300/D100/D100/D3zero; cold-start seed0; all360 frames",
+  "schema": "smplh_full_sequence_ablation_v1",
+  "source_commands": {
+    "new": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json"
+  },
+  "stop": "Original initialization/nonfinite gates. Preserve failures; no masks/data changes, no smoothing or interpolation, no mainline promotion by residual alone.",
+  "variable": "Only body observation weighting and its reprojection plateau; reference ray-gap80mm, confidence floor0.6, quartic tail, minimum1e-4. Initial raw quality unchanged.",
+  "success": "Report all-joint residuals under immutable old and uniform weights, knees/ankles motion, right-knee321to322, surfaces, extreme points. Preferred candidate should improve arm agreement and event without >10% all-sequence knee/ankle second-difference P95 worsening.",
+  "limits": "Agreement and indexed motion are internal measures, not independent anatomical accuracy; uniform is a stress control; stage is excluded from fitting.",
+  "seed": 0
+}

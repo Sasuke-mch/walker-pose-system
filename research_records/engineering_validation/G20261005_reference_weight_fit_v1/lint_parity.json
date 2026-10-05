@@ -1,0 +1,22 @@
+{
+  "realtime_app/pose_app/smplh_fitting/losses.py": {
+    "baseline_count": 1,
+    "current_count": 1,
+    "new_count": 0
+  },
+  "realtime_app/pose_app/smplh_fitting/stages.py": {
+    "baseline_count": 0,
+    "current_count": 0,
+    "new_count": 0
+  },
+  "realtime_app/pose_app/smplh_fitting/pipeline.py": {
+    "baseline_count": 8,
+    "current_count": 8,
+    "new_count": 0
+  },
+  "realtime_app/walker_tools/body/fit_smplh_wilor_sequence.py": {
+    "baseline_count": 3,
+    "current_count": 3,
+    "new_count": 0
+  }
+}

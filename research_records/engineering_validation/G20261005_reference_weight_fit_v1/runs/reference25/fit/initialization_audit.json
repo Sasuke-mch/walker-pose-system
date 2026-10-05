@@ -1,0 +1,9 @@
+{
+  "body_rms_mm": 145.61103284358978,
+  "valid_root_basis_frames": 360,
+  "total_frames": 360,
+  "max_init_body_rms_mm": 300.0,
+  "root_init_source_counts": {
+    "shoulder_hip_rigid_basis": 360
+  }
+}

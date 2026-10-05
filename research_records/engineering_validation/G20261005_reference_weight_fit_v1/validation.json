@@ -1,0 +1,25 @@
+{
+  "ruff_new_files": "passed",
+  "status": "completed_engineering_candidate_not_promoted",
+  "syntax_files_passed": 6,
+  "tests_passed": 67,
+  "limits": "Internal agreement and indexed motion, not independent anatomical/physical contact truth",
+  "source_parity": "raw XYZ, mask, original quality and numeric cold initialization exact",
+  "selection_reason": "Both reference candidates pass preset motion/agreement checks; reference25 has lower aggregate leg second differences and stronger extreme-geometry downweighting.",
+  "mainline_promoted": false,
+  "preferred_candidate": "reference25",
+  "visual_review": [
+    "fit_comparison.png",
+    "weight_curves.png",
+    "review_v2/arm_before_after.png",
+    "review_v2/knee_before_after.png"
+  ],
+  "earlier_visual_issue": "v1 arm panel automatic extent varied; v2 fixes common pixel limits and retains outside-image projections in white margins",
+  "fits_completed": 4,
+  "failure_states_retained": "No failed fit; earlier linter diagnostics retained and corrected only in new evaluator",
+  "ruff_existing_files": "12 pre-existing diagnostics, no new diagnostics; see lint_parity.json",
+  "quality_replay_max_coco_difference_mm": 0,
+  "mesh_reconstruction": "all four full360 meshes/native joints/COCO passed tolerance2e-6m",
+  "frames_per_fit": 360,
+  "changes": "body observation weighting only, no detector, raw quality, accepted mask, body temporal, VPoser prior, contact, stage, interpolation or display smoothing changes"
+}

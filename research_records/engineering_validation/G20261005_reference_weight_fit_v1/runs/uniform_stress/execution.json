@@ -1,0 +1,16 @@
+{
+  "status": "completed",
+  "seconds": 55.922127799999544,
+  "seed": 0,
+  "case": {
+    "id": "uniform_stress",
+    "detector": "new",
+    "changes": {
+      "body_weighting": "uniform"
+    }
+  },
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "cuda_device": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "includes": "input audits, fitting, checkpoint serialization, output serialization; excludes Python imports and evaluation"
+}

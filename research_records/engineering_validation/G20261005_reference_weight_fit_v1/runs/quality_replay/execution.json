@@ -1,0 +1,14 @@
+{
+  "status": "completed",
+  "seconds": 47.55103300000064,
+  "seed": 0,
+  "case": {
+    "id": "quality_replay",
+    "detector": "new",
+    "changes": {}
+  },
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "cuda_device": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "includes": "input audits, fitting, checkpoint serialization, output serialization; excludes Python imports and evaluation"
+}
