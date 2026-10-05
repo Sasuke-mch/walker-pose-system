@@ -1,0 +1,14 @@
+{
+  "input": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_arm_triangulation_v1",
+  "calibration_sources": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2\\protocol.json",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\comparison\\protocol.json"
+  },
+  "code": "realtime_app/experiment_arm_sensitivity.py",
+  "variable": "Finite-difference projection Jacobian at unchanged nonlinear point, step=0.01mm",
+  "assumptions": "Fixed exact calibration, independent isotropic 1px per-coordinate noise, local linearization",
+  "formula": "Cov=(J^T J)^-1; length std=sqrt(u^T(C_elbow+C_wrist)u)",
+  "success": "Positive-depth slots with per-point condition/sensitivity and paired bone propagation",
+  "stop": "Nonfinite, negative depth, rank deficient retain explicit unavailable state",
+  "limits": "Not learned or calibrated uncertainty, ignores correlations/calibration/semantic errors and bias. No confidence interval or accuracy claim."
+}

@@ -1,0 +1,5 @@
+{
+  "tests": "3 tests passed including 300-draw seed20261005 small-noise Monte Carlo against original nonlinear solver",
+  "ruff": "passed",
+  "mainline_changed": false
+}
