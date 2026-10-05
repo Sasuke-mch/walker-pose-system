@@ -1,0 +1,6 @@
+{
+  "tests": "3 tests passed: translation, length, rotation, random/zero-length algebra",
+  "ruff": "passed",
+  "max_closure_mm2": 5.820766091346741e-11,
+  "mainline_changed": false
+}

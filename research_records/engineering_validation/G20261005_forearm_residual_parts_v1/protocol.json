@@ -1,0 +1,15 @@
+{
+  "inputs": {
+    "old_pmpose_wrist_on": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_smplh_ablation_v1\\pmpose_baseline\\fit\\result.npz",
+    "old_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_smplh_ablation_v1\\pmpose_no_wrist\\fit\\result.npz",
+    "old_sapiens_wrist_on": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\smplh_cold_start_v2_joint300\\fit\\result.npz",
+    "new_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz"
+  },
+  "code": "realtime_app/experiment_forearm_residual_parts.py",
+  "variable": "No new candidate; exact decomposition of frozen elbow+wrist squared residual",
+  "formula": "SSE=2*||midpoint difference||^2 + 0.5*(length difference)^2 + Lm*Lo*(1-cos angle)",
+  "controls": "Original predicted_coco, raw_triangulated_points and body_accepted; both endpoints required",
+  "success": "Identity numerical closure on all finite valid pairs; report all components and unavailable counts",
+  "stop": "Frame mismatch or identity failure abort, no fitting change",
+  "limits": "Unweighted endpoint algebra, not decomposition of robust fitting objective or causal proof. Only old wrist-on/off is controlled A/B."
+}
