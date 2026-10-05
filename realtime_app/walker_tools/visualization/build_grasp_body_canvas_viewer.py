@@ -133,6 +133,11 @@ def main():
     reasons[candidate & ~strict & ((el + er) / 2 > 10)] = "reprojection_above_10px"
     if a.strict_jsonl:
         strict, reasons = recorded_strict_gate(a.strict_jsonl, ids)
+        if not np.array_equal(strict, s['accepted'][ids]):
+            raise ValueError('strict viewer/scene accepted mask mismatch')
+    # Ankle trails use the scene's actual strict XYZ, not the separate DLT
+    # body-fitting observations merely labeled with a strict accepted mask.
+    strict_ground = xf(s['raw_triangulated_points_mm'][ids] / 1000)
     sets = json.loads(a.surface_sets.read_text(encoding="utf-8"))["sets"]
     soles = np.unique(sum([sum(sets[f"{side}_sole_surface_candidate"].values(), []) for side in ("left", "right")], []))
     palms = np.unique(sum([sum(sets[f"{side}_palm_surface_candidate"].values(), []) for side in ("left", "right")], []))
@@ -176,7 +181,7 @@ def main():
         p1 = fisheye_project_numpy(r["predicted_coco"][i] @ cal.R_cam0_to_cam1.T * 1000 + cal.T_cam0_to_cam1_mm, cal.K1, cal.D1)
         projection.append([float(np.median(np.linalg.norm(p0 - left[i, :, :2], axis=1))), float(np.median(np.linalg.norm(p1 - right[i, :, :2], axis=1)))])
     data = {"v": encode(vg), "j": encode(cg), "w": encode(wg), "t": encode(tg), "he": encode(he),
-        "c": encode(cameras), "a": encode(tg[:, [15, 16]]), "av": strict[:, [15, 16]].ravel().tolist(),
+        "c": encode(cameras), "a": encode(strict_ground[:, [15, 16]]), "av": s['accepted'][ids][:, [15, 16]].ravel().tolist(),
         "faces": r["faces"].tolist(), "n": n, "nv": 6890, "ids": ids.tolist(), "wn": names,
         "we": [[names.index(x), names.index(y)] for x, y in w["edges"]], "si": soles.tolist(), "pi": palms.tolist(),
         "acc": strict.ravel().tolist(), "fit_acc": candidate.tolist(), "stage": stages, "pose": poses, "e3": e3,
