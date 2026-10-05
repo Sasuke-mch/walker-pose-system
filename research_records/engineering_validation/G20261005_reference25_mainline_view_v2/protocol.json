@@ -1,0 +1,48 @@
+{
+  "selected_body": {
+    "result": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz",
+    "source_command": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json",
+    "audit": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit/initialization_audit.json",
+    "level": "selected_engineering_mainline_not_physical_validation",
+    "accepted_for_main_fit": false,
+    "wrist_reference_enabled": false,
+    "beta_policy": "joint_shared_sequence",
+    "native_mano_pose_prior": true,
+    "contact_enabled": false,
+    "body_temporal_weight": 0.0,
+    "body_weighting": "reference",
+    "reference_parameters": {
+      "reprojection_px": 25.0,
+      "ray_gap_mm": 80.0,
+      "confidence_floor": 0.6,
+      "tail_power": 4,
+      "minimum_tail": 0.0001
+    },
+    "resolved_options": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/resolved_options.json",
+    "reproduction_arguments": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_fit_args.json",
+    "selection_record": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_decision.json",
+    "evaluation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/review_v2/evaluation.json",
+    "original_quality_field": "body_quality",
+    "effective_fit_weight_field": "body_fit_weights",
+    "acceptance_scope": "accepted_for_main_fit=false retains the unpassed physical/contact gate; selection as engineering mainline is explicit",
+    "selection_validation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_selection_validation.json"
+  },
+  "frames": 360,
+  "frame_ids": "0..359",
+  "source_pair_ids": "1157..1516",
+  "scene_profile": "mainline -> baseline",
+  "detector_inputs": {
+    "left": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/left_pmpose_raw.json",
+    "right": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/right_pmpose_raw.json",
+    "images": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input"
+  },
+  "implementation": "realtime_app/build_current_mainline_view.py",
+  "variable": "Visualization export of selected body; fresh strict geometry and baseline replay, no fitting changes",
+  "success": "Complete real mesh, original/rejected observations, same-frame transforms, solid walker and cameras; file and browser verification",
+  "stop": "Missing assets or source/frame/geometry mismatch: preserve failure and stop; no relaxed gates or substituted frames",
+  "old_dynamic_inputs_consumed": false,
+  "body_refitted": false,
+  "display_smoothing": false,
+  "interpolation": false,
+  "limits": "Engineering display; static installation is an assumption, no independent contact or 3D truth"
+}

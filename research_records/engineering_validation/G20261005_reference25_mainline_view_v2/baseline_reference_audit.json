@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "rotation_ground_from_left": true,
+    "translation_ground_from_left_mm": true,
+    "accepted": true,
+    "raw_triangulated_points_mm": true,
+    "strict_records_all_values_equal": true
+  },
+  "reference_scene": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review",
+  "reference_strict": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/first_instance_strict.jsonl",
+  "scope": "Historical arrays read only after fresh replay, for independent equality audit; not consumed as current input"
+}

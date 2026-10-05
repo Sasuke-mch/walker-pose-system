@@ -1,0 +1,46 @@
+{
+  "status": "passed",
+  "url": "http://127.0.0.1:8767/body.html",
+  "frames_observed": [
+    0,
+    33,
+    136,
+    151,
+    234,
+    333,
+    359
+  ],
+  "mesh_surface_visible": true,
+  "payload": {
+    "frames": 360,
+    "vertices": 6890,
+    "faces": 13776,
+    "index_entries": 41328,
+    "source_pair_ids": [
+      1157,
+      1516
+    ]
+  },
+  "observed_rejected_frame333": "strict 0/17, fitting candidates17/17; association_failed retained",
+  "controls": {
+    "frame_slider": "passed",
+    "play_pause": "passed",
+    "rate_menu_0_5_1_2": "passed",
+    "free_rotation": "passed_same_frame",
+    "wheel_zoom": "passed_same_frame",
+    "pan": "handler retained; not independently exercised"
+  },
+  "console_warnings_errors": [],
+  "screenshots": [
+    "preview.jpg",
+    "preview136.jpg",
+    "preview333.jpg",
+    "preview136_orbit.jpg",
+    "preview136_zoom.jpg",
+    "preview_playback.jpg",
+    "preview359.jpg"
+  ],
+  "network": "No external scripts or assets; preview server binds127.0.0.1 and only serves this page, no directory or model/raw-file access",
+  "limits": "Controls and appearance verified; actual playback throughput and end-to-end real-time fitting not certified",
+  "observed_unavailable_frame359": "ground unavailable; strict_two_foot_input_missing and missing_rotation_edges=2 retained"
+}

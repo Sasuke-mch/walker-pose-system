@@ -811,3 +811,9 @@ Stage2使用历史相机系脚点中位数再做0.45平移更新，会引入因�
 选择等级为selected_engineering_mainline_not_physical_validation；accepted_for_main_fit=false继续表示独立物理/接触门未通过。第24节evaluation/validation保留其实验时未晋升的决定；本次新决定在同实验mainline_decision.json登记，不改写历史评价。左肘/部分腕点恶化、原质量RMS上升及掌面/足底位移全部保留，不据平均改善认定上肢问题已解决。
 
 身体复现必须使用current_mainline.json的body.reproduction_arguments（mainline_fit_args.json），先把output-dir改到不存在的新目录，再通过run_tool.py body.fit_smplh_wilor_sequence运行。原通用求解器CLI省略body-weighting仍为quality，以保护历史调用；省略当前主线参数不算reference25复现。场景独立重放不读取身体拟合参数，新身体显示必须读取reference25网格及同源baseline的R/t，旧HTML/旧mesh不自动变成新身体主线。
+
+## 26. 最新主线可视化（2026-10-05）
+
+当前页面为research_records/engineering_validation/G20261005_reference25_mainline_view_v2/body.html；完整360帧reference25身体和本次mainline→baseline重放R/t，未重拟合身体，未复用历史动态输入。实际网格6890顶点/13776面、黑色DLT观测骨架、拒绝点、同源实体助步器与双相机；原质量和实际reference权重分开显示。严格XYZ供Stage与踝轨迹，身体DLT观测与严格mask各自标明，不能混称严格三维身体监督。19项源/变换核对与18项相关测试通过，浏览器网格、时间轴、旋转、缩放和播放倍率已查看；333帧关联拒绝完整保留。静态扶手安装与地面/足底显示不认证物理接触。
+
+从仓库根运行`.venv-cuda/Scripts/python.exe -B realtime_app/build_current_mainline_view.py --output <新目录>`重新导出；随后运行`.venv-cuda/Scripts/python.exe -B realtime_app/validate_current_mainline_view.py --view <新目录>`核对。主线清单visualization保存页面、预览与协议/验证路径。首轮v1失败和v2初期检查失败保留，各自见FAILURE.json及validation_attempts.json；最终完整源检查和截图在v2目录。

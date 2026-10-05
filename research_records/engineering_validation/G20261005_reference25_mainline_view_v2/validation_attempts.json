@@ -1,0 +1,6 @@
+{
+  "retained_first_export": "../G20261005_reference25_mainline_view_v1/FAILURE.json: hand audit used copied walker path instead of scene-declared static source; corrected source path, equality checked, guard unchanged",
+  "initial_source_validation": "GBK read and NumPy equal_nan on string arrays failed; UTF8 and dtype-aware comparisons corrected",
+  "retained_quality_check_failure": "source_validation_initial_quality_mismatch.json: recomputed float64 quality differed from stored fit quality; original body_quality now displayed verbatim, recomputed values kept separately",
+  "final": "source_validation19 checks pass; no body parameters, accepted masks, gates or scene algorithms changed"
+}

@@ -1,0 +1,5 @@
+[
+  ".venv-cuda/Scripts/python.exe",
+  "-B",
+  "research_records\\engineering_validation\\G20261005_reference25_mainline_view_v2\\preview_server.py"
+]

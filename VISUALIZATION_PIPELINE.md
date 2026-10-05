@@ -206,9 +206,11 @@ Three.js `OrbitControls` 必须支持：
 14. 相机 YZ 侧面投影轨迹和双踝地面拖尾均可见；MP4 中两面网格墙可见；被拒绝的右膝连线若显示，必须用黑色实线，拒绝状态仍通过关节点标记及诊断栏明确展示；
 15. 记录页面路径、输入路径、唯一修改变量和失败边界。
 
-当前正式诊断页面：
+当前主线交互页面（2026-10-05，工程显示）：
 
-`research_records/engineering_validation/G20260924_smpl_vposer_shared_beta_v1/full448_formal/stage_c_grounded_xoy_viewer_final.html`
+`research_records/engineering_validation/G20261005_reference25_mainline_view_v2/body.html`
+
+该页使用reference25完整360帧身体与本轮重新计算的strict几何/重新重放的baseline Stage及地面；来源与19项数组/变换核对、逐关节审计和浏览器截图保存在同目录。身体DLT观测骨架与严格场景点分支分别标明，踝拖尾使用本轮严格场景XYZ/mask。历史448帧页面继续保留为历史诊断，不代表当前身体权重。
 
 视频参考视角补充（2026-09-26）：参考视频风格 MP4 使用物理地面 `[X,Y,Z]`（不镜像 Y），网页仍使用 `[X,-Y,Z]`。观察角 elev=23°，azim=相机首末平面位移角−35°；两面墙在 x=hi、y=hi，沿负 Y 行走时横墙位于起点后方。
 

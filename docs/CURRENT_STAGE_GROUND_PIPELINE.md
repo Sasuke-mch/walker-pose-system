@@ -17,6 +17,8 @@
 
 
 
+最新主线交互页面：`research_records/engineering_validation/G20261005_reference25_mainline_view_v2/body.html`。本轮重新计算strict几何并重放baseline，页面索引与source/browser_validation见current_mainline.json/mainline_selection.visualization。身体参数不变；旧动态场景仅用于事后等值审计。
+
 ### 正式版本的处理顺序与接口边界
 
 1. **输入与观测**：物理相机身份仍由instance_id注册表解析；cam0=LEFT、cam1=RIGHT。已有检测输入可转正，但进入几何前逆旋转回原始鱼眼像素。人物关联和逐点几何质量门不改变，最多匹配一对人物；失败帧、拒绝原因及NaN保持可见。
@@ -245,7 +247,7 @@ Git 不提交原始数据、JSONL和视频。当前本地只保留以下主线�
 
 ## 9. 2026-10-04：连续交接候选与当前决策
 
-当前换机位360帧默认展示仍为`G20261003_repositioned360_manual_v1/full_view_rotation_fix_v1/body.html`。新实验不替换原`RealtimeDynamicGroundWriter`默认参数；方法级别仍是工程候选。
+2026-10-05当前换机位360帧主线展示为`G20261005_reference25_mainline_view_v2/body.html`，使用reference25身体和新重放baseline场景；旧`full_view_rotation_fix_v1/body.html`保留历史展示身份。新实验不替换原`RealtimeDynamicGroundWriter`默认参数；方法级别仍是工程候选。
 
 同源回放新增可选`--frames-metadata <frames.json>`与`--foot-observation-mode current`。前者校验保存图身份、双侧主机时间和偏差，输出配对及左右时间；host_return不是曝光时间。360对实际主机跨度17.4267秒，旧30fps名义时间只有11.9667秒。后者改变当前严格踝观测的因果滤波方式，未改变人体检测与严格三角化门。
 

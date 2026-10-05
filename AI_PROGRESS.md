@@ -3699,3 +3699,17 @@ G20261005_reference_weight_fit_v1提前保存plan；原权重复现及3个新候
 第24节及原validation保留实验时未晋升的历史决定，本次晋升另记mainline_decision。臂均差75.12→66.38、腿d2P9573.68→41.92仅为内部/索引运动结果；左肘等局部变差、固定原质量RMS51.10→57.93及掌面/足底位移仍保留。accepted_for_main_fit=false保持物理/接触门未通过语义，工程主线身份不覆盖该门。
 
 主线切换核查：26项相关测试通过，mainline_selection_validation.json的15项检查全通过；完整360帧raw XYZ、mask、原quality、实际reference25权重及编号逐元素相同，复现全参数一致，448冻结字段/场景开关不变。既有报告备份同步追加本次决定；该文件原已未受版本管理，本次不整份纳入提交。原工作区改动隔离保留，仅提交本次选择与记录。
+
+### 2026-10-05 当前reference25主线完整同源可视化
+
+按VISUALIZATION_PIPELINE及walker-visualization要求，新输出G20261005_reference25_mainline_view_v2/body.html，输入为所选reference25完整360帧身体result、PMPose原始双目行/对应图像、固定标定和静态地面/助步器拓扑。build_current_mainline_view.py重新计算原身体DLT及严格first-instance几何，原关联/10px/置信度/max_matches=1门保留；重新调用mainline→baseline Stage/地面重放。新R/t和严格XYZ/mask与历史baseline独立审计逐值一致，历史动态数组仅在重放完成后用于核对，没有进入当前计算。身体参数未重新拟合或修改，所有输出字段与所选result逐元素一致。
+
+页面为6890顶点/13776真实三角面、完整360帧；网格、模型COCO、原DLT骨架、实体助步器、双相机统一由新R/t映射到固定地面并用[X,-Y,Z]显示。黑色实线包含右膝两段连接，有限严格拒绝点保留橙叉；严格场景门与身体候选门分开显示。仅XY地面着深色，其他空间浅色，无网页墙体、无插值/显示平滑。足底负高度可见，静态安装/扶手几何不宣称真实接触。侧栏分别显示原body_quality与reference25实际body_fit_weights，并保留重新计算的几何quality作为独立字段。
+
+本轮修复既有页面踝拖尾来源：拖尾从本次场景strict XYZ与mask生成，不再给独立身体DLT踝坐标套严格mask；新增场景/严格mask一致性检查。18项相关测试、3份语法检查通过；两新脚本Ruff通过，既有builder的12条诊断与修改前类型/消息计数一致，无新增。validate_current_mainline_view.py的19项源/变换核对通过，另保留逐关节finite/accepted/rejected及拒绝原因、Stage计数准备3/Stage1 223/过渡64/Stage2 70、严格接受3031点。
+
+实际浏览器看到着色人体表面，0/136/333等帧可定位，第333帧strict0/17和association_failed仍可见；播放倍率0.5/1/2、播放暂停、自由旋转及滚轮缩放已检查，当前倍率1、136帧停止。未出现控制台warn/error。右键/Shift平移沿用既有handler，本轮未独立测试；不声称实际60fps或整套实时运行达标。预览仅127.0.0.1、本页白名单，不开放目录/原图/模型读取；完整HTML本地自包含。preview.jpg及其他截图保留。
+
+首轮v1因手部审计记录助步器副本路径，被既有来源门拦住，失败与输出保留；v2改为来源声明中的原静态路径并核对副本相等，没有放宽来源检查。源验证初期的UTF8/字符串比较问题和存档质量与重算质量差别记录在validation_attempts及保留的失败检查文件，现已纠正。current_mainline的visualization及scene/strict索引指向本轮产物；旧场景和旧页面保留历史角色。报告备份同步追加，未把既有未受版本管理备份整份提交；原89条状态保留，大型网格/图像/HTML不提交。
+
+末帧359也已在浏览器访问：地面unavailable、strict_two_foot_input_missing和2条未观测旋转边保留，严格4/17、身体候选17/17；preview359.jpg保留。当前页面未以旧地面替代该失效状态。

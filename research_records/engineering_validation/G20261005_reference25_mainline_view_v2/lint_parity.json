@@ -1,0 +1,23 @@
+{
+  "legacy_count": 12,
+  "current_count": 12,
+  "legacy": {
+    "I001: Import block is un-sorted or un-formatted": 3,
+    "FURB167: Use of regular expression alias `re.S`": 1,
+    "RUF059: Unpacked variable `dl` is never used": 1,
+    "RUF059: Unpacked variable `dr` is never used": 1,
+    "RUF017: Avoid quadratic list summation": 4,
+    "C401: Unnecessary generator (rewrite as a set comprehension)": 1,
+    "SIM102: Use a single `if` statement instead of nested `if` statements": 1
+  },
+  "current": {
+    "I001: Import block is un-sorted or un-formatted": 3,
+    "FURB167: Use of regular expression alias `re.S`": 1,
+    "RUF059: Unpacked variable `dl` is never used": 1,
+    "RUF059: Unpacked variable `dr` is never used": 1,
+    "RUF017: Avoid quadratic list summation": 4,
+    "C401: Unnecessary generator (rewrite as a set comprehension)": 1,
+    "SIM102: Use a single `if` statement instead of nested `if` statements": 1
+  },
+  "no_new_diagnostics": true
+}

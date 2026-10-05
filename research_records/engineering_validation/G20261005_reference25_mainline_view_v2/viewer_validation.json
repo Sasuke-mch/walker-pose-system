@@ -1,0 +1,184 @@
+{
+  "status": "file_and_browser_checks_passed",
+  "vertices": 6890,
+  "faces": 13776,
+  "index_entries": 41328,
+  "frames": 360,
+  "joints": {
+    "0": {
+      "finite": 324,
+      "strict_accepted": 10,
+      "finite_rejected": 314,
+      "rejection_reasons": {
+        "out_of_raw_image_bounds": 28,
+        "low_2d_score": 182,
+        "high_reprojection_error": 111,
+        "association_failed": 29
+      }
+    },
+    "1": {
+      "finite": 318,
+      "strict_accepted": 28,
+      "finite_rejected": 290,
+      "rejection_reasons": {
+        "out_of_raw_image_bounds": 34,
+        "low_2d_score": 93,
+        "high_reprojection_error": 176,
+        "association_failed": 29
+      }
+    },
+    "2": {
+      "finite": 310,
+      "strict_accepted": 18,
+      "finite_rejected": 292,
+      "rejection_reasons": {
+        "out_of_raw_image_bounds": 42,
+        "low_2d_score": 94,
+        "high_reprojection_error": 177,
+        "association_failed": 29
+      }
+    },
+    "3": {
+      "finite": 340,
+      "strict_accepted": 162,
+      "finite_rejected": 178,
+      "rejection_reasons": {
+        "out_of_raw_image_bounds": 15,
+        "high_reprojection_error": 154,
+        "association_failed": 29
+      }
+    },
+    "4": {
+      "finite": 337,
+      "strict_accepted": 98,
+      "finite_rejected": 239,
+      "rejection_reasons": {
+        "out_of_raw_image_bounds": 17,
+        "high_reprojection_error": 216,
+        "association_failed": 29
+      }
+    },
+    "5": {
+      "finite": 360,
+      "strict_accepted": 198,
+      "finite_rejected": 162,
+      "rejection_reasons": {
+        "high_reprojection_error": 133,
+        "association_failed": 29
+      }
+    },
+    "6": {
+      "finite": 360,
+      "strict_accepted": 306,
+      "finite_rejected": 54,
+      "rejection_reasons": {
+        "high_reprojection_error": 25,
+        "association_failed": 29
+      }
+    },
+    "7": {
+      "finite": 360,
+      "strict_accepted": 149,
+      "finite_rejected": 211,
+      "rejection_reasons": {
+        "high_reprojection_error": 182,
+        "association_failed": 29
+      }
+    },
+    "8": {
+      "finite": 360,
+      "strict_accepted": 221,
+      "finite_rejected": 139,
+      "rejection_reasons": {
+        "high_reprojection_error": 110,
+        "association_failed": 29
+      }
+    },
+    "9": {
+      "finite": 360,
+      "strict_accepted": 149,
+      "finite_rejected": 211,
+      "rejection_reasons": {
+        "high_reprojection_error": 182,
+        "association_failed": 29
+      }
+    },
+    "10": {
+      "finite": 360,
+      "strict_accepted": 229,
+      "finite_rejected": 131,
+      "rejection_reasons": {
+        "high_reprojection_error": 102,
+        "association_failed": 29
+      }
+    },
+    "11": {
+      "finite": 360,
+      "strict_accepted": 257,
+      "finite_rejected": 103,
+      "rejection_reasons": {
+        "high_reprojection_error": 74,
+        "association_failed": 29
+      }
+    },
+    "12": {
+      "finite": 360,
+      "strict_accepted": 272,
+      "finite_rejected": 88,
+      "rejection_reasons": {
+        "high_reprojection_error": 59,
+        "association_failed": 29
+      }
+    },
+    "13": {
+      "finite": 360,
+      "strict_accepted": 153,
+      "finite_rejected": 207,
+      "rejection_reasons": {
+        "high_reprojection_error": 178,
+        "association_failed": 29
+      }
+    },
+    "14": {
+      "finite": 360,
+      "strict_accepted": 222,
+      "finite_rejected": 138,
+      "rejection_reasons": {
+        "high_reprojection_error": 109,
+        "association_failed": 29
+      }
+    },
+    "15": {
+      "finite": 360,
+      "strict_accepted": 302,
+      "finite_rejected": 58,
+      "rejection_reasons": {
+        "high_reprojection_error": 29,
+        "association_failed": 29
+      }
+    },
+    "16": {
+      "finite": 360,
+      "strict_accepted": 257,
+      "finite_rejected": 103,
+      "rejection_reasons": {
+        "high_reprojection_error": 74,
+        "association_failed": 29
+      }
+    }
+  },
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_reference25_mainline_view_v2\\result.npz",
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_reference25_mainline_view_v2\\scene",
+  "stage_counts": {
+    "warming_up": 3,
+    "stage1_walker_static_human_moving": 223,
+    "transition": 64,
+    "stage2_feet_static_walker_moving": 70
+  },
+  "no_display_smoothing": true,
+  "source_consistency_checks": 19,
+  "related_tests_passed": 18,
+  "syntax_files_passed": 3,
+  "browser_validation": "browser_validation.json",
+  "preview": "preview.jpg"
+}

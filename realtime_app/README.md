@@ -13,6 +13,8 @@ $fitArgs[[Array]::IndexOf($fitArgs, '--output-dir') + 1] = 'research_records/eng
 & ./.venv-cuda/Scripts/python.exe -B realtime_app/run_tool.py body.fit_smplh_wilor_sequence @fitArgs
 ```
 
+最新主线可视化入口：`build_current_mainline_view.py --output <新目录>`（本地Python从仓库根调用）。它读取当前选择的reference25身体，重新计算三角化、重放mainline→baseline，并生成完整自包含body.html；不重拟合身体。随后用`validate_current_mainline_view.py --view <目录>`核对网格/点/严格踝拖尾/相机/助步器与新变换。已验证页面路径保存在current_mainline.json/mainline_selection.visualization。
+
 命令从仓库根运行；本地授权模型/缓存缺失则报告不可用。新显示应读取选择的reference25网格和同源baseline变换，历史HTML不可冒充新结果。工程主线选择仍不表示独立三维精度或物理接触认证。
 
 
