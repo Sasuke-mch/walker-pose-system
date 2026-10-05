@@ -1,0 +1,36 @@
+{
+  "sources": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2"
+  },
+  "labels": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2\\points.json",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\comparison\\points.json"
+  },
+  "mapping": "D:\\my_works\\walker_pose_system\\third_party\\sapiens2\\repo\\sapiens\\pose\\configs\\_base_\\keypoints308.py",
+  "palm_indices": {
+    "left": [
+      49,
+      53,
+      57,
+      61
+    ],
+    "right": [
+      28,
+      32,
+      36,
+      40
+    ]
+  },
+  "wrist_indices": {
+    "left": 62,
+    "right": 41
+  },
+  "code": "realtime_app/experiment_sapiens_palm_transfer.py",
+  "variable": "Direction from original wrist to mean of four proximal finger landmarks, one scalar coefficient",
+  "training": "Median signed projected coefficient on all original other-capture labels; no test tuning or additional inference",
+  "controls": "Raw full308 first instance mapped by file_name sequence index and raw-fisheye inverse rotation; exact compare COCO source wrists",
+  "success": "Report both transfer directions, every original slot, camera/hand groups, no silent exclusions",
+  "stop": "Missing frame or mapping mismatch abort; degenerate palm keeps original with unavailable flag",
+  "limits": "Proximal landmarks are model-derived anatomical labels; coefficient is operational pixel alignment, not 3D truth or semantic repair"
+}

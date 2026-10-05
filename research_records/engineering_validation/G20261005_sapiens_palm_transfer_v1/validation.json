@@ -1,0 +1,6 @@
+{
+  "tests": "2 passed",
+  "ruff": "passed",
+  "mapping_replay": "All old448/new360 both views full308 wrist coordinates match original COCO export within1e-5px",
+  "mainline_changed": false
+}
