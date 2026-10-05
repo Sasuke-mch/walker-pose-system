@@ -1,0 +1,17 @@
+{
+  "alignment_and_rigid_checks": "passed",
+  "decomposition": "passed",
+  "images_generated": 64,
+  "visual_model_review": "completed_subset_23_frames_both_views",
+  "no_input_mutation": true,
+  "tests_passed": 5,
+  "ruff": "passed",
+  "compile_without_cache": "passed",
+  "failure_history": [
+    "v1 float64 vs originalfloat32 weight parity failure, preserved; fixed by exact input path",
+    "initial scipy single-axis Euler test shape failed; corrected to Nx1 and passed",
+    "initial Ruff not installed in cuda environment; uv tool run ruff available and final checks passed"
+  ],
+  "inputs_unchanged": true,
+  "mainline_unchanged": true
+}

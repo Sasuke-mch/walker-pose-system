@@ -1,0 +1,30 @@
+{
+  "code": "realtime_app/audit_limb_chain.py",
+  "fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz",
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\stage_landing_recovery_v1\\baseline_profile_review",
+  "detector_inputs": {
+    "left": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/left_pmpose_raw.json",
+    "right": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/right_pmpose_raw.json",
+    "images": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input"
+  },
+  "frames": 360,
+  "objective": "Locate observation, geometry, fit and ground-transform contributions before any method changes",
+  "controls": "Frozen current input, calibration, masks, body parameters and archived baseline scene; no inference/refit/replay",
+  "diagnostic_variable": "Algebraic removal of ground transform; isolated within-valid-triple kernel as explicit counterfactual only",
+  "success": "Recomputed raw XYZ/mask/quality match saved body; exact world-step decomposition and same-frame residual invariance; visual audit of preset and ranked frames",
+  "stop": "Frame/mask/source mismatch, non-rigid scene, unavailable images; preserve failures and do not substitute",
+  "units": "2D px; 3D mm; indexed step mm/frame and second difference mm/frame^2, not physical acceleration",
+  "limits": "No anatomical 3D or stage truth; motion includes actual movement; pose component is an algebraic term, not a percentage of error",
+  "scene_usage": "Saved scene is an audited input, not a newly replayed scene or new 3D visualization",
+  "visual_selection": "Preset 0,42,74,101,136,139,184,226,268,313,359 plus maximum arm residual, raw knee second difference, model pelvis-relative knee second difference, and five largest world pose steps; include ranked-event neighbours",
+  "execution_command": [
+    ".venv-cuda/Scripts/python.exe",
+    "-B",
+    "realtime_app/audit_limb_chain.py",
+    "--output",
+    "research_records\\engineering_validation\\G20261005_limb_chain_audit_v3"
+  ],
+  "visual_supplement": "contact_sheet from same module, existing overlays, 201/202/203; camera-space original-image comparison only",
+  "fit_source_command": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit_command.json",
+  "calibration": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\calibration"
+}

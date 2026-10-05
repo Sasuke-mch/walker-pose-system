@@ -1,0 +1,7 @@
+{
+  "status": "blocked_before_metrics",
+  "max_quality_difference": 6.82210122E-06,
+  "initial_ruff": "cuda environment lacks ruff module",
+  "correction": "match original float32 path; preserve exact zero tolerance and rerun in v2",
+  "reason": "audit used float64 observations but original fitter converts raw pixels/confidence to float32 before triangulation"
+}

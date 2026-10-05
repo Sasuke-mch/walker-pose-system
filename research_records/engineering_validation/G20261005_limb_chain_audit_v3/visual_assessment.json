@@ -1,0 +1,125 @@
+{
+  "review_method": "Assistant visual inspection via view_image, original upright image and preserved point overlays; no detector/segmentation inference or new labels",
+  "reviewed_frames_both_views": [
+    0,
+    42,
+    74,
+    101,
+    136,
+    137,
+    138,
+    139,
+    184,
+    201,
+    202,
+    203,
+    226,
+    231,
+    268,
+    298,
+    299,
+    300,
+    313,
+    320,
+    321,
+    322,
+    359
+  ],
+  "numeric_scope": "All360 current frames; historical448 smoothing separately",
+  "overlay_legend": {
+    "green_circle": "original2D",
+    "cyan_square": "rawDLT reprojected",
+    "red_cross": "SMPLH COCO regressor",
+    "orange_cross": "native joint"
+  },
+  "observations": [
+    {
+      "frames": [
+        0,
+        42,
+        74,
+        101,
+        136,
+        139,
+        184,
+        226,
+        231,
+        268,
+        313,
+        359
+      ],
+      "finding": "Multiple right views show fitted elbow shifted distally on forearm, while 2D point and raw projection lie closer together. The shift is not explained by native/COCO mapping alone. Near hand, occlusion, extreme perspective and fisheye edge prevent direct localization of internal wrist center."
+    },
+    {
+      "frames": [
+        0,
+        42,
+        74,
+        101,
+        136,
+        139,
+        226,
+        268,
+        313,
+        359
+      ],
+      "finding": "Fitted knee projections frequently sit below detector knee projections in both views; native and COCO projections are close. Dark loose pants conceal anatomical knee center, so this is model-observation disagreement rather than certified true knee error."
+    },
+    {
+      "frames": [
+        320,
+        321,
+        322
+      ],
+      "finding": "Model knee/ankle positions change more than raw knee triangulation; R/t held exactly. Original points also move, so frame320..322 is not claimed to be a static ground-truth pose. Body quality shifts sharply."
+    },
+    {
+      "frames": [
+        137,
+        138,
+        139
+      ],
+      "finding": "Background/viewpoint motion and some ankle localization changes are visible; raw geometry contains transients and real camera movement. Second differences cannot all be called noise."
+    },
+    {
+      "frames": [
+        201,
+        202,
+        203,
+        298,
+        299,
+        300
+      ],
+      "finding": "Camera-space overlays plus exact R/t decomposition locate extra world-motion terms; image panels themselves contain no new ground render and do not certify correct Stage labels."
+    }
+  ],
+  "confirmed": [
+    "Rigid common ground transform cannot fix same-frame arm residuals",
+    "Knee variation increases in the fitter and remains after removing pelvis/root motion",
+    "Foot raw geometry already has large changes",
+    "Stage recovery and Stage1 reanchor add discrete world-motion terms",
+    "Current body does not use archived smoothed triangulation"
+  ],
+  "unresolved": [
+    "Detector bias versus fixed calibration and exposure synchronization contributions",
+    "True person-specific limb lengths and anatomical joint centers",
+    "Whether operational Stage labels are wrong without manual stage truth",
+    "Causal fraction of upper-body latent coupling in lower-body variation"
+  ],
+  "analytic_stage2_lag_example": {
+    "assumptions": "All samples valid, fixed rotation, perfect stationary world feet, constant camera translation v mm/frame",
+    "median_delay_frames": 2,
+    "gain": 0.45,
+    "gain_extra_delay_frames": 1.2222222222222223,
+    "steady_total_lag_in_v_units": 3.2222222222222223,
+    "status": "analytic mechanism example, not estimated real capture error"
+  },
+  "historical_evidence_rechecked": [
+    "G20261005_arm_triangulation_v1/summary.json",
+    "G20261005_forearm_residual_parts_v1/summary.json",
+    "G20261005_body_translation_audit_v1/summary.json",
+    "G20261005_pmpose_prior_ablation_v1/evaluation.json"
+  ],
+  "promotion": false,
+  "wrist_objective_scope": "Independent manual wrist reference is disabled; detector wrist triangulation still enters quality-weighted body loss. WiLoR local hand pose is not an absolute wrist/elbow position reference."
+}
