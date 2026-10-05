@@ -1,0 +1,26 @@
+{
+  "inputs": {
+    "old_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_smplh_ablation_v1\\pmpose_no_wrist\\fit\\result.npz",
+    "new_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz"
+  },
+  "assets": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models",
+  "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+  "code": "realtime_app/experiment_local_arm_pose.py",
+  "variable": "Release direct collar/shoulder/elbow axis-angle around frozen pose, 0.15rad per component box",
+  "body_pose_indices": [
+    12,
+    13,
+    15,
+    16,
+    17,
+    18
+  ],
+  "steps": 100,
+  "lr": 0.005,
+  "batch": 32,
+  "controls": "Same body quality, mask, COCO regressor, full SMPLH and frozen beta/root/transl/legs/fingers",
+  "objective": "Original all-body weighted squared observation residual; no new labels or detector",
+  "success": "Initial full-mesh replay<=2e-6m, finite candidate, lower-body COCO displacement<=1mm; report full residual and pose/motion changes",
+  "stop": "Replay mismatch/nonfinite abort, preserve failed protocol/log; no retuning",
+  "limits": "Candidate leaves VPoser manifold; no physical contact or anatomical accuracy certification; not accepted for main fit"
+}

@@ -1,0 +1,12 @@
+{
+  "full_sequence_frames": [
+    448,
+    360
+  ],
+  "replay_max_m": 5.960464477539062e-07,
+  "frozen_parameters_exact": true,
+  "ruff": "passed",
+  "candidate_gate": "failed_lower_body_displacement_over_1mm_both_captures",
+  "accepted_for_main_fit": false,
+  "code_adjustments_during_run": "Import formatting and explicit binding of immediately invoked loop closure only; numerical operations unchanged"
+}
