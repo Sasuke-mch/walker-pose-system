@@ -1,0 +1,13 @@
+{
+  "inputs": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2\\protocol.json",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\comparison\\protocol.json"
+  },
+  "code": "realtime_app/experiment_fast_arm_assignment.py",
+  "variable": "Replace nonlinear cost with raw-pixel Jacobian Sampson approximation and DLT depth",
+  "pixel_derivative_step": 0.001,
+  "rule": "same conservative 4 passes / +2 passes / 0.75 residual ratio",
+  "success": "Report decision agreement against nonlinear diagnostic and all original manual slots, runtime",
+  "limits": "RMS<=10 differs from each-view<=10; diagnostic only, not strict mainline gate. Local approximation can fail for large errors. Batch amortized timing is not streaming latency",
+  "stop": "Frame mismatch abort; no point relabeling in production, no smoothing"
+}
