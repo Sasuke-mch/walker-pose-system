@@ -1,0 +1,192 @@
+{
+  "surface_sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260930_smplh_contact_set_fix_v1_run3\\contact_vertex_sets.json",
+  "limits": "Surface displacement is not contact validation; second differences in mm/frame^2, no assumed fps",
+  "cases": {
+    "old_pmpose_wrist_off": {
+      "unchanged": {
+        "betas": true,
+        "global_orient": true,
+        "transl": true,
+        "left_hand_pose": true,
+        "right_hand_pose": true,
+        "other_body_pose": true
+      },
+      "max_component_delta_rad": 0.07820869237184525,
+      "near_box_limit_fraction": 0.0,
+      "joints": {
+        "arms": {
+          "residual_change_mm": {
+            "n": 1792,
+            "mean": -1.598971850128141,
+            "median": -1.691681846169054,
+            "p95": 2.6857873418254363,
+            "max": 6.430339386450072
+          },
+          "worse_over_1mm": 216,
+          "second_difference_before": {
+            "n": 1784,
+            "mean": 27.212204927018938,
+            "median": 21.15484619140625,
+            "p95": 69.04804115295401,
+            "max": 214.09353637695312
+          },
+          "second_difference_after": {
+            "n": 1784,
+            "mean": 27.40920441300345,
+            "median": 21.26751708984375,
+            "p95": 70.6268989562988,
+            "max": 225.36517333984375
+          }
+        },
+        "legs": {
+          "residual_change_mm": {
+            "n": 1792,
+            "mean": 0.0034471853824391,
+            "median": -0.004907386979487782,
+            "p95": 0.07370660292451196,
+            "max": 0.24134100417903426
+          },
+          "worse_over_1mm": 0,
+          "second_difference_before": {
+            "n": 1784,
+            "mean": 29.71474075724993,
+            "median": 25.989009857177734,
+            "p95": 63.22137680053711,
+            "max": 166.66046142578125
+          },
+          "second_difference_after": {
+            "n": 1784,
+            "mean": 29.71135787017677,
+            "median": 25.989083290100098,
+            "p95": 63.23341197967529,
+            "max": 166.62770080566406
+          }
+        }
+      },
+      "surfaces": {
+        "left_sole_movement_mm": {
+          "n": 24192,
+          "mean": 0.04106065297047141,
+          "median": 0.033121583983302116,
+          "p95": 0.10347797460854057,
+          "max": 0.4167536199092865
+        },
+        "left_palm_movement_mm": {
+          "n": 103488,
+          "mean": 6.311375841939558,
+          "median": 6.795709848403931,
+          "p95": 7.779937076568603,
+          "max": 8.147802352905273
+        },
+        "right_sole_movement_mm": {
+          "n": 24192,
+          "mean": 0.029788720897009607,
+          "median": 0.022179096937179565,
+          "p95": 0.07979314029216766,
+          "max": 0.25055181980133057
+        },
+        "right_palm_movement_mm": {
+          "n": 103488,
+          "mean": 6.043946529787561,
+          "median": 6.545453071594238,
+          "p95": 7.721925258636475,
+          "max": 8.195212364196777
+        }
+      },
+      "decision": "research_candidate_not_accepted"
+    },
+    "new_pmpose_wrist_off": {
+      "unchanged": {
+        "betas": true,
+        "global_orient": true,
+        "transl": true,
+        "left_hand_pose": true,
+        "right_hand_pose": true,
+        "other_body_pose": true
+      },
+      "max_component_delta_rad": 0.057679176330566406,
+      "near_box_limit_fraction": 0.0,
+      "joints": {
+        "arms": {
+          "residual_change_mm": {
+            "n": 1440,
+            "mean": -1.7463857964505332,
+            "median": -1.963578943972152,
+            "p95": 2.8947210391956384,
+            "max": 7.12372335925436
+          },
+          "worse_over_1mm": 194,
+          "second_difference_before": {
+            "n": 1432,
+            "mean": 39.94502723067166,
+            "median": 28.21383571624756,
+            "p95": 119.42146301269534,
+            "max": 367.99090576171875
+          },
+          "second_difference_after": {
+            "n": 1432,
+            "mean": 40.48572002759193,
+            "median": 28.576998710632324,
+            "p95": 120.1259159088135,
+            "max": 375.5781555175781
+          }
+        },
+        "legs": {
+          "residual_change_mm": {
+            "n": 1440,
+            "mean": -0.01814205477124914,
+            "median": -0.0189184642729181,
+            "p95": 0.02424791652110192,
+            "max": 0.12068782764691832
+          },
+          "worse_over_1mm": 0,
+          "second_difference_before": {
+            "n": 1432,
+            "mean": 30.33459261950501,
+            "median": 24.369949340820312,
+            "p95": 73.68485145568852,
+            "max": 356.25140380859375
+          },
+          "second_difference_after": {
+            "n": 1432,
+            "mean": 30.3373475987152,
+            "median": 24.349976539611816,
+            "p95": 73.66553573608402,
+            "max": 356.37982177734375
+          }
+        }
+      },
+      "surfaces": {
+        "left_sole_movement_mm": {
+          "n": 19440,
+          "mean": 0.025035113378147605,
+          "median": 0.01841689459979534,
+          "p95": 0.06840575113892555,
+          "max": 0.26184263825416565
+        },
+        "left_palm_movement_mm": {
+          "n": 83160,
+          "mean": 5.483321452638947,
+          "median": 5.841348648071289,
+          "p95": 7.709884095191955,
+          "max": 8.134260177612305
+        },
+        "right_sole_movement_mm": {
+          "n": 19440,
+          "mean": 0.02581116810775232,
+          "median": 0.020810100249946117,
+          "p95": 0.0631232641637325,
+          "max": 0.21442434191703796
+        },
+        "right_palm_movement_mm": {
+          "n": 83160,
+          "mean": 6.456045406342929,
+          "median": 7.087131500244141,
+          "p95": 7.81836085319519,
+          "max": 8.177650451660156
+        }
+      },
+      "decision": "research_candidate_not_accepted"
+    }
+  }
+}

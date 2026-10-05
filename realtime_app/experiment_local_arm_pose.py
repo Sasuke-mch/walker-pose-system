@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 import numpy as np
-from compare_capture_arm_bias import ROOT, stats
+from compare_capture_arm_bias import RECORDS, ROOT, read, stats
 from experiment_forearm_residual_parts import FITS
 
 BODY_INDICES = [12, 13, 15, 16, 17, 18]  # native 13/14 collars,16/17 shoulders,18/19 elbows
@@ -37,7 +37,10 @@ def load_model(assets):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--output", type=Path, required=True)
+    ap.add_argument("--surface-penalty", type=float, default=0.)
     args = ap.parse_args()
+    if not np.isfinite(args.surface_penalty) or args.surface_penalty < 0:
+        raise ValueError("invalid_surface_penalty")
     if args.output.exists():
         raise ValueError("refuse_existing_output")
     args.output.mkdir(parents=True)
@@ -55,6 +58,12 @@ def main():
         "stop": "Replay mismatch/nonfinite abort, preserve failed protocol/log; no retuning",
         "limits": "Candidate leaves VPoser manifold; no physical contact or anatomical accuracy certification; not accepted for main fit"
     }
+    protocol["surface_penalty"] = {
+        "weight": args.surface_penalty, "on": "per-frame maximum point displacement squared hinge",
+        "soft_margins_m": {"sole": .0008, "palm": .008, "lower_coco": .0008},
+        "hard_audit_m": {"sole": .001, "palm": .010, "lower_coco": .001},
+        "sets": str(RECORDS / "G20260930_smplh_contact_set_fix_v1_run3/contact_vertex_sets.json"),
+    }
     (args.output / "protocol.json").write_text(json.dumps(protocol, indent=2), encoding="utf-8")
     import torch
     from pose_app.smpl_coco_observation import (
@@ -67,6 +76,10 @@ def main():
         raise RuntimeError("CUDA required for registered experiment")
     model = load_model(assets)
     reg = load_coco17_regressor(protocol["regressor"])
+    sets = read(Path(protocol["surface_penalty"]["sets"]))["sets"] if args.surface_penalty else {}
+    surface_indices = {part: sorted({i for side in ("left", "right")
+                                    for group in sets[f"{side}_{part}_surface_candidate"].values() for i in group})
+                       for part in ("sole", "palm")} if sets else {}
     def tensor(x):
         return torch.as_tensor(x, dtype=torch.float32, device="cuda")
     summaries = {}
@@ -91,13 +104,23 @@ def main():
             mask = src["body_accepted"][start:end]
             target = tensor(np.where(mask[..., None], src["raw_triangulated_points"][start:end] / 1000, 0))
             weights = tensor(np.where(mask, src["body_quality"][start:end], 0))
+            original_mesh = tensor(src["vertices"][start:end]) if args.surface_penalty else None
+            original_coco = tensor(src["predicted_coco"][start:end]) if args.surface_penalty else None
             optim = torch.optim.Adam([delta], lr=.005)
             def forward(initial=initial, selector=selector, delta=delta, beta=beta,
-                        fixed=fixed, target=target, weights=weights):
+                        fixed=fixed, target=target, weights=weights,
+                        original_mesh=original_mesh, original_coco=original_coco):
                 pose = initial + torch.einsum("jk,nkc->njc", selector, delta)
                 out = model(betas=beta, body_pose=pose.reshape(-1, 63), return_verts=True, **fixed)
                 coco = regress_coco17_torch(out.vertices, reg)
                 loss = ((coco - target).square().sum(-1) * weights).sum() / weights.sum().clamp_min(1e-8)
+                if args.surface_penalty:
+                    for part, ids in surface_indices.items():
+                        displacement = torch.linalg.vector_norm(out.vertices[:, ids] - original_mesh[:, ids], dim=-1).amax(dim=1)
+                        margin = protocol["surface_penalty"]["soft_margins_m"][part]
+                        loss = loss + args.surface_penalty * torch.relu(displacement - margin).square().mean()
+                    lower = torch.linalg.vector_norm(coco[:, 11:] - original_coco[:, 11:], dim=-1).amax(dim=1)
+                    loss = loss + args.surface_penalty * torch.relu(lower - .0008).square().mean()
                 return pose, out, coco, loss
             with torch.no_grad():
                 _, out, _, loss0 = forward()

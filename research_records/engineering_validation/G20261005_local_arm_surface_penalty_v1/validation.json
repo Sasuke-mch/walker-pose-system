@@ -1,0 +1,12 @@
+{
+  "mesh_replay_max_m": 5.960464477539062e-07,
+  "frozen_parameters_exact": true,
+  "full_frames": [
+    448,
+    360
+  ],
+  "surface_displacement_guards": "passed both datasets",
+  "temporal": "second difference P95 mildly worse both datasets",
+  "ruff": "passed",
+  "accepted_for_main_fit": false
+}
