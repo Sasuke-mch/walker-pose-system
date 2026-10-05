@@ -1,0 +1,15 @@
+{
+  "cold_start": true,
+  "detector": "pmpose",
+  "viewer_bundle_only": true,
+  "source_fitted_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\runs\\reference25\\fit\\result.npz",
+  "inputs": {
+    "left_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "calibration_dir": "realtime_app\\calibration\\results"
+  },
+  "allow_diagnostic_wrist_reference": false,
+  "hand_position_source": "body_fit_native_finger_rotation_only",
+  "old_fitted_parameters_consumed": false,
+  "source_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\view\\scene"
+}

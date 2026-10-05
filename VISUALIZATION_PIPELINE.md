@@ -230,3 +230,6 @@ Three.js `OrbitControls` 必须支持：
 ### 2026-10-04 场景缓冲与有效点来源
 
 固定延迟候选的 `consume()` 返回行尚可被缓冲恢复修改，不是已发布帧。导出只能读取writer关闭后的 `dynamic_ground_pose.jsonl`，与 `scene_transforms.npz` 的ID、R/t逐帧一致。NPZ的 `accepted` 与 `raw_triangulated_points_mm` 必须来自本次严格JSONL；独立检测重三角化字段 `detector_only_*` 只能用于诊断，不能恢复被关联拒绝的点。展示必须区分协议支撑恢复与有效观测，不以恢复后高度为零标记真实落地。旧 `stage_landing_recovery_v1/view_final` 属于冻结 `lag_lowerbody`，不是本次修订候选。重建新页面时须将冻结拟合顶点及新场景位姿一起重新导出，禁止只换标签。
+
+
+2026-10-05旧采集当前逻辑复现页：`research_records/engineering_validation/G20261005_old_capture_reference25_v1/view/body.html`。完整448帧（不是441）；身体重新reference25无腕冷启动，strict/Stage/地面本轮重算；19项来源核对与浏览器记录在同目录。旧采集使用自身标定与静态地面参考，360帧选定主线不变。

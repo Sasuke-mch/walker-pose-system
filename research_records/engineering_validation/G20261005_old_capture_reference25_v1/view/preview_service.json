@@ -1,0 +1,10 @@
+{
+  "url": "http://127.0.0.1:8768/body.html",
+  "binding": "127.0.0.1",
+  "paths": [
+    "/",
+    "/body.html"
+  ],
+  "source": "preview_server.py",
+  "scope": "readonly artifact only"
+}

@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "url": "http://127.0.0.1:8768/body.html",
+  "frames_observed": [
+    0,
+    28,
+    100,
+    224,
+    285,
+    447
+  ],
+  "screenshots": [
+    "preview_224.jpg",
+    "preview_447.jpg",
+    "preview.jpg"
+  ],
+  "mesh_surface_visible": true,
+  "solid_walker_visible": true,
+  "rejected_states_visible": true,
+  "orbit_drag": true,
+  "wheel_zoom": true,
+  "play_pause": true,
+  "rates_selected": [
+    0.5,
+    1,
+    2
+  ],
+  "console_errors": [],
+  "limits": "Visual and functional checks, no contact/accuracy certification; right/Shift pan handler retained but not independently exercised"
+}

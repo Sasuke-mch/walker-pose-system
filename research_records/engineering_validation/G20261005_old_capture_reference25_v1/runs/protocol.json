@@ -1,0 +1,25 @@
+{
+  "schema": "old_capture_current_mainline_reference25_v1",
+  "seed": 0,
+  "frames": 448,
+  "frame_ids": "0..447",
+  "requested_frame_count": 441,
+  "frame_count_resolution": "Existing old capture verified as 448 images/rows per side; full capture retained, no silent truncation. User range clarification pending.",
+  "fps": 30,
+  "source_commands": {
+    "pmpose": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\source_fit_args.json"
+  },
+  "fixed_inputs": "Old ordered PMPose and native WiLoR observations, old capture calibration and static installation references; current reference25, no wrist/contact/temporal/2D, A30/B30/C300/D1_100/D2_100/D3_0, shared beta, seed0. No old fitted parameters consumed.",
+  "variable": "Apply current mainline body weighting and baseline scene implementation to the old full capture; compare with same-capture no-wrist quality control; cross-capture accuracy comparisons prohibited.",
+  "success": "Complete finite same-frame model, unchanged raw support, explicit effective weights, parameter reconstruction; fresh strict and baseline replay plus browser verified source-identical visualization",
+  "stop": "Initialization/asset/nonfinite/frame mismatch gates remain unchanged; preserve failed outputs, do not drop frames or relax gates",
+  "limits": "Engineering/internal consistency only; no independent contact or 3D truth",
+  "cases": [
+    {
+      "id": "reference25",
+      "detector": "pmpose",
+      "changes": {},
+      "kind": "current_mainline_reprocessing"
+    }
+  ]
+}

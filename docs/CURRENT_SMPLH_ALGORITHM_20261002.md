@@ -817,3 +817,14 @@ Stage2使用历史相机系脚点中位数再做0.45平移更新，会引入因�
 当前页面为research_records/engineering_validation/G20261005_reference25_mainline_view_v2/body.html；完整360帧reference25身体和本次mainline→baseline重放R/t，未重拟合身体，未复用历史动态输入。实际网格6890顶点/13776面、黑色DLT观测骨架、拒绝点、同源实体助步器与双相机；原质量和实际reference权重分开显示。严格XYZ供Stage与踝轨迹，身体DLT观测与严格mask各自标明，不能混称严格三维身体监督。19项源/变换核对与18项相关测试通过，浏览器网格、时间轴、旋转、缩放和播放倍率已查看；333帧关联拒绝完整保留。静态扶手安装与地面/足底显示不认证物理接触。
 
 从仓库根运行`.venv-cuda/Scripts/python.exe -B realtime_app/build_current_mainline_view.py --output <新目录>`重新导出；随后运行`.venv-cuda/Scripts/python.exe -B realtime_app/validate_current_mainline_view.py --view <新目录>`核对。主线清单visualization保存页面、预览与协议/验证路径。首轮v1失败和v2初期检查失败保留，各自见FAILURE.json及validation_attempts.json；最终完整源检查和截图在v2目录。
+
+
+### 2026-10-05 旧采集按当前reference25主线重算与可视化
+
+用户提及441帧；原始左右图像和PMPose记录实查均为448帧（0..447），按完整旧采集执行并明确标为448，未静默截掉7帧。当前360帧主线选择不变。结果目录：`research_records/engineering_validation/G20261005_old_capture_reference25_v1/`；新页面：同目录`view/body.html`。
+
+旧质量/人工腕版本不直接复用：本轮PMPose + 原WiLoR输入重新冷启动，reference25/80mm/0.6、seed0、A30/B30/C300/D1_100/D2_100/D3_0，共享beta、原生局部手姿；人工腕、身体时序、身体2D和接触均关闭。拟合约52.25秒；保存参数重建与观测契约通过，`current_logic_validation.json`核对除采集输入/输出路径外全部当前已解析参数相同。旧捕获标定、旧捕获静态地面参考及静态助步器拓扑保留来源，未误用新机位标定。
+
+当前代码重新计算严格几何、重新重放baseline Stage和完整SE(3)动态地面；严格接受5286点，Stage计数warming_up5、transition114、Stage2 115、Stage1 214。19项页面来源/变换核对通过、逐关节有限/候选/严格接受/拒绝及权重记录在`view/per_joint_validation.json`；浏览器检查首中末及Stage状态、真实表面和实体杆件、逐帧播放暂停、0.5/1/2倍速选项、旋转缩放，无console error/warn。末帧未观测旋转边1与地面旋转保持继续显示；无显示插值/平滑或旧动态场景混合。旧数据缺少所选帧的host时间戳，重放使用明确记录的30FPS名义时间，不伪造曝光同步。
+
+出口新增显式`--selection`以支持不同采集；验证器按当前协议帧身份和strict逐点记录核对，不再硬编码360帧配对号与3031点。既有360帧核对仍通过，18项相关测试及修改脚本Ruff通过。一次旧协议字符串区间兼容检查失败后修正，失败记录保留为`validator_legacy_range_failure.json`。结论限于工程显示与内部一致性；手脚几何代理未认证接触，也未证明独立三维精度。

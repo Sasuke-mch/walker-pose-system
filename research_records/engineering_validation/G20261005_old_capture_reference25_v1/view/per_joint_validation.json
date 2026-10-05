@@ -1,0 +1,231 @@
+{
+  "frames": 448,
+  "joints": [
+    {
+      "joint": 0,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 256,
+      "strict_rejected": 192,
+      "rejection_reasons": {
+        "high_reprojection_error": 191,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.1715890195560702,
+      "effective_weight_median": 0.8731029865958635
+    },
+    {
+      "joint": 1,
+      "finite_raw": 433,
+      "body_candidates": 433,
+      "strict_accepted": 244,
+      "strict_rejected": 204,
+      "rejection_reasons": {
+        "high_reprojection_error": 186,
+        "out_of_raw_image_bounds": 17,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.16348705306331607,
+      "effective_weight_median": 0.8817054959998348
+    },
+    {
+      "joint": 2,
+      "finite_raw": 439,
+      "body_candidates": 439,
+      "strict_accepted": 234,
+      "strict_rejected": 214,
+      "rejection_reasons": {
+        "high_reprojection_error": 204,
+        "out_of_raw_image_bounds": 9,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.14189105106406824,
+      "effective_weight_median": 0.8812070412251434
+    },
+    {
+      "joint": 3,
+      "finite_raw": 390,
+      "body_candidates": 390,
+      "strict_accepted": 295,
+      "strict_rejected": 153,
+      "rejection_reasons": {
+        "high_reprojection_error": 95,
+        "out_of_raw_image_bounds": 57,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.2555978320351033,
+      "effective_weight_median": 0.9252759120839097
+    },
+    {
+      "joint": 4,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 356,
+      "strict_rejected": 92,
+      "rejection_reasons": {
+        "high_reprojection_error": 91,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.3503879402958919,
+      "effective_weight_median": 0.9238846611715039
+    },
+    {
+      "joint": 5,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 300,
+      "strict_rejected": 148,
+      "rejection_reasons": {
+        "high_reprojection_error": 147,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.3527632239880248,
+      "effective_weight_median": 0.9494653461579929
+    },
+    {
+      "joint": 6,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 414,
+      "strict_rejected": 34,
+      "rejection_reasons": {
+        "high_reprojection_error": 33,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.4449916804852659,
+      "effective_weight_median": 0.9532769213353568
+    },
+    {
+      "joint": 7,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 265,
+      "strict_rejected": 183,
+      "rejection_reasons": {
+        "high_reprojection_error": 182,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.21533501910088637,
+      "effective_weight_median": 0.9430343568789954
+    },
+    {
+      "joint": 8,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 377,
+      "strict_rejected": 71,
+      "rejection_reasons": {
+        "high_reprojection_error": 70,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.31911776321207214,
+      "effective_weight_median": 0.9548603406561665
+    },
+    {
+      "joint": 9,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 278,
+      "strict_rejected": 170,
+      "rejection_reasons": {
+        "high_reprojection_error": 167,
+        "association_failed": 1,
+        "low_2d_score": 2
+      },
+      "original_quality_median": 0.22483424430013962,
+      "effective_weight_median": 0.9229233184857113
+    },
+    {
+      "joint": 10,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 430,
+      "strict_rejected": 18,
+      "rejection_reasons": {
+        "high_reprojection_error": 17,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.4852045531012622,
+      "effective_weight_median": 0.949627813728248
+    },
+    {
+      "joint": 11,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 326,
+      "strict_rejected": 122,
+      "rejection_reasons": {
+        "high_reprojection_error": 121,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.2855978954430899,
+      "effective_weight_median": 0.9417148522200636
+    },
+    {
+      "joint": 12,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 325,
+      "strict_rejected": 123,
+      "rejection_reasons": {
+        "high_reprojection_error": 122,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.28427054259186446,
+      "effective_weight_median": 0.9423328272023592
+    },
+    {
+      "joint": 13,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 356,
+      "strict_rejected": 92,
+      "rejection_reasons": {
+        "high_reprojection_error": 91,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.2773748697173582,
+      "effective_weight_median": 0.9404508996290548
+    },
+    {
+      "joint": 14,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 84,
+      "strict_rejected": 364,
+      "rejection_reasons": {
+        "high_reprojection_error": 363,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.054292736049979834,
+      "effective_weight_median": 0.939750718211801
+    },
+    {
+      "joint": 15,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 317,
+      "strict_rejected": 131,
+      "rejection_reasons": {
+        "high_reprojection_error": 130,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.25829168705541494,
+      "effective_weight_median": 0.9693783587632252
+    },
+    {
+      "joint": 16,
+      "finite_raw": 448,
+      "body_candidates": 448,
+      "strict_accepted": 429,
+      "strict_rejected": 19,
+      "rejection_reasons": {
+        "high_reprojection_error": 18,
+        "association_failed": 1
+      },
+      "original_quality_median": 0.37735953477655804,
+      "effective_weight_median": 0.96616839558096
+    }
+  ],
+  "limits": "Same-frame observation and weight inventory only"
+}
