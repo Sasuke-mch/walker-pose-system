@@ -37,25 +37,28 @@ def execute(out, name, command):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--selection", type=Path,
+                        help="explicit capture selection using the current reference25/baseline logic")
     cli = parser.parse_args()
     out = cli.output.resolve()
     if out.exists():
         raise FileExistsError(out)
     cfg = read(ROOT / "realtime_app/configs/current_mainline.json")
-    sel, body = cfg["mainline_selection"], cfg["mainline_selection"]["body"]
+    sel = read(cli.selection) if cli.selection else cfg["mainline_selection"]
+    body = sel["body"]
     options = fit_arguments(ROOT / body["reproduction_arguments"])
     if (sel["detector"] != "pmpose" or options.body_weighting != "reference"
             or [options.body_reference_reprojection_px, options.body_reference_ray_gap_mm,
                 options.body_reference_confidence_floor] != [25.0, 80.0, 0.6]
             or cfg["scene_route"]["default_profile"] != "baseline"):
         raise ValueError("exporter requires selected PMPose reference25/baseline route")
-    frames = read(ROOT / sel["dataset"] / "frames.json")
+    frames = read(ROOT / sel.get("frames_metadata", str(Path(sel["dataset"]) / "frames.json")))
     if len(frames) != sel["frames"]:
         raise ValueError("frame metadata count differs from selection")
     out.mkdir(parents=True)
     write(out / "protocol.json", {
         "selected_body": body, "frames": sel["frames"], "frame_ids": sel["frame_ids"],
-        "source_pair_ids": sel["source_pair_ids"], "scene_profile": "mainline -> baseline",
+        "source_pair_ids": [int(row["pair_id"]) for row in frames], "scene_profile": "mainline -> baseline",
         "detector_inputs": sel["detector_inputs"],
         "implementation": "realtime_app/build_current_mainline_view.py",
         "variable": "Visualization export of selected body; fresh strict geometry and baseline replay, no fitting changes",
@@ -136,7 +139,7 @@ def main():
                 "--strict-jsonl", str(strict_path), "--output", str(out / "body.html")])
         page_path = out / "body.html"
         page = page_path.read_text(encoding="utf-8")
-        title = "当前主线 · reference25 · baseline"
+        title = sel.get("visualization_title", "当前主线 · reference25 · baseline")
         page = re.sub(r"<title>.*?</title>", "<title>" + title + "</title>", page)
         page = re.sub(r"<h1>.*?</h1>", "<h1>" + title + "</h1>", page)
         match = re.search(r'(<script id="data" type="application/json">)(.*?)(</script>)', page, re.DOTALL)

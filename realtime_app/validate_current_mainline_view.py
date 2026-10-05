@@ -59,19 +59,28 @@ def main():
     checks["ankle_trail_mask_exact"] = equal(np.array(data["av"]).reshape(n, 2), scene["accepted"][:, [15, 16]])
     checks["fit_weights_exact"] = equal(data["fit_weights"], body["body_fit_weights"])
     checks["old_quality_separate_exact"] = equal(data["quality"], body["body_quality"])
-    checks["source_pair_ids_exact"] = data["source_pair_ids"] == list(range(1157, 1517))
+    expected_pairs = protocol["source_pair_ids"]
+    if isinstance(expected_pairs, dict):
+        expected_pairs = list(range(expected_pairs["start"], expected_pairs["end"] + 1))
+    elif isinstance(expected_pairs, str):
+        first, last = map(int, expected_pairs.split(".."))
+        expected_pairs = list(range(first, last + 1))
+    checks["source_pair_ids_exact"] = data["source_pair_ids"] == expected_pairs
     stages = Counter(read_row["stage"]["operational"] for read_row in
                      (json.loads(line) for line in (out / "scene/stage1_stage2.jsonl").read_text(encoding="utf-8").splitlines()))
     checks["stage_counts_current"] = Counter(data["stage"]) == stages
     sources = read(out / "scene/scene_sources.json")
     checks["old_scene_not_consumed"] = all(sources[k] is False for k in
         ("old_stage_jsonl_read", "old_dynamic_ground_read", "old_dynamic_walker_pose_read"))
-    checks["strict_points_count"] = int(scene["accepted"].sum()) == 3031
-    for i, line in enumerate((out / "first_instance_strict.jsonl").read_text(encoding="utf-8").splitlines()):
+    strict_lines = (out / "first_instance_strict.jsonl").read_text(encoding="utf-8").splitlines()
+    strict_count = 0
+    for i, line in enumerate(strict_lines):
         for person in json.loads(line)["persons_3d"]:
             for point in person["keypoints_3d"]:
                 if point["valid"]:
+                    strict_count += 1
                     np.testing.assert_array_equal(scene["raw_triangulated_points_mm"][i, point["index"]], point["xyz"])
+    checks["strict_points_count"] = len(strict_lines) == n and int(scene["accepted"].sum()) == strict_count
     checks["strict_accepted_xyz_current_records"] = True
     options = read(selected["resolved_options"])
     cal = load_stereo_fisheye(Path(options["calibration_dir"]))
