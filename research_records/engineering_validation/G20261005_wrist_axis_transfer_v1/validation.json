@@ -1,0 +1,6 @@
+{
+  "tests": "2 tests passed",
+  "ruff": "passed",
+  "split": "Every coefficient uses opposite capture only; median estimator retains anomalous training slots",
+  "mainline_changed": false
+}

@@ -1,0 +1,14 @@
+{
+  "inputs": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2\\protocol.json",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\comparison\\protocol.json"
+  },
+  "code": "realtime_app/experiment_wrist_axis_transfer.py",
+  "variable": "One scalar along own predicted elbow-to-wrist axis, pixels or forearm fraction",
+  "training": "Median signed 1D projections across every available training manual slot; robust L1 location",
+  "test": "Opposite capture only, both directions; no hyperparameter or grouping fitted on test labels",
+  "controls": "Original raw detections and original anomalous labels retained; no stereo swaps applied",
+  "success": "Report all errors and camera-hand groups including failures; do not select method by test means",
+  "stop": "No valid training axis abort; degenerate test axes use unchanged point and explicit flag",
+  "limits": "Small repeated samples, manual operational wrist definition, not independent anatomical truth; group tables descriptive only"
+}
