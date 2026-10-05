@@ -1,0 +1,16 @@
+{
+  "status": "completed",
+  "seconds": 54.16953290000674,
+  "seed": 0,
+  "case": {
+    "id": "new_no_vposer_prior",
+    "detector": "new",
+    "changes": {
+      "vposer_prior_weight": 0.0
+    }
+  },
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "cuda_device": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "includes": "input audits, fitting, checkpoint serialization, output serialization; excludes Python imports and evaluation"
+}

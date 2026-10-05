@@ -1,0 +1,298 @@
+{
+  "limits": "Same observations not independent truth; surface displacement not contact; motion units mm/frame^2; no fps assumed",
+  "surface_sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260930_smplh_contact_set_fix_v1_run3\\contact_vertex_sets.json",
+  "cases": {
+    "old_no_vposer_prior": {
+      "state": "completed_not_promoted",
+      "options_changed": {
+        "output_dir": [
+          "baseline-placeholder",
+          "research_records\\engineering_validation\\G20261005_pmpose_prior_ablation_v1\\runs\\old_no_vposer_prior\\fit"
+        ],
+        "vposer_prior_weight": [
+          0.02,
+          0.0
+        ]
+      },
+      "initialization_parity": {
+        "betas": true,
+        "global_orient": true,
+        "transl": true,
+        "vposer_latent": true,
+        "pair_id": true
+      },
+      "metrics": {
+        "baseline": {
+          "weighted_body_rms_mm": 62.66805806653705,
+          "beta_norm": 1.4410184621810913,
+          "latent_mean_square": 0.06760813295841217,
+          "groups": {
+            "arms": {
+              "residual_mm": {
+                "n": 1792,
+                "mean": 79.98445040700155,
+                "median": 80.10251702397586,
+                "p95": 127.79138548576672,
+                "max": 193.6981528756882
+              },
+              "second_difference": {
+                "n": 1784,
+                "mean": 27.212204927018938,
+                "median": 21.15484619140625,
+                "p95": 69.04804115295401,
+                "max": 214.09353637695312
+              }
+            },
+            "legs": {
+              "residual_mm": {
+                "n": 1792,
+                "mean": 74.3210650842633,
+                "median": 76.72993481554516,
+                "p95": 125.44596638930243,
+                "max": 177.57385287738273
+              },
+              "second_difference": {
+                "n": 1784,
+                "mean": 29.71474075724993,
+                "median": 25.989009857177734,
+                "p95": 63.22137680053711,
+                "max": 166.66046142578125
+              }
+            }
+          }
+        },
+        "candidate": {
+          "weighted_body_rms_mm": 51.040780784416846,
+          "beta_norm": 1.4307607412338257,
+          "latent_mean_square": 0.4995931088924408,
+          "groups": {
+            "arms": {
+              "residual_mm": {
+                "n": 1792,
+                "mean": 58.915741614296685,
+                "median": 56.717038936397145,
+                "p95": 104.0498610271566,
+                "max": 162.49440574179968
+              },
+              "second_difference": {
+                "n": 1784,
+                "mean": 30.07703108751453,
+                "median": 25.119790077209473,
+                "p95": 70.0652683258056,
+                "max": 169.1221923828125
+              }
+            },
+            "legs": {
+              "residual_mm": {
+                "n": 1792,
+                "mean": 55.36538098730386,
+                "median": 49.007613443449436,
+                "p95": 121.65538120265929,
+                "max": 191.16015267773275
+              },
+              "second_difference": {
+                "n": 1784,
+                "mean": 30.569205621232367,
+                "median": 25.959437370300293,
+                "p95": 71.42685317993163,
+                "max": 149.38377380371094
+              }
+            }
+          }
+        }
+      },
+      "surface_movement_mm": {
+        "left_sole": {
+          "n": 24192,
+          "mean": 52.63183657831892,
+          "median": 46.552223205566406,
+          "p95": 105.77912979125989,
+          "max": 162.5128631591797
+        },
+        "left_palm": {
+          "n": 103488,
+          "mean": 60.93981622602968,
+          "median": 51.96162414550781,
+          "p95": 130.47586059570312,
+          "max": 207.6657257080078
+        },
+        "right_sole": {
+          "n": 24192,
+          "mean": 57.55263718168335,
+          "median": 53.34540367126465,
+          "p95": 109.90208129882816,
+          "max": 169.86526489257812
+        },
+        "right_palm": {
+          "n": 103488,
+          "mean": 34.464515674806876,
+          "median": 31.63675594329834,
+          "p95": 65.30684585571288,
+          "max": 124.02310180664062
+        }
+      },
+      "execution": {
+        "status": "completed",
+        "seconds": 50.482503600011114,
+        "seed": 0,
+        "case": {
+          "id": "old_no_vposer_prior",
+          "detector": "old",
+          "changes": {
+            "vposer_prior_weight": 0.0
+          }
+        },
+        "torch": "2.11.0+cu128",
+        "cuda": "12.8",
+        "cuda_device": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+        "includes": "input audits, fitting, checkpoint serialization, output serialization; excludes Python imports and evaluation"
+      }
+    },
+    "new_no_vposer_prior": {
+      "state": "completed_not_promoted",
+      "options_changed": {
+        "output_dir": [
+          "baseline-placeholder",
+          "research_records\\engineering_validation\\G20261005_pmpose_prior_ablation_v1\\runs\\new_no_vposer_prior\\fit"
+        ],
+        "vposer_prior_weight": [
+          0.02,
+          0.0
+        ]
+      },
+      "initialization_parity": {
+        "betas": true,
+        "global_orient": true,
+        "transl": true,
+        "vposer_latent": true,
+        "pair_id": true
+      },
+      "metrics": {
+        "baseline": {
+          "weighted_body_rms_mm": 51.09651695506825,
+          "beta_norm": 1.537675142288208,
+          "latent_mean_square": 0.04904621094465256,
+          "groups": {
+            "arms": {
+              "residual_mm": {
+                "n": 1440,
+                "mean": 75.11572845700218,
+                "median": 64.11689810869053,
+                "p95": 162.28748405309534,
+                "max": 383.2386206178733
+              },
+              "second_difference": {
+                "n": 1432,
+                "mean": 39.94502723067166,
+                "median": 28.21383571624756,
+                "p95": 119.42146301269534,
+                "max": 367.99090576171875
+              }
+            },
+            "legs": {
+              "residual_mm": {
+                "n": 1440,
+                "mean": 54.134156862002946,
+                "median": 53.18324759085388,
+                "p95": 88.24518883419127,
+                "max": 431.08163626540335
+              },
+              "second_difference": {
+                "n": 1432,
+                "mean": 30.33459261950501,
+                "median": 24.369949340820312,
+                "p95": 73.68485145568852,
+                "max": 356.25140380859375
+              }
+            }
+          }
+        },
+        "candidate": {
+          "weighted_body_rms_mm": 42.04696722164721,
+          "beta_norm": 1.5775680541992188,
+          "latent_mean_square": 0.4520162343978882,
+          "groups": {
+            "arms": {
+              "residual_mm": {
+                "n": 1440,
+                "mean": 57.48979699067873,
+                "median": 44.98380591075304,
+                "p95": 139.17054845347022,
+                "max": 414.6887463622716
+              },
+              "second_difference": {
+                "n": 1432,
+                "mean": 50.00575107265285,
+                "median": 33.14548301696777,
+                "p95": 153.27057876586915,
+                "max": 380.9346008300781
+              }
+            },
+            "legs": {
+              "residual_mm": {
+                "n": 1440,
+                "mean": 42.82243177854078,
+                "median": 36.49745622559804,
+                "p95": 100.46311865077152,
+                "max": 322.48034668765587
+              },
+              "second_difference": {
+                "n": 1432,
+                "mean": 35.88381316283895,
+                "median": 27.014245986938477,
+                "p95": 96.91866874694826,
+                "max": 244.50025939941406
+              }
+            }
+          }
+        }
+      },
+      "surface_movement_mm": {
+        "left_sole": {
+          "n": 19440,
+          "mean": 39.907185091433945,
+          "median": 36.504568099975586,
+          "p95": 74.1757541656494,
+          "max": 137.61033630371094
+        },
+        "left_palm": {
+          "n": 83160,
+          "mean": 77.40693026167332,
+          "median": 64.54560089111328,
+          "p95": 180.09757995605472,
+          "max": 302.1546630859375
+        },
+        "right_sole": {
+          "n": 19440,
+          "mean": 44.730934604944146,
+          "median": 37.58527183532715,
+          "p95": 94.16021614074704,
+          "max": 320.098388671875
+        },
+        "right_palm": {
+          "n": 83160,
+          "mean": 62.625775647592725,
+          "median": 46.73223114013672,
+          "p95": 161.36846542358407,
+          "max": 282.8188781738281
+        }
+      },
+      "execution": {
+        "status": "completed",
+        "seconds": 54.16953290000674,
+        "seed": 0,
+        "case": {
+          "id": "new_no_vposer_prior",
+          "detector": "new",
+          "changes": {
+            "vposer_prior_weight": 0.0
+          }
+        },
+        "torch": "2.11.0+cu128",
+        "cuda": "12.8",
+        "cuda_device": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+        "includes": "input audits, fitting, checkpoint serialization, output serialization; excludes Python imports and evaluation"
+      }
+    }
+  }
+}

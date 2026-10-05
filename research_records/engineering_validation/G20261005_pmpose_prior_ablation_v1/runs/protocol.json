@@ -1,0 +1,33 @@
+{
+  "schema": "smplh_full_sequence_ablation_v1",
+  "seed": 0,
+  "source_commands": {
+    "old": "research_records/engineering_validation/G20261003_smplh_ablation_v1/pmpose_no_wrist/fit_args.json",
+    "new": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json"
+  },
+  "cases": [
+    {
+      "id": "old_no_vposer_prior",
+      "detector": "old",
+      "changes": {
+        "vposer_prior_weight": 0.0
+      }
+    },
+    {
+      "id": "new_no_vposer_prior",
+      "detector": "new",
+      "changes": {
+        "vposer_prior_weight": 0.0
+      }
+    }
+  ],
+  "control_results": {
+    "old": "research_records/engineering_validation/G20261003_smplh_ablation_v1/pmpose_no_wrist/fit/result.npz",
+    "new": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz"
+  },
+  "variable": "Only latent quadratic prior weight0.02->0, VPoser decoder retained",
+  "budget": "Original A30/B30/C300/D100/D100/D3zero",
+  "success": "Report observation, beta/pose, surfaces and second differences; no acceptance by residual alone",
+  "stop": "Existing initialization/nonfinite gates; no extra steps or fallback; mainline unchanged",
+  "limits": "Engineering ablation, model-data agreement not anatomical accuracy; both no wrist reference"
+}

@@ -1,0 +1,6 @@
+{
+  "tests": "26 experiment tests passed before final paired audit",
+  "paired_audit": "All numeric cold initialization arrays exact; frame IDs, mask, quality and raw3D exact; resolved options only output_dir and vposer_prior_weight differ",
+  "evaluation_initial_failure": "read expected Path, source command string converted explicitly; rerun passed",
+  "accepted_for_main_fit": false
+}
