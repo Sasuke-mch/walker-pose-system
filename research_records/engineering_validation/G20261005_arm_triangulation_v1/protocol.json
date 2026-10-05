@@ -1,0 +1,108 @@
+{
+  "question": "Does raw-fisheye nonlinear triangulation materially explain arm length mismatch?",
+  "inputs": {
+    "old448": {
+      "schema": "sparse_manual_wrist_comparison_v1",
+      "annotations": "D:\\my_works\\walker_pose_system\\research_records\\annotation_handoffs\\H20261001_people1_wrist_joint_10pairs_v5_corrected",
+      "frames": [
+        0,
+        50,
+        99,
+        149,
+        199,
+        248,
+        298,
+        348,
+        397,
+        447
+      ],
+      "inputs": {
+        "PMPose": {
+          "left_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+          "right_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+          "wilor_left": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_left.jsonl",
+          "wilor_right": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_right.jsonl",
+          "calibration_dir": "realtime_app\\calibration\\results"
+        },
+        "Sapiens2": {
+          "left_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\left_sapiens_coco17_model_input.json",
+          "right_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\right_sapiens_coco17_model_input.json",
+          "wilor_left": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_left.jsonl",
+          "wilor_right": "research_records\\engineering_validation\\G20261001_fixed_mano_pca448_v1\\wilor_right.jsonl",
+          "calibration_dir": "realtime_app\\calibration\\results"
+        }
+      },
+      "primary_methods": [
+        "PMPose",
+        "Sapiens2",
+        "WiLoR"
+      ],
+      "wilor_primary": "existing read_view using PMPose wrist association; no manual selection",
+      "sensitivity": "same WiLoR pixels with Sapiens2 association, plus unique-side candidates without body association",
+      "coordinates": "raw1920x1080 fisheye; anatomical COCO9/10 versus MANO projected joint0; Euclidean pixels",
+      "criteria": "all available manual points and common-support comparison, retain every unavailable/rejected state",
+      "three_dimensional": "per-pair solve_point with unchanged geometry gate; rejected manual geometry is diagnostic only",
+      "limits": "10 labelled frames in one sequence; visible manual wrist, not anatomical3D truth; no fitted SMPLH or shared wrist target used"
+    },
+    "new360": {
+      "schema": "sparse_manual_wrist_comparison_v1",
+      "annotations": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\annotations",
+      "frames": [
+        0,
+        42,
+        74,
+        101,
+        139,
+        184,
+        226,
+        268,
+        313,
+        359
+      ],
+      "sequence_frames": 360,
+      "inputs": {
+        "PMPose": {
+          "left_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\left_pmpose_raw.json",
+          "right_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\right_pmpose_raw.json",
+          "wilor_left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\wilor_left.jsonl",
+          "wilor_right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\wilor_right.jsonl",
+          "calibration_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\calibration"
+        },
+        "Sapiens2": {
+          "left_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\left_sapiens_coco17_model_input.json",
+          "right_raw": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\right_sapiens_coco17_model_input.json",
+          "wilor_left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\wilor_left.jsonl",
+          "wilor_right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\wilor_right.jsonl",
+          "calibration_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\calibration"
+        }
+      },
+      "primary_methods": [
+        "PMPose",
+        "Sapiens2",
+        "WiLoR"
+      ],
+      "wilor_primary": "existing read_view using PMPose wrist association; no manual selection",
+      "sensitivity": "same WiLoR pixels with Sapiens2 association, plus unique-side candidates without body association",
+      "coordinates": "raw1920x1080 fisheye; anatomical COCO9/10 versus MANO projected joint0; Euclidean pixels",
+      "criteria": "all available manual points and common-support comparison, retain every unavailable/rejected state",
+      "three_dimensional": "per-pair solve_point with unchanged geometry gate; rejected manual geometry is diagnostic only",
+      "limits": "10 labelled frames in one sequence; visible manual wrist, not anatomical3D truth; no fitted SMPLH or shared wrist target used"
+    }
+  },
+  "frames": {
+    "old448": 448,
+    "new360": 360
+  },
+  "variable": "DLT versus existing solve_point nonlinear pixel least squares, max_nfev=100",
+  "controls": "Identical detections/calibration, no label use, six arm joints, all frames retained",
+  "code": [
+    "realtime_app/experiment_arm_triangulation.py",
+    "realtime_app/pose_app/body_observations.py",
+    "realtime_app/walker_tools/hands/solve_annotated_wrist_targets.py"
+  ],
+  "diagnostic_gate": "positive depths; each view <=10px; ray angle >=1deg; solver success for candidate",
+  "success": "Numerically verified paired metrics and timing; no automatic mainline promotion",
+  "stop": "Missing/mismatched frames abort; rejected/nonfinite/negative depth retained",
+  "limits": "No independent elbow/3D truth. Lower pixel error is objective optimization, not accuracy.",
+  "output": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_arm_triangulation_v1"
+}

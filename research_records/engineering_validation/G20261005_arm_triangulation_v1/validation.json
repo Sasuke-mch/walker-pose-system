@@ -1,0 +1,27 @@
+{
+  "tests": "4 synthetic tests passed from realtime_app working directory",
+  "ruff": "passed after import formatting",
+  "initial_test_invocation": "root unittest discovery lacked realtime_app import path; corrected working directory, no algorithm change",
+  "datasets": {
+    "new360_PMPose": {
+      "slots": 2160,
+      "objective_increases_over_1e-5": 0,
+      "mainline_modified": false
+    },
+    "new360_Sapiens2": {
+      "slots": 2160,
+      "objective_increases_over_1e-5": 0,
+      "mainline_modified": false
+    },
+    "old448_PMPose": {
+      "slots": 2688,
+      "objective_increases_over_1e-5": 0,
+      "mainline_modified": false
+    },
+    "old448_Sapiens2": {
+      "slots": 2688,
+      "objective_increases_over_1e-5": 0,
+      "mainline_modified": false
+    }
+  }
+}
