@@ -1,0 +1,14 @@
+{
+  "inputs": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2\\protocol.json",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\comparison\\protocol.json"
+  },
+  "same_source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_arm_triangulation_v1",
+  "code": "realtime_app/experiment_stereo_arm_assignment.py",
+  "variable": "Unchanged pairing versus swapping right-view shoulder/elbow/wrist labels jointly",
+  "rule": "candidate pass>=4/6 and >=same+2, mean pixel error <0.75*same; otherwise unchanged",
+  "controls": "Same nonlinear solve and gates for both; no other detector, labels or future used",
+  "success": "Compare full geometry and original sparse label disagreement, preserve failures",
+  "stop": "No missing frames permitted. No fitted-body export or production config change",
+  "limits": "Stereo cannot tell which camera is mislabeled, or resolve simultaneous bilateral swaps. Right-only is a hypothesis, not identity truth."
+}

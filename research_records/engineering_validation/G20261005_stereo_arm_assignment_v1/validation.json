@@ -1,0 +1,6 @@
+{
+  "tests": "3 new tests passed",
+  "ruff": "passed",
+  "mainline_changed": false,
+  "reference_limit": "Only one switched right-view manually annotated slot; all other switched frames lack identity ground truth"
+}
