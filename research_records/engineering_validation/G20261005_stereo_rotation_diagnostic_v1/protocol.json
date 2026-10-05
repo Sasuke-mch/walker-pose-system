@@ -1,0 +1,14 @@
+{
+  "inputs": {
+    "old448": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_wrist_detector_manual_v2\\protocol.json",
+    "new360": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\comparison\\protocol.json"
+  },
+  "code": "realtime_app/experiment_stereo_rotation_diagnostic.py",
+  "variable": "One constant three-axis stereo rotation perturbation bounded +/-1 degree per axis, translation fixed",
+  "train": "first half frames, shoulders and hips 5,6,11,12 only, frozen original positive-depth/body mask",
+  "test": "second half torso and both halves held-out elbows/wrists, separately reported",
+  "solver": "least_squares Huber f_scale3px max_nfev50, start zero, no hyperparameter search",
+  "success": "All four capture/model diagnostics report effects and fail states; calibration files never written",
+  "stop": "Input mismatch abort, unsuccessful solver not promoted",
+  "limits": "May absorb consistent detector bias or wrong correspondence; human landmarks are not independent calibration evidence. No metric accuracy claim. Time halves not independent subjects."
+}

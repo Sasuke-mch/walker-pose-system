@@ -1,0 +1,7 @@
+{
+  "tests": "1 synthetic test passed",
+  "ruff": "passed",
+  "all_four_solvers_success": true,
+  "calibration_files_changed": false,
+  "mainline_changed": false
+}
