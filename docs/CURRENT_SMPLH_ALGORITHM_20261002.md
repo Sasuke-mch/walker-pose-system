@@ -1,10 +1,12 @@
 # 当前 SMPL-H 算法流程与交接记录
 
-## 本文范围与当前选择（2026-10-04）
+## 本文范围与当前选择（2026-10-05）
 
-本文主体记录448帧冷启动身体内核和冻结对照；不应将其中的人工腕权重、数据路径或默认Sapiens2候选套到360帧换机位实验。正式场景路线选用PMPose和baseline，360帧身体仍为工程候选，未启用人工腕参考。全片共享beta在B/C阶段优化同一个参数，随后冻结；不存在逐帧beta。身体源命令为 `research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json`，场景与身体分支的接受掩码不同，不可混称。完整选择及调用见 `CURRENT_STAGE_GROUND_PIPELINE.md` 和 `realtime_app/configs/current_mainline.json` 的 `mainline_selection`；顶层旧字段保留448帧语义。
+当前360帧身体工程主线为PMPose同源SMPL-H冷启动reference25，结果G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz；实际命令参数见同实验runs/reference25/fit_args.json，显式冻结的复现参数见mainline_fit_args.json。普通偏差保留有效权重，仅严重几何异常连续降权，body_quality与body_fit_weights分开保存。未启用人工腕参考、身体时序或接触目标。Stage/地面仍为baseline；各关节权重与置信度规则是后续重点，详见第25节。
 
-更新时间：2026-10-02。仓库根目录：`D:\my_works\walker_pose_system`。
+本文早期主体保留448帧内核与冻结对照，不能将人工腕参数、Sapiens2候选或quality默认套到当前360帧。全片共享beta在B/C优化、随后冻结，不存在逐帧beta。顶层旧字段保留448帧语义，当前选择以current_mainline.json/mainline_selection和AI_PROGRESS.md为准；工程主线选择不代表物理/接触门通过。
+
+更新时间：2026-10-05（早期448帧主体保留其历史范围）。仓库根目录：`D:\my_works\walker_pose_system`。
 
 本文记录当前 448 帧冷启动身体与手部拟合的实际计算，不按二维检测器品牌组织，也不把历史固定抓握精修误写成当前步骤。依据为实际入口、拟合源码、保存的运行命令、结果及审计文件。它是当前实验的实现说明；长期规则仍以 AGENTS.md、AI_PROGRESS.md 和 VISUALIZATION_PIPELINE.md 为准。
 
@@ -794,6 +796,18 @@ Stage2使用历史相机系脚点中位数再做0.45平移更新，会引入因�
 
 参考25版左右膝d2P9561.24/72.69→38.91/42.23，左右踝61.53/85.53→41.69/46.03。无时序项也发生下降，单变量结果支持原指数降权是该序列模型腿变化的重要原因。上肢改善不均匀：左腕残差中位70.42→52.54mm，但左肘65.86→70.44、右腕45.87→46.53；1440个肘腕槽位仍637个恶化>1mm。仅凭臂均差下降不能说肘定位问题已解决。
 
-新解相对原同帧表面发生移动：参考25左右足底最大89.42/285.90mm、掌面291.25/238.65mm，属于重新拟合的几何变化，不是接触误差。未启用接触目标、未通过独立人体/足底/抓握真值检查，因此完整冷启动新结果保留为实验候选，不替换current_mainline选择。
+新解相对原同帧表面发生移动：参考25左右足底最大89.42/285.90mm、掌面291.25/238.65mm，属于重新拟合的几何变化，不是接触误差。未启用接触目标、未通过独立人体/足底/抓握真值检查，因此本轮实验完成时保留为工程候选；用户随后明确要求晋升，当前选择见第25节，物理/接触结论边界不变。
 
 评价入口`realtime_app/evaluate_reference_weight_fit.py`；evaluation.json及review_v2/evaluation.json统计相同，v2修复拼图各面板自动扩轴的显示尺度，窗外投影在白边保留，旧图未覆盖。新图片包含全组数值对照、权重曲线、320..322膝踝及136/184/231肘腕双目回投影；红＋旧拟合，黄×新拟合。仅为相机系观测对照，没有复用旧地面生成新场景。67项相关测试、6份语法检查通过；新脚本Ruff通过，4个原实现文件Ruff的12条既有问题逐项类型/消息计数与HEAD一致，无新增违规，未顺带清理。四组360帧独立参数重建核对网格/原生关节/COCO，最大顶点坐标差≤6.56e-7m，小于2e-6m容差。原工作区改动保留，代码、协议、评价及文档分属本轮提交范围。
+
+## 25. 2026-10-05 reference25设为身体工程主线及后续重点
+
+用户在完整360帧对照之后明确要求采用温和参考权重逻辑。选择清单mainline_selection.body已指向G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz；原360帧quality结果进入previous_body_control，448帧冻结对照仍为quality。baseline Stage/地面算法没有改变。该决定采用已有完整冷启动结果，不额外调参、拟合或平滑。
+
+主线规则为第24.1节的reference25：25px回投影平台、80mm射线间距平台、置信度参考下限0.6、四次尾衰减和1e-4尾项下限。原始body_quality不改写，实际拟合使用body_fit_weights；原缺失/负深度/拒绝点及严格场景门保留。普通偏差点继续提供约束，但这不保证二维语义或三维观测正确。各关节权重暂共用这一规则，不能称为校准概率。
+
+后续重点明确登记为**各关节权重与置信度计算规则**：区分二维检测分数、几何诊断和实际损失权重；按关节/左右侧、可见性和几何敏感性研究普通偏差与严重异常界限；重点核查肘腕系统偏差、膝踝权重随帧变化，以及共享体型/姿态先验的取舍。后续逐因素比较必须用完整同源窗口、固定评价口径并保留长尾和拒绝状态，不凭第322帧或显示平滑决定；跨采集和独立标注/真值若可获得应单列。当前不开展该项新算法实验，不把暂定25px/80mm写成最终最优值。
+
+选择等级为selected_engineering_mainline_not_physical_validation；accepted_for_main_fit=false继续表示独立物理/接触门未通过。第24节evaluation/validation保留其实验时未晋升的决定；本次新决定在同实验mainline_decision.json登记，不改写历史评价。左肘/部分腕点恶化、原质量RMS上升及掌面/足底位移全部保留，不据平均改善认定上肢问题已解决。
+
+身体复现必须使用current_mainline.json的body.reproduction_arguments（mainline_fit_args.json），先把output-dir改到不存在的新目录，再通过run_tool.py body.fit_smplh_wilor_sequence运行。原通用求解器CLI省略body-weighting仍为quality，以保护历史调用；省略当前主线参数不算reference25复现。场景独立重放不读取身体拟合参数，新身体显示必须读取reference25网格及同源baseline的R/t，旧HTML/旧mesh不自动变成新身体主线。

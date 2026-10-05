@@ -1,5 +1,21 @@
 # realtime_app
 
+## 当前360帧身体工程主线（2026-10-05）
+
+选择来源为configs/current_mainline.json/mainline_selection.body；当前为reference25完整冷启动结果。身体权重采用reference，25px回投影平台、80mm射线间距平台、0.6置信度参考下限；body_quality与body_fit_weights分存。各关节权重/置信度规则登记为后续重点，详细取舍见../docs/CURRENT_SMPLH_ALGORITHM_20261002.md第25节。Stage/地面仍为baseline，448帧冻结profile保持quality。通用求解器省略参数的兼容默认不能冒充此主线。
+
+复现读取选择清单的显式参数，输出改到新的不存在目录；以下只替换输出，其他原输入/冷启动预算全部保留：
+
+```powershell
+$selectedBody = (Get-Content realtime_app/configs/current_mainline.json -Raw | ConvertFrom-Json).mainline_selection.body
+$fitArgs = [string[]](Get-Content $selectedBody.reproduction_arguments -Raw | ConvertFrom-Json)
+$fitArgs[[Array]::IndexOf($fitArgs, '--output-dir') + 1] = 'research_records/engineering_validation/reference25_new_run/fit'
+& ./.venv-cuda/Scripts/python.exe -B realtime_app/run_tool.py body.fit_smplh_wilor_sequence @fitArgs
+```
+
+命令从仓库根运行；本地授权模型/缓存缺失则报告不可用。新显示应读取选择的reference25网格和同源baseline变换，历史HTML不可冒充新结果。工程主线选择仍不表示独立三维精度或物理接触认证。
+
+
 `realtime_app` 是助步器项目的实时视觉程序。当前代码把三类职责分开：
 
 ```text

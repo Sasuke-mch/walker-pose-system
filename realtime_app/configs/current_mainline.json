@@ -80,7 +80,7 @@
       "strict_input_mask_and_points_export",
       "published_ground_stream_export"
     ],
-    "body_route_unchanged": true,
+    "body_route_unchanged": false,
     "live_landing_integrated": false,
     "decision": "Formal scene mainline remains baseline. Strict-input and published-stream export repairs are shared; fixed-lag and joint-window landing algorithms remain explicit offline candidates.",
     "validation_dataset": "G20261003_repositioned360_manual_v1; scene replay independent of the frozen 448-frame body comparison above",
@@ -91,11 +91,12 @@
       "decision": "Speed/acceleration improve; support closure and real-time compute budget fail.",
       "full_replacement_accepted": false
     },
-    "default_alias": "mainline"
+    "default_alias": "mainline",
+    "body_route_change_scope": "Only selected 360-frame fit weighting/result changed to reference25; scene algorithms and frozen 448-frame body comparison unchanged."
   },
   "legacy_fields_scope": "frames, frame_ids, body_candidate, matched_control, profile, frozen_scalar_options and body entries describe the unchanged frozen 448-frame comparison, not the current 360-frame scene selection.",
   "mainline_selection": {
-    "decision_date": "2026-10-04",
+    "decision_date": "2026-10-05",
     "level": "selected_engineering_route_not_physical_validation",
     "detector": "pmpose",
     "frames": 360,
@@ -114,16 +115,32 @@
     "scene_reference": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review",
     "scene_reproduction_command": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review_command.json",
     "body": {
-      "result": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz",
-      "source_command": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json",
-      "audit": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/implementation_audit.json",
-      "level": "engineering_candidate",
+      "result": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz",
+      "source_command": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json",
+      "audit": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit/initialization_audit.json",
+      "level": "selected_engineering_mainline_not_physical_validation",
       "accepted_for_main_fit": false,
       "wrist_reference_enabled": false,
       "beta_policy": "joint_shared_sequence",
       "native_mano_pose_prior": true,
       "contact_enabled": false,
-      "body_temporal_weight": 0.0
+      "body_temporal_weight": 0.0,
+      "body_weighting": "reference",
+      "reference_parameters": {
+        "reprojection_px": 25.0,
+        "ray_gap_mm": 80.0,
+        "confidence_floor": 0.6,
+        "tail_power": 4,
+        "minimum_tail": 0.0001
+      },
+      "resolved_options": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/resolved_options.json",
+      "reproduction_arguments": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_fit_args.json",
+      "selection_record": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_decision.json",
+      "evaluation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/review_v2/evaluation.json",
+      "original_quality_field": "body_quality",
+      "effective_fit_weight_field": "body_fit_weights",
+      "acceptance_scope": "accepted_for_main_fit=false retains the unpassed physical/contact gate; selection as engineering mainline is explicit",
+      "selection_validation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_selection_validation.json"
     },
     "live": {
       "entry": "realtime_app/run_stereo.py",
@@ -141,13 +158,42 @@
       "Missing background rotation and strict foot points retain unavailable/rejected states.",
       "Body fitting and strict scene triangulation have distinct accepted masks; do not relabel body inputs as strict scene points.",
       "Historical walker installation is a display reference, not this capture physical-contact truth.",
-      "No independent metric 3D truth, validated hand/sole contact, or end-to-end real-time body fit."
+      "No independent metric 3D truth, validated hand/sole contact, or end-to-end real-time body fit.",
+      "Reference25 improves aggregate arm agreement and leg indexed motion but worsens some elbow/wrist slots and fixed-original-quality RMS; no universal joint accuracy claim.",
+      "25 px / 80 mm / confidence floor 0.6 are provisional shared engineering parameters, not calibrated per-joint probabilities."
     ],
     "retained_comparison_scope": "448-frame Sapiens2 body candidate and PMPose matched control retain their existing levels and all frozen options.",
     "candidate_promotion": {
       "landing_fixed_lag": false,
       "joint_stage_window": false
     },
-    "decision_reason": "Retain the reproducible baseline; candidates improve some motion metrics but fail landing closure, with joint window also exceeding the compute budget. Sapiens2 360-frame cold initialization failed the unchanged 300 mm gate."
+    "decision_reason": "User selects reference25 as the current 360-frame engineering body mainline. Ordinary observations retain useful weights; severe geometry anomalies retain continuous downweighting. Baseline Stage/ground and frozen 448-frame comparisons keep their existing methods and evidence levels.",
+    "previous_body_control": {
+      "result": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz",
+      "source_command": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json",
+      "audit": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/implementation_audit.json",
+      "level": "engineering_candidate",
+      "accepted_for_main_fit": false,
+      "wrist_reference_enabled": false,
+      "beta_policy": "joint_shared_sequence",
+      "native_mano_pose_prior": true,
+      "contact_enabled": false,
+      "body_temporal_weight": 0.0
+    },
+    "scene_reference_scope": "Independent Stage/ground replay from unchanged raw image pairs, strict points and calibration. No fitted mesh is stored in scene_transforms.npz; old body viewers remain historical and must not represent reference25.",
+    "follow_up_priorities": [
+      {
+        "topic": "per_joint_observation_weight_and_confidence_rules",
+        "priority": "high",
+        "status": "deferred_research_not_part_of_this_promotion",
+        "scope": [
+          "Separate detector confidence, stereo geometry diagnostics, and effective fit weights.",
+          "Define ordinary versus extreme anomalies by joint, anatomical side, view visibility and geometry sensitivity.",
+          "Check elbow/wrist, knee and ankle tails and interactions with shared shape and pose priors; do not tune only one event.",
+          "Use complete same-source controlled windows and cross-capture/independent labels when available; retain all rejected states."
+        ],
+        "provisional_rule": "Keep shared reference25 until a separately recorded controlled comparison supports a replacement."
+      }
+    ]
   }
 }

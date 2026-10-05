@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-05",
+  "status": "selected_engineering_mainline_not_physical_validation",
+  "authorization": "User explicitly requests promotion of the reference weighting logic and recording of per-joint confidence/weight rules as a future priority.",
+  "selected_case": "reference25",
+  "inputs": {
+    "left": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/left_pmpose_raw.json",
+    "right": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/right_pmpose_raw.json",
+    "images": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input"
+  },
+  "frames": 360,
+  "frame_ids": "0..359",
+  "source_pair_ids": "1157..1516",
+  "result": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz",
+  "actual_fit_arguments": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json",
+  "explicit_reproduction_arguments": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_fit_args.json",
+  "parameters": {
+    "reprojection_px": 25.0,
+    "ray_gap_mm": 80.0,
+    "confidence_floor": 0.6,
+    "tail_power": 4,
+    "minimum_tail": 0.0001
+  },
+  "solver": "realtime_app/walker_tools/body/fit_smplh_wilor_sequence.py",
+  "weight_implementation": "realtime_app/pose_app/smplh_fitting/losses.py",
+  "evaluation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/review_v2/evaluation.json",
+  "historical_validation": "validation.json remains the completed experiment-time decision before promotion. This file records the later mainline selection; it does not rewrite that historical result.",
+  "previous_body_control": {
+    "result": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz",
+    "source_command": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json",
+    "audit": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/implementation_audit.json",
+    "level": "engineering_candidate",
+    "accepted_for_main_fit": false,
+    "wrist_reference_enabled": false,
+    "beta_policy": "joint_shared_sequence",
+    "native_mano_pose_prior": true,
+    "contact_enabled": false,
+    "body_temporal_weight": 0.0
+  },
+  "scene_profile": "baseline",
+  "scene_replay_scope": "Independent Stage/ground replay from unchanged raw image pairs, strict points and calibration. No fitted mesh is stored in scene_transforms.npz; old body viewers remain historical and must not represent reference25.",
+  "accepted_for_main_fit": false,
+  "limitations": [
+    "Reference25 improves aggregate arm agreement and leg indexed motion but worsens some elbow/wrist slots and fixed-original-quality RMS; no universal joint accuracy claim.",
+    "25 px / 80 mm / confidence floor 0.6 are provisional shared engineering parameters, not calibrated per-joint probabilities."
+  ],
+  "next_priority": {
+    "topic": "per_joint_observation_weight_and_confidence_rules",
+    "priority": "high",
+    "status": "deferred_research_not_part_of_this_promotion",
+    "scope": [
+      "Separate detector confidence, stereo geometry diagnostics, and effective fit weights.",
+      "Define ordinary versus extreme anomalies by joint, anatomical side, view visibility and geometry sensitivity.",
+      "Check elbow/wrist, knee and ankle tails and interactions with shared shape and pose priors; do not tune only one event.",
+      "Use complete same-source controlled windows and cross-capture/independent labels when available; retain all rejected states."
+    ],
+    "provisional_rule": "Keep shared reference25 until a separately recorded controlled comparison supports a replacement."
+  },
+  "validation_goal": "Selected result and effective weights match the reference25 saved run, reproduction arguments resolve to identical numeric controls, frozen 448-frame controls and baseline Stage selection remain unchanged.",
+  "stop_conditions": [
+    "Missing/mismatched selected artifacts or reproduction parameters: report unavailable/mismatch; do not change gates or refit to hide it.",
+    "No detector, triangulation, temporal/contact or Stage algorithm changes in this promotion."
+  ]
+}

@@ -3687,3 +3687,15 @@ G20261005_reference_weight_fit_v1提前保存plan；原权重复现及3个新候
 上肢仍未解决：左腕中位70.42→52.54mm，左肘65.86→70.44、右腕45.87→46.53，1440臂槽位637个恶化>1mm。新参考25足底最大移动89.42/285.90mm、掌面291.25/238.65mm，不是物理接触误差或保护通过。新完整网格结果保留工程候选；current_mainline、场景和严格门不替换。评价evaluator输出evaluation、curve、全组comparison、双目arms/knees；review_v2统一图像面板像素尺度并保留窗外点，v1图保留。
 
 67项相关测试、6份无缓存语法检查通过。Ruff新脚本通过；原4文件已有12条问题与HEAD计数/类型/消息一致，无新增，未扩大范围清理。四组全360帧参数独立网格/原生关节/COCO重建通过，最大顶点差6.56e-7m，容差2e-6m；没有新拟合或新Stage作为核对替代。详细算法及边界写入原算法文档第24节，全部控制/失败/位移保留。仅暂存本轮修改和小型协议评价，原89条既有状态及大型fit/图像不纳入提交，不推送。
+
+### 2026-10-05 reference25正式身体工程主线与后续权重研究
+
+用户明确要求将温和参考权重设为主线，并将各关节权重/置信度规则列为后续重点。current_mainline.json/mainline_selection已从原360帧quality结果切换到G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz，原结果保留previous_body_control；记录实际fit_args、resolved_options、评价及新增mainline_decision.json。显式复现mainline_fit_args固定reference、25px/80mm/0.6，尾项4次及minimum1e-4沿源码；通用CLI quality兼容默认不是当前主线复现。
+
+本次仅更新选择、复现参数及文档，没有重跑拟合或改变检测/三角化/Stage/地面。身体原quality与effective fit weights分存，缺失与拒绝状态保留；448帧冻结选项及baseline场景开关不变。场景重放独立消费同源原图/strict点，不包含旧拟合网格，因此仍保留该R/t参考；旧页面不代表新身体。
+
+后续高优先级：各关节权重与置信度计算规则。区分二维分数/几何诊断/实际损失权重，按关节、左右侧、可见性、几何敏感性检查普通偏差与极端异常界限、时变权重与先验的平衡；肘腕和膝踝分别评估完整窗口与长尾，独立/跨采集证据单列。当前不开展该研究，不声称共享阈值最优。
+
+第24节及原validation保留实验时未晋升的历史决定，本次晋升另记mainline_decision。臂均差75.12→66.38、腿d2P9573.68→41.92仅为内部/索引运动结果；左肘等局部变差、固定原质量RMS51.10→57.93及掌面/足底位移仍保留。accepted_for_main_fit=false保持物理/接触门未通过语义，工程主线身份不覆盖该门。
+
+主线切换核查：26项相关测试通过，mainline_selection_validation.json的15项检查全通过；完整360帧raw XYZ、mask、原quality、实际reference25权重及编号逐元素相同，复现全参数一致，448冻结字段/场景开关不变。既有报告备份同步追加本次决定；该文件原已未受版本管理，本次不整份纳入提交。原工作区改动隔离保留，仅提交本次选择与记录。

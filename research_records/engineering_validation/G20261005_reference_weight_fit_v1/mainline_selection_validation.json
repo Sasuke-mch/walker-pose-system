@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "checks": {
+    "frozen_448_fields_identical": true,
+    "baseline_scene_profile_identical": true,
+    "scene_controls_identical": true,
+    "original_360_body_retained": true,
+    "experiment_time_decision_preserved": true,
+    "all_reproduction_options_identical": true,
+    "selected_artifacts_present": true,
+    "weights_selected_reference25": true,
+    "raw_triangulated_points_exact": true,
+    "body_quality_exact": true,
+    "body_accepted_exact": true,
+    "body_fit_weights_exact": true,
+    "pair_id_exact": true,
+    "rejected_body_weights_zero": true,
+    "future_joint_rule_priority_recorded": true
+  },
+  "related_tests_passed": 26,
+  "scope": "Selection/reproduction/weight/source consistency only; no refit, no new physical accuracy claim."
+}
