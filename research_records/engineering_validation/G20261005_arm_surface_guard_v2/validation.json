@@ -1,0 +1,7 @@
+{
+  "all_zero_steps_pass": true,
+  "endpoints_mesh_parity_m": 2e-06,
+  "ruff": "passed",
+  "initial_v1_failure": "Archived float32 COCO vs replay GEMM produced zero-step objective warnings; v2 uses identical replay baseline; no gate threshold relaxed",
+  "mainline_changed": false
+}

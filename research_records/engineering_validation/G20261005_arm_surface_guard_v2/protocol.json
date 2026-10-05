@@ -1,0 +1,26 @@
+{
+  "input_candidate": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_local_arm_pose_v1",
+  "sources": {
+    "old_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_smplh_ablation_v1\\pmpose_no_wrist\\fit\\result.npz",
+    "new_pmpose_wrist_off": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_manual_v1\\pmpose\\fit\\result.npz"
+  },
+  "code": "realtime_app/experiment_arm_surface_guard.py",
+  "scales": [
+    0.0,
+    0.0078125,
+    0.015625,
+    0.03125,
+    0.0625,
+    0.125,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260930_smplh_contact_set_fix_v1_run3\\contact_vertex_sets.json",
+  "variable": "Uniform sequence-wide scale of candidate axis-angle delta; no optimization",
+  "guards": "Every frame sole vertex displacement<=1mm, palm<=10mm, lower COCO<=1mm; weighted body SSE no increase",
+  "success": "Find whether any nonzero uniform step meets every guard, report rejected frames and metrics for every scale",
+  "stop": "Scale0 original replay or scale1 candidate replay >2e-6m abort; no retuning guards",
+  "limits": "Displacement protects original geometry, not correct contact; no old/new mesh mixing or frame-specific selection",
+  "objective_baseline": "Scale-zero mesh replay, same batch/device arithmetic as candidates; frozen original mesh separately parity checked"
+}

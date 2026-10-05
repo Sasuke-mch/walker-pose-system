@@ -12,6 +12,28 @@ from experiment_forearm_residual_parts import FITS
 BODY_INDICES = [12, 13, 15, 16, 17, 18]  # native 13/14 collars,16/17 shoulders,18/19 elbows
 
 
+def load_model(assets):
+    """Use the fitter's compatibility setup and native SMPLH/MANO assets."""
+    from pose_app.smplh_fitting import pipeline  # noqa: F401
+
+    # isort: split
+    import smplx
+    from smplx.utils import Struct
+
+    with (assets / "SMPLH_male.pkl").open("rb") as stream:
+        data = pickle.load(stream, encoding="latin1")
+    for short, side in (("l", "LEFT"), ("r", "RIGHT")):
+        with (assets / f"MANO_{side}.pkl").open("rb") as stream:
+            mano = pickle.load(stream, encoding="latin1")
+        data["hands_components" + short] = np.asarray(mano["hands_components"], np.float32)
+        data["hands_mean" + short] = np.asarray(mano["hands_mean"], np.float32)
+    model = smplx.SMPLH(str(assets / "SMPLH_male.pkl"), data_struct=Struct(**data), gender="male",
+                        use_pca=False, flat_hand_mean=True, batch_size=1).cuda()
+    for parameter in model.parameters():
+        parameter.requires_grad_(False)
+    return model
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--output", type=Path, required=True)
@@ -34,32 +56,16 @@ def main():
         "limits": "Candidate leaves VPoser manifold; no physical contact or anatomical accuracy certification; not accepted for main fit"
     }
     (args.output / "protocol.json").write_text(json.dumps(protocol, indent=2), encoding="utf-8")
-    # Exactly the mainline compatibility setup and native SMPLH+MANO loading convention.
-    from pose_app.smplh_fitting import pipeline  # noqa: F401
-
-    # isort: split
-    import smplx
     import torch
     from pose_app.smpl_coco_observation import (
         load_coco17_regressor,
         regress_coco17_torch,
     )
-    from smplx.utils import Struct
 
     torch.manual_seed(0)
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA required for registered experiment")
-    with (assets / "SMPLH_male.pkl").open("rb") as stream:
-        data = pickle.load(stream, encoding="latin1")
-    for short, side in (("l", "LEFT"), ("r", "RIGHT")):
-        with (assets / f"MANO_{side}.pkl").open("rb") as stream:
-            mano = pickle.load(stream, encoding="latin1")
-        data["hands_components" + short] = np.asarray(mano["hands_components"], np.float32)
-        data["hands_mean" + short] = np.asarray(mano["hands_mean"], np.float32)
-    model = smplx.SMPLH(str(assets / "SMPLH_male.pkl"), data_struct=Struct(**data), gender="male",
-                        use_pca=False, flat_hand_mean=True, batch_size=1).cuda()
-    for parameter in model.parameters():
-        parameter.requires_grad_(False)
+    model = load_model(assets)
     reg = load_coco17_regressor(protocol["regressor"])
     def tensor(x):
         return torch.as_tensor(x, dtype=torch.float32, device="cuda")
