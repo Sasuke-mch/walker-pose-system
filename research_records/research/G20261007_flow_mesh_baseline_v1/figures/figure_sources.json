@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-08",
+  "references_visually_inspected": [
+    {
+      "paper": "ProHMR",
+      "figure": "3",
+      "source": "https://arxiv.org/html/2108.11944v1/figures/method.png",
+      "local": "references/prohmr_fig3.png",
+      "used_for": "Condition encoder with parallel shape branch and generative pose branch; layout only."
+    },
+    {
+      "paper": "FMPose3D",
+      "figure": "1",
+      "source": "https://arxiv.org/html/2602.05755v1/overview_training.png",
+      "local": "references/fmpose3d_fig1.png",
+      "used_for": "Noise-to-label linear transport and velocity supervision panel."
+    },
+    {
+      "paper": "MotionAGFormer",
+      "figure": "2",
+      "source": "https://arxiv.org/html/2310.16288v1/MotionAGFormerFigure.png",
+      "local": "references/motionagformer_fig2.png",
+      "used_for": "Overview plus enlarged spatial module, attention and graph parallel depiction; actual module differs."
+    }
+  ],
+  "code": [
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/body.py",
+    "realtime_app/learning_flow_mesh/draw_architecture.py"
+  ],
+  "config": "config_learning1000.json",
+  "mesh_source": "outputs/fresh_flow/prediction.npz sequence0 frame0",
+  "output_files": [
+    "architecture_en.png",
+    "architecture_en.svg",
+    "architecture_en.pdf",
+    "architecture_zh.png",
+    "architecture_zh.svg",
+    "architecture_zh.pdf"
+  ],
+  "limitations": [
+    "Current research baseline only; separate from reference25 engineering route.",
+    "22 observation joints and 52 rotation nodes; not COCO17 interchangeability.",
+    "Euclidean 6D CFM; no SO(3) RFM, likelihood evaluation, multi-hypothesis aggregation or contact module.",
+    "Only synthetic baseline has been verified; figure does not establish accuracy."
+  ],
+  "first_lint_failure": [
+    "I001 import layout",
+    "RUF007 successive zip pairs"
+  ],
+  "final_lint": "passed"
+}

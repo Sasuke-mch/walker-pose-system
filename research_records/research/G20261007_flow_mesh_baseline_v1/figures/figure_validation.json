@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "language": "en",
+      "texts_checked": 44,
+      "outside_canvas": [],
+      "mesh_source": "outputs/fresh_flow/prediction.npz, sequence0/frame0",
+      "vertices": 6890,
+      "faces": 13776,
+      "svg_text": "editable"
+    },
+    {
+      "language": "zh",
+      "texts_checked": 44,
+      "outside_canvas": [],
+      "mesh_source": "outputs/fresh_flow/prediction.npz, sequence0/frame0",
+      "vertices": 6890,
+      "faces": 13776,
+      "svg_text": "editable"
+    }
+  ],
+  "configuration": "config_learning1000.json",
+  "configuration_contract": "22 observations, width64, heads4, blocks2, graph/history enabled; 8 Euler steps",
+  "scope": "diagram export, not new model evaluation"
+}

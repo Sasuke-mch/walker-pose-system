@@ -81,3 +81,15 @@ loss目标不同，不能跨FM/回归比较数值。fresh的4组均保留完整6
 本轮目标是建立可研究的通用baseline，已完成相应实现与基础验证；真实人体数据训练和新的科研结论须另立数据/评估协议，不把它们偷换成当前通过项。
 
 实现与小型记录已单独本地提交，既有89条状态保留；完整原文/资产/数据/checkpoint/网格NPZ留在本地，未提交或推送。停用hourly请求返回自动任务不存在，标准本地automations目录无对应条目；未重新创建任务，progress记为ABSENT_ON_COMPLETION，而不是伪称已暂停成功。
+
+## 2026-10-08 架构图
+
+按用户要求绘制当前已实现Flow Matching人体模型的论文式架构图，输出在本目录`figures/architecture_en.{png,svg,pdf}`与`architecture_zh.{png,svg,pdf}`。复现脚本为`realtime_app/learning_flow_mesh/draw_architecture.py`，使用已有1000步配置和`outputs/fresh_flow/prediction.npz`第0序列第0帧的真实SMPL-H顶点/面；没有重新训练、推理或改正式工程主线。
+
+实际查看了已下载论文正文中对应的原图：ProHMR Figure3（条件编码、姿态生成和形状分支）；FMPose3D Figure1（高斯初值、线性CFM路径与速度监督）；MotionAGFormer Figure2（总览加模块放大、全局注意力和局部图）。原图参考副本仅保存在`figures/references/`，来源和借鉴范围记录在`figure_sources.json`。最终图为原创重绘：本实现是欧氏6D CFM、单向GRU、同帧注意力加可切换运动树图，不是上述任一论文完整复现；不复制ProHMR可逆似然分支、FMPose3D多候选聚合或MotionAGFormer时间GCN。
+
+图分(a)条件编码—速度场—8步Euler—6D转SO(3)—固定可微SMPL-H，形状/逐帧平移为独立回归分支；(b)两层空间模块中的全局注意力与局部图并行残差结构；(c)带标签掩码的CFM和形状/平移/单步终点网格辅助损失。52节点为根1、身体21、双手各15，22输入观测关节不能冒充COCO17。首帧共享beta与原工程全片优化beta是不同策略。Stage/地面/接触未画入学习网络。
+
+Matplotlib精确生成可编辑SVG及带矢量框线文字的PDF，人体缩略图由真实三角面渲染并嵌入，以避免13,776面导致编辑文件过大。PNG为4320×2520。两种语言均实际查看，文字边界自动检查、配置契约检查和源网格尺寸检查通过；Ruff初轮发现import排列及pairwise风格问题，修复后通过。未运行模型测试或产生新精度指标。
+
+复现：从仓库根执行`.venv-cuda/Scripts/python.exe -B realtime_app/learning_flow_mesh/draw_architecture.py --output research_records/research/G20261007_flow_mesh_baseline_v1/figures`。配置契约变化时脚本拒绝继续生成陈旧标注，需核对新代码并同步图。
