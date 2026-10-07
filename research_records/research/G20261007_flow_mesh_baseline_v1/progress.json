@@ -1,10 +1,10 @@
 {
   "objective": "Read and analyze 20 primary papers, then implement a conditional Flow Matching SMPL-H mesh baseline",
-  "stage": "literature",
-  "papers_read": 0,
+  "stage": "design_gate_passed",
+  "papers_read": 20,
   "implementation_started": false,
   "automation_id": "flow-matching-baseline",
   "automation_status": "ACTIVE",
-  "next": "Select 20 distinct papers and inspect full methods, experiments and limitations",
+  "next": "Implement isolated model and verify training, inference, masks, causality and real SMPL-H gradients",
   "evidence_boundary": "No trained model or accuracy result yet"
 }

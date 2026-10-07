@@ -3728,3 +3728,9 @@ G20261005_reference_weight_fit_v1提前保存plan；原权重复现及3个新候
 ### 2026-10-07 Flow Matching人体模型baseline长期任务启动
 
 用户明确授权先阅读并分析20篇类似场景的原始研究，再搭建通用Flow Matching网络；最终目标为人体三维模型，分析与实现过程均需记录。建立本聊天长期目标及每小时heartbeat（flow-matching-baseline），只有阶段完成、需用户处理的阻碍或任务完成时通知。协议与进度位于research_records/research/G20261007_flow_mesh_baseline_v1/。先完成文献分析再决定baseline，不将前期聊天建议作为已实现方法。当前处于文献筛选阶段，尚未完成20篇精读、实现或训练。新研究模块隔离开发；正式reference25工程主线、Stage/地面及已有89条工作区状态保留。
+
+### 2026-10-07 文献分析与baseline设计门完成
+
+上述目录papers.json及LITERATURE_ANALYSIS.md已记录20篇原始正文的方法/主要实验阅读锚点、监督、对照、局限及横向比较；覆盖FM/RFM、参数生成、视频、标定多视图、自由网格、遮挡和鱼眼。未声称全部附录证明、逐图视觉检查或20个作者仓库复现。核对FMPose3D帧内图/attention作者代码及ScoreHMR训练入口；PoseD-Flow项目按钮无正文链接，保留来源缺口并未计入20篇。
+
+决定隔离实现52旋转节点6D条件FM、因果GRU观测条件、帧内全身attention和可切换运动树图；共享前缀shape与逐帧米制translation独立。真实SMPL-H本地资产实际6890顶点/13776面/52父子节点；直接加载遭遇旧chumpy API错误，已查清需要局部Python/NumPy兼容和匹配MANO字段，不修改模型文件。正式主线不替换；接下来实现并做合成工程学习及梯度检查，仍没有真实精度结果。
