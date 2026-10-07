@@ -46,5 +46,12 @@
     "status": "documented",
     "issue": "historical train reports mesh_auxiliary field used flow description also for regression",
     "repair": "current writer selects per-mode description; numerical results unchanged; historical fields preserved"
+  },
+  {
+    "attempt": "completion_automation_stop",
+    "status": "original_automation_absent",
+    "tool_response": "Automation does not exist in the app and could not be updated",
+    "local_check": "standard automations directory has no matching record",
+    "action": "Did not recreate; no claim of successful pause; complete goal instead"
   }
 ]

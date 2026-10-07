@@ -1,11 +1,11 @@
 {
   "objective": "Read and analyze 20 primary papers, then implement a conditional Flow Matching SMPL-H mesh baseline",
-  "stage": "verified_pending_commit",
+  "stage": "complete",
   "papers_read": 20,
   "implementation_started": true,
   "automation_id": "flow-matching-baseline",
-  "automation_status": "ACTIVE",
-  "next": "Commit isolated implementation, confirm remaining status, then stop heartbeat and complete goal",
+  "automation_status": "ABSENT_ON_COMPLETION",
+  "next": "No automatic baseline work remains; real-data research requires a new data/evaluation protocol",
   "evidence_boundary": "Synthetic engineering/label consistency only; regression outperformed flow; no real RGB or fish-eye accuracy claim",
   "validation": {
     "behavior_tests": 21,
@@ -13,5 +13,6 @@
     "ruff": "passed",
     "synthetic_training_steps_per_model": 1000,
     "real_accuracy": "not_evaluated"
-  }
+  },
+  "completion_scope": "20 primary main-method/experiment analyses and a implemented, trainable, reproducible generic SMPL-H Flow Matching baseline; synthetic engineering verification only"
 }

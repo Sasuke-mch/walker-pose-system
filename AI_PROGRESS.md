@@ -3744,3 +3744,5 @@ G20261007_flow_mesh_baseline_v1记录20篇卡片/横表/正文锚点及设计依
 21项行为测试通过，Ruff及语法解析通过；真实左右手/shape/translation梯度和ODE→mesh梯度有限非零，future/prefix/stream及RGB梯度检查无未来泄露。4组64帧输出真实6890顶点/13776面，正交/行列式误差<5e-7。全训练1000步重跑state逐位相同，fresh推理及输入重建一致；全缺失无标签真实CLI保留64无效帧和NaN、无伪造指标。旧chumpy/scipy弃用warning和首轮失败保留；结果审计脚本读取actual NPZ/checkpoint/log/XML/config，verification_summary的29项核对通过。
 
 数据仅由本地有许可资产产生人工低维相关旋转、透视双相机和关节heatmap代理RGB，不是自然运动/真实鱼眼或独立三维真值；没有公开数据大规模训练、概率校准或人体真实精度结论。原test用于工程预算诊断，不包装成冻结科研测试；fresh结果后不调整模型。当前请求的文献→通用baseline基础研究目标完成；后续真实数据研究另设协议，本轮完成后停用hourly跟进，保留全部来源与失败。原工作区89条状态隔离保留，不推送。
+
+交付核查：本任务实现及记录已本地提交；暂存不含原始论文、模型资产、checkpoint或大型推理输出，剩余工作区状态仍为原89条。停用flow-matching-baseline请求返回“Automation does not exist”，本地automations目录也没有对应记录；未重建或假报停用成功。当前目标完成后不再继续自动训练，自动跟进记录记为完成时不存在。
