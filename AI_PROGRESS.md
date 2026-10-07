@@ -3724,3 +3724,7 @@ G20261005_reference_weight_fit_v1提前保存plan；原权重复现及3个新候
 当前代码重新计算严格几何、重新重放baseline Stage和完整SE(3)动态地面；严格接受5286点，Stage计数warming_up5、transition114、Stage2 115、Stage1 214。19项页面来源/变换核对通过、逐关节有限/候选/严格接受/拒绝及权重记录在`view/per_joint_validation.json`；浏览器检查首中末及Stage状态、真实表面和实体杆件、逐帧播放暂停、0.5/1/2倍速选项、旋转缩放，无console error/warn。末帧未观测旋转边1与地面旋转保持继续显示；无显示插值/平滑或旧动态场景混合。旧数据缺少所选帧的host时间戳，重放使用明确记录的30FPS名义时间，不伪造曝光同步。
 
 出口新增显式`--selection`以支持不同采集；验证器按当前协议帧身份和strict逐点记录核对，不再硬编码360帧配对号与3031点。既有360帧核对仍通过，18项相关测试及修改脚本Ruff通过。一次旧协议字符串区间兼容检查失败后修正，失败记录保留为`validator_legacy_range_failure.json`。结论限于工程显示与内部一致性；手脚几何代理未认证接触，也未证明独立三维精度。
+
+### 2026-10-07 Flow Matching人体模型baseline长期任务启动
+
+用户明确授权先阅读并分析20篇类似场景的原始研究，再搭建通用Flow Matching网络；最终目标为人体三维模型，分析与实现过程均需记录。建立本聊天长期目标及每小时heartbeat（flow-matching-baseline），只有阶段完成、需用户处理的阻碍或任务完成时通知。协议与进度位于research_records/research/G20261007_flow_mesh_baseline_v1/。先完成文献分析再决定baseline，不将前期聊天建议作为已实现方法。当前处于文献筛选阶段，尚未完成20篇精读、实现或训练。新研究模块隔离开发；正式reference25工程主线、Stage/地面及已有89条工作区状态保留。
