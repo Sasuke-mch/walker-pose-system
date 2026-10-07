@@ -1,0 +1,33 @@
+{
+  "seed": 7,
+  "device": "cuda",
+  "model": {
+    "observation_joints": 22,
+    "image_feature_dim": 32,
+    "width": 64,
+    "heads": 4,
+    "layers": 2,
+    "use_graph": true,
+    "use_history": true,
+    "rotation_scale": 0.25,
+    "root_offset": [
+      0.0,
+      0.0,
+      3.0
+    ]
+  },
+  "assets": {
+    "model_path": "third_party/WiLoR/mano_data/models/SMPLH_male.pkl",
+    "mano_left": "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl",
+    "mano_right": "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl"
+  },
+  "training": {
+    "steps": 1000,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "mesh_weight": 0.02,
+    "shape_weight": 0.1,
+    "translation_weight": 1.0,
+    "sample_steps": 8
+  }
+}

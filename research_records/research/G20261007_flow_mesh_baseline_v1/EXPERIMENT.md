@@ -30,4 +30,4 @@
 
 ## 当前状态
 
-已建立长期目标与hourly heartbeat（flow-matching-baseline）。文献筛选进行中；尚未完成20篇分析，尚未实现、训练或验收网络。
+20篇方法/主要实验分析、隔离网络及4组1000步合成训练/推理完成。旋转、因果性、缺失、真实解码梯度、全训练重放通过；具体证据见IMPLEMENTATION.md和verification_summary.json。合成回归优于FM，图/历史无已证增益；无真实RGB/鱼眼或独立精度结果。交付前只提交本任务文件，完成后停用heartbeat。

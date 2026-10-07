@@ -1,0 +1,13 @@
+{
+  "python": "3.12.12",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "smplx": "0.1.28",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "chumpy": "0.70",
+    "pytest": "9.1.1",
+    "requests": "2.34.2"
+  }
+}

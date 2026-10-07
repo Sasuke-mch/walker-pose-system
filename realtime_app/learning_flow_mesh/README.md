@@ -1,0 +1,64 @@
+# 条件 Flow Matching SMPL-H baseline
+
+这是隔离的研究模块，不参与正式实时主线。先读20篇原始正文后确定设计，依据和失败记录在 [研究目录](../../research_records/research/G20261007_flow_mesh_baseline_v1/)。需要本地有许可的SMPL-H与匹配MANO资产；不会自动下载数据或模型。
+
+## 网络与坐标
+
+观测二维点/置信度、存在mask、相机原点/单位射线、可选RGB或图像特征 → 52个旋转查询cross-attention → 单向GRU历史 → 条件速度场（帧内全身attention、可切换运动树GCN）→ 6D终点投影 → 真实SMPL-H网格。人体体型beta由初始帧估计后冻结，平移逐帧回归。历史/图开关在config.json。另有同条件编码的确定性回归入口。
+
+旋转状态是 `(R6D - identity6D)/0.25`，6D存**旋转矩阵前两列依次拼接**，不与前两行惯例混用。52节点依次为根、21身体、15左手、15右手；图父子表读取真实模型。人体层直接接收绝对局部旋转矩阵，不加MANO均值；MANO字段仅用于官方SMPLHLayer资产构造，未把单位PCA当手先验。第一版模型资产为male，10维shape，6890顶点/13776真实三角面。
+
+采样为固定步数Euler，默认8 NFE、1候选。不同噪声产生候选，同一序列各帧共享噪声以避免人为随机抖动；这不是时间准确性证明。训练FM采用随机时间线性CFM路径；未知姿态标签节点保留噪声并不参加目标损失，不假造手姿标签。可选mesh辅助损失作用于单步终点估计，不是精确积分终点，更不是接触约束。近共线6D/非有限旋转保留invalid和NaN，不静默替换。
+
+第一版不是SO(3) RFM，不是论文完整复现。小CNN随机初始化；若传冻结特征，其权重/来源要写入数据metadata。当前没有人体真实RGB数据训练、预训练视觉骨干或项目鱼眼接入。
+
+## NPZ输入契约
+
+维度 `N,T,V,J` 为样本序列、帧、视图、观测关节。默认J=22使用SMPL-H前22运动学关节；COCO17须改config并在数据适配器声明拓扑，不能偷偷当同一组点。
+
+|字段|形状|说明|
+|---|---|---|
+|xy|N,T,V,J,2|坐标归一化方式写metadata；几何射线须来自原始成像坐标|
+|confidence|N,T,V,J|0..1参考值；不硬乘到趋零损失|
+|observation_mask|N,T,V,J|bool，真正缺失；低置信度不自动等于缺失|
+|view_mask|N,T,V|bool，视图可用状态|
+|ray_origins / ray_directions|N,T,V,J,3|米制公共参考系原点及单位方向|
+|geometry_mask|N,T,V,J|bool，射线是否存在；可与二维存在不同|
+|image_mask|N,T,V|bool；图像/特征是否存在|
+|images 或 image_features|N,T,V,3,H,W 或 N,T,V,F|可选其一，float RGB [0,1]；F由config指定|
+|rotations / pose_mask|N,T,52,3,3 / N,T,52|训练绝对局部旋转标签及bool；缺失不能作identity真值|
+|betas / shape_mask|N,10 / N|共享体型及bool标签mask|
+|translation / translation_mask|N,T,3 / N,T|米制平移及bool标签mask|
+|metadata|scalar JSON string|来源、身份、坐标、单位、拓扑、split等|
+
+metadata必含label_source/reference_frame/units/rotation_convention/subject_ids/sequence_ids/split/observation_topology/geometry_source/image_source。units=metres，rotation_convention=absolute_local_matrix_columns；每样本有被试/序列ID。训练、验证和测试跨被试/序列不重叠。推理允许不提供全部目标字段；评估若提供标签则必须包含完整目标字段与mask。输入中的不存在项可NaN，存在项非有限会报错，禁止隐式清理成可用观测。
+
+鱼眼适配由上游标定把**原始鱼眼像素**转成参考系单位射线，本模块没有把透视P矩阵直接用于鱼眼。真实相机ID、同步、左右身份、Stage及动态地面仍由正式工程定义；本研究不更改严格三角化质量门。
+
+## 可复现命令
+
+从仓库根运行，Windows PowerShell 7。使用已有CUDA环境；CPU可复制配置改device，无需下载资产。输出目录必须不存在，防止覆盖失败证据。
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+$py = '.\.venv-cuda\Scripts\python.exe'
+$rec = 'research_records/research/G20261007_flow_mesh_baseline_v1/outputs'
+$cfg = 'research_records/research/G20261007_flow_mesh_baseline_v1/config_learning1000.json'
+& $py -B -m realtime_app.learning_flow_mesh.synthetic --config $cfg --output "$rec/my_data_replay"
+& $py -B -m realtime_app.learning_flow_mesh.train --config $cfg --data "$rec/my_data_replay" --output "$rec/my_flow_replay" --mode flow
+& $py -B -m realtime_app.learning_flow_mesh.train --config $cfg --data "$rec/my_data_replay" --output "$rec/my_regression_replay" --mode regression
+& $py -B -m realtime_app.learning_flow_mesh.prepare_verification --config $cfg --output "$rec/my_verification_inputs" --seed 1234
+& $py -B -m realtime_app.learning_flow_mesh.infer --checkpoint "$rec/my_flow_replay/checkpoint.pt" --input "$rec/my_verification_inputs/fresh_test.npz" --output "$rec/my_flow_inference" --seed 99 --steps 8
+& $py -B -m pytest realtime_app/learning_flow_mesh/tests -q
+uvx ruff check realtime_app/learning_flow_mesh
+```
+
+合成数据为真实人体层解码的人工低维相关旋转族，2个透视相机、3通道关节heatmap代理图像；不是自然人体RGB或鱼眼。64训练、16验证、16测试序列，每序列4帧，ID分开。验证CFM使用固定噪声/时间，推理独立seed，不用真值选候选。结果含标签一致性的顶点误差和打乱观测对照；不得据其声称真实人体恢复精度或泛化。
+
+流式API：`encoder(batch, hidden=previous_hidden, fixed_betas=initial_betas)`。首次帧无观测且无图像时shape_available=false；后续可在观测到来时初始化新的前缀，不追溯填补先前失败帧。单纯滑窗重置hidden/beta不等于持续在线状态，需要调用者携带它们。transport返回rotation_valid/frame_observed，推理产物逐帧保留frame_valid及NaN失败。完全缺失帧可由历史先验生成，不能称观测支持的真实姿态。
+
+## 验证范围
+
+测试检查旋转正交/行列式、零/近共线拒绝、未来扰动不泄露、前缀与流式等价、缺失NaN不污染、全缺失状态、零置信度仍使用坐标、真实网格输入梯度、网络→ODE→网格梯度、checkpoint/seed一致性和划分拒绝。训练损失下降仅是基础学习证据。真实研究下一阶段需要有许可的公开/合成规模数据及真实场景独立测试；当前360/448连续工程拟合不能充当独立三维真值。
+
+最新验收使用上述1000步配置；同容量回归、关闭graph、关闭history均执行，详见研究目录IMPLEMENTATION.md和verification_summary.json。21项测试通过。FM fresh合成顶点一致性110.47mm，回归50.07mm；图/历史没有在这组人工任务证实收益。FM全训练重跑、fresh推理与输入重建均逐位相同（限本环境）；全缺失64帧保留无效。默认模块config.json的200步仅为快速检查，不等同最新1000步结果。

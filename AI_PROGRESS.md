@@ -3734,3 +3734,13 @@ G20261005_reference_weight_fit_v1提前保存plan；原权重复现及3个新候
 上述目录papers.json及LITERATURE_ANALYSIS.md已记录20篇原始正文的方法/主要实验阅读锚点、监督、对照、局限及横向比较；覆盖FM/RFM、参数生成、视频、标定多视图、自由网格、遮挡和鱼眼。未声称全部附录证明、逐图视觉检查或20个作者仓库复现。核对FMPose3D帧内图/attention作者代码及ScoreHMR训练入口；PoseD-Flow项目按钮无正文链接，保留来源缺口并未计入20篇。
 
 决定隔离实现52旋转节点6D条件FM、因果GRU观测条件、帧内全身attention和可切换运动树图；共享前缀shape与逐帧米制translation独立。真实SMPL-H本地资产实际6890顶点/13776面/52父子节点；直接加载遭遇旧chumpy API错误，已查清需要局部Python/NumPy兼容和匹配MANO字段，不修改模型文件。正式主线不替换；接下来实现并做合成工程学习及梯度检查，仍没有真实精度结果。
+
+### 2026-10-07 通用Flow Matching人体模型baseline实现与合成验证
+
+新增隔离模块realtime_app/learning_flow_mesh：52旋转6D CFM、RGB/特征与二维/射线条件、单向GRU、空间attention及可切换运动树图；beta初始前缀冻结、逐帧米制translation、真实SMPL-H解码。含严格NPZ来源/掩码/跨被试序列划分、配置、训练/推理入口及独立测试。confidence只作输入参考，0置信度存在点不硬丢弃；真正缺失才mask。未更改current_mainline、Stage、动态地面或原身体拟合。
+
+G20261007_flow_mesh_baseline_v1记录20篇卡片/横表/正文锚点及设计依据；IMPLEMENTATION.md记录实现、命令、失败和限制。原200步v1的弱条件利用及不匹配回归decoder保留历史源/输出；最终回归与FM共享完整空间decoder、容量144019。4组各1000步、同人工数据/优化预算/候选1；FM8 NFE，回归1次。冻结后新seed1234合成测试16×4帧：FM顶点一致性110.47mm、回归50.07mm、关图99.74mm、关历史98.25mm；打乱条件分别443.44/468.93/453.74/459.53mm。**FM未优于回归，图和历史无已证收益**；各自loss下降只能证基础学习，目标不同不能横比loss。
+
+21项行为测试通过，Ruff及语法解析通过；真实左右手/shape/translation梯度和ODE→mesh梯度有限非零，future/prefix/stream及RGB梯度检查无未来泄露。4组64帧输出真实6890顶点/13776面，正交/行列式误差<5e-7。全训练1000步重跑state逐位相同，fresh推理及输入重建一致；全缺失无标签真实CLI保留64无效帧和NaN、无伪造指标。旧chumpy/scipy弃用warning和首轮失败保留；结果审计脚本读取actual NPZ/checkpoint/log/XML/config，verification_summary的29项核对通过。
+
+数据仅由本地有许可资产产生人工低维相关旋转、透视双相机和关节heatmap代理RGB，不是自然运动/真实鱼眼或独立三维真值；没有公开数据大规模训练、概率校准或人体真实精度结论。原test用于工程预算诊断，不包装成冻结科研测试；fresh结果后不调整模型。当前请求的文献→通用baseline基础研究目标完成；后续真实数据研究另设协议，本轮完成后停用hourly跟进，保留全部来源与失败。原工作区89条状态隔离保留，不推送。

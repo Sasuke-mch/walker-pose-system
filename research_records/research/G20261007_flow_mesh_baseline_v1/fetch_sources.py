@@ -61,11 +61,12 @@ class PaperText(HTMLParser):
 
 def fetch(paper, root):
     pid, title, aid, category = paper
-    result = dict(id=pid, title=title, arxiv_id=aid, category=category,
-                  primary_url=f"https://arxiv.org/abs/{aid}", reading_status="not_read")
+    result = {"id": pid, "title": title, "arxiv_id": aid, "category": category,
+              "primary_url": f"https://arxiv.org/abs/{aid}", "reading_status": "not_read"}
     target = root / "sources" / f"{pid}.txt"
     if target.exists():
-        result.update(source_status="archived", text_path=str(target.relative_to(root)))
+        result.update(source_status="archived", text_path=str(target.relative_to(root)),
+                      lines=len(target.read_text(encoding="utf-8").splitlines()))
         return result
     attempts = []
     for base in ["https://arxiv.org/html/", "https://ar5iv.labs.arxiv.org/html/"]:
@@ -84,8 +85,8 @@ def fetch(paper, root):
             result.update(source_status="archived", fetched_url=url,
                           text_path=str(target.relative_to(root)), lines=len(lines))
             break
-        except Exception as error:
-            attempts.append(dict(url=url, error=str(error)))
+        except (requests.RequestException, ValueError, OSError) as error:
+            attempts.append({"url": url, "error": str(error)})
     else:
         result["source_status"] = "failed"
     result["source_attempts"] = attempts
@@ -100,6 +101,15 @@ def main():
     (root / "sources").mkdir(exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
         records = list(pool.map(lambda paper: fetch(paper, root), PAPERS))
+    registry = root / "papers.json"
+    previous = {p["id"]: p for p in json.loads(registry.read_text(encoding="utf-8"))} if registry.exists() else {}
+    for record in records:
+        old = previous.get(record["id"], {})
+        # Fetching again must not erase an already completed reading audit.
+        for key in ("reading_status", "read_anchor_lines", "analysis", "reading_scope",
+                    "fetched_url", "lines", "source_attempts"):
+            if key in old and (key not in record or key == "reading_status"):
+                record[key] = old[key]
     (root / "papers.json").write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps([{k: p.get(k) for k in ["id", "source_status", "lines", "source_attempts"]} for p in records], ensure_ascii=False))
 

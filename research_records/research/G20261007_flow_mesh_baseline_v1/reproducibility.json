@@ -1,0 +1,11 @@
+{
+  "full_training_steps": 1000,
+  "seed": 7,
+  "all_state_tensors_bitwise_equal": true,
+  "state_tensor_count": 72,
+  "first": "outputs/flow_v2",
+  "replay": "outputs/flow_v2_replay",
+  "environment": "same local CUDA environment",
+  "cross_hardware_guarantee": false,
+  "frozen_verification_inputs_recreated_exactly": true
+}

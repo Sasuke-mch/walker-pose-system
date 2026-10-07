@@ -7,13 +7,13 @@
     "primary_url": "https://arxiv.org/abs/2210.02747",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2210.02747",
     "text_path": "sources\\P01.txt",
-    "lines": 1137,
-    "source_attempts": [],
+    "lines": 1127,
     "read_anchor_lines": "94-230;255-386",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2210.02747",
+    "source_attempts": []
   },
   {
     "id": "P02",
@@ -23,13 +23,13 @@
     "primary_url": "https://arxiv.org/abs/2302.03660",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2302.03660",
     "text_path": "sources\\P02.txt",
-    "lines": 1111,
-    "source_attempts": [],
+    "lines": 1104,
     "read_anchor_lines": "128-264;358-426",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2302.03660",
+    "source_attempts": []
   },
   {
     "id": "P03",
@@ -39,13 +39,13 @@
     "primary_url": "https://arxiv.org/abs/2602.05755v1",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2602.05755v1",
     "text_path": "sources\\P03.txt",
     "lines": 1606,
-    "source_attempts": [],
     "read_anchor_lines": "102-201;544-746",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2602.05755v1",
+    "source_attempts": []
   },
   {
     "id": "P04",
@@ -55,13 +55,13 @@
     "primary_url": "https://arxiv.org/abs/2108.11944",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2108.11944",
     "text_path": "sources\\P04.txt",
     "lines": 624,
-    "source_attempts": [],
     "read_anchor_lines": "82-156;157-331",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2108.11944",
+    "source_attempts": []
   },
   {
     "id": "P05",
@@ -71,13 +71,13 @@
     "primary_url": "https://arxiv.org/abs/2305.06968",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2305.06968",
     "text_path": "sources\\P05.txt",
-    "lines": 1202,
-    "source_attempts": [],
+    "lines": 1198,
     "read_anchor_lines": "70-117;209-300;374-379",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2305.06968",
+    "source_attempts": []
   },
   {
     "id": "P06",
@@ -87,13 +87,13 @@
     "primary_url": "https://arxiv.org/abs/2403.09623",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2403.09623",
     "text_path": "sources\\P06.txt",
-    "lines": 836,
-    "source_attempts": [],
+    "lines": 835,
     "read_anchor_lines": "86-147;250-305;369-373",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2403.09623",
+    "source_attempts": []
   },
   {
     "id": "P07",
@@ -103,13 +103,13 @@
     "primary_url": "https://arxiv.org/abs/2305.20091",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2305.20091",
     "text_path": "sources\\P07.txt",
     "lines": 1122,
-    "source_attempts": [],
     "read_anchor_lines": "124-174;518-541",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2305.20091",
+    "source_attempts": []
   },
   {
     "id": "P08",
@@ -119,13 +119,13 @@
     "primary_url": "https://arxiv.org/abs/1909.12828",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/1909.12828",
     "text_path": "sources\\P08.txt",
     "lines": 537,
-    "source_attempts": [],
     "read_anchor_lines": "74-138",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/1909.12828",
+    "source_attempts": []
   },
   {
     "id": "P09",
@@ -135,13 +135,13 @@
     "primary_url": "https://arxiv.org/abs/1912.05656",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/1912.05656",
     "text_path": "sources\\P09.txt",
     "lines": 847,
-    "source_attempts": [],
     "read_anchor_lines": "135-196;315-331;379-412",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/1912.05656",
+    "source_attempts": []
   },
   {
     "id": "P10",
@@ -151,13 +151,13 @@
     "primary_url": "https://arxiv.org/abs/2312.07531",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2312.07531",
     "text_path": "sources\\P10.txt",
     "lines": 1031,
-    "source_attempts": [],
     "read_anchor_lines": "113-167;527-547",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2312.07531",
+    "source_attempts": []
   },
   {
     "id": "P11",
@@ -167,13 +167,13 @@
     "primary_url": "https://arxiv.org/abs/2409.06662",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2409.06662",
     "text_path": "sources\\P11.txt",
-    "lines": 1371,
-    "source_attempts": [],
+    "lines": 1365,
     "read_anchor_lines": "189-333;803-820",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2409.06662",
+    "source_attempts": []
   },
   {
     "id": "P12",
@@ -183,13 +183,13 @@
     "primary_url": "https://arxiv.org/abs/2210.06551",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2210.06551",
     "text_path": "sources\\P12.txt",
-    "lines": 2109,
-    "source_attempts": [],
+    "lines": 2107,
     "read_anchor_lines": "89-148;1139-1152;1210-1224",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2210.06551",
+    "source_attempts": []
   },
   {
     "id": "P13",
@@ -199,13 +199,13 @@
     "primary_url": "https://arxiv.org/abs/1811.11742",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/1811.11742",
     "text_path": "sources\\P13.txt",
     "lines": 1361,
-    "source_attempts": [],
     "read_anchor_lines": "122-173;673-692",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/1811.11742",
+    "source_attempts": []
   },
   {
     "id": "P14",
@@ -215,13 +215,13 @@
     "primary_url": "https://arxiv.org/abs/2310.16288",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2310.16288",
     "text_path": "sources\\P14.txt",
-    "lines": 1440,
-    "source_attempts": [],
+    "lines": 1438,
     "read_anchor_lines": "80-140;398-404",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2310.16288",
+    "source_attempts": []
   },
   {
     "id": "P15",
@@ -231,13 +231,13 @@
     "primary_url": "https://arxiv.org/abs/2311.10983",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2311.10983",
     "text_path": "sources\\P15.txt",
-    "lines": 1016,
-    "source_attempts": [],
+    "lines": 1015,
     "read_anchor_lines": "94-140;582-589",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2311.10983",
+    "source_attempts": []
   },
   {
     "id": "P16",
@@ -247,13 +247,13 @@
     "primary_url": "https://arxiv.org/abs/1905.05754",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/1905.05754",
     "text_path": "sources\\P16.txt",
-    "lines": 738,
-    "source_attempts": [],
+    "lines": 736,
     "read_anchor_lines": "68-149;545-578",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/1905.05754",
+    "source_attempts": []
   },
   {
     "id": "P17",
@@ -263,13 +263,13 @@
     "primary_url": "https://arxiv.org/abs/2012.09760",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2012.09760",
     "text_path": "sources\\P17.txt",
     "lines": 877,
-    "source_attempts": [],
     "read_anchor_lines": "110-142;237-251",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2012.09760",
+    "source_attempts": []
   },
   {
     "id": "P18",
@@ -279,13 +279,13 @@
     "primary_url": "https://arxiv.org/abs/2104.00272",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2104.00272",
     "text_path": "sources\\P18.txt",
     "lines": 698,
-    "source_attempts": [],
     "read_anchor_lines": "76-111;211-230;275-329",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2104.00272",
+    "source_attempts": []
   },
   {
     "id": "P19",
@@ -295,13 +295,13 @@
     "primary_url": "https://arxiv.org/abs/2304.06024",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2304.06024",
     "text_path": "sources\\P19.txt",
     "lines": 1145,
-    "source_attempts": [],
     "read_anchor_lines": "130-264;442-465",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2304.06024",
+    "source_attempts": []
   },
   {
     "id": "P20",
@@ -311,12 +311,12 @@
     "primary_url": "https://arxiv.org/abs/2503.06089",
     "reading_status": "methods_main_experiments_analyzed",
     "source_status": "archived",
-    "fetched_url": "https://arxiv.org/html/2503.06089",
     "text_path": "sources\\P20.txt",
-    "lines": 474,
-    "source_attempts": [],
+    "lines": 470,
     "read_anchor_lines": "86-150;230-251;295-301",
     "analysis": "LITERATURE_ANALYSIS.md",
-    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified"
+    "reading_scope": "Core methods and main experimental text; not full appendices or all figures visually verified",
+    "fetched_url": "https://arxiv.org/html/2503.06089",
+    "source_attempts": []
   }
 ]
