@@ -107,3 +107,9 @@ H5在`hand_candidate.py`接入原生手部条件：两视图独立memory含6D/�
 `check_existing_smpl_variant`使用用户授权现有male标准SMPL，运行HuManiFlow原随机网络点估计/50候选→原SMPL包装器。输出6890顶点/13776面/90原节点，保存参数独立smplx重建精确，三个原regressor块独立误差<=1.19e-7m。
 
 仅替代male库子路径：作者CLI非neutral实际NotImplementedError，默认neutral/原图像proxy/渲染/评价未做。135回归测试及实际原子路径独立验证通过、Ruff/44AST；默认14资源缺口仍在，无训练/权重加载/主线变更/准确性结论。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_existing_smpl_variant --output <new.json>`，JSON及同名NPZ保留不覆盖。
+
+### R3 原HuManiFlow图像proxy路径
+
+固定保存frame0经原HRNet-W48、crop/Canny/Gaussian及predict源AST十二句到原50候选/共享shape，再解码显式male库网格。141测试/15warning及Ruff/46AST通过；独立保存参数50mesh重建精确。R2库默认允许候选shape变化，R3按原图像路径use_shape_mode_for_samples=True，两者不混记。
+
+原zero/negative HRNet热图仍强制7通道可见并产生Gaussian，maskedNaN仍NaN；不是有效观测门。不改作者/主线、无训练/权重，defaultneutral/renderer/完整函数/CLI/检测评价仍缺。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_original_proxy --output <new.json>`，结果只证明原子路径接线。

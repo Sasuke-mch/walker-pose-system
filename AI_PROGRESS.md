@@ -3857,3 +3857,11 @@ v1保留float64检查器与原float32 pipeline的框腕距离微差失败，只�
 ### 2026-10-08 优化说明补充符号释义
 
 在用户现有Word编辑基础上，于7处公式旁补充索引、模型函数、权重/掩码、正则、初始化、手旋转、Adam和坐标变换符号说明；16个原生公式逐项保留，调整公式段距维持3页。用户关闭Word后直接更新原文件，结构校验及逐页渲染检查通过。本次提交按旧版本单独加入符号说明和段距调整，用户原有文档编辑保留于工作区；其他任务记录与代码保留。
+
+### 2026-10-08 R3 原HuManiFlow RGB/proxy输入及缺失语义
+
+依据P05原文L207–209/L886/L1100–1101，固定读取保存frame0/原pair1157/LEFT CCW90全视图，无labels/strictXYZ/旧fit。原HRNet-W48发布384×288，63,595,745参数、17×96×72热图；原no-detector分支未验证人物居中/关联。精确执行predict_humaniflow.py L74–115的12条原AST语句，原crop/Canny/高斯18×256proxy→ResNet18/23SO3→50候选，原图像设置sharedshape=True；R2是库默认False，两者分开，不扩大R2覆盖。
+
+原male SMPL库输出50×6890/13776面/90点，独立保存50参数重建网格/前45点/面精确；保存RGB、HRNet argmax/confidence、原Canny重算与存储精确，独立crop坐标差0、Gaussian差5.96e-8。重复proxy及点估计精确，随机HRNet41/flow31，无训练/权重/网络请求/参数更新。没有执行带renderer的完整predict函数或原CLI/defaultneutral/评价，默认14缺口不变。
+
+原缺失规则反例：zero或negative热图原argmax给0坐标，confidence无效，仍强制前7（面部/肩）可见并产生7张非零Gaussian；缺失NaN坐标乘false掩码仍NaN。原crop调整aspect时会原位改bbox高度。保持作者文件不动，不把finiteproxy当有效观测。新增6测试，实际全141/15warning、Ruff/46AST通过；11原路径不变，719作者文件存在/字节数核对。HRNet“is”SyntaxWarning、meshgrid/cross弃用和缺pytorch3d提示保留。v1/validation为原输入子路径证据，无真实人体/鱼眼准确性、无完整十篇复现结论；长期目标继续，不推送。

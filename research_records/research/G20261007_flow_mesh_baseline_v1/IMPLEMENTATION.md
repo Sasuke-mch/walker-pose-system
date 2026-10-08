@@ -295,3 +295,15 @@ check_existing_smpl_variant.py独立进程安装权重下载/torch.load拒绝保
 照原predict_humaniflow的参数调用point和50sample网格路径：父相对23body矩阵、global矩阵、shape_mode或shape_samples、pose2rot=False。输出1/50×6890×3、13776面、90关节。90为45 smplx原节点+9extra+19cocoplus+17H36M，不能叫COCO17或SMPL-H52。原采样旋转正交误差1.19e-7、det误差1.79e-7；同资产独立smplx网格及前45点完全一致，三个独立einsum块差<=1.19e-7m，保存50样本另进程重建及faces也精确。无训练/checkpoint/optimizer/参数变化或网络请求，原FlowMesh/H5/H6/主线未动。
 
 135已有回归测试实际重跑通过/14warning，原male路径由运行器和独立保存重建另验，不混作单元测试覆盖；Ruff/44AST通过，719作者文件存在/字节数一致。初轮Ruff1导入格式诊断修正后执行，原torch.cross warning、SMPL10系数提示及Failed to import pytorch3d保留，未调用渲染函数。新v1及validation保留，NPZ仅本地不提交。没有检测/crop/HRNet/edge-generated输入、世界可视化或原评价，没有默认neutral完整网格或CLI。原默认资源14缺口不变；这是替代资产原库子路径工程证据，不是完整方法或自然人体准确性。
+
+## R3 原RGB→HRNet→proxy→概率参数子路径
+
+原文P05 L207–209、L886及L1100–1101明确Canny边图/HRNet-W48二维热图18×256proxy及ResNet18。协议固定保存LEFT转正frame0/pair1157，不以结果挑帧，不读取PMPose标签/strictXYZ/旧mesh。原no-detector分支对保存全视图运行，输入不是经独立认可的居中单人crop，不能作人物关联或人体观测有效性证据。
+
+新增check_original_proxy.py，原HRNet-W48 config384×288、17×96×72、63,595,745参数，随机seed41；HumaniflowModel seed31，均eval无训练权重。原predict_hrnet函数实际前向；从predict_humaniflow.py选取L74–115十二条连续原AST（hrnet_output到pred），保留原坐标/裁剪/Canny/高斯/visibility/拼接和网络调用。原完整函数在该块前构造PyTorch3D renderer；本次不假造renderer，AST只是源子路径，不声称完整函数/CLI执行。输出proxy1×18×256×256，50候选及原use_shape_mode_for_samples=True。R2调用原库defaultFalse允许shape采样，所以R2是原库body接线，不是发布图像采样设置；现明确补记该区别。
+
+原mode与50候选以现有male标准SMPL经作者wrapper解码6890/13776/90点，不替代neutral。保存的RGB与当前源像素精确，HRNet argmax/confidence独立重建精确，独立proxy仿射坐标差0、高斯差5.96e-8，原Canny对保存crop重跑与边图精确；50参数独立smplx顶点/前45点/面精确，sharedshape50行完全相同。重复proxy与point完全相同，旋转正交/det误差2.98e-7，三模块state_dict不变。没有optimizer、torch.load或网络请求，模型资产/作者/core/主线不改。
+
+必须保留的有效性反例：原HRNet zero/negative热图argmax坐标0、置信值无效，原输入块仍force indices0..6=True，生成7张非零Gaussian；forced对象是COCO面部与肩，不是原SMPL前三关节。Gaussian对NaN坐标返回NaN，乘false仍NaN。原crop匹配aspect时原位改bbox_heights/bbox_widths，复用调用方数组需明确所有权。本次仅记录，不修作者、不引入项目阈值或改主线；有限网络输入不能说明真实观测存在。
+
+六项新测试包括独立非对称Gaussian/argmax/affine控制、zero/negative/NaN、confidence严格大于0.75及head7强制、原AST边界。全模块实际141/15warning、Ruff/46AST通过；原“is”literal SyntaxWarning、meshgrid/cross弃用、Failed to import pytorch3d/SMPL10提示保留。719作者文件存在/字节数（非逐字比较）、11原core/候选/读取路径未变。结果architecture_r3_results_v1.json/NPZ及validation保存，不提交RGB/mesh大NPZ。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_original_proxy --output <new.json>`。没有原detector、defaultneutral、renderer/fullfunction/CLI/checkpoint/完整评价，14默认资源缺口不变；输入原路径拓展不等于整篇完成或精度改进。

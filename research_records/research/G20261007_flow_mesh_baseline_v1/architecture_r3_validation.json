@@ -1,0 +1,76 @@
+{
+  "status": "R3_original_RGB_proxy_parameter_male_mesh_subpath_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "parameter_updates": false,
+  "data_scope": "One fixed savedframe0/originalpair1157 LEFT CCW90 fullview, no detector or verified person crop; no labels/strictXYZ/oldmesh used",
+  "author_AST_actual_source_lines": [
+    74,
+    115
+  ],
+  "author_AST_actual_source_statements": 12,
+  "actual_HRNet_W48_parameters": 63595745,
+  "original_shape_mode_for50samples_true": true,
+  "R2_library_sample_setting_was_default_false_not_released_image_setting": true,
+  "independent_RGB_exact": true,
+  "independent_HRNet_argmax_xy_confidence_exact": true,
+  "independent_affine_pixel_error": 0.0,
+  "independent_gaussian_proxy_error": 5.960464477539063e-08,
+  "original_Canny_same_saved_crop_exact": true,
+  "original_visibility_threshold_and_forced7rule_exact": true,
+  "original_missing_semantic_counterexamples": {
+    "gaussian_row_column_control_error": 0.0,
+    "asymmetric_argmax_exact": true,
+    "affine_pixel_control_error": 3.814697265625e-06,
+    "crop_mutates_bbox_height_for_aspect_ratio": true,
+    "zero_heatmap_argmax_xy": [
+      0,
+      0
+    ],
+    "zero_heatmap_confidence": 0,
+    "zero_or_negative_heatmap_forced_visible_head_shoulder_channels": 7,
+    "zero_heatmap_nonzero_gaussian_channels_after_original_mask": 7,
+    "masked_nan_joint_heatmap_remains_nan": true,
+    "boundary": "Original forced visibility and multiplication are not observation validity gates; no source fix or mainline adaptation"
+  },
+  "saved50sample_mesh_and_faces_independently_exact": true,
+  "default_neutral_completed": false,
+  "default_resources_missing_still": 14,
+  "full_top_level_function_renderer_CLI_evaluation_executed": false,
+  "tests": {
+    "tests": "141",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "new_proxy_cases": 6,
+  "full_test_warnings_retained": 15,
+  "original_runtime_warnings_retained": [
+    "HRNet is with literal SyntaxWarning",
+    "meshgrid implicit indexing",
+    "torch.cross implicit dim",
+    "Failed to import pytorch3d; renderer not executed",
+    "SMPL10coefficients notice"
+  ],
+  "linter": "uvx --offline ruff passed",
+  "syntax_AST_files": 46,
+  "author_source_existence_bytecounts_verified": 719,
+  "author_content_comparison_executed": false,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/pose_app/wilor_mano_prior.py",
+    "realtime_app/learning_flow_mesh/missing_history.py"
+  ],
+  "failure_retained": "InitialRuff1import-format issue corrected before realpath. Zero/negative/NaN and bboxmutation failures of validity assumptions retained as successful diagnostic counterexamples, not authorcode patched.",
+  "boundary": "Random original RGB/proxy/parameter plus alternatemale library subpath; allzero heatmaps still produce7forcedGaussian channels and maskedNaN remainsNaN. Finite proxy is not valid input evidence; no accuracy/uncertainty or default fullmethod completion."
+}

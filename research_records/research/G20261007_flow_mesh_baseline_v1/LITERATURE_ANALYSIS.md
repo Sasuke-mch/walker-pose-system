@@ -356,3 +356,9 @@ ProHMR FCHead只取mean的shape/cam，HMR2头还读取pose。两个实际获取�
 HuManiFlow的CLI帮助列出male/female，执行却对非neutral主动NotImplementedError。这说明“官方参数列有选项”不是路径跑通证据。现有male标准SMPL可由原library wrapper处理，原随机概率头点估计/50采样→body库网格实际运行通过，独立保存重建一致，但只算显式替代male库配置，不算原CLI/defaultneutral。
 
 原90joint输出拼接45+9+19+17；同样6890顶点也不能因此忽略regressor语义、gender或参数拓扑。现有SMPLX_NEUTRAL不是默认SMPL_NEUTRAL，SMPL-H也不是23body原模型替代。随机网格有限及SO3合法只支持接线与解码，缺完整图像proxy/权重/评价的情况下没有准确性、采样不确定性或男女泛化结论。默认14项资源缺口继续保留。
+
+## R3：proxy的有限性和可见性假设
+
+P05正文L207–209、附录L886说明Canny/HRNet-W48 proxy；原图像预测路径L74–115实际在confidence>0.75后强制COCO indices0..6可见。零或负HRNet热图仍返回0坐标，随后7张Gaussian非零，这个强制先验不能被项目当作“已观察到头肩”。NaN Gaussian乘false仍NaN，原mask不是NaN隔离接口。原算法对正常检测的假设与本项目失败帧契约必须分开，不能沿用其finite输入即可认为有效。
+
+原图像路径use_shape_mode_for_samples=True，50候选共享shape mode；R2的原库默认False是另一个采样配置，不能混记。它们都不是跨视频因果共享β。固定真实保存RGB通过原HRNet/crop/Canny/sourceAST到原网络并解码male网格，只证明该原输入子路径可运行；随机HRNet/概率参数无法说明检测准确、模态可辨识或不确定性校准。完整predict函数先依赖renderer，原neutral/CLI/检测/评价未覆盖，不升级十篇完整复现。

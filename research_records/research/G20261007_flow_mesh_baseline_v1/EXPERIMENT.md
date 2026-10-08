@@ -100,3 +100,7 @@ architecture_h6_results_v1.json/NPZ与validation通过。原H5随机参数/手�
 ### R3 HuManiFlow原RGB/proxy输入路径预注册
 
 见architecture_r3_protocol.json。固定保存frame0/原pair1157/LEFT转正全视图，作者no-detector分支只作结构输入不宣称已居中人物crop。原HRNet-W48/384×288、Canny、18×256proxy及源AST输入→pred语句实际运行，使用原图像路径50候选/sharedshape=True；R2的默认False采样另记库配置，非原图像路径设置。另审查zero/negative热图、强制头7可见、NaN mask及非对称坐标。随机无权重、male库资产独立标记，renderer/原CLI/neutral/评价未覆盖，作者文件/主线不改。
+
+### R3 实际验收
+
+固定frame0 RGB→原HRNet-W48→原crop/Canny/高斯/visibility连续AST L74–115→原50sharedshape参数→male原SMPL wrapper通过。独立保存RGB/argmax/conf/Canny精确、Gaussian误差5.96e-8、仿射0、50保存mesh/前45点/面重建精确；141全测试/15warning、Ruff/46AST。zero/negative热图强制7Gaussian、maskedNaN仍NaN及bbox原位改变反例保留，作者不修改。随机无训练/权重/网络，仍非已认可人物crop、未做detector/defaultneutral/renderer完整函数/CLI/评价，默认14缺口保留。R2默认False库采样与R3原图像True共享shape显式分开。结果v1/validation保持whole_goal_complete=false。
