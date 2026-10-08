@@ -1,0 +1,33 @@
+{
+  "status": "R11_transport_failure_and_no_fullarchive_fallback_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "results": "architecture_r11_results_v1.json",
+  "primary_resource_script_verified_live": "https://raw.githubusercontent.com/mkocabas/VIBE/master/scripts/prepare_data.sh",
+  "GET_invocations": 1,
+  "same_source_budget_remaining": 1,
+  "attempt_claim_persisted_before_GET": true,
+  "HTTP_status": 200,
+  "range_response_supported_this_invocation": false,
+  "archive_body_reader_bytes": 0,
+  "installed_resources": [],
+  "before_default_gaps": 14,
+  "after_default_gaps": 14,
+  "source_budget_exhausted": false,
+  "same_stage_retry_allowed": false,
+  "tests": {
+    "tests": "158",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "new_tests": 3,
+  "full_suite_warnings": 18,
+  "Ruff": "passed",
+  "AST_files": 60,
+  "paper_source_presence_byte_checks": 638,
+  "author_content_comparison": false,
+  "frozen_paths_unchanged": 11,
+  "boundary": "Failed suffix-range metadata request; no index or selectedfiles acquired, no VIBE mesh/fullnetwork. bodyreader0 excludes redirect/header/TLS traffic. Do not assume200 payload is archive, confirmation page or serverwideRange support."
+}

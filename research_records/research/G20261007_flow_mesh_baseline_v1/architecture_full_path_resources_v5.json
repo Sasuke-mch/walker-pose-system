@@ -1,0 +1,259 @@
+{
+  "status": "resource_inventory_completed_with_gaps",
+  "training_executed": false,
+  "specific_fixture_byte_comparisons": [
+    {
+      "official_path": "third_party/architecture_reproduction/ProHMR/data/smpl_mean_params.npz",
+      "fixture_path": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+      "raw_bytes_equal": true
+    },
+    {
+      "official_path": "C:/Users/毛晨昊/.cache/4DHumans/data/smpl_mean_params.npz",
+      "fixture_path": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+      "raw_bytes_equal": true
+    }
+  ],
+  "author_mesh_paths": [
+    {
+      "id": "P04",
+      "source_anchors": [
+        "third_party/architecture_reproduction/ProHMR/prohmr/configs/prohmr.yaml"
+      ],
+      "default_mesh_ready": false,
+      "requirements": [
+        {
+          "path": "third_party/architecture_reproduction/ProHMR/data/smpl/SMPL_NEUTRAL.pkl",
+          "role": "released neutral SMPL",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/ProHMR/data/SMPL_to_J19.pkl",
+          "role": "published OpenPose plus J19 regressor",
+          "available": true,
+          "bytes": 1047441
+        },
+        {
+          "path": "third_party/architecture_reproduction/ProHMR/data/smpl_mean_params.npz",
+          "role": "original mean parameters, release equivalence required",
+          "available": true,
+          "bytes": 1310
+        }
+      ]
+    },
+    {
+      "id": "P07",
+      "source_anchors": [
+        "third_party/architecture_reproduction/HMR2/hmr2/configs_hydra/experiment/default.yaml"
+      ],
+      "default_mesh_ready": false,
+      "requirements": [
+        {
+          "path": "C:/Users/毛晨昊/.cache/4DHumans/data/smpl/SMPL_NEUTRAL.pkl",
+          "role": "released neutral SMPL in configured user cache",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "C:/Users/毛晨昊/.cache/4DHumans/data/SMPL_to_J19.pkl",
+          "role": "published J19 regressor",
+          "available": true,
+          "bytes": 1047441
+        },
+        {
+          "path": "C:/Users/毛晨昊/.cache/4DHumans/data/smpl_mean_params.npz",
+          "role": "original release mean parameters",
+          "available": true,
+          "bytes": 1310
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "source_anchors": [
+        "third_party/architecture_reproduction/HuManiFlow/configs/paths.py",
+        "third_party/architecture_reproduction/HuManiFlow/models/smpl.py",
+        "third_party/architecture_reproduction/HuManiFlow/scripts/run_predict.py"
+      ],
+      "default_mesh_ready": false,
+      "requirements": [
+        {
+          "path": "third_party/architecture_reproduction/HuManiFlow/model_files/smpl/SMPL_NEUTRAL.pkl",
+          "role": "default neutral SMPL; CLI gender alternatives do not reproduce default",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/HuManiFlow/model_files/J_regressor_extra.npy",
+          "role": "extra joints",
+          "available": true,
+          "bytes": 496160
+        },
+        {
+          "path": "third_party/architecture_reproduction/HuManiFlow/model_files/cocoplus_regressor.npy",
+          "role": "COCO-plus joints",
+          "available": true,
+          "bytes": 1047408
+        },
+        {
+          "path": "third_party/architecture_reproduction/HuManiFlow/model_files/J_regressor_h36m.npy",
+          "role": "H36M evaluation joints",
+          "available": true,
+          "bytes": 937168
+        }
+      ]
+    },
+    {
+      "id": "P09",
+      "source_anchors": [
+        "third_party/architecture_reproduction/VIBE/lib/core/config.py",
+        "third_party/architecture_reproduction/VIBE/lib/models/smpl.py",
+        "third_party/architecture_reproduction/VIBE/lib/models/spin.py"
+      ],
+      "default_mesh_ready": false,
+      "requirements": [
+        {
+          "path": "third_party/architecture_reproduction/VIBE/data/vibe_data/SMPL_NEUTRAL.pkl",
+          "role": "default smplx.SMPL neutral model",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/VIBE/data/vibe_data/J_regressor_extra.npy",
+          "role": "extra joints for original 49-point output",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/VIBE/data/vibe_data/smpl_mean_params.npz",
+          "role": "original iterative initialization",
+          "available": false,
+          "bytes": null
+        }
+      ]
+    },
+    {
+      "id": "P10",
+      "source_anchors": [
+        "third_party/architecture_reproduction/WHAM/configs/constants.py",
+        "third_party/architecture_reproduction/WHAM/lib/models/smpl.py",
+        "third_party/architecture_reproduction/WHAM/lib/models/__init__.py"
+      ],
+      "default_mesh_ready": false,
+      "requirements": [
+        {
+          "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/smpl/SMPL_NEUTRAL.pkl",
+          "role": "build_body_model default neutral model",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/J_regressor_wham.npy",
+          "role": "WHAM COCO/extended landmarks",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/J_regressor_h36m.npy",
+          "role": "evaluation joints",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/J_regressor_feet.npy",
+          "role": "original foot geometry for trajectory/refinement",
+          "available": false,
+          "bytes": null
+        }
+      ]
+    },
+    {
+      "id": "P12",
+      "source_anchors": [
+        "third_party/architecture_reproduction/MotionBERT/docs/mesh.md",
+        "third_party/architecture_reproduction/MotionBERT/lib/utils/utils_smpl.py",
+        "third_party/architecture_reproduction/MotionBERT/lib/model/model_mesh.py"
+      ],
+      "default_mesh_ready": false,
+      "requirements": [
+        {
+          "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/SMPL_NEUTRAL.pkl",
+          "role": "default neutral SMPL explicitly required in mesh documentation",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/J_regressor_extra.npy",
+          "role": "extra landmark joints",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/J_regressor_h36m_correct.npy",
+          "role": "specific corrected H36M regressor, not arbitrary COCO17",
+          "available": false,
+          "bytes": null
+        },
+        {
+          "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/smpl_mean_params.npz",
+          "role": "original mesh-head initialization",
+          "available": false,
+          "bytes": null
+        }
+      ]
+    }
+  ],
+  "smplx_default_gender_verified": "neutral",
+  "targeted_resource_names_found": [
+    "models\\smpl\\J_regressor_coco.npy",
+    "third_party\\architecture_reproduction\\ProHMR\\data\\SMPL_to_J19.pkl",
+    "third_party\\architecture_reproduction\\HuManiFlow\\model_files\\J_regressor_h36m.npy",
+    "third_party\\architecture_reproduction\\HuManiFlow\\model_files\\J_regressor_extra.npy",
+    "third_party\\architecture_reproduction\\HuManiFlow\\model_files\\cocoplus_regressor.npy",
+    "third_party\\architecture_reproduction\\auxiliary\\HMR2\\data\\SMPL_to_J19.pkl"
+  ],
+  "existing_alternatives": [
+    {
+      "path": "models/smpl/basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+      "role": "local licensed male SMPL, not neutral",
+      "available": true,
+      "bytes": 39056404
+    },
+    {
+      "path": "models/smpl/basicModel_f_lbs_10_207_0_v1.0.0.pkl",
+      "role": "local licensed female SMPL, not neutral",
+      "available": true,
+      "bytes": 39056454
+    },
+    {
+      "path": "third_party/WiLoR/mano_data/models/SMPLH_male.pkl",
+      "role": "local licensed SMPL-H, different parameterization",
+      "available": true,
+      "bytes": 130422893
+    },
+    {
+      "path": "models/smplx/SMPLX_NEUTRAL.pkl",
+      "role": "SMPL-X neutral, different vertex/parameter topology",
+      "available": true,
+      "bytes": 544173380
+    },
+    {
+      "path": "models/smpl/J_regressor_coco.npy",
+      "role": "project COCO17 surface regressor, not original regressors",
+      "available": true,
+      "bytes": 937168
+    },
+    {
+      "path": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+      "role": "public fixture byte-identical to acquired ProHMR/HMR2 means only; no automatic substitution",
+      "available": true,
+      "bytes": 1310
+    }
+  ],
+  "automatic_substitutions": [],
+  "mesh_loading_or_weights_loading_executed": false,
+  "scope": "Six original SMPL-dependent default mesh paths only; readiness checks prerequisites, not full method completion",
+  "neutral_acquisition_reference": "third_party/architecture_reproduction/WHAM/fetch_demo_data.sh",
+  "neutral_acquisition_policy": "Author script requires official SMPLify account/license. No credential lookup or authenticated download attempted",
+  "remaining": "Original neutral asset/regressors/means, input preprocessing and full evaluation; independent other methods continue"
+}

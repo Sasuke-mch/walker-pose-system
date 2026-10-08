@@ -1,0 +1,30 @@
+{
+  "status": "R11_bounded_VIBE_index_audited",
+  "protocol": "architecture_r11_protocol.json",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "whole_goal_complete": false,
+  "GET_invocations": 1,
+  "same_source_budget_remaining": 1,
+  "attempt_claim": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_r11_attempt.json",
+  "elapsed_seconds": 1.437999999994645,
+  "archive_request": {
+    "status": "bounded_index_request_failed",
+    "inventory": [],
+    "installed": [],
+    "body_bytes": 0,
+    "http_status": 200,
+    "final_url": "https://drive.usercontent.google.com/download?id=1untXhYOLQtpNEy4GTY_0fL_H-k6cTf_r",
+    "content_range": null,
+    "error": "ValueError: suffix range required206, got200; no fullzip fallback",
+    "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_vibe_index.py\", line 50, in run\n    offset, end, total = validate_range(response.status_code, response.headers)\n                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_vibe_index.py\", line 22, in validate_range\n    raise ValueError(f\"suffix range required206, got{status}; no fullzip fallback\")\nValueError: suffix range required206, got200; no fullzip fallback\n"
+  },
+  "before_missing": 14,
+  "after_missing": 14,
+  "after_audit": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_full_path_resources_v5.json",
+  "selected_members_status": {
+    "vibe_data/J_regressor_extra.npy": "not_acquired",
+    "vibe_data/smpl_mean_params.npz": "not_acquired"
+  },
+  "boundary": "ZIP index only, not auxiliary acquisition or fullVIBE. Bodybytes do not count HTTP/TLS redirects. Existingclaim blocks retry; any second source request requires distinct preregistered stage."
+}

@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "H7_local_vs_recurrent_shape_information_source_verified_original_paths_and_final_synthesis_pending",
+  "stage": "R11_VIBE_official_range_index_request_failed_HTTP200_default14gaps_original_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -190,7 +190,7 @@
       ]
     }
   ],
-  "next": "Continue original VIBE regressor/body resource route with only official auxiliary members and distinct bounded budget; no weights/neutral substitution/WHAM same-source retry. Then remaining original temporal/multiview contracts and evidence-bounded synthesis. H7 closes feature-source audit, not beta accuracy.",
+  "next": "Investigate VIBE officialZIP selective auxiliary access before using remaining one source request; thisstageclaim cannot retry. Do not fullarchive fallback or substitute licensedneutral/checkpoints. Continue original uncovered contracts and final synthesis independently; WHAM same-source budget remains exhausted.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -223,7 +223,8 @@
     "R8 Original MotionBERT global_lite/wild reader/inference AST; input/order/futurecrop/missing/pixeldepth boundaries",
     "R9 MotionAGFormer defaultbase/full evaluation AST on syntheticreader; exactintermediate and original tail/perfecterror/units failures",
     "R10 Ten explicit coverage rows and evidencefield links; corrected VIBE sharedbeta attribution and stale currentstage; H7 and originalpath gaps retained",
-    "H7 originalpreGRU feature capture changes only sharedbeta readout; savedH6control/nonbetaoutputs/hidden/noiseexact, real360/mesh/stream/future/attribution and155tests verified"
+    "H7 originalpreGRU feature capture changes only sharedbeta readout; savedH6control/nonbetaoutputs/hidden/noiseexact, real360/mesh/stream/future/attribution and155tests verified",
+    "R11 primaryVIBEresource script verified; one boundedZIPsuffix request rejectedHTTP200 beforebodyread; persistentclaim/14gaps/158tests audited, not acquired"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -535,5 +536,14 @@
     "accuracy_preference_selected": false,
     "all_nonbeta_outputs_unchanged": true,
     "duration_concurrency_export_limits_remaining": true
+  },
+  "vibe_resource_index": {
+    "protocol": "architecture_r11_protocol.json",
+    "result": "architecture_r11_results_v1.json",
+    "validation": "architecture_r11_validation.json",
+    "full_path_inventory": "architecture_full_path_resources_v5.json",
+    "same_source_budget_remaining": 1,
+    "index_acquired": false,
+    "auxiliary_files_installed": false
   }
 }
