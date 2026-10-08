@@ -92,3 +92,7 @@ architecture_h6_results_v1.json/NPZ与validation通过。原H5随机参数/手�
 ### R2 用户现有资产及HuManiFlow男模型库子路径预注册
 
 用户提供三个本地资产目录并授权有用则用；实际无neutral SMPL，SMPLX_NEUTRAL不是替代品。HuManiFlow CLI列出male/female但非neutral实际NotImplementedError，不能当CLI支持证据。见architecture_r2_protocol.json，独立配置以现有male SMPL调用原模型库点估计/50候选→原SMPL wrapper，核对真实网格/90关节及原regressor；不加载训练权重、不改作者文件、不补齐默认neutral，不宣称完整图像/CLI推理。
+
+### R2 实际验收
+
+原HuManiFlow男模型库子路径v1通过：原点估计/50采样头接原SMPL wrapper输出6890/13776/90，另进程50保存参数独立重建及原regressor块核对。随机seed31/人工proxy，参数不改、网络0、无训练/训练权重；原CLI对非neutral拒绝和默认neutral未覆盖明确保留，PyTorch3D缺失提示保留且未渲染。135现有回归测试重新通过/14warning，原子路径由另验覆盖，Ruff/44AST。默认14缺口未变；architecture_r2_validation.json保持whole_goal_complete=false。

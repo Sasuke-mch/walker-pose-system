@@ -1,0 +1,55 @@
+{
+  "status": "R2_original_library_alternate_male_mesh_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests_executed": 0,
+  "weights_unchanged": true,
+  "artificial_proxy_random_network": true,
+  "default_neutral_reproduced": false,
+  "author_CLI_executed": false,
+  "author_CLI_non_neutral_NotImplementedError": true,
+  "samples_independently_rebuilt": 50,
+  "independent_mesh_vertex_and_faces_exact": true,
+  "independent_base45_joints_exact": true,
+  "independent_regressor_einsum_errors_m": [
+    5.960464477539063e-08,
+    1.1920928955078125e-07,
+    1.1920928955078125e-07
+  ],
+  "sample_joint_schema": "45smplx +9extra +19cocoplus +17H36M =90, not COCO17/SMPL-H52",
+  "tests": {
+    "tests": "135",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "test_scope": "Existing135 regression cases rerun; actual original alternate-body path checked by runner plus separate saved50sample rebuild, not covered by those135 cases",
+  "warnings_retained": [
+    "14 full-suite deprecation warnings",
+    "Author torch.cross implicit dim deprecation",
+    "Author printed Failed to import pytorch3d; rendering functions not executed",
+    "SMPL10shape notice"
+  ],
+  "syntax_AST_files": 44,
+  "linter": "uvx --offline ruff passed",
+  "author_source_existence_bytecounts_verified": 719,
+  "author_content_comparison_executed": false,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/pose_app/wilor_mano_prior.py",
+    "realtime_app/learning_flow_mesh/missing_history.py"
+  ],
+  "default_resource_missing_still": 14,
+  "retained_static_failure": "InitialRuff one import-format diagnostic fixed before original path execution",
+  "boundary": "Alternate male library parameter-to-mesh subpath only; no defaultneutral/CLI, originalimageproxy/detector/renderer/evaluation or trained performance",
+  "next": "Continue original input paths that do not load learned weights; retain neutral and method-specific resource gaps separately from alternate assets."
+}

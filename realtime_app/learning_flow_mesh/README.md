@@ -101,3 +101,9 @@ H5在`hand_candidate.py`接入原生手部条件：两视图独立memory含6D/�
 独立`missing_history.py`只改变无当前观测时的原GRU hidden更新；不改H5/core文件或shape池化，关闭策略与保存H5完全一致。真实360保留324可用/7校准/29无观测与NaN；freeze在缺失hidden变化0，原控制最大0.547084。
 
 135测试/14warning及Ruff/43AST通过。缺失1/8/64后恢复相同、帧号10倍无响应说明freeze忽略经过时间；没有准确性优胜结论。临时eager hook先运行原GRU再复算，仅验证harness，无并发/编译或实时性能结论。运行`python -B -m realtime_app.learning_flow_mesh.reproduction.check_missing_history --output <new.json>`；结果/validation在已有研究目录，长期目标未完成。
+
+### R2 现有male原库网格路径
+
+`check_existing_smpl_variant`使用用户授权现有male标准SMPL，运行HuManiFlow原随机网络点估计/50候选→原SMPL包装器。输出6890顶点/13776面/90原节点，保存参数独立smplx重建精确，三个原regressor块独立误差<=1.19e-7m。
+
+仅替代male库子路径：作者CLI非neutral实际NotImplementedError，默认neutral/原图像proxy/渲染/评价未做。135回归测试及实际原子路径独立验证通过、Ruff/44AST；默认14资源缺口仍在，无训练/权重加载/主线变更/准确性结论。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_existing_smpl_variant --output <new.json>`，JSON及同名NPZ保留不覆盖。

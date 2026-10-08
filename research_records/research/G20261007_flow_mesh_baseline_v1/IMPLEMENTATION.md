@@ -285,3 +285,13 @@ mean原pose144/shape10/cam3，HMR2 heads/smpl_head.py 49–55初始化读取全�
 逐帧/11/64分块原固定容差2e-5通过，最大raw state差9.54e-7，未来120后身体/手token扰动影响0；真实SMPL-H6890/13776/52及COCO表面读取，独立保存参数重建差2.38e-7m。长missing1/8/64后恢复与无gap一步完全相同，frame IDs乘10（身体/native同步）除编号外全部输出差0。freeze只知道观测次数，完全不编码时间；不能称运动建模更正确，原null update也没有物理经过时间验证。
 
 新增11行为测试：all-observed原GRU一致、混合行隔离、缺失前缀/恢复、hidden不原位修改、状态帧号继续前进、shape认可不等于观测存在、masked/future输入梯度0而恢复后当前/过去观测及原GRU梯度有限非零、异常移除hook，无参数更新。全模块实际135通过/14warning，Ruff及43AST通过，10原路径相对提交未改，719作者文件存在/字节数核对非逐字比对。初轮9测试通过，Ruff2导入格式问题修正后扩大11测试；实际JSON/NPZ及validation保留。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_missing_history --output <new.json>`，不覆盖输出，NPZ大文件不提交。证据仅因果/状态/真实人体接口，不构成accuracy或主线推广。
+
+## R2 现有male SMPL的HuManiFlow原库网格子路径
+
+用户明确授权使用三个给定资产目录。实际是SMPL male/female、SMPL-H male/female、MANO和SMPL-X三性别，无neutral SMPL。作者scripts/run_predict.py底部虽然声明gender choices，`args.gender != neutral`实际NotImplementedError；run_predict函数参数与原SMPL wrapper支持传入gender。故本协议只检验另一个male库配置，不能记作默认neutral或原CLI复现。
+
+check_existing_smpl_variant.py独立进程安装权重下载/torch.load拒绝保护，以原24节点树实例化作者HumaniflowModel：原ResNet18、23层级SO3、原配置，seed31随机参数，人工1×18×256×256proxy，原脚本50候选预算。读取本机male标准6890文件直接传给原SMPL wrapper，无复制/改名、无作者文件修改；configs.paths在本进程只解析R1三个原regressor绝对路径，legacy NumPy/inspect兼容只本进程，原模型资产不变。
+
+照原predict_humaniflow的参数调用point和50sample网格路径：父相对23body矩阵、global矩阵、shape_mode或shape_samples、pose2rot=False。输出1/50×6890×3、13776面、90关节。90为45 smplx原节点+9extra+19cocoplus+17H36M，不能叫COCO17或SMPL-H52。原采样旋转正交误差1.19e-7、det误差1.79e-7；同资产独立smplx网格及前45点完全一致，三个独立einsum块差<=1.19e-7m，保存50样本另进程重建及faces也精确。无训练/checkpoint/optimizer/参数变化或网络请求，原FlowMesh/H5/H6/主线未动。
+
+135已有回归测试实际重跑通过/14warning，原male路径由运行器和独立保存重建另验，不混作单元测试覆盖；Ruff/44AST通过，719作者文件存在/字节数一致。初轮Ruff1导入格式诊断修正后执行，原torch.cross warning、SMPL10系数提示及Failed to import pytorch3d保留，未调用渲染函数。新v1及validation保留，NPZ仅本地不提交。没有检测/crop/HRNet/edge-generated输入、世界可视化或原评价，没有默认neutral完整网格或CLI。原默认资源14缺口不变；这是替代资产原库子路径工程证据，不是完整方法或自然人体准确性。

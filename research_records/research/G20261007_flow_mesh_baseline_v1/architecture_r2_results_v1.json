@@ -1,0 +1,174 @@
+{
+  "status": "R2_original_library_male_mesh_subpath_passed",
+  "protocol": "architecture_r2_protocol.json",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "parameters_unchanged": true,
+  "random_model_seed": 31,
+  "asset": "models/smpl/basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+  "asset_gender": "male",
+  "default_neutral_reproduced": false,
+  "author_CLI_non_neutral_NotImplementedError_verified": true,
+  "input_semantics": "Artificial random18channel256proxy; no detector/edge-generated input",
+  "sample_budget": 50,
+  "parameter_count": 12490497,
+  "point_vertices_shape": [
+    1,
+    6890,
+    3
+  ],
+  "samples_vertices_shape": [
+    50,
+    6890,
+    3
+  ],
+  "samples_joints_shape": [
+    50,
+    90,
+    3
+  ],
+  "faces_shape": [
+    13776,
+    3
+  ],
+  "parents": [
+    -1,
+    0,
+    0,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    9,
+    9,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "joint_semantics": "45 original smplx landmarks plus9 extra,19COCOplus,17H36M; not COCO17 or SMPL-H52",
+  "same_asset_independent_smplx_mesh_max_error_m": 0.0,
+  "joint_block_einsum_errors_m": {
+    "base45": 0.0,
+    "J_regressor_extra": 5.960464477539063e-08,
+    "J_regressor_cocoplus": 1.1920928955078125e-07,
+    "J_regressor_h36m": 1.1920928955078125e-07
+  },
+  "point_repeat_exact": true,
+  "rotation_check": {
+    "orthogonality_max_error": 1.1920928955078125e-07,
+    "determinant_max_error": 1.7881393432617188e-07
+  },
+  "default_missing_still": 14,
+  "local_asset_directory_inventory": {
+    "third_party/WiLoR/mano_data/models": [
+      {
+        "name": "info.txt",
+        "bytes": 95
+      },
+      {
+        "name": "LICENSE.txt",
+        "bytes": 4330
+      },
+      {
+        "name": "MANO_LEFT.pkl",
+        "bytes": 3821391
+      },
+      {
+        "name": "MANO_RIGHT.pkl",
+        "bytes": 3821356
+      },
+      {
+        "name": "SMPLH_female.pkl",
+        "bytes": 130423021
+      },
+      {
+        "name": "SMPLH_male.pkl",
+        "bytes": 130422893
+      }
+    ],
+    "models/smplx": [
+      {
+        "name": "SMPLX_FEMALE.npz",
+        "bytes": 108794146
+      },
+      {
+        "name": "SMPLX_FEMALE.pkl",
+        "bytes": 544434140
+      },
+      {
+        "name": "SMPLX_MALE.npz",
+        "bytes": 108753445
+      },
+      {
+        "name": "SMPLX_MALE.pkl",
+        "bytes": 544477159
+      },
+      {
+        "name": "SMPLX_NEUTRAL.npz",
+        "bytes": 108752058
+      },
+      {
+        "name": "SMPLX_NEUTRAL.pkl",
+        "bytes": 544173380
+      },
+      {
+        "name": "version.txt",
+        "bytes": 33
+      }
+    ],
+    "models/smpl": [
+      {
+        "name": ".DS_Store",
+        "bytes": 6148
+      },
+      {
+        "name": "basicModel_f_lbs_10_207_0_v1.0.0.pkl",
+        "bytes": 39056454
+      },
+      {
+        "name": "basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+        "bytes": 39056404
+      },
+      {
+        "name": "J_regressor_coco.npy",
+        "bytes": 937168
+      },
+      {
+        "name": "README.md",
+        "bytes": 675
+      },
+      {
+        "name": "__init__.py",
+        "bytes": 535
+      }
+    ]
+  },
+  "adaptations": [
+    "Exact original regressor paths resolved in process-local configs.paths",
+    "Existing male file explicitly passed to original library wrapper; no asset copies/renaming",
+    "Legacy NumPy/inspect aliases only in this subprocess for licensed pickle"
+  ],
+  "coverage": "Original fresh ResNet18/hierarchical flow point and50sample parameters to original SMPL wrapper mesh; alternate male library subpath only",
+  "not_executed": [
+    "default neutral body path",
+    "author CLI",
+    "image crop/detector/HRNet/edge proxy",
+    "renderer/world visualization",
+    "checkpoint/performance evaluation"
+  ],
+  "boundary": "Alternate asset original library engineering, no default/full-image method completion or real pose/shape/uncertainty accuracy."
+}
