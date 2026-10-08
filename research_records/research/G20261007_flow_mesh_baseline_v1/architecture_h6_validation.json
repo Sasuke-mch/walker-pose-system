@@ -1,0 +1,52 @@
+{
+  "status": "H6_single_factor_history_contract_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "parameters_updated": false,
+  "new_parameters": 0,
+  "tests": {
+    "tests": "135",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "new_history_cases": 11,
+  "warnings_retained": 14,
+  "linter": "uvx --offline ruff passed",
+  "syntax_AST_files": 43,
+  "source_H2_fields_preserved": 17,
+  "source_H4_fields_preserved_excluding_duplicate_H2": 11,
+  "saved_H5_control_arrays_independently_equal": 13,
+  "publication_masks_and_counts_unchanged": true,
+  "missing_parameters_and_mesh_all_nan": true,
+  "frozen_beta_all_ready_frames_constant": true,
+  "missing_hidden_exactly_unchanged": true,
+  "original_missing_hidden_max_change": 0.5470843315124512,
+  "chunk_state_max_difference": 9.5367431640625e-07,
+  "future_before120_max_difference": 0.0,
+  "independent_saved_parameter_mesh_rebuild_max_error_m": 2.384185791015625e-07,
+  "duration1_8_64_recovery_equivalence": true,
+  "sparse_IDs10x_all_output_parameters_exactly_equal": true,
+  "shape_pooling_unchanged_but_history_input_can_change": true,
+  "gradient_evidence": "Recovered generated state/T gradients to observed past/current xy and original recurrent weights finite nonzero; masked current and future xy gradient0, weights unchanged, no optimizer. Mixed batch state test also passed.",
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/pose_app/wilor_mano_prior.py"
+  ],
+  "author_source_existence_bytecounts_verified": 719,
+  "author_content_comparison_executed": false,
+  "retained_failures": [
+    "First H6 Ruff two import-format diagnostics corrected; first9 behavior cases passed, expanded11 and actual full135 passed"
+  ],
+  "boundary": "Random wiring/state diagnostics only. Freeze ignores elapsed time, original null update is not a validated physical-time predictor either. No accuracy preference, training, deployment/latency or mainline change.",
+  "next": "Prioritize remaining original input/mesh paths when exact licensed resources available. Separately audit shape feature information duplication; do not add elapsed-time dynamics without a new protocol."
+}

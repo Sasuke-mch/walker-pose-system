@@ -1,0 +1,114 @@
+{
+  "status": "H6_missing_history_contract_passed",
+  "protocol": "architecture_h6_protocol.json",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "parameter_updates": false,
+  "new_parameters": 0,
+  "frames": 360,
+  "physical_pair_range": [
+    1157,
+    1516
+  ],
+  "model_seed": 19,
+  "hand_seed": 29,
+  "noise_seed": 97,
+  "Euler_nfe": 8,
+  "shape_calibration_frames": 8,
+  "source_body": "architecture_h2_results_v3.npz",
+  "source_hands": "architecture_h4_results_v3.npz",
+  "disabled_policy_H5_exact_parity": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "saved_H5_exact_parity": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "source_body_fields_preserved": 17,
+  "source_hand_slots": 763,
+  "admitted_hand_slots": 706,
+  "strict_points": 3031,
+  "status_counts": {
+    "available": 324,
+    "calibration_pending": 7,
+    "no_current_observation": 29,
+    "invalid_rotation": 0,
+    "nonfinite_parameters": 0
+  },
+  "shape_first_ready_frame": 7,
+  "frozen_missing_hidden_max_change": 0.0,
+  "control_missing_hidden_max_change": 0.5470843315124512,
+  "hidden_max_change_between_policies_not_accuracy": 0.8221743702888489,
+  "beta_max_change_between_policies_not_accuracy": 5.960464477539063e-08,
+  "mesh_max_change_m_not_accuracy": 0.2663367688655853,
+  "chunk_checks": {
+    "1": {
+      "betas": 5.960464477539063e-08,
+      "rotations": 4.172325134277344e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.172325134277344e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 9.5367431640625e-07
+    },
+    "11": {
+      "betas": 1.1920928955078125e-07,
+      "rotations": 4.76837158203125e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.76837158203125e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 7.152557373046875e-07
+    },
+    "64": {
+      "betas": 0.0,
+      "rotations": 4.470348358154297e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.470348358154297e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 9.5367431640625e-07
+    }
+  },
+  "future_before120_checks": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "long_missing_duration_checks": {
+    "1": {
+      "recovery_hidden_vs_compressed_observation_max_error": 0.0,
+      "time_signal_provided": false
+    },
+    "8": {
+      "recovery_hidden_vs_compressed_observation_max_error": 0.0,
+      "time_signal_provided": false
+    },
+    "64": {
+      "recovery_hidden_vs_compressed_observation_max_error": 0.0,
+      "time_signal_provided": false
+    }
+  },
+  "sparse_frame_ids_no_time_response": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "independent_parameter_mesh_rebuild_max_error_m": 2.384185791015625e-07,
+  "elapsed_time_limit": "Frozen history uses observation clock only. Missing1/8/64 and frame IDs scaled10 give identical recovery; no physical-time motion prediction.",
+  "harness_limit": "Scoped eager GRU output hook runs original batched path then repeats GRU per frame; no concurrency/export or latency claim.",
+  "boundary": "Random untrained state/causal and real decoder wiring only, not accuracy improvement or recommended deployment policy."
+}

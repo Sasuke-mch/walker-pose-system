@@ -84,3 +84,7 @@ H5执行：v1运行器误取COCO回归矩阵一行而失败，已修运行器并
 ### H6 缺失帧历史更新预注册
 
 见architecture_h6_protocol.json；先锁协议再执行。唯一变量是无当前观测帧的GRU transition：原null照常更新对照，候选冻结hidden。保持H5所有参数/shape池化/native条件/noise97/K8/8Euler/发布规则。冻结不编码经过的时间，以真实360缺失和人工1/8/64长缺失检验恢复及时间忽略，不能先认定更好。使用临时eager原GRU输出hook复用原参数，额外重复计算及并发/编译限制明确保留。无训练/权重加载/主线变更/准确性结论。
+
+### H6 实际验收
+
+architecture_h6_results_v1.json/NPZ与validation通过。原H5随机参数/手来源/shape池化/noise/K8/8Euler不变；唯一变量为无原当前观测时冻结GRU transition。真实360完整源字段/strict3031/native763→706/失败29保存；324/7/29输出不变，missing参数网格NaN。原missing hidden变化0.547084，freeze为0，未来影响0，分块<=9.54e-7、真实网格重建2.38e-7m。人工missing1/8/64恢复及稀疏帧号证明freeze忽略经过时间，不能以结构通过选为更准主线。135全测试/14warning、Ruff/43AST通过，无训练/更新/新参数或主线变更。完整原方法及14资源缺口仍待推进。

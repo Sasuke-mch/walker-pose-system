@@ -273,3 +273,15 @@ NativeHandConditioner的参数包括MLP(7→64→64)、2×64视图identity、2×
 mean原pose144/shape10/cam3，HMR2 heads/smpl_head.py 49–55初始化读取全部三项，ProHMR heads/fc_head.py只读取shape/cam。packed columns根正交残量1.5099581673894136e-7；作者F.normalize默认eps1e-12仍输出合法旋转，项目eps1e-6拒绝节点0，其余节点原decoder与adapter差0。初始化不是有效姿态观测，不修改资产、不放宽门。两个官方mean与旧MMPose fixture的keys/数组/dtype/原字节全相同；不得外推VIBE/MotionBERT其他同名文件。
 
 原audit_mesh_resources入口执行v2，并在明确fixture比较后新建v3（不覆盖v2）；当前默认缺14项，P04/P07/P05各1、P09为3、P10/P12各4，六条mesh都未就绪。raw/原包/早期失败v1/v2全部保留。完整模块实际124测试、R1新增22、14warning、Ruff、40文件AST通过；719作者文件按清单核对存在/字节数，非内容逐字比对。core/主线、H3/H5、原WiLoR读取器10路径未改，无训练/权重加载/optimizer或完整原mesh。验收architecture_resources_validation.json的whole_goal_complete=false；本地提交不含辅助资产、作者源码、模型、原论文或大产物。
+
+## H6 缺失历史单因素候选（2026-10-08）
+
+`MissingHistoryMeshCandidate`继承H5，只在原history输出上临时拦截；`update_all`直接走原H5，`freeze`复用原GRU.forward逐帧，missing行hidden原样保留，初始missing为零hidden，当前全局输出取最后一层hidden。原ConditionEncoder仍计算局部null条件，shape的认可只由原admitted决定，missing不变成体型证据。当前有图像或2D观测仍更新历史，严格点全拒绝不等于没当前观测。K8池化规则、手分支、随机noise、生成器及所有head未改。共享β/T/姿态可因输入历史变化而改变，这属于唯一变量的下游效应，不宣称它们与H5必须相同。
+
+该harness使用scoped eager hook，原整段GRU实际先执行再复算逐帧，direct forward绕过hook递归；finally清理自身hook，H1特征读取hook同步读取替换后的真实历史输出。没有额外持久状态/参数、训练/权重加载/optimizer。共享模块并发/compile/export不适用，额外计算不能当加速；部署接口应另设协议。
+
+输入为H2/H4全部360保存槽及H5保存控制，model19/hand29/noise97、8Euler。当前v1关闭策略与旧H5所有控制参数逐位相同；17身体及11手源字段、3031严格点、763源/706准入手槽全部独立NPZ核对。仍324/7/29发布状态，missing参数/真实网格NaN；β第7帧ready后常数，policy间β差5.96e-8来自逐帧复算舍入，不能称体型改善。29无观测时原hidden最大变化0.547084、freeze精确0，policy间hidden差0.822174、随机网格差266.337mm仅结构影响。
+
+逐帧/11/64分块原固定容差2e-5通过，最大raw state差9.54e-7，未来120后身体/手token扰动影响0；真实SMPL-H6890/13776/52及COCO表面读取，独立保存参数重建差2.38e-7m。长missing1/8/64后恢复与无gap一步完全相同，frame IDs乘10（身体/native同步）除编号外全部输出差0。freeze只知道观测次数，完全不编码时间；不能称运动建模更正确，原null update也没有物理经过时间验证。
+
+新增11行为测试：all-observed原GRU一致、混合行隔离、缺失前缀/恢复、hidden不原位修改、状态帧号继续前进、shape认可不等于观测存在、masked/future输入梯度0而恢复后当前/过去观测及原GRU梯度有限非零、异常移除hook，无参数更新。全模块实际135通过/14warning，Ruff及43AST通过，10原路径相对提交未改，719作者文件存在/字节数核对非逐字比对。初轮9测试通过，Ruff2导入格式问题修正后扩大11测试；实际JSON/NPZ及validation保留。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_missing_history --output <new.json>`，不覆盖输出，NPZ大文件不提交。证据仅因果/状态/真实人体接口，不构成accuracy或主线推广。

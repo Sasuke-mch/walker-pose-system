@@ -95,3 +95,9 @@ H5在`hand_candidate.py`接入原生手部条件：两视图独立memory含6D/�
 七个已有官方regressor/mean通过schema、人工6890顶点线性/平移/梯度检查；本次不联网。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.fetch_auxiliary_resources --local-only --output <new.json>`；网络入口拒绝记录中已有两次的第三次尝试。归档以唯一目标集合确定完成，EOF缺项和重复成员保留。
 
 实际全模块124测试、14warning及Ruff/40文件AST通过。两个官方mean与MMPose fixture字节一致仅限明确对象；mean根退化与观测codec门不同，不改门。当前architecture_full_path_resources_v3.json仍缺14项，六条默认neutral路径未运行；validation保持whole_goal_complete=false。无训练/权重加载、无主线变化，无精度结论。
+
+### H6 null-frame历史对照
+
+独立`missing_history.py`只改变无当前观测时的原GRU hidden更新；不改H5/core文件或shape池化，关闭策略与保存H5完全一致。真实360保留324可用/7校准/29无观测与NaN；freeze在缺失hidden变化0，原控制最大0.547084。
+
+135测试/14warning及Ruff/43AST通过。缺失1/8/64后恢复相同、帧号10倍无响应说明freeze忽略经过时间；没有准确性优胜结论。临时eager hook先运行原GRU再复算，仅验证harness，无并发/编译或实时性能结论。运行`python -B -m realtime_app.learning_flow_mesh.reproduction.check_missing_history --output <new.json>`；结果/validation在已有研究目录，长期目标未完成。

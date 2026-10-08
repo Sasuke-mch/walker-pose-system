@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R1_auxiliary_resource_contract_passed_full_original_paths_and_single_factor_candidates_pending",
+  "stage": "H6_missing_history_single_factor_contract_passed_duration_blindness_explicit_full_original_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -168,7 +168,7 @@
       "coverage": "Original sphere geodesic/JVP, configured tangent network/loss plus published1000-step projected Euler sample/sample_all; no original dataset likelihood or human SO3."
     }
   ],
-  "next": "Original default full paths require licensed neutral SMPL and remaining dedicated resources; independently preregister null-frame GRU history control with explicit elapsed-time limitation, unchanged shape pooling and generator.",
+  "next": "Prioritize remaining original input/mesh paths when exact licensed resources available. Separately audit shape feature information duplication; do not add elapsed-time dynamics without a new protocol.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -190,7 +190,8 @@
     "H3 H1/H2 real COCO17-to52rotation-toSMPLH surface integration, controlled K1/K8 readout, complete360 streaming/future/missing/gradient contracts",
     "H4 exact original WiLoR reader/asset audit on360frames, typed native hand inputs, source/candidate availability separation, per-frame causality and90total tests",
     "H5 native two-view hand condition branch composed with unchangedbody/shape/T/state/flow; exact oldH3 no-hand control,360stream/future/realmesh/gradient and102tests; limitedCPUcomponentcost",
-    "R1 seven exact auxiliary files locally verified, explicit unique archive completion and network budget protection, specific mean equivalence,124 tests;14 default gaps retained"
+    "R1 seven exact auxiliary files locally verified, explicit unique archive completion and network budget protection, specific mean equivalence,124 tests;14 default gaps retained",
+    "H6 original-vs-freeze missing GRU single factor, full360/null29/stream/future/native/mesh, duration blindness and135tests; no accuracy preference"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -396,5 +397,13 @@
     "boundary": "Artificial vertices and random/no-learned decoder resource checks only; no original neutral mesh, full input/evaluation, real joint/shape/contact accuracy or evidence-level upgrade",
     "unrelated_workspace_entries_preserved": 89
   },
-  "resource_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_validation.json"
+  "resource_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_validation.json",
+  "H6": {
+    "protocol": "architecture_h6_protocol.json",
+    "results": "architecture_h6_results_v1.json",
+    "validation": "architecture_h6_validation.json",
+    "status": "H6_single_factor_history_contract_verified",
+    "accuracy_preference_established": false,
+    "elapsed_time_encoded": false
+  }
 }
