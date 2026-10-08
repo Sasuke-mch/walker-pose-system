@@ -1,0 +1,27 @@
+{
+  "id": "R10",
+  "status": "protocol_locked_before_execution",
+  "purpose": "Requirement-by-requirement ten-paper coverage audit and correction of stale stage/completion/provenance metadata",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "network_requests_allowed": false,
+  "inputs": [
+    "Current architecture_research.json ten check_file entries and additional_checks",
+    "Versioned result/validation JSON and original source snapshot manifest",
+    "Original VIBE forward/Regressor and MotionBERT SMPLRegressor source AST; P09 paper Section3.1",
+    "Existing H1-H6 candidate protocols and results"
+  ],
+  "unique_variable": "Records/provenance coverage correction only; no model or candidate behavior changes",
+  "checks": [
+    "All ten IDs unique, all cited evidence files exist and JSON parses",
+    "Keep component, fullnetwork, AST inference subpath, alternative mesh and default whole method separate",
+    "Tie each recorded contract to result key or source line; absence is unexecuted rather than passed",
+    "Recheck actual default resource paths without fetching or substituting",
+    "Static AST confirms VIBE perframe regressor and MotionBERT temporal pool/beta expansion; not fullmodel forward",
+    "Check source manifest presence/bytes only and frozen paths against current HEAD",
+    "Update six existing authority records and retain all previous failures"
+  ],
+  "success": "Ten explicit coverage rows, unresolved contracts and prioritized remaining stages; stale metadata fixed without upgrading evidence",
+  "stop": "Any absent/conflicting evidence remains unresolved; no reruns, source edits, asset substitution, weights, gate changes or new Markdown",
+  "boundary": "Coverage/provenance audit, not new network execution or accuracy. Goal remains active while original paths and isolated revisions remain unresolved."
+}
