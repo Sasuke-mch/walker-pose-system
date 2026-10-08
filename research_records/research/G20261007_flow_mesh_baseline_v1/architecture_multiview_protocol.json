@@ -1,0 +1,22 @@
+{
+  "id": "M1",
+  "status": "protocol_locked_before_implementation",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Complete original P16 volumetric and RANSAC inference structures and audit required measured/estimated inputs",
+  "inputs": "Original human36m eval YAMLs, source snapshots; explicit artificial 384x384 RGB tensors and four calibrated undistorted pinhole cameras in millimetres; synthetic17-joint predicted pelvis metadata for volume fixture, never project truth",
+  "volumetric": {
+    "configuration": "Original ResNet152, 32-channel feature lifting, V2V, 64 cubed volume, 2500mm cuboid, softmax volume aggregation; eval use_gt_pelvis=false",
+    "changes": "Backbone initialization disabled, no checkpoint loaded; batch1/fourviews, original width/depth/grid/resolution retained",
+    "checks": "Full forward outputs finite/shape-correct, predicted center selects index6 for original MPII convention, camera resize uses deep copy, volume integrates to1, same-input repeat; remove predicted center to confirm required input and separately perturb supplied P argument versus actual batch cameras"
+  },
+  "ransac": {
+    "configuration": "Original ResNet152, 384x384,10iterations,15px threshold,direct_optimization=true",
+    "checks": "Attempt unchanged original path first; full forward and exact known-point triangulation with/outlier/direct-refinement control; inspect dualview degeneracy and reported confidences",
+    "compatibility": "If Python3.12 random.sample(set) fails, preserve failed run then allow a process-local module random namespace facade converting sorted integer set to sequence only. Author source, sample count and geometry unchanged; separately label compatibility-adapted result"
+  },
+  "success": "Declared original networks execute or specific original incompatibility retained; no asset/topology/scale substitution, center and camera dependency checks, analytic geometric control, original result arrays kept locally",
+  "failure_stop": "No reduced grid/model disguised as original; if memory/numerics fail retain evidence. Invalid/absent input behavior recorded; no project gates recalculated/relaxed or mainline data used",
+  "boundary": "Random architecture and internal geometric tests, not trained Human3.6M performance, independent body accuracy, fish-eye input compatibility or realtime deployment; datasets/checkpoints/preprocessing evaluation remain separate",
+  "outputs": ["architecture_checks/P16_volumetric_v1.json", "architecture_checks/P16_ransac_v1.json"]
+}
