@@ -1,0 +1,49 @@
+{
+  "status": "R8_original_wild_subpath_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "results": "architecture_r8_results_v2.json",
+  "inputs": [
+    "architecture_r8_input_v2.json",
+    "architecture_r8_duplicate_input_v2.json"
+  ],
+  "retained": [
+    "architecture_r8_results_v1.json",
+    "architecture_r8_input_v1.json",
+    "architecture_r8_duplicate_input_v1.json"
+  ],
+  "fresh_v1_v2_all_saved_arrays_equal_including_NaN_positions": true,
+  "v2_reason": "Extract exact dataset loader into shared original_reader for source tests and fix helper input names to follow output version; no source/model change.",
+  "saved_input_affine_and_output_shapes_root_checks_independent": true,
+  "tests": {
+    "tests": "146",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "new_cases": 3,
+  "warnings": 15,
+  "Ruff": "passed",
+  "AST_files": 53,
+  "author_presence_bytes": 719,
+  "author_content_comparison": false,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/learning_flow_mesh/missing_history.py",
+    "realtime_app/pose_app/wilor_mano_prior.py"
+  ],
+  "default_resources_missing_still": 14,
+  "negative_confidence_nonzero_used_by_crop": true,
+  "boundary": "Original default wild inference subpath engineering on synthetic HALPE26. Output scale equals imagepixels, not metricdepth, rootrelative skeleton or SMPL-H. Complete detector/videoCLI/neutralmesh/datasetaccuracy not executed. Sequencecrop uses future observations; originalparser is not identity/frame association.",
+  "retained_initial_lint_issue": "One test import-format issue corrected before final checks"
+}
