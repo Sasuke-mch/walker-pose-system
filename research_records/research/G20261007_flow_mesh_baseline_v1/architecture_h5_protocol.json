@@ -1,0 +1,42 @@
+{
+  "id": "H5",
+  "status": "protocol_locked_before_implementation",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Build the independently typed native-hand condition branch and compose it with the H3 candidate, keeping shape, translation and history information sources unchanged",
+  "primary_basis": {
+    "P07_text": "sources/P07.txt L134-L138: single parameter query cross-attends image tokens",
+    "P07_code": "third_party/architecture_reproduction/HMR2/hmr2/models/heads/smpl_head.py lines17-91",
+    "distinction": "Project adaptation uses30hand node queries and2camera native15-rotation memories, not original HMR2 single-token image decoder and not another reproduced paper"
+  },
+  "inputs": {
+    "H2": "architecture_h2_results_v3.json/npz entire360frames0..359 physicalpairs1157..1516,17COCO surface observations, rawfish normalizedpixels andcam0/metre rays; strict3031 and allreasons retained",
+    "H4": "architecture_h4_results_v3.json/npz typed nativeMANO local rotations after original anatomical mirror; source763hand/view slots,706H2-admitted,10590joint tokens; declaredcam0LEFT/cam1RIGHT",
+    "model": "Same seed19 freshCOCO17 FlowMesh width64/heads4/layers2/history+graph/rotation_scale.25/root_offset(0,0,3), no learning checkpoint",
+    "new_branch": "Fresh separately seeded29 parameters, width64 and4heads; source box score is input only, not a physical or per-joint uncertainty weight",
+    "noise": "Same seed97 sequence state,1candidate and8EulerNFE",
+    "assets": "Existing licensed real SMPLH/MANO and COCO17 surface regressor, not substituted original neutral-SMPL paper assets"
+  },
+  "control": "Exact H3 on identicalmodel/bodyinputs/state/noise. Native-hand branch disabled via explicit controlled missing-hand intervention; also independent rawH3 replay for zero-effect parity",
+  "unique_variable": "Add per-frame hand-local cross-attention residual to the30hand node conditions. Do not change body encoder/GRU/globalfeatures, sharedshape admission/readout/freeze, translation, Euler, current-observation publication or strictgeometry",
+  "architecture": "MLP7->64->64 encodes6Dlocalrotation+boxscore. Learned2view and30anatomicalnode IDs identify memories; each left/right15queries attends only its same-hand two-view memories. Missing tokens masked after selecting them away fromNaNs; all-missing hand rows skipped and exactzero delta. Residual added only to22..36/37..51 conditions, then existing52-node spatial/flow decoder; no hard rotation overwrite or average hypotheses. No new temporal state",
+  "implementation_scope": "New hand_candidate.py and check_hand_candidate runner/tests. One protected encoding-delegation method in candidate.py permits reuse of its unchangedshape/noise/status/publication workflow; zero-inputH3 parity must prove no behavior change. Core model/train/infer/config, H1/H2/H4 factories, officialauthorcode andmainline unchanged",
+  "checks": [
+    "Full360conditions andsourceIDs/masks/reasons preserved; exactH4toH2bodyframe/view identity, explicitcam0/cam1 andnative52handIDs",
+    "Absent hand gives exactzero residual and publishedH3 parity; missingNaNs cannot leak, all-missingrows never enter attention; sourcepresent is separate from controlledablation",
+    "Branch cannot influence shape/T/hidden/admission/readiness/status rules; beta frozen aftersame frame7,29missingbodyframes remain unavailable even if internal extrapolation finite",
+    "Changing valid nativehand rotations changes conditionalpose but does not replace outputrotation; body propagation can occur via existing spatialdecoder, not interpreted as accuracy",
+    "Whole versus chunks1/11/64 carryH3state/noise; mask/status exact, finiteparameter/mesh arithmetic differences<=2e-5",
+    "Futurebody/nativehands after120 cannot changeprefix; nativehandbranch has nohistory and cannot use offlinefittedsharedhands",
+    "MismatchedframeIDs/nodeIDs/views/typedmask/dtype/finitepresenttoken rejected; anatomicalhand memorycannot directly cross tootherhand duringnewbranch",
+    "Independent presentrotation/boxscore/handprojection/identity/attention gradients finite nonzero throughrealSMPLH surface decode; maskedinputs andfuturegradient0, nooptimizer",
+    "Freshprocessrepeat, parameter snapshots unchanged; report actualparameter increment and warmedCPU two-thread branch/candidate latencies separately from preprocessing/detectors/bodydecode/Stage, not realtimecertification"
+  ],
+  "tolerances": "Exact mask/ID/source/state and zero-effect parity where tensor shapes same; stream/rebuild float32 finiteparameter and meshmaxdifference<=2e-5. No gate relaxation.",
+  "failure_stop": "Preserve failures; no defaults/imputation/oldmesh substitutions, no offline futurehandtargets asinput, no changes tobodypublication orphysicalevidencelevels. If branchcontract fails, retainH3 and diagnose.",
+  "outputs": [
+    "architecture_h5_results_v1.json/npz",
+    "architecture_h5_validation.json"
+  ],
+  "boundary": "Untrained isolated architecture/interface and cost checks only. No physical/accuracy/contact/betaidentifiability or realtimeclaim; not completion often fullmethod reproductions. Original default resource/input/evaluation gaps remain."
+}
