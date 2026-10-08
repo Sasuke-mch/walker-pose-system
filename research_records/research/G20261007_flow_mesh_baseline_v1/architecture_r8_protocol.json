@@ -1,0 +1,31 @@
+{
+  "id": "R8",
+  "status": "protocol_locked_before_execution",
+  "purpose": "P12 original wild-video input/inference/postprocessing subpath and temporal semantics",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "inputs": [
+    "Synthetic248records HALPE26 pixelxy/confidence, one explicitfocusid, asymmetricknowncoordinates, seed61",
+    "Original infer_wild CLI default configs/pose3d/MB_ft_h36m_global_lite.yaml width256/depth5/243, exact author load_backbone",
+    "Original read_input/halpe2h36m/WildDetDataset and infer_wild no_grad loop AST, flip_data/crop_scale original functions"
+  ],
+  "unique_variable": "Expand original P12 coverage from normalized network to author published default wild input/clip/TTA/root/pixel postprocessing. This is source-path audit, not candidate efficacy ablation. Defaultlite differs prior fullsizeliftingconfig, disclosed.",
+  "execution": "Original defaultflip true/rootrelfalse/no_conffalse/gt_2dfalse,243+5 tailclips, explicitpixel1920x1080 and clipcrop branches. No detector,videoIO,renderer,weights or top-levelCLI.",
+  "controls": [
+    "Independent HALPE26→H36M17 row/mean mappings and pixel affine roundtrip",
+    "Exact TTA arithmetic and flatten/pixel restoration; coordinate output never renamedmeters",
+    "Duplicate-person/scrambledimage_id/emptyfocus/missingconfidence read_input probes preserve failure semantics",
+    "Only futureframe extreme coordinate changed: compare prefix input under original full-sequence crop versus pixel normalization",
+    "Original zero-confidence/NaN preprocessing and network probes, no cleaning",
+    "Root branch zeros only firstframe z in eachclip, independent reference; fullstate_dict unchanged/repeat"
+  ],
+  "success": "Actual original defaultlite network/243+5/TTA loop and original read-input contract execute, independent errors<2e-5, everyinputfailure/future dependency preserved",
+  "stop": "No artificialCOCO-to-H36M anatomical claim, realdata association, fakepadding, resampling/masks/rootcorrection, resource retry/training/weight loads/source edits",
+  "outputs": [
+    "architecture_r8_results_v1.json",
+    "architecture_r8_results_v1.npz",
+    "architecture_r8_input_v1.json",
+    "architecture_r8_validation.json"
+  ],
+  "boundary": "Synthetic HALPE26 original wild-input method subpath only; not realdetector/videoCLI/dataset accuracy/SMPL-H or metric3D. Pixel-mode restores an image-relative scale, not calibrateddepth."
+}
