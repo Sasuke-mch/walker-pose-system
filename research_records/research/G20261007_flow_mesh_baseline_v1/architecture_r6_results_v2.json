@@ -1,0 +1,66 @@
+{
+  "status": "R6_original_sphere_density_verified",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "source": "third_party\\architecture_reproduction\\RiemannianFM\\manifm\\model_pl.py",
+  "configured_network_parameters": 1816966,
+  "input_points": [
+    [
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.6000000238418579,
+      0.0,
+      0.800000011920929
+    ]
+  ],
+  "seed": 53,
+  "div_mode": "exact",
+  "eval_projx": true,
+  "random_density": [
+    -2.5590150356292725,
+    -2.5883312225341797
+  ],
+  "random_logs": {
+    "nfe": 1000.0,
+    "integ_error": 5.960464477539063e-08
+  },
+  "repeat_exact": true,
+  "network_state_unchanged": true,
+  "rotation_control_error": 4.440892098500626e-16,
+  "rotation_logs": {
+    "nfe": 1000.0,
+    "integ_error": 0.0
+  },
+  "zero_field_error": 4.440892098500626e-16,
+  "sphere_gradient_divergence_error": 0.0,
+  "gradient_analytic_density_error": 8.613112067479278e-05,
+  "gradient_logs": {
+    "nfe": 1000.0,
+    "integ_error": 1.1102230246251565e-16
+  },
+  "normalize_by_ambient_dim3_error": 1.1102230246251565e-16,
+  "uniform_sphere_log_density": -2.5310242469692907,
+  "exception_fallback": {
+    "result": [
+      0.0,
+      0.0
+    ],
+    "finite": true,
+    "return_tuple_requested_but_tensor_returned": true,
+    "logs": {},
+    "stderr_trace": "\r  0%|          | 0/1000 [00:00<?, ?it/s]\r  0%|          | 0/1000 [00:00<?, ?it/s]\nTraceback (most recent call last):\n  File \"third_party\\architecture_reproduction\\RiemannianFM\\manifm\\model_pl.py\", line 510, in compute_exact_loglikelihood\n    state0 = projx_integrator_return_last(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\torch\\utils\\_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\RiemannianFM\\manifm\\solvers.py\", line 60, in projx_integrator_return_last\n    vt = odefunc(t0, xt)\n         ^^^^^^^^^^^^^^^\n  File \"third_party\\architecture_reproduction\\RiemannianFM\\manifm\\model_pl.py\", line 473, in odefunc\n    dx, div = output_and_div(vecfield, x, v=v, div_mode=div_mode)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"third_party\\architecture_reproduction\\RiemannianFM\\manifm\\model_pl.py\", line 47, in output_and_div\n    dx = vecfield(x)\n         ^^^^^^^^^^^\n  File \"third_party\\architecture_reproduction\\RiemannianFM\\manifm\\model_pl.py\", line 472, in <lambda>\n    vecfield = lambda x: self.vecfield(t, x)\n                         ^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_manifold_density.py\", line 103, in fail\n    raise RuntimeError(\"R6 intentional vectorfield failure\")\nRuntimeError: R6 intentional vectorfield failure\n"
+  },
+  "nan_field": {
+    "nonfinite_density_count": 2,
+    "logs": {
+      "nfe": 1000.0,
+      "integ_error": NaN
+    },
+    "returns_tuple": true,
+    "stderr": "\r  0%|          | 0/1000 [00:00<?, ?it/s]\r  9%|8         | 87/1000 [00:00<00:01, 868.55it/s]\r 18%|#7        | 177/1000 [00:00<00:00, 883.73it/s]\r 27%|##6       | 266/1000 [00:00<00:01, 541.91it/s]\r 33%|###3      | 331/1000 [00:00<00:01, 450.23it/s]\r 38%|###8      | 384/1000 [00:00<00:01, 401.78it/s]\r 43%|####2     | 429/1000 [00:00<00:01, 375.38it/s]\r 47%|####6     | 470/1000 [00:01<00:01, 354.57it/s]\r 51%|#####     | 507/1000 [00:01<00:01, 342.59it/s]\r 54%|#####4    | 543/1000 [00:01<00:01, 329.27it/s]\r 58%|#####7    | 578/1000 [00:01<00:01, 333.58it/s]\r 62%|######1   | 616/1000 [00:01<00:01, 344.34it/s]\r 65%|######5   | 651/1000 [00:01<00:01, 344.87it/s]\r 69%|######8   | 686/1000 [00:01<00:00, 335.90it/s]\r 72%|#######2  | 720/1000 [00:01<00:00, 332.86it/s]\r 76%|#######5  | 755/1000 [00:01<00:00, 337.57it/s]\r 79%|#######9  | 793/1000 [00:02<00:00, 348.32it/s]\r 83%|########3 | 834/1000 [00:02<00:00, 365.56it/s]\r 87%|########7 | 872/1000 [00:02<00:00, 366.87it/s]\r 91%|######### | 909/1000 [00:02<00:00, 361.05it/s]\r 95%|#########4| 946/1000 [00:02<00:00, 356.86it/s]\r 98%|#########8| 982/1000 [00:02<00:00, 350.39it/s]\r100%|##########| 1000/1000 [00:02<00:00, 381.04it/s]\n"
+  },
+  "boundary": "Original SphereS2 likelihood method and exact divergence executed with projectedEuler1000 and randomconfigured network. Function returns logdensity despite negative-loglikelihood docstring. Exception fallback finitezeros/logdensity1 is invalid evidence; not dataset likelihood or humanSO3."
+}

@@ -1,0 +1,5 @@
+{
+  "status": "R6_failed",
+  "error": "AssertionError: ",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_manifold_density.py\", line 137, in main\n    result = run()\n             ^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_manifold_density.py\", line 90, in run\n    assert divergence_error < 1e-8\n           ^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+}

@@ -175,7 +175,10 @@
       "source_file_count": 54,
       "local_source": "third_party/architecture_reproduction/RiemannianFM",
       "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_sampling_v1.json",
-      "coverage": "Original sphere geodesic/JVP, configured tangent network/loss plus published1000-step projected Euler sample/sample_all; no original dataset likelihood or human SO3."
+      "coverage": "Original Sphere geodesic/tangent loss and published1000step sample/sample_all plus exactdivergence compute_exact_loglikelihood AST with ProductManifold integration and analytic density controls; exception fallbackfinitezero/returntype failure retained. Originalvolcano dataset, Lightning/EMAinitializer and humanSO3 not executed.",
+      "additional_checks": [
+        "architecture_r6_results_v3.json"
+      ]
     }
   ],
   "next": "Prioritize other original input/fullnetwork paths and exact remaining auxiliary resources; defaultneutral gaps preserved. Shape information pooling remains independent future factor, not forced by source masks.",
@@ -451,5 +454,13 @@
     "default_neutral_reproduced": false,
     "fresh_image_only_coldstart_supported": false,
     "data_dependent_actnorm_initialization_executed": false
+  },
+  "R6": {
+    "protocol": "architecture_r6_protocol.json",
+    "results": "architecture_r6_results_v3.json",
+    "validation": "architecture_r6_validation.json",
+    "original_density_AST_executed": true,
+    "original_dataset_or_human_SO3_executed": false,
+    "exception_zero_not_valid_density": true
   }
 }
