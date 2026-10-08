@@ -1,0 +1,37 @@
+{
+  "id": "R3",
+  "status": "protocol_locked_before_execution",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Original HuManiFlow RGB-to-proxy-to-parameters plus explicit existing male body library path; original input/missing semantics audit",
+  "primary_text_anchors": [
+    "sources/P05.txt L0207-L0209",
+    "L0886",
+    "L1100-L1101"
+  ],
+  "inputs": [
+    "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input/left_ccw90/pair_0000.png",
+    "Existing author original HuManiFlow HRNet-W48 config/model, predict_hrnet, image_utils, Canny and heatmap functions",
+    "Exact AST statements hrnet_output through pred from predict_humaniflow.py",
+    "Existing authorized male SMPL andR1 originalregressors"
+  ],
+  "data_scope": "One preregistered saved frame0(cam0 LEFT turnedCCW90, originalpair1157), no frame selection after results and no labels/strictXYZ/oldfit inputs. Original no-detector/pre-cropped branch invoked on saved full view, not certified centered-person crop or association.",
+  "unique_variable": "Replacing R2 artificial random18proxy with original RGB/HRNet/crop/edge/proxy pipeline. Other original network structures retained; use_shape_mode_for_samples=True explicitly follows released predict path, not R2 defaultFalse library sample configuration. This is original path scope expansion, not a candidate accuracy ablation.",
+  "execution": "Author HRNet-W48 at384x288/17x96x72 plus proxy256/18channels, CannyNMS true, original0.75 visibility cutoff/head7forced true, original50samples/sharedshape, originalmaleSMPLwrapper point/sample decode. Compile exact source AST statements rather than rewrite them; skip renderer/disk-loop/checkpoint-loading CLI.",
+  "controls": [
+    "Independent Gaussian heatmap row/column and argmax locations with asymmetriccoords",
+    "Independent known affine point transforms and bbox alias/mutation audit",
+    "Zero/nonpositive HRNet heatmaps, NaN masked Gaussian behavior, head7forcedpresence diagnostics",
+    "Saved intermediate tensors and independent exact same-asset SMPL rebuild",
+    "Deterministic point/input repeat, no state_dict modifications, no weights/network/training"
+  ],
+  "success": "Declared original input/model/body subpaths execute or explicit unresolved failure retained; original invalid-condition behavior diagnosed, not fixed. OriginalCLI/defaultneutral/renderer/evaluation remains incomplete.",
+  "limits": "No pretrainedHRNet ordetector, so observedjoints/confidences/proxy are random engineeringoutputs, not valid humanobservations. Full source loop startsrenderer; this AST path is a subpath, not fullpredict_humaniflow execution.",
+  "stop": "Retain every failure, choose new outputversion; never patchauthor masks/thresholds or installrenderer/weights to manufacture completion",
+  "outputs": [
+    "architecture_r3_results_v1.json",
+    "architecture_r3_results_v1.npz",
+    "architecture_r3_validation.json"
+  ],
+  "boundary": "Original input/parameter/body subpath with alternatemale asset and randomweights, notdefaultneutral fullmethod orfisheye accuracy/uncertainty."
+}

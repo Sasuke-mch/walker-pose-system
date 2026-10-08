@@ -96,3 +96,7 @@ architecture_h6_results_v1.json/NPZ与validation通过。原H5随机参数/手�
 ### R2 实际验收
 
 原HuManiFlow男模型库子路径v1通过：原点估计/50采样头接原SMPL wrapper输出6890/13776/90，另进程50保存参数独立重建及原regressor块核对。随机seed31/人工proxy，参数不改、网络0、无训练/训练权重；原CLI对非neutral拒绝和默认neutral未覆盖明确保留，PyTorch3D缺失提示保留且未渲染。135现有回归测试重新通过/14warning，原子路径由另验覆盖，Ruff/44AST。默认14缺口未变；architecture_r2_validation.json保持whole_goal_complete=false。
+
+### R3 HuManiFlow原RGB/proxy输入路径预注册
+
+见architecture_r3_protocol.json。固定保存frame0/原pair1157/LEFT转正全视图，作者no-detector分支只作结构输入不宣称已居中人物crop。原HRNet-W48/384×288、Canny、18×256proxy及源AST输入→pred语句实际运行，使用原图像路径50候选/sharedshape=True；R2的默认False采样另记库配置，非原图像路径设置。另审查zero/negative热图、强制头7可见、NaN mask及非对称坐标。随机无权重、male库资产独立标记，renderer/原CLI/neutral/评价未覆盖，作者文件/主线不改。
