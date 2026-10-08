@@ -1,0 +1,33 @@
+{
+  "id": "H4",
+  "status": "protocol_locked_before_implementation",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Audit and implement the native-hand condition contract before adding a learned hand branch to H3",
+  "inputs": {
+    "H2_contract": "architecture_h2_results_v3.json/npz,360frames0..359,pairs1157..1516",
+    "resolved_mainline_options": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/resolved_options.json",
+    "native_wilor": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/wilor_left.jsonl and wilor_right.jsonl",
+    "existing_reader": "realtime_app/pose_app/wilor_mano_prior.py:read_parameter_view/convert_record/audit_assets/encode_pca; current soft body wrist reader raw_side, not pinhole hand keypoints",
+    "native_convention": "Network canonical-right parent-relative rotations in index/middle/pinky/ring/thumb order; existing left M R M conversion; no global-orient, betas or camera-translation transfer",
+    "assets": "Same local SMPL-H, MANO_LEFT/MANO_RIGHT/canonical-right files as resolved mainline; no licensed asset substitution"
+  },
+  "control": "Run unchanged mainline per-view native association on unchanged soft body observations; match rotations/weights/audit against saved mainline parameter audit. Separate H3 admission from original source acceptance",
+  "unique_variable": "Typed native-hand condition availability intersects original accepted native pose with H2 selected-person/view availability; original source matrices, confidences, associations, reasons and strict geometry remain preserved. No network branch or hard pose replacement in this stage",
+  "adapter": "Explicit T,V,side,15 parent-local rotations, left/right side order and52-node finger indices; selected matrices encoded packed-column6D plus detector-box confidence, missing tokens NaN and unavailable. Original reader identity placeholders with zero weight must never become valid identity hand evidence",
+  "checks": [
+    "Exact full360 source frame/image identity, source per-view accepted/selected reasons and weights reproduce current mainline audit",
+    "Asset chain/mirror/rest-base audit; no OpenPose21 order confused with native15 joint rotations",
+    "Same actual matrix values under left/right conversion, valid SO3 and6D roundtrip; source acceptance versus H3 admitted token counts separately recorded",
+    "Both view hypotheses retained; per-side/finger disagreement only model consistency, not independent accuracy",
+    "No-associated-body frames stay unavailable; no interpolation or first-person substitution in H3; all original source rejected/default/finite states retained",
+    "Future-only local rotation perturbation cannot affect earlier per-frame native tokens; run exact original offline shared-PCA initialization assignment via reviewed AST with changed future inputs to demonstrate its separate full-sequence dependency",
+    "Changing valid MANO shape/global orientation or pinhole projected-keypoint/camera fields must not change local hand condition; invalid declared schema or misaligned frame IDs rejects input",
+    "Conditional7D token assembly differentiable through present rotations/confidence, no optimizer/model training"
+  ],
+  "tolerances": "Original float64 reader/source audit matrix values and source weights exact; float32 token rotation reconstruction<=1e-5 matrix difference. Asset gates unchanged. Future parameter dependency probes are artificial, not accuracy tests",
+  "success": "Native-hand source, coordinate/joint semantics, missing policy and offline versus causal information access verified on full real saved stream; ready typed hand token contract for separately registered learned branch",
+  "failure_stop": "Retain original failed audit/compatibility/source exceptions; do not change old association gates, infer pose from projected points, relabel box confidence as joint confidence, use whole-video fitted hands as online input or silently erase conflicts",
+  "outputs": ["architecture_h4_results_v1.json", "architecture_h4_results_v1.npz", "architecture_h4_validation.json"],
+  "boundary": "Existing trained WiLoR output is a model hypothesis, not truth. No training, new detection, body fitting, original ten-method mesh completion, temporal support change, physical-contact accuracy or realtime certification. H3 generator untouched; a learned hand branch follows only after this contract gate"
+}
