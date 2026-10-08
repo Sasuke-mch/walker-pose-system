@@ -3985,3 +3985,13 @@ architecture_synthesis_v1.json形成十篇当前实际覆盖、八个模块决�
 下一H8只检验显式sharedβ进入现有velocity condition的单因素：保持H7体型读出/冻结、pose网络、history/T/nativehand、solver/noise、严格与发布门，提供关闭分支精确H7控制及主动β梯度/响应。未readyβ不得以NaN/默认0被当有效shape；记录新增conditioning容量，360/流式/未来/真实解码/梯度须独立验证。该结构受P05 shape context与本轮缺边启发，不是原SO3祖先流移植，也不预设条件化提高精度；H8尚未预注册或执行。
 
 本轮真实干预/梯度/保存数组独立核对通过，八决定证据字段及十篇引用逐项验证；Ruff/63AST、638论文源码存在/字节数与11冻结路径通过，14默认缺口/WHAM耗尽/VIBE余1不变。R12的160测试/18warning为既有回归证据，本轮新检查器以实际运行及独立数组检查验证，没有镜像实现的新单测或重跑旧全套。首次importformat lint修正，SMPLH10系数warning保留。六份现有记录同步与小型证据/检查器本地提交；原完整输入/mesh等缺口、SO3/退化多视图等未执行范围继续跟踪，长期目标未完成。
+
+### 2026-10-08 H8 显式体型条件进入姿态生成：单因素验收
+
+按 architecture_h8_protocol.json 预注册，仅增加无偏置 Linear(10,64) 的共享体型条件残差，广播至52个query后进入原8步Euler；新增640随机参数，总167955。H7的K8体型估计/冻结、原history、nativehand、translation、noise及严格发布门不变。未ready体型仅条件残差为0，公开beta和mesh仍保留NaN；开关随state绑定，改变策略须显式reset。不是原HuManiFlow层级SO3完整移植。
+
+architecture_h8_results_v1.json：完整360帧/pair1157..1516；关闭分支与同seed H7及saved H7逐值一致。开启后beta/T/mask/hidden/noise不变，前7未ready帧state一致；324available、7calibration_pending、29no_current_observation，3031严格点、763原手部slot/706admitted及17项body原字段完整保留。chunk1/11/64最大误差9.536743e-7，修改120以后body/hand对此前输出影响0。固定条件仅beta加0.25，前16帧endpoint变化0.1825393，beta梯度L1=0.0806542、projection梯度L1=2.1161964，前7未知beta梯度0；实际SMPLH测试固定decoder beta为0，另验证beta经pose进入mesh的梯度。随机mesh差134.586mm仅为路径响应，不是精度或改善。
+
+独立进程读取saved NPZ核对原body/hand、未改字段和不可用NaN；重新由第7/359帧旋转、beta、T构建真实SMPLH，vertices最大误差2.384186e-7m，faces一致，见 architecture_h8_rebuild_v1.json。大型NPZ只留本地。实际全套168passed/21warnings，新8项测试；Ruff/66AST通过，638论文源文件存在/字节数及11冻结路径核对，源内容未作全面比对。首次7项targeted失败来自测试fixture引用不存在schema属性，改为显式COCO17后通过；首次import order lint已修正；失败描述与运行warning保留在 architecture_h8_validation.json。
+
+六项现有记录同步。本阶段不训练、不加载checkpoint、不改变冻结主线或证据等级；不存在精度胜者结论。14项默认资源缺口仍在，WHAM同源预算耗尽，VIBE剩1次需先有实际选择性访问证据。下一阶段继续原作者完整路径与未执行退化多视图/时序/流形契约；长期目标未完成。

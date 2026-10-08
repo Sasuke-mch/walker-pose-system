@@ -1,0 +1,16 @@
+{
+  "status": "saved_H8_parameters_and_source_arrays_independent_process_verified",
+  "input": "architecture_h8_results_v1.npz",
+  "frame_ids": [
+    7,
+    359
+  ],
+  "max_vertex_error_m": 2.384185791015625e-07,
+  "faces_exact": true,
+  "body_source_fields_exact": 17,
+  "hand_source_payload_exact": true,
+  "unchanged_fields_and_unavailable_NaN": true,
+  "gradient_saved_unknownprefix0": true,
+  "training_executed": false,
+  "checkpoint_loaded": false
+}

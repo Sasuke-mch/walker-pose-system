@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R13_evidence_bounded_architecture_synthesis_and_beta_flow_dependency_verified_H8_proposed_original_paths_pending",
+  "stage": "H8_explicit_shared_beta_velocity_condition_verified_original_full_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -191,7 +191,7 @@
       ]
     }
   ],
-  "next": "Preregister H8 explicitsharedbeta-to-velocity conditioning as onefactor; preserveH7shape/history/T/hand/noise/quality and absentprefix. Disabled exactcontrol and activegradient/360stream/mesh required, no training or accuracypreference. Continue original14resource/fullpath and unexecutedtemporal/multiview/manifold gaps afterward; VIBE remaining1budget must not be spent on guessedURLs.",
+  "next": "Continue original author resource/full-path and unexecuted temporal/manifold/degenerate multiview contracts. Default14 gaps remain; WHAM same-source budget exhausted, VIBE remaining1 requires actual selective-access evidence before any request. No training, checkpoints, mainline or evidence-level changes.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -227,7 +227,8 @@
     "H7 originalpreGRU feature capture changes only sharedbeta readout; savedH6control/nonbetaoutputs/hidden/noiseexact, real360/mesh/stream/future/attribution and155tests verified",
     "R11 primaryVIBEresource script verified; one boundedZIPsuffix request rejectedHTTP200 beforebodyread; persistentclaim/14gaps/158tests audited, not acquired",
     "R12 originalVIBETemporalEncoder16window/48reset-vs-carry/missing0NaN/future contract, 160tests; originalfullVIBEbody unexecuted",
-    "R13 tenpaper/eightdecision evidence-linked synthesis, beta/T16frame intervention and autogradabsentflowedge/positiveSMPLHmeshgradient; no accuracyselection"
+    "R13 tenpaper/eightdecision evidence-linked synthesis, beta/T16frame intervention and autogradabsentflowedge/positiveSMPLHmeshgradient; no accuracyselection",
+    "H8 explicit sharedbeta velocity conditioning:640 added random parameters, disabledexactH7, full360/source/hand/stream/future/mesh/gradient verified;168tests21warnings,66AST"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -376,6 +377,16 @@
       "validation": "architecture_h7_validation.json",
       "tests": 6,
       "boundary": "No recurrent reuse for shape pool; no statistical independence, trainedaccuracy, deployment or latency claim. Feature/missingpolicy states require explicitreset."
+    },
+    {
+      "id": "H8",
+      "status": "H8_beta_velocity_condition_contract_passed",
+      "variable": "Only ready shared beta bias-free10to64 condition residual before unchanged original Euler flow",
+      "implementation": "realtime_app/learning_flow_mesh/beta_conditioning.py",
+      "added_parameters": 640,
+      "total_parameters": 167955,
+      "tests": 8,
+      "boundary": "640 random conditioning parameters; engineering dependency, not accuracy gain, capacity matched comparison, original hierarchical SO3 transplant or deployment. H6 elapsed-time and eager-hook concurrency/export limits remain."
     }
   ],
   "sampling_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_protocol.json",
@@ -550,5 +561,13 @@
     "auxiliary_files_installed": false
   },
   "synthesis": "architecture_synthesis_v1.json",
-  "synthesis_validation": "architecture_r13_validation.json"
+  "synthesis_validation": "architecture_r13_validation.json",
+  "H8": {
+    "protocol": "architecture_h8_protocol.json",
+    "results": "architecture_h8_results_v1.json",
+    "validation": "architecture_h8_validation.json",
+    "independent_rebuild": "architecture_h8_rebuild_v1.json",
+    "status": "H8_beta_velocity_condition_contract_passed",
+    "accuracy_preference_established": false
+  }
 }
