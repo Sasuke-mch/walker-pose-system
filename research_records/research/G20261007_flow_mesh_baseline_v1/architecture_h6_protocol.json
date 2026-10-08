@@ -1,0 +1,39 @@
+{
+  "id": "H6",
+  "status": "protocol_locked_before_execution",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Single-factor audit of null-frame recurrent updates, not accuracy selection",
+  "inputs": [
+    "architecture_h2_results_v3.npz all360frame slots and reasons",
+    "architecture_h4_results_v3.npz native hand conditions",
+    "architecture_h5_results_v3.npz saved control",
+    "Artificial long missing prefixes/gaps, mixed batches and frame-ID gaps"
+  ],
+  "control": "Existing H5 update_all null-frame GRU behavior with model seed19/hand seed29/noise97/K8/8Euler",
+  "candidate": "Freeze carried GRU hidden only when original encoder frame_observed is false; current image/2D availability remains distinct from strict shape admission. Missing output global feature is last carried hidden (zero before first observation), not new evidence. No time encoding added.",
+  "unique_variable": "Missing-frame recurrent transition; original encoder/GRU parameters, local conditions, hand branch, shape pooling/head, generator/noise, translations head and publication rules unchanged. Translation/global features/shape may differ downstream as a consequence, not additional head modifications.",
+  "implementation": "Scoped eager original GRU forward-output hook replays original same GRU per time step and selects hidden; original batched GRU invocation still runs then its result is replaced. No author or core source edits; no new parameters. Extra diagnostic compute and shared-module hook concurrency/compilation limitation explicitly retained.",
+  "elapsed_time_policy": "Freeze has no learned/explicit elapsed-time signal. Frame IDs remain validation metadata; gaps1/8/64 and sparse IDs must demonstrate compressed-observation equivalence and lack of duration response. This is a limitation, not temporal correctness or deployment approval.",
+  "checks": [
+    "Disabled policy matches H5 saved controls",
+    "All observed equivalence within2e-5, no added parameters or state_dict updates",
+    "Full360 source fields/rejected states/native inputs preserved; unavailable publication remains NaN",
+    "Frame-by-frame and chunks11/64 match policy within2e-5",
+    "Future perturbation before120 isolation",
+    "Hidden exactly invariant during all-missing and no state mutation, mixed row independence",
+    "Long missing recovery equals same original GRU update from pre-gap state; missing duration insensitivity reported",
+    "Strict shape admission remains original; observation presence alone not shape admission",
+    "Exception removes hook; original encoder unchanged after scoped invocation",
+    "Gradients from recovered output through observed inputs/history finite, masked input gradient0; no optimizer or update",
+    "True SMPL-H ready outputs, independent saved parameter reconstruction"
+  ],
+  "success": "Contract and causal state checks pass; full missing reasons retained; no accuracy preference inferred",
+  "stop": "Keep actual failures/versioned outputs. Do not relax2e-5, fill gaps, train/load checkpoints, add time features or change shape pooling.",
+  "outputs": [
+    "architecture_h6_results_v1.json",
+    "architecture_h6_results_v1.npz",
+    "architecture_h6_validation.json"
+  ],
+  "boundary": "Untrained structure/state diagnostics only; freeze ignores elapsed time and cannot be called a better motion model without independent training/evaluation"
+}

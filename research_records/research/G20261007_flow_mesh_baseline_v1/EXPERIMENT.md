@@ -80,3 +80,7 @@ H5执行：v1运行器误取COCO回归矩阵一行而失败，已修运行器并
 ### R1 实际验收
 
 七项原公共辅助文件schema及人工线性/梯度本地核验通过，本次网络0，保留v1/v2获取和历史WHAM传输失败。唯一变量仍是辅助资源，未改正式主线、作者原源码或候选。获取器唯一目标完成/EOF缺项/重复成员/读后deadline和已记录两次网络尝试保护已检查。新architecture_resources_results_v3.json与full-path资源v3为当前证据，v2保留。六个默认mesh路径仍缺14项，未执行完整neutral网格或原评价。124测试/14warning、Ruff/40文件AST通过，详细边界与不变路径在architecture_resources_validation.json。长期目标未完成。
+
+### H6 缺失帧历史更新预注册
+
+见architecture_h6_protocol.json；先锁协议再执行。唯一变量是无当前观测帧的GRU transition：原null照常更新对照，候选冻结hidden。保持H5所有参数/shape池化/native条件/noise97/K8/8Euler/发布规则。冻结不编码经过的时间，以真实360缺失和人工1/8/64长缺失检验恢复及时间忽略，不能先认定更好。使用临时eager原GRU输出hook复用原参数，额外重复计算及并发/编译限制明确保留。无训练/权重加载/主线变更/准确性结论。
