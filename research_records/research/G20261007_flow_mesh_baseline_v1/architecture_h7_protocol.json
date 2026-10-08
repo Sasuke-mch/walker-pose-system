@@ -1,0 +1,36 @@
+{
+  "id": "H7",
+  "status": "protocol_locked_before_implementation",
+  "purpose": "Single-factor shape information-source audit: frame-local features versus recurrent-history summaries",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "mainline_modified": false,
+  "inputs": [
+    "Unchanged H2 full360 saved rawfisheye/COCO17 source conditions and17 sourcefields",
+    "Unchanged H4 nativehand inputs763source/706admitted",
+    "H6 frozen missing GRU policy baseline, modelseed19/handseed29/noiseseed97/K8/8Euler",
+    "Artificial gradient/nonadmitted/missing prefixes and mixedrows"
+  ],
+  "control": "Exact H6 MissingHistoryMeshCandidate(missing_policy=freeze), shape features from original history outputs",
+  "candidate": "Same encoded pose/translation/hidden/nativehands, use original GRU input pooled=mean(original normalized52 query conditions) for shape only. Scoped forward-pre-hook captures actual pooled tensor read-only; no reconstruction/secondencoder/no new weights. No detach.",
+  "unique_variable": "Feature tensor consumed by unchanged PrefixSharedShape. K8 admission/head/state/noise/pose/T/nativehand/quality/publication rules unchanged. Control source=history must exactly recover savedH6.",
+  "checks": [
+    "Control source=history exact H6, same params/state_dict",
+    "Local source equals original GRU input; all nonbeta outputs/hidden/noise exactly unchanged in samebatch",
+    "Local pooled feature of a later frame cannot depend on earlier frame input, while history can; fullJacobian sensitivity is a diagnostic, not independence of real observations",
+    "Controlled intermediate-feature fixture: nonadmitted but observed earlyframe has zero local-shape gradient and nonzero history-shape gradient; admitted gradients nonzero/finite; missing masks excludeNaN",
+    "Full360 sourcefields/reasons/nativeinputs retained; published324available/7pending/29missing with NaN meshes outsideavailable",
+    "Whole/step/chunks11/64 and futureprefix120 parity within original2e-5 gate, exact samebatch futureprefix",
+    "No new parameters/no updates, beta freezes after8 admitted, allmissing unavailable and explicit state reset/order/IDs",
+    "RealSMPLH6890vertices/13776faces on allavailable, independent parameter rebuild",
+    "Scoped hooks removed on success/failure; eager concurrent/export deployment unsupported"
+  ],
+  "success": "Information-source and streaming/mesh contracts pass, characterize changes without accuracy selection",
+  "stop": "Keep versioned failedoutputs; no gate relaxation, pretrained/training, source/mainline edits, smoothing, durationfeatures or headchange",
+  "outputs": [
+    "architecture_h7_results_v1.json",
+    "architecture_h7_results_v1.npz",
+    "architecture_h7_validation.json"
+  ],
+  "boundary": "Local aggregation eliminates recurrent reuse by construction but does not guarantee statistical independent information or improved beta/pose accuracy. Random model weights, saved realconditions and actual SMPLH decoder only."
+}
