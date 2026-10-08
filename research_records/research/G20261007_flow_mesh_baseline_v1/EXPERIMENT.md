@@ -104,3 +104,9 @@ architecture_h6_results_v1.json/NPZ与validation通过。原H5随机参数/手�
 ### R3 实际验收
 
 固定frame0 RGB→原HRNet-W48→原crop/Canny/高斯/visibility连续AST L74–115→原50sharedshape参数→male原SMPL wrapper通过。独立保存RGB/argmax/conf/Canny精确、Gaussian误差5.96e-8、仿射0、50保存mesh/前45点/面重建精确；141全测试/15warning、Ruff/46AST。zero/negative热图强制7Gaussian、maskedNaN仍NaN及bbox原位改变反例保留，作者不修改。随机无训练/权重/网络，仍非已认可人物crop、未做detector/defaultneutral/renderer完整函数/CLI/评价，默认14缺口保留。R2默认False库采样与R3原图像True共享shape显式分开。结果v1/validation保持whole_goal_complete=false。
+
+### 2026-10-08 R4：HMR2原前向方法与明确male人体配置
+
+执行作者HMR2.forward_step完整AST方法（源89–140行），原ViT-H/16+六层Transformer共670459037参数、seed43人工RGB256裁剪192，使用R1作者均值/J19和用户已有male SMPLLayer。未执行Lightning初始化、检测/裁剪估计、neutral默认、训练/权重/评价；44关节为25OpenPose+19回归，不能当COCO17或SMPL-H52。6890顶点/13776面，独立同设备SMPLLayer顶点精确、J19误差2.98e-8m、独立投影精确；保存NPZ在CPU另行重建误差2.98e-7m。重复精确，参数版本计数不变。
+
+裁剪内单个NaN污染全部20670顶点坐标、132关节坐标和88投影坐标；原投影对零/负尺度派生平移仍返回有限值（深度1e13及-39.0625），有限输出不证明物理合法或有效观察。初次v1失败CPU均值buffer/CUDA设备冲突已保留，检查器显式head.cuda后v2通过，作者文件未改。Ruff首次格式/S102问题修正，141实际回归测试/15warning、47AST，另实际原方法与独立保存数据检查；原timm/cross/SMPL提示保留。原11路径不变、719作者文件仅存在/字节数核对，14默认资源缺口仍在，十篇长期任务保持active。

@@ -113,3 +113,9 @@ H5在`hand_candidate.py`接入原生手部条件：两视图独立memory含6D/�
 固定保存frame0经原HRNet-W48、crop/Canny/Gaussian及predict源AST十二句到原50候选/共享shape，再解码显式male库网格。141测试/15warning及Ruff/46AST通过；独立保存参数50mesh重建精确。R2库默认允许候选shape变化，R3按原图像路径use_shape_mode_for_samples=True，两者不混记。
 
 原zero/negative HRNet热图仍强制7通道可见并产生Gaussian，maskedNaN仍NaN；不是有效观测门。不改作者/主线、无训练/权重，defaultneutral/renderer/完整函数/CLI/检测评价仍缺。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_original_proxy --output <new.json>`，结果只证明原子路径接线。
+
+### 2026-10-08 R4：HMR2原前向方法与明确male人体配置
+
+执行作者HMR2.forward_step完整AST方法（源89–140行），原ViT-H/16+六层Transformer共670459037参数、seed43人工RGB256裁剪192，使用R1作者均值/J19和用户已有male SMPLLayer。未执行Lightning初始化、检测/裁剪估计、neutral默认、训练/权重/评价；44关节为25OpenPose+19回归，不能当COCO17或SMPL-H52。6890顶点/13776面，独立同设备SMPLLayer顶点精确、J19误差2.98e-8m、独立投影精确；保存NPZ在CPU另行重建误差2.98e-7m。重复精确，参数版本计数不变。
+
+裁剪内单个NaN污染全部20670顶点坐标、132关节坐标和88投影坐标；原投影对零/负尺度派生平移仍返回有限值（深度1e13及-39.0625），有限输出不证明物理合法或有效观察。初次v1失败CPU均值buffer/CUDA设备冲突已保留，检查器显式head.cuda后v2通过，作者文件未改。Ruff首次格式/S102问题修正，141实际回归测试/15warning、47AST，另实际原方法与独立保存数据检查；原timm/cross/SMPL提示保留。原11路径不变、719作者文件仅存在/字节数核对，14默认资源缺口仍在，十篇长期任务保持active。

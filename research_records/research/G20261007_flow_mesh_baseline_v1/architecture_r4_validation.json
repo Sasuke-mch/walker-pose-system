@@ -1,0 +1,36 @@
+{
+  "status": "R4_verified",
+  "results": "architecture_r4_results_v2.json",
+  "retained_failure": "architecture_r4_results_v1.json",
+  "failure_reason": "CPU mean NumPy buffers despite CUDA constructor; harness explicit head.cuda fixed, author unchanged",
+  "saved_mesh_CPU_vs_CUDA_max_error_m": 2.980232238769531e-07,
+  "AST_files": 47,
+  "ruff": "passed",
+  "full_suite": "architecture_r4_tests.xml",
+  "boundary": "Exact original forward_step method via namespace/AST harness and alternate male SMPLLayer. No original initializer, detector/crop, neutral default, training, physical calibration or accuracy evaluation.",
+  "tests": {
+    "tests": "141",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "warnings": 15,
+  "author_source_presence_bytecounts": 719,
+  "author_content_comparison": false,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/learning_flow_mesh/missing_history.py",
+    "realtime_app/pose_app/wilor_mano_prior.py"
+  ],
+  "whole_goal_complete": false,
+  "default_missing_still": 14,
+  "protocol_camera_probe_limit": "Zero and negative scales tested original projection with derived translations, not head learned distribution"
+}

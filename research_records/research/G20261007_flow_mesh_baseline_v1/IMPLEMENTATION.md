@@ -307,3 +307,9 @@ check_existing_smpl_variant.py独立进程安装权重下载/torch.load拒绝保
 必须保留的有效性反例：原HRNet zero/negative热图argmax坐标0、置信值无效，原输入块仍force indices0..6=True，生成7张非零Gaussian；forced对象是COCO面部与肩，不是原SMPL前三关节。Gaussian对NaN坐标返回NaN，乘false仍NaN。原crop匹配aspect时原位改bbox_heights/bbox_widths，复用调用方数组需明确所有权。本次仅记录，不修作者、不引入项目阈值或改主线；有限网络输入不能说明真实观测存在。
 
 六项新测试包括独立非对称Gaussian/argmax/affine控制、zero/negative/NaN、confidence严格大于0.75及head7强制、原AST边界。全模块实际141/15warning、Ruff/46AST通过；原“is”literal SyntaxWarning、meshgrid/cross弃用、Failed to import pytorch3d/SMPL10提示保留。719作者文件存在/字节数（非逐字比较）、11原core/候选/读取路径未变。结果architecture_r3_results_v1.json/NPZ及validation保存，不提交RGB/mesh大NPZ。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.check_original_proxy --output <new.json>`。没有原detector、defaultneutral、renderer/fullfunction/CLI/checkpoint/完整评价，14默认资源缺口不变；输入原路径拓展不等于整篇完成或精度改进。
+
+### 2026-10-08 R4：HMR2原前向方法与明确male人体配置
+
+执行作者HMR2.forward_step完整AST方法（源89–140行），原ViT-H/16+六层Transformer共670459037参数、seed43人工RGB256裁剪192，使用R1作者均值/J19和用户已有male SMPLLayer。未执行Lightning初始化、检测/裁剪估计、neutral默认、训练/权重/评价；44关节为25OpenPose+19回归，不能当COCO17或SMPL-H52。6890顶点/13776面，独立同设备SMPLLayer顶点精确、J19误差2.98e-8m、独立投影精确；保存NPZ在CPU另行重建误差2.98e-7m。重复精确，参数版本计数不变。
+
+裁剪内单个NaN污染全部20670顶点坐标、132关节坐标和88投影坐标；原投影对零/负尺度派生平移仍返回有限值（深度1e13及-39.0625），有限输出不证明物理合法或有效观察。初次v1失败CPU均值buffer/CUDA设备冲突已保留，检查器显式head.cuda后v2通过，作者文件未改。Ruff首次格式/S102问题修正，141实际回归测试/15warning、47AST，另实际原方法与独立保存数据检查；原timm/cross/SMPL提示保留。原11路径不变、719作者文件仅存在/字节数核对，14默认资源缺口仍在，十篇长期任务保持active。

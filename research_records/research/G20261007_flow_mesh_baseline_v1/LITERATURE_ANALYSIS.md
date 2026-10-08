@@ -362,3 +362,9 @@ HuManiFlow的CLI帮助列出male/female，执行却对非neutral主动NotImpleme
 P05正文L207–209、附录L886说明Canny/HRNet-W48 proxy；原图像预测路径L74–115实际在confidence>0.75后强制COCO indices0..6可见。零或负HRNet热图仍返回0坐标，随后7张Gaussian非零，这个强制先验不能被项目当作“已观察到头肩”。NaN Gaussian乘false仍NaN，原mask不是NaN隔离接口。原算法对正常检测的假设与本项目失败帧契约必须分开，不能沿用其finite输入即可认为有效。
 
 原图像路径use_shape_mode_for_samples=True，50候选共享shape mode；R2的原库默认False是另一个采样配置，不能混记。它们都不是跨视频因果共享β。固定真实保存RGB通过原HRNet/crop/Canny/sourceAST到原网络并解码male网格，只证明该原输入子路径可运行；随机HRNet/概率参数无法说明检测准确、模态可辨识或不确定性校准。完整predict函数先依赖renderer，原neutral/CLI/检测/评价未覆盖，不升级十篇完整复现。
+
+### 2026-10-08 R4：HMR2原前向方法与明确male人体配置
+
+执行作者HMR2.forward_step完整AST方法（源89–140行），原ViT-H/16+六层Transformer共670459037参数、seed43人工RGB256裁剪192，使用R1作者均值/J19和用户已有male SMPLLayer。未执行Lightning初始化、检测/裁剪估计、neutral默认、训练/权重/评价；44关节为25OpenPose+19回归，不能当COCO17或SMPL-H52。6890顶点/13776面，独立同设备SMPLLayer顶点精确、J19误差2.98e-8m、独立投影精确；保存NPZ在CPU另行重建误差2.98e-7m。重复精确，参数版本计数不变。
+
+裁剪内单个NaN污染全部20670顶点坐标、132关节坐标和88投影坐标；原投影对零/负尺度派生平移仍返回有限值（深度1e13及-39.0625），有限输出不证明物理合法或有效观察。初次v1失败CPU均值buffer/CUDA设备冲突已保留，检查器显式head.cuda后v2通过，作者文件未改。Ruff首次格式/S102问题修正，141实际回归测试/15warning、47AST，另实际原方法与独立保存数据检查；原timm/cross/SMPL提示保留。原11路径不变、719作者文件仅存在/字节数核对，14默认资源缺口仍在，十篇长期任务保持active。

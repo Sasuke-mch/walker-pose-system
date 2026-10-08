@@ -1,0 +1,103 @@
+{
+  "status": "R4_original_forward_method_male_passed",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "source_method": "third_party\\architecture_reproduction\\HMR2\\hmr2\\models\\hmr2.py",
+  "source_lines": [
+    89,
+    140
+  ],
+  "input": "Artificial normalized RGB 1x3x256x256, seed43",
+  "asset": "D:\\my_works\\walker_pose_system\\models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+  "gender": "male",
+  "original_default_neutral_executed": false,
+  "top_level_initializer_executed": false,
+  "mean": "C:\\Users\\毛晨昊\\.cache\\4DHumans\\data\\smpl_mean_params.npz",
+  "regressor": "C:\\Users\\毛晨昊\\.cache\\4DHumans\\data\\SMPL_to_J19.pkl",
+  "parameter_count": 670459037,
+  "output_shapes": {
+    "pred_cam": [
+      1,
+      3
+    ],
+    "pred_cam_t": [
+      1,
+      3
+    ],
+    "focal_length": [
+      1,
+      2
+    ],
+    "pred_keypoints_3d": [
+      1,
+      44,
+      3
+    ],
+    "pred_vertices": [
+      1,
+      6890,
+      3
+    ],
+    "pred_keypoints_2d": [
+      1,
+      44,
+      2
+    ],
+    "smpl_global_orient": [
+      1,
+      1,
+      3,
+      3
+    ],
+    "smpl_body_pose": [
+      1,
+      23,
+      3,
+      3
+    ],
+    "smpl_betas": [
+      1,
+      10
+    ],
+    "faces": [
+      13776,
+      3
+    ]
+  },
+  "independent_errors": {
+    "mesh_m": 0.0,
+    "joints_m": 2.9802322387695312e-08,
+    "projection_normalized": 0.0
+  },
+  "joint_semantics": "25 OpenPose plus19 regressed joints; not COCO17 or SMPL-H52",
+  "update_hips": false,
+  "rotation_check": {
+    "orthogonality_max_error": 1.7881393432617188e-07,
+    "determinant_max_error": 2.384185791015625e-07
+  },
+  "repeat_exact": true,
+  "parameter_versions_unchanged": true,
+  "NaN_input_nonfinite_output_counts": {
+    "pred_cam": 3,
+    "pred_cam_t": 3,
+    "focal_length": 0,
+    "pred_keypoints_3d": 132,
+    "pred_vertices": 20670,
+    "pred_keypoints_2d": 88
+  },
+  "zero_negative_scale_projection_probes": [
+    {
+      "scale": 0.0,
+      "depth": 10000000000000.0,
+      "finite": true
+    },
+    {
+      "scale": -1.0,
+      "depth": -39.06250000015259,
+      "finite": true
+    }
+  ],
+  "camera_scale": 2.197098970413208,
+  "camera_depth": 17.77912712097168,
+  "boundary": "Exact original forward_step method via namespace/AST harness and alternate male SMPLLayer. No original initializer, detector/crop, neutral default, training, physical calibration or accuracy evaluation."
+}

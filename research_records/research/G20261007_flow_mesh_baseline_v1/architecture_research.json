@@ -427,5 +427,14 @@
     "validation": "architecture_r3_validation.json",
     "default_neutral_reproduced": false,
     "author_top_level_predict_function_executed": false
+  },
+  "R4": {
+    "protocol": "architecture_r4_protocol.json",
+    "results": "architecture_r4_results_v2.json",
+    "retained_failure": "architecture_r4_results_v1.json",
+    "validation": "architecture_r4_validation.json",
+    "original_forward_step_method_executed": true,
+    "original_initializer_executed": false,
+    "default_neutral_reproduced": false
   }
 }
