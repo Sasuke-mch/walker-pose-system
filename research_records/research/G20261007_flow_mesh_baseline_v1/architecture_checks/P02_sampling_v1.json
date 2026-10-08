@@ -1,0 +1,34 @@
+{
+  "status": "original_sphere_sampling_paths_passed",
+  "config": "third_party/architecture_reproduction/RiemannianFM/configs/train.yaml",
+  "sample_source": "third_party/architecture_reproduction/RiemannianFM/manifm/model_pl.py",
+  "solver_source": "third_party/architecture_reproduction/RiemannianFM/manifm/solvers.py",
+  "parameter_count": 1816966,
+  "eval_projx": true,
+  "local_coords": false,
+  "steps": 1000,
+  "last_only_nfe": 1000,
+  "trajectory_nfe_including_endpoint_velocity": 1001,
+  "trajectory_shape": [
+    1001,
+    4,
+    3
+  ],
+  "endpoint_max_difference": 0.0,
+  "trajectory_unit_norm_max_error": 1.1920928955078125e-07,
+  "same_initial_state_repeat_exact": true,
+  "analytic_rotation_control_max_error": 2.804901295672124e-07,
+  "state_dict_unchanged": true,
+  "coverage": "Original configured projected Euler sample/sample_all with original Sphere/network; not original volcano data, likelihood, other manifolds or human SO(3)",
+  "id": "P02",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "protocol": "architecture_sampling_protocol.json",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu",
+    "elapsed_total_seconds_not_latency": 9.510436499986099
+  },
+  "evidence_boundary": "Untrained structure and dependency audit; no pose accuracy or realtime deployment evidence"
+}

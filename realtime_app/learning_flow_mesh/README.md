@@ -75,3 +75,5 @@ uvx ruff check realtime_app/learning_flow_mesh
 ```
 
 结果JSON与同名NPZ不覆盖已有版本。NPZ含完整帧/物理pair编号、人物索引、原始像素、归一化像素、置信度、cam0米制光心与单位射线、观察/几何/严格掩码、拒绝原因、quality_flags及有限拒绝三维诊断值。未执行真实图像网络前向、拟合或精度评价。
+
+S1已增加FMPose3D原Euler/flip-TTA/RPEA输入依赖、RiemannianFM原1000步球面采样检查，全模块累计60项测试通过。`reproduction.run_sampling`分别使用`--paper P03 --device cuda`或`--paper P02 --device cpu`，并显式给新`--output`；`reproduction.audit_mesh_resources`输出各原网格路径的资源缺口。RPEA发布评估路径读取真值根，不能直接作为无真值在线组件；有限fallback不代表几何可用。原默认neutral人体及专用回归器仍缺失，未用现有male/SMPL-H或COCO回归器冒充。

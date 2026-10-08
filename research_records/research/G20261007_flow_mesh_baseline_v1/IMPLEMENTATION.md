@@ -171,3 +171,21 @@ uvx --offline ruff check realtime_app/learning_flow_mesh/reproduction realtime_a
 3031个严格接受点与每个原拒绝reason照录；2091个高重投影误差点有限XYZ仍保留诊断，未变成接受点。其余原拒绝为低2D分数369、越界136；关联失败493为无逐点源条目的框架不可用状态，同时保存原pair_outcome。双视图像素/射线有效11118；单位射线范数误差3.33e-16；沿光线点重投影最大误差左6.85e-13px、右2.74e-12px，仅为内部一致性。cal单位mm、基线0.27591249m；世界/动态地面未接入、不借这套检查证明人体准确性。
 
 命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_interfaces --output <new.json>`，结果带同名本地NPZ，保留所有槽、人物与拒绝状态且拒绝覆盖。v1通过；v2增加原置信度照录；v3补物理pair范围和置信度范围检查。单元新增16例，全模块54通过；初次故障注入尝试修改frozen校准实例失败，改为测试内临时类方法注入，不改校准类。Ruff初次导入排序及检查器边界标记修正后通过。详见architecture_h2_validation.json。完整原方法网格/输入/评估仍未全部完成；下一阶段先补可运行的原路径与资源清单，再将H1/H2接入一个声明COCO17、52旋转的隔离候选，不能把随机输出当改进精度。
+
+## 2026-10-08 S1：原采样、聚合输入及网格资源
+
+协议architecture_sampling_protocol.json先提交后执行。新增reproduction/run_sampling.py与audit_mesh_resources.py，原作者文件、原baseline和工程主线均未修改，没有优化器更新或学习权重加载。结果P03_sampling_v4.json、P02_sampling_v1.json及architecture_full_path_resources_v1.json。
+
+P03使用原512宽/5层/17点GAMLP，参数16045837，单帧H36M归一化二维人工输入、固定三维噪声。实际执行原common/utils.py的Euler与原FMPose3DInference._run_euler_sample方法；只跳过加载器/检测器外壳，不复制改写模型。1/3/5指积分步数，分别1/3/5次速度前向，独立Euler算术对照差0；同噪声完全重复。发布默认3步，flip-TTA原两路独立噪声、左右重排/反翻转/均值，实际6次前向，同seed完全重复。并非整段视频因果推理或二维检测器复现，原helper输出为后处理前的原始17点。单元另运行原HumanPostProcessor(camera_rotation=None)，确认原地将根置0、其他已根相对的节点不变、world为复制；默认示例四元数/最低z平移没有接入项目。单个NaN腕输入导致原采样输出51个非有限值，完整保留，没有补帧。
+
+P03 RPEA的实际输入比注释更多。aggregation_methods.py中gt_3D不仅用于B/F/J形状，还取gt_3D[:,pad,0]，把候选的非根点加上这个根，再用Human3.6M透视/径向切向畸变投影函数计算二维误差；原投影还clamp x/z,y/z到[-1,1]，不是鱼眼模型。load_data_hm36.py 86–90将非根点减根、保留根的绝对相机坐标；scripts/FMPose3D_main.py 135将该gt_3D直接传入聚合。因此这条评估路径使用了真值根位置，不能把代码里的shape-only注释当在线输入契约。
+
+依赖对照：三个人工根相对17点候选、同一归一化针孔相机、同一二维目标，只有传入根深度1m→3m变化。硬选择输出最大变化0.4m，原topk=3/exp_temp=0.002聚合变化0.299993m；改动非根gt_3D到100，输出变化0。以上为人工依赖检查，绝不是模型在人身上的误差测量，也不据此否定论文整体。原RPEA逐关节权重可混合不同候选，不能默认保留人体骨长或合法旋转。
+
+边界探针：代码将选中误差截断到20×temperature，若全部超过这个数，指数权重相同；远误差人工例退化为均值，最大差5.55e-17。根设NaN时，代码用uniform_weights代替NaN权重，仍返回有限均值，差1.39e-17；有限输出不代表有效几何。可选反传探针因原dist[:,:,0]原地修改norm结果失败，错误信息保留；这是原评估聚合的反传限制，不阻止其no_grad前向，不修作者文件、不偷换可微公式。P03_sampling_v1因把这项可选能力当必过条件整体失败；v2起独立记录前向结果与反传失败。v3增加NaN根探针，v4去掉沿用旧检查器的“五帧”注释，明确本次为单帧/多积分步。
+
+P02使用原Sphere、512宽/8层切向网络1816966参数以及原sample/sample_all方法。按train.yaml的eval_projx=True/local_coords=False，保留1000次投影Euler，未缩预算。完整轨迹1001×4×3，last-only前向1000次，完整轨迹额外查询终点速度所以1001次。两条路径末点差0、同初始状态重复一致；全过程单位范数最大误差1.19e-7。已知赤道切向场旋转1弧度的float64解析对照误差2.81e-7。原网络state_dict完全不变。仅验证球面采样，不是volcano真实数据、似然评价或人体SO(3)概率模型；构造/检查总耗时不当实时延迟。
+
+网格资源审计读取六个原SMPL路径及当前smplx默认gender，确认默认neutral。ProHMR/HMR2还需SMPL_to_J19和原mean；HuManiFlow需extra/cocoplus/h36m；VIBE需extra和mean；WHAM需wham/h36m/feet；MotionBERT需extra/h36m_correct和mean。默认路径共21项先决文件当前均缺失；models/third_party定向名称检索只找到项目COCO回归器，没有neutral SMPL及这些原回归器。现有male/female SMPL、SMPL-H、neutral SMPL-X及公共mean fixture列为不同资产/未确认等价来源，没有自动替换。WHAM作者下载脚本要求SMPLify账户许可，不读取凭据或尝试认证下载。审计完成不等于六个原网格方法完成。
+
+命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.run_sampling --paper P03 --device cuda --output <new.json>`；P02实际验证使用`--device cpu`。资源命令为`-m realtime_app.learning_flow_mesh.reproduction.audit_mesh_resources --output <new.json>`；输出均不覆盖。新增6个原源码行为/解析控制测试，全模块60通过，Ruff/AST通过。初次测试将0.2×3与3/5要求逐位相同，差1.11e-16，改为明确1e-15算术容差；没有改采样器或几何门。下一阶段取得可公开获取的原辅助资源，并预注册H1/H2真实COCO17输入的隔离候选联调；不可取得的许可资产仍列缺口。不要直接照搬RPEA真值根、有限fallback、示例世界旋转或逐帧beta行为。

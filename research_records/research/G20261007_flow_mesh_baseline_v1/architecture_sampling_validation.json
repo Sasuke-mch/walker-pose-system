@@ -1,0 +1,44 @@
+{
+  "status": "passed_with_explicit_original_limitations",
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "tests": {
+    "tests": "60",
+    "failures": "0",
+    "errors": "0"
+  },
+  "sampling_new_behavior_cases": 6,
+  "linter": "passed",
+  "syntax": "AST passed",
+  "original_source_files_exist_and_byte_sizes_unchanged": 719,
+  "mainline_and_baseline_unchanged_after_CRLF_normalization": true,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/config.json"
+  ],
+  "results_files": [
+    "architecture_checks/P03_sampling_v4.json",
+    "architecture_checks/P02_sampling_v1.json",
+    "architecture_full_path_resources_v1.json"
+  ],
+  "failures_retained": [
+    {
+      "file": "architecture_checks/P03_sampling_v1.json",
+      "failure": "Original RPEA norm output modified inplace prevents optional backward; v2 onward records this independently of inference success"
+    },
+    {
+      "stage": "first unit tests",
+      "failure": "1 failed, 5 passed: double arithmetic 0.2*3 vs3/5 differed 1.11e-16",
+      "resolution": "Explicit 1e-15 arithmetic tolerance, author function unchanged"
+    },
+    {
+      "stage": "first linter",
+      "failure": "Two import ordering diagnostics",
+      "resolution": "Sorted local new imports"
+    }
+  ],
+  "evidence_boundary": "Original sampling and actual deployment dependency checks; missing default mesh assets and trained evaluation remain incomplete",
+  "unrelated_workspace_entries_at_start": 89
+}

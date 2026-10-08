@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "H2_interfaces_and_saved_replay_passed_original_full_paths_pending",
+  "stage": "S1_original_sampling_passed_mesh_resource_gaps_and_candidate_integration_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -130,12 +130,12 @@
       "repo": "AdaptiveMotorControlLab/FMPose3D",
       "branch": "main",
       "focus": "Conditional flow velocity and candidate aggregation",
-      "status": "original_network_forward_passed",
+      "status": "original_sampling_and_aggregation_dependency_audit_passed",
       "source_status": "source_archived",
       "source_file_count": 103,
       "local_source": "third_party/architecture_reproduction/FMPose3D",
-      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_v1.json",
-      "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered"
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_sampling_v4.json",
+      "coverage": "Original published human velocity network, Euler and exact single-frame flip-TTA method, RPEA input dependency probes; original RPEA evaluation requires GT root. No trained dataset/video/detector/SMPL-H path."
     },
     {
       "id": "P16",
@@ -156,15 +156,15 @@
       "repo": "facebookresearch/riemannian-fm",
       "branch": "main",
       "focus": "Manifold probability paths and tangent vector fields",
-      "status": "original_sphere_vector_field_and_loss_passed",
+      "status": "original_sphere_sampling_paths_passed",
       "source_status": "source_archived",
       "source_file_count": 54,
       "local_source": "third_party/architecture_reproduction/RiemannianFM",
-      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_v2.json",
-      "coverage": "Original sphere geodesic/JVP, configured 512-wide eight-layer time-MLP/tangent projection and exact author rfm_loss_fn; no training, density/ODE evaluation, meshes or SO(3) human pose"
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_sampling_v1.json",
+      "coverage": "Original sphere geodesic/JVP, configured tangent network/loss plus published1000-step projected Euler sample/sample_all; no original dataset likelihood or human SO3."
     }
   ],
-  "next": "Complete original input/body/evaluation paths or document specific unavailable resources; then preregister real COCO17 candidate integration with H1/H2 and 52 local rotations. No training or mainline replacement.",
+  "next": "Acquire publicly available original auxiliary resources without license substitution; preregister H1/H2 real COCO17 to52-rotation candidate integration. Default neutral SMPL gaps remain; no training or mainline replacement.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -178,7 +178,10 @@
     "Original HMR2 ViT-H/16 and Transformer SMPL parameter head",
     "Original Riemannian FM sphere geodesic, tangent network and exact loss method",
     "H1 masked causal eight-admissible-frame calibration using unchanged shape head, explicit unavailable prefix, fixed beta, real SMPL-H ready-segment decode and gradients",
-    "H2 explicit joint/6D/mask/pixel/unit contracts, exact parity with six author rotation functions and complete frozen 360-frame strict replay"
+    "H2 explicit joint/6D/mask/pixel/unit contracts, exact parity with six author rotation functions and complete frozen 360-frame strict replay",
+    "S1 original P03 single-frame Euler/flip-TTA and GT-root dependence/saturation/NaN behavior audit",
+    "S1 original P02 projected Euler full/last paths at1000steps with analytic control",
+    "Exact default mesh prerequisite inventory for six SMPL-dependent original methods; missing assets explicitly retained"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -192,7 +195,8 @@
     "SPIN raw mean-parameter URL returned 404; public MMPose fixture acquired and matched existing local copy. Original release-bundle equivalence remains unconfirmed.",
     "H1_v1 fixture writes into broadcast camera-origin storage contaminated valid frames; tensor clone before fault injection fixes harness only, no generator/mainline change.",
     "H1_v2 bitwise comparison across B=1 versus B=2 GEMM differed by 2.98e-8; identical-batch formula is exact, cross-batch discrepancy recorded below 1e-6 numerical tolerance. No geometric acceptance gate changed.",
-    "H2 test fixture attempted to monkeypatch frozen calibration instance; test-local class monkeypatch fixes injection. Initial Ruff import/intentional harness/noqa syntax issues corrected and retained in validation record."
+    "H2 test fixture attempted to monkeypatch frozen calibration instance; test-local class monkeypatch fixes injection. Initial Ruff import/intentional harness/noqa syntax issues corrected and retained in validation record.",
+    "P03_sampling_v1 failed optional RPEA backward because original norm output is modified inplace. Original eval forward retained; v2 onward separates backward limitation. First time-arithmetic fixture required bitwise agreement across algebraically equivalent doubles; explicit1e-15 tolerance fixes test, no source/gate changes."
   ],
   "candidate_revisions": [
     {
@@ -243,5 +247,8 @@
       "results": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_h2_results_v3.json",
       "tests": 16
     }
-  ]
+  ],
+  "sampling_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_protocol.json",
+  "mesh_resource_audit": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_full_path_resources_v1.json",
+  "sampling_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_validation.json"
 }

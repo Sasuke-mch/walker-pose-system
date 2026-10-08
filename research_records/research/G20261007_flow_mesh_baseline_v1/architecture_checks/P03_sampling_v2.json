@@ -1,0 +1,124 @@
+{
+  "status": "original_sampling_and_aggregation_dependency_audit_passed",
+  "config": "third_party/architecture_reproduction/FMPose3D/scripts/FMPose3D_train.sh",
+  "model_options": {
+    "channel": 512,
+    "d_hid": 1024,
+    "token_dim": 256,
+    "layers": 5,
+    "n_joints": 17
+  },
+  "parameter_count": 16045837,
+  "sampling": [
+    {
+      "steps": 1,
+      "nfe": 1,
+      "shape": [
+        1,
+        1,
+        17,
+        3
+      ],
+      "independent_euler_arithmetic_max_error": 0.0,
+      "same_noise_repeat_exact": true
+    },
+    {
+      "steps": 3,
+      "nfe": 3,
+      "shape": [
+        1,
+        1,
+        17,
+        3
+      ],
+      "independent_euler_arithmetic_max_error": 0.0,
+      "same_noise_repeat_exact": true
+    },
+    {
+      "steps": 5,
+      "nfe": 5,
+      "shape": [
+        1,
+        1,
+        17,
+        3
+      ],
+      "independent_euler_arithmetic_max_error": 0.0,
+      "same_noise_repeat_exact": true
+    }
+  ],
+  "released_default_steps": 3,
+  "flip_tta": {
+    "nfe": 6,
+    "independent_branch_noise": true,
+    "condition_flip_and_side_reindex_exact": true,
+    "fixed_seed_repeat_exact": true,
+    "output_shape": [
+      1,
+      1,
+      17,
+      3
+    ]
+  },
+  "single_missing_wrist_nonfinite_output_values": 51,
+  "state_dict_unchanged": true,
+  "rpea_dependency": {
+    "controlled_fixture": "Three unchanged root-relative 17-joint candidates; normalized pinhole camera and fixed 2D; only GT root z changes 1m to3m",
+    "functions": {
+      "hard_joint_selection": {
+        "root_change_max_output_delta_m_fixture": 0.4,
+        "nonroot_truth_change_max_output_delta": 0.0,
+        "joint1_root_z1_result": [
+          0.2,
+          0.0,
+          0.1
+        ],
+        "joint1_root_z3_result": [
+          0.4,
+          0.0,
+          0.5
+        ]
+      },
+      "topk3_rpea": {
+        "root_change_max_output_delta_m_fixture": 0.2999931871849758,
+        "nonroot_truth_change_max_output_delta": 0.0,
+        "joint1_root_z1_result": [
+          0.10000000000000003,
+          0.0,
+          0.2666666666666667
+        ],
+        "joint1_root_z3_result": [
+          0.39999318718497584,
+          0.0,
+          0.4999892424715145
+        ]
+      }
+    },
+    "optional_backward_probe": {
+      "status": "original_backward_failed",
+      "error": "one of the variables needed for gradient computation has been modified by an inplace operation: [torch.DoubleTensor [1, 3, 17]], which is output 0 of LinalgVectorNormBackward0, is at version 1; expected version 0 instead. Hint: enable anomaly detection to find the operation that failed to compute its gradient, with torch.autograd.set_detect_anomaly(True, check_nan=False).",
+      "required_for_eval_forward": false
+    },
+    "far_error_clamp_to_uniform_mean_max_difference": 5.551115123125783e-17,
+    "camera_projection_function": "project_to_2d",
+    "docstring_shape_only_claim_contradicted": true,
+    "boundary": "Controlled dependency probe, not pose error/accuracy; root is actual function input, cannot replace it silently for project deployment"
+  },
+  "adaptations": [
+    "Bypass top-level detector/inference/animal package facades only; original velocity network and graph files unchanged",
+    "Primary check uses published one-frame setting; extra five-frame test checks frame independence, not temporal training",
+    "Exact API method uses explicitly supplied original self members; no inference constructor/weight loader, video detector or world quaternion"
+  ],
+  "coverage": "Original human velocity network, Euler, single-frame flip-TTA and exact aggregation functions; image detector, trained evaluation, video/camera-to-world and SMPL-H not run",
+  "id": "P03",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "protocol": "architecture_sampling_protocol.json",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 2.7919674000004306
+  },
+  "evidence_boundary": "Untrained structure and dependency audit; no pose accuracy or realtime deployment evidence"
+}
