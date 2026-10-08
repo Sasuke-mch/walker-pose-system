@@ -1,0 +1,32 @@
+{
+  "id": "H1",
+  "status": "protocol_locked_before_implementation",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "source_basis": [
+    "VIBE paper section 3.1 clip-shared shape, released code discrepancy retained",
+    "MotionBERT original model_mesh.py shape-feature aggregation"
+  ],
+  "input": "Existing unchanged FlowMesh global_condition B,T,64; explicit upstream admissible bool mask B,T; strictly increasing per-stream frame IDs and explicit sequence IDs",
+  "control": "Same frozen/random FlowMesh encoder/shape head, first-frame shape_head(global_condition[:,0]) on a fixture whose first frame is admissible",
+  "candidate": "Mean of first 8 admissible prefix features using same shape_head; beta unavailable (NaN plus ready=False) before eighth admissible frame; one shared beta thereafter",
+  "single_variable": "Shape calibration readout: first-frame versus masked prefix; pose generator, graph/history, weights, random seed, SMPL-H assets, sampling budget unchanged",
+  "calibration_frames": 8,
+  "evidence_eligibility": "Supplied explicitly by caller; does not infer quality from network confidence or change strict geometry gates. Admissible requires caller-provided finite evidence; number of frames is an engineering threshold, not shape observability proof",
+  "stream_contract": "State bound to sequence IDs and batch rows; duplicate/reordered IDs rejected; no future features influence published beta; missing frames not counted; no output or retroactive patch for unready frames",
+  "success": [
+    "batch/stream and chunk equivalence",
+    "future perturbation cannot change already released beta",
+    "missing/nonfinite masked frames excluded; all missing remains unavailable",
+    "exact same beta after freeze",
+    "different sequences/batch rows never share state",
+    "no baseline parameter change or new learned layer",
+    "real SMPL-H decode finite and finite nonzero shape/feature gradient for ready segment"
+  ],
+  "failure_stop": "Nonfinite admissible features, sequence/frame-order mismatch, illegal rotation or asset mismatch fail explicitly; do not replace missing beta with zero/default",
+  "boundary": "Structural architecture improvement only; beta accuracy, real imagery, independent 3D precision and realtime latency untested",
+  "planned_outputs": [
+    "architecture_h1_results_v1.json",
+    "outputs/architecture_h1_tests.xml"
+  ]
+}

@@ -39,3 +39,8 @@
 执行协议和逐篇状态见`architecture_research.json`。选择ProHMR、HuManiFlow、HMR2、VIBE、WHAM、MotionBERT、MotionAGFormer、FMPose3D、Learnable Triangulation和Riemannian FM，覆盖体型/姿态分支、空间/时序、标定视图融合和流形路径。作者源码留`third_party/architecture_reproduction/`，只提交自写运行器及小型来源/结果记录。区分原组件、原完整网络、项目适配和自写候选，不把随机前向称为精度复现。许可/资源阻碍保留并继续其他独立部分。
 
 先锁定协议，再执行结构检查；逐项候选改动必须写明输入、对照、唯一变量、预期作用和失败条件。先核对共享体型信息来源及因果性，再决定空间模块和旋转流的修改，不预设图/历史/FM有效。每小时本聊天自动跟进仅在里程碑、实质失败或需输入时通知。
+
+
+### H1 因果前缀共享体型校准预注册
+
+见`architecture_h1_protocol.json`，编码器、shape_head、姿态生成器及参数保持原样，仅替换shape读出：首帧→前8个调用方明确认可帧的条件特征均值。校准完成前β为不可用，NaN与ready=False同时保存；完成后同一序列冻结一个β，不回写已发布帧。严格递增帧号和序列状态隔离，缺失帧不计入8帧。8为结构检查阈值，不证明真实体型可辨识。检查batch/stream、未来隔离、缺失、冻结、真实SMPL-H解码/梯度；不训练，不接入主线。协议先提交后实现。

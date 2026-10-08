@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "ten_selected_original_components_checked_full_reproductions_and_candidates_pending",
+  "stage": "H1_protocol_locked_candidate_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -192,7 +192,7 @@
   "candidate_revisions": [
     {
       "id": "H1",
-      "status": "planned_not_implemented",
+      "status": "protocol_locked_not_implemented",
       "change": "Causal multi-frame shared shape calibration, explicit unavailable state until freeze",
       "sources": [
         "P09 paper Section 3.1",
@@ -206,7 +206,8 @@
         "same beta after freeze",
         "real SMPL-H decode and gradient contract"
       ],
-      "boundary": "Architecture and observability design only; no claim that pooling improves beta accuracy without trained evaluation"
+      "boundary": "Architecture and observability design only; no claim that pooling improves beta accuracy without trained evaluation",
+      "protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h1_protocol.json"
     },
     {
       "id": "H2",
