@@ -1,0 +1,27 @@
+{
+  "id": "R6",
+  "status": "protocol_locked_before_execution",
+  "purpose": "P02 exact original sphere compute_exact_loglikelihood and divergence paths, including exception-return semantics",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "inputs": [
+    "Published configs/train.yaml width512/eightlayer tangentnetwork with originalUnbatch",
+    "Two preregistered spherepoints [1,0,0] and [0.6,0,0.8], seed53 float32 CPU",
+    "Analytic zero/rotation and projectedconstant-axis tangentfields, float64"
+  ],
+  "execution": "Original full AST density method with exact divergence and published1000 projectedEuler steps, ProductManifold sphere x Euclidean; framework logger stub records everylog. No dataset ingestion or training.",
+  "controls": [
+    "Independent sphereuniform logdensity -log(4pi) and zero divergence rotation",
+    "Analytic z-gradient flow divergence -2az and exact integrated logdensity sign;1000step Euler error<3e-3",
+    "Independent autograd or closedform divergence and normalized dimension division",
+    "Intentional vectorfield exception retains traceback and original finitezero return; compare NaN vectorfield semantics",
+    "Random network repeat and unchanged state_dict, ambient unit sphere checks"
+  ],
+  "success": "Originalrandom density finite with1000NFE and repeat; analytic density error<3e-3, knownzero/rotation error<1e-8float64; failures and broadexceptionfallback recorded",
+  "stop": "No authorpatch, invalidinput cleanup, trained/clinical/humanSO3 density claim, data-dependent training or relaxed tolerance",
+  "outputs": [
+    "architecture_r6_results_v1.json",
+    "architecture_r6_validation.json"
+  ],
+  "boundary": "SphereS2 density architecture only; exact names refer divergence estimation, not exact numerical integration, dataset performance or humanSO3. Original broadexceptionzero fallback is a failure signal, not validdensity."
+}
