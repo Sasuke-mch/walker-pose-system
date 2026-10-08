@@ -3794,3 +3794,11 @@ ProHMR原ResNet50/ConditionalGlow、HuManiFlow代理编码/SO(3)层级采样/密
 P16_ransac_v1保留Python3.12 random.sample(set)失败；v2明确模块局部整数集合→排序序列兼容后原完整前向通过。原误差为半像素欧氏距离，15门限实际约30px；抽中的视图强制保留，双目没有额外投票，confidence全零为占位。四视图人工外点可排除，两视图异常仍强制接纳；不接为主线质量门。新增6测试、全模块66及Ruff/AST通过，首轮AST测试符号/静态检查失败保留在validation。原源码/核心及89条既有工作区状态保留，无训练/主线替换/推送。
 
 实现/文献/模块说明及architecture_research同步。架构下一步仍先组合H1/H2的真实COCO17输入和52旋转，保留中心/相机/质量状态边界，不照搬体素或双目RANSAC。六个默认SMPL资源与完整原数据路径仍缺项；长期goal与hourly跟进继续，十篇完整方法尚未完成。
+
+### 2026-10-08 H3 真实COCO17→52旋转→完整人体接口
+
+先锁architecture_h3_protocol.json，再新增candidate.py及完整联调入口check_joint_candidate。复用H2完整360帧；J17 fresh随机模型保留原生成器/图/历史/8步Euler，未加载J22合成checkpoint、未训练。K8与K1只改变共享shape读出，同shape_head、同输入/hidden/noise，姿态与平移完全相同。strict3031点及29失败帧、全部拒绝诊断保留，XYZ不作网络条件。shape第7帧完成校准后冻结；7待校准、29无当前观测帧均NaN/不可用，内部推测仅diagnostic，不回填。
+
+真实SMPL-H6890顶点/13776面/52节点及COCO17表面回归联调通过，运动学点不混为观测。逐帧/11/64分块掩码一致，最大state差1.43e−6；网格分块差4.77e−7m，未来120帧后扰动对先前输出影响0。K1首帧β与原head一致；K8变化不是精度结论。新增9测试含非有限失败状态与真实解码/表面/生成梯度，参数不变；全模块75、Ruff/AST通过，v1/v2及validation保留。当前候选没有WiLoR手条件、原GRU仍消费null帧，后续单因素研究；完整原方法资源缺口仍列明。
+
+主线及核心model/train/infer/config、作者文件/许可资产未改，89项原工作区状态保留，不推送。实现/文献/模块说明/architecture_research同步；长期goal及每小时跟进继续，不将随机真实输入联调称精度提升或十篇完整复现完成。

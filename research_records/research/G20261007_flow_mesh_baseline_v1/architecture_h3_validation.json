@@ -1,0 +1,52 @@
+{
+  "status": "passed_with_explicit_random_architecture_limits",
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "tests": {
+    "tests": "75",
+    "failures": "0",
+    "errors": "0"
+  },
+  "new_composition_behavior_cases": 9,
+  "linter": "passed",
+  "syntax": "AST passed for 32 module Python files",
+  "source_arrays_preserved_fields": 17,
+  "fresh_process_repeat_equal_arrays_excluding_metadata": 48,
+  "independent_saved_parameter_mesh_rebuild_max_error_m": 2.384185791015625e-07,
+  "independent_surface_rebuild_max_error_m": 2.384185791015625e-07,
+  "saved_available324_and_unavailable_nan_states_verified": true,
+  "saved_shared_beta_and_unavailable_prefix_verified": true,
+  "original_source_files_exist_and_byte_sizes_unchanged": 719,
+  "mainline_and_baseline_unchanged_after_CRLF_normalization": true,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json"
+  ],
+  "results_files": [
+    "architecture_h3_results_v1.json",
+    "architecture_h3_results_v2.json"
+  ],
+  "gradient_test": "test_real_body_surface_and_flow_composition_are_differentiable_without_training passed; input/shape/translation/velocity/observation identity finite nonzero gradients, no optimizer, parameters unchanged",
+  "initial_checks": "7new tests passed; first Ruff found only import formatting; corrected. Expanded two actual parameter NaN fault tests and full75passed",
+  "warnings_retained": "10 legacy chumpy/scipy deprecations in full tests; SMPLH10shape-coefficients constructor notice in CLI",
+  "limitations": [
+    "Random outputs not meaningful body/shape accuracy",
+    "No WiLoR hand condition yet",
+    "Existing GRU consumes null frames",
+    "Pooling recurrent features may duplicate past information",
+    "Eager hook not compiled or concurrent deployment",
+    "Neutral-SMPL default original-method gaps remain separate"
+  ],
+  "unrelated_workspace_entries_at_start": 89,
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu",
+    "model_dtype": "float32",
+    "model_seed": 19,
+    "sequence_noise_seed": 97
+  }
+}

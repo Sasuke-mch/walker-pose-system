@@ -79,3 +79,5 @@ uvx ruff check realtime_app/learning_flow_mesh
 S1已增加FMPose3D原Euler/flip-TTA/RPEA输入依赖、RiemannianFM原1000步球面采样检查，全模块累计60项测试通过。`reproduction.run_sampling`分别使用`--paper P03 --device cuda`或`--paper P02 --device cpu`，并显式给新`--output`；`reproduction.audit_mesh_resources`输出各原网格路径的资源缺口。RPEA发布评估路径读取真值根，不能直接作为无真值在线组件；有限fallback不代表几何可用。原默认neutral人体及专用回归器仍缺失，未用现有male/SMPL-H或COCO回归器冒充。
 
 M1补齐P16原64³体素/V2V和原RANSAC完整前向，累计66项测试通过。`reproduction.run_multiview --kind volume --device cuda --output <new.json>`；RANSAC先不带兼容开关保留Python集合采样失败，再用`--kind ransac --python-set-compatibility`显式运行兼容版本。使用人工四相机针孔输入、随机权重，不是原数据性能复现。体素要求外部预测中心，并从batch相机重建投影；RANSAC原阈值为半欧氏距离，双目强制保留两视图，输出confidence全零占位，不能用来替换项目严格门。详见`architecture_multiview_validation.json`和研究记录M1节。
+
+H3在`candidate.py`组合H1/H2和原生成器，明确使用COCO17随机模型，不加载J22合成checkpoint。`reproduction.check_joint_candidate --device cpu --output <new.json>`完整运行既有360帧保存契约→52旋转→真实SMPL-H→COCO17表面回归。前7帧体型待校准及29个无观测帧保留不可用；内部推测另存diagnostic，原严格掩码/拒绝XYZ不作网络目标。K1/K8只改变共享shape读出；姿态与平移相同。新增9个契约/数值故障/梯度测试，全模块75通过。详见`architecture_h3_validation.json`；仅真实输入接线和随机结构，不是准确性或实时结果。

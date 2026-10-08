@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "M1_original_multiview_branches_passed_candidate_integration_and_mesh_gaps_pending",
+  "stage": "H3_real_COCO17_to_mesh_contract_passed_original_method_gaps_and_candidate_refinement_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -168,7 +168,7 @@
       "coverage": "Original sphere geodesic/JVP, configured tangent network/loss plus published1000-step projected Euler sample/sample_all; no original dataset likelihood or human SO3."
     }
   ],
-  "next": "Acquire publicly available original auxiliary resources without license substitution; preregister H1/H2 real COCO17 to52-rotation candidate integration. Default neutral SMPL gaps remain; no training or mainline replacement.",
+  "next": "Review hand-conditioning inputs and missing-frame recurrent state one factor at a time; acquire public original auxiliary resources without neutral-asset substitution. No training or mainline replacement.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -186,7 +186,8 @@
     "S1 original P03 single-frame Euler/flip-TTA and GT-root dependence/saturation/NaN behavior audit",
     "S1 original P02 projected Euler full/last paths at1000steps with analytic control",
     "Exact default mesh prerequisite inventory for six SMPL-dependent original methods; missing assets explicitly retained",
-    "M1 original P16 volume/RANSAC branches, center/camera-source dependencies, half-distance threshold and forced dual-view inlier audit"
+    "M1 original P16 volume/RANSAC branches, center/camera-source dependencies, half-distance threshold and forced dual-view inlier audit",
+    "H3 H1/H2 real COCO17-to52rotation-toSMPLH surface integration, controlled K1/K8 readout, complete360 streaming/future/missing/gradient contracts"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -204,7 +205,8 @@
     "P03_sampling_v1 failed optional RPEA backward because original norm output is modified inplace. Original eval forward retained; v2 onward separates backward limitation. First time-arithmetic fixture required bitwise agreement across algebraically equivalent doubles; explicit1e-15 tolerance fixes test, no source/gate changes.",
     "P16_ransac_v1 failed unchanged original random.sample(set) under Python3.12; v2 explicitly uses a module-local sorted-integer-sequence compatibility facade. No author files modified; old Python set iteration parity not claimed.",
     "M1 first unit tests:65 passed/1 failed because isolated AST test omitted original nn module import. Test-only symbol supplied, final66 passed; original network not changed.",
-    "M1 first Ruff:unused import/two unpacked variables and test import ordering; harness-only cleanup, final check passed."
+    "M1 first Ruff:unused import/two unpacked variables and test import ordering; harness-only cleanup, final check passed.",
+    "H3 first Ruff reported test import formatting only; corrected. No failed H3 forward or unit tests; original licensed-body deprecation notices retained."
   ],
   "candidate_revisions": [
     {
@@ -254,6 +256,28 @@
       "implementation": "realtime_app/learning_flow_mesh/interfaces.py",
       "results": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_h2_results_v3.json",
       "tests": 16
+    },
+    {
+      "id": "H3",
+      "status": "isolated_real_input_mesh_contract_passed_not_mainline",
+      "change": "Compose existing H1/H2 with unchanged pose generator, explicit COCO17 random model and published availability policy",
+      "sources": [
+        "P04",
+        "P07",
+        "P09",
+        "P10",
+        "P12",
+        "P16",
+        "H1",
+        "H2"
+      ],
+      "variable": "K1 versusK8 shared shape readout; identical model/conditions/pose/translation/noise/publication policy",
+      "protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h3_protocol.json",
+      "implementation": "realtime_app/learning_flow_mesh/candidate.py",
+      "results": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h3_results_v2.json",
+      "validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h3_validation.json",
+      "tests": 9,
+      "boundary": "Fresh random architecture on saved real conditions,75total tests, no accuracy/training/mainline/ground/contact/realtime claim"
     }
   ],
   "sampling_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_protocol.json",

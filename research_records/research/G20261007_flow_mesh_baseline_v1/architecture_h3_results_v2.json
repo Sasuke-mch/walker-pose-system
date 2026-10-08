@@ -1,0 +1,118 @@
+{
+  "status": "isolated_H3_real_input_mesh_contract_passed",
+  "protocol": "architecture_h3_protocol.json",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "weights": "fresh_random_seed19",
+  "source_contract": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h2_results_v3.npz",
+  "source_paths": [
+    "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\left_pmpose_raw.json",
+    "research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\right_pmpose_raw.json",
+    "research_records\\engineering_validation\\G20261005_reference25_mainline_view_v2\\first_instance_strict.jsonl"
+  ],
+  "frames": 360,
+  "physical_pair_range": [
+    1157,
+    1516
+  ],
+  "input_schema": "coco17_surface_observations",
+  "model_config": {
+    "observation_joints": 17,
+    "image_feature_dim": 32,
+    "width": 64,
+    "heads": 4,
+    "layers": 2,
+    "use_graph": true,
+    "use_history": true,
+    "rotation_scale": 0.25,
+    "root_offset": [
+      0.0,
+      0.0,
+      3.0
+    ]
+  },
+  "model_parameter_count": 143699,
+  "neural_input_keys": [
+    "xy",
+    "confidence",
+    "observation_mask",
+    "geometry_mask",
+    "ray_origins",
+    "ray_directions",
+    "view_mask",
+    "image_mask"
+  ],
+  "strict_xyz_excluded_from_conditions": true,
+  "strict_accepted_preserved": 3031,
+  "unmatched_frames_preserved": 29,
+  "source_arrays_unchanged": true,
+  "shape_admission": "any immutable strict accepted stereo COCO point, operational not shape accuracy",
+  "first_ready_frame": 7,
+  "beta_constant_after_ready": true,
+  "same_shape_head": true,
+  "shape_K8_vs_K1_l2_not_accuracy": 0.4424628019332886,
+  "pose_and_translation_same_in_K1_K8": true,
+  "K1_original_first_frame_beta_max_error": 0.0,
+  "status_counts": {
+    "available": 324,
+    "calibration_pending": 7,
+    "no_current_observation": 29,
+    "invalid_rotation": 0,
+    "nonfinite_parameters": 0
+  },
+  "model_state_unchanged": true,
+  "candidates": 1,
+  "Euler_nfe_per_frame": 8,
+  "batch_stream_checks": {
+    "1": {
+      "betas": 5.960464477539063e-08,
+      "rotations": 4.76837158203125e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.76837158203125e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 1.430511474609375e-06
+    },
+    "11": {
+      "betas": 2.9802322387695312e-08,
+      "rotations": 4.76837158203125e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.76837158203125e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 7.152557373046875e-07,
+      "mesh_max_error_m": 4.76837158203125e-07,
+      "coco_surface_max_error_m": 7.152557373046875e-07
+    },
+    "64": {
+      "betas": 0.0,
+      "rotations": 4.76837158203125e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.76837158203125e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 9.5367431640625e-07
+    }
+  },
+  "future_before120_checks": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "topology": {
+    "vertices": 6890,
+    "faces": 13776,
+    "rotation_nodes": 52,
+    "surface_observations": 17
+  },
+  "coco_surface_reconstruction_max_error_m": 0.0,
+  "saved_parameter_mesh_rebuild_max_error_m": 2.384185791015625e-07,
+  "assets": {
+    "model_path": "third_party/WiLoR/mano_data/models/SMPLH_male.pkl",
+    "mano_left": "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl",
+    "mano_right": "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl"
+  },
+  "regressor": "models/smpl/J_regressor_coco.npy",
+  "total_check_seconds_not_latency": 7.600125199998729,
+  "boundary": "Real conditions and random structure/internal consistency only. No accuracy, world/ground/contact, original-paper performance or realtime claim. Existing GRU still consumes null frames; shared pooling not proven unbiased/identifiable."
+}

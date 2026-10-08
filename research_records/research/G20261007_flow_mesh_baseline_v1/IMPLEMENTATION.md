@@ -205,3 +205,23 @@ RANSAC P16_ransac_v1.json记录原random.sample(set)在Python3.12的TypeError。
 执行命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.run_multiview --kind volume --device cuda --output <new.json>`；RANSAC先用--kind ransac不加兼容开关保存失败，再以新输出路径加--python-set-compatibility。同名NPZ本地保存，输出拒绝覆盖。新增6个原几何/兼容/体素积分测试，全模块66通过。首次测试AST环境遗漏原nn导入导致1失败65通过，补齐测试符号后通过；初次Ruff未用变量/导入格式诊断均已修正。失败结果/XML保留，见architecture_multiview_validation.json。
 
 M1只补齐P16原三种求解分支的结构证据；输入构建、真实原数据、原检查点/指标、鱼眼适配、严格质量门与人体网格均不在这项证据内。后续隔离候选必须声明中心/相机来源和有效状态，不能把体素输出、confidence占位或双目inlier_count当成真实性。长期目标继续，六个原默认mesh资源缺项及候选组合尚未完成。
+
+## 2026-10-08 H3：真实COCO17输入到完整人体接口
+
+architecture_h3_protocol.json先锁定后实现。新增candidate.py、reproduction/check_joint_candidate.py、tests/test_joint_candidate.py；原model/train/infer/config、工程主线、作者源码及资产未修改，不加载学习权重、不运行优化器。使用H2 results_v3.json/npz保存的360帧0..359、物理pair1157..1516。完整原始像素、人物索引、掩码、拒绝原因、quality_flags、有限拒绝XYZ照录在输出source__字段；未重新关联、检测、三角化或改变质量门。
+
+saved_contract_conditions要求显式COCO17_SURFACE/cam0/meter。检查T×2×17形状、布尔掩码、选中人物、严格门双视图一致以及帧号；原float64条件只在这里转换为模型float32，IDs从int32转int64。像素、confidence、严格接受射线/光心、view/image mask作为条件；没有原始三维XYZ、β、姿态标签或世界地面输入。改写诊断XYZ不会改变任何网络输入。0置信度若观测存在仍保留；没有加新的置信度门。image_mask明确全false，不把随机RGB或虚构特征补成真实输入。
+
+模型fresh seed19，ModelConfig仅显式J22→COCO17，width64/heads4/layers2、图/历史、rotation_scale0.25/root_offset(0,0,3)保持原值，143699参数。旧J22人工模型checkpoint不兼容这套观测语义，本轮未加载。条件仍由原52queries cross-attention及GRU产生，H1临时只读hook取global feature。K8前8个认可帧取均值后调用同一shape_head；对照K1复用完全相同模型/生成器/输出规则。实际frame0认可，K1与原首帧β差0。认可条件是当前存在任意原严格接受COCO点，只是操作性校准规则，不保证足够体型信息。隐藏状态仍由原GRU逐帧处理，包括null帧；没有悄悄冻结或修正该状态。
+
+CandidateState携带原GRU hidden、H1 ShapeState和每序列seed97的B×1×52×6噪声；每块扩展同一噪声到各帧，不逐帧重抽。H1按sequence_id及严格递增frame_id隔离状态；跨序列/重复帧/换噪声seed拒绝。原Euler为8步、候选1个，姿态编码/解码没有改成RFM。K1/K8的raw_state和raw_translation完全相同；βL2差0.44246仅说明读出变化，不是体型误差或收益。
+
+输出明确分三层：原严格观测状态、内部network diagnostic、候选可用状态。shape未校准时beta为NaN/ready=False，人体参数和网格不可用；校准完成后β全序列冻结。当前帧无观测则status=no_current_observation，published rotations/translation/mesh为NaN，即使GRU/网络内部推测有限，也只存raw_*_diagnostic。旋转退化和参数非有限另留状态。没有前缀回填、插值或旧网格替换。这一可用状态只表示数值与当前输入契约，不等于原严格门全部通过、物理可靠或真实姿态准确；没有改变冻结baseline的infer.py行为。
+
+真实BodyDecoder按52矩阵拆根/21身体/左右15手，使用原本地SMPLH_male/MANO资产及flat_hand_mean=True，无伪造人体层。按可用帧选择解码，每一序列复制同一已冻结β到该序列的各帧。保留6890顶点/13776面/52运动学节点，另由models/smpl/J_regressor_coco.npy生成17个表面点。运动学关节与表面点分别保存，不拿腕或肘的名字当恒等映射。当前随机模型没有WiLoR手部条件，30手旋转只是结构输出，不能据此评价抓握。
+
+完整结果v1/v2：原3031严格接受点、29关联失败帧完整保留；K8第7帧首次ready，324可用、7待校准、29无当前观测、0数值故障。逐帧/11/64分块与整段的掩码/status一致；β最大差5.96e−8、rotation4.77e−7、translation2.38e−7m、flow state1.43e−6。11帧分块网格差4.77e−7m、COCO表面点7.15e−7m，均小于预注册2e−5容差。修改120帧后的二维/置信度，此前参数差0，冻结β不变。保存参数首/末可用帧重建网格差2.38e−7m，表面回归重复差0。上述差为算术一致性，不是三维测量误差；总检查耗时含模型构造/多种复测与解码，不能当实时部署延迟。
+
+命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_joint_candidate --device cpu --output <new.json>`，必须先有H2声明的保存输入与本地许可资产。新输出同名NPZ保留完整人体和诊断，仅本地保存，不覆盖旧版本。新增9项测试含数值故障注入及真实SMPL-H/表面点反传；输入、shape head、translation head、velocity head及观测identity梯度有限非零，参数未更新，没有训练。全模块75测试、Ruff/AST通过；初次Ruff仅导入格式诊断已修正，原chumpy/scipy警告保留。独立NPZ/源输入/参数重建检查见architecture_h3_validation.json。
+
+H3完成的是接口组合；尚未证明shape可辨识、池化不偏、手姿正确、世界/地面恢复或实时性。下一阶段单独研究缺失帧历史状态和手部条件；六个原默认neutral SMPL路径/输入/评估仍为十篇完整方法缺口，不用此处SMPL-H候选解码冒充原方法补齐。
