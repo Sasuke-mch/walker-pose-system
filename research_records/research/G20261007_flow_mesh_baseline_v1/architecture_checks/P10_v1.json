@@ -1,0 +1,58 @@
+{
+  "status": "original_components_forward_passed",
+  "source": "third_party/architecture_reproduction/WHAM/lib/models/wham.py",
+  "config": "third_party/architecture_reproduction/WHAM/configs/yamls/model_base.yaml",
+  "constructor": {
+    "architecture": "RNN",
+    "in_dim": 49,
+    "n_iters": 1,
+    "pose_dr": 0.15,
+    "d_embed": 512,
+    "n_layers": 3,
+    "layer": "LSTM"
+  },
+  "input_shape": [
+    1,
+    8,
+    37
+  ],
+  "pose_shape": [
+    1,
+    8,
+    144
+  ],
+  "beta_shape": [
+    1,
+    8,
+    10
+  ],
+  "root_shape": [
+    1,
+    9,
+    6
+  ],
+  "velocity_shape": [
+    1,
+    8,
+    3
+  ],
+  "past_pose_change": 0.0,
+  "past_keypoint_change": 0.0,
+  "past_shape_change": 0.0,
+  "same_sequence_beta_max_change": 0.0007227770984172821,
+  "masked_nan_cleaned_by_original_preprocess": true,
+  "coverage": "Original full Network constructor without body asset, plus original motion encoder, motion decoder, trajectory decoder and missing-point preprocessing. No SMPL mesh/global-feet/refiner execution",
+  "unresolved": [
+    "Original neutral SMPL and WHAM/H36M/feet regressors required before full Network.forward",
+    "Released decoder predicts per-frame beta; streaming hidden/previous predictions require an explicit adapter"
+  ],
+  "id": "P10",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu"
+  },
+  "evidence_boundary": "Untrained structure/interface checks only; no accuracy or deployment-speed conclusion"
+}

@@ -1,36 +1,216 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "official_source_acquisition",
+  "stage": "six_original_structure_checks_remaining_probability_models",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
   "automation_status": "ACTIVE",
   "source_root": "third_party/architecture_reproduction",
-  "evidence_levels": ["primary_method_and_implementation_read", "original_component_forward", "original_full_network_forward", "project_adapter_contract", "isolated_candidate_contract"],
+  "evidence_levels": [
+    "primary_method_and_implementation_read",
+    "original_component_forward",
+    "original_full_network_forward",
+    "project_adapter_contract",
+    "isolated_candidate_contract"
+  ],
   "protocol": {
     "inputs": "Existing primary texts P02/P03/P04/P05/P07/P09/P10/P12/P14/P16 and author repositories; explicit artificial tensors for untrained forward checks",
     "control": "Keep the current FlowMesh and engineering mainline untouched; compare each original implementation with its own published configuration before project adaptation",
     "variables": "One architecture/interface change per candidate; label reduced sizes, feature-only tests, alternate assets and compatibility patches explicitly",
     "success": "For each of ten papers: method/code anchors, runnable original inference structure or explicitly unresolved resource failure, tensor/coordinate/representation contract, limitations; then verified isolated candidate revisions and architecture synthesis",
-    "checks": ["original model/config instantiation", "finite forward output and actual shapes", "declared joint topology and units", "rotation convention and SO(3) endpoints where relevant", "shared shape policy", "future-dependence and streaming state where applicable", "missing-observation semantics", "no download of weights during random initialization"],
+    "checks": [
+      "original model/config instantiation",
+      "finite forward output and actual shapes",
+      "declared joint topology and units",
+      "rotation convention and SO(3) endpoints where relevant",
+      "shared shape policy",
+      "future-dependence and streaming state where applicable",
+      "missing-observation semantics",
+      "no download of weights during random initialization"
+    ],
     "stopping_rules": "Stop only the affected test on absent assets/license or numerical failure; preserve evidence and continue independent papers. No training, no random-output accuracy claims, no frozen-mainline replacement, no redistributing external code/assets",
     "scope_boundary": "Architecture reproduction is not replication of published trained performance. A component forward is not a full model forward; project adaptations remain separate from the original architecture. Do not mark the whole goal complete while any requested reproduction or architecture revision remains unresolved."
   },
   "papers": [
-    {"id":"P04","name":"ProHMR","repo":"nkolot/ProHMR","branch":"master","focus":"Separate probabilistic pose and deterministic shape; multiview fitting","status":"pending"},
-    {"id":"P05","name":"HuManiFlow","repo":"akashsengupta1997/HuManiFlow","branch":"main","focus":"Ancestor-conditioned SO(3) pose and shape distributions","status":"pending"},
-    {"id":"P07","name":"HMR2","repo":"shubham-goel/4D-Humans","branch":"main","focus":"Image tokens and iterative parameter queries","status":"pending"},
-    {"id":"P09","name":"VIBE","repo":"mkocabas/VIBE","branch":"master","focus":"Temporal feature encoder and shared clip shape; future dependence","status":"pending"},
-    {"id":"P10","name":"WHAM","repo":"yohanshin/WHAM","branch":"main","focus":"Causal body motion and separate world trajectory","status":"pending"},
-    {"id":"P12","name":"MotionBERT","repo":"Walter0807/MotionBERT","branch":"main","focus":"Separate spatial and temporal attention; mesh head","status":"pending"},
-    {"id":"P14","name":"MotionAGFormer","repo":"TaatiTeam/MotionAGFormer","branch":"master","focus":"Global attention and local spatial/temporal graph branches","status":"pending"},
-    {"id":"P03","name":"FMPose3D","repo":"AdaptiveMotorControlLab/FMPose3D","branch":"main","focus":"Conditional flow velocity and candidate aggregation","status":"pending"},
-    {"id":"P16","name":"LearnableTriangulation","repo":"karfly/learnable-triangulation-pytorch","branch":"master","focus":"Algebraic/volumetric calibrated view fusion; pinhole boundary","status":"pending"},
-    {"id":"P02","name":"RiemannianFM","repo":"facebookresearch/riemannian-fm","branch":"main","focus":"Manifold probability paths and tangent vector fields","status":"pending"}
+    {
+      "id": "P04",
+      "name": "ProHMR",
+      "repo": "nkolot/ProHMR",
+      "branch": "master",
+      "focus": "Separate probabilistic pose and deterministic shape; multiview fitting",
+      "status": "source_archived_original_forward_pending",
+      "source_status": "source_archived",
+      "source_file_count": 55,
+      "local_source": "third_party/architecture_reproduction/ProHMR"
+    },
+    {
+      "id": "P05",
+      "name": "HuManiFlow",
+      "repo": "akashsengupta1997/HuManiFlow",
+      "branch": "main",
+      "focus": "Ancestor-conditioned SO(3) pose and shape distributions",
+      "status": "source_archived_original_forward_pending",
+      "source_status": "source_archived",
+      "source_file_count": 73,
+      "local_source": "third_party/architecture_reproduction/HuManiFlow"
+    },
+    {
+      "id": "P07",
+      "name": "HMR2",
+      "repo": "shubham-goel/4D-Humans",
+      "branch": "main",
+      "focus": "Image tokens and iterative parameter queries",
+      "status": "source_archived_original_forward_pending",
+      "source_status": "source_archived",
+      "source_file_count": 67,
+      "local_source": "third_party/architecture_reproduction/HMR2"
+    },
+    {
+      "id": "P09",
+      "name": "VIBE",
+      "repo": "mkocabas/VIBE",
+      "branch": "master",
+      "focus": "Temporal feature encoder and shared clip shape; future dependence",
+      "status": "original_component_forward_passed",
+      "source_status": "source_archived",
+      "source_file_count": 64,
+      "local_source": "third_party/architecture_reproduction/VIBE",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P09_v1.json",
+      "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration"
+    },
+    {
+      "id": "P10",
+      "name": "WHAM",
+      "repo": "yohanshin/WHAM",
+      "branch": "main",
+      "focus": "Causal body motion and separate world trajectory",
+      "status": "original_components_forward_passed",
+      "source_status": "source_archived",
+      "source_file_count": 69,
+      "local_source": "third_party/architecture_reproduction/WHAM",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P10_v1.json",
+      "coverage": "Original full Network constructor without body asset, plus original motion encoder, motion decoder, trajectory decoder and missing-point preprocessing. No SMPL mesh/global-feet/refiner execution"
+    },
+    {
+      "id": "P12",
+      "name": "MotionBERT",
+      "repo": "Walter0807/MotionBERT",
+      "branch": "main",
+      "focus": "Separate spatial and temporal attention; mesh head",
+      "status": "original_network_forward_passed",
+      "source_status": "source_archived",
+      "source_file_count": 56,
+      "local_source": "third_party/architecture_reproduction/MotionBERT",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P12_v1.json",
+      "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered"
+    },
+    {
+      "id": "P14",
+      "name": "MotionAGFormer",
+      "repo": "TaatiTeam/MotionAGFormer",
+      "branch": "master",
+      "focus": "Global attention and local spatial/temporal graph branches",
+      "status": "original_network_forward_passed",
+      "source_status": "source_archived",
+      "source_file_count": 63,
+      "local_source": "third_party/architecture_reproduction/MotionAGFormer",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P14_v1.json",
+      "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered"
+    },
+    {
+      "id": "P03",
+      "name": "FMPose3D",
+      "repo": "AdaptiveMotorControlLab/FMPose3D",
+      "branch": "main",
+      "focus": "Conditional flow velocity and candidate aggregation",
+      "status": "original_network_forward_passed",
+      "source_status": "source_archived",
+      "source_file_count": 103,
+      "local_source": "third_party/architecture_reproduction/FMPose3D",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_v1.json",
+      "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered"
+    },
+    {
+      "id": "P16",
+      "name": "LearnableTriangulation",
+      "repo": "karfly/learnable-triangulation-pytorch",
+      "branch": "master",
+      "focus": "Algebraic/volumetric calibrated view fusion; pinhole boundary",
+      "status": "original_algebraic_network_forward_passed",
+      "source_status": "source_archived",
+      "source_file_count": 34,
+      "local_source": "third_party/architecture_reproduction/LearnableTriangulation",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_v1.json",
+      "coverage": "Original algebraic network and original pinhole DLT; volumetric/RANSAC variants not run"
+    },
+    {
+      "id": "P02",
+      "name": "RiemannianFM",
+      "repo": "facebookresearch/riemannian-fm",
+      "branch": "main",
+      "focus": "Manifold probability paths and tangent vector fields",
+      "status": "source_archived_original_forward_pending",
+      "source_status": "source_archived",
+      "source_file_count": 54,
+      "local_source": "third_party/architecture_reproduction/RiemannianFM"
+    }
   ],
-  "next": "Acquire source/config/license snapshots with file provenance, then run original MotionAGFormer/MotionBERT/FMPose3D structures in isolated subprocesses before adopting a new spatial block",
-  "completed": [],
-  "failures": [],
-  "candidate_revisions": []
+  "next": "Inspect ProHMR/HuManiFlow/HMR2/RiemannianFM dependency and resource contracts; use isolated dependencies and actual initialization resources to run remaining original neural architectures. Complete mesh-body paths and project adapters separately before claiming ten complete reproductions; then implement H1 causal multi-frame shared-shape calibration.",
+  "completed": [
+    "Protocol locked before executing source/model checks",
+    "Ten source/config/license snapshots acquired with local provenance",
+    "Three original lifting/velocity networks ran with published width/depth/resolution",
+    "VIBE original TemporalEncoder plus bidirectional diagnostic",
+    "WHAM original Network construction and motion/trajectory components without fake SMPL",
+    "LearnableTriangulation original ResNet152 algebraic network at 384x384 and exact pinhole control",
+    "Seven archive containment/no-overwrite tests passed"
+  ],
+  "failures": [
+    "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
+    "Ruff is absent in .venv-cuda; used existing cached uvx --offline ruff without changing environment.",
+    "LearnableTriangulation original repo is karfly/learnable-triangulation-pytorch; initial saic-violet URL returned 404 and was not used."
+  ],
+  "candidate_revisions": [
+    {
+      "id": "H1",
+      "status": "planned_not_implemented",
+      "change": "Causal multi-frame shared shape calibration, explicit unavailable state until freeze",
+      "sources": [
+        "P09 paper Section 3.1",
+        "P12 original model_mesh.py SMPLRegressor"
+      ],
+      "variable": "First-frame-only shape estimation versus masked prefix aggregation; freeze after calibration and keep all pose/flow parameters unchanged",
+      "checks": [
+        "batch/stream equivalence",
+        "future perturbation cannot change already released frames",
+        "missing frames do not become valid shape evidence",
+        "same beta after freeze",
+        "real SMPL-H decode and gradient contract"
+      ],
+      "boundary": "Architecture and observability design only; no claim that pooling improves beta accuracy without trained evaluation"
+    },
+    {
+      "id": "H2",
+      "status": "planned_not_implemented",
+      "change": "Explicit camera/joint/rotation/units adapters before adopting original modules",
+      "sources": [
+        "P03",
+        "P07",
+        "P10",
+        "P12",
+        "P14",
+        "P16"
+      ],
+      "variable": "Typed semantic adapters rather than direct tensor reuse",
+      "checks": [
+        "COCO17 versus H36M17 versus SMPL-H52",
+        "6D ordering roundtrip",
+        "raw fish-eye pixels to rays via calibration",
+        "weak camera parameters never renamed metric translation",
+        "missing/presence mask polarity"
+      ],
+      "boundary": "Frozen strict geometry/Stage/ground remain external; no learned replacement"
+    }
+  ]
 }

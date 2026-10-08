@@ -1,0 +1,29 @@
+{
+  "source_snapshots": 10,
+  "original_checks_with_explicit_coverage": 6,
+  "remaining_original_forwards": [
+    "P04",
+    "P05",
+    "P07",
+    "P02"
+  ],
+  "all_snapshot_files_exist_and_sizes_match": true,
+  "syntax_passed": true,
+  "frozen_controls_unchanged": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/config.json"
+  ],
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "scope": "First architecture/source milestone; complete mesh variants and project adapters remain unverified",
+  "tests": {
+    "count": 28,
+    "failures": 0,
+    "errors": 0,
+    "xml": "outputs/architecture_phase1_tests.xml",
+    "legacy_asset_deprecation_warnings": 4,
+    "ruff": "passed"
+  }
+}

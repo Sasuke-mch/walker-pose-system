@@ -1,0 +1,45 @@
+{
+  "id": "P12",
+  "status": "original_network_forward_passed",
+  "source": "D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\MotionBERT\\lib\\model\\DSTformer.py",
+  "config": "third_party/architecture_reproduction/MotionBERT/configs/pose3d/MB_ft_h36m.yaml",
+  "constructor": {
+    "dim_feat": 512,
+    "dim_rep": 512,
+    "depth": 5,
+    "num_heads": 8,
+    "mlp_ratio": 2,
+    "num_joints": 17,
+    "maxlen": 243,
+    "att_fuse": true
+  },
+  "parameter_count": 42466317,
+  "published_input_shape": [
+    1,
+    243,
+    17,
+    3
+  ],
+  "published_output_shape": [
+    1,
+    243,
+    17,
+    3
+  ],
+  "future_probe_frames": 243,
+  "past_output_max_change_when_future_changed": 0.11063595116138458,
+  "finite_input_repeat_exact": true,
+  "nonfinite_output_elements_after_one_missing_point": 12393,
+  "original_observation_mask_api": false,
+  "weights": "random_initialization",
+  "training_executed": false,
+  "adaptations": [],
+  "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered",
+  "evidence_boundary": "Architecture/interface behavior only; random outputs are not accuracy or real-time deployment evidence",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu",
+    "elapsed_total_seconds_not_inference_latency": 13.514625100011472
+  }
+}

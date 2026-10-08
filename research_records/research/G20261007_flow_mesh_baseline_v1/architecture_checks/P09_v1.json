@@ -1,0 +1,42 @@
+{
+  "status": "original_component_forward_passed",
+  "source": "third_party/architecture_reproduction/VIBE/lib/models/vibe.py",
+  "config": "third_party/architecture_reproduction/VIBE/configs/config.yaml",
+  "class_source_lines": [
+    27,
+    63
+  ],
+  "constructor": {
+    "n_layers": 2,
+    "hidden_size": 1024,
+    "add_linear": true,
+    "bidirectional": false,
+    "use_residual": true
+  },
+  "input_shape": [
+    1,
+    16,
+    2048
+  ],
+  "output_shape": [
+    1,
+    16,
+    2048
+  ],
+  "official_config_past_change_when_future_changed": 0.0,
+  "paper_bidirectional_variant_past_change": 0.21360501646995544,
+  "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration",
+  "unresolved": [
+    "Original SMPL neutral/extra joint regressors and mean-parameter resources needed for complete mesh path",
+    "Paper describes clip-averaged beta, released VIBE.forward flattens temporal features and its Regressor predicts beta per frame"
+  ],
+  "id": "P09",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu"
+  },
+  "evidence_boundary": "Untrained structure/interface checks only; no accuracy or deployment-speed conclusion"
+}

@@ -3756,3 +3756,9 @@ G20261007_flow_mesh_baseline_v1记录20篇卡片/横表/正文锚点及设计依
 ### 2026-10-08 十篇架构复现长期任务：协议启动
 
 用户授权不训练地研究/复现十篇相似结构，再逐步改进隔离架构。选定P02/P03/P04/P05/P07/P09/P10/P12/P14/P16，协议与状态在G20261007_flow_mesh_baseline_v1/architecture_research.json。既有20篇阅读不算作者结构复现；随机初始化检查不算性能复现。正式reference25、原FlowMesh及资产不修改。已创建本聊天每小时heartbeat“人体架构复现”，本机automation.toml核实ACTIVE且target_thread_id为本聊天；早期缺destination调用失败后已正确建立。先完成来源/配置核对及作者原结构检查，才推进项目候选。
+
+### 2026-10-08 十篇架构复现：首批源码及原结构检查
+
+十个官方源码/配置/许可快照已保存third_party/architecture_reproduction；只有自写隔离运行器和小型来源/检查记录纳入提交。P03/P12/P14原速度/姿态网络按原宽度/深度/帧数随机前向通过；P16原ResNet152代数双目分支384×384通过，独立已知点原DLT误差<1e−5m。P09原TemporalEncoder及P10原构造/运动和轨迹组件通过，但没有假人体层补足完整模型。合计6篇有不同范围运行证据，不称6篇完整论文复现；P04/P05/P07/P02原前向仍待推进。
+
+新发现：P12/P14时间网络使用未来；P03速度场逐帧。单NaN原输入污染P12全clip、P14全clip、P03该帧；不能直接接项目缺失mask。VIBE正文双向/共享平均shape，发布配置单向且回归路径未平均；WHAM发布beta为B,T,10，亦非全片共享。P12 mesh head时间特征平均才预测shape，是另一路径。具体源行/公式范围及适配判断追加既有LITERATURE_ANALYSIS/IMPLEMENTATION。7项来源安全/不覆盖测试、Ruff和语法检查通过；无训练/权重加载/精度结论/主线变更。H1多帧因果shape校准及H2语义接口仅预注册，下一阶段优先完成剩余原网络/资源核对。目标及hourly跟进保持active。

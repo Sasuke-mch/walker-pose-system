@@ -1,0 +1,48 @@
+{
+  "status": "original_algebraic_network_forward_passed",
+  "source": "third_party/architecture_reproduction/LearnableTriangulation/mvn/models/triangulation.py",
+  "config": "third_party/architecture_reproduction/LearnableTriangulation/experiments/human36m/train/human36m_alg.yaml",
+  "input_shape": [
+    1,
+    2,
+    3,
+    384,
+    384
+  ],
+  "xyz_shape": [
+    1,
+    17,
+    3
+  ],
+  "heatmap_shape": [
+    1,
+    2,
+    17,
+    96,
+    96
+  ],
+  "confidence_shape": [
+    1,
+    2,
+    17
+  ],
+  "parameter_count": 79521890,
+  "exact_geometry_control_max_error_m": 9.5367431640625e-07,
+  "adaptations": [
+    "Only backbone.init_weights=True changed to False; ResNet152, 384x384 input and confidence head unchanged"
+  ],
+  "coverage": "Original algebraic network and original pinhole DLT; volumetric/RANSAC variants not run",
+  "unresolved": [
+    "Raw fish-eye pixels cannot be used with pinhole projection matrices; project ray adapter and strict gates must remain separate",
+    "No native point-rejection/missing-state contract; cannot replace strict triangulation"
+  ],
+  "id": "P16",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu"
+  },
+  "evidence_boundary": "Untrained structure/interface checks only; no accuracy or deployment-speed conclusion"
+}

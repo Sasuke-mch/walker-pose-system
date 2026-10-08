@@ -243,6 +243,33 @@
 
 PoseD-Flow项目页：https://circle-group.github.io/research/PoseD-Flow/。页面显示旋转流形FM和人体恢复应用，但2026-10-07实查论文/代码按钮为空链接，未获得原始正文，不能计入20篇已读论文，也不据项目页完整推断其实现。暂用Mesh Graphormer补足正式20篇。后续如取得正文再追加，不虚报阅读。
 
+## 2026-10-08 十篇作者实现审查：第一阶段
+
+本阶段重新核对下面十个作者仓库，不用已有二十篇阅读数冒充十个结构复现。十份源码/配置/许可快照在`third_party/architecture_reproduction/`；逐文件来源、字节数和取得时间见`architecture_sources_v1.json`和各快照`SOURCE_SNAPSHOT.json`。不提交作者代码、资产或完整原文。外部仓库可能随时间变化，复现使用本地快照，不假定之后远端同名分支仍相同。
+
+|论文及官方代码|实际检查的源码位置|对本系统的具体启示|当前执行范围|
+|---|---|---|---|
+|[ProHMR](https://github.com/nkolot/ProHMR)|heads/fc_head.py 7–51；heads/smpl_flow.py 12–90|图像特征MLP输出beta/camera，沿候选轴重复；概率姿态与确定性shape分开。camera不是双鱼眼米制translation。作者使用修改版nflows的ConditionalGlow，标准nflows不够|源码审查，原前向待执行|
+|[HuManiFlow](https://github.com/akashsengupta1997/HuManiFlow)|models/humaniflow_model.py 33–340|shape均值/标准差定义分布；shape、root、camera及祖先旋转共同条件化关节SO(3)分布，默认采样shape会随候选变化，use_shape_mode_for_samples另有语义。不是FM，也不是我们的并行图平均|源码审查，原前向待执行|
+|[HMR2](https://github.com/shubham-goel/4D-Humans)|heads/smpl_head.py 17–111；utils/geometry.py 47–62|单查询cross-attention看完整图像patch，输出pose/beta/camera残差；不等于52个独立姿态查询或多帧shape。6D先按两组三维向量排列，必须核对转换函数而非只看名字|源码审查，原前向待执行|
+|[VIBE](https://github.com/mkocabas/VIBE)|lib/models/vibe.py 27–117；spin.py 209–293；configs/config.yaml|正文P09 L137/L143–144描述双向GRU和整段平均shape；当前发布配置BIDIRECTIONAL=false，VIBE.forward把N,T特征展平，Regressor逐帧输出shape，这条代码路径未做平均。必须区分论文版本与发布实现|原TemporalEncoder完成；完整SMPL回归路径未执行|
+|[WHAM](https://github.com/yohanshin/WHAM)|lib/models/wham.py 15–201；layers/modules.py 98–217|MotionEncoder/Decoder/TrajectoryDecoder均按过去递归；beta实际为B,T,10，不天然全片共享。preprocess的mask=True表示缺失，与本项目presence mask相反。世界轨迹/脚修正需真实人体层及外部相机语义|原网络构造、三个原组件和mask完成；真实人体层及全局脚/精修未执行|
+|[MotionBERT](https://github.com/Walter0807/MotionBERT)|DSTformer.py 269–361及forward_temporal 188–200；model_mesh.py 9–80|姿态主干空间/时间两顺序分支融合；时间attention看整clip。mesh head先平均时间特征再预测一套beta，随后广播；与VIBE论文先预测beta再平均不同。shape池化使用未来，实时适配必须单列|原H36M姿态网络243帧、512宽、5层完成；mesh分支未执行|
+|[MotionAGFormer](https://github.com/TaatiTeam/MotionAGFormer)|MotionAGFormer.py 68–160/196–284；attention.py 50–62；graph.py 10–128|attention与图分支各含空间和时间操作，再自适应融合；时间attention及相似图没有因果屏蔽。原图为H36M17且图层有节点BatchNorm，不能将我们的52节点相邻平均称原结构复现|原xsmall网络27帧、64宽、12层完成|
+|[FMPose3D](https://github.com/AdaptiveMotorControlLab/FMPose3D)|model_GAMLP.py 111–152/216–247；scripts/FMPose3D_train.sh|2D、3D状态与生成时间拼接，B,F展平成B×F后执行图/attention，网络是帧内速度场，不含我们的GRU，也不输出mesh/beta。完整论文另有采样、RPEA及评价预算|原512宽、5层、17节点速度网络完成；采样/RPEA未执行|
+|[Learnable Triangulation](https://github.com/karfly/learnable-triangulation-pytorch)|mvn/models/triangulation.py 131–200/203–355；utils/multiview.py 141–168；experiments/human36m/train/human36m_alg.yaml|原ResNet152、heatmap积分、跨相机归一化confidence和加权DLT；体素分支需要人体中心和体素空间。透视P矩阵不能直接处理原始鱼眼像素；没有项目严格门/拒绝原因，不可直接替换|原代数分支384×384完整前向及已知点DLT完成；体素/RANSAC待执行|
+|[Riemannian FM](https://github.com/facebookresearch/riemannian-fm)|manifm/model/arch.py 75–106；model_pl.py 556–615|网络向量场投影到当前位置切空间；测地路径用jvp求目标速度，再用流形度量比较。不能把欧氏6D直线后投影终点称SO(3) RFM；此仓库也不是现成条件人体恢复网络|核心源码审查，原流形路径/向量场待执行|
+
+### 对架构的阶段性判断
+
+1. 共享体型是我们需要显式规定的任务契约，不能假设视频方法都天然共享。P09正文、发布实现、P10发布实现和P12 mesh head实际做法不同。当前首帧beta分支应保留为冻结对照；拟议候选采用因果多帧校准、完成后冻结，并在校准期明确shape unavailable，不追溯改写已发布帧。池化是否提升体型精度尚未验证，不训练阶段只验证信息来源和共享/因果语义。
+2. 原MotionBERT和MotionAGFormer看未来是其离线算法正常行为，不是作者代码bug；如果任务要求零延迟在线，应另写因果适配并报告改法及延迟，不能只把整clip放入网络再称实时。
+3. 局部关节旋转、全局根旋转、相机坐标平移和世界轨迹必须分开；弱透视camera不能改名为translation_m。Stage/地面仍由原系统负责，网络组件不能掩盖该层失败。
+4. 缺失语义是必须补齐的接口，而非可选小技巧。原三种骨架网络不收项目presence mask，一个NaN输入可污染整clip/整帧；项目适配须显式保留拒绝/无效输出。WHAM缺失mask极性相反，直接传入会把正确点遮掉。
+5. 当前图平均与GRU模块均未证明有效。原作者空间、时间和图结构复杂程度不同；先保留同容量确定性对照，再单因素搭建候选。旋转RFM需独立概率路径和切向速度定义，不能仅替换输出转换函数。
+
+这只是源码与无训练结构证据，未形成新精度结果，也未完成十篇的全部结构/适配复现。正式状态以architecture_research.json为准。
+
 ## 进度
 
 20篇公开正文的方法与主要实验分析已完成，含监督/对照/局限及设计依据。正文逐行存档于sources/；图目前依据正文图注解释，未声称逐图视觉检查。随后已实现并训练隔离baseline，结果见IMPLEMENTATION.md；只有合成工程证据，没有真实精度结果。

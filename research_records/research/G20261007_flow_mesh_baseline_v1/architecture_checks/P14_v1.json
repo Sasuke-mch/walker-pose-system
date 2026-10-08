@@ -1,0 +1,60 @@
+{
+  "id": "P14",
+  "status": "original_network_forward_passed",
+  "source": "D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\MotionAGFormer\\model\\MotionAGFormer.py",
+  "config": "third_party/architecture_reproduction/MotionAGFormer/configs/h36m/MotionAGFormer-xsmall.yaml",
+  "constructor": {
+    "n_layers": 12,
+    "dim_in": 3,
+    "dim_feat": 64,
+    "dim_rep": 512,
+    "dim_out": 3,
+    "mlp_ratio": 4,
+    "attn_drop": 0.0,
+    "drop": 0.0,
+    "drop_path": 0.0,
+    "use_layer_scale": true,
+    "layer_scale_init_value": 1e-05,
+    "use_adaptive_fusion": true,
+    "num_heads": 8,
+    "qkv_bias": false,
+    "qkv_scale": null,
+    "hierarchical": false,
+    "use_temporal_similarity": true,
+    "neighbour_num": 2,
+    "temporal_connection_len": 1,
+    "use_tcn": false,
+    "graph_only": false,
+    "n_frames": 27,
+    "num_joints": 17
+  },
+  "parameter_count": 2241531,
+  "published_input_shape": [
+    1,
+    27,
+    17,
+    3
+  ],
+  "published_output_shape": [
+    1,
+    27,
+    17,
+    3
+  ],
+  "future_probe_frames": 27,
+  "past_output_max_change_when_future_changed": 4.0978193283081055e-06,
+  "finite_input_repeat_exact": true,
+  "nonfinite_output_elements_after_one_missing_point": 1377,
+  "original_observation_mask_api": false,
+  "weights": "random_initialization",
+  "training_executed": false,
+  "adaptations": [],
+  "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered",
+  "evidence_boundary": "Architecture/interface behavior only; random outputs are not accuracy or real-time deployment evidence",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu",
+    "elapsed_total_seconds_not_inference_latency": 4.483404599974165
+  }
+}

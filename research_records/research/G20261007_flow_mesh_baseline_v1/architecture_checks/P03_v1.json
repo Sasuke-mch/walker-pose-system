@@ -1,0 +1,45 @@
+{
+  "id": "P03",
+  "status": "original_network_forward_passed",
+  "source": "D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\FMPose3D\\fmpose3d\\models\\fmpose3d\\model_GAMLP.py",
+  "config": "third_party/architecture_reproduction/FMPose3D/scripts/FMPose3D_train.sh",
+  "constructor": {
+    "channel": 512,
+    "d_hid": 1024,
+    "token_dim": 256,
+    "layers": 5,
+    "n_joints": 17
+  },
+  "parameter_count": 16045837,
+  "published_input_shape": [
+    1,
+    1,
+    17,
+    2
+  ],
+  "published_output_shape": [
+    1,
+    1,
+    17,
+    3
+  ],
+  "future_probe_frames": 5,
+  "past_output_max_change_when_future_changed": 0.0,
+  "finite_input_repeat_exact": true,
+  "nonfinite_output_elements_after_one_missing_point": 51,
+  "original_observation_mask_api": false,
+  "weights": "random_initialization",
+  "training_executed": false,
+  "adaptations": [
+    "Bypass top-level detector/inference/animal package facades only; original velocity network and graph files unchanged",
+    "Primary check uses published one-frame setting; extra five-frame test checks frame independence, not temporal training"
+  ],
+  "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered",
+  "evidence_boundary": "Architecture/interface behavior only; random outputs are not accuracy or real-time deployment evidence",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu",
+    "elapsed_total_seconds_not_inference_latency": 4.281107899994822
+  }
+}

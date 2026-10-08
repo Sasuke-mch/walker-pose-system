@@ -93,3 +93,34 @@ loss目标不同，不能跨FM/回归比较数值。fresh的4组均保留完整6
 Matplotlib精确生成可编辑SVG及带矢量框线文字的PDF，人体缩略图由真实三角面渲染并嵌入，以避免13,776面导致编辑文件过大。PNG为4320×2520。两种语言均实际查看，文字边界自动检查、配置契约检查和源网格尺寸检查通过；Ruff初轮发现import排列及pairwise风格问题，修复后通过。未运行模型测试或产生新精度指标。
 
 复现：从仓库根执行`.venv-cuda/Scripts/python.exe -B realtime_app/learning_flow_mesh/draw_architecture.py --output research_records/research/G20261007_flow_mesh_baseline_v1/figures`。配置契约变化时脚本拒绝继续生成陈旧标注，需核对新代码并同步图。
+
+## 2026-10-08 十篇原结构复现：源码及首批运行
+
+协议锁定后执行。新增隔离运行器`realtime_app/learning_flow_mesh/reproduction/`：fetch保存十份原代码/配置/许可及来源清单；run_original运行P03/P12/P14原神经网络；run_components运行P09/P10原视频组件与P16原代数网络。源码仅在third_party本地保存，没有复制进维护代码，也没有安装旧torch/torchvision到现有环境。
+
+全部为CPU、随机初始化、eval/inference_mode、seed19，不训练、不读取现有被试图像、不比较随机输出精度。Python3.12.12、torch2.11.0+cu128。作者旧timm导入warning保留。run_original的整个过程时间含构造/诊断，不是推理延迟；没有整体实时认证。
+
+|实际运行|构造/输入|已验证行为|未覆盖|
+|---|---|---|---|
+|P12 DSTformer|原H36M配置512宽/5层/8头；1×243×17×3；42,466,317参数|输出1×243×17×3有限、重复逐位一致；改变未来半段，过去最大变化0.110636；一个缺失NaN造成12,393个非有限输出|SMPL mesh head、真实精度、项目缺失/因果适配|
+|P14 MotionAGFormer xsmall|原配置64宽/12层/8头/27帧；2,241,531参数|输出有限/重复一致；过去变化4.10e−6，虽小仍非因果；NaN污染全部1,377输出|训练效果、因果/52节点适配|
+|P03 FMPose3D Model|原512宽/5层/17节点；16,045,837参数；原单帧条件2D/状态3D/时间1|输出速度有限/重复一致；附加5帧检验过去变化0；NaN只污染该帧51输出|作者完整ODE、RPEA、多候选选择和mesh/beta|
+|P09 TemporalEncoder|发布config.yaml：2层/1024隐层/单向/线性+残差；1×16×2048|原配置未来扰动过去变化0；明确改双向的诊断0.213605，不能混作发布配置|完整回归/人体层；原组件按AST加载，未改类代码，绕过资产依赖顶层导入|
+|P10 WHAM组件|原model_base配置；Network(smpl=None)只构造，原MotionEncoder/Decoder/TrajectoryDecoder前向；1×8×37|过去pose/keypoint/beta变化均0；beta为1×8×10，同序列最大变化0.000723；缺失点NaN通过原preprocess清除|没有假SMPL替代真实人体层；全Network.forward、脚世界坐标/轨迹精修仍待资源|
+|P16代数网络|原ResNet152、384×384、置信度头；79,521,890参数；1×2×3×384×384|完整原分支输出1×17×3及双目heatmap/置信度有限；原DLT已知3D点最大误差9.54e−7m|只关闭预训练初始化，没有改变结构/分辨率；体素/RANSAC/鱼眼适配/严格拒绝门未执行|
+
+P03通过namespace package路径绕过高层detector/动物/自动权重下载facade，原Model/Graph未修改。P09只编译实际原TemporalEncoder AST；不能把这一组件检查称完整VIBE复现。P10保持原配置字段，但实际Network根据17关节计算37维输入，配置in_dim=49不决定该构造器的输入；layers/modules读取rnn_type默认LSTM，配置layer字段未自动等于接口名。这里记录实际构造而不是猜测字段含义。
+
+复现命令（仓库根；输出必须不存在，改用新版本文件保留历史）：
+
+```powershell
+./.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.fetch --output research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sources_v2.json
+./.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.run_original --paper P12 --output research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P12_v2.json
+./.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.run_components --paper P16 --output research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_v2.json
+./.venv-cuda/Scripts/python.exe -B -m pytest realtime_app/learning_flow_mesh/tests/test_reproduction_fetch.py -q
+uvx --offline ruff check realtime_app/learning_flow_mesh/reproduction realtime_app/learning_flow_mesh/tests/test_reproduction_fetch.py
+```
+
+原source acquire前验证全部ZIP成员再写入，拒绝目录逃逸、Windows驱动路径和反斜杠；未完成/不一致缓存不覆盖且记录失败。7项安全/缓存保留检查通过。初次linter的2项import已修正；执行已审查原类的AST和异常报告边界有局部注明，仍返回失败退出码，不吞错假报通过。当前cuda环境未安装ruff，使用已缓存uvx离线版本；没有为此更换环境依赖。
+
+下一阶段：P04/P05/P07/P02原概率/参数/流形网络；随后补齐真实人体层及正式接口。核心SMPL-H学习baseline及reference25主线没改。H1因果多帧共享体型与H2语义适配仅有协议，尚未实现；十篇复现和架构优化长期目标保持进行中。

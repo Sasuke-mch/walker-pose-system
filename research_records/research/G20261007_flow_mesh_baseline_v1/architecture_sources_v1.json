@@ -1,0 +1,2737 @@
+{
+  "training_executed": false,
+  "papers": [
+    {
+      "id": "P04",
+      "name": "ProHMR",
+      "repo_url": "https://github.com/nkolot/ProHMR",
+      "archive_url": "https://codeload.github.com/nkolot/ProHMR/zip/refs/heads/master",
+      "branch": "master",
+      "source_path": "third_party/architecture_reproduction/ProHMR",
+      "downloaded_at_utc": "2026-10-08T00:13:06.426736+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 1536
+        },
+        {
+          "path": "README.md",
+          "bytes": 7062
+        },
+        {
+          "path": "colab_requirements.txt",
+          "bytes": 231
+        },
+        {
+          "path": "dataset_preprocessing/README.md",
+          "bytes": 4579
+        },
+        {
+          "path": "dataset_preprocessing/preprocess_3dpw.py",
+          "bytes": 5161
+        },
+        {
+          "path": "dataset_preprocessing/preprocess_h36m.py",
+          "bytes": 6941
+        },
+        {
+          "path": "demo.py",
+          "bytes": 4899
+        },
+        {
+          "path": "environment.yml",
+          "bytes": 4885
+        },
+        {
+          "path": "eval/eval_keypoint_fitting.py",
+          "bytes": 3056
+        },
+        {
+          "path": "eval/eval_multiview.py",
+          "bytes": 2579
+        },
+        {
+          "path": "eval/eval_regression.py",
+          "bytes": 2878
+        },
+        {
+          "path": "eval/eval_skeleton.py",
+          "bytes": 3201
+        },
+        {
+          "path": "example_data/keypoints/pexels-anete-lusina-4793258_keypoints.json",
+          "bytes": 845
+        },
+        {
+          "path": "fetch_data.sh",
+          "bytes": 293
+        },
+        {
+          "path": "prohmr/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "prohmr/configs/__init__.py",
+          "bytes": 3456
+        },
+        {
+          "path": "prohmr/configs/datasets.yaml",
+          "bytes": 2350
+        },
+        {
+          "path": "prohmr/configs/prohmr.yaml",
+          "bytes": 1428
+        },
+        {
+          "path": "prohmr/configs/proskeleton.yaml",
+          "bytes": 707
+        },
+        {
+          "path": "prohmr/datasets/__init__.py",
+          "bytes": 6126
+        },
+        {
+          "path": "prohmr/datasets/batched_image_dataset.py",
+          "bytes": 6710
+        },
+        {
+          "path": "prohmr/datasets/dataset.py",
+          "bytes": 659
+        },
+        {
+          "path": "prohmr/datasets/image_dataset.py",
+          "bytes": 7086
+        },
+        {
+          "path": "prohmr/datasets/mocap_dataset.py",
+          "bytes": 797
+        },
+        {
+          "path": "prohmr/datasets/openpose_dataset.py",
+          "bytes": 5838
+        },
+        {
+          "path": "prohmr/datasets/skeleton_dataset.py",
+          "bytes": 1870
+        },
+        {
+          "path": "prohmr/datasets/utils.py",
+          "bytes": 23177
+        },
+        {
+          "path": "prohmr/models/__init__.py",
+          "bytes": 135
+        },
+        {
+          "path": "prohmr/models/backbones/__init__.py",
+          "bytes": 313
+        },
+        {
+          "path": "prohmr/models/backbones/fcresnet.py",
+          "bytes": 2514
+        },
+        {
+          "path": "prohmr/models/backbones/resnet.py",
+          "bytes": 8608
+        },
+        {
+          "path": "prohmr/models/discriminator.py",
+          "bytes": 3619
+        },
+        {
+          "path": "prohmr/models/heads/__init__.py",
+          "bytes": 99
+        },
+        {
+          "path": "prohmr/models/heads/fc_head.py",
+          "bytes": 2077
+        },
+        {
+          "path": "prohmr/models/heads/skeleton_flow.py",
+          "bytes": 3192
+        },
+        {
+          "path": "prohmr/models/heads/smpl_flow.py",
+          "bytes": 4412
+        },
+        {
+          "path": "prohmr/models/losses.py",
+          "bytes": 4009
+        },
+        {
+          "path": "prohmr/models/prohmr.py",
+          "bytes": 22177
+        },
+        {
+          "path": "prohmr/models/proskeleton.py",
+          "bytes": 9347
+        },
+        {
+          "path": "prohmr/models/smpl_wrapper.py",
+          "bytes": 1604
+        },
+        {
+          "path": "prohmr/optimization/__init__.py",
+          "bytes": 148
+        },
+        {
+          "path": "prohmr/optimization/keypoint_fitting.py",
+          "bytes": 5629
+        },
+        {
+          "path": "prohmr/optimization/losses.py",
+          "bytes": 4141
+        },
+        {
+          "path": "prohmr/optimization/multiview_refinement.py",
+          "bytes": 3126
+        },
+        {
+          "path": "prohmr/optimization/optimization_task.py",
+          "bytes": 1409
+        },
+        {
+          "path": "prohmr/utils/__init__.py",
+          "bytes": 735
+        },
+        {
+          "path": "prohmr/utils/geometry.py",
+          "bytes": 4189
+        },
+        {
+          "path": "prohmr/utils/pose_utils.py",
+          "bytes": 6942
+        },
+        {
+          "path": "prohmr/utils/render_openpose.py",
+          "bytes": 6714
+        },
+        {
+          "path": "prohmr/utils/renderer.py",
+          "bytes": 4690
+        },
+        {
+          "path": "prohmr/utils/skeleton_renderer.py",
+          "bytes": 9370
+        },
+        {
+          "path": "requirements.txt",
+          "bytes": 354
+        },
+        {
+          "path": "setup.py",
+          "bytes": 182
+        },
+        {
+          "path": "train/train_prohmr.py",
+          "bytes": 2212
+        },
+        {
+          "path": "train/train_skeleton.py",
+          "bytes": 2374
+        }
+      ],
+      "source_file_count": 55,
+      "selected_bytes": 222671,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P05",
+      "name": "HuManiFlow",
+      "repo_url": "https://github.com/akashsengupta1997/HuManiFlow",
+      "archive_url": "https://codeload.github.com/akashsengupta1997/HuManiFlow/zip/refs/heads/main",
+      "branch": "main",
+      "source_path": "third_party/architecture_reproduction/HuManiFlow",
+      "downloaded_at_utc": "2026-10-08T00:13:06.426736+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 1071
+        },
+        {
+          "path": "README.md",
+          "bytes": 10326
+        },
+        {
+          "path": "configs/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "configs/humaniflow_config.py",
+          "bytes": 4265
+        },
+        {
+          "path": "configs/optimise_config.py",
+          "bytes": 301
+        },
+        {
+          "path": "configs/paths.py",
+          "bytes": 913
+        },
+        {
+          "path": "configs/pose2D_hrnet_config.py",
+          "bytes": 1984
+        },
+        {
+          "path": "data/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "data/copy_lsun_images_to_train_files_dir.py",
+          "bytes": 1606
+        },
+        {
+          "path": "data/load_optimise_data.py",
+          "bytes": 1045
+        },
+        {
+          "path": "data/on_the_fly_smpl_train_dataset.py",
+          "bytes": 4207
+        },
+        {
+          "path": "data/pw3d_eval_dataset.py",
+          "bytes": 5029
+        },
+        {
+          "path": "data/pw3d_preprocess.py",
+          "bytes": 11773
+        },
+        {
+          "path": "data/ssp3d_eval_dataset.py",
+          "bytes": 4320
+        },
+        {
+          "path": "evaluate/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "evaluate/evaluate_humaniflow.py",
+          "bytes": 20828
+        },
+        {
+          "path": "losses/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "losses/humaniflow_loss.py",
+          "bytes": 4206
+        },
+        {
+          "path": "metrics/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "metrics/eval_metrics_tracker.py",
+          "bytes": 36055
+        },
+        {
+          "path": "metrics/train_loss_and_metrics_tracker.py",
+          "bytes": 14185
+        },
+        {
+          "path": "models/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "models/canny_edge_detector.py",
+          "bytes": 8908
+        },
+        {
+          "path": "models/humaniflow_model.py",
+          "bytes": 21003
+        },
+        {
+          "path": "models/norm_flows/__init__.py",
+          "bytes": 132
+        },
+        {
+          "path": "models/norm_flows/local_diffeo_transformed_distribution.py",
+          "bytes": 6998
+        },
+        {
+          "path": "models/norm_flows/pyro_conditional_norm_flow.py",
+          "bytes": 6531
+        },
+        {
+          "path": "models/norm_flows/transforms/__init__.py",
+          "bytes": 631
+        },
+        {
+          "path": "models/norm_flows/transforms/additive_coupling_transform.py",
+          "bytes": 4536
+        },
+        {
+          "path": "models/norm_flows/transforms/conditional_spline_coupling_transform.py",
+          "bytes": 2815
+        },
+        {
+          "path": "models/norm_flows/transforms/linearPLU_transform.py",
+          "bytes": 7107
+        },
+        {
+          "path": "models/norm_flows/transforms/local_diffeo_transform.py",
+          "bytes": 3780
+        },
+        {
+          "path": "models/norm_flows/transforms/radial_tanh_transform.py",
+          "bytes": 2646
+        },
+        {
+          "path": "models/norm_flows/transforms/scaled_radial_tanh_transform.py",
+          "bytes": 1848
+        },
+        {
+          "path": "models/norm_flows/transforms/so3_exp_transform.py",
+          "bytes": 1455
+        },
+        {
+          "path": "models/norm_flows/transforms/to_transform.py",
+          "bytes": 597
+        },
+        {
+          "path": "models/pose2D_hrnet.py",
+          "bytes": 18220
+        },
+        {
+          "path": "models/resnet.py",
+          "bytes": 14061
+        },
+        {
+          "path": "models/smpl.py",
+          "bytes": 2045
+        },
+        {
+          "path": "optimise/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "optimise/optimise_humaniflow.py",
+          "bytes": 14213
+        },
+        {
+          "path": "predict/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "predict/predict_hrnet.py",
+          "bytes": 5836
+        },
+        {
+          "path": "predict/predict_humaniflow.py",
+          "bytes": 20917
+        },
+        {
+          "path": "requirements.txt",
+          "bytes": 145
+        },
+        {
+          "path": "scripts/run_evaluate.py",
+          "bytes": 7057
+        },
+        {
+          "path": "scripts/run_optimise.py",
+          "bytes": 4228
+        },
+        {
+          "path": "scripts/run_predict.py",
+          "bytes": 6846
+        },
+        {
+          "path": "scripts/run_train.py",
+          "bytes": 7649
+        },
+        {
+          "path": "train/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "train/train_humaniflow.py",
+          "bytes": 29267
+        },
+        {
+          "path": "utils/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "utils/augmentation/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "utils/augmentation/cam_augmentation.py",
+          "bytes": 477
+        },
+        {
+          "path": "utils/augmentation/lighting_augmentation.py",
+          "bytes": 2796
+        },
+        {
+          "path": "utils/augmentation/proxy_rep_augmentation.py",
+          "bytes": 12223
+        },
+        {
+          "path": "utils/augmentation/rgb_augmentation.py",
+          "bytes": 4839
+        },
+        {
+          "path": "utils/augmentation/smpl_augmentation.py",
+          "bytes": 1458
+        },
+        {
+          "path": "utils/cam_utils.py",
+          "bytes": 3171
+        },
+        {
+          "path": "utils/checkpoint_utils.py",
+          "bytes": 1142
+        },
+        {
+          "path": "utils/eval_utils.py",
+          "bytes": 5426
+        },
+        {
+          "path": "utils/image_utils.py",
+          "bytes": 21089
+        },
+        {
+          "path": "utils/joints2d_utils.py",
+          "bytes": 1659
+        },
+        {
+          "path": "utils/label_conversions.py",
+          "bytes": 7063
+        },
+        {
+          "path": "utils/lin_alg_utils.py",
+          "bytes": 157
+        },
+        {
+          "path": "utils/plot_loss_curves.py",
+          "bytes": 1545
+        },
+        {
+          "path": "utils/predict_utils.py",
+          "bytes": 1392
+        },
+        {
+          "path": "utils/renderers/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "utils/renderers/pytorch3d_textured_renderer.py",
+          "bytes": 16844
+        },
+        {
+          "path": "utils/rigid_transform_utils.py",
+          "bytes": 13032
+        },
+        {
+          "path": "utils/sampling_utils.py",
+          "bytes": 4233
+        },
+        {
+          "path": "utils/train_utils.py",
+          "bytes": 371
+        },
+        {
+          "path": "utils/visualise_utils.py",
+          "bytes": 11626
+        }
+      ],
+      "source_file_count": 73,
+      "selected_bytes": 432128,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P07",
+      "name": "HMR2",
+      "repo_url": "https://github.com/shubham-goel/4D-Humans",
+      "archive_url": "https://codeload.github.com/shubham-goel/4D-Humans/zip/refs/heads/main",
+      "branch": "main",
+      "source_path": "third_party/architecture_reproduction/HMR2",
+      "downloaded_at_utc": "2026-10-08T00:13:06.427735+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE.md",
+          "bytes": 1081
+        },
+        {
+          "path": "README.md",
+          "bytes": 5918
+        },
+        {
+          "path": "demo.py",
+          "bytes": 8608
+        },
+        {
+          "path": "environment.yml",
+          "bytes": 566
+        },
+        {
+          "path": "eval.py",
+          "bytes": 5081
+        },
+        {
+          "path": "fetch_training_data.sh",
+          "bytes": 1661
+        },
+        {
+          "path": "gradio_app.py",
+          "bytes": 8623
+        },
+        {
+          "path": "hmr2/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "hmr2/configs/__init__.py",
+          "bytes": 3393
+        },
+        {
+          "path": "hmr2/configs/cascade_mask_rcnn_vitdet_h_75ep.py",
+          "bytes": 4251
+        },
+        {
+          "path": "hmr2/configs/datasets_eval.yaml",
+          "bytes": 1030
+        },
+        {
+          "path": "hmr2/configs/datasets_tar.yaml",
+          "bytes": 1559
+        },
+        {
+          "path": "hmr2/configs_hydra/data/mix_all.yaml",
+          "bytes": 515
+        },
+        {
+          "path": "hmr2/configs_hydra/data_filtering/low1.yaml",
+          "bytes": 337
+        },
+        {
+          "path": "hmr2/configs_hydra/experiment/default.yaml",
+          "bytes": 633
+        },
+        {
+          "path": "hmr2/configs_hydra/experiment/hmr_vit_transformer.yaml",
+          "bytes": 980
+        },
+        {
+          "path": "hmr2/configs_hydra/extras/default.yaml",
+          "bytes": 232
+        },
+        {
+          "path": "hmr2/configs_hydra/hydra/default.yaml",
+          "bytes": 630
+        },
+        {
+          "path": "hmr2/configs_hydra/launcher/local.yaml",
+          "bytes": 257
+        },
+        {
+          "path": "hmr2/configs_hydra/launcher/slurm.yaml",
+          "bytes": 490
+        },
+        {
+          "path": "hmr2/configs_hydra/paths/default.yaml",
+          "bytes": 613
+        },
+        {
+          "path": "hmr2/configs_hydra/train.yaml",
+          "bytes": 1533
+        },
+        {
+          "path": "hmr2/configs_hydra/trainer/cpu.yaml",
+          "bytes": 77
+        },
+        {
+          "path": "hmr2/configs_hydra/trainer/ddp.yaml",
+          "bytes": 411
+        },
+        {
+          "path": "hmr2/configs_hydra/trainer/default.yaml",
+          "bytes": 251
+        },
+        {
+          "path": "hmr2/configs_hydra/trainer/default_hmr.yaml",
+          "bytes": 224
+        },
+        {
+          "path": "hmr2/configs_hydra/trainer/gpu.yaml",
+          "bytes": 77
+        },
+        {
+          "path": "hmr2/configs_hydra/trainer/mps.yaml",
+          "bytes": 77
+        },
+        {
+          "path": "hmr2/datasets/__init__.py",
+          "bytes": 3858
+        },
+        {
+          "path": "hmr2/datasets/dataset.py",
+          "bytes": 659
+        },
+        {
+          "path": "hmr2/datasets/image_dataset.py",
+          "bytes": 20971
+        },
+        {
+          "path": "hmr2/datasets/mocap_dataset.py",
+          "bytes": 797
+        },
+        {
+          "path": "hmr2/datasets/preprocess/lspet_to_npz.py",
+          "bytes": 2488
+        },
+        {
+          "path": "hmr2/datasets/preprocess/posetrack_to_npz.py",
+          "bytes": 3483
+        },
+        {
+          "path": "hmr2/datasets/smplh_prob_filter.py",
+          "bytes": 5224
+        },
+        {
+          "path": "hmr2/datasets/utils.py",
+          "bytes": 45217
+        },
+        {
+          "path": "hmr2/datasets/vitdet_dataset.py",
+          "bytes": 3237
+        },
+        {
+          "path": "hmr2/models/__init__.py",
+          "bytes": 3298
+        },
+        {
+          "path": "hmr2/models/backbones/__init__.py",
+          "bytes": 193
+        },
+        {
+          "path": "hmr2/models/backbones/vit.py",
+          "bytes": 12450
+        },
+        {
+          "path": "hmr2/models/backbones/vit_vitpose.py",
+          "bytes": 616
+        },
+        {
+          "path": "hmr2/models/components/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "hmr2/models/components/pose_transformer.py",
+          "bytes": 11299
+        },
+        {
+          "path": "hmr2/models/components/t_cond_mlp.py",
+          "bytes": 6791
+        },
+        {
+          "path": "hmr2/models/discriminator.py",
+          "bytes": 3688
+        },
+        {
+          "path": "hmr2/models/heads/__init__.py",
+          "bytes": 39
+        },
+        {
+          "path": "hmr2/models/heads/smpl_head.py",
+          "bytes": 4877
+        },
+        {
+          "path": "hmr2/models/hmr2.py",
+          "bytes": 16479
+        },
+        {
+          "path": "hmr2/models/losses.py",
+          "bytes": 3949
+        },
+        {
+          "path": "hmr2/models/smpl_wrapper.py",
+          "bytes": 1884
+        },
+        {
+          "path": "hmr2/utils/__init__.py",
+          "bytes": 775
+        },
+        {
+          "path": "hmr2/utils/download.py",
+          "bytes": 2290
+        },
+        {
+          "path": "hmr2/utils/geometry.py",
+          "bytes": 4189
+        },
+        {
+          "path": "hmr2/utils/mesh_renderer.py",
+          "bytes": 6819
+        },
+        {
+          "path": "hmr2/utils/misc.py",
+          "bytes": 6340
+        },
+        {
+          "path": "hmr2/utils/pck_accuracy.py",
+          "bytes": 3441
+        },
+        {
+          "path": "hmr2/utils/pose_utils.py",
+          "bytes": 12438
+        },
+        {
+          "path": "hmr2/utils/pylogger.py",
+          "bytes": 608
+        },
+        {
+          "path": "hmr2/utils/render_openpose.py",
+          "bytes": 6714
+        },
+        {
+          "path": "hmr2/utils/renderer.py",
+          "bytes": 14585
+        },
+        {
+          "path": "hmr2/utils/rich_utils.py",
+          "bytes": 3320
+        },
+        {
+          "path": "hmr2/utils/skeleton_renderer.py",
+          "bytes": 8974
+        },
+        {
+          "path": "hmr2/utils/texture_utils.py",
+          "bytes": 3096
+        },
+        {
+          "path": "hmr2/utils/utils_detectron2.py",
+          "bytes": 3735
+        },
+        {
+          "path": "setup.py",
+          "bytes": 708
+        },
+        {
+          "path": "track.py",
+          "bytes": 6869
+        },
+        {
+          "path": "train.py",
+          "bytes": 3406
+        }
+      ],
+      "source_file_count": 67,
+      "selected_bytes": 288912,
+      "license_paths": [
+        "LICENSE.md"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P09",
+      "name": "VIBE",
+      "repo_url": "https://github.com/mkocabas/VIBE",
+      "archive_url": "https://codeload.github.com/mkocabas/VIBE/zip/refs/heads/master",
+      "branch": "master",
+      "source_path": "third_party/architecture_reproduction/VIBE",
+      "downloaded_at_utc": "2026-10-08T00:13:06.427735+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 6476
+        },
+        {
+          "path": "README.md",
+          "bytes": 8850
+        },
+        {
+          "path": "configs/config.yaml",
+          "bytes": 999
+        },
+        {
+          "path": "configs/config_wo_3dpw.yaml",
+          "bytes": 1001
+        },
+        {
+          "path": "demo.py",
+          "bytes": 15867
+        },
+        {
+          "path": "doc/demo.md",
+          "bytes": 6046
+        },
+        {
+          "path": "doc/eval.md",
+          "bytes": 485
+        },
+        {
+          "path": "doc/train.md",
+          "bytes": 3321
+        },
+        {
+          "path": "eval.py",
+          "bytes": 1583
+        },
+        {
+          "path": "lib/core/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "lib/core/config.py",
+          "bytes": 3511
+        },
+        {
+          "path": "lib/core/evaluate.py",
+          "bytes": 5334
+        },
+        {
+          "path": "lib/core/loss.py",
+          "bytes": 9459
+        },
+        {
+          "path": "lib/core/trainer.py",
+          "bytes": 15940
+        },
+        {
+          "path": "lib/data_utils/amass_utils.py",
+          "bytes": 4543
+        },
+        {
+          "path": "lib/data_utils/feature_extractor.py",
+          "bytes": 3853
+        },
+        {
+          "path": "lib/data_utils/img_utils.py",
+          "bytes": 10967
+        },
+        {
+          "path": "lib/data_utils/insta_utils.py",
+          "bytes": 12729
+        },
+        {
+          "path": "lib/data_utils/kp_utils.py",
+          "bytes": 17008
+        },
+        {
+          "path": "lib/data_utils/mpii3d_utils.py",
+          "bytes": 13548
+        },
+        {
+          "path": "lib/data_utils/penn_action_utils.py",
+          "bytes": 3853
+        },
+        {
+          "path": "lib/data_utils/posetrack_utils.py",
+          "bytes": 6140
+        },
+        {
+          "path": "lib/data_utils/threedpw_utils.py",
+          "bytes": 6375
+        },
+        {
+          "path": "lib/dataset/__init__.py",
+          "bytes": 247
+        },
+        {
+          "path": "lib/dataset/amass.py",
+          "bytes": 1948
+        },
+        {
+          "path": "lib/dataset/dataset_2d.py",
+          "bytes": 4839
+        },
+        {
+          "path": "lib/dataset/dataset_3d.py",
+          "bytes": 7516
+        },
+        {
+          "path": "lib/dataset/inference.py",
+          "bytes": 3247
+        },
+        {
+          "path": "lib/dataset/insta.py",
+          "bytes": 2722
+        },
+        {
+          "path": "lib/dataset/loaders.py",
+          "bytes": 2760
+        },
+        {
+          "path": "lib/dataset/mpii3d.py",
+          "bytes": 1401
+        },
+        {
+          "path": "lib/dataset/penn_action.py",
+          "bytes": 1162
+        },
+        {
+          "path": "lib/dataset/posetrack.py",
+          "bytes": 1169
+        },
+        {
+          "path": "lib/dataset/threedpw.py",
+          "bytes": 1396
+        },
+        {
+          "path": "lib/models/__init__.py",
+          "bytes": 77
+        },
+        {
+          "path": "lib/models/attention.py",
+          "bytes": 2810
+        },
+        {
+          "path": "lib/models/motion_discriminator.py",
+          "bytes": 3040
+        },
+        {
+          "path": "lib/models/resnet.py",
+          "bytes": 13745
+        },
+        {
+          "path": "lib/models/smpl.py",
+          "bytes": 3724
+        },
+        {
+          "path": "lib/models/spin.py",
+          "bytes": 12757
+        },
+        {
+          "path": "lib/models/vibe.py",
+          "bytes": 5761
+        },
+        {
+          "path": "lib/smplify/losses.py",
+          "bytes": 8891
+        },
+        {
+          "path": "lib/smplify/prior.py",
+          "bytes": 8688
+        },
+        {
+          "path": "lib/smplify/temporal_smplify.py",
+          "bytes": 11087
+        },
+        {
+          "path": "lib/utils/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "lib/utils/demo_utils.py",
+          "bytes": 10158
+        },
+        {
+          "path": "lib/utils/eval_utils.py",
+          "bytes": 8246
+        },
+        {
+          "path": "lib/utils/fbx_output.py",
+          "bytes": 11247
+        },
+        {
+          "path": "lib/utils/geometry.py",
+          "bytes": 11975
+        },
+        {
+          "path": "lib/utils/one_euro_filter.py",
+          "bytes": 1260
+        },
+        {
+          "path": "lib/utils/pose_tracker.py",
+          "bytes": 2923
+        },
+        {
+          "path": "lib/utils/renderer.py",
+          "bytes": 4090
+        },
+        {
+          "path": "lib/utils/smooth_bbox.py",
+          "bytes": 3955
+        },
+        {
+          "path": "lib/utils/smooth_pose.py",
+          "bytes": 2444
+        },
+        {
+          "path": "lib/utils/utils.py",
+          "bytes": 4750
+        },
+        {
+          "path": "lib/utils/vis.py",
+          "bytes": 15293
+        },
+        {
+          "path": "requirements.txt",
+          "bytes": 523
+        },
+        {
+          "path": "scripts/install_conda.sh",
+          "bytes": 362
+        },
+        {
+          "path": "scripts/install_pip.sh",
+          "bytes": 368
+        },
+        {
+          "path": "scripts/prepare_data.sh",
+          "bytes": 280
+        },
+        {
+          "path": "scripts/prepare_training_data.sh",
+          "bytes": 594
+        },
+        {
+          "path": "tests/test_2d_datasets.py",
+          "bytes": 1238
+        },
+        {
+          "path": "tests/test_3d_datasets.py",
+          "bytes": 1643
+        },
+        {
+          "path": "train.py",
+          "bytes": 5718
+        }
+      ],
+      "source_file_count": 64,
+      "selected_bytes": 343942,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P10",
+      "name": "WHAM",
+      "repo_url": "https://github.com/yohanshin/WHAM",
+      "archive_url": "https://codeload.github.com/yohanshin/WHAM/zip/refs/heads/main",
+      "branch": "main",
+      "source_path": "third_party/architecture_reproduction/WHAM",
+      "downloaded_at_utc": "2026-10-08T00:13:08.547112+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 1068
+        },
+        {
+          "path": "README.md",
+          "bytes": 5908
+        },
+        {
+          "path": "configs/config.py",
+          "bytes": 3015
+        },
+        {
+          "path": "configs/constants.py",
+          "bytes": 2126
+        },
+        {
+          "path": "configs/yamls/demo.yaml",
+          "bytes": 257
+        },
+        {
+          "path": "configs/yamls/model_base.yaml",
+          "bytes": 94
+        },
+        {
+          "path": "configs/yamls/stage1.yaml",
+          "bytes": 552
+        },
+        {
+          "path": "configs/yamls/stage2.yaml",
+          "bytes": 706
+        },
+        {
+          "path": "configs/yamls/stage2_b.yaml",
+          "bytes": 744
+        },
+        {
+          "path": "demo.py",
+          "bytes": 9835
+        },
+        {
+          "path": "docs/API.md",
+          "bytes": 519
+        },
+        {
+          "path": "docs/DATASET.md",
+          "bytes": 3121
+        },
+        {
+          "path": "docs/DOCKER.md",
+          "bytes": 1092
+        },
+        {
+          "path": "docs/INSTALL.md",
+          "bytes": 1199
+        },
+        {
+          "path": "fetch_demo_data.sh",
+          "bytes": 3054
+        },
+        {
+          "path": "lib/core/loss.py",
+          "bytes": 14527
+        },
+        {
+          "path": "lib/core/trainer.py",
+          "bytes": 13323
+        },
+        {
+          "path": "lib/data/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "lib/data/_dataset.py",
+          "bytes": 2681
+        },
+        {
+          "path": "lib/data/dataloader.py",
+          "bytes": 1242
+        },
+        {
+          "path": "lib/data/datasets/__init__.py",
+          "bytes": 118
+        },
+        {
+          "path": "lib/data/datasets/amass.py",
+          "bytes": 6797
+        },
+        {
+          "path": "lib/data/datasets/bedlam.py",
+          "bytes": 6609
+        },
+        {
+          "path": "lib/data/datasets/dataset2d.py",
+          "bytes": 5489
+        },
+        {
+          "path": "lib/data/datasets/dataset3d.py",
+          "bytes": 7399
+        },
+        {
+          "path": "lib/data/datasets/dataset_custom.py",
+          "bytes": 4636
+        },
+        {
+          "path": "lib/data/datasets/dataset_eval.py",
+          "bytes": 4232
+        },
+        {
+          "path": "lib/data/datasets/mixed_dataset.py",
+          "bytes": 2146
+        },
+        {
+          "path": "lib/data/datasets/videos.py",
+          "bytes": 3661
+        },
+        {
+          "path": "lib/data/utils/augmentor.py",
+          "bytes": 10699
+        },
+        {
+          "path": "lib/data/utils/normalizer.py",
+          "bytes": 3832
+        },
+        {
+          "path": "lib/data_utils/amass_utils.py",
+          "bytes": 4371
+        },
+        {
+          "path": "lib/data_utils/emdb_eval_utils.py",
+          "bytes": 8171
+        },
+        {
+          "path": "lib/data_utils/rich_eval_utils.py",
+          "bytes": 2642
+        },
+        {
+          "path": "lib/data_utils/threedpw_eval_utils.py",
+          "bytes": 8475
+        },
+        {
+          "path": "lib/data_utils/threedpw_train_utils.py",
+          "bytes": 6554
+        },
+        {
+          "path": "lib/eval/eval_utils.py",
+          "bytes": 14181
+        },
+        {
+          "path": "lib/eval/evaluate_3dpw.py",
+          "bytes": 7962
+        },
+        {
+          "path": "lib/eval/evaluate_emdb.py",
+          "bytes": 10506
+        },
+        {
+          "path": "lib/eval/evaluate_rich.py",
+          "bytes": 7051
+        },
+        {
+          "path": "lib/models/__init__.py",
+          "bytes": 1342
+        },
+        {
+          "path": "lib/models/layers/__init__.py",
+          "bytes": 205
+        },
+        {
+          "path": "lib/models/layers/modules.py",
+          "bytes": 9018
+        },
+        {
+          "path": "lib/models/layers/utils.py",
+          "bytes": 2138
+        },
+        {
+          "path": "lib/models/preproc/backbone/hmr2.py",
+          "bytes": 2929
+        },
+        {
+          "path": "lib/models/preproc/backbone/pose_transformer.py",
+          "bytes": 11298
+        },
+        {
+          "path": "lib/models/preproc/backbone/smpl_head.py",
+          "bytes": 5178
+        },
+        {
+          "path": "lib/models/preproc/backbone/t_cond_mlp.py",
+          "bytes": 6790
+        },
+        {
+          "path": "lib/models/preproc/backbone/utils.py",
+          "bytes": 3901
+        },
+        {
+          "path": "lib/models/preproc/backbone/vit.py",
+          "bytes": 12446
+        },
+        {
+          "path": "lib/models/preproc/detector.py",
+          "bytes": 4977
+        },
+        {
+          "path": "lib/models/preproc/extractor.py",
+          "bytes": 4498
+        },
+        {
+          "path": "lib/models/preproc/slam.py",
+          "bytes": 2291
+        },
+        {
+          "path": "lib/models/smpl.py",
+          "bytes": 9011
+        },
+        {
+          "path": "lib/models/smplify/__init__.py",
+          "bytes": 36
+        },
+        {
+          "path": "lib/models/smplify/losses.py",
+          "bytes": 2880
+        },
+        {
+          "path": "lib/models/smplify/smplify.py",
+          "bytes": 2613
+        },
+        {
+          "path": "lib/models/wham.py",
+          "bytes": 8261
+        },
+        {
+          "path": "lib/utils/data_utils.py",
+          "bytes": 3256
+        },
+        {
+          "path": "lib/utils/imutils.py",
+          "bytes": 12334
+        },
+        {
+          "path": "lib/utils/kp_utils.py",
+          "bytes": 17911
+        },
+        {
+          "path": "lib/utils/transforms.py",
+          "bytes": 27622
+        },
+        {
+          "path": "lib/utils/utils.py",
+          "bytes": 7885
+        },
+        {
+          "path": "lib/vis/renderer.py",
+          "bytes": 10176
+        },
+        {
+          "path": "lib/vis/run_vis.py",
+          "bytes": 3802
+        },
+        {
+          "path": "lib/vis/tools.py",
+          "bytes": 23268
+        },
+        {
+          "path": "requirements.txt",
+          "bytes": 267
+        },
+        {
+          "path": "train.py",
+          "bytes": 2699
+        },
+        {
+          "path": "wham_api.py",
+          "bytes": 5893
+        }
+      ],
+      "source_file_count": 69,
+      "selected_bytes": 395519,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P12",
+      "name": "MotionBERT",
+      "repo_url": "https://github.com/Walter0807/MotionBERT",
+      "archive_url": "https://codeload.github.com/Walter0807/MotionBERT/zip/refs/heads/main",
+      "branch": "main",
+      "source_path": "third_party/architecture_reproduction/MotionBERT",
+      "downloaded_at_utc": "2026-10-08T00:13:09.357648+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 11372
+        },
+        {
+          "path": "README.md",
+          "bytes": 6676
+        },
+        {
+          "path": "configs/action/MB_ft_NTU120_oneshot.yaml",
+          "bytes": 453
+        },
+        {
+          "path": "configs/action/MB_ft_NTU60_xsub.yaml",
+          "bytes": 489
+        },
+        {
+          "path": "configs/action/MB_ft_NTU60_xview.yaml",
+          "bytes": 490
+        },
+        {
+          "path": "configs/action/MB_train_NTU120_oneshot.yaml",
+          "bytes": 454
+        },
+        {
+          "path": "configs/action/MB_train_NTU60_xsub.yaml",
+          "bytes": 491
+        },
+        {
+          "path": "configs/action/MB_train_NTU60_xview.yaml",
+          "bytes": 492
+        },
+        {
+          "path": "configs/mesh/MB_ft_h36m.yaml",
+          "bytes": 698
+        },
+        {
+          "path": "configs/mesh/MB_ft_pw3d.yaml",
+          "bytes": 762
+        },
+        {
+          "path": "configs/mesh/MB_train_h36m.yaml",
+          "bytes": 699
+        },
+        {
+          "path": "configs/mesh/MB_train_pw3d.yaml",
+          "bytes": 763
+        },
+        {
+          "path": "configs/pose3d/MB_ft_h36m.yaml",
+          "bytes": 725
+        },
+        {
+          "path": "configs/pose3d/MB_ft_h36m_global.yaml",
+          "bytes": 725
+        },
+        {
+          "path": "configs/pose3d/MB_ft_h36m_global_lite.yaml",
+          "bytes": 725
+        },
+        {
+          "path": "configs/pose3d/MB_train_h36m.yaml",
+          "bytes": 728
+        },
+        {
+          "path": "configs/pretrain/MB_lite.yaml",
+          "bytes": 902
+        },
+        {
+          "path": "configs/pretrain/MB_pretrain.yaml",
+          "bytes": 903
+        },
+        {
+          "path": "docs/action.md",
+          "bytes": 2321
+        },
+        {
+          "path": "docs/inference.md",
+          "bytes": 2182
+        },
+        {
+          "path": "docs/mesh.md",
+          "bytes": 1584
+        },
+        {
+          "path": "docs/pose3d.md",
+          "bytes": 1221
+        },
+        {
+          "path": "docs/pretrain.md",
+          "bytes": 2232
+        },
+        {
+          "path": "infer_wild.py",
+          "bytes": 3977
+        },
+        {
+          "path": "infer_wild_mesh.py",
+          "bytes": 6129
+        },
+        {
+          "path": "lib/data/augmentation.py",
+          "bytes": 4027
+        },
+        {
+          "path": "lib/data/datareader_h36m.py",
+          "bytes": 7657
+        },
+        {
+          "path": "lib/data/datareader_mesh.py",
+          "bytes": 3228
+        },
+        {
+          "path": "lib/data/dataset_action.py",
+          "bytes": 7924
+        },
+        {
+          "path": "lib/data/dataset_mesh.py",
+          "bytes": 5083
+        },
+        {
+          "path": "lib/data/dataset_motion_2d.py",
+          "bytes": 5284
+        },
+        {
+          "path": "lib/data/dataset_motion_3d.py",
+          "bytes": 2777
+        },
+        {
+          "path": "lib/data/dataset_wild.py",
+          "bytes": 2711
+        },
+        {
+          "path": "lib/model/DSTformer.py",
+          "bytes": 16101
+        },
+        {
+          "path": "lib/model/drop.py",
+          "bytes": 1978
+        },
+        {
+          "path": "lib/model/loss.py",
+          "bytes": 6684
+        },
+        {
+          "path": "lib/model/loss_mesh.py",
+          "bytes": 3048
+        },
+        {
+          "path": "lib/model/loss_supcon.py",
+          "bytes": 3758
+        },
+        {
+          "path": "lib/model/model_action.py",
+          "bytes": 2840
+        },
+        {
+          "path": "lib/model/model_mesh.py",
+          "bytes": 4499
+        },
+        {
+          "path": "lib/utils/learning.py",
+          "bytes": 3994
+        },
+        {
+          "path": "lib/utils/tools.py",
+          "bytes": 1975
+        },
+        {
+          "path": "lib/utils/utils_data.py",
+          "bytes": 3867
+        },
+        {
+          "path": "lib/utils/utils_mesh.py",
+          "bytes": 18102
+        },
+        {
+          "path": "lib/utils/utils_smpl.py",
+          "bytes": 3811
+        },
+        {
+          "path": "lib/utils/vismo.py",
+          "bytes": 14968
+        },
+        {
+          "path": "requirements.txt",
+          "bytes": 253
+        },
+        {
+          "path": "tools/compress_amass.py",
+          "bytes": 1660
+        },
+        {
+          "path": "tools/convert_amass.py",
+          "bytes": 1979
+        },
+        {
+          "path": "tools/convert_h36m.py",
+          "bytes": 1388
+        },
+        {
+          "path": "tools/convert_insta.py",
+          "bytes": 2446
+        },
+        {
+          "path": "tools/preprocess_amass.py",
+          "bytes": 2970
+        },
+        {
+          "path": "train.py",
+          "bytes": 17292
+        },
+        {
+          "path": "train_action.py",
+          "bytes": 10857
+        },
+        {
+          "path": "train_action_1shot.py",
+          "bytes": 10820
+        },
+        {
+          "path": "train_mesh.py",
+          "bytes": 21298
+        }
+      ],
+      "source_file_count": 56,
+      "selected_bytes": 243472,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P14",
+      "name": "MotionAGFormer",
+      "repo_url": "https://github.com/TaatiTeam/MotionAGFormer",
+      "archive_url": "https://codeload.github.com/TaatiTeam/MotionAGFormer/zip/refs/heads/master",
+      "branch": "master",
+      "source_path": "third_party/architecture_reproduction/MotionAGFormer",
+      "downloaded_at_utc": "2026-10-08T00:13:09.446400+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 11357
+        },
+        {
+          "path": "README.md",
+          "bytes": 7219
+        },
+        {
+          "path": "configs/h36m/MotionAGFormer-base.yaml",
+          "bytes": 1123
+        },
+        {
+          "path": "configs/h36m/MotionAGFormer-large.yaml",
+          "bytes": 1123
+        },
+        {
+          "path": "configs/h36m/MotionAGFormer-small.yaml",
+          "bytes": 1103
+        },
+        {
+          "path": "configs/h36m/MotionAGFormer-xsmall.yaml",
+          "bytes": 1102
+        },
+        {
+          "path": "configs/mpi/MotionAGFormer-base.yaml",
+          "bytes": 979
+        },
+        {
+          "path": "configs/mpi/MotionAGFormer-large.yaml",
+          "bytes": 979
+        },
+        {
+          "path": "configs/mpi/MotionAGFormer-small.yaml",
+          "bytes": 978
+        },
+        {
+          "path": "configs/mpi/MotionAGFormer-xsmall.yaml",
+          "bytes": 978
+        },
+        {
+          "path": "data/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "data/const.py",
+          "bytes": 973
+        },
+        {
+          "path": "data/preprocess/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "data/preprocess/data_to_npz_3dhp.py",
+          "bytes": 2289
+        },
+        {
+          "path": "data/preprocess/data_to_npz_3dhp_test.py",
+          "bytes": 950
+        },
+        {
+          "path": "data/preprocess/h36m.py",
+          "bytes": 1733
+        },
+        {
+          "path": "data/preprocess/visualize.py",
+          "bytes": 3592
+        },
+        {
+          "path": "data/reader/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "data/reader/generator_3dhp.py",
+          "bytes": 8468
+        },
+        {
+          "path": "data/reader/h36m.py",
+          "bytes": 7814
+        },
+        {
+          "path": "data/reader/motion_dataset.py",
+          "bytes": 15253
+        },
+        {
+          "path": "demo/lib/hrnet/experiments/w48_384x288_adam_lr1e-3.yaml",
+          "bytes": 2166
+        },
+        {
+          "path": "demo/lib/hrnet/gen_kpts.py",
+          "bytes": 5633
+        },
+        {
+          "path": "demo/lib/hrnet/lib/config/__init__.py",
+          "bytes": 369
+        },
+        {
+          "path": "demo/lib/hrnet/lib/config/default.py",
+          "bytes": 3521
+        },
+        {
+          "path": "demo/lib/hrnet/lib/config/models.py",
+          "bytes": 2118
+        },
+        {
+          "path": "demo/lib/hrnet/lib/models/pose_hrnet.py",
+          "bytes": 18140
+        },
+        {
+          "path": "demo/lib/hrnet/lib/utils/coco_h36m.py",
+          "bytes": 2230
+        },
+        {
+          "path": "demo/lib/hrnet/lib/utils/inference.py",
+          "bytes": 2712
+        },
+        {
+          "path": "demo/lib/hrnet/lib/utils/transforms.py",
+          "bytes": 3827
+        },
+        {
+          "path": "demo/lib/hrnet/lib/utils/utilitys.py",
+          "bytes": 5776
+        },
+        {
+          "path": "demo/lib/preprocess.py",
+          "bytes": 4077
+        },
+        {
+          "path": "demo/lib/sort/sort.py",
+          "bytes": 8026
+        },
+        {
+          "path": "demo/lib/utils.py",
+          "bytes": 1813
+        },
+        {
+          "path": "demo/lib/yolov3/bbox.py",
+          "bytes": 3348
+        },
+        {
+          "path": "demo/lib/yolov3/cfg/tiny-yolo-voc.cfg",
+          "bytes": 1408
+        },
+        {
+          "path": "demo/lib/yolov3/cfg/yolo-voc.cfg",
+          "bytes": 2736
+        },
+        {
+          "path": "demo/lib/yolov3/cfg/yolo.cfg",
+          "bytes": 2726
+        },
+        {
+          "path": "demo/lib/yolov3/cfg/yolov3.cfg",
+          "bytes": 8345
+        },
+        {
+          "path": "demo/lib/yolov3/darknet.py",
+          "bytes": 14221
+        },
+        {
+          "path": "demo/lib/yolov3/human_detector.py",
+          "bytes": 5231
+        },
+        {
+          "path": "demo/lib/yolov3/preprocess.py",
+          "bytes": 1757
+        },
+        {
+          "path": "demo/lib/yolov3/util.py",
+          "bytes": 8176
+        },
+        {
+          "path": "demo/vis.py",
+          "bytes": 11957
+        },
+        {
+          "path": "loss/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "loss/pose3d.py",
+          "bytes": 7472
+        },
+        {
+          "path": "model/MotionAGFormer.py",
+          "bytes": 15650
+        },
+        {
+          "path": "model/modules/attention.py",
+          "bytes": 2283
+        },
+        {
+          "path": "model/modules/ctr_attention.py",
+          "bytes": 6013
+        },
+        {
+          "path": "model/modules/ctrgc.py",
+          "bytes": 4679
+        },
+        {
+          "path": "model/modules/graph.py",
+          "bytes": 4930
+        },
+        {
+          "path": "model/modules/metaformer.py",
+          "bytes": 3690
+        },
+        {
+          "path": "model/modules/mlp.py",
+          "bytes": 1052
+        },
+        {
+          "path": "model/modules/normalization.py",
+          "bytes": 249
+        },
+        {
+          "path": "model/modules/tcn.py",
+          "bytes": 3724
+        },
+        {
+          "path": "requirements.txt",
+          "bytes": 134
+        },
+        {
+          "path": "train.py",
+          "bytes": 15785
+        },
+        {
+          "path": "train_3dhp.py",
+          "bytes": 11933
+        },
+        {
+          "path": "utils/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "utils/data.py",
+          "bytes": 8896
+        },
+        {
+          "path": "utils/learning.py",
+          "bytes": 4175
+        },
+        {
+          "path": "utils/tools.py",
+          "bytes": 2108
+        },
+        {
+          "path": "utils/utils_3dhp.py",
+          "bytes": 1658
+        }
+      ],
+      "source_file_count": 63,
+      "selected_bytes": 282757,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P03",
+      "name": "FMPose3D",
+      "repo_url": "https://github.com/AdaptiveMotorControlLab/FMPose3D",
+      "archive_url": "https://codeload.github.com/AdaptiveMotorControlLab/FMPose3D/zip/refs/heads/main",
+      "branch": "main",
+      "source_path": "third_party/architecture_reproduction/FMPose3D",
+      "downloaded_at_utc": "2026-10-08T00:13:09.934538+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "3dhp_test/README.md",
+          "bytes": 3326
+        },
+        {
+          "path": "3dhp_test/dataset/prepare_3dhp_test_npz.py",
+          "bytes": 1982
+        },
+        {
+          "path": "3dhp_test/infer_3dhp.py",
+          "bytes": 18428
+        },
+        {
+          "path": "3dhp_test/lib/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "3dhp_test/lib/camera.py",
+          "bytes": 2144
+        },
+        {
+          "path": "3dhp_test/lib/dataset_3dhp.py",
+          "bytes": 3518
+        },
+        {
+          "path": "3dhp_test/lib/eval_cal.py",
+          "bytes": 5119
+        },
+        {
+          "path": "3dhp_test/lib/utils.py",
+          "bytes": 995
+        },
+        {
+          "path": "3dhp_test/test_3dhp.sh",
+          "bytes": 1560
+        },
+        {
+          "path": "LICENSE.txt",
+          "bytes": 11357
+        },
+        {
+          "path": "README.md",
+          "bytes": 6299
+        },
+        {
+          "path": "animals/README.md",
+          "bytes": 2610
+        },
+        {
+          "path": "animals/dataset/readme.txt",
+          "bytes": 51
+        },
+        {
+          "path": "animals/demo/vis_animals.py",
+          "bytes": 22920
+        },
+        {
+          "path": "animals/demo/vis_animals.sh",
+          "bytes": 1132
+        },
+        {
+          "path": "animals/models/model_animals.py",
+          "bytes": 8745
+        },
+        {
+          "path": "animals/pre_trained_models/readme.md",
+          "bytes": 252
+        },
+        {
+          "path": "animals/scripts/main_animal3d.py",
+          "bytes": 14618
+        },
+        {
+          "path": "animals/scripts/test_animal3d.sh",
+          "bytes": 1566
+        },
+        {
+          "path": "animals/scripts/train_animal3d.sh",
+          "bytes": 1218
+        },
+        {
+          "path": "dataset/readme.txt",
+          "bytes": 163
+        },
+        {
+          "path": "demo/vis_in_the_wild.py",
+          "bytes": 13446
+        },
+        {
+          "path": "demo/vis_in_the_wild.sh",
+          "bytes": 792
+        },
+        {
+          "path": "fmpose3d/__init__.py",
+          "bytes": 1897
+        },
+        {
+          "path": "fmpose3d/aggregation_methods.py",
+          "bytes": 7591
+        },
+        {
+          "path": "fmpose3d/animals/__init__.py",
+          "bytes": 274
+        },
+        {
+          "path": "fmpose3d/animals/common/__init__.py",
+          "bytes": 302
+        },
+        {
+          "path": "fmpose3d/animals/common/animal3d_dataset.py",
+          "bytes": 2391
+        },
+        {
+          "path": "fmpose3d/animals/common/arguments.py",
+          "bytes": 11302
+        },
+        {
+          "path": "fmpose3d/animals/common/camera.py",
+          "bytes": 1832
+        },
+        {
+          "path": "fmpose3d/animals/common/skeleton.py",
+          "bytes": 2758
+        },
+        {
+          "path": "fmpose3d/animals/common/utils.py",
+          "bytes": 17913
+        },
+        {
+          "path": "fmpose3d/animals/configs/__init__.py",
+          "bytes": 954
+        },
+        {
+          "path": "fmpose3d/animals/configs/sa_finetune_hrnet_w32.yaml",
+          "bytes": 4809
+        },
+        {
+          "path": "fmpose3d/animals/models/__init__.py",
+          "bytes": 376
+        },
+        {
+          "path": "fmpose3d/animals/models/graph_frames.py",
+          "bytes": 15423
+        },
+        {
+          "path": "fmpose3d/animals/models/model_animal3d.py",
+          "bytes": 8939
+        },
+        {
+          "path": "fmpose3d/common/__init__.py",
+          "bytes": 1408
+        },
+        {
+          "path": "fmpose3d/common/arguments.py",
+          "bytes": 8559
+        },
+        {
+          "path": "fmpose3d/common/camera.py",
+          "bytes": 1832
+        },
+        {
+          "path": "fmpose3d/common/config.py",
+          "bytes": 13494
+        },
+        {
+          "path": "fmpose3d/common/generator.py",
+          "bytes": 8216
+        },
+        {
+          "path": "fmpose3d/common/graph_utils.py",
+          "bytes": 2582
+        },
+        {
+          "path": "fmpose3d/common/h36m_dataset.py",
+          "bytes": 14032
+        },
+        {
+          "path": "fmpose3d/common/load_data_hm36.py",
+          "bytes": 9804
+        },
+        {
+          "path": "fmpose3d/common/mocap_dataset.py",
+          "bytes": 1079
+        },
+        {
+          "path": "fmpose3d/common/skeleton.py",
+          "bytes": 2758
+        },
+        {
+          "path": "fmpose3d/common/utils.py",
+          "bytes": 15277
+        },
+        {
+          "path": "fmpose3d/inference_api/README.md",
+          "bytes": 9206
+        },
+        {
+          "path": "fmpose3d/inference_api/__init__.py",
+          "bytes": 478
+        },
+        {
+          "path": "fmpose3d/inference_api/fmpose3d.py",
+          "bytes": 57684
+        },
+        {
+          "path": "fmpose3d/lib/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/checkpoint/README.md",
+          "bytes": 808
+        },
+        {
+          "path": "fmpose3d/lib/checkpoint/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/checkpoint/download_checkpoints.py",
+          "bytes": 4220
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/experiments/w48_384x288_adam_lr1e-3.yaml",
+          "bytes": 2166
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/gen_kpts.py",
+          "bytes": 7218
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/hrnet.py",
+          "bytes": 9670
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/config/__init__.py",
+          "bytes": 614
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/config/default.py",
+          "bytes": 3766
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/config/models.py",
+          "bytes": 2363
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/models/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/models/pose_hrnet.py",
+          "bytes": 18385
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/utils/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/utils/inference.py",
+          "bytes": 2957
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/utils/transforms.py",
+          "bytes": 3939
+        },
+        {
+          "path": "fmpose3d/lib/hrnet/lib/utils/utilitys.py",
+          "bytes": 3238
+        },
+        {
+          "path": "fmpose3d/lib/preprocess.py",
+          "bytes": 4322
+        },
+        {
+          "path": "fmpose3d/lib/sort/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/sort/sort.py",
+          "bytes": 8286
+        },
+        {
+          "path": "fmpose3d/lib/yolov3/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "fmpose3d/lib/yolov3/bbox.py",
+          "bytes": 3593
+        },
+        {
+          "path": "fmpose3d/lib/yolov3/cfg/yolov3.cfg",
+          "bytes": 8345
+        },
+        {
+          "path": "fmpose3d/lib/yolov3/darknet.py",
+          "bytes": 14485
+        },
+        {
+          "path": "fmpose3d/lib/yolov3/human_detector.py",
+          "bytes": 5652
+        },
+        {
+          "path": "fmpose3d/lib/yolov3/preprocess.py",
+          "bytes": 2002
+        },
+        {
+          "path": "fmpose3d/lib/yolov3/util.py",
+          "bytes": 8512
+        },
+        {
+          "path": "fmpose3d/models/__init__.py",
+          "bytes": 706
+        },
+        {
+          "path": "fmpose3d/models/base_model.py",
+          "bytes": 3373
+        },
+        {
+          "path": "fmpose3d/models/fmpose3d/__init__.py",
+          "bytes": 386
+        },
+        {
+          "path": "fmpose3d/models/fmpose3d/graph_frames.py",
+          "bytes": 8458
+        },
+        {
+          "path": "fmpose3d/models/fmpose3d/model_GAMLP.py",
+          "bytes": 9814
+        },
+        {
+          "path": "fmpose3d/utils/__init__.py",
+          "bytes": 244
+        },
+        {
+          "path": "fmpose3d/utils/weights.py",
+          "bytes": 1578
+        },
+        {
+          "path": "pre_trained_models/readme.md",
+          "bytes": 252
+        },
+        {
+          "path": "pyproject.toml",
+          "bytes": 2519
+        },
+        {
+          "path": "scripts/FMPose3D_main.py",
+          "bytes": 17059
+        },
+        {
+          "path": "scripts/FMPose3D_test.sh",
+          "bytes": 930
+        },
+        {
+          "path": "scripts/FMPose3D_train.sh",
+          "bytes": 901
+        },
+        {
+          "path": "scripts/update_headers.py",
+          "bytes": 9471
+        },
+        {
+          "path": "tests/__init__.py",
+          "bytes": 0
+        },
+        {
+          "path": "tests/fmpose3d_api/__init__.py",
+          "bytes": 244
+        },
+        {
+          "path": "tests/fmpose3d_api/conftest.py",
+          "bytes": 3297
+        },
+        {
+          "path": "tests/fmpose3d_api/test_fmpose3d.py",
+          "bytes": 39353
+        },
+        {
+          "path": "tests/fmpose3d_api/test_huggingface.py",
+          "bytes": 3648
+        },
+        {
+          "path": "tests/fmpose3d_api/test_pipeline.py",
+          "bytes": 12638
+        },
+        {
+          "path": "tests/test_3dhp_infer_model_loading.py",
+          "bytes": 3798
+        },
+        {
+          "path": "tests/test_config.py",
+          "bytes": 13401
+        },
+        {
+          "path": "tests/test_demo_human.py",
+          "bytes": 2624
+        },
+        {
+          "path": "tests/test_model.py",
+          "bytes": 1795
+        },
+        {
+          "path": "tests/test_training_pipeline.py",
+          "bytes": 5616
+        }
+      ],
+      "source_file_count": 103,
+      "selected_bytes": 602057,
+      "license_paths": [
+        "LICENSE.txt"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P16",
+      "name": "LearnableTriangulation",
+      "repo_url": "https://github.com/karfly/learnable-triangulation-pytorch",
+      "archive_url": "https://codeload.github.com/karfly/learnable-triangulation-pytorch/zip/refs/heads/master",
+      "branch": "master",
+      "source_path": "third_party/architecture_reproduction/LearnableTriangulation",
+      "downloaded_at_utc": "2026-10-08T00:13:10.052534+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "LICENSE",
+          "bytes": 1130
+        },
+        {
+          "path": "README.md",
+          "bytes": 13454
+        },
+        {
+          "path": "experiments/human36m/eval/human36m_alg.yaml",
+          "bytes": 1416
+        },
+        {
+          "path": "experiments/human36m/eval/human36m_ransac.yaml",
+          "bytes": 1348
+        },
+        {
+          "path": "experiments/human36m/eval/human36m_vol_softmax.yaml",
+          "bytes": 1880
+        },
+        {
+          "path": "experiments/human36m/train/human36m_alg.yaml",
+          "bytes": 1337
+        },
+        {
+          "path": "experiments/human36m/train/human36m_alg_no_conf.yaml",
+          "bytes": 1338
+        },
+        {
+          "path": "experiments/human36m/train/human36m_vol_softmax.yaml",
+          "bytes": 1795
+        },
+        {
+          "path": "mvn/__init__.py",
+          "bytes": 39
+        },
+        {
+          "path": "mvn/datasets/__init__.py",
+          "bytes": 39
+        },
+        {
+          "path": "mvn/datasets/human36m.py",
+          "bytes": 12144
+        },
+        {
+          "path": "mvn/datasets/human36m_preprocessing/README.md",
+          "bytes": 4108
+        },
+        {
+          "path": "mvn/datasets/human36m_preprocessing/action_to_bbox_filename.py",
+          "bytes": 5129
+        },
+        {
+          "path": "mvn/datasets/human36m_preprocessing/action_to_una_dinosauria.py",
+          "bytes": 5194
+        },
+        {
+          "path": "mvn/datasets/human36m_preprocessing/collect-bboxes.py",
+          "bytes": 3762
+        },
+        {
+          "path": "mvn/datasets/human36m_preprocessing/generate-labels-npy-multiview.py",
+          "bytes": 8375
+        },
+        {
+          "path": "mvn/datasets/human36m_preprocessing/undistort-h36m.py",
+          "bytes": 4868
+        },
+        {
+          "path": "mvn/datasets/human36m_preprocessing/view-dataset.py",
+          "bytes": 2634
+        },
+        {
+          "path": "mvn/datasets/utils.py",
+          "bytes": 2615
+        },
+        {
+          "path": "mvn/models/__init__.py",
+          "bytes": 39
+        },
+        {
+          "path": "mvn/models/loss.py",
+          "bytes": 3067
+        },
+        {
+          "path": "mvn/models/pose_resnet.py",
+          "bytes": 12698
+        },
+        {
+          "path": "mvn/models/triangulation.py",
+          "bytes": 15472
+        },
+        {
+          "path": "mvn/models/v2v.py",
+          "bytes": 5892
+        },
+        {
+          "path": "mvn/utils/__init__.py",
+          "bytes": 39
+        },
+        {
+          "path": "mvn/utils/cfg.py",
+          "bytes": 167
+        },
+        {
+          "path": "mvn/utils/img.py",
+          "bytes": 3291
+        },
+        {
+          "path": "mvn/utils/misc.py",
+          "bytes": 823
+        },
+        {
+          "path": "mvn/utils/multiview.py",
+          "bytes": 7432
+        },
+        {
+          "path": "mvn/utils/op.py",
+          "bytes": 7940
+        },
+        {
+          "path": "mvn/utils/vis.py",
+          "bytes": 16262
+        },
+        {
+          "path": "mvn/utils/volumetric.py",
+          "bytes": 4192
+        },
+        {
+          "path": "requirements.txt",
+          "bytes": 361
+        },
+        {
+          "path": "train.py",
+          "bytes": 21782
+        }
+      ],
+      "source_file_count": 34,
+      "selected_bytes": 172062,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    },
+    {
+      "id": "P02",
+      "name": "RiemannianFM",
+      "repo_url": "https://github.com/facebookresearch/riemannian-fm",
+      "archive_url": "https://codeload.github.com/facebookresearch/riemannian-fm/zip/refs/heads/main",
+      "branch": "main",
+      "source_path": "third_party/architecture_reproduction/RiemannianFM",
+      "downloaded_at_utc": "2026-10-08T00:13:10.802114+00:00",
+      "status": "source_archived",
+      "files": [
+        {
+          "path": "CODE_OF_CONDUCT.md",
+          "bytes": 3536
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "bytes": 1265
+        },
+        {
+          "path": "LICENSE",
+          "bytes": 19333
+        },
+        {
+          "path": "README.md",
+          "bytes": 2318
+        },
+        {
+          "path": "configs/experiment/bunny10.yaml",
+          "bytes": 388
+        },
+        {
+          "path": "configs/experiment/bunny100.yaml",
+          "bytes": 389
+        },
+        {
+          "path": "configs/experiment/bunny50.yaml",
+          "bytes": 388
+        },
+        {
+          "path": "configs/experiment/earthquake.yaml",
+          "bytes": 172
+        },
+        {
+          "path": "configs/experiment/fire.yaml",
+          "bytes": 165
+        },
+        {
+          "path": "configs/experiment/flood.yaml",
+          "bytes": 166
+        },
+        {
+          "path": "configs/experiment/general.yaml",
+          "bytes": 167
+        },
+        {
+          "path": "configs/experiment/glycine.yaml",
+          "bytes": 168
+        },
+        {
+          "path": "configs/experiment/hyperbolic.yaml",
+          "bytes": 375
+        },
+        {
+          "path": "configs/experiment/maze3v2.yaml",
+          "bytes": 448
+        },
+        {
+          "path": "configs/experiment/maze4v2.yaml",
+          "bytes": 403
+        },
+        {
+          "path": "configs/experiment/prepro.yaml",
+          "bytes": 166
+        },
+        {
+          "path": "configs/experiment/proline.yaml",
+          "bytes": 167
+        },
+        {
+          "path": "configs/experiment/rna.yaml",
+          "bytes": 162
+        },
+        {
+          "path": "configs/experiment/simple_bunny.yaml",
+          "bytes": 278
+        },
+        {
+          "path": "configs/experiment/spot10.yaml",
+          "bytes": 387
+        },
+        {
+          "path": "configs/experiment/spot100.yaml",
+          "bytes": 388
+        },
+        {
+          "path": "configs/experiment/spot50.yaml",
+          "bytes": 387
+        },
+        {
+          "path": "configs/experiment/volcano.yaml",
+          "bytes": 168
+        },
+        {
+          "path": "configs/experiment/wrapped_spd.yaml",
+          "bytes": 346
+        },
+        {
+          "path": "configs/experiment/wrapped_torus.yaml",
+          "bytes": 277
+        },
+        {
+          "path": "configs/train.yaml",
+          "bytes": 1797
+        },
+        {
+          "path": "data/synthesize_mesh_data.py",
+          "bytes": 7208
+        },
+        {
+          "path": "environment.yml",
+          "bytes": 578
+        },
+        {
+          "path": "evaluate.py",
+          "bytes": 1394
+        },
+        {
+          "path": "manifm/datasets.py",
+          "bytes": 13542
+        },
+        {
+          "path": "manifm/dist.py",
+          "bytes": 1161
+        },
+        {
+          "path": "manifm/ema.py",
+          "bytes": 2414
+        },
+        {
+          "path": "manifm/eval_utils.py",
+          "bytes": 1669
+        },
+        {
+          "path": "manifm/manifolds/__init__.py",
+          "bytes": 327
+        },
+        {
+          "path": "manifm/manifolds/hyperbolic.py",
+          "bytes": 558
+        },
+        {
+          "path": "manifm/manifolds/mesh.py",
+          "bytes": 17126
+        },
+        {
+          "path": "manifm/manifolds/spd.py",
+          "bytes": 10663
+        },
+        {
+          "path": "manifm/manifolds/sphere.py",
+          "bytes": 798
+        },
+        {
+          "path": "manifm/manifolds/torus.py",
+          "bytes": 1083
+        },
+        {
+          "path": "manifm/manifolds/utils.py",
+          "bytes": 635
+        },
+        {
+          "path": "manifm/mesh_utils.py",
+          "bytes": 1373
+        },
+        {
+          "path": "manifm/model/actfn.py",
+          "bytes": 476
+        },
+        {
+          "path": "manifm/model/arch.py",
+          "bytes": 3663
+        },
+        {
+          "path": "manifm/model/diffeq_layers/__init__.py",
+          "bytes": 319
+        },
+        {
+          "path": "manifm/model/diffeq_layers/basic.py",
+          "bytes": 13585
+        },
+        {
+          "path": "manifm/model/diffeq_layers/container.py",
+          "bytes": 1550
+        },
+        {
+          "path": "manifm/model/diffeq_layers/normalization.py",
+          "bytes": 8683
+        },
+        {
+          "path": "manifm/model/diffeq_layers/resnet.py",
+          "bytes": 2191
+        },
+        {
+          "path": "manifm/model/diffeq_layers/wrappers.py",
+          "bytes": 1563
+        },
+        {
+          "path": "manifm/model_pl.py",
+          "bytes": 24569
+        },
+        {
+          "path": "manifm/solvers.py",
+          "bytes": 2464
+        },
+        {
+          "path": "manifm/utils.py",
+          "bytes": 1619
+        },
+        {
+          "path": "setup.py",
+          "bytes": 356
+        },
+        {
+          "path": "train.py",
+          "bytes": 4951
+        }
+      ],
+      "source_file_count": 54,
+      "selected_bytes": 160722,
+      "license_paths": [
+        "LICENSE"
+      ],
+      "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+    }
+  ]
+}
