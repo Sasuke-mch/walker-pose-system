@@ -435,3 +435,13 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 官方短链经301/302到onedrive.live.com，返回HTTP200 text/html，声明Content-Length404347字节，超过预注册262144上限，读取正文前拒绝；body_bytes_read=0、清单空、安装空、辅助资源0。保留完整源URL/redirect/header/原异常在 architecture_r15_results_v1.json 与 architecture_r15_attempt.json。这不是服务器不可达、文件不存在、资源下载成功或完整作者路径的证明。未尝试账号、猜Graph/确认URL、镜像、整包数据或权重。该链接当前保守2次访问预算耗尽，不能自动提高限额或重试。
 
 8项针对性测试验证HTTP/类型/编码/超限头拒绝及existing claim在网络session前拒绝；全模块Ruff通过，首次test importformat已修复；70AST、638论文源存在/字节数、11冻结路径核对通过。没有全面源内容比较或本阶段全套重跑；H8的168tests/21warnings与R14的3tests仅是先前证据。六项现有记录同步，小型请求/验证证据提交；14项默认缺口不变，neutral及P12三个辅助文件尚缺。只停止该资源入口，继续其他独立原推理/时序/流形路径。长期目标未完成，见 architecture_r15_validation.json。
+
+### 2026-10-08 R16 HMR2原保存图裁剪至完整随机网格子路径
+
+按 architecture_r16_protocol.json 固定frame0/cam0 LEFT正立CCW90图pair_0000.png（原pair1157），1920×1080；输入框显式整图[0,0,1080,1920]，不是检测器输出或已认证人物框。直接加载作者ViTDetDataset及utils；采用原ViT配置256输入、原loader第75..78行BBOX_SHAPE=[192,256]，未读取checkpoint。原crop实际Gaussian抗混叠downsampling_factor=7.50000048，size1920.000122/center[540,960]；BGR转RGB及ImageNet归一化后接完整670459037参数ViTH/6层头/原forward_step AST/合法现有maleSMPL44joint，原seed43不变。只为R4 harness增加可选normalized_image参数，不改作者或任何冻结核心。
+
+同图重复逐值一致、参数version不变；原GPU独立mesh误差0/joint5.96e-8m/projection0，另独立CPU进程从saved旋转/beta重建mesh最大误差2.384186e-7m，faces一致，保存输入像素与源图完全相同。小型非抗混叠非对称fixture的独立affine/BGRtoRGB/归一化与作者逐值相同；不将此控制扩展为完整图Gaussian独立等价证明。原NaN输入产生20670个非有限vertex等，照原行为保留。
+
+原emptybox length0；图外框仍返回有限normalized black并保留personid；zero-size框产生scalar divide warning却返回有限patch；NaN框原AssertionError，不修补。报告channel std使用float32累计会有小数值残差，测试按逐像素black广播控制，不把std残差当图像内容变化。作者原框处理不证明人体观测有效，更不提供原鱼眼标定/严格几何或精度。
+
+首次完整运行在新增报告汇总处变量error被except绑定清除，UnboundLocalError；v1 JSON/input/mesh NPZ保留，更名affine_error后v2完整重跑通过。初次targeted2failed/1passed分别是bbox float32舍入误差与恒定patch均值累计误差，修正测试控制，不改作者输出；失败XML原样本地保留，failure描述提交。实际全套182passed/21warnings，新3项；Ruff/72AST、638论文源存在/字节数及11冻结路径核对通过。没有全面源内容比较。六项记录同步，14默认资源缺口不变；neutral、作者initializer/detector/完整demo与真实性能仍未执行，不标完整复现。所有大型NPZ留本地，小型结果/重建/验证/成功XML及本阶段代码本地提交。长期目标未完成。

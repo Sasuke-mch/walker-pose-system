@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R15_MotionBERT_official_directory_reachable_bounded_body_rejected_original_paths_pending",
+  "stage": "R16_original_HMR2_saved_RGB_crop_full_forward_alternate_male_verified_default_path_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -230,7 +230,8 @@
     "R13 tenpaper/eightdecision evidence-linked synthesis, beta/T16frame intervention and autogradabsentflowedge/positiveSMPLHmeshgradient; no accuracyselection",
     "H8 explicit sharedbeta velocity conditioning:640 added random parameters, disabledexactH7, full360/source/hand/stream/future/mesh/gradient verified;168tests21warnings,66AST",
     "R14 unchanged P16 NumPy/Torch DLT:10 paired cases and1batched dtype case, independent stereo controls, original failures retained;3 targetedtests/fullmoduleRuff/68AST",
-    "R15 official MotionBERT mesh directory HTTP200/404347declaredHTML rejected beforebodyread under262144cap; noresourcesacquired, conservative2accessbudgetconsumed,8guardtests/Ruff/70AST"
+    "R15 official MotionBERT mesh directory HTTP200/404347declaredHTML rejected beforebodyread under262144cap; noresourcesacquired, conservative2accessbudgetconsumed,8guardtests/Ruff/70AST",
+    "R16 original ViTDetDataset savedframe0/loaderbbox192x256 -> full670459037ViTH/head/forward AST/male44joint mesh; independentRGBaffine0/CPUmesh2.38e-7;182tests21warnings/Ruff72AST; detector/defaultneutral unexecuted"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -587,5 +588,14 @@
     "file_inventory_obtained": false,
     "resources_acquired": 0,
     "conservative_same_source_budget_remaining": 0
+  },
+  "R16": {
+    "protocol": "architecture_r16_protocol.json",
+    "results": "architecture_r16_results_v2.json",
+    "validation": "architecture_r16_validation.json",
+    "original_crop_executed": true,
+    "detector_executed": false,
+    "default_neutral_reproduced": false,
+    "whole_author_method_reproduced": false
   }
 }

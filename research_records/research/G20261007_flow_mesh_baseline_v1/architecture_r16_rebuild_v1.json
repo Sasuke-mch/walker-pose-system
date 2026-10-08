@@ -1,0 +1,11 @@
+{
+  "status": "R16_savedmesh_independent_CPU_process_rebuilt",
+  "input_source_pixels_exact": true,
+  "mesh_error_m": 2.384185791015625e-07,
+  "faces_exact": true,
+  "paper_source_presence_bytes": 638,
+  "frozen_paths": 11,
+  "AST_files": 72,
+  "training_executed": false,
+  "checkpoint_loaded": false
+}

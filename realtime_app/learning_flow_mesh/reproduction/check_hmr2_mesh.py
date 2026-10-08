@@ -22,7 +22,7 @@ from .run_probability import (
 )
 
 
-def run(output):
+def run(output, *, normalized_image=None):
     torch.set_num_threads(2)
     torch.manual_seed(43)
     install_download_guard()
@@ -56,7 +56,14 @@ def run(output):
     exec(compile(ast.Module(body=[method], type_ignores=[]), str(source), "exec"), symbols)  # noqa: S102 -- exact archived author method
     harness = SimpleNamespace(cfg=cfg, backbone=backbone, smpl_head=head, smpl=body)
     versions = [p._version for m in (backbone, head, body) for p in m.parameters()]
-    image = torch.randn(1, 3, 256, 256, device="cuda") * .1
+    if normalized_image is None:
+        image = torch.randn(1, 3, 256, 256, device="cuda") * .1
+    else:
+        if normalized_image.shape != (1, 3, 256, 256) or normalized_image.dtype != torch.float32:
+            raise ValueError("explicit normalized RGB must be float32 1x3x256x256")
+        if not torch.isfinite(normalized_image).all():
+            raise ValueError("declared original crop must be finite")
+        image = normalized_image.to("cuda")
     with torch.no_grad():
         result = symbols["forward_step"](harness, {"img": image})
         repeat = symbols["forward_step"](harness, {"img": image})
@@ -101,7 +108,8 @@ def run(output):
     np.savez_compressed(output.with_suffix(".npz"), **arrays)
     return {"status": "R4_original_forward_method_male_passed", "training_executed": False,
             "checkpoint_loaded": False, "source_method": str(source), "source_lines": [method.lineno, method.end_lineno],
-            "input": "Artificial normalized RGB 1x3x256x256, seed43", "asset": str(asset), "gender": "male",
+            "input": "Artificial normalized RGB 1x3x256x256, seed43" if normalized_image is None else "Explicit original ViTDetDataset normalized RGB; external R16 provenance",
+            "asset": str(asset), "gender": "male",
             "original_default_neutral_executed": False, "top_level_initializer_executed": False,
             "mean": cfg.SMPL.MEAN_PARAMS, "regressor": str(cache / "SMPL_to_J19.pkl"),
             "parameter_count": sum(p.numel() for m in (backbone, head) for p in m.parameters()),

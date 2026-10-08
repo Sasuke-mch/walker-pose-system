@@ -1,0 +1,6 @@
+{
+  "status": "R16_original_crop_forward_failed",
+  "error": "UnboundLocalError: cannot access local variable 'error' where it is not associated with a value",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_hmr2_crop.py\", line 115, in main\n    result = run(args.output)\n             ^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_hmr2_crop.py\", line 102, in run\n    \"independent_affine_RGB_normalization_max_error\": error, \"empty_box_dataset_length\": len(empty),\n                                                      ^^^^^\nUnboundLocalError: cannot access local variable 'error' where it is not associated with a value\n",
+  "training_executed": false
+}
