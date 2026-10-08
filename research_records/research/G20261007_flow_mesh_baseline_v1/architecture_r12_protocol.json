@@ -1,0 +1,29 @@
+{
+  "id": "R12",
+  "status": "protocol_locked_before_execution",
+  "purpose": "OriginalVIBE temporal missing and stream-state contract, preserving fullregressor/mesh gaps",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "network_requests_allowed": false,
+  "input": "Original configs/config.yaml released TemporalEncoder2layers/1024hidden/linear/residual/oneway, seed113 untrainedfeatures1x48x2048; published16window checked separately",
+  "control": "Unmodified original TemporalEncoder forward AST; full48 and reset16/16/16 windows",
+  "diagnostic_adapter": "Inject carried hidden only at original GRU pre-hook and read actualGRU returnedhidden with output-hook. Original TemporalEncoder still runs its unchanged fullforward. Explicit augmentedstate input, not nativeauthorstream API. No new weights/pose/body surrogate.",
+  "unique_variable": "Carry versus reset original GRU hidden across original16featurewindows; missingfeatures probed separately",
+  "checks": [
+    "Native forward has no hidden/mask/frameID arguments and no persistenthidden state",
+    "Default16 forward and48sequence dimensions/finite/repeat unchanged state_dict",
+    "Whole48 versus resetwindows diverge afterwindowboundary; scoped carryadapter matches within original2e-5",
+    "Future24+ perturbation preserves prefix24 exactly",
+    "Original zero features produce finite/nonzero outputs; no observedavailability API",
+    "NaN feature at17 preservesprefix17 then recurrentnonfinitepropagation; no cleaning ormask fabricated",
+    "No training/loadweights; all failureoutputs/state/limits saved; hooks removed on error",
+    "All14default resources remain missing; this is not original completeVIBE/SMPL"
+  ],
+  "stop": "Retain numerical/compatibilityfailures; do not relax2e-5/change originalsource/gates, fillNaNs, addelapsedtime, bodyassets orcheckpoint",
+  "outputs": [
+    "architecture_r12_results_v1.json",
+    "architecture_r12_results_v1.npz",
+    "architecture_r12_validation.json"
+  ],
+  "boundary": "Original TemporalEncoder component semantics and explicit hidden-state diagnostic adapter; no fullregressor/body/defaultmesh/detector or trainedaccuracy."
+}
