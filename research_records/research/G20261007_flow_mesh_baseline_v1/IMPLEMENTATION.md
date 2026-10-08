@@ -427,3 +427,11 @@ architecture_h8_results_v1.json：完整360帧/pair1157..1516；关闭分支与�
 健康Torch误差1.86446e-11mm，独立双射线视差深度公式误差4.54747e-13mm；省略/全1权重逐值相同，统一乘7误差9.09495e-13mm。全0置信度Torch返回有限[0,0,0]、无warning，实际投影却非有限；仅1有效视角或重合相机也可返回有限但不唯一的点，两SVD后端重合相机数值显著不同，不把具体坐标当稳定契约。负深度点被正常返回，无cheirality拒绝。0/1视角原函数IndexError，NaN点/相机/置信度触发原SVD异常，均保留而不填补。batch输入float64却输出float32。这里证明有限坐标不足以判定有效几何，不是物理精度，也不替换项目严格质量门或鱼眼模型。
 
 architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lambda变量绑定lint已以显式default capture修复，未改作者函数。独立双射线对照、零置信度反例与缺失/NaN异常3项targeted测试通过，全模块Ruff/68AST、638论文源存在/字节数与11冻结路径核对通过；没有全面源内容比较。H8的168测试/21warnings保留为上阶段证据，本阶段没有重跑完整套。见 architecture_r14_validation.json/architecture_r14_tests.xml。六项记录同步，14默认资源缺口及原完整路径待执行范围保留，长期目标未完成。
+
+### 2026-10-08 R15 MotionBERT官方网格辅助资源目录访问
+
+按 architecture_r15_protocol.json 核对P12 docs/mesh.md第5行官方OneDrive目录，该文档只将SPIN链接作为regressor说明，不能据此把SPIN同名文件或HuManiFlow旧文件直接换入P12。网页工具open未能读取链接，无正文返回；为保守预算计1次同源访问。预注册后仅1次direct GET，持久exclusive claim防止重启重复请求。无本研究真实进程运行，无训练/模型/权重分配或主线修改。
+
+官方短链经301/302到onedrive.live.com，返回HTTP200 text/html，声明Content-Length404347字节，超过预注册262144上限，读取正文前拒绝；body_bytes_read=0、清单空、安装空、辅助资源0。保留完整源URL/redirect/header/原异常在 architecture_r15_results_v1.json 与 architecture_r15_attempt.json。这不是服务器不可达、文件不存在、资源下载成功或完整作者路径的证明。未尝试账号、猜Graph/确认URL、镜像、整包数据或权重。该链接当前保守2次访问预算耗尽，不能自动提高限额或重试。
+
+8项针对性测试验证HTTP/类型/编码/超限头拒绝及existing claim在网络session前拒绝；全模块Ruff通过，首次test importformat已修复；70AST、638论文源存在/字节数、11冻结路径核对通过。没有全面源内容比较或本阶段全套重跑；H8的168tests/21warnings与R14的3tests仅是先前证据。六项现有记录同步，小型请求/验证证据提交；14项默认缺口不变，neutral及P12三个辅助文件尚缺。只停止该资源入口，继续其他独立原推理/时序/流形路径。长期目标未完成，见 architecture_r15_validation.json。

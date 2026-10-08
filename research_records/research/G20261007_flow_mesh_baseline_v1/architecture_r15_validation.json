@@ -1,0 +1,32 @@
+{
+  "status": "R15_bounded_directory_access_failure_retained_and_guard_checks_passed",
+  "results": "architecture_r15_results_v1.json",
+  "attempt_claim": "architecture_r15_attempt.json",
+  "tests": {
+    "tests": "8",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "Ruff": "wholemodule passed after test importformat correction",
+  "AST_files": 70,
+  "paper_source_presence_bytes": 638,
+  "author_content_comparison": false,
+  "frozen_paths_verified": 11,
+  "directory_HTTP200_observed": true,
+  "declared_html_bytes": 404347,
+  "allowed_html_bytes": 262144,
+  "body_bytes_read": 0,
+  "resource_files_acquired": 0,
+  "default_resource_gaps": 14,
+  "original_mesh_path_executed": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "whole_goal_complete": false,
+  "live_stage_process_at_start": false,
+  "prior_web_tool_open_failed": true,
+  "conservative_same_source_budget_remaining": 0,
+  "full_suite_rerun": false,
+  "retained_prior_evidence": "H8 168tests21warnings and R14 3targeted passed are earlier evidence only",
+  "boundary": "Response directory oversized relative to preregistration, not evidence of unavailable server or missing resources. No body/inventory obtained; no default resource equivalence or method completion claim. No authentication, guessed API or mirror used."
+}

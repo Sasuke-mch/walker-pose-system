@@ -1,0 +1,40 @@
+{
+  "status": "R15_official_MotionBERT_directory_audited",
+  "protocol": "architecture_r15_protocol.json",
+  "directory": {
+    "status": "directory_access_failed",
+    "body_bytes_read": 0,
+    "installed": [],
+    "filename_mentions": [],
+    "http_status": 200,
+    "final_url": "https://onedrive.live.com/?id=A5438CD242871DF0%21127&cid=A5438CD242871DF0&spopath=%2Fpersonal%2Fa5438cd242871df0%2FDocuments%2Fmotionbert%2Fdata%2Fmesh&listurl=%2Fpersonal%2Fa5438cd242871df0%2FDocuments&ithint=folder&migratedtospo=true&redeem=aHR0cHM6Ly8xZHJ2Lm1zL2YvYy9hNTQzOGNkMjQyODcxZGYwL0lnRHdIWWRDMG94RElJQ2xmd0FBQUFBQUFmMHFqN0poWlgwc1hFYVg1OUVYT0Mw&ga=1",
+    "redirects": [
+      {
+        "status": 301,
+        "url": "https://1drv.ms/f/c/a5438cd242871df0/IgDwHYdC0oxDIIClfwAAAAAAAf0qj7JhZX0sXEaX59EXOC0"
+      },
+      {
+        "status": 302,
+        "url": "https://onedrive.live.com/:f:/g/personal/A5438CD242871DF0/IgDwHYdC0oxDIIClfwAAAAAAAf0qj7JhZX0sXEaX59EXOC0?resid=A5438CD242871DF0!127&ithint=folder&migratedtospo=true&redeem=aHR0cHM6Ly8xZHJ2Lm1zL2YvYy9hNTQzOGNkMjQyODcxZGYwL0lnRHdIWWRDMG94RElJQ2xmd0FBQUFBQUFmMHFqN0poWlgwc1hFYVg1OUVYT0Mw"
+      }
+    ],
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Content-Length": "404347",
+      "Content-Encoding": null
+    },
+    "error": "ValueError: invalid or excessive declared body size",
+    "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_motionbert_directory.py\", line 41, in run\n    validate_headers(response.status_code, response.headers, cap)\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_motionbert_directory.py\", line 22, in validate_headers\n    raise ValueError(\"invalid or excessive declared body size\")\nValueError: invalid or excessive declared body size\n"
+  },
+  "elapsed_seconds": 8.328000000008615,
+  "direct_GET_invocations": 1,
+  "prior_documentation_attempts": 1,
+  "conservative_same_source_budget_remaining": 0,
+  "resource_files_acquired": 0,
+  "default_gaps_before": 14,
+  "default_gaps_after": 14,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "whole_goal_complete": false,
+  "boundary": "Official directory reachability and text only, never proof of selected auxiliary bytes or complete method."
+}

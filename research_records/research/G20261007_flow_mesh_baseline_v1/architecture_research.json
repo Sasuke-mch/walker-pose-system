@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R14_original_DLT_missing_confidence_and_degenerate_geometry_audited_full_paths_pending",
+  "stage": "R15_MotionBERT_official_directory_reachable_bounded_body_rejected_original_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -191,7 +191,7 @@
       ]
     }
   ],
-  "next": "Continue original author resource/full-path and unexecuted temporal/manifold/degenerate multiview contracts. Default14 gaps remain; WHAM same-source budget exhausted, VIBE remaining1 requires actual selective-access evidence before any request. No training, checkpoints, mainline or evidence-level changes.",
+  "next": "Continue independently actionable original inference/input/temporal/manifold/geometry scopes while retaining14default resource gaps. MotionBERT current official directory budget exhausted conservatively; WHAM exhausted; VIBE1remaining needs actual selective-access evidence. Do not retry claimed stages or fetch credentials/weights/fullarchives.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -229,7 +229,8 @@
     "R12 originalVIBETemporalEncoder16window/48reset-vs-carry/missing0NaN/future contract, 160tests; originalfullVIBEbody unexecuted",
     "R13 tenpaper/eightdecision evidence-linked synthesis, beta/T16frame intervention and autogradabsentflowedge/positiveSMPLHmeshgradient; no accuracyselection",
     "H8 explicit sharedbeta velocity conditioning:640 added random parameters, disabledexactH7, full360/source/hand/stream/future/mesh/gradient verified;168tests21warnings,66AST",
-    "R14 unchanged P16 NumPy/Torch DLT:10 paired cases and1batched dtype case, independent stereo controls, original failures retained;3 targetedtests/fullmoduleRuff/68AST"
+    "R14 unchanged P16 NumPy/Torch DLT:10 paired cases and1batched dtype case, independent stereo controls, original failures retained;3 targetedtests/fullmoduleRuff/68AST",
+    "R15 official MotionBERT mesh directory HTTP200/404347declaredHTML rejected beforebodyread under262144cap; noresourcesacquired, conservative2accessbudgetconsumed,8guardtests/Ruff/70AST"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -577,5 +578,14 @@
     "validation": "architecture_r14_validation.json",
     "finite_output_implies_valid_geometry": false,
     "whole_author_method_reproduced": false
+  },
+  "R15": {
+    "protocol": "architecture_r15_protocol.json",
+    "result": "architecture_r15_results_v1.json",
+    "validation": "architecture_r15_validation.json",
+    "directory_reachable": true,
+    "file_inventory_obtained": false,
+    "resources_acquired": 0,
+    "conservative_same_source_budget_remaining": 0
   }
 }
