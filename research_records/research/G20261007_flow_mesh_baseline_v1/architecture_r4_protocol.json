@@ -1,0 +1,30 @@
+{
+  "id": "R4",
+  "status": "protocol_locked_before_execution",
+  "purpose": "P07 original complete forward_step method with explicit existing male SMPLLayer; not original neutral configuration",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "inputs": [
+    "HMR2 published ViT-H and six-layer SMPL transformer config",
+    "C:/Users/毛晨昊/.cache/4DHumans/data/smpl_mean_params.npz",
+    "C:/Users/毛晨昊/.cache/4DHumans/data/SMPL_to_J19.pkl",
+    "models/smpl/basicmodel_m_lbs_10_207_0_v1.0.0.pkl"
+  ],
+  "data_scope": "Artificial normalized RGB 1x3x256x256, seed43, float32, CUDA; no raw observations or prior fit",
+  "unique_variable": "Extend original ViT/head coverage through exact author forward_step AST method to body and perspective projection, gender male explicitly separate from neutral default",
+  "controls": [
+    "Same asset independent SMPLLayer mesh/base45 plus independent J19 einsum and hip update",
+    "Independent pinhole projection/camera formula",
+    "Exact repeat, model parameter version counters unchanged",
+    "NaN input probe retained without cleaning",
+    "Zero and negative camera scale projection probe; no metric interpretation"
+  ],
+  "success": "Original method returns finite 6890 vertices/44 joints/2D and independent residuals <2e-5; every failure preserved",
+  "stop": "No author edits, substituted asset names, checkpoints, optimizer or resource acquisition; failed output kept under new version",
+  "outputs": [
+    "architecture_r4_results_v1.json",
+    "architecture_r4_results_v1.npz",
+    "architecture_r4_validation.json"
+  ],
+  "boundary": "AST complete forward_step method only; original Lightning initializer/detector/crop/trained accuracy/neutral default and full evaluation not executed"
+}
