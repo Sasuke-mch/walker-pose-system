@@ -1,0 +1,430 @@
+{
+  "training_executed": false,
+  "neural_check_source_unchanged": true,
+  "download_guard": true,
+  "failed_run_erratum": {
+    "file": "architecture_checks/P04_v1.json",
+    "actual_backbone_weights": "ImageNet default loaded; flow head did not import",
+    "excluded_from_success_evidence": true
+  },
+  "mean_params": {
+    "url": "https://raw.githubusercontent.com/open-mmlab/mmpose/main/tests/data/smpl/smpl_mean_params.npz",
+    "path": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+    "downloaded_at_utc": "2026-10-08T00:30:58.987335+00:00",
+    "bytes": 1310,
+    "arrays": {
+      "shape": {
+        "shape": [
+          10
+        ],
+        "dtype": "float32",
+        "matches_existing_local_copy": true
+      },
+      "pose": {
+        "shape": [
+          144
+        ],
+        "dtype": "float32",
+        "matches_existing_local_copy": true
+      },
+      "cam": {
+        "shape": [
+          3
+        ],
+        "dtype": "float32",
+        "matches_existing_local_copy": true
+      }
+    },
+    "boundary": "Public MMPose initialization fixture, not confirmed byte-identical to ProHMR/HMR2 release bundle; only neural structure checks use this file",
+    "failed_source_attempt": "SPIN/master/data/smpl_mean_params.npz returned 404; no synthetic mean file substituted"
+  },
+  "nflows_source": {
+    "id": "P04-dependency",
+    "name": "ProHMR_nflows",
+    "repo_url": "https://github.com/nkolot/nflows",
+    "archive_url": "https://codeload.github.com/nkolot/nflows/zip/refs/heads/master",
+    "branch": "master",
+    "source_path": "third_party/architecture_reproduction/ProHMR_nflows",
+    "downloaded_at_utc": "2026-10-08T00:30:09.187413+00:00",
+    "status": "source_archived",
+    "files": [
+      {
+        "path": "LICENSE.md",
+        "bytes": 1118
+      },
+      {
+        "path": "README.md",
+        "bytes": 3337
+      },
+      {
+        "path": "environment.yml",
+        "bytes": 447
+      },
+      {
+        "path": "nflows/__init__.py",
+        "bytes": 0
+      },
+      {
+        "path": "nflows/distributions/__init__.py",
+        "bytes": 384
+      },
+      {
+        "path": "nflows/distributions/base.py",
+        "bytes": 4633
+      },
+      {
+        "path": "nflows/distributions/discrete.py",
+        "bytes": 2542
+      },
+      {
+        "path": "nflows/distributions/mixture.py",
+        "bytes": 1384
+      },
+      {
+        "path": "nflows/distributions/normal.py",
+        "bytes": 6782
+      },
+      {
+        "path": "nflows/distributions/uniform.py",
+        "bytes": 3416
+      },
+      {
+        "path": "nflows/flows/__init__.py",
+        "bytes": 193
+      },
+      {
+        "path": "nflows/flows/autoregressive.py",
+        "bytes": 2153
+      },
+      {
+        "path": "nflows/flows/base.py",
+        "bytes": 5912
+      },
+      {
+        "path": "nflows/flows/glow.py",
+        "bytes": 1924
+      },
+      {
+        "path": "nflows/flows/realnvp.py",
+        "bytes": 2131
+      },
+      {
+        "path": "nflows/nn/__init__.py",
+        "bytes": 0
+      },
+      {
+        "path": "nflows/nn/nde/__init__.py",
+        "bytes": 54
+      },
+      {
+        "path": "nflows/nn/nde/made.py",
+        "bytes": 14323
+      },
+      {
+        "path": "nflows/nn/nets/__init__.py",
+        "bytes": 98
+      },
+      {
+        "path": "nflows/nn/nets/mlp.py",
+        "bytes": 2233
+      },
+      {
+        "path": "nflows/nn/nets/resnet.py",
+        "bytes": 7615
+      },
+      {
+        "path": "nflows/transforms/UMNN/MonotonicNormalizer.py",
+        "bytes": 2921
+      },
+      {
+        "path": "nflows/transforms/UMNN/__init__.py",
+        "bytes": 88
+      },
+      {
+        "path": "nflows/transforms/__init__.py",
+        "bytes": 1754
+      },
+      {
+        "path": "nflows/transforms/autoregressive.py",
+        "bytes": 19017
+      },
+      {
+        "path": "nflows/transforms/base.py",
+        "bytes": 8047
+      },
+      {
+        "path": "nflows/transforms/conv.py",
+        "bytes": 1640
+      },
+      {
+        "path": "nflows/transforms/coupling.py",
+        "bytes": 21098
+      },
+      {
+        "path": "nflows/transforms/linear.py",
+        "bytes": 7593
+      },
+      {
+        "path": "nflows/transforms/lu.py",
+        "bytes": 4311
+      },
+      {
+        "path": "nflows/transforms/made.py",
+        "bytes": 9220
+      },
+      {
+        "path": "nflows/transforms/nonlinearities.py",
+        "bytes": 16126
+      },
+      {
+        "path": "nflows/transforms/normalization.py",
+        "bytes": 8379
+      },
+      {
+        "path": "nflows/transforms/orthogonal.py",
+        "bytes": 4032
+      },
+      {
+        "path": "nflows/transforms/permutations.py",
+        "bytes": 2241
+      },
+      {
+        "path": "nflows/transforms/qr.py",
+        "bytes": 3680
+      },
+      {
+        "path": "nflows/transforms/reshape.py",
+        "bytes": 2257
+      },
+      {
+        "path": "nflows/transforms/splines/__init__.py",
+        "bytes": 420
+      },
+      {
+        "path": "nflows/transforms/splines/cubic.py",
+        "bytes": 9150
+      },
+      {
+        "path": "nflows/transforms/splines/linear.py",
+        "bytes": 3217
+      },
+      {
+        "path": "nflows/transforms/splines/quadratic.py",
+        "bytes": 5472
+      },
+      {
+        "path": "nflows/transforms/splines/rational_quadratic.py",
+        "bytes": 6362
+      },
+      {
+        "path": "nflows/transforms/standard.py",
+        "bytes": 2914
+      },
+      {
+        "path": "nflows/transforms/svd.py",
+        "bytes": 3910
+      },
+      {
+        "path": "nflows/utils/__init__.py",
+        "bytes": 524
+      },
+      {
+        "path": "nflows/utils/torchutils.py",
+        "bytes": 5323
+      },
+      {
+        "path": "nflows/utils/typechecks.py",
+        "bytes": 363
+      },
+      {
+        "path": "nflows/version.py",
+        "bytes": 43
+      },
+      {
+        "path": "setup.cfg",
+        "bytes": 78
+      },
+      {
+        "path": "setup.py",
+        "bytes": 1097
+      },
+      {
+        "path": "tests/__init__.py",
+        "bytes": 0
+      },
+      {
+        "path": "tests/distributions/__init__.py",
+        "bytes": 0
+      },
+      {
+        "path": "tests/distributions/discrete_test.py",
+        "bytes": 3318
+      },
+      {
+        "path": "tests/distributions/normal_test.py",
+        "bytes": 6618
+      },
+      {
+        "path": "tests/flows/__init__.py",
+        "bytes": 0
+      },
+      {
+        "path": "tests/flows/autoregressive_test.py",
+        "bytes": 1073
+      },
+      {
+        "path": "tests/flows/base_test.py",
+        "bytes": 4231
+      },
+      {
+        "path": "tests/flows/realnvp_test.py",
+        "bytes": 1025
+      },
+      {
+        "path": "tests/transforms/__init__.py",
+        "bytes": 0
+      },
+      {
+        "path": "tests/transforms/autoregressive_test.py",
+        "bytes": 5179
+      },
+      {
+        "path": "tests/transforms/base_test.py",
+        "bytes": 5147
+      },
+      {
+        "path": "tests/transforms/conv_test.py",
+        "bytes": 535
+      },
+      {
+        "path": "tests/transforms/coupling_test.py",
+        "bytes": 11066
+      },
+      {
+        "path": "tests/transforms/linear_test.py",
+        "bytes": 9699
+      },
+      {
+        "path": "tests/transforms/lu_test.py",
+        "bytes": 2583
+      },
+      {
+        "path": "tests/transforms/made_test.py",
+        "bytes": 6029
+      },
+      {
+        "path": "tests/transforms/nonlinearities_test.py",
+        "bytes": 5444
+      },
+      {
+        "path": "tests/transforms/normalization_test.py",
+        "bytes": 6387
+      },
+      {
+        "path": "tests/transforms/orthogonal_test.py",
+        "bytes": 3419
+      },
+      {
+        "path": "tests/transforms/permutations_test.py",
+        "bytes": 1856
+      },
+      {
+        "path": "tests/transforms/qr_test.py",
+        "bytes": 2620
+      },
+      {
+        "path": "tests/transforms/reshape_test.py",
+        "bytes": 2289
+      },
+      {
+        "path": "tests/transforms/splines/__init__.py",
+        "bytes": 0
+      },
+      {
+        "path": "tests/transforms/splines/cubic_test.py",
+        "bytes": 3694
+      },
+      {
+        "path": "tests/transforms/splines/linear_test.py",
+        "bytes": 2457
+      },
+      {
+        "path": "tests/transforms/splines/quadratic_test.py",
+        "bytes": 2986
+      },
+      {
+        "path": "tests/transforms/splines/rational_quadratic_test.py",
+        "bytes": 3386
+      },
+      {
+        "path": "tests/transforms/standard_test.py",
+        "bytes": 3825
+      },
+      {
+        "path": "tests/transforms/svd_test.py",
+        "bytes": 2836
+      },
+      {
+        "path": "tests/transforms/transform_test.py",
+        "bytes": 1228
+      },
+      {
+        "path": "tests/utils/torchutils_test.py",
+        "bytes": 3993
+      }
+    ],
+    "source_file_count": 81,
+    "selected_bytes": 314879,
+    "license_paths": [
+      "LICENSE.md"
+    ],
+    "scope": "Source/config snapshot only; no model/data binaries extracted, no import or forward yet"
+  },
+  "dependencies": [
+    {
+      "name": "pyro-ppl",
+      "version": "1.8.6",
+      "download_url": "https://files.pythonhosted.org/packages/f2/93/59bced321ede6eeb60061f156df8aae3f4832127fe97f4e86c567ad3b9cc/pyro_ppl-1.8.6-py3-none-any.whl"
+    },
+    {
+      "name": "pyro-api",
+      "version": "0.1.2",
+      "download_url": "https://files.pythonhosted.org/packages/fc/81/957ae78e6398460a7230b0eb9b8f1cb954c5e913e868e48d89324c68cec7/pyro_api-0.1.2-py3-none-any.whl"
+    },
+    {
+      "name": "geoopt",
+      "version": "0.5.1",
+      "download_url": "https://files.pythonhosted.org/packages/07/0f/f8d4afc40ffd1d2e8a4386bad152176cdc726b077c9bd5d65621b122559d/geoopt-0.5.1-py3-none-any.whl"
+    },
+    {
+      "name": "torchdiffeq",
+      "version": "0.2.5",
+      "download_url": "https://files.pythonhosted.org/packages/b9/35/537f64f2d0b3cfebaae0f903b4e3a3b239abcc99d0f73cb15b9cee9b8212/torchdiffeq-0.2.5-py3-none-any.whl"
+    },
+    {
+      "name": "libigl",
+      "version": "2.6.1",
+      "download_url": "https://files.pythonhosted.org/packages/97/8b/77405e7076e218351a14c1561f2a324b499df8dd3711a517e5d082ed1c77/libigl-2.6.1-cp312-abi3-win_amd64.whl"
+    },
+    {
+      "name": "UMNN",
+      "version": "1.68",
+      "download_url": "https://files.pythonhosted.org/packages/5a/58/8126c21d6c9e3d61ab1cdc52b1719f5ca58fcdf746090c42c942bf7b17b7/UMNN-1.68.tar.gz"
+    },
+    {
+      "name": "opt_einsum",
+      "version": "3.4.0",
+      "download_url": "https://files.pythonhosted.org/packages/23/cd/066e86230ae37ed0be70aae89aabf03ca8d9f39c8aea0dec8029455b5540/opt_einsum-3.4.0-py3-none-any.whl"
+    }
+  ],
+  "dependency_root": "third_party/architecture_reproduction/_deps",
+  "original_venv_packages_changed": false,
+  "errors_and_limitations": [
+    "P04_v1 loaded default ImageNet backbone before failing on missing UMNN; its weights=random_initialization field is inaccurate. This run is excluded from random-initialization evidence. Re-run P04_v3 explicitly pretrained=False with download guard.",
+    "P04_v2 exposed author nflows explicit-noise N>1 context row bug; unchanged released 63 random + 1 zero path passed in v3.",
+    "P05_v1 missing opt_einsum; isolated dependency added, v2 passed.",
+    "P07_v1 chained eval() returned None because original ViT.train() omits return; harness uses in-place eval, v2 passed.",
+    "Initial download guard accessed lazy torch.utils.model_zoo before import and exited before JSON; corrected explicit import inside exception-recording boundary. No model executed in this failed invocation.",
+    "SPIN raw mean-parameter URL returned 404; public MMPose fixture acquired and matched existing local copy. Original release-bundle equivalence remains unconfirmed."
+  ]
+}

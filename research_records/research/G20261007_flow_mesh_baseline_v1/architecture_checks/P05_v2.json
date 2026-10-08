@@ -1,0 +1,91 @@
+{
+  "status": "original_hierarchical_probability_network_passed",
+  "config": "third_party/architecture_reproduction/HuManiFlow/configs/humaniflow_config.py",
+  "parameter_count": 12490497,
+  "proxy_input_shape": [
+    1,
+    18,
+    256,
+    256
+  ],
+  "input_semantics": "17 COCO heatmaps plus edge channel; fixture is random, not RGB",
+  "body_rotations_shape": [
+    1,
+    23,
+    3,
+    3
+  ],
+  "sample_rotations_shape": [
+    1,
+    4,
+    23,
+    3,
+    3
+  ],
+  "beta_sample_shape": [
+    1,
+    4,
+    10
+  ],
+  "joint_logprob_shape": [
+    1,
+    23
+  ],
+  "point_rotation_check": {
+    "orthogonality_max_error": 1.1920928955078125e-07,
+    "determinant_max_error": 2.384185791015625e-07
+  },
+  "sample_rotation_check": {
+    "orthogonality_max_error": 1.1920928955078125e-07,
+    "determinant_max_error": 1.1920928955078125e-07
+  },
+  "global_rotation_check": {
+    "orthogonality_max_error": 1.1920928955078125e-07,
+    "determinant_max_error": 1.1920928955078125e-07
+  },
+  "point_estimate_repeat_exact": true,
+  "candidate_beta_max_difference": 3.7492852210998535,
+  "use_shape_mode_for_samples_produces_shared_candidate_beta": true,
+  "parent_asset": "models/smpl/basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+  "parents": [
+    -1,
+    0,
+    0,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    9,
+    9,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "coverage": "Original ResNet18/23 hierarchical SO(3) flows, shape distribution, weak camera, point/sampling/log-density paths; no detector/edge generation, SMPL neutral mesh or full evaluation",
+  "adaptations": [
+    "Actual local male SMPL kinematic tree (24 nodes) used only as topology; no SMPL-H substitution",
+    "Random 18-channel proxy and four candidates for structural checks; no checkpoint"
+  ],
+  "id": "P05",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 4.040070299990475
+  },
+  "evidence_boundary": "Untrained structural/probability contracts only; no accuracy or deployment conclusion"
+}

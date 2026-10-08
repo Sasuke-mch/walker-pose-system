@@ -1,0 +1,32 @@
+{
+  "status": "original_sphere_vector_field_and_loss_passed",
+  "config": "third_party/architecture_reproduction/RiemannianFM/configs/train.yaml",
+  "source_loss": "third_party/architecture_reproduction/RiemannianFM/manifm/model_pl.py",
+  "parameter_count": 1816966,
+  "manifold": "Sphere S2, ambient dim3",
+  "path_shape": [
+    4,
+    3,
+    3
+  ],
+  "path_endpoint_max_error": 1.7881393432617188e-07,
+  "path_unit_norm_max_error": 1.1920928955078125e-07,
+  "target_tangent_max_error": 2.384185791015625e-07,
+  "vector_field_tangent_max_error": 3.725290298461914e-09,
+  "untrained_loss": 0.6005089282989502,
+  "coverage": "Original sphere geodesic/JVP, configured 512-wide eight-layer time-MLP/tangent projection and exact author rfm_loss_fn; no training, density/ODE evaluation, meshes or SO(3) human pose",
+  "adaptations": [
+    "Sphere geometry fixture, not original volcano dataset",
+    "Exact loss method AST only bypasses Lightning/data facade; original manifold/network source unchanged"
+  ],
+  "id": "P02",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu",
+    "elapsed_total_seconds_not_latency": 2.520339899987448
+  },
+  "evidence_boundary": "Untrained structural/probability contracts only; no accuracy or deployment conclusion"
+}

@@ -124,3 +124,21 @@ uvx --offline ruff check realtime_app/learning_flow_mesh/reproduction realtime_a
 原source acquire前验证全部ZIP成员再写入，拒绝目录逃逸、Windows驱动路径和反斜杠；未完成/不一致缓存不覆盖且记录失败。7项安全/缓存保留检查通过。初次linter的2项import已修正；执行已审查原类的AST和异常报告边界有局部注明，仍返回失败退出码，不吞错假报通过。当前cuda环境未安装ruff，使用已缓存uvx离线版本；没有为此更换环境依赖。
 
 下一阶段：P04/P05/P07/P02原概率/参数/流形网络；随后补齐真实人体层及正式接口。核心SMPL-H学习baseline及reference25主线没改。H1因果多帧共享体型与H2语义适配仅有协议，尚未实现；十篇复现和架构优化长期目标保持进行中。
+
+
+## 2026-10-08 概率姿态和参数回归原结构检查
+
+运行器：`realtime_app/learning_flow_mesh/reproduction/run_probability.py`。每篇一个独立进程，随机种子19，float32，不创建优化器，不反传更新，不运行训练。依赖只安装到`third_party/architecture_reproduction/_deps`，版本、来源、作者nflows快照和均值文件见`architecture_probability_resources_v1.json`。公开MMPose均值文件与本地副本相同，但未证实与两篇原发布包一致，不称完整原包重放。
+
+| 论文 | 实际覆盖 | 检查结果 | 未覆盖 |
+|---|---|---|---|
+| ProHMR | 原ResNet50、144维ConditionalGlow、β/弱透视头、63随机＋1零潜变量 | 51,513,389参数；逆变换最大误差2.38e-7；密度往返差0；64候选β一致 | 原GT ActNorm初始化、neutral SMPL、完整损失/评估 |
+| HuManiFlow | 原18通道256×256代理、ResNet18、23个SO(3)层级流、形状分布、采样/密度 | 12,490,497参数；旋转正交/行列式通过；4候选默认β不同，shape-mode开关使β一致 | 检测/边缘代理生成、neutral SMPL、完整评估 |
+| HMR2 | 原ViT-H/16＋6层Transformer头；RGB256×256按原代码裁成256×192 | 670,459,037参数；24旋转＋10β＋3弱透视参数；重复/旋转通过 | 检测裁剪估计、neutral SMPL、原checkpoint/评估 |
+| Riemannian FM | 原球面geodesic/JVP、512宽8层time-MLP、切向投影、原rfm_loss_fn | 1,816,966参数；端点误差1.79e-7；目标切向误差2.38e-7；网络切向误差3.73e-9 | 原数据密度、ODE、Mesh/SPD等分支、人体SO(3) |
+
+命令：`python -B -m realtime_app.learning_flow_mesh.reproduction.run_probability --paper P04 --device cuda --output <new.json>`；P05同样，P07加`--hmr2-backbone`，P02使用CPU。实际解释器`.venv-cuda/Scripts/python.exe`；输出为新文件，禁止覆盖。最终代码重放检查分别P04_v4、P05_v3、P07_v3、P02_v2；前序版本及失败保留。
+
+失败保留：P04_v1骨干默认pretrained=True，加载ImageNet后因UMNN缺失失败，该JSON“random_initialization”字段不准确，以资源记录勘误为准，排除通过证据。最终显式pretrained=False，并在导入作者模型前拦截权重下载。P04_v2暴露作者固定多候选noise路径context行数不匹配；未改原源码，v3使用原发布63随机＋1零路径通过。P05_v1缺opt_einsum，隔离补依赖后v2通过。P07_v1原ViT.train不返回self，不能链式赋值eval；改运行器原地调用后v2通过。首次guard调用lazy model_zoo未显式import，在模型执行前退出，修正后捕获边界覆盖此处。资源记录生成一次未指定UTF-8而失败，源/结果未损坏，显式编码后重建。弃用警告和HuManiFlow非执行分支pytorch3d提示保留。
+
+四篇都未验证真实三维精度。十篇选定组件通过不等于十个完整方法、项目接入或架构优化完成。

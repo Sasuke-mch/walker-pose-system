@@ -3762,3 +3762,8 @@ G20261007_flow_mesh_baseline_v1记录20篇卡片/横表/正文锚点及设计依
 十个官方源码/配置/许可快照已保存third_party/architecture_reproduction；只有自写隔离运行器和小型来源/检查记录纳入提交。P03/P12/P14原速度/姿态网络按原宽度/深度/帧数随机前向通过；P16原ResNet152代数双目分支384×384通过，独立已知点原DLT误差<1e−5m。P09原TemporalEncoder及P10原构造/运动和轨迹组件通过，但没有假人体层补足完整模型。合计6篇有不同范围运行证据，不称6篇完整论文复现；P04/P05/P07/P02原前向仍待推进。
 
 新发现：P12/P14时间网络使用未来；P03速度场逐帧。单NaN原输入污染P12全clip、P14全clip、P03该帧；不能直接接项目缺失mask。VIBE正文双向/共享平均shape，发布配置单向且回归路径未平均；WHAM发布beta为B,T,10，亦非全片共享。P12 mesh head时间特征平均才预测shape，是另一路径。具体源行/公式范围及适配判断追加既有LITERATURE_ANALYSIS/IMPLEMENTATION。7项来源安全/不覆盖测试、Ruff和语法检查通过；无训练/权重加载/精度结论/主线变更。H1多帧因果shape校准及H2语义接口仅预注册，下一阶段优先完成剩余原网络/资源核对。目标及hourly跟进保持active。
+
+
+### 2026-10-08 十篇结构研究：概率/网格参数头阶段
+
+ProHMR原ResNet50/ConditionalGlow、HuManiFlow代理编码/SO(3)层级采样/密度、HMR2原ViT-H/16/Transformer头、Riemannian FM原球面路径/切向网络/损失方法检查通过。十篇选定组件均有输出，完整mesh/input/evaluation仍有缺口；不训练，不改reference25主线，不升级证据。失败、预训练默认值勘误、作者API问题和资源限制保留于`architecture_research.json`、`architecture_probability_resources_v1.json`和`architecture_checks/`。下一阶段先锁H1因果多帧共享β协议，再实现隔离候选；姿态/flow参数保持原样。长期goal和每小时跟进继续。

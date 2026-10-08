@@ -1,0 +1,15 @@
+{
+  "status": "original_probability_check_failed",
+  "error": "TypeError: 'NoneType' object is not callable",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\run_probability.py\", line 245, in main\n    result = hmr2(args.device, args.hmr2_backbone) if args.paper == \"P07\" else {\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\run_probability.py\", line 158, in hmr2\n    features = backbone(image[:, :, :, 32:-32])  # original HMR2.forward_step crop.\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: 'NoneType' object is not callable\n",
+  "id": "P07",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 3.3493707999878097
+  },
+  "evidence_boundary": "Untrained structural/probability contracts only; no accuracy or deployment conclusion"
+}

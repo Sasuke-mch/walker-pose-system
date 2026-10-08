@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "six_original_structure_checks_remaining_probability_models",
+  "stage": "ten_selected_original_components_checked_full_reproductions_and_candidates_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -39,10 +39,12 @@
       "repo": "nkolot/ProHMR",
       "branch": "master",
       "focus": "Separate probabilistic pose and deterministic shape; multiview fitting",
-      "status": "source_archived_original_forward_pending",
+      "status": "original_backbone_probability_head_passed",
       "source_status": "source_archived",
       "source_file_count": 55,
-      "local_source": "third_party/architecture_reproduction/ProHMR"
+      "local_source": "third_party/architecture_reproduction/ProHMR",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P04_v4.json",
+      "coverage": "Original RGB backbone plus pose-flow/beta/weak-camera head, released 63 random + 1 zero candidates, invertible-flow density roundtrip; original neutral SMPL and full loss/evaluation not run"
     },
     {
       "id": "P05",
@@ -50,10 +52,12 @@
       "repo": "akashsengupta1997/HuManiFlow",
       "branch": "main",
       "focus": "Ancestor-conditioned SO(3) pose and shape distributions",
-      "status": "source_archived_original_forward_pending",
+      "status": "original_hierarchical_probability_network_passed",
       "source_status": "source_archived",
       "source_file_count": 73,
-      "local_source": "third_party/architecture_reproduction/HuManiFlow"
+      "local_source": "third_party/architecture_reproduction/HuManiFlow",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P05_v3.json",
+      "coverage": "Original ResNet18/23 hierarchical SO(3) flows, shape distribution, weak camera, point/sampling/log-density paths; no detector/edge generation, SMPL neutral mesh or full evaluation"
     },
     {
       "id": "P07",
@@ -61,10 +65,12 @@
       "repo": "shubham-goel/4D-Humans",
       "branch": "main",
       "focus": "Image tokens and iterative parameter queries",
-      "status": "source_archived_original_forward_pending",
+      "status": "original_vit_and_mesh_head_passed",
       "source_status": "source_archived",
       "source_file_count": 67,
-      "local_source": "third_party/architecture_reproduction/HMR2"
+      "local_source": "third_party/architecture_reproduction/HMR2",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P07_v3.json",
+      "coverage": "Original ViT-H/16 (when enabled) and six-layer Transformer SMPL head; neutral SMPL mesh, detector/crop estimation, checkpoint and full evaluation not run"
     },
     {
       "id": "P09",
@@ -150,13 +156,15 @@
       "repo": "facebookresearch/riemannian-fm",
       "branch": "main",
       "focus": "Manifold probability paths and tangent vector fields",
-      "status": "source_archived_original_forward_pending",
+      "status": "original_sphere_vector_field_and_loss_passed",
       "source_status": "source_archived",
       "source_file_count": 54,
-      "local_source": "third_party/architecture_reproduction/RiemannianFM"
+      "local_source": "third_party/architecture_reproduction/RiemannianFM",
+      "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_v2.json",
+      "coverage": "Original sphere geodesic/JVP, configured 512-wide eight-layer time-MLP/tangent projection and exact author rfm_loss_fn; no training, density/ODE evaluation, meshes or SO(3) human pose"
     }
   ],
-  "next": "Inspect ProHMR/HuManiFlow/HMR2/RiemannianFM dependency and resource contracts; use isolated dependencies and actual initialization resources to run remaining original neural architectures. Complete mesh-body paths and project adapters separately before claiming ten complete reproductions; then implement H1 causal multi-frame shared-shape calibration.",
+  "next": "Lock H1 prefix shared-shape calibration protocol and implement isolated candidate; then explicit adapters and remaining mesh/input/evaluation reproduction paths. No training and no mainline promotion.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -164,12 +172,22 @@
     "VIBE original TemporalEncoder plus bidirectional diagnostic",
     "WHAM original Network construction and motion/trajectory components without fake SMPL",
     "LearnableTriangulation original ResNet152 algebraic network at 384x384 and exact pinhole control",
-    "Seven archive containment/no-overwrite tests passed"
+    "Seven archive containment/no-overwrite tests passed",
+    "Original ProHMR ResNet50/ConditionalGlow inference and density roundtrip",
+    "Original HuManiFlow proxy encoder/hierarchical SO(3) sampling and log density",
+    "Original HMR2 ViT-H/16 and Transformer SMPL parameter head",
+    "Original Riemannian FM sphere geodesic, tangent network and exact loss method"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
     "Ruff is absent in .venv-cuda; used existing cached uvx --offline ruff without changing environment.",
-    "LearnableTriangulation original repo is karfly/learnable-triangulation-pytorch; initial saic-violet URL returned 404 and was not used."
+    "LearnableTriangulation original repo is karfly/learnable-triangulation-pytorch; initial saic-violet URL returned 404 and was not used.",
+    "P04_v1 loaded default ImageNet backbone before failing on missing UMNN; its weights=random_initialization field is inaccurate. This run is excluded from random-initialization evidence. Re-run P04_v3 explicitly pretrained=False with download guard.",
+    "P04_v2 exposed author nflows explicit-noise N>1 context row bug; unchanged released 63 random + 1 zero path passed in v3.",
+    "P05_v1 missing opt_einsum; isolated dependency added, v2 passed.",
+    "P07_v1 chained eval() returned None because original ViT.train() omits return; harness uses in-place eval, v2 passed.",
+    "Initial download guard accessed lazy torch.utils.model_zoo before import and exited before JSON; corrected explicit import inside exception-recording boundary. No model executed in this failed invocation.",
+    "SPIN raw mean-parameter URL returned 404; public MMPose fixture acquired and matched existing local copy. Original release-bundle equivalence remains unconfirmed."
   ],
   "candidate_revisions": [
     {

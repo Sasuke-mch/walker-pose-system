@@ -1,0 +1,62 @@
+{
+  "status": "original_backbone_probability_head_passed",
+  "config": "third_party/architecture_reproduction/ProHMR/prohmr/configs/prohmr.yaml",
+  "parameter_count": 51513389,
+  "input_shape": [
+    1,
+    3,
+    224,
+    224
+  ],
+  "feature_shape": [
+    1,
+    2048
+  ],
+  "rotation_shape": [
+    1,
+    64,
+    24,
+    3,
+    3
+  ],
+  "beta_shape": [
+    1,
+    64,
+    10
+  ],
+  "camera_shape": [
+    1,
+    64,
+    3
+  ],
+  "density_shape": [
+    1,
+    64
+  ],
+  "flow_inverse_max_error": 2.384185791015625e-07,
+  "density_roundtrip_max_error": 0.0,
+  "rotation_check": {
+    "orthogonality_max_error": 3.2786592782940716e-06,
+    "determinant_max_error": 3.5762786865234375e-07
+  },
+  "zero_latent_repeat_exact": true,
+  "candidate_beta_max_difference": 0.0,
+  "mean_params": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+  "adaptations": [
+    "Namespace package facades; original ResNet50/ConditionalGlow unchanged, pretrained=False explicitly",
+    "Public MMPose mean initialization fixture; equivalence to original release bundle unconfirmed",
+    "ActNorm stays at constructor identity in eval; no GT-dependent initialization or training"
+  ],
+  "known_author_interface_issue": "Explicit noise with N>1 fails context-row check; released 63 random + 1 zero path is retained",
+  "coverage": "Original RGB backbone plus pose-flow/beta/weak-camera head, released 63 random + 1 zero candidates, invertible-flow density roundtrip; original neutral SMPL and full loss/evaluation not run",
+  "id": "P04",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 1.8287033000087831
+  },
+  "evidence_boundary": "Untrained structural/probability contracts only; no accuracy or deployment conclusion"
+}

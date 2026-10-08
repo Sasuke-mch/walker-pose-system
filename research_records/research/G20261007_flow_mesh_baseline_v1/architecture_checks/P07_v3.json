@@ -1,0 +1,65 @@
+{
+  "status": "original_vit_and_mesh_head_passed",
+  "config": "third_party/architecture_reproduction/HMR2/hmr2/configs_hydra/experiment/hmr_vit_transformer.yaml",
+  "parameter_count": 670459037,
+  "backbone_enabled": true,
+  "rgb_input_shape": [
+    1,
+    3,
+    256,
+    256
+  ],
+  "backbone_input_after_original_crop": [
+    1,
+    3,
+    256,
+    192
+  ],
+  "feature_shape": [
+    1,
+    1280,
+    16,
+    12
+  ],
+  "rotation_shape": [
+    1,
+    24,
+    3,
+    3
+  ],
+  "beta_shape": [
+    1,
+    10
+  ],
+  "camera_shape": [
+    1,
+    3
+  ],
+  "rotation_check": {
+    "orthogonality_max_error": 2.478805356531666e-07,
+    "determinant_max_error": 2.980232238769531e-07
+  },
+  "finite_repeat_exact": true,
+  "ief_iters": 1,
+  "history_beta_shape": [
+    1,
+    10
+  ],
+  "mean_params": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+  "coverage": "Original ViT-H/16 (when enabled) and six-layer Transformer SMPL head; neutral SMPL mesh, detector/crop estimation, checkpoint and full evaluation not run",
+  "adaptations": [
+    "Namespace facades bypass Lightning/downloads; source unchanged",
+    "Public MMPose initialization fixture; original release-bundle equivalence unconfirmed",
+    "GPU allocation only; original width/depth/float32 retained"
+  ],
+  "id": "P07",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 3.6320635000010952
+  },
+  "evidence_boundary": "Untrained structural/probability contracts only; no accuracy or deployment conclusion"
+}

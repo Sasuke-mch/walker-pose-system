@@ -1,0 +1,15 @@
+{
+  "status": "original_probability_check_failed",
+  "error": "ValueError: Number of input items must be equal to number of context items.",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\run_probability.py\", line 247, in main\n    result = hmr2(args.device, args.hmr2_backbone) if args.paper == \"P07\" else {\n                                                                               ^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\run_probability.py\", line 75, in prohmr\n    params, camera, density, _, pose6d = head(features, z=noise)\n                                         ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1779, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1790, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\torch\\amp\\autocast_mode.py\", line 44, in decorate_autocast\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\ProHMR\\prohmr\\models\\heads\\smpl_flow.py\", line 79, in forward\n    samples, log_prob, z = self.flow.sample_and_log_prob(num_samples, context=feats, noise=z)\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\ProHMR_nflows\\nflows\\flows\\base.py\", line 75, in sample_and_log_prob\n    log_prob = self._distribution.log_prob(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\ProHMR_nflows\\nflows\\distributions\\base.py\", line 37, in log_prob\n    raise ValueError(\nValueError: Number of input items must be equal to number of context items.\n",
+  "id": "P04",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 1.5366381999920122
+  },
+  "evidence_boundary": "Untrained structural/probability contracts only; no accuracy or deployment conclusion"
+}

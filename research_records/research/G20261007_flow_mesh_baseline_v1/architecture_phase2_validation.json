@@ -1,0 +1,28 @@
+{
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "original_component_count": 10,
+  "original_full_method_reproductions_complete": false,
+  "latest_probability_checks": {
+    "P04": "P04_v4.json",
+    "P05": "P05_v3.json",
+    "P07": "P07_v3.json",
+    "P02": "P02_v2.json"
+  },
+  "tests": {
+    "tests": "30",
+    "failures": "0",
+    "errors": "0"
+  },
+  "author_source_files_size_verified": 719,
+  "mainline_and_baseline_unchanged_after_CRLF_normalization": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/config.json"
+  ],
+  "test_warnings": "four existing legacy asset warnings",
+  "linter": "passed after one test import formatting fix",
+  "validation_issue": "Initial byte comparison against git LF failed for existing working-tree CRLF; confirmed no textual differences, normalized only for comparison, did not rewrite files",
+  "remaining": "H1/H2 candidate implementation, complete input/body/evaluation reproduction paths, no trained accuracy claims"
+}
