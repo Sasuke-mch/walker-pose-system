@@ -1,0 +1,34 @@
+{
+  "id": "R9",
+  "status": "protocol_locked_before_execution",
+  "purpose": "P14 original defaultBASE architecture, H36Mreader scale, full evaluate method boundary and metric semantics",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "inputs": [
+    "Original MotionAGFormer-base.yaml16layers/128feat/512rep/243frames, factory load_model",
+    "SyntheticH36M17 imagexy/confidence and joints_2.5d_image reference, seed67; explicit fake dataset, no realtruth",
+    "OriginalDataReaderH36M class with syntheticdt_dataset allocated via __new__, constructor fileIO skipped, split caches explicit one243frameclip",
+    "Full authortrain.evaluate AST and original metricfunctions"
+  ],
+  "unique_variable": "Expand P14 from xsmall component to defaultbase fullnetwork and full evaluationmethod with declaredsynthetic reader. Not accuracyablation or originalH36M dataset reproduction.",
+  "fixtures": [
+    "243totalframes, clip covers all; expect last2 acceleration indexing risk retained",
+    "245totalframes, same first243clip and2uncovered tailframes; legal indices, counts/metrics isolatedengineering only"
+  ],
+  "controls": [
+    "Independent flip-TTA, rootzero and width/height denormalization",
+    "Exact fullnetwork repeat/future perturbation, zero-confidence/NaN effects",
+    "Change only originaldataset2.5d_factor1→2 and record metricdependency",
+    "Independent perframeMPJPE/joint aggregation/Procrustes and acceleration arithmetic; nofps inferred from original second differences",
+    "Original perfect-zero error exclusion or failure semantics retained; no source corrections",
+    "state_dict unchanged and declaredcoverage of uncoveredframes"
+  ],
+  "success": "Original base runs atpublished dimensions, sourcefull evaluator executes or exact failure retained; independent affine/TTA/metrics within2e-5 numeric tolerance, original boundaries not patched",
+  "stop": "No weight/optimizer/train/backward, fakephysicaltruth ordatasetbenchmark, defaultarchitecturecompression, actor/camera reinterpretation, sourcepatching or revisedmetricdenominators",
+  "outputs": [
+    "architecture_r9_results_v1.json",
+    "architecture_r9_results_v1.npz",
+    "architecture_r9_validation.json"
+  ],
+  "boundary": "Default original architecture and exactevaluation method on synthetic reference data only. H36M authenticdata/trainedaccuracy, detector/video and humanSMPL-H not completed. Label-dependent scale andFPS absence are not calibrated reconstruction."
+}
