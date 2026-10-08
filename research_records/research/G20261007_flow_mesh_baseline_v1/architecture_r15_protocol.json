@@ -1,0 +1,26 @@
+{
+  "id": "R15",
+  "status": "locked_before_direct_request",
+  "purpose": "Inspect MotionBERT official mesh resource directory; acquire no models, checkpoints or datasets",
+  "source": "https://1drv.ms/f/c/a5438cd242871df0/IgDwHYdC0oxDIIClfwAAAAAAAf0qj7JhZX0sXEaX59EXOC0",
+  "source_anchor": "third_party/architecture_reproduction/MotionBERT/docs/mesh.md:5",
+  "wanted": [
+    "J_regressor_extra.npy",
+    "J_regressor_h36m_correct.npy",
+    "smpl_mean_params.npz"
+  ],
+  "prior_documentation_open": "web tool inaccessible URL; no returned page content or resource body. Count conservatively as1 source access attempt.",
+  "attempt_budget_total": 2,
+  "direct_GET_invocations": 1,
+  "max_html_body_bytes": 262144,
+  "deadline_seconds": 20,
+  "redirect_limit": 5,
+  "allowed_response": "HTTP200 text/html only, Content-Encoding identity; reject binary or oversized responses before reading where headers permit. Bounded page text only saved ignored locally.",
+  "success": "Exact source URL/redirects/headers and bounded body or failure preserved; visible filenames only inventory hints, never proof of auxiliary bytes or provenance equivalence.",
+  "stop": "After one direct GET no further same-source request in this stage, no guessed Graph API, confirmation URL, mirrored asset, authentication or full archive. Existing claim rejects restart.",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests_plan": 1,
+  "mainline_modified": false,
+  "boundary": "Official directory reachability only; source bodies not independently verified by web-tool failure, not full mesh inference."
+}
