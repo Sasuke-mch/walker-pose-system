@@ -85,3 +85,7 @@ H3在`candidate.py`组合H1/H2和原生成器，明确使用COCO17随机模型�
 H4新增`hand_conditions.py`和`reproduction.check_hand_conditions --output <new.json>`，按原WiLoR读取器复现360帧全部原生手姿选择及拒绝记录。左右镜像仍由原`convert_record`完成；输入为15个父相对旋转，不能以21个OpenPose投影点代替。保留两个相机的独立假设，6D列拼接加检测框置信度形成`B,T,V,2,15,7`条件。原零权重identity及H2人物不可用视图均保持missing/NaN；source-present与候选admitted分别保存。原主线763个接受手/视图槽中，候选准入706个、另外57个有源手姿但H2视图不可用。此阶段只增加类型明确的手部输入，没有把它接入生成器，没有改H3/正式主线。
 
 `architecture_h4_validation.json`记录763项原始记录的独立镜像/权重核对、17个H2字段原样保存、未来隔离及6D往返。新增15项测试，全模块90项通过，Ruff/AST通过。原共享PCA手姿初始化用整段视频，这是离线设计；新逐帧条件没有这种未来依赖。初次audit因检查器误用float64身体像素失败，保留v1，按原pipeline先精确核对raw像素再cast float32，v2/v3通过。双视图旋转分歧是模型一致性诊断，框置信度不是关节不确定性；不据此声明准确手形、抓握或实时部署。
+
+H5在`hand_candidate.py`接入原生手部条件：两视图独立memory含6D/框score、camera ID及30个解剖节点ID，同手15queries读取同手memory，只把残差加到对应30手节点condition，再由原52节点生成器传播。全缺失的手跳过attention并贡献精确零；输入不直接覆盖输出旋转，不进入共享β/平移/GRU。`candidate.py`只增加编码委托接口，其他状态及发布逻辑复用；关闭手条件的完整360帧结果与旧H3保存结果完全相同。
+
+命令：`-m realtime_app.learning_flow_mesh.reproduction.check_hand_candidate --output <new.json>`，CPU2threads，必须已有H2/H4保存契约和本地人体资产。新增分支23616参数、候选总167315；新增12测试，全模块102项/Ruff/AST通过。完整360/分块/未来/真实解码与独立重建检查见`architecture_h5_validation.json`。随机条件影响不能当精度改进；两次分支CPU中位数0.650/0.754ms不包含检测/人体解码/Stage，也不代表整套实时性。首轮误取COCO regressor一行的运行器失败保留；没有训练、模型权重更新或主线更改。原方法默认资源缺口、null帧GRU、shape池化和eager部署限制仍在。

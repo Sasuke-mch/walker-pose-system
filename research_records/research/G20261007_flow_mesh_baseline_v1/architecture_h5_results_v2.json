@@ -1,0 +1,145 @@
+{
+  "status": "isolated_native_hand_condition_branch_contract_passed",
+  "protocol": "architecture_h5_protocol.json",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "frames": 360,
+  "physical_pair_range": [
+    1157,
+    1516
+  ],
+  "model_seed": 19,
+  "hand_branch_seed": 29,
+  "noise_seed": 97,
+  "candidates": 1,
+  "Euler_nfe": 8,
+  "model_config": {
+    "observation_joints": 17,
+    "image_feature_dim": 32,
+    "width": 64,
+    "heads": 4,
+    "layers": 2,
+    "use_graph": true,
+    "use_history": true,
+    "rotation_scale": 0.25,
+    "root_offset": [
+      0.0,
+      0.0,
+      3.0
+    ]
+  },
+  "base_parameters": 143699,
+  "new_hand_parameters": 23616,
+  "weights_unchanged": true,
+  "source_body": "architecture_h2_results_v3.json/npz",
+  "source_hands": "architecture_h4_results_v3.json/npz",
+  "camera_order": [
+    "cam0",
+    "cam1"
+  ],
+  "source_hand_view_slots": 763,
+  "admitted_hand_view_slots": 706,
+  "source_fields_preserved": 17,
+  "zero_hand_control_H3_parity": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "saved_previous_H3_parity": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "shape_translation_history_noise_unchanged": true,
+  "shared_beta_first_ready_frame": 7,
+  "status_counts": {
+    "available": 324,
+    "calibration_pending": 7,
+    "no_current_observation": 29,
+    "invalid_rotation": 0,
+    "nonfinite_parameters": 0
+  },
+  "nonhand_condition_residual_exact_zero": true,
+  "all_missing_hand_condition_exact_zero": true,
+  "raw_flow_state_max_change_not_accuracy": 0.5251490473747253,
+  "generated_vs_native_max_difference_not_error": 1.4045292139053345,
+  "stream_checks": {
+    "1": {
+      "betas": 5.960464477539063e-08,
+      "rotations": 4.76837158203125e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.76837158203125e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 1.1920928955078125e-06
+    },
+    "11": {
+      "betas": 2.9802322387695312e-08,
+      "rotations": 4.172325134277344e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.172325134277344e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 9.5367431640625e-07,
+      "vertices_max_error_m": 7.152557373046875e-07,
+      "coco_surface_max_error_m": 7.152557373046875e-07
+    },
+    "64": {
+      "betas": 0.0,
+      "rotations": 4.172325134277344e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.172325134277344e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 7.152557373046875e-07
+    }
+  },
+  "future_before120_checks": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "saved_parameter_mesh_rebuild_max_error_m": 2.384185791015625e-07,
+  "mesh_vertex_max_change_m_not_accuracy": 0.04883044958114624,
+  "CPU_two_thread_cost_checks": {
+    "branch_real_frame8": {
+      "samples": 50,
+      "warmup": 5,
+      "median_ms": 0.6500000163214281,
+      "p95_ms": 0.8330800090334378
+    },
+    "branch_missing_frame8": {
+      "samples": 50,
+      "warmup": 5,
+      "median_ms": 0.11914999049622566,
+      "p95_ms": 0.1425549926352687
+    },
+    "H3_candidate_frame8_8NFE": {
+      "samples": 50,
+      "warmup": 5,
+      "median_ms": 7.6182000047992915,
+      "p95_ms": 9.567515009257475
+    },
+    "H5_candidate_frame8_8NFE": {
+      "samples": 50,
+      "warmup": 5,
+      "median_ms": 8.439750003162771,
+      "p95_ms": 11.392315018747466
+    }
+  },
+  "cost_boundary": "50warmed repetitions CPU eager frame8 only; excludes detection, raw/strict geometry, source preparation, real body decode and Stage. Not end-to-end FPS or realtime certification.",
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cpu",
+    "threads": 2,
+    "dtype": "float32"
+  },
+  "boundary": "Untrained condition-branch wiring/internal consistency only, not pose/shape/contact accuracy. Original method resources/input/evaluation gaps and H3 null-GRU/pooling limitations remain."
+}

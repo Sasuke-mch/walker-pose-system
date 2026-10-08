@@ -112,12 +112,16 @@ class CausalMeshCandidate:
         self.steps = steps
         self.noise_seed = noise_seed
 
+    def _encode(self, batch, frame_ids, hidden):
+        """Delegate encoding; extensions reuse the shape/state/publication workflow."""
+        return encode_with_global_features(self.model.encoder, batch, hidden=hidden)
+
     def step(self, batch, frame_ids, sequence_ids, admitted, state=None):
         if admitted.dtype != torch.bool or admitted.shape != batch["xy"].shape[:2]:
             raise ValueError("shape admission must be explicit boolean B,T")
         shape_state = state.shape if state is not None else None
         hidden = state.hidden if state is not None else None
-        encoded, features = encode_with_global_features(self.model.encoder, batch, hidden=hidden)
+        encoded, features = self._encode(batch, frame_ids, hidden)
         if (admitted & ~encoded["frame_observed"]).any():
             raise ValueError("missing current observations cannot be shape evidence")
         shape = self.shape(features, admitted, frame_ids, sequence_ids, shape_state)

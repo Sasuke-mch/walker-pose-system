@@ -1,0 +1,56 @@
+{
+  "status": "H5_isolated_native_hand_branch_verified",
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "tests": {
+    "tests": "102",
+    "failures": "0",
+    "errors": "0"
+  },
+  "new_hand_branch_cases": 12,
+  "linter": "uvx ruff passed",
+  "syntax_AST_files": 38,
+  "source_H2_fields_preserved": 17,
+  "source_H4_fields_preserved_excluding_duplicate_H2": 11,
+  "fresh_process_equal_arrays_excluding_metadata": 60,
+  "old_H3_control_saved_parameters_exactly_equal": true,
+  "same_beta_translation_shape_admission_readiness_observation_availability_status": true,
+  "source_frame_gate_reasons_preserved": true,
+  "missing_hand_exact_zero_condition_and_pose_delta": true,
+  "branch_only_affects30hand_conditions": true,
+  "existing_spatial_decoder_nonhand_rotation_max_change_not_accuracy": 0.1125592589378357,
+  "independent_saved_parameter_mesh_rebuild_max_error_m": 2.384185791015625e-07,
+  "independent_surface_rebuild_max_error_m": 2.384185791015625e-07,
+  "new_hand_parameters": 23616,
+  "total_candidate_parameters": 167315,
+  "gradient_test": "test_real_mesh_hand_condition_gradients_without_training passed: present current rotations/box score and hand projection/node/view identity/attention gradients finite nonzero through real body/surface; masked current camera and all prior/future hand inputs gradient0; no optimizer/weight change",
+  "source_author_files_bytes_unchanged": 719,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/pose_app/wilor_mano_prior.py"
+  ],
+  "candidate_change_verified": "Only protected _encode delegation and original call replacement; reverse textual change equals previous source and saved full360 H3 control is exact",
+  "failure_retained": "architecture_h5_results_v1.json: runner mistakenly took [0] of COCO17 regressor array, yielding6890vector; corrected runner only, v2/v3 passed",
+  "first_static_check": "Two type-exception diagnostics fixed before real run; later import formatting/nested-if style corrected. All12 initial behavior tests passed; expanded masked-current-camera gradient before full102.",
+  "warnings_retained": "13 legacy chumpy/scipy deprecations in full tests; real-body constructor10shape-coefficient notice retained",
+  "cost_checks": "Two CPU2thread warmed50repeat runs; branch median0.650/0.754ms, missing branch0.119/0.146ms; full8NFE candidate is separately timed. Sequential small-sample microchecks not hardware-stable speedup or complete-system latency.",
+  "limits": [
+    "Untrained branch and random outputs, no accuracy/contact/beta-identifiability claim",
+    "Hand branch currently frame-local; no new hand temporal state",
+    "Body shape and translation intentionally do not see new hand conditions",
+    "Null-frame GRU/prefix pooling/eager hook deployment limitations remain",
+    "Default neutral-SMPL original-method resource/input/evaluation gaps remain"
+  ],
+  "unrelated_workspace_entries_at_start": 89,
+  "results_files": [
+    "architecture_h5_results_v1.json",
+    "architecture_h5_results_v2.json",
+    "architecture_h5_results_v3.json"
+  ]
+}

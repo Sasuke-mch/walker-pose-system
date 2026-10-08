@@ -3810,3 +3810,11 @@ P16_ransac_v1保留Python3.12 random.sample(set)失败；v2明确模块局部整
 左右相机主要分别提供右/左手，双视图同时有手姿每只手33帧；native旋转差P95左25.58°/右37.94°，仅模型一致性。MANO/SMPLH rest骨向差最大11.57°/7.07°，原45°资产门只排明显顺序/轴错误。原shared-PCA手初值及拟合使用整段视频，未来探针改变原初值是有意离线设计；新逐帧输入未来影响0。全局朝向、MANO β、弱相机和21投影点没有转移到米制人体。当前只完成手部来源/输入，不含学习手分支，H3未改。
 
 v1保留float64检查器与原float32 pipeline的框腕距离微差失败，只修检查器转换时机；v2/v3通过，17源字段照录、27非metadata数组重复逐位一致，独立原记录核对763项通过，6D重建相对源最大2.98e-7。测试fixture及Ruff风格首轮失败已记录；全模块90、Ruff/35文件AST通过，既有10warning保留，719作者文件字节数不变。原89条工作区状态、正式主线/core/原手流程不改，不推送。实现/文献/模块说明及architecture_research同步，长期任务继续；下阶段接入独立手部条件分支及因果检查，完整原方法资源缺口继续保留。
+
+### 2026-10-08 H5 原生手部条件→完整人体生成器
+
+先锁architecture_h5_protocol.json，再新增hand_candidate/check_hand_candidate及12测试；candidate.py仅增加_encode委托复用原shape/state/noise/status发布逻辑。带cam0/cam1和native52手节点身份的两个视图15旋转memory，由同手15queries读取，残差只加到30手condition，再走原52节点/8NFE生成器。全缺失hand-row跳过attention，delta精确零；不硬替换人体旋转、不更新body encoder/GRU/globalfeature/β/T来源、不读取整段离线手拟合。新增23616参数，总167315，未训练/载权重或更改正式主线。
+
+全360帧保留17个H2源字段与H4源信息，763源/706准入；324可用/7待校准/29无body观测保持NaN。关闭手条件与旧H3保存参数逐位一致；开启后β/T/hidden/noise/认可/status相同，β仍第7帧冻结；当前无手帧flow也与H3相同。流式1/11/64算术差<=1.19e-6，网格差7.15e-7m；未来120以后扰动不影响此前，独立保存参数人体/表面重建2.38e-7m。v2/v3的60非metadata数组重复一致。新空间条件传播到非手旋转，随机网格变化48.83mm不作精度/收益结论。
+
+全模块102、Ruff/38文件AST通过，真实native/boxscore/节点与视图identity/attention梯度有限非零，当前masked camera及其他过去/未来手输入梯度0，无优化器。首轮v1误取COCO regressor一行的运行器错误已修并保留失败；13资产warning保留。两次CPU2thread warmed50分支中位0.650/0.754ms，无手0.119/0.146ms；完整8NFE候选另计，不含检测/人体解码/Stage，不能推整套FPS。原core/主线等8路径不变，candidate文本委托外完全相同，719作者文件字节数一致；89既有工作区条目保留，不推送。实现/文献/模块/研究状态同步，长期任务继续，公共原辅助资源/完整路径及null帧历史对照仍待推进。

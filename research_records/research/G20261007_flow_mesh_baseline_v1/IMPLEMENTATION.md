@@ -243,3 +243,23 @@ architecture_h4_protocol.json先锁定，新增hand_conditions.py、reproduction
 结果v1失败保留：检查器先前把float64 body直接传原读取器，与原pipeline float32导致box_wrist_distance_px微差；只修检查器dtype，不放宽“完全相同”检查。v2/v3全部通过，27个非metadata数组在新进程重复逐位一致；独立读取原JSONL和审计选中record，对763个接受槽验证原native矩阵、M R M和框权重完全相同；6D重建相对float64源最大差2.98e-7。所有17个H2数组原样保存。15项测试涵盖缺失identity、视图分离、镜像及排除字段、错误语义/帧/掩码/旋转/tree、原读取器未来隔离、离线初始化依赖、旋转及score反传；无优化器。首轮两个fixture分别错用了confidence键和含side的PCA维度，已按原接口改正；Ruff五项dict风格问题修正。全模块90通过，10个既有chumpy/scipy warning保留；Ruff及35个Python文件AST通过，719个作者文件存在及字节数一致。详见architecture_h4_validation.json。
 
 复现命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_hand_conditions --output <new.json>`；必须提供未使用的新名字，输出同名NPZ。原始WiLoR、论文/作者文件、许可资产、大型数组留本地，不提交。下一阶段在独立候选中接入带视图/手/关节身份的原生手部条件，检查全缺失分支严格为零、时间因果性、梯度和算力；不以随机前向宣称手部改善，仍需完成原默认方法的许可/公共资源路径。
+
+## 2026-10-08 H5：手部条件与完整人体生成器接线
+
+architecture_h5_protocol.json先锁定。新增hand_candidate.py、reproduction/check_hand_candidate.py及12项测试，candidate.py只增加受保护的_encode委托并把原调用移入该方法；原H1形状/noise/状态/发布工作流不复制。core model/train/infer/config、H1/H2/H4工厂、原手读取器、作者源和reference25主线保持原样。参考依据是P07正文L134–138与官方smpl_head.py17–91中参数query读取条件memory的接口；P07原来是一个query读取ViT图像tokens，本项目为30个手节点query读取native手信息，两者明确不是相同架构，也不把候选算新论文复现。
+
+输入是H2全360帧原始鱼眼归一化像素/严格射线条件和H4保存的原生手姿来源；saved_native_hands重新调用H4工厂，由source_native_rotations/source_box_confidence和明确cam0/cam1人物状态重建tokens。帧号必须与body step相同，解剖节点必须左22..36/右37..51，掩码为bool、矩阵编码/分数与模型float32/device一致；不读取离线拟合出来的共享手姿。原763源手/视图槽与706准入、10590关节tokens及所有17个H2字段保存，源缺失与明确controlled-ablation分别处理。关闭条件时保留源source_present，但admitted/present全false且token/localR全NaN，说明人为消融，不改写原来源。
+
+NativeHandConditioner的参数包括MLP(7→64→64)、2×64视图identity、2×15×64解剖节点identity、memory/query LayerNorm以及4头64维cross-attention，总23616；原模型143699，总167315。每个(batch,time,hand)为一行，15个body手节点condition作query，2camera×15个native节点作memory；相机与解剖identity加到memory，保证两视图不是不明身份的混合。左右手分别处理，不能在新增attention中互相读取，但一只手可以读取同手其他关节与两个视图的信息。框score是7维输入的一部分，不是关节概率、质量门或硬权重。
+
+缺失memory在投影前由where隔离NaN，并在attention中mask；整个hand-row都缺失时完全跳过attention，避免全masked softmax及输出bias制造信息。生成B,T,52,64的delta，其中前22个节点恒为精确零；只有对应30手节点有残差，加到原condition后再运行原8次Euler。没有把WiLoR矩阵写入人体输出，没有平均视图/PCA，没有新增手部时序状态，也没有回填缺失。新分支不进入body encoder/GRU/globalfeatures；因此同源H1共享β、平移、hidden、noise和认可/冻结时机不受手条件影响。原52节点空间attention/图层可把手condition的影响传到身体旋转，这是后续受控研究对象，不是手影响身体一定有益的证明。
+
+全流程结果v2/v3：共享β仍第7帧ready并冻结，324可用/7待校准/29无当前观测；后者参数/网格保持NaN。即使人工契约探针给了手条件但没有当前body观测，也不把帧发布为身体可用或新shape证据。控制关闭手条件后，完整360帧全部H3参数/掩码与本次独立H3及上阶段保存结果逐位相同。开启后β/T/shape认可/status与H3完全相同，hidden/noise相同；非手condition delta为0，无手帧flow state也与控制完全相同。随机输出与native源最大矩阵差1.4045，证明并非直接替换；flow state最大改变0.5251、网格最大变化48.83mm及非手旋转矩阵最大变化0.11256只表示条件影响，绝不是精度/误差或收益。
+
+逐帧/11/64分块状态及掩码一致；flow最大算术差1.19e-6、矩阵4.77e-7、T2.38e-7m、β5.96e-8、网格与COCO表面点7.15e-7m，均满足预注册2e-5。未来120帧以后同时扰动身体像素/score和原生手旋转，前120帧全部参数差0，β冻结不变。v2/v3新进程60个非metadata数组完全重复；独立读取保存R/β/T，重建首/末可用人体及COCO表面点最大差2.38e-7m。旧H3参数对照、source H2/H4字段、NaN/status/β和delta逐项独立核验在architecture_h5_validation.json。
+
+成本仅为本机CPU2线程、eager、真实第8帧条件，warmup5后50次：v2/v3 branch有手中位0.650/0.754ms，无手0.119/0.146ms；同一8NFE候选H3 7.618/8.291ms，H5 8.440/8.537ms。计时在各模式内顺序进行且样本少，有调度/缓存波动，不能把中位数差当稳定增量、加速率或硬实时证据；不含检测器、raw/strict准备、手来源读取、完整人体解码、Stage和显示。没有作吞吐外推或整套FPS声明。
+
+12项测试检查精确零控制、shape/T/hidden/noise不变、同手memory/跨手隔离、被mask输入无效、错误帧/节点/掩码/非有限/dtype/人物视图拒绝、body缺失发布、逐帧/分块/未来及真实人体梯度。真实网格/COCO loss反传到当前有效native旋转、框score、projection/节点/视图identity/attention，梯度有限非零；当前缺失相机及其他过去/未来手条件梯度严格0，无优化器，参数不更新。全模块102通过、13个既有资产弃用warning保留，Ruff及38文件AST通过。候选文本逆去_encode委托后与原源码完全相同；原core/主线等8路径文本与已提交版本相同，719作者文件存在及字节数一致。
+
+首次完整v1失败由运行器错误取load_coco17_regressor(...)[0]造成6890向量，修运行器为完整17×6890矩阵；不改回归器/人体层/原阈值，v1 JSON保留。静态检查的TypeError/导入格式/nested-if修正，初轮12行为测试通过后增加“当前masked camera梯度0”覆盖再跑102全套。命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_hand_candidate --output <new.json>`，输出同名NPZ不覆盖。候选为未训练的接线，尚无手形、β可辨识、世界位置/接触精度结论；null-frame GRU、history feature池化及eager hook部署限制不变。后续继续原方法公共辅助资源/完整输入路径，以及独立缺失历史状态对照，不扩大本阶段变量。

@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "H4_native_hand_source_and_causal_token_contract_passed_hand_branch_and_original_method_gaps_pending",
+  "stage": "H5_native_hand_condition_branch_and_real_mesh_contract_passed_original_full_paths_and_other_factors_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -168,7 +168,7 @@
       "coverage": "Original sphere geodesic/JVP, configured tangent network/loss plus published1000-step projected Euler sample/sample_all; no original dataset likelihood or human SO3."
     }
   ],
-  "next": "Preregister independent native-hand condition branch; retain view/anatomical identity and missing masks, avoid offline whole-video fitted hands as causal inputs. Continue public auxiliary resources and default neutral-SMPL/full original input gaps separately.",
+  "next": "Acquire public original auxiliary resources and verify full original inference path prerequisites; preserve default neutral-SMPL gaps and any explicitly distinct asset variants. Separately preregister null-frame history update control; no training or mainline replacement.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -188,7 +188,8 @@
     "Exact default mesh prerequisite inventory for six SMPL-dependent original methods; missing assets explicitly retained",
     "M1 original P16 volume/RANSAC branches, center/camera-source dependencies, half-distance threshold and forced dual-view inlier audit",
     "H3 H1/H2 real COCO17-to52rotation-toSMPLH surface integration, controlled K1/K8 readout, complete360 streaming/future/missing/gradient contracts",
-    "H4 exact original WiLoR reader/asset audit on360frames, typed native hand inputs, source/candidate availability separation, per-frame causality and90total tests"
+    "H4 exact original WiLoR reader/asset audit on360frames, typed native hand inputs, source/candidate availability separation, per-frame causality and90total tests",
+    "H5 native two-view hand condition branch composed with unchangedbody/shape/T/state/flow; exact oldH3 no-hand control,360stream/future/realmesh/gradient and102tests; limitedCPUcomponentcost"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -208,7 +209,8 @@
     "M1 first unit tests:65 passed/1 failed because isolated AST test omitted original nn module import. Test-only symbol supplied, final66 passed; original network not changed.",
     "M1 first Ruff:unused import/two unpacked variables and test import ordering; harness-only cleanup, final check passed.",
     "H3 first Ruff reported test import formatting only; corrected. No failed H3 forward or unit tests; original licensed-body deprecation notices retained.",
-    "H4v1 harness used float64 body observations whereas original pipeline castsfloat32; retained failure and matched original dtype without relaxed audit. Initial two test fixture and Ruff style failures corrected; seeH4validation."
+    "H4v1 harness used float64 body observations whereas original pipeline castsfloat32; retained failure and matched original dtype without relaxed audit. Initial two test fixture and Ruff style failures corrected; seeH4validation.",
+    "H5v1 runner mistakenly selectedrow0ofCOCO17 regressor matrix; correctedrunneronly, failurepreserved,v2/v3pass. Initial static type/import/nested-ifdiagnostics corrected; allbehaviorchecks passed."
   ],
   "candidate_revisions": [
     {
@@ -297,6 +299,25 @@
       "validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h4_validation.json",
       "tests": 15,
       "boundary": "360 saved real frames and original source audit;90 total tests; no learned hand branch, training, accuracy/contact/realtime or mainline change"
+    },
+    {
+      "id": "H5",
+      "status": "isolated_native_hand_branch_contract_passed_not_trained_or_mainline",
+      "change": "Same-hand15queries attend separatetwo-camera native15rotation+boxscore tokens withcamera/anatomical identity; exactzero ifmissing and residualonly30handconditions beforeoriginal52-nodeflow",
+      "sources": [
+        "P07 primary query/memory interface, explicitly adapted",
+        "H4",
+        "H3"
+      ],
+      "variable": "Native-hand condition residual only; sharedshape, translation, bodyhistory, outputpolicy andmodel/flow budget unchanged",
+      "protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h5_protocol.json",
+      "implementation": "realtime_app/learning_flow_mesh/hand_candidate.py",
+      "results": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h5_results_v3.json",
+      "validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h5_validation.json",
+      "tests": 12,
+      "new_parameters": 23616,
+      "total_parameters": 167315,
+      "boundary": "102tests,real360 saved input,random weights; no accuracy/contact/betaidentifiability or fullsystemrealtime claim,originalmethod resources andfullinputs remain."
     }
   ],
   "sampling_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_protocol.json",
