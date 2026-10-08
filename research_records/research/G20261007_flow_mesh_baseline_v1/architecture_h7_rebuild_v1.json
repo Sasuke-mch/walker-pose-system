@@ -1,0 +1,12 @@
+{
+  "status": "saved_parameters_independent_process_mesh_rebuild_passed",
+  "input": "architecture_h7_results_v1.npz",
+  "frame_ids": [
+    7,
+    359
+  ],
+  "max_vertex_error_m": 2.384185791015625e-07,
+  "faces_exact": true,
+  "training_executed": false,
+  "checkpoint_loaded": false
+}

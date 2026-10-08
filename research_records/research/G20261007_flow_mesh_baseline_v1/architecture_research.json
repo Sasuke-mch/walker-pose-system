@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R10_ten_paper_coverage_provenance_audited_H7_shape_information_source_next_original_paths_pending",
+  "stage": "H7_local_vs_recurrent_shape_information_source_verified_original_paths_and_final_synthesis_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -190,7 +190,7 @@
       ]
     }
   ],
-  "next": "H7 preregister one-factor local-frame versus recurrent-history shape feature source, keeping K8/head/pose/state/noise/publication/gates fixed; continue distinct original resource and uncovered contracts afterward. Fourteen default prerequisites remain missing; no WHAM same-source retry or defaultneutral substitution.",
+  "next": "Continue original VIBE regressor/body resource route with only official auxiliary members and distinct bounded budget; no weights/neutral substitution/WHAM same-source retry. Then remaining original temporal/multiview contracts and evidence-bounded synthesis. H7 closes feature-source audit, not beta accuracy.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -222,7 +222,8 @@
     "R7 One remaining WHAM officialsource attempt timedout; persistent budget exhausted;14default gaps unchanged",
     "R8 Original MotionBERT global_lite/wild reader/inference AST; input/order/futurecrop/missing/pixeldepth boundaries",
     "R9 MotionAGFormer defaultbase/full evaluation AST on syntheticreader; exactintermediate and original tail/perfecterror/units failures",
-    "R10 Ten explicit coverage rows and evidencefield links; corrected VIBE sharedbeta attribution and stale currentstage; H7 and originalpath gaps retained"
+    "R10 Ten explicit coverage rows and evidencefield links; corrected VIBE sharedbeta attribution and stale currentstage; H7 and originalpath gaps retained",
+    "H7 originalpreGRU feature capture changes only sharedbeta readout; savedH6control/nonbetaoutputs/hidden/noiseexact, real360/mesh/stream/future/attribution and155tests verified"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -353,6 +354,24 @@
       "new_parameters": 23616,
       "total_parameters": 167315,
       "boundary": "102tests,real360 saved input,random weights; no accuracy/contact/betaidentifiability or fullsystemrealtime claim,originalmethod resources andfullinputs remain."
+    },
+    {
+      "id": "H7",
+      "status": "isolated_shape_information_source_contract_passed_not_accuracy_selected",
+      "change": "Shape only: original GRU input pooledframefeatures versus recurrenthistory summaries",
+      "sources": [
+        "Original unchanged ConditionEncoder.norm/mean/history input",
+        "H1 prefixreadout",
+        "H6 missingfreeze",
+        "R10 provenance correction"
+      ],
+      "variable": "Feature source consumed by same K8 sharedshape/head; encoder/history/nativehands/pose/T/noise/gates untouched",
+      "protocol": "architecture_h7_protocol.json",
+      "implementation": "realtime_app/learning_flow_mesh/shape_features.py",
+      "results": "architecture_h7_results_v1.json",
+      "validation": "architecture_h7_validation.json",
+      "tests": 6,
+      "boundary": "No recurrent reuse for shape pool; no statistical independence, trainedaccuracy, deployment or latency claim. Feature/missingpolicy states require explicitreset."
     }
   ],
   "sampling_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_protocol.json",
@@ -508,5 +527,13 @@
     "authentic_H36M_dataset_evaluated": false,
     "tail_and_perfect_reference_failures_retained": true
   },
-  "coverage_audit": "architecture_r10_results_v1.json"
+  "coverage_audit": "architecture_r10_results_v1.json",
+  "h7_information_source": {
+    "local_nonadmitted_early_gradient_zero": true,
+    "history_nonadmitted_early_gradient_nonzero": true,
+    "local_statistical_independence_proven": false,
+    "accuracy_preference_selected": false,
+    "all_nonbeta_outputs_unchanged": true,
+    "duration_concurrency_export_limits_remaining": true
+  }
 }

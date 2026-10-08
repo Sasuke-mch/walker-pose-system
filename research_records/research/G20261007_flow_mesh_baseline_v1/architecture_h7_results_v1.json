@@ -1,0 +1,152 @@
+{
+  "status": "H7_shape_information_source_contract_passed",
+  "protocol": "architecture_h7_protocol.json",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "new_parameters": 0,
+  "parameter_count": 167315,
+  "parameters_unchanged": true,
+  "frames": 360,
+  "physical_pair_range": [
+    1157,
+    1516
+  ],
+  "model_seed": 19,
+  "hand_seed": 29,
+  "noise_seed": 97,
+  "Euler_nfe": 8,
+  "shape_calibration_frames": 8,
+  "source_body": "architecture_h2_results_v3.npz",
+  "source_hands": "architecture_h4_results_v3.npz",
+  "history_source_H6_exact_parity": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "saved_H6_exact_parity": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "local_vs_history_all_nonbeta_tensors_exact": {
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "hidden_noise_exact": true,
+  "local_features_equal_original_GRU_inputs": true,
+  "independent_beta_mean_max_error": 0.0,
+  "shape_calibration_frame_ids": [
+    [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  ],
+  "source_body_fields_preserved": 17,
+  "source_hand_slots": 763,
+  "admitted_hand_slots": 706,
+  "strict_points": 3031,
+  "status_counts": {
+    "available": 324,
+    "calibration_pending": 7,
+    "no_current_observation": 29,
+    "invalid_rotation": 0,
+    "nonfinite_parameters": 0
+  },
+  "beta_max_change_not_accuracy": 0.9487205147743225,
+  "mesh_max_change_m_not_accuracy": 0.04199099540710449,
+  "chunk_checks": {
+    "1": {
+      "betas": 5.960464477539063e-08,
+      "rotations": 4.172325134277344e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.172325134277344e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 9.5367431640625e-07
+    },
+    "11": {
+      "betas": 5.960464477539063e-08,
+      "rotations": 4.76837158203125e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.76837158203125e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 7.152557373046875e-07
+    },
+    "64": {
+      "betas": 0.0,
+      "rotations": 4.470348358154297e-07,
+      "translation_m": 2.384185791015625e-07,
+      "raw_rotations_diagnostic": 4.470348358154297e-07,
+      "raw_translation_diagnostic_m": 2.384185791015625e-07,
+      "raw_state_diagnostic": 9.5367431640625e-07
+    }
+  },
+  "future_before120_checks": {
+    "betas": 0.0,
+    "rotations": 0.0,
+    "translation_m": 0.0,
+    "raw_rotations_diagnostic": 0.0,
+    "raw_translation_diagnostic_m": 0.0,
+    "raw_state_diagnostic": 0.0
+  },
+  "earlier_frame_perturb_later_local_features_delta": 0,
+  "earlier_frame_perturb_later_history_features_delta": 0.11979007720947266,
+  "controlled_gradient_attribution": {
+    "local_gradient_l1_by_frame": [
+      0.0,
+      0.0,
+      0.5419955253601074,
+      0.5419955253601074,
+      0.5419955253601074,
+      0.5419955253601074,
+      0.5419955253601074,
+      0.5419955253601074,
+      0.5419955253601074,
+      0.5419955253601074
+    ],
+    "history_gradient_l1_by_frame": [
+      0.05073542520403862,
+      0.07223084568977356,
+      0.17931504547595978,
+      0.14590099453926086,
+      0.13375693559646606,
+      0.18127107620239258,
+      0.13925307989120483,
+      0.1276477873325348,
+      0.1153261661529541,
+      0.07445777207612991
+    ],
+    "nonadmitted_early_local_beta_delta": 0.0,
+    "nonadmitted_early_history_beta_delta": 0.021306395530700684,
+    "fixture": "Two observed but unadmitted frames, followed by eight admitted; gradient norm is sensitivity, not statistical information/accuracy"
+  },
+  "independent_mesh_rebuild_error_m": 2.384185791015625e-07,
+  "vertices_shape": [
+    1,
+    360,
+    6890,
+    3
+  ],
+  "faces_shape": [
+    13776,
+    3
+  ],
+  "harness_limit": "Read-only eager GRU input hook plus inheritedH6 output intervention; not concurrent/export/deployment or latency evidence",
+  "boundary": "Removes recurrent history reuse from shape feature pool, not statistical dependence or shape error. Untrained engineering ablation; no accuracy preference. H6 time blindness retained."
+}
