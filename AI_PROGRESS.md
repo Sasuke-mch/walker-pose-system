@@ -4026,3 +4026,17 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 原emptybox length0；图外框仍返回有限normalized black并保留personid；zero-size框产生scalar divide warning却返回有限patch；NaN框原AssertionError，不修补。报告channel std使用float32累计会有小数值残差，测试按逐像素black广播控制，不把std残差当图像内容变化。作者原框处理不证明人体观测有效，更不提供原鱼眼标定/严格几何或精度。
 
 首次完整运行在新增报告汇总处变量error被except绑定清除，UnboundLocalError；v1 JSON/input/mesh NPZ保留，更名affine_error后v2完整重跑通过。初次targeted2failed/1passed分别是bbox float32舍入误差与恒定patch均值累计误差，修正测试控制，不改作者输出；失败XML原样本地保留，failure描述提交。实际全套182passed/21warnings，新3项；Ruff/72AST、638论文源存在/字节数及11冻结路径核对通过。没有全面源内容比较。六项记录同步，14默认资源缺口不变；neutral、作者initializer/detector/完整demo与真实性能仍未执行，不标完整复现。所有大型NPZ留本地，小型结果/重建/验证/成功XML及本阶段代码本地提交。长期目标未完成。
+
+### 2026-10-08 用户停止扩展后的最终架构综合分析
+
+用户明确要求“现在停止继续深入了。你基于现有的结果，进行详细分析。然后达成我的目标”。据此停止资源获取、作者路径扩展与新候选实验，原长期扩展goal暂停、automation已删除。原十篇默认完整复现仍未达成；本次完成的是基于现有证据的架构分析与参考实现收敛，不将用户停止研究写成全部原方法完成。architecture_conclusion_v1.json整理最新十篇覆盖与设计决定；R13旧综合保留为历史。
+
+十篇的作用是明确结构适用条件，而非模块投票。ProHMR提供条件分布与共享shape样本设计，但image-only冷启/ActNorm及NaN有限logprob有边界；HuManiFlow明确shape参与pose条件，可启发H8依赖边，不能直接换SMPL24为SMPLH52；HMR2提供query-memory/原RGBcrop与参数头路径，R16固定图原crop+完整网络/male网格已运行，detector/defaultneutral仍未完成。VIBE原TemporalEncoder按窗口重置且完整regressor为逐帧beta，不支持此前误称的clip平均；MotionBERT与MotionAGFormer可启发空间时序关系，但整序列未来依赖不满足当前在线因果合同。WHAM的世界运动、脚与refiner不因运行motion组件就具备。LearnableTriangulation是无畸变针孔/显式camera/center方法，不能替换原鱼眼质量门；零confidence返回有限点更表明finite不是valid。FMPose3D的GT-root参与RPEA不允许直接用于未知根位置的实际推理。RiemannianFM现有S2不是人体SO3，6D旋转合法也不等于SO3概率流。
+
+收敛为现有H8研究参考：同源原鱼眼条件/显式COCO17观测与52rotationquery分离 → 现有空间编码及H5手部局部memory → H6单向GRU显式carry/无当前观测冻结hidden → H7原preGRU局部特征在8个admitted帧池化共享10D beta并冻结 → H8 readybeta经无偏置10to64残差进入原condition → 原8Euler/guarded6D局部旋转 → 真实maleSMPLH解码及严格availability发布。167955参数，其中native手条件新增23616、H8新增640；关闭H8精确回到H7，已存在可审计单因素对照。base config默认22观测不是本合同：H8 runner显式observation_joints=17/COCO17_SURFACE，不能直接套默认旧infer入口宣称H8完成。
+
+关键选择依据是契约而非精度：H7隔离非admitted早期信息进入shape池化，但局部帧不代表统计独立、K8不代表可辨识；H6避开null编码隐藏态漂移，但长缺失压缩了物理时间，不能称已处理时间；H8证明beta→pose→mesh路径有响应/梯度，并未证明共享shape准确或耦合有收益；native手部条件只作用声明的局部query，不能解释成手/接触改善。保留图与空间attention为现有参考结构和可隔离因素，没有证据宣布graph/history优于简化对照。已保存360帧324available/7pending/29no-current，3031严格点、所有拒绝与NaN保留；availability不是精度通过率。
+
+历史同1000合成步/144019参数：FM110.4661mm、8NFE；确定性回归50.0678mm、1NFE。仅该人工任务内部一致性支持回归为更强对照，未证明真实双鱼眼性能，不能推出FM优于回归。no-graph99.7432mm且参数135699，不能归因graph有害；no-history98.2499mm也未建立真实时间规律。研究参考保留FM以表达生成任务，确定性回归必须保留为对照；若只追求单一人体点估计，当前证据不支持付出FM额外采样成本。多样样本、finite密度、smooth或双视角一致不能替代独立准确度/校准证据。
+
+最终交付是一套已实现、接口与依赖清楚、可复核的研究候选及十篇边界分析，不是已训练可用的真实人体恢复系统。14资源缺口、完整作者路径、SO3替代、elapsed time/部署、独立三维与接触/体型精度保持未执行，不继续追补也不消除历史失败。最新实际回归证据R16全套182passed/21warnings、Ruff/72AST；原GPUmesh重建0、独立CPU2.384186e-7m仅内部一致性。本次只综合已有结果，无新实验/训练/权重/主线改动。六项记录同步，本地提交，不推送。

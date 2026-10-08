@@ -1,0 +1,150 @@
+{
+  "status": "user_requested_research_expansion_stopped_existing_evidence_synthesized",
+  "analysis_delivery_complete": true,
+  "whole_original_reproduction_goal_complete": false,
+  "user_instruction": "现在停止继续深入了。你基于现有的结果，进行详细分析。然后达成我的目标",
+  "goal_status": "paused_by_user_stop_expansion",
+  "automation_id": "automation",
+  "automation_status": "deleted",
+  "new_experiments_executed_for_synthesis": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "mainline_changed": false,
+  "papers": [
+    {
+      "id": "P04",
+      "name": "ProHMR",
+      "coverage": "Original ResNet50/ConditionalGlow density and exact initialize+forward_step AST methods64samples/male SMPL44joints/projection; fresh image-only inference requires SMPL labels, eval topflag not dataActNorm initialization. Neutral/default initializer/renderer/evaluation incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P04_v4.json",
+      "additional_checks": [
+        "architecture_r5_results_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P05",
+      "name": "HuManiFlow",
+      "coverage": "Original HRNetW48 RGB crop/Canny/18proxy AST-to-HuManiFlow point/50shared-shape samples and alternatemaleSMPL90joints library mesh, plus original density; originaldetector/defaultneutral/renderer/CLI/fullinputloop/evaluation remain incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P05_v3.json",
+      "additional_checks": [
+        "architecture_r2_results_v1.json",
+        "architecture_r3_results_v1.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P07",
+      "name": "HMR2",
+      "coverage": "Original full forward_step AST method, ViT-H/16/head/male SMPLLayer44joints/projection; defaultneutral, Lightning initializer, original detector/crop/evaluation remain incomplete. R16 original ViTDetDataset fixed savedRGB/fullframe explicitbox-to-full ViTH/forward/male mesh now executed; defaultneutral/detector/init/demo still incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P07_v3.json",
+      "additional_checks": [
+        "architecture_r4_results_v2.json",
+        "architecture_r16_results_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P09",
+      "name": "VIBE",
+      "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration R10 originalsource AST and paper3.1 establish perframe beta; previous clip-averaged-beta claim was incorrect. Full Regressor/body output remains unexecuted. R12 originaldefaultTemporalEncoder zero/NaN/future and resetwindows versus explicitcarryGRU audit; carried hook is projectdiagnostic, native forward has no hidden/mask/frameID API. Fullbody still not executed. R12 carry/reset/zero/NaN/future original encoder behavior audited.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P09_v1.json",
+      "additional_checks": [
+        "architecture_r10_results_v1.json",
+        "architecture_r12_results_v1.json",
+        "architecture_r12_results_v1.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P10",
+      "name": "WHAM",
+      "coverage": "Original full Network constructor without body asset, plus original motion encoder, motion decoder, trajectory decoder and missing-point preprocessing. No SMPL mesh/global-feet/refiner execution",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P10_v1.json",
+      "additional_checks": [],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P12",
+      "name": "MotionBERT",
+      "coverage": "Original fullsize pose-lifting network plus originalwild CLI-defaultglobal_lite factory, HALPE26reader,243+5clips, flipTTA/root/image-relative coordinate restoration AST subpath. Sequencecrop usesfuture; readerignoresimageids; meshhead/resources, realdetector/videoCLI and datasetaccuracy incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P12_v1.json",
+      "additional_checks": [
+        "architecture_r8_results_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P14",
+      "name": "MotionAGFormer",
+      "coverage": "Original publishedxsmall plus actualCLI-defaultbase16layers/243frames/fullfactory/full evaluationfunction on declaredsyntheticreader/reference, originaldenormalize/TTA/root/metrics and boundaryfailures audited. No actualdatasetfileIO/read2d/read3d/trainedaccuracy or detector/SMPL-H.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P14_v1.json",
+      "additional_checks": [
+        "architecture_r9_results_v3.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P03",
+      "name": "FMPose3D",
+      "coverage": "Original published human velocity network, Euler and exact single-frame flip-TTA method, RPEA input dependency probes; original RPEA evaluation requires GT root. No trained dataset/video/detector/SMPL-H path.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_sampling_v4.json",
+      "additional_checks": [],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P16",
+      "name": "LearnableTriangulation",
+      "coverage": "Original algebraic network, full64cubed volumetric/V2V forward with artificial predicted pelvis, original RANSAC/direct-refinement forward with explicit module-local Python-set compatibility. No original data/checkpoint/center estimator, fisheye adaptation or project strict quality mask. R14 original NumPy/Torch DLT degeneracy and zero-confidence audited; not all fullnetwork missingview cases.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_v1.json",
+      "additional_checks": [
+        "architecture_checks/P16_volumetric_v2.json",
+        "architecture_checks/P16_ransac_v2.json",
+        "architecture_r14_results_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P02",
+      "name": "RiemannianFM",
+      "coverage": "Original Sphere geodesic/tangent loss and published1000step sample/sample_all plus exactdivergence compute_exact_loglikelihood AST with ProductManifold integration and analytic density controls; exception fallbackfinitezero/returntype failure retained. Originalvolcano dataset, Lightning/EMAinitializer and humanSO3 not executed.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_sampling_v1.json",
+      "additional_checks": [
+        "architecture_r6_results_v3.json"
+      ],
+      "default_whole_method_complete": false
+    }
+  ],
+  "reference_implementation": "H8 engineering candidate, no accuracy preference established",
+  "reference_code": "realtime_app/learning_flow_mesh/beta_conditioning.py",
+  "reference_runner": "realtime_app/learning_flow_mesh/reproduction/check_beta_conditioning.py",
+  "reference_contract": {
+    "observations": "COCO17 rawfisheye-derived typed source; distinct from52 SMPLH rotation queries",
+    "shape": "H7 preGRU localfeatures admittedprefixK8, shared10D beta frozen afterward; unknown remains NaN",
+    "history": "H6 explicitcarry missinghiddenfreeze; no elapsedtime model and eagerhook deployment claim",
+    "hands": "H5 samehand15queries native two-camera15rotation memory, separate identities/masks",
+    "coupling": "H8 readybeta biasfree10to64 residual before original 8Euler, only640 newrandom parameters",
+    "representation": "Guarded Euclidean6D decoded to52local SO3 matrices, not manifoldFM",
+    "decoder": "LicensedmaleSMPLH with MANO assets,6890vertices/13776faces",
+    "capacity": 167955,
+    "availability": {
+      "available": 324,
+      "calibration_pending": 7,
+      "no_current_observation": 29,
+      "invalid_rotation": 0,
+      "nonfinite_parameters": 0
+    },
+    "missing_mesh": "Never publish no-current-observation or calibration-pending diagnostic poses",
+    "control": "H8off exactH7; deterministic regression mandatory comparison before any FM advantage claim"
+  },
+  "historical_metric_evidence": "verification_summary.json synthetic only, no checkpoint reopened",
+  "accuracy_winner_selected": false,
+  "blocked_or_unexecuted_scopes_retained": [
+    "14 default resource gaps and default neutral paths",
+    "full VIBE/WHAM/MotionBERT mesh paths",
+    "original detector/default top-level CLI/authentic dataset evaluations",
+    "physical elapsed time and production hook concurrency/export",
+    "human SO3 flow alternative",
+    "independent real 3D/shape/hand/contact accuracy and fullsystem realtime"
+  ],
+  "final_choice_basis": "Architecture contract and explicit causal dependency, not trained performance. No further exploration under latest stop instruction."
+}

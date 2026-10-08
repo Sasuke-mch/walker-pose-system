@@ -1,11 +1,11 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R16_original_HMR2_saved_RGB_crop_full_forward_alternate_male_verified_default_path_pending",
+  "stage": "user_stopped_expansion_final_existing_evidence_analysis_delivered",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
-  "automation_status": "ACTIVE",
+  "automation_status": "DELETED",
   "source_root": "third_party/architecture_reproduction",
   "evidence_levels": [
     "primary_method_and_implementation_read",
@@ -191,7 +191,7 @@
       ]
     }
   ],
-  "next": "Continue independently actionable original inference/input/temporal/manifold/geometry scopes while retaining14default resource gaps. MotionBERT current official directory budget exhausted conservatively; WHAM exhausted; VIBE1remaining needs actual selective-access evidence. Do not retry claimed stages or fetch credentials/weights/fullarchives.",
+  "next": "No further autonomous experiments/resource acquisition/path expansion under user stop instruction. Existing evidence final architecture analysis delivered; original fullreproduction gaps retained. Resume only on explicit user request.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -231,7 +231,8 @@
     "H8 explicit sharedbeta velocity conditioning:640 added random parameters, disabledexactH7, full360/source/hand/stream/future/mesh/gradient verified;168tests21warnings,66AST",
     "R14 unchanged P16 NumPy/Torch DLT:10 paired cases and1batched dtype case, independent stereo controls, original failures retained;3 targetedtests/fullmoduleRuff/68AST",
     "R15 official MotionBERT mesh directory HTTP200/404347declaredHTML rejected beforebodyread under262144cap; noresourcesacquired, conservative2accessbudgetconsumed,8guardtests/Ruff/70AST",
-    "R16 original ViTDetDataset savedframe0/loaderbbox192x256 -> full670459037ViTH/head/forward AST/male44joint mesh; independentRGBaffine0/CPUmesh2.38e-7;182tests21warnings/Ruff72AST; detector/defaultneutral unexecuted"
+    "R16 original ViTDetDataset savedframe0/loaderbbox192x256 -> full670459037ViTH/head/forward AST/male44joint mesh; independentRGBaffine0/CPUmesh2.38e-7;182tests21warnings/Ruff72AST; detector/defaultneutral unexecuted",
+    "User-requested existing-evidence synthesis and H8 reference architecture closure, not ten complete default methods"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -597,5 +598,7 @@
     "detector_executed": false,
     "default_neutral_reproduced": false,
     "whole_author_method_reproduced": false
-  }
+  },
+  "goal_status": "PAUSED",
+  "conclusion": "architecture_conclusion_v1.json"
 }
