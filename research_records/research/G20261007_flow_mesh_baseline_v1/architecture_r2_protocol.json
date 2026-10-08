@@ -1,0 +1,31 @@
+{
+  "id": "R2",
+  "status": "protocol_locked_before_execution",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "authorization": "User supplied three local model directories and authorized use where useful",
+  "purpose": "Verify original HuManiFlow parameter-to-mesh library subpath with explicitly distinct existing male SMPL asset; not default neutral/CLI reproduction",
+  "inputs": [
+    "models/smpl/basicmodel_m_lbs_10_207_0_v1.0.0.pkl existing licensed male SMPL",
+    "R1 exact three HuManiFlow regressors at original paths",
+    "Original HuManiFlow model/config/body wrapper and predict_humaniflow.py parameter-to-mesh call conventions",
+    "Artificial18channel256proxy, fresh random HumaniflowModel, original50sample budget"
+  ],
+  "unique_variable": "Explicit male library body-asset configuration instead of unavailable neutral; no author source modification, no frozen mainline changes",
+  "control": "Independent same-asset smplx.SMPL decode, independent einsum for all three extra regressors, original parents24 and original point/sample body call conventions",
+  "implementation_boundary": "Author CLI advertises male/female but explicitly raises NotImplementedError for nonneutral; run_predict function/body wrapper accept gender. Execute original library subpath only, bypassing checkpoint-loading top-level script. Process-local path resolution for exact original regressors and legacy pickle compatibility are explicit adaptations.",
+  "checks": [
+    "Original point estimate and50samples from original network decoded through original SMPL wrapper, actual vertices6890/faces13776/joints90",
+    "SO3/finite checks, repeat point path, model weights unchanged, no optimizer/checkpoint/network",
+    "Same-asset independent smplx decode and regressor blocks agree, actual kinematic tree passed into original flow",
+    "Keep missing default neutral and all14 default prerequisites unmodified, no asset copy/rename/download",
+    "Limited original library path is not complete detector/proxy/input/predict/render/evaluation or CLI"
+  ],
+  "stop": "Preserve actual failure/versioned outputs; no neutral substitution claim, no fixing author CLI guard, no weight loads or dataset/renderer install",
+  "outputs": [
+    "architecture_r2_results_v1.json",
+    "architecture_r2_results_v1.npz",
+    "architecture_r2_validation.json"
+  ],
+  "boundary": "Alternate male original-library parameter-to-mesh engineering only, fresh random artificial input, no learned pose/shape/clinical/accuracy conclusion"
+}

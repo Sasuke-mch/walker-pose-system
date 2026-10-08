@@ -88,3 +88,7 @@ H5执行：v1运行器误取COCO回归矩阵一行而失败，已修运行器并
 ### H6 实际验收
 
 architecture_h6_results_v1.json/NPZ与validation通过。原H5随机参数/手来源/shape池化/noise/K8/8Euler不变；唯一变量为无原当前观测时冻结GRU transition。真实360完整源字段/strict3031/native763→706/失败29保存；324/7/29输出不变，missing参数网格NaN。原missing hidden变化0.547084，freeze为0，未来影响0，分块<=9.54e-7、真实网格重建2.38e-7m。人工missing1/8/64恢复及稀疏帧号证明freeze忽略经过时间，不能以结构通过选为更准主线。135全测试/14warning、Ruff/43AST通过，无训练/更新/新参数或主线变更。完整原方法及14资源缺口仍待推进。
+
+### R2 用户现有资产及HuManiFlow男模型库子路径预注册
+
+用户提供三个本地资产目录并授权有用则用；实际无neutral SMPL，SMPLX_NEUTRAL不是替代品。HuManiFlow CLI列出male/female但非neutral实际NotImplementedError，不能当CLI支持证据。见architecture_r2_protocol.json，独立配置以现有male SMPL调用原模型库点估计/50候选→原SMPL wrapper，核对真实网格/90关节及原regressor；不加载训练权重、不改作者文件、不补齐默认neutral，不宣称完整图像/CLI推理。
