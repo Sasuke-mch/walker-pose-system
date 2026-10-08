@@ -1,0 +1,28 @@
+{
+  "id": "H2",
+  "status": "protocol_locked_before_implementation",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "inputs": {
+    "author_sources": "Local ProHMR/HuManiFlow/WHAM/MotionBERT/MotionAGFormer snapshots; exact original rotation functions and joint definitions",
+    "detector": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/{left,right}_pmpose_raw.json; rotated model-domain pixels despite basename",
+    "calibration": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/calibration/stereo_fisheye.json",
+    "strict_reference": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/first_instance_strict.jsonl",
+    "landmark_regressor": "models/smpl/J_regressor_coco.npy; existing COCO17 surface regressor, separate from SMPL-H kinematic rotation nodes"
+  },
+  "control": "Existing model_to_raw_point, raw_side and StereoCalibration; frozen strict point validity and reasons; exact author rotation decoders on nonidentity fixtures",
+  "single_variable": "Explicit interface adapter instead of assuming equal tensor dimensions imply equal joint, rotation, pixel or mask semantics",
+  "candidate": "Isolated typed schemas, three declared 6D layouts, explicit present/missing mask conversion, raw/model pixel restoration and calibrated rays in cam0 metres; no mainline callsite replacement",
+  "success": [
+    "Same-name/count joint schemas cannot be silently interchanged; COCO surface landmarks and SMPL-H rotation nodes remain distinct",
+    "Author rotation function parity on non-symmetric proper rotations; roundtrip across packed columns, interleaved columns and packed rows",
+    "Degenerate/nonfinite rotations remain NaN and invalid; no identity fallback",
+    "Mask polarity requires explicit declaration; numeric mask rejected",
+    "Pixel restoration exactly matches current reader for both physical camera roles; invalid points preserve reasons",
+    "Calibrated rays use cam0 frame and explicit unit conversion, verified against original camera projections",
+    "All 360 frame IDs and 6120 point slots replayed; strict accepted/rejected mask and every reason retained without gate recomputation or interpolation"
+  ],
+  "failure_stop": "Undeclared schema, pixel domain, mask polarity, unit, duplicate frame IDs, ambiguous person association or invalid extrinsic convention fails explicitly; never infer from filenames or tensor count",
+  "boundary": "Contract and internal geometry checks only. No training, new detector execution, optimization, independent accuracy claim or realtime latency claim. This does not complete ten full original model reproductions.",
+  "planned_outputs": ["architecture_h2_results_v1.json", "outputs/architecture_h2_tests.xml"]
+}
