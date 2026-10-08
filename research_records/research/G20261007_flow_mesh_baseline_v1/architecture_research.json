@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R11_VIBE_official_range_index_request_failed_HTTP200_default14gaps_original_paths_pending",
+  "stage": "R12_original_VIBE_missing_and_state_contract_verified_fullbody_resources_and_synthesis_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -93,9 +93,10 @@
       "source_file_count": 64,
       "local_source": "third_party/architecture_reproduction/VIBE",
       "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P09_v1.json",
-      "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration R10 originalsource AST and paper3.1 establish perframe beta; previous clip-averaged-beta claim was incorrect. Full Regressor/body output remains unexecuted.",
+      "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration R10 originalsource AST and paper3.1 establish perframe beta; previous clip-averaged-beta claim was incorrect. Full Regressor/body output remains unexecuted. R12 originaldefaultTemporalEncoder zero/NaN/future and resetwindows versus explicitcarryGRU audit; carried hook is projectdiagnostic, native forward has no hidden/mask/frameID API. Fullbody still not executed.",
       "additional_checks": [
-        "architecture_r10_results_v1.json"
+        "architecture_r10_results_v1.json",
+        "architecture_r12_results_v1.json"
       ]
     },
     {
@@ -190,7 +191,7 @@
       ]
     }
   ],
-  "next": "Investigate VIBE officialZIP selective auxiliary access before using remaining one source request; thisstageclaim cannot retry. Do not fullarchive fallback or substitute licensedneutral/checkpoints. Continue original uncovered contracts and final synthesis independently; WHAM same-source budget remains exhausted.",
+  "next": "Advance evidence-bounded architecture synthesis using actual original paths and H1-H7 controlled contracts, keeping default14resource and fullVIBE/WHAM/MotionBERTmesh gaps explicit. Investigate selective VIBE auxiliary access only before spending remaining1source request; no guessedconfirm URL/fullarchive fallback. Continue unexecuted original multiview/temporal contracts separately.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -224,7 +225,8 @@
     "R9 MotionAGFormer defaultbase/full evaluation AST on syntheticreader; exactintermediate and original tail/perfecterror/units failures",
     "R10 Ten explicit coverage rows and evidencefield links; corrected VIBE sharedbeta attribution and stale currentstage; H7 and originalpath gaps retained",
     "H7 originalpreGRU feature capture changes only sharedbeta readout; savedH6control/nonbetaoutputs/hidden/noiseexact, real360/mesh/stream/future/attribution and155tests verified",
-    "R11 primaryVIBEresource script verified; one boundedZIPsuffix request rejectedHTTP200 beforebodyread; persistentclaim/14gaps/158tests audited, not acquired"
+    "R11 primaryVIBEresource script verified; one boundedZIPsuffix request rejectedHTTP200 beforebodyread; persistentclaim/14gaps/158tests audited, not acquired",
+    "R12 originalVIBETemporalEncoder16window/48reset-vs-carry/missing0NaN/future contract, 160tests; originalfullVIBEbody unexecuted"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",

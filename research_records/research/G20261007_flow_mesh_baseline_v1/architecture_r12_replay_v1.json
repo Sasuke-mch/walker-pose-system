@@ -1,0 +1,9 @@
+{
+  "status": "saved_original_temporal_repeat_and_arrays_verified",
+  "input": "architecture_r12_results_v1.npz",
+  "same_random_seed_original_repeat_exact": true,
+  "carry_vs_whole_exact": true,
+  "NaN_prefix_and_allfuture_invalid_verified": true,
+  "training_executed": false,
+  "checkpoint_loaded": false
+}

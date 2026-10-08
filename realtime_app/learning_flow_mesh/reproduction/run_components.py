@@ -54,7 +54,7 @@ def vibe():
             "official_config_past_change_when_future_changed": difference,
             "paper_bidirectional_variant_past_change": bidirectional_difference,
             "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration",
-            "unresolved": ["Original SMPL neutral/extra joint regressors and mean-parameter resources needed for complete mesh path", "Paper describes clip-averaged beta, released VIBE.forward flattens temporal features and its Regressor predicts beta per frame"]}
+            "unresolved": ["Original SMPL neutral/extra joint regressors and mean-parameter resources needed for complete mesh path", "Released VIBE.forward flattens temporal features and Regressor predicts beta per frame; original paper Section3.1 does not establish clip-averaged beta"]}
 
 
 def wham():

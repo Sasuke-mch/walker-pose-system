@@ -1,0 +1,35 @@
+{
+  "status": "R12_original_temporal_missing_state_contract_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "results": "architecture_r12_results_v1.json",
+  "independent_saved_repeat": "architecture_r12_replay_v1.json",
+  "original_published16window_and48diagnostic": true,
+  "source_whole_class_AST": [
+    27,
+    63
+  ],
+  "explicit_carry_adapter_not_nativeAPI": true,
+  "tests": {
+    "tests": "160",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "new_tests": 2,
+  "full_suite_warnings": 18,
+  "Ruff": "passed",
+  "AST_files": 62,
+  "source_paper_presence_bytes": 638,
+  "author_content_comparison": false,
+  "frozen_paths": 11,
+  "default_resource_gaps": 14,
+  "VIBE_source_budget_remaining": 1,
+  "original_full_VIBE_or_SMPL_executed": false,
+  "initial_lint_issue": "UnusedBASE import removed; no failednumerical/test result thisstage",
+  "metadata_generator_correction": "run_components.vibe unresolved text no longer invents paper clip-averaged beta. Existing historical P09_v1 retained; currentauthority/sourcegenerator both corrected.",
+  "boundary": "Original TemporalEncoder original missing/reset behavior and explicitcarryGRU adapter only; no body/regressor/detector/defaultneutral or accuracy proof. Scope hooks unsupported for sharedmoduleconcurrent/export, no elapsedtime model.",
+  "network_requests_scope": "R12 execution/resource GET only; prior pre-protocol documentation browsing excluded"
+}

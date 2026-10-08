@@ -182,3 +182,15 @@ v3以process-local denormalize只读observer调用未变原方法并复制中间
 实际约1.438s，重定向drive.usercontent后HTTP200、Content-Range无，检查器在正文读取前拒绝；inventory/installed为空、应用层archive body reader计数0，两个成员not_acquired，默认14缺口不变，v5库存保存。0不代表HTTP/TLS/重定向无流量；未读取200内容，不能推断是ZIP、确认页或服务器全面不支持Range。该来源1次已消耗、尚余1次，现有claim禁止本阶段重试；第二次须先解决选择性获取方案并另行预注册，不绕账户/TLS/镜像，不整包下载、不获取neutral/权重。
 
 新增3项Range边界控制：200/重定向/HTTP错误在读取前拒绝、64KiB与archiveend约束、encoded transport拒绝；158实际全套测试/18warning、Ruff/60AST通过，638论文源码存在/字节数与11冻结路径核对，源码内容比较未做。六份现有记录同步，实际失败/claim/库存与检查器本地提交；验收的是失败与回退边界，不是资源成功或VIBE完整复现。H7结论保留，原完整路径与最终综合仍未完成。
+
+### 2026-10-08 R12 VIBE原缺失特征与分窗状态契约
+
+R11未读200正文，无法验证确认页/下载Range地址；现场查看gdown原实现需要从确认内容解析下载入口，没有证据支持猜测confirm参数耗用VIBE最后一次预算。本轮VIBE资源GET为0（只核对gdown源代码），不安装gdown/账户cookies，预算仍余1。改为完成R10明确未执行的P09missing/stream组件契约，原完整regressor/body缺口保留，未以组件替代完整方法。
+
+原TemporalEncoder完整class AST27–63，released2layers/hidden1024/linear/residual/oneway，17840128参数、seed113，默认16window另人工48帧feature诊断。native forward签名(x)，没有hidden/mask/frameID输入且丢弃GRU返回hidden。三个16window直接重置后与whole后段差0.0356448，首段精确；显式GRU pre-hook传入carriedhidden/output-hook读取hidden的诊断适配，仍执行未变原forward，与whole逐值精确。该适配不是原生stream API，不称并发/export或物理时间正确。future24后扰动对prefix24影响0、重复/state_dict不变。
+
+原全零feature输出98304个有限非零值，不表示当前观测可用。frame17单NaN对prefix0..16精确无影响，但frame17..47每帧全部2048非有限；不清洗、不造mask、不以finite输出作发布规则。独立进程从保存feature重新随机seed原实例化，whole逐值一致，savedcarry/reset/NaN边界逐值验证；NPZ本地保留。
+
+新增2个原carry/reset及坏hidden失败清理控制，160实际全套测试/18warning、Ruff/62AST通过，638论文源码存在/字节数与11冻结路径核对、14默认资源缺口不变；初次unusedBASE lint修正，没有失败数值或测试结果。run_components的未来metadata生成文字同步纠正P09“paper clip-averaged beta”错误，旧P09_v1/H1预注册保留历史，不改作者文件/实际算法。六份现有记录同步、小型结果/验证/成功XML与检查器本地提交，无训练/权重/mainline变化。
+
+下一阶段整理原已运行结构与H1–H7受控契约的架构综合，明确每个选择的证据和反例；原完整人体资源/输入与未执行多视图/时序缺口继续跟踪。不能因carry或缺失语义已清楚而宣称十篇完整方法或研究目标完成。
