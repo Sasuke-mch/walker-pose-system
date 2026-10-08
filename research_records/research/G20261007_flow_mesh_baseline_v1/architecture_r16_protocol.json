@@ -1,0 +1,30 @@
+{
+  "id": "R16",
+  "status": "locked_before_execution",
+  "purpose": "Original HMR2 ViTDetDataset savedRGB crop to full ViTH/head/forward_step alternate male mesh subpath",
+  "image": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input/left_ccw90/pair_0000.png",
+  "frame": "fixed frame0 cam0 LEFT turned CCW90 originalpair1157; no posthoc selection",
+  "box": "explicit [0,0,width,height] wholeimage boundary; not detector output or certified person-centered box",
+  "author_sources": [
+    "hmr2/datasets/vitdet_dataset.py",
+    "hmr2/datasets/utils.py",
+    "hmr2/models/__init__.py:75-78 [192,256] ViT bbox default",
+    "hmr2/models/hmr2.py forward_step"
+  ],
+  "source_root": "third_party/architecture_reproduction/HMR2",
+  "config": "hmr2/configs_hydra/experiment/hmr_vit_transformer.yaml; IMAGE_SIZE256 and author loader BBOX_SHAPE192,256 applied explicitly, not checkpointload",
+  "controls": [
+    "independent affine center/corner plus BGRtoRGB ImageNet normalization versus authorcrop",
+    "original metadata source identity and no image/box mutations",
+    "empty/outside/zero/NaN bbox outcomes retained; no validity assumed",
+    "original fullsize670M network and maleSMPL44joint projection independent sameasset rebuild",
+    "sameimage repeat/NaN input/fixed parameter versions, no optimization"
+  ],
+  "unique_change": "Replace R4 artificial normalizedimage with savedRGB through original ViTDetDataset; R4 originalnetwork/seed43/maleasset/forward probes preserved",
+  "stop": "No checkpoint/detector/neutral/license/renderer download; invalid boxes not repaired; preserve all failures and versions",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "mainline_modified": false,
+  "boundary": "Original crop + original forward AST subpath alternateasset/randomweights only; not defaultneutral complete demo, detection, valid body observation, rawfish camera calibration or accuracy."
+}
