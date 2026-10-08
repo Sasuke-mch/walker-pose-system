@@ -1,0 +1,85 @@
+{
+  "status": "original_ransac_full_forward_with_explicit_python_compatibility_passed",
+  "config": "third_party/architecture_reproduction/LearnableTriangulation/experiments/human36m/eval/human36m_ransac.yaml",
+  "parameter_count": 68635473,
+  "image_shape": [
+    1,
+    4,
+    3,
+    384,
+    384
+  ],
+  "xyz_shape": [
+    1,
+    17,
+    3
+  ],
+  "xy_shape": [
+    1,
+    4,
+    17,
+    2
+  ],
+  "heatmap_shape": [
+    1,
+    4,
+    17,
+    96,
+    96
+  ],
+  "confidence_shape": [
+    1,
+    4,
+    17
+  ],
+  "confidence_is_original_zero_placeholder": true,
+  "direct_optimization": true,
+  "state_dict_unchanged": true,
+  "geometry_controls": {
+    "known_point_error_mm": 2.366384256176868e-11,
+    "clean_inliers": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "outlier_view": 3,
+    "robust_error_mm": 4.3688492499529423e-11,
+    "robust_inliers": [
+      0,
+      1,
+      2
+    ],
+    "two_view_forced_inliers": [
+      0,
+      1
+    ],
+    "two_view_outlier_xyz_error_mm_fixture": 3453.572382941437,
+    "original_reprojection_error_for_20px_offset": [
+      [
+        10.0,
+        10.0,
+        10.0,
+        10.0
+      ]
+    ],
+    "declared_threshold": 15,
+    "effective_euclidean_pixel_distance_threshold": 30,
+    "boundary": "Analytic geometry/dependency fixture only; no real-person accuracy"
+  },
+  "compatibility": "module-local random.sample converts sorted integer set to list, source unchanged",
+  "coverage": "Original ResNet152/argmax/CPU RANSAC/SciPy direct refinement full forward; no original detector/data/checkpoints, no project strict mask",
+  "id": "P16",
+  "branch": "ransac",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "protocol": "architecture_multiview_protocol.json",
+  "python_set_compatibility": true,
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 1.837978600000497
+  },
+  "evidence_boundary": "Original structure and artificial geometry only, not real accuracy/fisheye compatibility/realtime"
+}

@@ -3786,3 +3786,11 @@ ProHMR原ResNet50/ConditionalGlow、HuManiFlow代理编码/SO(3)层级采样/密
 关键新证据：P03发布RPEA实际读取gt_3D根的绝对相机位置，并非注释所说仅取形状。固定人工候选/相机/二维，根z1→3m让原聚合变化，非根真值变化影响0；这不是人体准确性实验。原误差截断可退化等权，NaN根可产生有限均值，所以不能直接接为无真值在线评分或有效性门。可选反传失败保留，不修作者文件；原根置零后处理另以world旋转关闭的测试核对，不迁移示例归地。
 
 六个默认SMPL网格路径共21项先决资产当前缺失，明列neutral、原regressor/mean路径；现有male/female/SMPL-H/SMPL-X及公共mean不是原默认配置替代品。audit_mesh_resources.py及architecture_full_path_resources_v1.json记录，无认证下载/凭据读取。P03最终v4、P02v1，初次反传/时间浮点比较失败保留；新增6测试，全模块60及Ruff/AST通过。实现/文献/状态同步，原89条工作区保留；长期任务继续，下一步原辅助资源与真实COCO17隔离候选联调，不升级主线或精度结论。
+
+### 2026-10-08 M1 原多视图体素/RANSAC分支复现
+
+先锁architecture_multiview_protocol.json，再运行原P16发布384×384/ResNet152、64³/V2V/2500mm体素与RANSAC分支。P16_volumetric_v2：80,588,050参数，概率和差5.96e−8、重复差0，外部预测骨盆index6缺失明确失败；传入P实际被batch相机重建覆盖，NaN P无影响，batch相机cx扰动有影响，深复制不改输入K。随机权重、人工四针孔相机/中心，不是鱼眼或原数据精度结果。
+
+P16_ransac_v1保留Python3.12 random.sample(set)失败；v2明确模块局部整数集合→排序序列兼容后原完整前向通过。原误差为半像素欧氏距离，15门限实际约30px；抽中的视图强制保留，双目没有额外投票，confidence全零为占位。四视图人工外点可排除，两视图异常仍强制接纳；不接为主线质量门。新增6测试、全模块66及Ruff/AST通过，首轮AST测试符号/静态检查失败保留在validation。原源码/核心及89条既有工作区状态保留，无训练/主线替换/推送。
+
+实现/文献/模块说明及architecture_research同步。架构下一步仍先组合H1/H2的真实COCO17输入和52旋转，保留中心/相机/质量状态边界，不照搬体素或双目RANSAC。六个默认SMPL资源与完整原数据路径仍缺项；长期goal与hourly跟进继续，十篇完整方法尚未完成。

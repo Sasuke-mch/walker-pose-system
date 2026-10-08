@@ -189,3 +189,19 @@ P02使用原Sphere、512宽/8层切向网络1816966参数以及原sample/sample_
 网格资源审计读取六个原SMPL路径及当前smplx默认gender，确认默认neutral。ProHMR/HMR2还需SMPL_to_J19和原mean；HuManiFlow需extra/cocoplus/h36m；VIBE需extra和mean；WHAM需wham/h36m/feet；MotionBERT需extra/h36m_correct和mean。默认路径共21项先决文件当前均缺失；models/third_party定向名称检索只找到项目COCO回归器，没有neutral SMPL及这些原回归器。现有male/female SMPL、SMPL-H、neutral SMPL-X及公共mean fixture列为不同资产/未确认等价来源，没有自动替换。WHAM作者下载脚本要求SMPLify账户许可，不读取凭据或尝试认证下载。审计完成不等于六个原网格方法完成。
 
 命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.run_sampling --paper P03 --device cuda --output <new.json>`；P02实际验证使用`--device cpu`。资源命令为`-m realtime_app.learning_flow_mesh.reproduction.audit_mesh_resources --output <new.json>`；输出均不覆盖。新增6个原源码行为/解析控制测试，全模块60通过，Ruff/AST通过。初次测试将0.2×3与3/5要求逐位相同，差1.11e-16，改为明确1e-15算术容差；没有改采样器或几何门。下一阶段取得可公开获取的原辅助资源，并预注册H1/H2真实COCO17输入的隔离候选联调；不可取得的许可资产仍列缺口。不要直接照搬RPEA真值根、有限fallback、示例世界旋转或逐帧beta行为。
+
+## 2026-10-08 M1：原多视图体素与RANSAC
+
+architecture_multiview_protocol.json在实现前锁定。新增reproduction/run_multiview.py、tests/test_original_multiview.py；直接导入作者模型，关闭backbone权重初始化及自动权重下载，其余原网格/宽度/分辨率保留。人工四相机Kf384、图像384×384、光心为X/Y正负300mm、单位mm、无畸变；RGB为显式人工噪声。没有调用检测器、原数据集、预计算骨盆预测文件或训练权重，没有改作者文件、核心baseline或工程主线。
+
+体素最终P16_volumetric_v2.json：原80,588,050参数，eval human36m_vol_softmax.yaml，softmax跨视图聚合、volume_size64、cuboid_side2500mm、原V2V。输入1×4×3×384×384；特征1×4×32×96×96；17个64³概率及1×17×3输出。人工pred_keypoints_3d提供MPII index6中心[80,−40,3000]mm，体素边界中心±1250mm。概率和误差5.96e−8，同输入重复差0，state_dict不变。无预测中心报KeyError，未伪造中心。移动输入中心X100mm，输出最大变化100.521mm；这只是依赖探针，不是误差指标。
+
+原forward实际覆盖proj_matricies：保持batch.cameras，传NaN矩阵输出差0；保持传入矩阵，把batch相机cx增加20px，输出变化0.762mm。相机从batch深复制后缩放，原K未被改变。v1已通过；v2增加实际相机扰动对照。峰值allocated1,218,136,064bytes含检查用state_dict克隆、输出和复测，构造及复测总耗时也不是部署显存或实时延迟。原torch.meshgrid未来警告保留，不修改外部源码。
+
+RANSAC P16_ransac_v1.json记录原random.sample(set)在Python3.12的TypeError。v2使用明确开关--python-set-compatibility：仅该模块random命名空间改为将整数集合排序为list的抽样接口，finally恢复；不改全局random.sample、作者文件、10次采样或几何公式。固定seed与排序序列抽样一致，但不声称与作者旧Python的集合迭代顺序逐位相同。完整原68,635,473参数ResNet152/heatmap argmax/CPU RANSAC/SciPy Huber直接优化通过，四视图输入，1×17×3及1×4×17×2输出有限，参数未更新。confidence是原全零占位，不作为缺失/接受判断；完整forward不导出inliers。
+
+解析已知点[120,−40,3000]mm：四视图原求解误差2.37e−11mm；向第3视图添加[130,−100]px外点，保留0/1/2，误差4.37e−11mm；仅保留0/3两视图时两者被强制接纳，人工输出偏移3453.57mm。数值不是实际人体误差，只展示缺少冗余的行为。原calc_reprojection_error_matrix为0.5×欧氏像素距离，20px偏移返回10；默认epsilon15意味着欧氏距离约30px，不是15px。新增29.99/30.01px边界对照，不改默认阈值或项目门。原针孔投影也不包含鱼眼畸变。
+
+执行命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.run_multiview --kind volume --device cuda --output <new.json>`；RANSAC先用--kind ransac不加兼容开关保存失败，再以新输出路径加--python-set-compatibility。同名NPZ本地保存，输出拒绝覆盖。新增6个原几何/兼容/体素积分测试，全模块66通过。首次测试AST环境遗漏原nn导入导致1失败65通过，补齐测试符号后通过；初次Ruff未用变量/导入格式诊断均已修正。失败结果/XML保留，见architecture_multiview_validation.json。
+
+M1只补齐P16原三种求解分支的结构证据；输入构建、真实原数据、原检查点/指标、鱼眼适配、严格质量门与人体网格均不在这项证据内。后续隔离候选必须声明中心/相机来源和有效状态，不能把体素输出、confidence占位或双目inlier_count当成真实性。长期目标继续，六个原默认mesh资源缺项及候选组合尚未完成。

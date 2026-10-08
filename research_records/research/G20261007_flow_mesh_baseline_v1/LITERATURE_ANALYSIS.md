@@ -257,7 +257,7 @@ PoseD-Flow项目页：https://circle-group.github.io/research/PoseD-Flow/。页�
 |[MotionBERT](https://github.com/Walter0807/MotionBERT)|DSTformer.py 269–361及forward_temporal 188–200；model_mesh.py 9–80|姿态主干空间/时间两顺序分支融合；时间attention看整clip。mesh head先平均时间特征再预测一套beta，随后广播；与VIBE论文先预测beta再平均不同。shape池化使用未来，实时适配必须单列|原H36M姿态网络243帧、512宽、5层完成；mesh分支未执行|
 |[MotionAGFormer](https://github.com/TaatiTeam/MotionAGFormer)|MotionAGFormer.py 68–160/196–284；attention.py 50–62；graph.py 10–128|attention与图分支各含空间和时间操作，再自适应融合；时间attention及相似图没有因果屏蔽。原图为H36M17且图层有节点BatchNorm，不能将我们的52节点相邻平均称原结构复现|原xsmall网络27帧、64宽、12层完成|
 |[FMPose3D](https://github.com/AdaptiveMotorControlLab/FMPose3D)|model_GAMLP.py 111–152/216–247；scripts/FMPose3D_train.sh|2D、3D状态与生成时间拼接，B,F展平成B×F后执行图/attention，网络是帧内速度场，不含我们的GRU，也不输出mesh/beta。完整论文另有采样、RPEA及评价预算|原速度网络、Euler、flip-TTA及RPEA依赖通过；发布聚合读取GT根，原数据/检测评价待完成|
-|[Learnable Triangulation](https://github.com/karfly/learnable-triangulation-pytorch)|mvn/models/triangulation.py 131–200/203–355；utils/multiview.py 141–168；experiments/human36m/train/human36m_alg.yaml|原ResNet152、heatmap积分、跨相机归一化confidence和加权DLT；体素分支需要人体中心和体素空间。透视P矩阵不能直接处理原始鱼眼像素；没有项目严格门/拒绝原因，不可直接替换|原代数分支384×384完整前向及已知点DLT完成；体素/RANSAC待执行|
+|[Learnable Triangulation](https://github.com/karfly/learnable-triangulation-pytorch)|mvn/models/triangulation.py 18–129/131–200/203–355；utils/multiview.py；experiments/human36m/eval/|原ResNet152、heatmap积分、跨相机归一化confidence和加权DLT；体素分支依赖预测人体中心，实际从batch相机重建P。RANSAC半距离门、强制保留抽中的视图。透视P不能直接处理原始鱼眼像素，也没有项目严格门|原代数、64³体素/V2V完整前向通过；原RANSAC经显式Python集合采样兼容后通过；人工针孔输入、随机权重，原数据/检测/预测中心流程及性能待完成|
 |[Riemannian FM](https://github.com/facebookresearch/riemannian-fm)|manifm/model/arch.py 75–106；model_pl.py 556–615|网络向量场投影到当前位置切空间；测地路径用jvp求目标速度，再用流形度量比较。不能把欧氏6D直线后投影终点称SO(3) RFM；此仓库也不是现成条件人体恢复网络|原球面路径/网络/损失及1000步采样通过；原数据/似然及人体SO(3)未完成|
 
 ### 对架构的阶段性判断
@@ -302,3 +302,13 @@ Riemannian FM作者支持Sphere/FlatTorus/SPD/Mesh等，不直接提供人体SO(
 原RiemannianFM配置球面sample为1000步投影Euler；完整轨迹比last-only多一次终点速度查询。网络/测地损失/采样结构已经核实，但这些不等于人体SO(3)生成、更不证明比现有欧氏6D更准。后续旋转路径改进必须单列结构、梯度、推理预算和相同条件对照。
 
 六个原SMPL网格方法的neutral模型、专用回归器和原初始化文件目前有明确缺项，详见architecture_full_path_resources_v1.json；不以其他性别/模型族或合成回归器补齐并升级复现级别。原方法完整结构、项目适配和已训练性能继续分开。
+
+## 多视图空间结构的适用条件（M1）
+
+P16原体素路径已按发布评估配置执行ResNet152→32通道特征→64³反投影聚合→V2V→17点积分。体素不是自动发现人体的空间模块：use_gt_pelvis=false时仍需batch.pred_keypoints_3d，MPII中心为index6；评估YAML指定预先计算的代数预测文件。2500mm立方体围绕这个外部中心建立。本次人工中心平移100mm，原输出随之变化；这只证明依赖，不是人体精度。若用于本项目，中心必须来自明确、可用的估计，缺失时应不可用，不能用人工真值或旧结果偷偷补齐。
+
+原VolumetricTriangulationNet.forward将传入proj_matricies覆盖为batch.cameras深复制并缩放到heatmap后的P。保持batch相机，仅传NaN矩阵不影响输出；改变batch相机主点才影响结果。Camera.projection为K[R|t]，不包含鱼眼畸变。项目接入前应统一相机权威来源；原结构复现与鱼眼改造是两项不同任务，不能把适配鱼眼的射线直接塞进P矩阵位置。
+
+原RANSAC的calc_reprojection_error_matrix返回0.5×像素欧氏距离，所以默认epsilon15对应严格小于约30px欧氏距离；这不是项目当前的重投影质量门。原随机抽样两视图直接进入inlier_set，四视图人工外点能排除，但两视图没有额外的一致性投票。人工异常双目仍保留两者并产生大偏移，不能把inlier_count=2当可靠三角化。forward还返回全零confidence占位、丢弃逐关节inlier列表，没有项目逐点拒绝状态。
+
+架构判断：双鱼眼主线继续使用原严格几何与明确质量状态，优先将可用二维/射线及观测语义作为条件，再生成52旋转；不要为了“空间模块”照搬昂贵体素，或以RANSAC替代缺少冗余的双目质量门。三条P16分支运行证据完善了结构比较，但随机前向不证明体素/学习置信度优于当前算法。之后H1/H2组合只研究输入契约、共享体型和因果性，精度提升需另行训练和受控验证。

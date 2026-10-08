@@ -1,0 +1,18 @@
+{
+  "status": "original_multiview_check_failed",
+  "error": "TypeError: Population must be a sequence.  For dicts or sets, use sorted(d).",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\run_multiview.py\", line 203, in main\n    result, arrays = volume(args.device) if args.kind == \"volume\" else ransac(args.device, args.python_set_compatibility)\n                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\run_multiview.py\", line 164, in ransac\n    controls = ransac_controls(model, geometry, projection)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\run_multiview.py\", line 131, in ransac_controls\n    clean, inliers = model.triangulate_ransac(matrices, points, direct_optimization=True)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\LearnableTriangulation\\mvn\\models\\triangulation.py\", line 85, in triangulate_ransac\n    sampled_views = sorted(random.sample(view_set, 2))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\毛晨昊\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\Lib\\random.py\", line 413, in sample\n    raise TypeError(\"Population must be a sequence.  \"\nTypeError: Population must be a sequence.  For dicts or sets, use sorted(d).\n",
+  "id": "P16",
+  "branch": "ransac",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "protocol": "architecture_multiview_protocol.json",
+  "python_set_compatibility": false,
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 0.5901636999915354
+  },
+  "evidence_boundary": "Original structure and artificial geometry only, not real accuracy/fisheye compatibility/realtime"
+}

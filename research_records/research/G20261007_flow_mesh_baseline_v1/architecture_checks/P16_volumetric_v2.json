@@ -1,0 +1,88 @@
+{
+  "status": "original_volumetric_full_forward_passed",
+  "config": "third_party/architecture_reproduction/LearnableTriangulation/experiments/human36m/eval/human36m_vol_softmax.yaml",
+  "parameter_count": 80588050,
+  "image_shape": [
+    1,
+    4,
+    3,
+    384,
+    384
+  ],
+  "volume_size": 64,
+  "cuboid_side_mm": 2500.0,
+  "aggregation": "softmax",
+  "use_gt_pelvis": false,
+  "predicted_pelvis_index": 6,
+  "output_shapes": [
+    [
+      1,
+      17,
+      3
+    ],
+    [
+      1,
+      4,
+      32,
+      96,
+      96
+    ],
+    [
+      1,
+      17,
+      64,
+      64,
+      64
+    ],
+    null,
+    null,
+    [
+      1,
+      64,
+      64,
+      64,
+      3
+    ],
+    [
+      1,
+      3
+    ]
+  ],
+  "predicted_center_mm": [
+    80.0,
+    -40.0,
+    3000.0
+  ],
+  "volume_probability_sum_max_error": 5.960464477539063e-08,
+  "finite_repeat_max_error": 0.0,
+  "ignored_nan_projection_argument_output_max_error": 0.0,
+  "actual_camera_cx_shift_px": 20,
+  "actual_camera_shift_xyz_max_change_mm": 0.7619094848632812,
+  "actual_geometry_source": "batch cameras, resized deep copies",
+  "input_cameras_not_mutated": true,
+  "center_shift_mm": [
+    [
+      100.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "center_shift_xyz_max_change_mm": 100.52117156982422,
+  "missing_predicted_center_error": "'pred_keypoints_3d'",
+  "state_dict_unchanged": true,
+  "gpu_peak_allocated_bytes_including_check_snapshots": 1218136064,
+  "coverage": "Original ResNet152/unprojection/64cubed V2V/integration full forward; artificial predicted center/cameras, not original detector/precalculated center/data/checkpoints",
+  "id": "P16",
+  "branch": "volume",
+  "training_executed": false,
+  "weights": "random_initialization",
+  "protocol": "architecture_multiview_protocol.json",
+  "python_set_compatibility": false,
+  "environment": {
+    "python": "3.12.12",
+    "torch": "2.11.0+cu128",
+    "device": "cuda",
+    "elapsed_total_seconds_not_latency": 5.10368619998917
+  },
+  "evidence_boundary": "Original structure and artificial geometry only, not real accuracy/fisheye compatibility/realtime"
+}

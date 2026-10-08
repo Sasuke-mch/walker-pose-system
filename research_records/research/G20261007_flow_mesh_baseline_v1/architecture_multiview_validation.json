@@ -1,0 +1,48 @@
+{
+  "status": "passed_with_original_compatibility_failure_and_explicit_limits",
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "tests": {
+    "tests": "66",
+    "failures": "0",
+    "errors": "0"
+  },
+  "new_geometry_behavior_cases": 6,
+  "linter": "passed",
+  "syntax": "AST passed for 29 module Python files",
+  "original_source_files_exist_and_byte_sizes_unchanged": 719,
+  "mainline_and_baseline_unchanged_after_CRLF_normalization": true,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/config.json"
+  ],
+  "results_files": [
+    "architecture_checks/P16_volumetric_v1.json",
+    "architecture_checks/P16_volumetric_v2.json",
+    "architecture_checks/P16_ransac_v1.json",
+    "architecture_checks/P16_ransac_v2.json"
+  ],
+  "failures_retained": [
+    {
+      "file": "architecture_checks/P16_ransac_v1.json",
+      "failure": "Python3.12 rejects original random.sample(set)",
+      "resolution": "Explicit process-local original-module compatibility; source unchanged"
+    },
+    {
+      "stage": "first unit tests",
+      "failure": "1failed65passed, AST fixture missing original nn import",
+      "resolution": "Test-only namespace includes torch.nn; final66passed"
+    },
+    {
+      "stage": "first linter",
+      "failure": "unused import/variables and import ordering",
+      "resolution": "Local harness/test cleanup only"
+    }
+  ],
+  "source_warning_retained": "Original meshgrid future indexing argument warning; legacy chumpy/scipy warnings retained",
+  "evidence_boundary": "Artificial original-network forward and analytical dependencies, not real-person accuracy, original pretrained performance, fisheye input compatibility or realtime",
+  "next_stage": "H1/H2 real COCO17 candidate integration protocol, original licensed mesh gaps and public auxiliary resources remain distinct",
+  "unrelated_workspace_entries_at_start": 89
+}

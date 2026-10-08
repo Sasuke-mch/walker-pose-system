@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "S1_original_sampling_passed_mesh_resource_gaps_and_candidate_integration_pending",
+  "stage": "M1_original_multiview_branches_passed_candidate_integration_and_mesh_gaps_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -143,12 +143,16 @@
       "repo": "karfly/learnable-triangulation-pytorch",
       "branch": "master",
       "focus": "Algebraic/volumetric calibrated view fusion; pinhole boundary",
-      "status": "original_algebraic_network_forward_passed",
+      "status": "original_algebraic_volumetric_and_explicit_compatibility_ransac_forward_passed",
       "source_status": "source_archived",
       "source_file_count": 34,
       "local_source": "third_party/architecture_reproduction/LearnableTriangulation",
       "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_v1.json",
-      "coverage": "Original algebraic network and original pinhole DLT; volumetric/RANSAC variants not run"
+      "coverage": "Original algebraic network, full64cubed volumetric/V2V forward with artificial predicted pelvis, original RANSAC/direct-refinement forward with explicit module-local Python-set compatibility. No original data/checkpoint/center estimator, fisheye adaptation or project strict quality mask.",
+      "additional_checks": [
+        "architecture_checks/P16_volumetric_v2.json",
+        "architecture_checks/P16_ransac_v2.json"
+      ]
     },
     {
       "id": "P02",
@@ -181,7 +185,8 @@
     "H2 explicit joint/6D/mask/pixel/unit contracts, exact parity with six author rotation functions and complete frozen 360-frame strict replay",
     "S1 original P03 single-frame Euler/flip-TTA and GT-root dependence/saturation/NaN behavior audit",
     "S1 original P02 projected Euler full/last paths at1000steps with analytic control",
-    "Exact default mesh prerequisite inventory for six SMPL-dependent original methods; missing assets explicitly retained"
+    "Exact default mesh prerequisite inventory for six SMPL-dependent original methods; missing assets explicitly retained",
+    "M1 original P16 volume/RANSAC branches, center/camera-source dependencies, half-distance threshold and forced dual-view inlier audit"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -196,7 +201,10 @@
     "H1_v1 fixture writes into broadcast camera-origin storage contaminated valid frames; tensor clone before fault injection fixes harness only, no generator/mainline change.",
     "H1_v2 bitwise comparison across B=1 versus B=2 GEMM differed by 2.98e-8; identical-batch formula is exact, cross-batch discrepancy recorded below 1e-6 numerical tolerance. No geometric acceptance gate changed.",
     "H2 test fixture attempted to monkeypatch frozen calibration instance; test-local class monkeypatch fixes injection. Initial Ruff import/intentional harness/noqa syntax issues corrected and retained in validation record.",
-    "P03_sampling_v1 failed optional RPEA backward because original norm output is modified inplace. Original eval forward retained; v2 onward separates backward limitation. First time-arithmetic fixture required bitwise agreement across algebraically equivalent doubles; explicit1e-15 tolerance fixes test, no source/gate changes."
+    "P03_sampling_v1 failed optional RPEA backward because original norm output is modified inplace. Original eval forward retained; v2 onward separates backward limitation. First time-arithmetic fixture required bitwise agreement across algebraically equivalent doubles; explicit1e-15 tolerance fixes test, no source/gate changes.",
+    "P16_ransac_v1 failed unchanged original random.sample(set) under Python3.12; v2 explicitly uses a module-local sorted-integer-sequence compatibility facade. No author files modified; old Python set iteration parity not claimed.",
+    "M1 first unit tests:65 passed/1 failed because isolated AST test omitted original nn module import. Test-only symbol supplied, final66 passed; original network not changed.",
+    "M1 first Ruff:unused import/two unpacked variables and test import ordering; harness-only cleanup, final check passed."
   ],
   "candidate_revisions": [
     {
@@ -250,5 +258,7 @@
   ],
   "sampling_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_protocol.json",
   "mesh_resource_audit": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_full_path_resources_v1.json",
-  "sampling_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_validation.json"
+  "sampling_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_validation.json",
+  "multiview_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_multiview_protocol.json",
+  "multiview_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_multiview_validation.json"
 }
