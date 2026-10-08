@@ -3865,3 +3865,11 @@ v1保留float64检查器与原float32 pipeline的框腕距离微差失败，只�
 原male SMPL库输出50×6890/13776面/90点，独立保存50参数重建网格/前45点/面精确；保存RGB、HRNet argmax/confidence、原Canny重算与存储精确，独立crop坐标差0、Gaussian差5.96e-8。重复proxy及点估计精确，随机HRNet41/flow31，无训练/权重/网络请求/参数更新。没有执行带renderer的完整predict函数或原CLI/defaultneutral/评价，默认14缺口不变。
 
 原缺失规则反例：zero或negative热图原argmax给0坐标，confidence无效，仍强制前7（面部/肩）可见并产生7张非零Gaussian；缺失NaN坐标乘false掩码仍NaN。原crop调整aspect时会原位改bbox高度。保持作者文件不动，不把finiteproxy当有效观测。新增6测试，实际全141/15warning、Ruff/46AST通过；11原路径不变，719作者文件存在/字节数核对。HRNet“is”SyntaxWarning、meshgrid/cross弃用和缺pytorch3d提示保留。v1/validation为原输入子路径证据，无真实人体/鱼眼准确性、无完整十篇复现结论；长期目标继续，不推送。
+
+
+### 2026-10-08 优化方法说明公式与字号调整
+
+- 在现有 Word 说明基础上，将七处符号释义中的数学符号转换为 LaTeX 生成的 Word 原生可编辑公式；保留 16 个展示公式，新增 43 个行内公式。
+- 正文与符号说明 12 磅，展示公式 13 磅，表格 11 磅；调整章节分页，排版为四页。
+- 原文件被 Word 占用，另存至 `资料/实验报告/现有优化主线_数学描述与流程_20261008_公式排版.docx`。
+- DOCX 结构校验通过；导出 PDF 并逐页检查，公式、说明及表格显示完整。
