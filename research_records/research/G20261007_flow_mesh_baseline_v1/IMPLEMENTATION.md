@@ -142,3 +142,16 @@ uvx --offline ruff check realtime_app/learning_flow_mesh/reproduction realtime_a
 失败保留：P04_v1骨干默认pretrained=True，加载ImageNet后因UMNN缺失失败，该JSON“random_initialization”字段不准确，以资源记录勘误为准，排除通过证据。最终显式pretrained=False，并在导入作者模型前拦截权重下载。P04_v2暴露作者固定多候选noise路径context行数不匹配；未改原源码，v3使用原发布63随机＋1零路径通过。P05_v1缺opt_einsum，隔离补依赖后v2通过。P07_v1原ViT.train不返回self，不能链式赋值eval；改运行器原地调用后v2通过。首次guard调用lazy model_zoo未显式import，在模型执行前退出，修正后捕获边界覆盖此处。资源记录生成一次未指定UTF-8而失败，源/结果未损坏，显式编码后重建。弃用警告和HuManiFlow非执行分支pytorch3d提示保留。
 
 四篇都未验证真实三维精度。十篇选定组件通过不等于十个完整方法、项目接入或架构优化完成。
+
+
+## H1：因果多帧体型校准候选（隔离、不训练）
+
+代码`shared_shape.py`，验证入口`reproduction/check_shared_shape.py`。使用同一个既有ConditionEncoder和shape_head，无新增学习层或重新初始化已有参数。原编码器未暴露global_condition；检查适配器以临时只读hook取得GRU输出（关闭history时取原norm输出的52节点均值），finally移除hook。编码器源码、空间模块、姿态生成器、8次Euler预算、平移、所有主线配置未改。该hook只用于eager检查，尚无并发/编译/导出接口保证，不作为部署完成。
+
+流程：输入B,T,64条件特征、调用方明确认可的B,T bool、B,T int64帧号及每行独立序列ID。状态保存特征和、有效数、β、ready和上一帧号。缺失值用where先隔离，不能以0乘NaN代替。前8个认可帧等权平均，用原Linear(64,10)读出一次β；此前每帧β=NaN、ready=False。第8个有效帧开始发布，随后不再更新特征和/β；缺失帧不计数。跨chunk继续同状态，换序列显式reset；重复/倒序帧、串序列、认可的非有限特征均报错，不猜测修复。不可用前缀仍保留，不生成或回填网格。
+
+原模型联调使用真实SMPL-H/MANO资产生成2×13帧人工合成代理，网络随机种子19、生成种子31；没有调用训练或载入学习checkpoint。序列0第1帧缺失，序列1前3帧缺失，首次可用帧分别8、10。原条件/平移逐位不变，参数快照完全不变。模型逐帧和批处理β最大差5.96e-8；未来11帧后扰动造成已发布β变化0；冻结后β完全相同。只解码ready片段，真实网格分别1×5×6890×3、1×3×6890×3，有限。独立梯度检查确认有效校准特征与β头收到有限非零梯度，未来及缺失特征梯度为0。1帧控制在相同批形状下精确等于原公式；B=1/B=2 GEMM误差2.98e-8单独记录。对照改变β的L2=0.3578只是读出变化，不是改进精度。
+
+验证：全模块38项测试通过（H1新增8项），Ruff/AST通过，原模型/训练/配置及主线文本不变。v1失败由广播数组写入别名导致，将输入clone后才注入缺失修复；v2对不同批大小过度要求逐位相同导致失败，保留误差并增加同批精确公式控制。v3/v4成功，其中v4关闭整个结构运行器的梯度记录；梯度检查只在单元测试中反传，不做参数更新。详见architecture_h1_results_v4.json及architecture_h1_validation.json；NPZ本地保存完整不可用前缀和掩码，不提交数组。
+
+命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_shared_shape --output <new.json>`。输出同名NPZ，均不覆盖。既有条件编码器、历史GRU在缺失帧仍运行，H1只控制shape读出不改这一路；池化历史特征可能重复计入早期信息，尚未证明不偏或可辨识。8帧是工程阈值，需后续质量/时延研究；共享常数本身不证明体型正确。候选保持隔离，后续H2语义适配、原完整方法路径继续。

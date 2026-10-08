@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "H1_protocol_locked_candidate_pending",
+  "stage": "H1_isolated_candidate_structure_passed_H2_and_full_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -164,7 +164,7 @@
       "coverage": "Original sphere geodesic/JVP, configured 512-wide eight-layer time-MLP/tangent projection and exact author rfm_loss_fn; no training, density/ODE evaluation, meshes or SO(3) human pose"
     }
   ],
-  "next": "Lock H1 prefix shared-shape calibration protocol and implement isolated candidate; then explicit adapters and remaining mesh/input/evaluation reproduction paths. No training and no mainline promotion.",
+  "next": "Lock H2 explicit joint/camera/mask/6D adapter protocol. Complete remaining original input/body/evaluation reproduction paths separately; H1 remains a random structural candidate, not mainline. No training.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -176,7 +176,8 @@
     "Original ProHMR ResNet50/ConditionalGlow inference and density roundtrip",
     "Original HuManiFlow proxy encoder/hierarchical SO(3) sampling and log density",
     "Original HMR2 ViT-H/16 and Transformer SMPL parameter head",
-    "Original Riemannian FM sphere geodesic, tangent network and exact loss method"
+    "Original Riemannian FM sphere geodesic, tangent network and exact loss method",
+    "H1 masked causal eight-admissible-frame calibration using unchanged shape head, explicit unavailable prefix, fixed beta, real SMPL-H ready-segment decode and gradients"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -187,12 +188,14 @@
     "P05_v1 missing opt_einsum; isolated dependency added, v2 passed.",
     "P07_v1 chained eval() returned None because original ViT.train() omits return; harness uses in-place eval, v2 passed.",
     "Initial download guard accessed lazy torch.utils.model_zoo before import and exited before JSON; corrected explicit import inside exception-recording boundary. No model executed in this failed invocation.",
-    "SPIN raw mean-parameter URL returned 404; public MMPose fixture acquired and matched existing local copy. Original release-bundle equivalence remains unconfirmed."
+    "SPIN raw mean-parameter URL returned 404; public MMPose fixture acquired and matched existing local copy. Original release-bundle equivalence remains unconfirmed.",
+    "H1_v1 fixture writes into broadcast camera-origin storage contaminated valid frames; tensor clone before fault injection fixes harness only, no generator/mainline change.",
+    "H1_v2 bitwise comparison across B=1 versus B=2 GEMM differed by 2.98e-8; identical-batch formula is exact, cross-batch discrepancy recorded below 1e-6 numerical tolerance. No geometric acceptance gate changed."
   ],
   "candidate_revisions": [
     {
       "id": "H1",
-      "status": "protocol_locked_not_implemented",
+      "status": "isolated_structure_passed_not_mainline",
       "change": "Causal multi-frame shared shape calibration, explicit unavailable state until freeze",
       "sources": [
         "P09 paper Section 3.1",
@@ -206,8 +209,11 @@
         "same beta after freeze",
         "real SMPL-H decode and gradient contract"
       ],
-      "boundary": "Architecture and observability design only; no claim that pooling improves beta accuracy without trained evaluation",
-      "protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h1_protocol.json"
+      "boundary": "Eight tests plus original FlowMesh/body fixture; not beta accuracy, compiled/concurrent deployment or a trained model",
+      "protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h1_protocol.json",
+      "implementation": "realtime_app/learning_flow_mesh/shared_shape.py",
+      "results": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h1_results_v4.json",
+      "tests": 8
     },
     {
       "id": "H2",

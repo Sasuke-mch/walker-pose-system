@@ -3767,3 +3767,8 @@ G20261007_flow_mesh_baseline_v1记录20篇卡片/横表/正文锚点及设计依
 ### 2026-10-08 十篇结构研究：概率/网格参数头阶段
 
 ProHMR原ResNet50/ConditionalGlow、HuManiFlow代理编码/SO(3)层级采样/密度、HMR2原ViT-H/16/Transformer头、Riemannian FM原球面路径/切向网络/损失方法检查通过。十篇选定组件均有输出，完整mesh/input/evaluation仍有缺口；不训练，不改reference25主线，不升级证据。失败、预训练默认值勘误、作者API问题和资源限制保留于`architecture_research.json`、`architecture_probability_resources_v1.json`和`architecture_checks/`。下一阶段先锁H1因果多帧共享β协议，再实现隔离候选；姿态/flow参数保持原样。长期goal和每小时跟进继续。
+
+
+### 2026-10-08 H1 因果共享体型结构候选
+
+先锁协议再实现`learning_flow_mesh/shared_shape.py`：复用原head，取前8认可帧条件均值，校准前NaN/ready=False，随后冻结，严格帧号/序列隔离；原model/train/config及reference25未改。原FlowMesh＋真实SMPL-H结构联调通过：缺失前缀保留，2序列首次可用帧8/10，batch/streamβ差5.96e-8，未来扰动影响0，ready段真实网格有限；单独验证shape/特征梯度，无训练/参数更新。全模块38测试（H1新增8）通过。广播输入别名和跨批GEMM精确比较两次失败保留，最终v4及validation为当前证据。H1没有真实β准确性、编译/并发部署或主线接入结论；H2接口与原完整方法缺口待推进，长期目标保持active。

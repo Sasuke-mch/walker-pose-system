@@ -1,0 +1,6 @@
+{
+  "status": "isolated_H1_structure_failed",
+  "training_executed": false,
+  "error": "ValueError: present geometry must be finite",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_shared_shape.py\", line 118, in main\n    result = run(args.output)\n             ^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_shared_shape.py\", line 43, in run\n    direct = model.encoder(observed_inputs(batch))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1779, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\torch\\nn\\modules\\module.py\", line 1790, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\model.py\", line 83, in forward\n    raise ValueError(\"present geometry must be finite\")\nValueError: present geometry must be finite\n"
+}

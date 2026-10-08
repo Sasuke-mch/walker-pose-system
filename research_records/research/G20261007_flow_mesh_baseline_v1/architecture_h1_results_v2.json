@@ -1,0 +1,6 @@
+{
+  "status": "isolated_H1_structure_failed",
+  "training_executed": false,
+  "error": "AssertionError: Tensor-likes are not equal!\n\nMismatched elements: 8 / 10 (80.0%)\nGreatest absolute difference: 2.9802322387695312e-08 at index (0, 1)\nGreatest relative difference: 2.7079903475168976e-07 at index (0, 1)",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_shared_shape.py\", line 120, in main\n    result = run(args.output)\n             ^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_shared_shape.py\", line 89, in run\n    torch.testing.assert_close(first_control.betas[:, 0], encoded[\"betas\"][:1], atol=0, rtol=0)\n  File \"D:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\torch\\testing\\_comparison.py\", line 1600, in assert_close\n    raise error_metas[0].to_error(msg)\nAssertionError: Tensor-likes are not equal!\n\nMismatched elements: 8 / 10 (80.0%)\nGreatest absolute difference: 2.9802322387695312e-08 at index (0, 1)\nGreatest relative difference: 2.7079903475168976e-07 at index (0, 1)\n"
+}
