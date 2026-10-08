@@ -1,0 +1,38 @@
+{
+  "id": "R7",
+  "status": "protocol_locked_before_execution",
+  "purpose": "Remaining WHAM auxiliary resource transport and selective schema audit",
+  "source": "https://drive.google.com/uc?id=1pbmzRbWGgae6noDIyQOnohzaVnX_csUZ&export=download&confirm=t",
+  "authority": "WHAM/fetch_demo_data.sh auxiliary-body_models section; live primary source verified",
+  "historical_attempt": "Earlier handoff12sHEADredirect ReadTimeout, not current GET",
+  "network_budget": "One GET invocation total in this stage, count historicalHEAD toward source budget2. No retry, no credential lookup. Standard TLS,20s request/stream16MiB, selected8MiB. Redirects recorded by requests transport, not independent retries.",
+  "selection": {
+    "body_models/J_regressor_h36m.npy": {
+      "rows": 17,
+      "kind": "npy_regressor"
+    },
+    "body_models/J_regressor_feet.npy": {
+      "rows": 4,
+      "kind": "npy_regressor"
+    },
+    "body_models/smpl_mean_params.npz": {
+      "kind": "mean"
+    }
+  },
+  "scope": "Uncertain WHAMregressor rowsemantics is not assumed17 solely because inputs17; inspect inventory if reachable, do not substitute H36M or projectCOCO. No model/checkpoint/dataset installs. Unselected archive members not proof of absence.",
+  "unique_variable": "Exact primary auxiliary resources, original code/mainline/candidates/assets unchanged",
+  "controls": [
+    "Existing R1 safe archive extraction/schema/translation/einsum/gradient checks",
+    "Before/after actual default gaps",
+    "Stop before large unselectedmember and on bytes/time/HTTPfailure, retain partialsuccessfulfiles and failure"
+  ],
+  "success": "Transport/schema status truthfully recorded; resource presence alone not fullWHAM completion. Missing resources remain missing on failure",
+  "stop": "One GET only, no mirror/credential/disabledTLS/fullarchive downloads/threshold changes",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "outputs": [
+    "architecture_r7_results_v1.json",
+    "architecture_full_path_resources_v4.json",
+    "architecture_r7_validation.json"
+  ]
+}
