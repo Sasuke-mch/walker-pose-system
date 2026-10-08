@@ -225,3 +225,21 @@ CandidateState携带原GRU hidden、H1 ShapeState和每序列seed97的B×1×52×
 命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_joint_candidate --device cpu --output <new.json>`，必须先有H2声明的保存输入与本地许可资产。新输出同名NPZ保留完整人体和诊断，仅本地保存，不覆盖旧版本。新增9项测试含数值故障注入及真实SMPL-H/表面点反传；输入、shape head、translation head、velocity head及观测identity梯度有限非零，参数未更新，没有训练。全模块75测试、Ruff/AST通过；初次Ruff仅导入格式诊断已修正，原chumpy/scipy警告保留。独立NPZ/源输入/参数重建检查见architecture_h3_validation.json。
 
 H3完成的是接口组合；尚未证明shape可辨识、池化不偏、手姿正确、世界/地面恢复或实时性。下一阶段单独研究缺失帧历史状态和手部条件；六个原默认neutral SMPL路径/输入/评估仍为十篇完整方法缺口，不用此处SMPL-H候选解码冒充原方法补齐。
+
+## 2026-10-08 H4：原生手部条件、来源与离线/在线边界
+
+architecture_h4_protocol.json先锁定，新增hand_conditions.py、reproduction/check_hand_conditions.py及15项测试；本阶段不加学习分支、不训练、不重跑检测/拟合、不改变H3或原正式身体/手流程。来源为reference25/resolved_options.json指向的左右WiLoR JSONL、fit/wilor_mano_parameter_audit.json和H2 results_v3数组；全360帧0..359、物理pair1157..1516保留。官方WiLoR作为原生手信息的辅助来源，不增加十篇选定论文的完成计数。
+
+先复用原raw_side身体读取器，所有H2选中人物帧的float64 raw像素与H2逐位相同，再按原smplh_fitting/pipeline.py转float32后调用read_parameter_view。按原阈值检查原始鱼眼检测框与同侧身体腕点距离、候选歧义、元数据、15个局部SO(3)及检测框置信度；两相机的全部审计列表与原保存主线精确相同。不得以投影21点、弱透视相机或MANO β提供世界手位。原主线手来源接受与候选H2人物可用是独立层，先保存原状态，再相交，不改变原质量规则。
+
+原convert_record核对canonical-right约定、index/middle/pinky/ring/thumb顺序、parent_relative_rotmat、没有加mean和左crop镜像标记。左手转换M R M，M=diag(-1,1,1)，右手原样；不是M R，也不对已经转好的矩阵再次镜像。原15节点映射到SMPL-H左22..36/右37..51，父节点分别接腕20/21及各三节链。官方MANO wrapper的21点OpenPose重排只用于输出关节点，不能套到15个旋转上。审计资产与原主线相同；左右MANO rest镜像差0，但MANO/SMPL-H rest骨向差最大左11.57°/右7.07°，原45°只排明显轴/顺序错，不证明模型模板或精确局部基完全相同。
+
+接口NativeHandTokens要求B,T,V,2,15,3,3旋转和B,T,V,2框分数、显式解剖左右顺序、约定、bool视图可用和严格递增int64帧号；源/目标帧号必须相同。验证有源选择的SO(3)，即使候选视图随后被屏蔽。source_present为原weight>0，admitted为source_present与H2视图可用相交，present广播15节点。采用既有列拼接6D和同一框score形成B,T,V,2,15,7；框score只表示检测框，不伪装每关节置信度。缺失的token/local_rotation保留NaN，源的零权重identity不准入。两相机单独保存，不选更好者、不平均轴角/PCA、不补帧、不转移global_orient/β/weak-camera/投影2D。实际手部神经网络分支另立协议；当前H3生成器没有接收这些tokens。
+
+真实数据按“相机/解剖手”统计：左相机原接受左40/右356，候选准入左34/右328；右相机原接受左334/右33，候选准入左311/右33。原763个手/视图槽中706准入，57因H2视图人物不可用而保留源信息但不准入；共10590个15关节token。29个H2关联失败帧不赋予候选人物，3031个原严格接受点及全部拒绝状态不变。每只手各33帧有双视图同时准入；以这33帧×15关节的旋转角差作统计，左median11.43°/P95 25.58°、右13.11°/37.94°。这是交叉视图模型一致性，覆盖少且选中了特定可用帧，既不是三维真值误差，也不能推断单视图其余帧的准确性。
+
+逐帧token未来隔离：只改第120帧及以后的原生旋转，先前token差0。另从原pipeline AST提取并执行唯一shared_hand_pose分支initial赋值，不改写原公式。该PCA初始化按整段所有接受帧/视图加权，未来旋转扰动改变初值，具体系数变化见结果JSON；这是原有意离线处理，不是主线bug。后续共享手姿拟合也使用整段信息，不能以这份冻结结果充当在线输入。零权重保持原不可用，原PCA12/mean/scale与模型资产一致。
+
+结果v1失败保留：检查器先前把float64 body直接传原读取器，与原pipeline float32导致box_wrist_distance_px微差；只修检查器dtype，不放宽“完全相同”检查。v2/v3全部通过，27个非metadata数组在新进程重复逐位一致；独立读取原JSONL和审计选中record，对763个接受槽验证原native矩阵、M R M和框权重完全相同；6D重建相对float64源最大差2.98e-7。所有17个H2数组原样保存。15项测试涵盖缺失identity、视图分离、镜像及排除字段、错误语义/帧/掩码/旋转/tree、原读取器未来隔离、离线初始化依赖、旋转及score反传；无优化器。首轮两个fixture分别错用了confidence键和含side的PCA维度，已按原接口改正；Ruff五项dict风格问题修正。全模块90通过，10个既有chumpy/scipy warning保留；Ruff及35个Python文件AST通过，719个作者文件存在及字节数一致。详见architecture_h4_validation.json。
+
+复现命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_hand_conditions --output <new.json>`；必须提供未使用的新名字，输出同名NPZ。原始WiLoR、论文/作者文件、许可资产、大型数组留本地，不提交。下一阶段在独立候选中接入带视图/手/关节身份的原生手部条件，检查全缺失分支严格为零、时间因果性、梯度和算力；不以随机前向宣称手部改善，仍需完成原默认方法的许可/公共资源路径。

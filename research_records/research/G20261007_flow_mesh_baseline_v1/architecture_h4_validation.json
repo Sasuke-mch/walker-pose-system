@@ -1,0 +1,60 @@
+{
+  "status": "native_hand_source_and_causal_contract_verified",
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "tests": {
+    "tests": "90",
+    "failures": "0",
+    "errors": "0"
+  },
+  "new_hand_contract_cases": 15,
+  "linter": "uvx ruff all module passed",
+  "syntax_files_AST_checked": 35,
+  "source_arrays_preserved_fields": 17,
+  "fresh_process_repeat_equal_arrays_excluding_metadata": 27,
+  "independent_raw_record_native_rotation_and_box_score_checks": 763,
+  "admitted_hand_view_slots": 706,
+  "admitted_native_joint_tokens": 10590,
+  "masked_source_hand_view_slots_due_H2_view_unavailable": 57,
+  "rotation_roundtrip_against_float64_source_max_error": 2.980232238769531e-07,
+  "saved_tokens_masks_nodeIDs_box_confidence_missing_NaN_verified": true,
+  "future_prefix_difference": 0.0,
+  "source_default_mainline_audit_exact_parity": true,
+  "original_author_files_byte_sizes_unchanged": 719,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/pose_app/wilor_mano_prior.py",
+    "realtime_app/pose_app/smplh_fitting/pipeline.py"
+  ],
+  "results_files": [
+    "architecture_h4_results_v1.json",
+    "architecture_h4_results_v2.json",
+    "architecture_h4_results_v3.json"
+  ],
+  "first_failure": {
+    "result": "architecture_h4_results_v1.json",
+    "reason": "Mainline audit exact parity failed because harness used float64 raw body observations; original pipeline casts float32 before read_parameter_view. Corrected harness only; raw H2 float64 pixel comparison remains exact before cast."
+  },
+  "initial_unit_failures": {
+    "count": 2,
+    "reason": "Test fixtures used confidence instead of original detector_confidence and side-included PCA shape rather than original side-selected N,V,C shape. Corrected fixtures; original reader/initializer unchanged."
+  },
+  "initial_static_checks": "CUDA venv has no ruff; used existing uvx runner. First available Ruff found five dict-literal style diagnostics; corrected and full tests repeated.",
+  "gradient_test": "Native rotation and detector box score gradients finite nonzero, no optimizer; future tokens do not alter prefix.",
+  "warnings_retained": "10 existing chumpy/scipy deprecations in full tests; original pickle loader and SMPLH10-coefficient CLI notices retained.",
+  "limitations": [
+    "No learned hand branch or trained weights",
+    "Native rotations are model hypotheses, not physical truth",
+    "Box confidence is not a joint uncertainty estimate",
+    "Online token contract is separate from original intentional whole-video shared hand fit",
+    "MANO/SMPLH rest bones differ; gross axis gate is not precise basis equivalence",
+    "H3 existing null-frame GRU and prefix feature pooling unchanged",
+    "Default neutral-SMPL original-method resources remain unavailable"
+  ],
+  "unrelated_workspace_entries_at_start": 89
+}

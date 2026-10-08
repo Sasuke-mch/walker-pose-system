@@ -1,0 +1,6 @@
+{
+  "status": "native_hand_contract_failed",
+  "training_executed": false,
+  "error": "AssertionError: left",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_hand_conditions.py\", line 175, in main\n    result = run(args.output)\n             ^^^^^^^^^^^^^^^^\n  File \"D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh\\reproduction\\check_hand_conditions.py\", line 78, in run\n    assert audit == expected[f\"{side}_camera\"], side\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: left\n"
+}

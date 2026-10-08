@@ -81,3 +81,7 @@ S1已增加FMPose3D原Euler/flip-TTA/RPEA输入依赖、RiemannianFM原1000步�
 M1补齐P16原64³体素/V2V和原RANSAC完整前向，累计66项测试通过。`reproduction.run_multiview --kind volume --device cuda --output <new.json>`；RANSAC先不带兼容开关保留Python集合采样失败，再用`--kind ransac --python-set-compatibility`显式运行兼容版本。使用人工四相机针孔输入、随机权重，不是原数据性能复现。体素要求外部预测中心，并从batch相机重建投影；RANSAC原阈值为半欧氏距离，双目强制保留两视图，输出confidence全零占位，不能用来替换项目严格门。详见`architecture_multiview_validation.json`和研究记录M1节。
 
 H3在`candidate.py`组合H1/H2和原生成器，明确使用COCO17随机模型，不加载J22合成checkpoint。`reproduction.check_joint_candidate --device cpu --output <new.json>`完整运行既有360帧保存契约→52旋转→真实SMPL-H→COCO17表面回归。前7帧体型待校准及29个无观测帧保留不可用；内部推测另存diagnostic，原严格掩码/拒绝XYZ不作网络目标。K1/K8只改变共享shape读出；姿态与平移相同。新增9个契约/数值故障/梯度测试，全模块75通过。详见`architecture_h3_validation.json`；仅真实输入接线和随机结构，不是准确性或实时结果。
+
+H4新增`hand_conditions.py`和`reproduction.check_hand_conditions --output <new.json>`，按原WiLoR读取器复现360帧全部原生手姿选择及拒绝记录。左右镜像仍由原`convert_record`完成；输入为15个父相对旋转，不能以21个OpenPose投影点代替。保留两个相机的独立假设，6D列拼接加检测框置信度形成`B,T,V,2,15,7`条件。原零权重identity及H2人物不可用视图均保持missing/NaN；source-present与候选admitted分别保存。原主线763个接受手/视图槽中，候选准入706个、另外57个有源手姿但H2视图不可用。此阶段只增加类型明确的手部输入，没有把它接入生成器，没有改H3/正式主线。
+
+`architecture_h4_validation.json`记录763项原始记录的独立镜像/权重核对、17个H2字段原样保存、未来隔离及6D往返。新增15项测试，全模块90项通过，Ruff/AST通过。原共享PCA手姿初始化用整段视频，这是离线设计；新逐帧条件没有这种未来依赖。初次audit因检查器误用float64身体像素失败，保留v1，按原pipeline先精确核对raw像素再cast float32，v2/v3通过。双视图旋转分歧是模型一致性诊断，框置信度不是关节不确定性；不据此声明准确手形、抓握或实时部署。
