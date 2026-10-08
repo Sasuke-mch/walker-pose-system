@@ -1,0 +1,36 @@
+{
+  "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
+  "started": "2026-10-08",
+  "stage": "official_source_acquisition",
+  "training_allowed": false,
+  "mainline_frozen": "realtime_app/configs/current_mainline.json",
+  "automation_id": "automation",
+  "automation_status": "ACTIVE",
+  "source_root": "third_party/architecture_reproduction",
+  "evidence_levels": ["primary_method_and_implementation_read", "original_component_forward", "original_full_network_forward", "project_adapter_contract", "isolated_candidate_contract"],
+  "protocol": {
+    "inputs": "Existing primary texts P02/P03/P04/P05/P07/P09/P10/P12/P14/P16 and author repositories; explicit artificial tensors for untrained forward checks",
+    "control": "Keep the current FlowMesh and engineering mainline untouched; compare each original implementation with its own published configuration before project adaptation",
+    "variables": "One architecture/interface change per candidate; label reduced sizes, feature-only tests, alternate assets and compatibility patches explicitly",
+    "success": "For each of ten papers: method/code anchors, runnable original inference structure or explicitly unresolved resource failure, tensor/coordinate/representation contract, limitations; then verified isolated candidate revisions and architecture synthesis",
+    "checks": ["original model/config instantiation", "finite forward output and actual shapes", "declared joint topology and units", "rotation convention and SO(3) endpoints where relevant", "shared shape policy", "future-dependence and streaming state where applicable", "missing-observation semantics", "no download of weights during random initialization"],
+    "stopping_rules": "Stop only the affected test on absent assets/license or numerical failure; preserve evidence and continue independent papers. No training, no random-output accuracy claims, no frozen-mainline replacement, no redistributing external code/assets",
+    "scope_boundary": "Architecture reproduction is not replication of published trained performance. A component forward is not a full model forward; project adaptations remain separate from the original architecture. Do not mark the whole goal complete while any requested reproduction or architecture revision remains unresolved."
+  },
+  "papers": [
+    {"id":"P04","name":"ProHMR","repo":"nkolot/ProHMR","branch":"master","focus":"Separate probabilistic pose and deterministic shape; multiview fitting","status":"pending"},
+    {"id":"P05","name":"HuManiFlow","repo":"akashsengupta1997/HuManiFlow","branch":"main","focus":"Ancestor-conditioned SO(3) pose and shape distributions","status":"pending"},
+    {"id":"P07","name":"HMR2","repo":"shubham-goel/4D-Humans","branch":"main","focus":"Image tokens and iterative parameter queries","status":"pending"},
+    {"id":"P09","name":"VIBE","repo":"mkocabas/VIBE","branch":"master","focus":"Temporal feature encoder and shared clip shape; future dependence","status":"pending"},
+    {"id":"P10","name":"WHAM","repo":"yohanshin/WHAM","branch":"main","focus":"Causal body motion and separate world trajectory","status":"pending"},
+    {"id":"P12","name":"MotionBERT","repo":"Walter0807/MotionBERT","branch":"main","focus":"Separate spatial and temporal attention; mesh head","status":"pending"},
+    {"id":"P14","name":"MotionAGFormer","repo":"TaatiTeam/MotionAGFormer","branch":"master","focus":"Global attention and local spatial/temporal graph branches","status":"pending"},
+    {"id":"P03","name":"FMPose3D","repo":"AdaptiveMotorControlLab/FMPose3D","branch":"main","focus":"Conditional flow velocity and candidate aggregation","status":"pending"},
+    {"id":"P16","name":"LearnableTriangulation","repo":"karfly/learnable-triangulation-pytorch","branch":"master","focus":"Algebraic/volumetric calibrated view fusion; pinhole boundary","status":"pending"},
+    {"id":"P02","name":"RiemannianFM","repo":"facebookresearch/riemannian-fm","branch":"main","focus":"Manifold probability paths and tangent vector fields","status":"pending"}
+  ],
+  "next": "Acquire source/config/license snapshots with file provenance, then run original MotionAGFormer/MotionBERT/FMPose3D structures in isolated subprocesses before adopting a new spatial block",
+  "completed": [],
+  "failures": [],
+  "candidate_revisions": []
+}

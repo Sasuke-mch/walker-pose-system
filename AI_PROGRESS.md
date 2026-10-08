@@ -3752,3 +3752,7 @@ G20261007_flow_mesh_baseline_v1记录20篇卡片/横表/正文锚点及设计依
 按用户要求参考已下载论文图，实际查看ProHMR Fig3、FMPose3D Fig1、MotionAGFormer Fig2，核对model.py/train.py/body.py和1000步配置，新增draw_architecture.py，输出研究目录figures内中英文PNG/SVG/PDF及来源/边界检查JSON。原创重绘条件编码、52节点6D速度场、单向GRU、空间attention+可切换运动树图、8步Euler、形状与平移分支、真实SMPL-H解码及CFM训练；人体缩略图来自已有真实预测的6890顶点/13776面。图说明学习baseline，与reference25工程主线及Stage/地面/接触分开。
 
 两版PNG实际查看，配置与文字边界检查通过；初次Ruff两条风格问题修复后通过。只作图和记录，不训练、不推理、不修改核心/主线；原89条状态保留。原论文图副本留本地参考，不提交；本次只提交原创图、脚本和任务记录，不推送。
+
+### 2026-10-08 十篇架构复现长期任务：协议启动
+
+用户授权不训练地研究/复现十篇相似结构，再逐步改进隔离架构。选定P02/P03/P04/P05/P07/P09/P10/P12/P14/P16，协议与状态在G20261007_flow_mesh_baseline_v1/architecture_research.json。既有20篇阅读不算作者结构复现；随机初始化检查不算性能复现。正式reference25、原FlowMesh及资产不修改。已创建本聊天每小时heartbeat“人体架构复现”，本机automation.toml核实ACTIVE且target_thread_id为本聊天；早期缺destination调用失败后已正确建立。先完成来源/配置核对及作者原结构检查，才推进项目候选。
