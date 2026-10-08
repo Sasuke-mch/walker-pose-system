@@ -1,0 +1,36 @@
+{
+  "id": "R1",
+  "status": "protocol_locked_before_acquisition",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Acquire and validate exact public original auxiliary model resources; re-audit original full inference prerequisites without substituting licensed neutral models or original joint semantics",
+  "inputs": [
+    "Official HuManiFlow repository main/model_files/J_regressor_extra.npy, J_regressor_h36m.npy,cocoplus_regressor.npy identified in live official API tree and existing models/smpl.py",
+    "Official ProHMR fetch_data.sh data.tar.gz and HMR2 models/__init__.py hmr2_data.tar.gz; bounded stream/member inventory only for small auxiliary regressors andmeans",
+    "WHAM fetch_demo_data.sh auxiliary body_models GoogleDrive bundle; retained transport failures and bounded downloads ifavailable",
+    "Official repositories/defaultconfig/modelwrappers and prior architecture_full_path_resources_v1.json"
+  ],
+  "unique_variable": "Real public auxiliary files at their declared original locations; no change to author code, project conditions, inference architecture, licensed models or source selection",
+  "control": "Prior exact default resource inventory21missing; acquired file provenance/schema verified before explicit readiness re-audit. No other methods share assets merely because shapes/names match.",
+  "acquisition": "Only explicitly listed original regressors/mean arrays from primary sources. Standard TLS; boundedtime and transferredbytes; archive extraction selects allowlisted regular members, no extractall/symlinks/path traversal or model/checkpoint/dataset unpacking. Never overwriteexistingdifferentbytes. Keepfailedattempts andrecordurls/localpath/bytes/schema, nothashes.",
+  "validation": [
+    "Originaldeclaredregressor shape/float/finite against6890vertices; expectedHuManiFlow extra9,cocoplus19,H36M17; no COCO17 substitution and no forcednonnegativeweights",
+    "Originalmean keys/dims/6Dlayout checked againstreader source; no repackaging without originalschema evidence",
+    "Numeric linearity,translation response andgradient using explicitlyartificial6890vertex arrays; not originalmesh/accuracy or newqualitygate",
+    "Original resource inventorybefore/after withallmissingitems, separate source/candidate/modelroles; fullmethodnotpassedsolelybecausefilesexist",
+    "Author source719filesbytes andcore/mainline unchanged; ownfetch/safe-member/schema behavior tests andmodule tests/lint/AST"
+  ],
+  "outputs": [
+    "architecture_resources_results_v1.json",
+    "architecture_full_path_resources_v2.json",
+    "architecture_resources_validation.json"
+  ],
+  "limits": {
+    "per_raw_resource_bytes": 8388608,
+    "per_archive_stream_bytes": 16777216,
+    "request_timeout_seconds": 20,
+    "network_attempts_per_source": 2
+  },
+  "failure_stop": "Preserve HTTP/TLS/timeouts/bytecap/archive/schema failures; do not use third-party mirrors, credentials, unlicensedneutral downloads, fakedregressors, altereddefaultgender or existingprojectCocoregressor to manufacture fullmethods.",
+  "boundary": "Auxiliary-resource engineering and originaldefaultgap audit only; no training, learnedcheckpoint, datasetpreprocessing or physicalaccuracy/fullmethodperformance claim. Originalneutrallicense and fullinput/evaluation paths still separate."
+}

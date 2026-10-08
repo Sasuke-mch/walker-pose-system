@@ -72,3 +72,7 @@ H4执行记录：v1因检查器body dtype未按原pipeline转float32而与原审
 见`architecture_h5_protocol.json`。参考P07参数query读取独立条件memory的接口形式，项目候选使用30个手节点query及带相机/解剖节点身份的两视图native15旋转memory，同手cross-attention残差只加到对应手condition，随后复用原52节点生成器。明确不是原HMR2复现或训练结果。唯一变量为手部条件残差，body encoder/GRU/globalfeatures、β读出/冻结、平移、8步Euler和发布规则不变。没有手输入时跳过attention、贡献精确零并与H3对照；全部360帧、逐帧/分块、未来隔离、真实解码/梯度及限定CPU成本检查。原candidate只增加编码委托接口复用工作流，不复制状态逻辑；失败保留，不训练/替换主线。
 
 H5执行：v1运行器误取COCO回归矩阵一行而失败，已修运行器并保留；v2/v3通过。源17字段及H4来源照录，无手控制与旧H3参数逐位相同；β/T/hidden/发布规则不变，完整360与1/11/64分块、未来隔离、真实人体重建通过。新增23616参数，12项测试，全模块102/Ruff/AST通过。分支CPU中位0.650/0.754ms仅有限组件计时，不含检测/完整解码/Stage。随机姿态/网格变化不代表改进，详见IMPLEMENTATION.md及architecture_h5_validation.json；长期完整方法/资源和其他独立架构因素继续。
+
+### R1 原论文公共辅助资源预注册
+
+见`architecture_resources_protocol.json`。按官方仓库/资源脚本获取明确的原regressor/mean，检查形状、数值、单位响应和梯度，再重新核对六个默认人体路径的资源清单。只获取小型辅助文件，限制请求时间/字节，压缩包只读取allowlist常规成员，不展开模型/权重/数据集，不覆盖既有文件、不用同形同名或male/SMPL-H替代默认neutral。失败保留，原源码/core/主线不改。文件存在不代表完整方法或精度通过；许可模型和完整输入/评价仍单列。
