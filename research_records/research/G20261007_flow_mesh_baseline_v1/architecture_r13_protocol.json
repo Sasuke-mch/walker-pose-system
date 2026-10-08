@@ -1,0 +1,35 @@
+{
+  "id": "R13",
+  "status": "protocol_locked_before_execution",
+  "purpose": "Evidence-bounded ten-original/H1-H7 architecture synthesis and current beta/translation-to-flow dependency audit",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "network_requests_allowed": false,
+  "inputs": [
+    "Current R10 coverage plus R11/R12 and H7 result/evidence fields",
+    "Existing H2/H4 saved360 source conditions; dependency experiment first16frames0..15/pairs1157..1172 only",
+    "Original frozen ModelConfig J17/modelseed19/handseed29/noise97/K8/8Euler and unchanged H7"
+  ],
+  "control": "Same16featurebatch/condition/history/hands/noise/rawpose; compare savedH7prefix within existing2e-5",
+  "unique_variables": [
+    "Betaonly +0.25 onreadybeta; unchangedcondition/pose/T/noise",
+    "Translationonly +[0.1,-0.2,0.3]m; unchangedcondition/pose/beta/noise"
+  ],
+  "checks": [
+    "Samebatch state/rotations unchanged by betaonly or Tonly if sourcepass-through diagnosis holds",
+    "Autograd state endpoint wrtbeta absent vs actualSMPLH mesh beta gradient finite/nonzero; no optimizer or modelparametergrad",
+    "Actual SMPLH mesh responds to betaonly; Tonly movesvertices by knownvector within2e-5",
+    "No actual parameter/state_dict/core/source modifications; saved missingprefix NaN retained",
+    "Each architecture synthesis decision linked to actual evidence and retained counterexamples; distinguish contractselection from accuracy preference",
+    "Ten original coverage/gaps remain explicit; no wholegoalcompletion"
+  ],
+  "success": "Clarify current parameter coupling and coherent nextsinglefactor plan; derive synthesis from actual evidence not randomaccuracy",
+  "stop": "Retainfailures; do not train, loadweights, changegates, createindependenttruth or claim16counterfactual as newfull360validation",
+  "outputs": [
+    "architecture_r13_results_v1.json",
+    "architecture_r13_results_v1.npz",
+    "architecture_r13_validation.json",
+    "architecture_synthesis_v1.json"
+  ],
+  "boundary": "Dependency audit on16savedcondition frames, originalmethod/savedfull360evidence synthesis; no learnedaccuracy or defaultfullmethod upgrade."
+}
