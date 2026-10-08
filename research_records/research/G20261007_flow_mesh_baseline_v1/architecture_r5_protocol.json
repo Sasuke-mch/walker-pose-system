@@ -1,0 +1,29 @@
+{
+  "id": "R5",
+  "status": "protocol_locked_before_execution",
+  "purpose": "P04 exact original initialize and forward_step methods with explicit existing male SMPLLayer, 63 random plus zero mode",
+  "inputs": [
+    "Author ProHMR configs/prohmr.yaml, ResNet50, ConditionalGlow, originalR1mean/J19",
+    "Existing authorized models/smpl/basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+    "Artificial seed47 RGB1x3x224x224 and identity axis-angle SMPL labels for initialization diagnostics only"
+  ],
+  "unique_variable": "Extend P04 probability/head architecture through exact initialize+forward_step AST to originalbody/projection; alternate male separate from defaultneutral",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "controls": [
+    "Fresh initialized=False/image-only raises missing smpl_params without mutating parameters",
+    "Exact original initialization using artificial labels in eval mode; inspect topflag versus internalActNormflags/parameters",
+    "Same-seed 64sample repeat and mode first independent zero-latent head",
+    "Change only synthetic labels before original initializer, reset actual topbuffer toFalse; compare same-seed outputs and state",
+    "Independent sameasset mesh/J19/projection and savedCPU rebuild",
+    "One cropped RGB NaN output counts retained"
+  ],
+  "success": "Exact methods execute with explicit label dependency and no learned parameter changes, independent mesh/joint/projection error<2e-5; all failures retained",
+  "stop": "No train(), optimizer, backwards, author mutation, fake initialized=True bypass, label-as-observation accuracy claim or checkpoint/network",
+  "outputs": [
+    "architecture_r5_results_v1.json",
+    "architecture_r5_results_v1.npz",
+    "architecture_r5_validation.json"
+  ],
+  "boundary": "Exact author two methods AST subprocess harness, not Lightning initializer/renderer/neutral/default image-only coldstart or accuracy. Artificial labels test dependency only, not data-based ActNorm calibration."
+}
