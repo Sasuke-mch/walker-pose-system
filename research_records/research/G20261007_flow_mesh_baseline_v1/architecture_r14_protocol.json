@@ -1,0 +1,28 @@
+{
+  "id": "R14",
+  "status": "locked_before_execution",
+  "purpose": "Audit unchanged original P16 DLT missing-confidence and degenerate pinhole geometry behavior; no full network rerun",
+  "source": "third_party/architecture_reproduction/LearnableTriangulation/mvn/utils/multiview.py",
+  "scope": "Original NumPy and Torch point DLT and Torch batched DLT loaded directly from source; no source edits or facades",
+  "input": "Artificial float64 undistorted pinhole K focal384 principal192, parallel cameras centered x=-300,+300 millimetres, point[80,-40,3000]mm. Explicit confidence weights and missing/NaN variants. Never real fisheye coordinates.",
+  "controls": [
+    "two-view exact analytic reconstruction",
+    "confidence allones equals omitted",
+    "common positive confidence scaling invariant",
+    "negative-depth point",
+    "coincident cameras",
+    "zero confidence all/one",
+    "one/zero view",
+    "NaN point",
+    "NaN camera",
+    "NaN confidence",
+    "batch output dtype with float64 input"
+  ],
+  "success": "Analytic controls <=1e-7mm; all declared cases preserve numeric output classification or exact exception and warnings, including finite invalid outputs. Outcome not pre-assumed. Independent healthy two-ray analytic depth control.",
+  "stop": "No retry under patched source, no quality-gate reinterpretation, no model or checkpoint allocation",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "mainline_modified": false,
+  "network_requests": 0,
+  "boundary": "Small original geometry utility contract only; not full method, physical accuracy, confidence calibration or fish-eye compatibility."
+}
