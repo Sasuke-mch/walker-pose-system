@@ -159,6 +159,8 @@ def render():
     ax.text(2,1,"Added branches: hand conditions (H5), shared-shape calibration (H7), shape-to-pose coupling (H8).  Backbone and spatial flow blocks retained.",fontsize=8.5)
     for suffix in ("png","svg","pdf"):
         fig.savefig(OUT/f"architecture_comparison.{suffix}",dpi=240,facecolor="white")
+    svg = OUT / "architecture_comparison.svg"
+    svg.write_text("\n".join(line.rstrip() for line in svg.read_text(encoding="utf-8").splitlines()) + "\n", encoding="utf-8")
     plt.close(fig)
     print(str(OUT.resolve()))
 
