@@ -1,0 +1,33 @@
+{
+  "id": "H8",
+  "status": "protocol_locked_before_implementation",
+  "purpose": "Single-factor explicitsharedbeta condition into existing velocity features",
+  "training_allowed": false,
+  "checkpoint_allowed": false,
+  "mainline_modified": false,
+  "inputs": [
+    "UnchangedH2body360/COCO17 rawfisheyeconditions, H4nativehand inputs, H7 savedcontrol",
+    "Same model19/hand29/noise97/K8/8Euler; newconditioningseed127"
+  ],
+  "control": "SameH7 localshape/frozenmissing history; newwrapperbranchdisabled delegates original transport exactly",
+  "candidate": "Newbias-free Linear(10,width64) beta projection (640params) broadcast as additive condition residual over52queries before unchanged originalEuler transport. No perstep/head/solver/body rewrites. projection active only where originalshape_ready=True; unknownbetas remainNaN in outputs and givezero residual, not a validzero shape.",
+  "unique_variable": "Enabled versus disabled beta-conditioned velocityinput with identical originalweights/newbranchweights/inputs/noise. Sourcebeta estimate, body/hand conditions, GRU/T/shape heads/admission/publishing unchanged. Addedcapacity disclosed; not trained equalcapacityaccuracy experiment.",
+  "state_policy": "Feature/missing/conditioningenable state bound; changing policy requiresreset, originalshape/noise/hidden unchanged",
+  "checks": [
+    "Disabled exact savedH7 tensors/state; zerobeta neutraldelta originaltransport positivecontrol",
+    "Full360beta/T/hiddens/noise/sourcefields/admission/status unchanged; expected324/7/29 or retainactualrotationfailure withoutgatechanges",
+    "Full360whole/chunks1,11,64 within existing2e-5; future120 prefixexact; first7unchanged/noNaNpollution",
+    "Sameencodedcondition/noise betaonly intervention nowchanges finite endpoint with finite nonzero beta gradient; disable edge absent. Unknownprefix betagrad0",
+    "ActualSMPLH6890/13776 decode available outputs, unavailableNaN; independent savedparameter rebuild",
+    "Nativehand/source/rejected fields retained; no parameterupdates/no optimizer/weights; newbranch640params counted",
+    "Maskedunknownnan/inf ignored fordelta; declaredready nonfinite/dtype/mask/device mismatch reject; hooks/state reset contract unchanged"
+  ],
+  "success": "Explicit beta dependency and causal/missing/stream/mesh contracts verified without accuracy preference",
+  "stop": "Keepfailedversions and invalidrotations; no gate relaxation/smoothing/oldoutput mixtures, elapsedtimefeatures, source/mainline edits or training",
+  "outputs": [
+    "architecture_h8_results_v1.json",
+    "architecture_h8_results_v1.npz",
+    "architecture_h8_validation.json"
+  ],
+  "boundary": "Untrainedproject conditionalfeature adaptation inspired by P05 shapecontext and R13absentedge. Not originalHuManiFlow/HierarchicalSO3/FMF theory reproduction, noaccuracy/calibration/realtime claim."
+}
