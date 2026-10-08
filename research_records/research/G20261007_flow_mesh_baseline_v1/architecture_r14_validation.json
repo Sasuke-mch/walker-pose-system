@@ -1,0 +1,27 @@
+{
+  "status": "R14_original_DLT_contract_verified",
+  "results": "architecture_r14_results_v2.json",
+  "prior_result_retained": "architecture_r14_results_v1.json",
+  "results_before_after_lint_fix_exact": true,
+  "tests": {
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "full_suite_rerun": false,
+  "prior_full_suite": "H8 168 passed/21 warnings; historical regression evidence, not rerun this stage",
+  "Ruff": "whole learning_flow_mesh passed",
+  "AST_files": 68,
+  "source_presence_bytes": 638,
+  "author_source_content_comparison": false,
+  "frozen_paths_verified": 11,
+  "retained_lint_failure": "Six B023 loop-lambda binding diagnostics corrected with explicit default captures; synchronous numerical outputs identical before/after. No author edits.",
+  "original_exceptions_retained": "Original zero/one view IndexError, NaN input SVD failure are audited outcomes, not passing inference cases.",
+  "default_resource_gaps": 14,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "whole_goal_complete": false,
+  "boundary": "Original utility outputs/errors, artificial undistorted pinhole only. Finite result is not a valid geometry/visibility/quality decision. No author network or mainline gate changes."
+}

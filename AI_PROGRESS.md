@@ -4000,3 +4000,11 @@ architecture_h8_results_v1.json：完整360帧/pair1157..1516；关闭分支与�
 ### 2026-10-08 PMPose二维检测448帧视频
 
 使用V20260908_people0_1_2_pmpose_c3_chain/people_1的左右c3_predictions原始PMPose记录与input_448pairs正立图像，逐文件名核对0..447，生成G20261008_pmpose_2d448_video_v1/PMPose_2D_448frames.mp4。左右并排COCO17，阈值0.25仅控制显示颜色/连线，低分点灰色，所有帧与人员保留；无重新推理、平滑或插值。30fps、1216×1140、448帧完整解码通过，首尾叠加图视觉检查通过；Python编译/AST通过，Ruff两运行时不可用。OpenH264初始化警告后OpenCV后备编码成功。render_validation.json保存来源、输出及缺失/低分计数；视频属于二维检测显示。新增渲染工具与小型验证记录提交，大型视频及预览保留本地，其他工作区改动保留。
+
+### 2026-10-08 R14 作者DLT缺失置信度与退化几何审计
+
+按 architecture_r14_protocol.json，直接加载未改动P16 mvn/utils/multiview.py 原NumPy/Torch点DLT及batch函数；仅人工无畸变针孔、毫米float64，K焦距384/主点192、相机x=±300、点[80,-40,3000]。不分配作者网络、不加载权重、不访问网络。10组NumPy/Torch病例及1组batch dtype病例完整保存，NumPy没有confidence参数，其对应结果明确是无权重控制，不用于声称拒绝缺失置信度。
+
+健康Torch误差1.86446e-11mm，独立双射线视差深度公式误差4.54747e-13mm；省略/全1权重逐值相同，统一乘7误差9.09495e-13mm。全0置信度Torch返回有限[0,0,0]、无warning，实际投影却非有限；仅1有效视角或重合相机也可返回有限但不唯一的点，两SVD后端重合相机数值显著不同，不把具体坐标当稳定契约。负深度点被正常返回，无cheirality拒绝。0/1视角原函数IndexError，NaN点/相机/置信度触发原SVD异常，均保留而不填补。batch输入float64却输出float32。这里证明有限坐标不足以判定有效几何，不是物理精度，也不替换项目严格质量门或鱼眼模型。
+
+architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lambda变量绑定lint已以显式default capture修复，未改作者函数。独立双射线对照、零置信度反例与缺失/NaN异常3项targeted测试通过，全模块Ruff/68AST、638论文源存在/字节数与11冻结路径核对通过；没有全面源内容比较。H8的168测试/21warnings保留为上阶段证据，本阶段没有重跑完整套。见 architecture_r14_validation.json/architecture_r14_tests.xml。六项记录同步，14默认资源缺口及原完整路径待执行范围保留，长期目标未完成。

@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "H8_explicit_shared_beta_velocity_condition_verified_original_full_paths_pending",
+  "stage": "R14_original_DLT_missing_confidence_and_degenerate_geometry_audited_full_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -228,7 +228,8 @@
     "R11 primaryVIBEresource script verified; one boundedZIPsuffix request rejectedHTTP200 beforebodyread; persistentclaim/14gaps/158tests audited, not acquired",
     "R12 originalVIBETemporalEncoder16window/48reset-vs-carry/missing0NaN/future contract, 160tests; originalfullVIBEbody unexecuted",
     "R13 tenpaper/eightdecision evidence-linked synthesis, beta/T16frame intervention and autogradabsentflowedge/positiveSMPLHmeshgradient; no accuracyselection",
-    "H8 explicit sharedbeta velocity conditioning:640 added random parameters, disabledexactH7, full360/source/hand/stream/future/mesh/gradient verified;168tests21warnings,66AST"
+    "H8 explicit sharedbeta velocity conditioning:640 added random parameters, disabledexactH7, full360/source/hand/stream/future/mesh/gradient verified;168tests21warnings,66AST",
+    "R14 unchanged P16 NumPy/Torch DLT:10 paired cases and1batched dtype case, independent stereo controls, original failures retained;3 targetedtests/fullmoduleRuff/68AST"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -569,5 +570,12 @@
     "independent_rebuild": "architecture_h8_rebuild_v1.json",
     "status": "H8_beta_velocity_condition_contract_passed",
     "accuracy_preference_established": false
+  },
+  "R14": {
+    "protocol": "architecture_r14_protocol.json",
+    "results": "architecture_r14_results_v2.json",
+    "validation": "architecture_r14_validation.json",
+    "finite_output_implies_valid_geometry": false,
+    "whole_author_method_reproduced": false
   }
 }
