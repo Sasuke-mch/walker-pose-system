@@ -3995,3 +3995,8 @@ architecture_h8_results_v1.json：完整360帧/pair1157..1516；关闭分支与�
 独立进程读取saved NPZ核对原body/hand、未改字段和不可用NaN；重新由第7/359帧旋转、beta、T构建真实SMPLH，vertices最大误差2.384186e-7m，faces一致，见 architecture_h8_rebuild_v1.json。大型NPZ只留本地。实际全套168passed/21warnings，新8项测试；Ruff/66AST通过，638论文源文件存在/字节数及11冻结路径核对，源内容未作全面比对。首次7项targeted失败来自测试fixture引用不存在schema属性，改为显式COCO17后通过；首次import order lint已修正；失败描述与运行warning保留在 architecture_h8_validation.json。
 
 六项现有记录同步。本阶段不训练、不加载checkpoint、不改变冻结主线或证据等级；不存在精度胜者结论。14项默认资源缺口仍在，WHAM同源预算耗尽，VIBE剩1次需先有实际选择性访问证据。下一阶段继续原作者完整路径与未执行退化多视图/时序/流形契约；长期目标未完成。
+
+
+### 2026-10-08 PMPose二维检测448帧视频
+
+使用V20260908_people0_1_2_pmpose_c3_chain/people_1的左右c3_predictions原始PMPose记录与input_448pairs正立图像，逐文件名核对0..447，生成G20261008_pmpose_2d448_video_v1/PMPose_2D_448frames.mp4。左右并排COCO17，阈值0.25仅控制显示颜色/连线，低分点灰色，所有帧与人员保留；无重新推理、平滑或插值。30fps、1216×1140、448帧完整解码通过，首尾叠加图视觉检查通过；Python编译/AST通过，Ruff两运行时不可用。OpenH264初始化警告后OpenCV后备编码成功。render_validation.json保存来源、输出及缺失/低分计数；视频属于二维检测显示。新增渲染工具与小型验证记录提交，大型视频及预览保留本地，其他工作区改动保留。

@@ -1,0 +1,34 @@
+{
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1",
+  "images": "input_448pairs/{left_ccw90,right_cw90}/pair_0000.png..pair_0447.png",
+  "detections": "c3_predictions/{left,right}/pmpose/raw_predictions.json",
+  "coordinates": "saved upright model-input pixels; first 17 keypoints are COCO-17",
+  "output": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261008_pmpose_2d448_video_v1\\PMPose_2D_448frames.mp4",
+  "frames": 448,
+  "fps": 30.0,
+  "resolution": [
+    1216,
+    1140
+  ],
+  "score_display_threshold": 0.25,
+  "counts": {
+    "left": {
+      "people": 448,
+      "low_score": 2,
+      "unavailable": 75
+    },
+    "right": {
+      "people": 448,
+      "low_score": 0,
+      "unavailable": 9
+    }
+  },
+  "scope": "saved raw 2D detections; all frames/persons retained; low scores gray; no smoothing or interpolation",
+  "checks": {
+    "decoded_all_frames": true,
+    "first_last_visual_check": true,
+    "python_compile_and_ast": true,
+    "ruff": "unavailable in both runtimes",
+    "encoder": "OpenCV avc1 fallback succeeded; FFmpeg OpenH264 initialization warning retained here"
+  }
+}
