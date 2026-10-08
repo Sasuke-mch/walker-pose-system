@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R3_original_HuManiFlow_RGB_proxy_male_mesh_subpath_verified_original_missing_semantics_diagnosed_other_paths_pending",
+  "stage": "R10_ten_paper_coverage_provenance_audited_H7_shape_information_source_next_original_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -87,13 +87,16 @@
       "name": "VIBE",
       "repo": "mkocabas/VIBE",
       "branch": "master",
-      "focus": "Temporal feature encoder and shared clip shape; future dependence",
+      "focus": "Temporal feature encoder and per-frame shape regression; future dependence",
       "status": "original_component_forward_passed",
       "source_status": "source_archived",
       "source_file_count": 64,
       "local_source": "third_party/architecture_reproduction/VIBE",
       "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P09_v1.json",
-      "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration"
+      "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration R10 originalsource AST and paper3.1 establish perframe beta; previous clip-averaged-beta claim was incorrect. Full Regressor/body output remains unexecuted.",
+      "additional_checks": [
+        "architecture_r10_results_v1.json"
+      ]
     },
     {
       "id": "P10",
@@ -187,7 +190,7 @@
       ]
     }
   ],
-  "next": "Continue author original input/preprocessing and temporal/fullnetwork paths without unavailable assets; WHAM auxiliary source attempt budget exhausted. Neutraldefault/gender and originalregressor gaps remain. Do not relabel source components or alternate male methods as fullmethods.",
+  "next": "H7 preregister one-factor local-frame versus recurrent-history shape feature source, keeping K8/head/pose/state/noise/publication/gates fixed; continue distinct original resource and uncovered contracts afterward. Fourteen default prerequisites remain missing; no WHAM same-source retry or defaultneutral substitution.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -212,7 +215,14 @@
     "R1 seven exact auxiliary files locally verified, explicit unique archive completion and network budget protection, specific mean equivalence,124 tests;14 default gaps retained",
     "H6 original-vs-freeze missing GRU single factor, full360/null29/stream/future/native/mesh, duration blindness and135tests; no accuracy preference",
     "R2 user existing male SMPL original HuManiFlow library point/50sample mesh checked and independently rebuilt; CLI nonneutral rejection and14default gaps retained",
-    "R3 originalHRNetW48/74-115RGBproxy AST/50sharedshape samples/male mesh onfixedsavedframe0; zeroheatmap forced7/NaNmask/cropmutation audited;141tests"
+    "R3 originalHRNetW48/74-115RGBproxy AST/50sharedshape samples/male mesh onfixedsavedframe0; zeroheatmap forced7/NaNmask/cropmutation audited;141tests",
+    "R4 Original HMR2 full forward_step AST/ViTH/head/maleSMPL44joint projection and invalidcamera/missing probes",
+    "R5 Original ProHMR initialize/forward_step AST/64male meshes, coldstart/ActNorm/density validity diagnosed",
+    "R6 Original manifold density AST and analytic controls; exception finitezero/returntype failure retained",
+    "R7 One remaining WHAM officialsource attempt timedout; persistent budget exhausted;14default gaps unchanged",
+    "R8 Original MotionBERT global_lite/wild reader/inference AST; input/order/futurecrop/missing/pixeldepth boundaries",
+    "R9 MotionAGFormer defaultbase/full evaluation AST on syntheticreader; exactintermediate and original tail/perfecterror/units failures",
+    "R10 Ten explicit coverage rows and evidencefield links; corrected VIBE sharedbeta attribution and stale currentstage; H7 and originalpath gaps retained"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -233,7 +243,8 @@
     "M1 first Ruff:unused import/two unpacked variables and test import ordering; harness-only cleanup, final check passed.",
     "H3 first Ruff reported test import formatting only; corrected. No failed H3 forward or unit tests; original licensed-body deprecation notices retained.",
     "H4v1 harness used float64 body observations whereas original pipeline castsfloat32; retained failure and matched original dtype without relaxed audit. Initial two test fixture and Ruff style failures corrected; seeH4validation.",
-    "H5v1 runner mistakenly selectedrow0ofCOCO17 regressor matrix; correctedrunneronly, failurepreserved,v2/v3pass. Initial static type/import/nested-ifdiagnostics corrected; allbehaviorchecks passed."
+    "H5v1 runner mistakenly selectedrow0ofCOCO17 regressor matrix; correctedrunneronly, failurepreserved,v2/v3pass. Initial static type/import/nested-ifdiagnostics corrected; allbehaviorchecks passed.",
+    "R10 found stale stage/completed metadata throughR3 despiteR4-R9 executed; corrected current authority. Historical P09_v1/H1protocol clip-averaged VIBE beta claim unsupported by originalpaper3.1/code; retained historical files and explicit current correction."
   ],
   "candidate_revisions": [
     {
@@ -241,8 +252,8 @@
       "status": "isolated_structure_passed_not_mainline",
       "change": "Causal multi-frame shared shape calibration, explicit unavailable state until freeze",
       "sources": [
-        "P09 paper Section 3.1",
-        "P12 original model_mesh.py SMPLRegressor"
+        "P09 paper Section3.1 temporal features only, not shared beta",
+        "P12 original model_mesh.py SMPLRegressor temporal shape pooling; static reviewed, head not executed"
       ],
       "variable": "First-frame-only shape estimation versus masked prefix aggregation; freeze after calibration and keep all pose/flow parameters unchanged",
       "checks": [
@@ -256,7 +267,8 @@
       "protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h1_protocol.json",
       "implementation": "realtime_app/learning_flow_mesh/shared_shape.py",
       "results": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h1_results_v4.json",
-      "tests": 8
+      "tests": 8,
+      "source_correction": "R10 corrects original H1 preregistration/P09_v1 attribution without rewriting historical records. PrefixK8 causal freeze is project adaptation, not original VIBE/MotionBERT inference."
     },
     {
       "id": "H2",
@@ -495,5 +507,6 @@
     "full_original_evaluate_function_synthetic_executed": true,
     "authentic_H36M_dataset_evaluated": false,
     "tail_and_perfect_reference_failures_retained": true
-  }
+  },
+  "coverage_audit": "architecture_r10_results_v1.json"
 }

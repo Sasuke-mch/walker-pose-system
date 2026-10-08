@@ -1,0 +1,760 @@
+{
+  "id": "R10",
+  "status": "ten_paper_coverage_and_provenance_audit_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "papers": [
+    {
+      "id": "P04",
+      "name": "ProHMR",
+      "executed_scope": "full_probability_network_and_male_forward_step_AST",
+      "joint_rotation_coordinates": "24SMPL rotations;44 joints OpenPose25/J19; original camera projection checked, not camera calibration",
+      "missing_semantics": "NaN image poisons all meshes while64 logprob remain finite",
+      "temporal_shape_scope": "64 candidates share beta for one image; no temporal sharing/stream tested",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Default neutral SMPL",
+        "Original top-level initializer/data/detector/crop/fullCLI",
+        "Fresh image-only init requires labels; eval ActNorm not data initialized"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r5_results_v2.json",
+          "observed_fields": {
+            "output_shapes": {
+              "pred_cam": [
+                1,
+                64,
+                3
+              ],
+              "log_prob": [
+                1,
+                64
+              ],
+              "conditioning_feats": [
+                1,
+                2048
+              ],
+              "pred_pose_6d": [
+                1,
+                64,
+                144
+              ],
+              "pred_cam_t": [
+                1,
+                64,
+                3
+              ],
+              "pred_keypoints_3d": [
+                1,
+                64,
+                44,
+                3
+              ],
+              "pred_vertices": [
+                1,
+                64,
+                6890,
+                3
+              ],
+              "pred_keypoints_2d": [
+                1,
+                64,
+                44,
+                2
+              ],
+              "smpl_global_orient": [
+                64,
+                1,
+                3,
+                3
+              ],
+              "smpl_body_pose": [
+                64,
+                23,
+                3,
+                3
+              ],
+              "smpl_betas": [
+                64,
+                10
+              ],
+              "faces": [
+                13776,
+                3
+              ]
+            },
+            "joint_semantics": "25OpenPose plus19 regressions; not COCO17/SMPL-H52",
+            "rotation_check": {
+              "orthogonality_max_error": 3.416091203689575e-06,
+              "determinant_max_error": 3.5762786865234375e-07
+            },
+            "internal_actnorm_initialized": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "NaN_input_nonfinite_counts": {
+              "pred_cam": 192,
+              "log_prob": 0,
+              "conditioning_feats": 2048,
+              "pred_pose_6d": 9216,
+              "pred_cam_t": 192,
+              "pred_keypoints_3d": 8448,
+              "pred_vertices": 1322880,
+              "pred_keypoints_2d": 5632
+            },
+            "boundary": "Original initialize and forward_step AST methods executed with alternate male body. Eval-mode topflag changes but actual ActNorm remains uninitialized identity parameters; artificial labels test dependency only, no learned or data-calibrated density/accuracy. Original Lightning initializer/renderer/neutral path not run."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "name": "HuManiFlow",
+      "executed_scope": "full_probability_network_RGB_proxy_and_male_mesh_AST",
+      "joint_rotation_coordinates": "90 joint blocks retained; original HRNet17 proxy distinct from COCO17/SMPLH52; original SMPL rotations checked",
+      "missing_semantics": "Original zero/negative heatmaps forced7 visible; masked NaN survives",
+      "temporal_shape_scope": "50 candidates same image share beta in released image path; no video shared beta",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Default neutral SMPL",
+        "Original detector/renderer/fullpredict loop/CLI and evaluation"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r3_results_v1.json",
+          "observed_fields": {
+            "input_shape": [
+              3,
+              1920,
+              1080
+            ],
+            "source_lines": [
+              74,
+              115
+            ],
+            "sample_joints_shape": [
+              50,
+              90,
+              3
+            ],
+            "released_image_path_shared_shape_mode": true,
+            "input_semantics_probes": {
+              "gaussian_row_column_control_error": 0.0,
+              "asymmetric_argmax_exact": true,
+              "affine_pixel_control_error": 3.814697265625e-06,
+              "crop_mutates_bbox_height_for_aspect_ratio": true,
+              "zero_heatmap_argmax_xy": [
+                0,
+                0
+              ],
+              "zero_heatmap_confidence": 0,
+              "zero_or_negative_heatmap_forced_visible_head_shoulder_channels": 7,
+              "zero_heatmap_nonzero_gaussian_channels_after_original_mask": 7,
+              "masked_nan_joint_heatmap_remains_nan": true,
+              "boundary": "Original forced visibility and multiplication are not observation validity gates; no source fix or mainline adaptation"
+            },
+            "boundary": "Actual savedRGB through original random HRNet/proxy/flow to alternatemale library mesh; no human input/pose/uncertainty validity or fisheye accuracy claim"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P07",
+      "name": "HMR2",
+      "executed_scope": "full_ViTH_head_and_male_forward_step_AST",
+      "joint_rotation_coordinates": "24SMPL rotation/44 joint semantics; pinhole projection numerically checked, weak camera not metric truth",
+      "missing_semantics": "NaN image poisons mesh/joints/projection; finite invalid scale/depth diagnosed",
+      "temporal_shape_scope": "Single-image iterative beta; no clip sharing or stream execution",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Default neutral SMPL",
+        "Lightning initializer and original detector/crop/evaluation"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r4_results_v2.json",
+          "observed_fields": {
+            "output_shapes": {
+              "pred_cam": [
+                1,
+                3
+              ],
+              "pred_cam_t": [
+                1,
+                3
+              ],
+              "focal_length": [
+                1,
+                2
+              ],
+              "pred_keypoints_3d": [
+                1,
+                44,
+                3
+              ],
+              "pred_vertices": [
+                1,
+                6890,
+                3
+              ],
+              "pred_keypoints_2d": [
+                1,
+                44,
+                2
+              ],
+              "smpl_global_orient": [
+                1,
+                1,
+                3,
+                3
+              ],
+              "smpl_body_pose": [
+                1,
+                23,
+                3,
+                3
+              ],
+              "smpl_betas": [
+                1,
+                10
+              ],
+              "faces": [
+                13776,
+                3
+              ]
+            },
+            "joint_semantics": "25 OpenPose plus19 regressed joints; not COCO17 or SMPL-H52",
+            "rotation_check": {
+              "orthogonality_max_error": 1.7881393432617188e-07,
+              "determinant_max_error": 2.384185791015625e-07
+            },
+            "zero_negative_scale_projection_probes": [
+              {
+                "scale": 0.0,
+                "depth": 10000000000000.0,
+                "finite": true
+              },
+              {
+                "scale": -1.0,
+                "depth": -39.06250000015259,
+                "finite": true
+              }
+            ],
+            "boundary": "Exact original forward_step method via namespace/AST harness and alternate male SMPLLayer. No original initializer, detector/crop, neutral default, training, physical calibration or accuracy evaluation."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P09",
+      "name": "VIBE",
+      "executed_scope": "TemporalEncoder_component_only",
+      "joint_rotation_coordinates": "2048feature input/output; actual SMPL/joint/rotation/camera contract NOT executed",
+      "missing_semantics": "Original missing observation behavior NOT probed for complete VIBE",
+      "temporal_shape_scope": "Released one-way encoder future delta0; full streaming state untested. Perframe beta from static code, no temporal pool",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Three default mesh requirements missing",
+        "Full Regressor/VIBE mesh and image backbone path",
+        "Missing observation behavior and carryable stream state"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P09_v1.json",
+          "observed_fields": {
+            "constructor": {
+              "n_layers": 2,
+              "hidden_size": 1024,
+              "add_linear": true,
+              "bidirectional": false,
+              "use_residual": true
+            },
+            "input_shape": [
+              1,
+              16,
+              2048
+            ],
+            "output_shape": [
+              1,
+              16,
+              2048
+            ],
+            "official_config_past_change_when_future_changed": 0.0,
+            "paper_bidirectional_variant_past_change": 0.21360501646995544
+          }
+        }
+      ]
+    },
+    {
+      "id": "P10",
+      "name": "WHAM",
+      "executed_scope": "Network_constructor_and_motion_trajectory_components_only",
+      "joint_rotation_coordinates": "37feature→144 pose/10beta/root6D/velocity3; world-feet/mesh transform NOT executed",
+      "missing_semantics": "Original maskedNaN preprocessing checked; state duration/reset/long gaps unexecuted",
+      "temporal_shape_scope": "Components future delta0; perframe beta differs, no shared shape or full streaming state",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Four default mesh prerequisites missing; WHAM source budget exhausted",
+        "Image integrator/world motion feet and trajectory refiner fullforward",
+        "Full streaming state and reset/gap semantics"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P10_v1.json",
+          "observed_fields": {
+            "input_shape": [
+              1,
+              8,
+              37
+            ],
+            "pose_shape": [
+              1,
+              8,
+              144
+            ],
+            "beta_shape": [
+              1,
+              8,
+              10
+            ],
+            "root_shape": [
+              1,
+              9,
+              6
+            ],
+            "velocity_shape": [
+              1,
+              8,
+              3
+            ],
+            "past_pose_change": 0.0,
+            "same_sequence_beta_max_change": 0.0007227770984172821,
+            "masked_nan_cleaned_by_original_preprocess": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "P12",
+      "name": "MotionBERT",
+      "executed_scope": "full_pose_lifter_and_wild_AST_input_inference",
+      "joint_rotation_coordinates": "HALPE26→H36M17/pixel normalization restore tested; image-relative z NOT metric depth; mesh52 absent",
+      "missing_semantics": "Zero/negativeconf and NaN effects; IDs ignored, duplicatepeople become temporal records",
+      "temporal_shape_scope": "Future network and fullsequence crop dependencies observed; mesh shared beta only static source reviewed",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Four original mesh prerequisites missing",
+        "Full mesh/head runtime",
+        "Original detector/video/fullCLI and authentic dataset pipeline"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r8_results_v2.json",
+          "observed_fields": {
+            "clip_lengths": [
+              243,
+              5
+            ],
+            "independent_mapping_pixel_exact": true,
+            "future_fullsequence_crop_prefix_max_delta": 1.5810470581054688,
+            "zero_input_output_allfinite": true,
+            "NaN_network_nonfinite_output_values": 254,
+            "boundary": "Original default wild inference subpath engineering on synthetic HALPE26. Output scale equals imagepixels, not metricdepth, rootrelative skeleton or SMPL-H. Complete detector/videoCLI/neutralmesh/datasetaccuracy not executed. Sequencecrop uses future observations; originalparser is not identity/frame association."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P14",
+      "name": "MotionAGFormer",
+      "executed_scope": "full_base_pose_lifter_and_evaluate_AST",
+      "joint_rotation_coordinates": "H36M17, original reader affine and 2.5D label scale; acceleration perframe2, no FPS; not metric calibration",
+      "missing_semantics": "Zero confidence still outputs finite/nonzero; NaN propagates; original zero-error/tail failures retained",
+      "temporal_shape_scope": "Defaultbase future prefix dependency; pose-lifting has no beta",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Authentic reader fileIO/read2d/read3d and detector",
+        "Original full data inference/evaluation loop; no trained accuracy"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r9_results_v3.json",
+          "observed_fields": {
+            "layers": 16,
+            "parameters": 11723811,
+            "full_evaluator_TTA_root_denormalization_elementwise_exact": true,
+            "243_fullcoverage_failure": "IndexError: index 241 is out of bounds for axis 0 with size 241",
+            "perfect_reference_behavior": "AssertionError: MPJPE nan is not equal to mean of joint errors nan",
+            "acceleration_fps_normalization": false,
+            "future_prefix_network_max_delta": 3.3080577850341797e-06,
+            "boundary": "Original CLI-defaultBASE fullnetwork/full evaluation function on declared artificial references only; no authenticH36M/detector/video/weights or accuracy claim. Factor2.5D from dataset controls metric scale; acceleration second differences lackFPS despite printed mm/s². Original edge/perfect-error failures retained, not patched."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "name": "FMPose3D",
+      "executed_scope": "original_velocity_fullnetwork_sampling_aggregation",
+      "joint_rotation_coordinates": "H36M17 root-relative XYZ; RPEA requires external GT root, not calibrated deployment",
+      "missing_semantics": "One missing wrist poisons51 coordinates; no mask invented",
+      "temporal_shape_scope": "Single-frame velocity, not streaming; SMPL shape not applicable",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Original detector/data and camera-to-world inference loop",
+        "GT-root-free operational RPEA path remains unresolved"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_sampling_v4.json",
+          "observed_fields": {
+            "model_options": {
+              "channel": 512,
+              "d_hid": 1024,
+              "token_dim": 256,
+              "layers": 5,
+              "n_joints": 17
+            },
+            "released_default_steps": 3,
+            "flip_tta": {
+              "nfe": 6,
+              "independent_branch_noise": true,
+              "condition_flip_and_side_reindex_exact": true,
+              "fixed_seed_repeat_exact": true,
+              "output_shape": [
+                1,
+                1,
+                17,
+                3
+              ]
+            },
+            "single_missing_wrist_nonfinite_output_values": 51,
+            "rpea_dependency": {
+              "controlled_fixture": "Three unchanged root-relative 17-joint candidates; normalized pinhole camera and fixed 2D; only GT root z changes 1m to3m",
+              "functions": {
+                "hard_joint_selection": {
+                  "root_change_max_output_delta_m_fixture": 0.4,
+                  "nonroot_truth_change_max_output_delta": 0.0,
+                  "joint1_root_z1_result": [
+                    0.2,
+                    0.0,
+                    0.1
+                  ],
+                  "joint1_root_z3_result": [
+                    0.4,
+                    0.0,
+                    0.5
+                  ]
+                },
+                "topk3_rpea": {
+                  "root_change_max_output_delta_m_fixture": 0.2999931871849758,
+                  "nonroot_truth_change_max_output_delta": 0.0,
+                  "joint1_root_z1_result": [
+                    0.10000000000000003,
+                    0.0,
+                    0.2666666666666667
+                  ],
+                  "joint1_root_z3_result": [
+                    0.39999318718497584,
+                    0.0,
+                    0.4999892424715145
+                  ]
+                }
+              },
+              "optional_backward_probe": {
+                "status": "original_backward_failed",
+                "error": "one of the variables needed for gradient computation has been modified by an inplace operation: [torch.DoubleTensor [1, 3, 17]], which is output 0 of LinalgVectorNormBackward0, is at version 1; expected version 0 instead. Hint: enable anomaly detection to find the operation that failed to compute its gradient, with torch.autograd.set_detect_anomaly(True, check_nan=False).",
+                "required_for_eval_forward": false
+              },
+              "far_error_clamp_to_uniform_mean_max_difference": 5.551115123125783e-17,
+              "nan_root_still_returns_finite_pose": true,
+              "nan_root_to_uniform_mean_max_difference": 1.3877787807814457e-17,
+              "camera_projection_function": "project_to_2d",
+              "docstring_shape_only_claim_contradicted": true,
+              "boundary": "Controlled dependency probe, not pose error/accuracy; root is actual function input, cannot replace it silently for project deployment"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "P16",
+      "name": "LearnableTriangulation",
+      "executed_scope": "full_algebraic_volumetric_ransac_networks_artificial_cameras",
+      "joint_rotation_coordinates": "Pinhole projection and mm volume/center; MPII predicted pelvis6; incompatible raw fisheye geometry",
+      "missing_semantics": "Missingcenter failure, inputP ignored for actual batchcameras, dualview forcedinliers; no project quality gate",
+      "temporal_shape_scope": "Perframe multiview; shape/video stream not applicable",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Original detector/data and pelvis center estimator",
+        "Explicit fisheye adapter isolated from strict mainline",
+        "Missing view/camera and degenerate geometry contract broader than current probes"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_v1.json",
+          "observed_fields": {
+            "input_shape": [
+              1,
+              2,
+              3,
+              384,
+              384
+            ],
+            "xyz_shape": [
+              1,
+              17,
+              3
+            ],
+            "exact_geometry_control_max_error_m": 9.5367431640625e-07
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_volumetric_v2.json",
+          "observed_fields": {
+            "output_shapes": [
+              [
+                1,
+                17,
+                3
+              ],
+              [
+                1,
+                4,
+                32,
+                96,
+                96
+              ],
+              [
+                1,
+                17,
+                64,
+                64,
+                64
+              ],
+              null,
+              null,
+              [
+                1,
+                64,
+                64,
+                64,
+                3
+              ],
+              [
+                1,
+                3
+              ]
+            ],
+            "actual_geometry_source": "batch cameras, resized deep copies",
+            "missing_predicted_center_error": "'pred_keypoints_3d'"
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_ransac_v2.json",
+          "observed_fields": {
+            "coverage": "Original ResNet152/argmax/CPU RANSAC/SciPy direct refinement full forward; no original detector/data/checkpoints, no project strict mask"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "name": "RiemannianFM",
+      "executed_scope": "sphere_network_sampling_density_AST",
+      "joint_rotation_coordinates": "S2 ambient3, unit sphere; not human joints/SO3 or metric XYZ",
+      "missing_semantics": "NaN and caught-exception finite-zero density failure observed; no observation mask",
+      "temporal_shape_scope": "1000step ODE time is flow time; video causality/shape not applicable",
+      "original_default_whole_method_complete": false,
+      "remaining": [
+        "Original volcano input loader and Lightning/EMA initialization",
+        "Other manifold/human SO3 adaptation is not yet executed"
+      ],
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_sampling_v1.json",
+          "observed_fields": {
+            "trajectory_shape": [
+              1001,
+              4,
+              3
+            ],
+            "last_only_nfe": 1000
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r6_results_v3.json",
+          "observed_fields": {
+            "status": "R6_original_sphere_density_verified",
+            "boundary": "Original SphereS2 likelihood method and exact divergence executed with projectedEuler1000 and randomconfigured network. Function returns logdensity despite negative-loglikelihood docstring. Exception fallback finitezero logdensity/exponentiated density1 is invalid evidence; not dataset likelihood or humanSO3."
+          }
+        }
+      ]
+    }
+  ],
+  "source_static_checks": {
+    "VIBE_forward": {
+      "file": "third_party\\architecture_reproduction\\VIBE\\lib\\models\\vibe.py",
+      "lines": [
+        102,
+        117
+      ],
+      "fact": "Temporal features flattened B*T, perframe Regressor; no clip beta averaging in this method"
+    },
+    "VIBE_Regressor": {
+      "file": "third_party\\architecture_reproduction\\VIBE\\lib\\models\\spin.py",
+      "lines": [
+        242,
+        293
+      ],
+      "fact": "Perframe iterative decshape residual updates; no cross-time shape pool"
+    },
+    "MotionBERT_SMPLRegressor": {
+      "file": "third_party\\architecture_reproduction\\MotionBERT\\lib\\model\\model_mesh.py",
+      "lines": [
+        37,
+        80
+      ],
+      "fact": "Temporal feature average then one beta per sequence expanded acrossT; static code only, head not executed"
+    },
+    "P09_paper_anchor": {
+      "file": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\sources\\P09.txt",
+      "lines": [
+        147,
+        150
+      ],
+      "fact": "Section3.1 describes corresponding pose/shape in each frame and T regressors; does not establish clip-averaged beta"
+    },
+    "historical_incorrect_claims_retained": [
+      "architecture_checks/P09_v1.json.unresolved[1]",
+      "architecture_h1_protocol.json.source_basis[0]"
+    ],
+    "current_correction": "P09 supports temporal features, not clip-averaged beta. H1 prefixK8 freeze is project design informed by MotionBERT pooling; it is not either author original inference."
+  },
+  "default_missing_requirements": [
+    {
+      "id": "P04",
+      "path": "third_party/architecture_reproduction/ProHMR/data/smpl/SMPL_NEUTRAL.pkl",
+      "role": "released neutral SMPL"
+    },
+    {
+      "id": "P07",
+      "path": "C:/Users/毛晨昊/.cache/4DHumans/data/smpl/SMPL_NEUTRAL.pkl",
+      "role": "released neutral SMPL in configured user cache"
+    },
+    {
+      "id": "P05",
+      "path": "third_party/architecture_reproduction/HuManiFlow/model_files/smpl/SMPL_NEUTRAL.pkl",
+      "role": "default neutral SMPL; CLI gender alternatives do not reproduce default"
+    },
+    {
+      "id": "P09",
+      "path": "third_party/architecture_reproduction/VIBE/data/vibe_data/SMPL_NEUTRAL.pkl",
+      "role": "default smplx.SMPL neutral model"
+    },
+    {
+      "id": "P09",
+      "path": "third_party/architecture_reproduction/VIBE/data/vibe_data/J_regressor_extra.npy",
+      "role": "extra joints for original 49-point output"
+    },
+    {
+      "id": "P09",
+      "path": "third_party/architecture_reproduction/VIBE/data/vibe_data/smpl_mean_params.npz",
+      "role": "original iterative initialization"
+    },
+    {
+      "id": "P10",
+      "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/smpl/SMPL_NEUTRAL.pkl",
+      "role": "build_body_model default neutral model"
+    },
+    {
+      "id": "P10",
+      "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/J_regressor_wham.npy",
+      "role": "WHAM COCO/extended landmarks"
+    },
+    {
+      "id": "P10",
+      "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/J_regressor_h36m.npy",
+      "role": "evaluation joints"
+    },
+    {
+      "id": "P10",
+      "path": "third_party/architecture_reproduction/WHAM/dataset/body_models/J_regressor_feet.npy",
+      "role": "original foot geometry for trajectory/refinement"
+    },
+    {
+      "id": "P12",
+      "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/SMPL_NEUTRAL.pkl",
+      "role": "default neutral SMPL explicitly required in mesh documentation"
+    },
+    {
+      "id": "P12",
+      "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/J_regressor_extra.npy",
+      "role": "extra landmark joints"
+    },
+    {
+      "id": "P12",
+      "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/J_regressor_h36m_correct.npy",
+      "role": "specific corrected H36M regressor, not arbitrary COCO17"
+    },
+    {
+      "id": "P12",
+      "path": "third_party/architecture_reproduction/MotionBERT/data/mesh/smpl_mean_params.npz",
+      "role": "original mesh-head initialization"
+    }
+  ],
+  "resource_inventory_drift": [],
+  "paper_source_presence_byte_checks": 638,
+  "author_content_comparison": false,
+  "frozen_paths_equal_current_HEAD": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/learning_flow_mesh/missing_history.py",
+    "realtime_app/pose_app/wilor_mano_prior.py"
+  ],
+  "candidate_gaps": [
+    {
+      "id": "H1/H6",
+      "remaining": "Shape pool averages recurrent history summaries; early information may be counted repeatedly. Local frame features versus history summaries remains an unexecuted one-factor audit."
+    },
+    {
+      "id": "H6",
+      "remaining": "Freeze compresses observation time; no elapsed-time encoding. Do not infer physically correct motion across gaps."
+    },
+    {
+      "id": "H1-H6",
+      "remaining": "Eager hooks not concurrent/compiled deployment; engineering contracts only, no independent shape/pose accuracy."
+    }
+  ],
+  "next_priorities": [
+    {
+      "stage": "H7",
+      "action": "Preregister and execute original local-frame versus recurrent-history shape feature source, hold K8/head/pose/state/noise/gates fixed. Check gradients/information attribution and full360stream controls; no accuracy selection."
+    },
+    {
+      "stage": "Original resource paths",
+      "action": "Keep14 default gaps. Neutral requires legitimate neutralSMPL; VIBE and MotionBERT official auxiliary sources may be investigated under distinct budgets. WHAM same-source retries prohibited."
+    },
+    {
+      "stage": "Original uncovered semantics",
+      "action": "VIBE missing/stream state, WHAM fullbody/refiner when assets exist, MotionBERT mesh/runtime, P16 missing/degenerateview contracts remain explicit."
+    },
+    {
+      "stage": "Final synthesis",
+      "action": "Compare executed original coverage and candidate ablations; no overall completion while reproduction/revision requirements unresolved."
+    }
+  ],
+  "boundary": "Local provenance/coverage audit of existing artifacts and static code. No model rerun or dataset truth. Default wholemethod completion remains false for allten; missing trainedperformance is outside no-training scope, while required architecture paths are still tracked."
+}

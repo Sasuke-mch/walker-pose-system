@@ -1,0 +1,35 @@
+{
+  "status": "R10_coverage_record_correction_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "protocol": "architecture_r10_protocol.json",
+  "result": "architecture_r10_results_v1.json",
+  "paper_rows": 10,
+  "default_resource_gaps": 14,
+  "paper_source_presence_bytes": 638,
+  "author_content_comparison": false,
+  "frozen_paths": 11,
+  "original_AST_method_checks": 4,
+  "model_forward_executed_this_stage": false,
+  "previous_regression_evidence": {
+    "source": "architecture_r9_validation.json",
+    "tests": 149,
+    "warnings": 18,
+    "rerun_this_stage": false
+  },
+  "historical_protocol_and_results_overwritten": false,
+  "current_records_synced": 6,
+  "scope": "Provenance/coverage records correction; originalpaths/candidate gaps unresolved; no defaultwholemethod upgrade",
+  "checks": [
+    "Unique paper IDs",
+    "All evidence files and observed keys parse",
+    "All14 current unavailable paths matchpriorinventory",
+    "Manifest paperfiles presence/bytes",
+    "Frozenpaths normalizednewline contents matchcurrentHEAD",
+    "OriginalVIBE/Regressor/MotionBERTAST assertions",
+    "No NaN/Infinity in new strictJSON",
+    "Six authorityrecords includeR10marker"
+  ]
+}
