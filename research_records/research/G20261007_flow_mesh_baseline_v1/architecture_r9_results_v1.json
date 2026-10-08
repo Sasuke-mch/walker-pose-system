@@ -1,0 +1,51 @@
+{
+  "status": "R9_original_base_evaluation_contract_verified",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "config": "third_party\\architecture_reproduction\\MotionAGFormer\\configs\\h36m\\MotionAGFormer-base.yaml",
+  "layers": 16,
+  "frames": 243,
+  "parameters": 11723811,
+  "source_evaluate_lines": [
+    93,
+    221
+  ],
+  "synthetic_reader_initialization": "Exact original class/methods, __new__ skips fileIO; explicit synthetic dt_dataset and one clip split caches",
+  "243_fullcoverage_failure": "IndexError: index 241 is out of bounds for axis 0 with size 241",
+  "245_total_one243clip_execution": true,
+  "uncovered_tail_frames": [
+    243,
+    244
+  ],
+  "independent_residuals": {
+    "mean_joint_error": 0.0,
+    "per_joint_error": 1.7053025658242404e-13,
+    "acceleration_aggregation": 2.7566784410737455e-09,
+    "Procrustes_independent_scipy": 5.669105007655162e-08
+  },
+  "pixel_denormalize_error": 0.0,
+  "synthetic_reference_diagnostics": {
+    "factor1": [
+      219.47397928298375,
+      72.20325376104104,
+      257.3205742324425
+    ],
+    "factor2": [
+      408.92130549743183,
+      72.20325376104104,
+      268.8048663801152
+    ]
+  },
+  "acceleration_original_tail_zero_count": 2,
+  "acceleration_fps_normalization": false,
+  "perfect_reference_behavior": "AssertionError: MPJPE nan is not equal to mean of joint errors nan",
+  "perfect_reference_stdout_stderr": "[INFO] Evaluation\nD:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\numpy\\core\\fromnumeric.py:3504: RuntimeWarning: Mean of empty slice.\n  return _methods._mean(a, axis=axis, dtype=dtype,\nD:\\my_works\\walker_pose_system\\.venv-cuda\\Lib\\site-packages\\numpy\\core\\_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide\n  ret = ret.dtype.type(ret / rcount)\n",
+  "evaluation_stdout": "[INFO] Evaluation\n[INFO] Evaluation\nProtocol #1 Error (MPJPE): 219.47397928298375 mm\nAcceleration error: 257.3205742324425 mm/s^2\nProtocol #2 Error (P-MPJPE): 72.20325376104104 mm\n----------\n[INFO] Evaluation\nProtocol #1 Error (MPJPE): 408.92130549743183 mm\nAcceleration error: 268.8048663801152 mm/s^2\nProtocol #2 Error (P-MPJPE): 72.20325376104104 mm\n----------\n",
+  "repeat_exact": true,
+  "state_dict_unchanged": true,
+  "future_prefix_network_max_delta": 3.3080577850341797e-06,
+  "zero_conf_output_finite": true,
+  "zero_conf_output_nonzero_count": 12393,
+  "NaN_output_nonfinite_count": 12393,
+  "boundary": "Original CLI-defaultBASE fullnetwork/full evaluation function on declared artificial references only; no authenticH36M/detector/video/weights or accuracy claim. Factor2.5D from dataset controls metric scale; acceleration second differences lackFPS despite printed mm/s². Original edge/perfect-error failures retained, not patched."
+}

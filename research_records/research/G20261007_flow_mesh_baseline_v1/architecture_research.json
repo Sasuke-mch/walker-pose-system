@@ -135,7 +135,10 @@
       "source_file_count": 63,
       "local_source": "third_party/architecture_reproduction/MotionAGFormer",
       "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P14_v1.json",
-      "coverage": "Original pose-lifting network (P12/P14) or velocity network (P03); mesh heads, image detectors, learned accuracy and full evaluation pipelines are not covered"
+      "coverage": "Original publishedxsmall plus actualCLI-defaultbase16layers/243frames/fullfactory/full evaluationfunction on declaredsyntheticreader/reference, originaldenormalize/TTA/root/metrics and boundaryfailures audited. No actualdatasetfileIO/read2d/read3d/trainedaccuracy or detector/SMPL-H.",
+      "additional_checks": [
+        "architecture_r9_results_v3.json"
+      ]
     },
     {
       "id": "P03",
@@ -483,5 +486,14 @@
     "real_detector_video_cli_executed": false,
     "mesh_path_completed": false,
     "sequencecrop_causal": false
+  },
+  "R9": {
+    "protocol": "architecture_r9_protocol.json",
+    "results": "architecture_r9_results_v3.json",
+    "validation": "architecture_r9_validation.json",
+    "original_defaultbase_executed": true,
+    "full_original_evaluate_function_synthetic_executed": true,
+    "authentic_H36M_dataset_evaluated": false,
+    "tail_and_perfect_reference_failures_retained": true
   }
 }
