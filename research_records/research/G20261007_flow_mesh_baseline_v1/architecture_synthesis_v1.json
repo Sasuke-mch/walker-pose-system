@@ -1,0 +1,607 @@
+{
+  "status": "R13_architecture_synthesis_with_verified_dependency",
+  "whole_goal_complete": false,
+  "training_executed_this_stage": false,
+  "checkpoint_loaded_this_stage": false,
+  "mainline_changed": false,
+  "papers_current_coverage": [
+    {
+      "id": "P04",
+      "name": "ProHMR",
+      "coverage": "Original ResNet50/ConditionalGlow density and exact initialize+forward_step AST methods64samples/male SMPL44joints/projection; fresh image-only inference requires SMPL labels, eval topflag not dataActNorm initialization. Neutral/default initializer/renderer/evaluation incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P04_v4.json",
+      "additional_checks": [
+        "architecture_r5_results_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P05",
+      "name": "HuManiFlow",
+      "coverage": "Original HRNetW48 RGB crop/Canny/18proxy AST-to-HuManiFlow point/50shared-shape samples and alternatemaleSMPL90joints library mesh, plus original density; originaldetector/defaultneutral/renderer/CLI/fullinputloop/evaluation remain incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P05_v3.json",
+      "additional_checks": [
+        "architecture_r2_results_v1.json",
+        "architecture_r3_results_v1.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P07",
+      "name": "HMR2",
+      "coverage": "Original full forward_step AST method, ViT-H/16/head/male SMPLLayer44joints/projection; defaultneutral, Lightning initializer, original detector/crop/evaluation remain incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P07_v3.json",
+      "additional_checks": [
+        "architecture_r4_results_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P09",
+      "name": "VIBE",
+      "coverage": "Original TemporalEncoder only, exact AST class, not complete VIBE/SMPL; bidirectional diagnostic explicitly differs from released configuration R10 originalsource AST and paper3.1 establish perframe beta; previous clip-averaged-beta claim was incorrect. Full Regressor/body output remains unexecuted. R12 originaldefaultTemporalEncoder zero/NaN/future and resetwindows versus explicitcarryGRU audit; carried hook is projectdiagnostic, native forward has no hidden/mask/frameID API. Fullbody still not executed.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P09_v1.json",
+      "additional_checks": [
+        "architecture_r10_results_v1.json",
+        "architecture_r12_results_v1.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P10",
+      "name": "WHAM",
+      "coverage": "Original full Network constructor without body asset, plus original motion encoder, motion decoder, trajectory decoder and missing-point preprocessing. No SMPL mesh/global-feet/refiner execution",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P10_v1.json",
+      "additional_checks": [],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P12",
+      "name": "MotionBERT",
+      "coverage": "Original fullsize pose-lifting network plus originalwild CLI-defaultglobal_lite factory, HALPE26reader,243+5clips, flipTTA/root/image-relative coordinate restoration AST subpath. Sequencecrop usesfuture; readerignoresimageids; meshhead/resources, realdetector/videoCLI and datasetaccuracy incomplete.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P12_v1.json",
+      "additional_checks": [
+        "architecture_r8_results_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P14",
+      "name": "MotionAGFormer",
+      "coverage": "Original publishedxsmall plus actualCLI-defaultbase16layers/243frames/fullfactory/full evaluationfunction on declaredsyntheticreader/reference, originaldenormalize/TTA/root/metrics and boundaryfailures audited. No actualdatasetfileIO/read2d/read3d/trainedaccuracy or detector/SMPL-H.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P14_v1.json",
+      "additional_checks": [
+        "architecture_r9_results_v3.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P03",
+      "name": "FMPose3D",
+      "coverage": "Original published human velocity network, Euler and exact single-frame flip-TTA method, RPEA input dependency probes; original RPEA evaluation requires GT root. No trained dataset/video/detector/SMPL-H path.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_sampling_v4.json",
+      "additional_checks": [],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P16",
+      "name": "LearnableTriangulation",
+      "coverage": "Original algebraic network, full64cubed volumetric/V2V forward with artificial predicted pelvis, original RANSAC/direct-refinement forward with explicit module-local Python-set compatibility. No original data/checkpoint/center estimator, fisheye adaptation or project strict quality mask.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_v1.json",
+      "additional_checks": [
+        "architecture_checks/P16_volumetric_v2.json",
+        "architecture_checks/P16_ransac_v2.json"
+      ],
+      "default_whole_method_complete": false
+    },
+    {
+      "id": "P02",
+      "name": "RiemannianFM",
+      "coverage": "Original Sphere geodesic/tangent loss and published1000step sample/sample_all plus exactdivergence compute_exact_loglikelihood AST with ProductManifold integration and analytic density controls; exception fallbackfinitezero/returntype failure retained. Originalvolcano dataset, Lightning/EMAinitializer and humanSO3 not executed.",
+      "primary_check": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_sampling_v1.json",
+      "additional_checks": [
+        "architecture_r6_results_v3.json"
+      ],
+      "default_whole_method_complete": false
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1_input_geometry",
+      "contract_choice": "Retain explicit rawfisheye camera rays/COCO17 observations; keep17surface observations separate from52rotation queries",
+      "basis": "H2 measured adapters and frozenstrict mask; P16 original cameras arepinhole and volume center is separateinput",
+      "counterexamples_or_limits": "P16 actualbatch camera overrides passedprojection; dualview RANSAC forcedinliers and predicts confidence cannot replace strictgate",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_v1.json",
+          "observed_fields": {
+            "input_shape": [
+              1,
+              2,
+              3,
+              384,
+              384
+            ],
+            "exact_geometry_control_max_error_m": 9.5367431640625e-07
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P16_volumetric_v2.json",
+          "observed_fields": {
+            "actual_geometry_source": "batch cameras, resized deep copies",
+            "missing_predicted_center_error": "'pred_keypoints_3d'"
+          }
+        }
+      ]
+    },
+    {
+      "id": "D2_shared_shape",
+      "contract_choice": "Use H7 localfeature-prefixK8 and explicitunavailable/freeze as an isolatedcontract candidate, keepH6history alternativecontrol",
+      "basis": "Avoid recurrent reuse of earlier nonadmittedshape observations; original MotionBERT temporalpool is static sourcebasis, VIBE isperframebeta",
+      "counterexamples_or_limits": "K8 not observability; local does not mean statisticallyindependent; frozenbeta not demonstrated accurate",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h7_results_v1.json",
+          "observed_fields": {
+            "controlled_gradient_attribution": {
+              "local_gradient_l1_by_frame": [
+                0.0,
+                0.0,
+                0.5419955253601074,
+                0.5419955253601074,
+                0.5419955253601074,
+                0.5419955253601074,
+                0.5419955253601074,
+                0.5419955253601074,
+                0.5419955253601074,
+                0.5419955253601074
+              ],
+              "history_gradient_l1_by_frame": [
+                0.05073542520403862,
+                0.07223084568977356,
+                0.17931504547595978,
+                0.14590099453926086,
+                0.13375693559646606,
+                0.18127107620239258,
+                0.13925307989120483,
+                0.1276477873325348,
+                0.1153261661529541,
+                0.07445777207612991
+              ],
+              "nonadmitted_early_local_beta_delta": 0.0,
+              "nonadmitted_early_history_beta_delta": 0.021306395530700684,
+              "fixture": "Two observed but unadmitted frames, followed by eight admitted; gradient norm is sensitivity, not statistical information/accuracy"
+            },
+            "status_counts": {
+              "available": 324,
+              "calibration_pending": 7,
+              "no_current_observation": 29,
+              "invalid_rotation": 0,
+              "nonfinite_parameters": 0
+            },
+            "local_vs_history_all_nonbeta_tensors_exact": {
+              "rotations": 0.0,
+              "translation_m": 0.0,
+              "raw_rotations_diagnostic": 0.0,
+              "raw_translation_diagnostic_m": 0.0,
+              "raw_state_diagnostic": 0.0
+            }
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r12_results_v1.json",
+          "observed_fields": {
+            "native_hidden_mask_frameID_API": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "D3_temporal_state",
+      "contract_choice": "Keep originalonewayGRU with explicitcarried state; H6freeze is an experimental missingpolicy with limits",
+      "basis": "VIBE nativewindows reset; full48 versus carryadapter exact. H6null29 freezes instead ofbiasdrift",
+      "counterexamples_or_limits": "Freeze ignores physicalelapsedtime, missinglonggaps observations compressed; scopedhooks not concurrent/exportdeployment",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r12_results_v1.json",
+          "observed_fields": {
+            "reset_windows_later_delta": 0.0356447696685791,
+            "explicit_carry_vs_whole_max_error": 0.0,
+            "one_NaN_nonfinite_values_per_frame": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048,
+              2048
+            ]
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h6_results_v1.json",
+          "observed_fields": {
+            "long_missing_duration_checks": {
+              "1": {
+                "recovery_hidden_vs_compressed_observation_max_error": 0.0,
+                "time_signal_provided": false
+              },
+              "8": {
+                "recovery_hidden_vs_compressed_observation_max_error": 0.0,
+                "time_signal_provided": false
+              },
+              "64": {
+                "recovery_hidden_vs_compressed_observation_max_error": 0.0,
+                "time_signal_provided": false
+              }
+            },
+            "sparse_frame_ids_no_time_response": {
+              "betas": 0.0,
+              "rotations": 0.0,
+              "translation_m": 0.0,
+              "raw_rotations_diagnostic": 0.0,
+              "raw_translation_diagnostic_m": 0.0,
+              "raw_state_diagnostic": 0.0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "D4_spatial_attention_graph",
+      "contract_choice": "Retain52querycross-attention andnativehand-localmemory as candidatewiring; optionalgraph remains ablationfactor",
+      "basis": "P07originalViTH/head architecturalinterface; H5nativehand15queries/twoviewconditioning establishednohand control; P12/P14globaltemporal structures expose futuredependence",
+      "counterexamples_or_limits": "Attention learnt COCO17-to52 correspondence not validated; originalSMPL24flows not52SMPLH; syntheticgraphcontrol capacity differs, nobenefit established",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P07_v3.json",
+          "observed_fields": {
+            "feature_shape": [
+              1,
+              1280,
+              16,
+              12
+            ],
+            "rotation_shape": [
+              1,
+              24,
+              3,
+              3
+            ]
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h5_results_v3.json",
+          "observed_fields": {
+            "status": "isolated_native_hand_condition_branch_contract_passed",
+            "boundary": "Untrained condition-branch wiring/internal consistency only, not pose/shape/contact accuracy. Original method resources/input/evaluation gaps and H3 null-GRU/pooling limitations remain."
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r9_results_v3.json",
+          "observed_fields": {
+            "future_prefix_network_max_delta": 3.3080577850341797e-06
+          }
+        }
+      ]
+    },
+    {
+      "id": "D5_rotation_transport",
+      "contract_choice": "Retain guarded Euclidean6D baseline andexplicit original layouts, keepmanifold alternativeunexecuted",
+      "basis": "P02 executedS2geodesic/tangentdensity, P05 executesSO3hierarchicalflows, neither is current6DlinearCFM",
+      "counterexamples_or_limits": "EndpointvalidSO3 does not establish an SO3probabilitypath; P02author localmanifolds folder has sphere/torus/SPD/hyperbolic/mesh, noSO3class in archivedsnapshot",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P02_sampling_v1.json",
+          "observed_fields": {
+            "trajectory_shape": [
+              1001,
+              4,
+              3
+            ],
+            "steps": 1000,
+            "last_only_nfe": 1000
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P05_v3.json",
+          "observed_fields": {
+            "point_rotation_check": {
+              "orthogonality_max_error": 1.1920928955078125e-07,
+              "determinant_max_error": 2.384185791015625e-07
+            },
+            "sample_rotation_check": {
+              "orthogonality_max_error": 1.1920928955078125e-07,
+              "determinant_max_error": 1.1920928955078125e-07
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "D6_parameter_coupling",
+      "contract_choice": "Currentbeta/T remain decoupledreadouts; next singlefactor is explicit sharedbeta condition into velocity",
+      "basis": "OriginalHuManiFlow computes shape/glob/cam/ancestorcontext; R13 verifies currentcondition/state/time flow doesnotread beta",
+      "counterexamples_or_limits": "Intervening β has no flowedge butchangesmesh; thisdoesnotprove directcondition willimprove accuracy or justifyhierarchicalSO3/SMPLH substitution",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r13_results_v1.json",
+          "observed_fields": {
+            "state_autograd_beta_edge": "absent_None_allow_unused_not_saturation",
+            "beta_only_rawstate_rotations_translation_exact": true,
+            "T_only_rawstate_rotations_beta_exact": true,
+            "beta_mesh_gradient_l1": 0.012296270579099655,
+            "beta_mesh_max_change_m_not_accuracy": 0.010849297046661377
+          }
+        }
+      ]
+    },
+    {
+      "id": "D7_flow_vs_regression_sampling",
+      "contract_choice": "Keep matched deterministicregression as mandatorycontrol; do not nominateFM as accuracywinner",
+      "basis": "Historicalsyntheticonly matched144019parameterFM/regression; FM8NFE/regression1NFE, both1000steps",
+      "counterexamples_or_limits": "110.466 versus50.068mm syntheticconsistency favoursregressioninthatfixture; neitherrealRGB/fisheyeaccuracy nor randomarchitectureperformance. DifferentpaperNFE not matchedcost",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/verification_summary.json",
+          "observed_fields": {
+            "models": {
+              "flow": {
+                "training": "outputs/flow_v2",
+                "prediction": "outputs/fresh_flow",
+                "parameters": 144019,
+                "steps": 1000,
+                "initial_validation_loss": 1.5712306499481201,
+                "final_validation_loss": 0.05335620418190956,
+                "vertex_consistency_mm": 110.46610027551651,
+                "shuffled_condition_mm": 443.43915581703186,
+                "nfe": 8,
+                "candidates": 1,
+                "max_orthogonality_error": 4.76837158203125e-07,
+                "max_determinant_error": 4.172325134277344e-07
+              },
+              "regression": {
+                "training": "outputs/regression_v2",
+                "prediction": "outputs/fresh_regression",
+                "parameters": 144019,
+                "steps": 1000,
+                "initial_validation_loss": 0.5432623624801636,
+                "final_validation_loss": 0.0032627121545374393,
+                "vertex_consistency_mm": 50.06778985261917,
+                "shuffled_condition_mm": 468.9304828643799,
+                "nfe": 1,
+                "candidates": 1,
+                "max_orthogonality_error": 4.76837158203125e-07,
+                "max_determinant_error": 4.76837158203125e-07
+              },
+              "no_graph": {
+                "training": "outputs/flow_no_graph",
+                "prediction": "outputs/fresh_no_graph",
+                "parameters": 135699,
+                "steps": 1000,
+                "initial_validation_loss": 1.4297908544540405,
+                "final_validation_loss": 0.04528321698307991,
+                "vertex_consistency_mm": 99.74316507577896,
+                "shuffled_condition_mm": 453.7433385848999,
+                "nfe": 8,
+                "candidates": 1,
+                "max_orthogonality_error": 3.5762786865234375e-07,
+                "max_determinant_error": 3.5762786865234375e-07
+              },
+              "no_history": {
+                "training": "outputs/flow_no_history",
+                "prediction": "outputs/fresh_no_history",
+                "parameters": 144019,
+                "steps": 1000,
+                "initial_validation_loss": 1.4400463104248047,
+                "final_validation_loss": 0.07966621965169907,
+                "vertex_consistency_mm": 98.2498899102211,
+                "shuffled_condition_mm": 459.53381061553955,
+                "nfe": 8,
+                "candidates": 1,
+                "max_orthogonality_error": 4.172325134277344e-07,
+                "max_determinant_error": 4.172325134277344e-07
+              }
+            },
+            "evidence_boundary": "Synthetic low-dimensional artificial-motion engineering checks; not real RGB, fisheye or physical accuracy. Reading scope is methods/main experiments, not all appendices or visuals."
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_sampling_v4.json",
+          "observed_fields": {
+            "released_default_steps": 3,
+            "flip_tta": {
+              "nfe": 6,
+              "independent_branch_noise": true,
+              "condition_flip_and_side_reindex_exact": true,
+              "fixed_seed_repeat_exact": true,
+              "output_shape": [
+                1,
+                1,
+                17,
+                3
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "D8_probability_and_metrics",
+      "contract_choice": "Treat densities/projections/confidence as internal diagnostics; keepfailed and unavailableframes",
+      "basis": "ProHMR NaNimage corruptsmesheswhilelogprobstaysfinite; P02exceptionreturnsfinitezero; P14originaltail/perfecterror and2.5D/FPS pitfalls",
+      "counterexamples_or_limits": "Finite density isnotvalidbody or calibration; reprojection notindependent3Dtruth; P03RPEA GT-root dependency excludes directdeployment",
+      "accuracy_selected": false,
+      "evidence": [
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r5_results_v2.json",
+          "observed_fields": {
+            "NaN_input_nonfinite_counts": {
+              "pred_cam": 192,
+              "log_prob": 0,
+              "conditioning_feats": 2048,
+              "pred_pose_6d": 9216,
+              "pred_cam_t": 192,
+              "pred_keypoints_3d": 8448,
+              "pred_vertices": 1322880,
+              "pred_keypoints_2d": 5632
+            },
+            "boundary": "Original initialize and forward_step AST methods executed with alternate male body. Eval-mode topflag changes but actual ActNorm remains uninitialized identity parameters; artificial labels test dependency only, no learned or data-calibrated density/accuracy. Original Lightning initializer/renderer/neutral path not run."
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r6_results_v3.json",
+          "observed_fields": {
+            "status": "R6_original_sphere_density_verified",
+            "boundary": "Original SphereS2 likelihood method and exact divergence executed with projectedEuler1000 and randomconfigured network. Function returns logdensity despite negative-loglikelihood docstring. Exception fallback finitezero logdensity/exponentiated density1 is invalid evidence; not dataset likelihood or humanSO3."
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_r9_results_v3.json",
+          "observed_fields": {
+            "perfect_reference_behavior": "AssertionError: MPJPE nan is not equal to mean of joint errors nan",
+            "acceleration_fps_normalization": false
+          }
+        },
+        {
+          "file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P03_sampling_v4.json",
+          "observed_fields": {
+            "rpea_dependency": {
+              "controlled_fixture": "Three unchanged root-relative 17-joint candidates; normalized pinhole camera and fixed 2D; only GT root z changes 1m to3m",
+              "functions": {
+                "hard_joint_selection": {
+                  "root_change_max_output_delta_m_fixture": 0.4,
+                  "nonroot_truth_change_max_output_delta": 0.0,
+                  "joint1_root_z1_result": [
+                    0.2,
+                    0.0,
+                    0.1
+                  ],
+                  "joint1_root_z3_result": [
+                    0.4,
+                    0.0,
+                    0.5
+                  ]
+                },
+                "topk3_rpea": {
+                  "root_change_max_output_delta_m_fixture": 0.2999931871849758,
+                  "nonroot_truth_change_max_output_delta": 0.0,
+                  "joint1_root_z1_result": [
+                    0.10000000000000003,
+                    0.0,
+                    0.2666666666666667
+                  ],
+                  "joint1_root_z3_result": [
+                    0.39999318718497584,
+                    0.0,
+                    0.4999892424715145
+                  ]
+                }
+              },
+              "optional_backward_probe": {
+                "status": "original_backward_failed",
+                "error": "one of the variables needed for gradient computation has been modified by an inplace operation: [torch.DoubleTensor [1, 3, 17]], which is output 0 of LinalgVectorNormBackward0, is at version 1; expected version 0 instead. Hint: enable anomaly detection to find the operation that failed to compute its gradient, with torch.autograd.set_detect_anomaly(True, check_nan=False).",
+                "required_for_eval_forward": false
+              },
+              "far_error_clamp_to_uniform_mean_max_difference": 5.551115123125783e-17,
+              "nan_root_still_returns_finite_pose": true,
+              "nan_root_to_uniform_mean_max_difference": 1.3877787807814457e-17,
+              "camera_projection_function": "project_to_2d",
+              "docstring_shape_only_claim_contradicted": true,
+              "boundary": "Controlled dependency probe, not pose error/accuracy; root is actual function input, cannot replace it silently for project deployment"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "new_dependency_experiment": "architecture_r13_results_v1.json",
+  "original_shape_context_anchor": {
+    "file": "third_party/architecture_reproduction/HuManiFlow/models/humaniflow_model.py",
+    "constructor_lines": [
+      78,
+      90
+    ],
+    "method": "compute_input_shape_glob_cam_feats",
+    "boundary": "Inspiration for conditioning dependency only; no wholehierarchicalSO3 transplant."
+  },
+  "remaining_default_assets": "architecture_full_path_resources_v5.json:14missing",
+  "resource_budgets": {
+    "WHAM_source_remaining": 0,
+    "VIBE_source_remaining": 1,
+    "neutralSMPL_userpaths_found": false
+  },
+  "next_candidate": {
+    "id": "H8",
+    "status": "proposed_not_preregistered_or_executed",
+    "single_factor": "Add explicit sharedbeta conditioning to existingvelocity condition; leaveH7beta/source/K8/heads/hands/history/T/solver/noise/publicationgates untouched",
+    "inspiration": [
+      "P05 original shape-conditioned joint flows",
+      "R13 absentbeta-to-stateedge"
+    ],
+    "required_controls": [
+      "Disabled exactH7 control and sameparams/weights/inputs comparison",
+      "Explicitready masks prevent NaN/unavailablebeta from becomingcondition",
+      "Samebeta source/noise; changingonlybeta underfixedconditions mustcause finitepose sensitivity",
+      "Original nonready publication/statuses and rejectedframes remain; beta/T/hiddens unchanged",
+      "Whole360/chunks/future/badinputs/realSMPLH/gradients; no training or accuracypreference",
+      "Record additionalconditioningparametercapacity; no cost/accuracy conclusion from unequalcapacity"
+    ],
+    "unresolved": "Beta modulation useful orharmful requires later legitimate supervisedindependent evaluation; not established bycontract sensitivity."
+  },
+  "remaining_author_paths": [
+    "Defaultneutral body prerequisites and originalfullVIBE/WHAM/MotionBERTmesh paths",
+    "Originaldetector/data/top-levelCLI/evaluation andP16degenerate/missingview contracts",
+    "Explicit physicalelapsedtime model remains outsidecompletedH6/R12; no time correctness claim",
+    "Currentmanifold evidenceS2notSO3humanflow; originalSMPL24/52 adaptation remainsseparate"
+  ],
+  "boundary": "Synthesis selects explicit engineeringcontracts and nexttest, not a trainedarchitecturewinner. Tenpaper coverage is scoped as executed and remainsincomplete; currentmainline accepted_for_main_fit boundary remains."
+}

@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "R12_original_VIBE_missing_and_state_contract_verified_fullbody_resources_and_synthesis_pending",
+  "stage": "R13_evidence_bounded_architecture_synthesis_and_beta_flow_dependency_verified_H8_proposed_original_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -191,7 +191,7 @@
       ]
     }
   ],
-  "next": "Advance evidence-bounded architecture synthesis using actual original paths and H1-H7 controlled contracts, keeping default14resource and fullVIBE/WHAM/MotionBERTmesh gaps explicit. Investigate selective VIBE auxiliary access only before spending remaining1source request; no guessedconfirm URL/fullarchive fallback. Continue unexecuted original multiview/temporal contracts separately.",
+  "next": "Preregister H8 explicitsharedbeta-to-velocity conditioning as onefactor; preserveH7shape/history/T/hand/noise/quality and absentprefix. Disabled exactcontrol and activegradient/360stream/mesh required, no training or accuracypreference. Continue original14resource/fullpath and unexecutedtemporal/multiview/manifold gaps afterward; VIBE remaining1budget must not be spent on guessedURLs.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -226,7 +226,8 @@
     "R10 Ten explicit coverage rows and evidencefield links; corrected VIBE sharedbeta attribution and stale currentstage; H7 and originalpath gaps retained",
     "H7 originalpreGRU feature capture changes only sharedbeta readout; savedH6control/nonbetaoutputs/hidden/noiseexact, real360/mesh/stream/future/attribution and155tests verified",
     "R11 primaryVIBEresource script verified; one boundedZIPsuffix request rejectedHTTP200 beforebodyread; persistentclaim/14gaps/158tests audited, not acquired",
-    "R12 originalVIBETemporalEncoder16window/48reset-vs-carry/missing0NaN/future contract, 160tests; originalfullVIBEbody unexecuted"
+    "R12 originalVIBETemporalEncoder16window/48reset-vs-carry/missing0NaN/future contract, 160tests; originalfullVIBEbody unexecuted",
+    "R13 tenpaper/eightdecision evidence-linked synthesis, beta/T16frame intervention and autogradabsentflowedge/positiveSMPLHmeshgradient; no accuracyselection"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -547,5 +548,7 @@
     "same_source_budget_remaining": 1,
     "index_acquired": false,
     "auxiliary_files_installed": false
-  }
+  },
+  "synthesis": "architecture_synthesis_v1.json",
+  "synthesis_validation": "architecture_r13_validation.json"
 }

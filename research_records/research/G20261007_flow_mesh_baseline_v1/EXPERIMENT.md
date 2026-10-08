@@ -194,3 +194,15 @@ R11未读200正文，无法验证确认页/下载Range地址；现场查看gdown
 新增2个原carry/reset及坏hidden失败清理控制，160实际全套测试/18warning、Ruff/62AST通过，638论文源码存在/字节数与11冻结路径核对、14默认资源缺口不变；初次unusedBASE lint修正，没有失败数值或测试结果。run_components的未来metadata生成文字同步纠正P09“paper clip-averaged beta”错误，旧P09_v1/H1预注册保留历史，不改作者文件/实际算法。六份现有记录同步、小型结果/验证/成功XML与检查器本地提交，无训练/权重/mainline变化。
 
 下一阶段整理原已运行结构与H1–H7受控契约的架构综合，明确每个选择的证据和反例；原完整人体资源/输入与未执行多视图/时序缺口继续跟踪。不能因carry或缺失语义已清楚而宣称十篇完整方法或研究目标完成。
+
+### 2026-10-08 R13 架构综合与β/平移依赖审查
+
+architecture_synthesis_v1.json形成十篇当前实际覆盖、八个模块决定及证据字段绑定：原鱼眼射线/COCO17与52旋转query接口、H7局部前缀shape、H6显式历史与缺失策略、空间/手条件、6D与流形边界、参数耦合、FM/回归对照、概率/评价边界。没有用投票或随机前向“选最佳模型”；每项记录反例/未执行范围，default全方法不标完成。P09原逐帧β、P12静态时间pool与项目K8冻结区分，S2原RFM不能冒充人体SO3流，原SMPL24不等同SMPLH52。
+
+本轮新增依赖干预仅frame0..15/原pair1157..1172（16帧、9ready），非新增360验证。model19/hand29/noise97/K8/8Euler保持H7；与原savedH7prefix差最大4.7684e-7在既有2e-5门内。只加β0.25时state/rotation/T逐值不变，只加T向量[0.1,-0.2,0.3]m时state/rotation/β逐值不变。autograd返回velocity endpoint对β的edge为None（无计算依赖，不是饱和0）；同一真实SMPLH网格对β梯度L1=0.0122963，β干预网格最大变化10.8493mm，T平移响应误差2.9802e-7m。说明当前β/T是独立读出并只参与mesh，不直接条件化姿态流；共享encoder相关性与β反馈是不同结构。前7mesh NaN保留、state_dict/冻结核心未变，无训练/权重加载。
+
+历史verification_summary中同容量144019参数、同1000步合成FM110.4661mm/8NFE，回归50.0678mm/1NFE，关闭graph99.7432mm、关闭history98.2499mm；只读取既有metadata，不载入checkpoint/重训练。低维人工运动/代理图像任务不支持FM优于回归，也不能推断真实鱼眼、图结构/历史或概率校准收益；no-graph参数135699存在容量差，不能升级成graph有害的结论。FM与匹配回归继续双路控制，不指定准确性胜者。
+
+下一H8只检验显式sharedβ进入现有velocity condition的单因素：保持H7体型读出/冻结、pose网络、history/T/nativehand、solver/noise、严格与发布门，提供关闭分支精确H7控制及主动β梯度/响应。未readyβ不得以NaN/默认0被当有效shape；记录新增conditioning容量，360/流式/未来/真实解码/梯度须独立验证。该结构受P05 shape context与本轮缺边启发，不是原SO3祖先流移植，也不预设条件化提高精度；H8尚未预注册或执行。
+
+本轮真实干预/梯度/保存数组独立核对通过，八决定证据字段及十篇引用逐项验证；Ruff/63AST、638论文源码存在/字节数与11冻结路径通过，14默认缺口/WHAM耗尽/VIBE余1不变。R12的160测试/18warning为既有回归证据，本轮新检查器以实际运行及独立数组检查验证，没有镜像实现的新单测或重跑旧全套。首次importformat lint修正，SMPLH10系数warning保留。六份现有记录同步与小型证据/检查器本地提交；原完整输入/mesh等缺口、SO3/退化多视图等未执行范围继续跟踪，长期目标未完成。

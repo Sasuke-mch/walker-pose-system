@@ -1,0 +1,31 @@
+{
+  "status": "R13_synthesis_and_dependency_audit_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "results": "architecture_r13_results_v1.json",
+  "synthesis": "architecture_synthesis_v1.json",
+  "ten_paper_scope_rows": 10,
+  "design_decisions": 8,
+  "literal_evidence_fields_verified": 39,
+  "counterfactual_frames": 16,
+  "independent_saved_intervention_gradient_arrays_verified": true,
+  "related_checks": "R13 actual inference/intervention/autograd/realdecoder runtime and independently savedstate/mesh/missing/gradient arraychecks; no new unit tests that mirrorimplementation",
+  "previous_regression_evidence": {
+    "source": "architecture_r12_validation.json",
+    "tests": 160,
+    "warnings": 18,
+    "rerun_this_stage": false
+  },
+  "Ruff": "passed",
+  "AST_files": 63,
+  "paper_source_presence_bytes": 638,
+  "author_content_comparison": false,
+  "unchanged_frozen_paths": 11,
+  "default_resource_gaps": 14,
+  "initial_lint_issue": "Checker import wrapping only, corrected; no failed numerical result",
+  "runtime_warning_retained": "SMPLH10shape coefficients",
+  "next_H8_status": "Proposedsinglefactor, not yet preregistered or executed",
+  "boundary": "No newfull360run or architectureaccuracyselection; originalfullpaths/resource gaps and finalscope remaintracked. Historytrainedsynthetic result only read as priorcontrol, never weightsloaded/retrained."
+}

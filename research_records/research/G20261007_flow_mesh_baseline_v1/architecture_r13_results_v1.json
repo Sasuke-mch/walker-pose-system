@@ -1,0 +1,48 @@
+{
+  "status": "R13_parameter_coupling_verified",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests": 0,
+  "whole_goal_complete": false,
+  "frames": 16,
+  "frame_range": [
+    0,
+    15
+  ],
+  "physical_pair_range": [
+    1157,
+    1172
+  ],
+  "model_seed": 19,
+  "hand_seed": 29,
+  "noise_seed": 97,
+  "shape_K": 8,
+  "Euler_nfe": 8,
+  "source_body": "architecture_h2_results_v3.npz",
+  "source_hands": "architecture_h4_results_v3.npz",
+  "saved_H7_prefix_checks": {
+    "betas": 0.0,
+    "rotations": 1.4901161193847656e-07,
+    "translation_m": 5.960464477539063e-08,
+    "raw_rotations_diagnostic": 1.4901161193847656e-07,
+    "raw_translation_diagnostic_m": 5.960464477539063e-08,
+    "raw_state_diagnostic": 4.76837158203125e-07
+  },
+  "available_frames": 9,
+  "beta_only_delta": 0.25,
+  "beta_only_rawstate_rotations_translation_exact": true,
+  "T_only_shift_m": [
+    0.10000000149011612,
+    -0.20000000298023224,
+    0.30000001192092896
+  ],
+  "T_only_rawstate_rotations_beta_exact": true,
+  "state_autograd_beta_edge": "absent_None_allow_unused_not_saturation",
+  "beta_mesh_gradient_l1": 0.012296270579099655,
+  "beta_mesh_max_change_m_not_accuracy": 0.010849297046661377,
+  "translation_mesh_shift_max_error_m": 2.980232238769531e-07,
+  "unavailable_meshes_retained_NaN": true,
+  "parameters_unchanged": true,
+  "finding": "Current conditional velocity consumes condition/state/time only. Beta and translation are pass-through readouts to mesh, not velocity conditions. Learned correlation through shared encoder is not direct beta conditioning.",
+  "boundary": "16-frame intervention/dependency audit only, not new360 validation or improvedmesh/pose accuracy. Beta/body positive control prevents conflating absent flowdependency with irrelevant beta asset."
+}
