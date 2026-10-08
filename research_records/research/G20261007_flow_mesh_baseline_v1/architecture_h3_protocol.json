@@ -1,0 +1,34 @@
+{
+  "id": "H3",
+  "status": "protocol_locked_before_implementation",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Compose H1 causal shared shape and H2 typed real COCO17 conditions with the unchanged 52-rotation generator and real SMPL-H surface observation decoder",
+  "inputs": {
+    "contract_json": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h2_results_v3.json",
+    "contract_arrays": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h2_results_v3.npz",
+    "source_range": "360frames0..359, physical pairs1157..1516; both PMPose saved detection streams and immutable strict geometry from H2",
+    "semantics": "COCO17 surface observations; normalized raw sensor pixels, cam0 rays/origins in metres; geometry_mask remains strict-gate intersected, confidence retained without threshold/clipping",
+    "model": "Fresh random seed19, explicitly observation_joints17, remaining original width64/heads4/layers2/history/graph/rotation-scale0.25 and root-offset(0,0,3) retained. No 22-observation checkpoint substitution, image branch inputs absent and explicitly masked unavailable",
+    "assets": "Original local baseline licensed SMPLH_male/MANO_LEFT/MANO_RIGHT from config.json, models/smpl/J_regressor_coco.npy surface regressor; not original ten-method neutral SMPL substitution",
+    "noise": "One explicitly fixed seed97 B,1,52,6 initial state per sequence carried across chunks, expanded to frames. Single candidate,8Euler evaluations per frame"
+  },
+  "controls": "K1 first admitted-frame shared shape versus H1 K8 first8admitted-frame feature mean; same freshly initialized model/shape head, observations, hidden/history, pose flow, translation, noise and publication rules. Frame0 is admitted in the real fixture so K1 coincides with original first-frame beta within numerical tolerance",
+  "unique_variable": "Shape calibration readout K1 versus K8. H2 adaptation is identical in both; no graph/history/reprojection-loss/optimizer/ground change",
+  "admission": "Caller declares shape admission as any immutable accepted stereo COCO point this frame. This operational rule does not establish sufficient shape evidence, unbiased pooling or physical identifiability. Missing/no-association frames are never admitted",
+  "output_policy": "Shape pending gives NaN beta and unavailable mesh; after freeze keep one shared beta, but frames without current observations remain unavailable. Finite internal network extrapolation is diagnostic only, never published as measured/available pose. Preserve every frame/pair/person, original strict gate/reasons/flags/finite rejected XYZ, numeric failures and explicit statuses; no interpolation or retroactive prefix fill",
+  "implementation_scope": "New isolated eager candidate wrapper plus checked H2-array adapter and reproduction CLI. Do not edit core model.py/train.py/infer.py/config.json, original paper source or current_mainline.json. Temporary H1 read-only hooks remain eager-only; deployment/export/concurrent support not claimed",
+  "checks": [
+    "360 frames/physical IDs/people/strict3031accepted and all rejected states unchanged; diagnostic XYZ not fed into neural conditions",
+    "COCO17 conditions,52rotations, B,T,10 beta with explicit readiness; body mesh6890vertices13776faces; COCO17 surface regressor rather than kinematic joint alias",
+    "K1 matches original first-frame beta; K8 differs only in shape, same generated pose/translation and model parameters unchanged",
+    "Full sequence versus chunks1/11/64 with carried GRU/shape/noise state; masks/status exact, finite state/beta/translation max difference<=2e-5, mesh parity<=2e-5metres",
+    "Future perturbation after frame120 cannot affect prior output; frozen beta remains constant; chunk state cannot cross sequence, reorder frames or change noise",
+    "Missing observations cannot count as shape evidence or available mesh; fewer-than8 admitted frames remain unavailable; no current observation after freeze remains unavailable",
+    "Real decoder and surface regressor numerical reconstruction; separate small differentiable fixture checks input/shape/translation/pose transport gradients without an optimizer"
+  ],
+  "success": "Runnable isolated real-input condition-to-52rotation-to-real-mesh interface with all operational states preserved and controlled shape-readout contracts verified; no accuracy claim from random outputs",
+  "failure_stop": "Keep failed JSON/XML; do not relax project gates, pad COCO to22, load mismatched trained weights, repair unknown shape with defaults, publish missing frames or use old meshes. Numerical checks use preregistered arithmetic tolerances only; unresolved method resource gaps remain explicit",
+  "outputs": ["architecture_h3_results_v1.json", "architecture_h3_results_v1.npz", "architecture_h3_validation.json"],
+  "boundary": "Real observation plumbing and random architecture/internal consistency only. No trained RGB/fisheye inference accuracy, beta accuracy, world/ground recovery, contact, original paper performance or realtime certification; original complete mesh methods still have separate neutral-asset gaps"
+}
