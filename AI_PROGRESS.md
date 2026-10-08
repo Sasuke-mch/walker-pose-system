@@ -4044,3 +4044,7 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 ### 2026-10-08 论文式架构对照图
 
 按用户要求将原baseline与当前H8绘为上下两栏模块图，输出 architecture_figure_v2/architecture_comparison.png（3840×2400）、可编辑SVG和PDF。特征块/GRU/骨架为结构示意；网格为合法现有maleSMPLH在零beta/单位局部旋转下的真实解码示意，不是预测结果或精度证据。核对H7 preGRU体型池、共享beta直接解码与独立10to64姿态条件、H5手部条件及H6历史/平移分支；v1标签/连线调整后v2视觉检查、AST/Ruff通过。无新研究实验/训练/权重加载，长期目标仍暂停，自动跟进仍删除。
+
+### 2026-10-08 中文论文式架构图
+
+按用户要求保留原baseline/H8上下对照与模块图形，新增 architecture_figure_v4_cn/architecture_comparison.png（3840×2400）、中文SVG/PDF；模块、条件、缺失历史、8个认可帧池化及体型/平移标注改为中文。v3缺少下标0字形，v4移除该符号、补充GRU记忆说明后视觉检查通过；Ruff/AST/SVG XML与图片尺寸检查通过。英文v2保持原样；无架构/实验/训练/主线改动。

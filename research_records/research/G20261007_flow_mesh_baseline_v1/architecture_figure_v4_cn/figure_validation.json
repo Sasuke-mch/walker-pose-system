@@ -1,0 +1,18 @@
+{
+  "status": "Chinese paper architecture comparison visually verified",
+  "language": "zh with GRU Euler SMPL-H terms",
+  "dimensions": [
+    3840,
+    2400
+  ],
+  "labels": "Chinese modules, beta10D shape/T3D translation explanation, first8admittedframes explicitly labeled",
+  "font": "Microsoft YaHei embedded in PDF; SVG editable text requires installed Chinese font",
+  "mesh": "same licensed neutral-pose SMPLH illustration, no inferred accuracy",
+  "retained_previous": "English v2 unchanged; Chinese v3 retained locally with subscript-zero missing-glyph warning; v4 removes unsupported subscript and passed visual review",
+  "Ruff": "passed",
+  "AST": "passed",
+  "SVG_XML": "passed",
+  "training": false,
+  "checkpoint_loaded": false,
+  "new_research_experiment": false
+}

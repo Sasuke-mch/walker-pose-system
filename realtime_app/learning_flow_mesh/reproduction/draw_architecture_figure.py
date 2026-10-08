@@ -1,4 +1,5 @@
 """Paper-style architecture comparison; schematic modules, real neutral SMPL-H."""
+import argparse
 from itertools import pairwise
 from pathlib import Path
 
@@ -8,6 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from matplotlib import font_manager
 from matplotlib.collections import PolyCollection
 from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, Rectangle
 
@@ -82,7 +84,10 @@ def mesh_image():
     return plt.imread(path)
 
 
-def render():
+def render(language="en"):
+    global OUT  # Language-specific sibling output; original English files retained.
+    if language == "zh":
+        OUT = OUT.with_name("architecture_figure_v4_cn")
     OUT.mkdir(parents=True,exist_ok=False)
     plt.rcParams.update({"font.family":"DejaVu Sans","svg.fonttype":"none","pdf.fonttype":42})
     mesh=mesh_image()
@@ -157,6 +162,57 @@ def render():
     ax.text(107,22,"noise z₀ + flow time τ",fontsize=8.5,ha="center")
     arrow(ax,[(112,23),(112,26)])
     ax.text(2,1,"Added branches: hand conditions (H5), shared-shape calibration (H7), shape-to-pose coupling (H8).  Backbone and spatial flow blocks retained.",fontsize=8.5)
+    if language == "zh":
+        font_manager.fontManager.addfont("C:/Windows/Fonts/msyh.ttc")
+        font_manager.fontManager.addfont("C:/Windows/Fonts/msyhbd.ttc")
+        labels = {
+            "Conditional SMPL-H reconstruction: baseline and H8": "双鱼眼条件人体重建：初始架构与当前 H8",
+            "(a) Original baseline": "（a）初始架构：体型只参与网格解码",
+            "Observations": "身体观测",
+            "h": "记忆",
+            "xy / score / rays": "坐标／置信度／射线",
+            "Condition encoder": "条件编码器",
+            "52 learned queries": "52个可学习旋转查询",
+            "Causal GRU": "因果历史编码（GRU）",
+            "all-frame update": "每帧更新，包括缺失帧",
+            "Pose flow": "姿态生成（流匹配）",
+            "graph + attention / Euler": "骨架图＋注意力／Euler积分",
+            "pose + shape + T": "姿态＋体型＋平移",
+            "First-frame β": "首帧体型 β",
+            "Translation T": "全局平移 T",
+            "β enters the body decoder only": "原来：β只改变网格体型，不进入姿态生成器",
+            "(b) Current H8 research architecture": "（b）当前 H8：增加手姿条件、共享体型与体型—姿态耦合",
+            "Body inputs": "身体输入",
+            "COCO17 / 2 views": "双视角／17个身体观测点",
+            "Cross-attention": "交叉注意力",
+            "52 × 64 features": "52个查询 × 64维特征",
+            "Q ← observations": "旋转查询 ← 观测信息",
+            "Local + GRU context": "局部特征＋GRU历史",
+            "H6: carry / missing freeze": "H6：携带状态，缺失时冻结",
+            "Pose velocity": "姿态速度网络",
+            "2 spatial blocks / 8 Euler": "2层空间模块／8步Euler积分",
+            "52 × 6D → rotations": "52×6D状态 → 局部旋转",
+            "Local features → K=8 pool → β head": "当帧特征 → 前8个认可帧池化 → 共享体型 β",
+            "H8: β projection 10→64": "H8：体型映射（10→64维）",
+            "ready-gated": "体型就绪后启用",
+            "shared β": "共享体型 β",
+            "Native hand tokens": "原生手姿条件",
+            "2 views × 2 hands × 15": "双视角 × 左右手 × 15关节",
+            "Hand cross-attention": "手部交叉注意力",
+            "H5: hand-query residual": "H5：向手部查询添加条件",
+            "SMPL-H decoder": "SMPL-H网格解码器",
+            "6,890 vertices": "6890顶点／13776三角面",
+            "Translation head": "平移预测头",
+            "T from history features": "由历史特征预测全局平移 T",
+            "Publish gate": "输出有效性检查",
+            "ready / observed / valid": "体型就绪／当前有观测／参数合法",
+            "noise z₀ + flow time τ": "初始噪声 ＋ 流时间 τ",
+            "Added branches: hand conditions (H5), shared-shape calibration (H7), shape-to-pose coupling (H8).  Backbone and spatial flow blocks retained.": "绿色：手姿条件分支；金色：共享体型及其对姿态的条件作用。β＝10维体型参数；T＝3维全局平移。网格为结构示意。",
+        }
+        for text in ax.texts:
+            text.set_text(labels.get(text.get_text(), text.get_text()))
+            text.set_fontfamily("Microsoft YaHei")
+        ax.texts[-1].set_fontsize(8.0)
     for suffix in ("png","svg","pdf"):
         fig.savefig(OUT/f"architecture_comparison.{suffix}",dpi=240,facecolor="white")
     svg = OUT / "architecture_comparison.svg"
@@ -166,4 +222,6 @@ def render():
 
 
 if __name__=="__main__":
-    render()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--language", choices=("en", "zh"), default="en")
+    render(parser.parse_args().language)
