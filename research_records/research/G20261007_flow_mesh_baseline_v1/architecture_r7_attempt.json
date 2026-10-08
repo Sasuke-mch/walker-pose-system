@@ -1,0 +1,6 @@
+{
+  "status": "attempt_claimed_before_GET",
+  "url": "https://drive.google.com/uc?id=1pbmzRbWGgae6noDIyQOnohzaVnX_csUZ&export=download&confirm=t",
+  "R7_GET_invocations": 1,
+  "prior_historical_HEAD_report": 1
+}

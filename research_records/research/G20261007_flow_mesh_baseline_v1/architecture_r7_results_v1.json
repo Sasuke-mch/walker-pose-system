@@ -1,0 +1,35 @@
+{
+  "status": "R7_bounded_resource_request_audited",
+  "protocol": "architecture_r7_protocol.json",
+  "network_GET_invocations": 1,
+  "prior_HEAD_handoff_report": 1,
+  "attempt_claim": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_r7_attempt.json",
+  "elapsed_seconds": 21.046999999991385,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "archive_request": {
+    "url": "https://drive.google.com/uc?id=1pbmzRbWGgae6noDIyQOnohzaVnX_csUZ&export=download&confirm=t",
+    "status": "bounded_archive_stopped",
+    "error": "ReadTimeout: HTTPSConnectionPool(host='drive.usercontent.google.com', port=443): Read timed out. (read timeout=20)",
+    "inventory": [],
+    "wanted_members": [
+      "body_models/J_regressor_feet.npy",
+      "body_models/J_regressor_h36m.npy",
+      "body_models/smpl_mean_params.npz"
+    ],
+    "acquired_members": [],
+    "missing_members": [
+      "body_models/J_regressor_feet.npy",
+      "body_models/J_regressor_h36m.npy",
+      "body_models/smpl_mean_params.npz"
+    ],
+    "all_selected_acquired": false,
+    "installed": [],
+    "transferred_bytes": 0,
+    "boundary": "stopped before large members or byte/time cap; unvisited members not proved absent"
+  },
+  "before_missing": 14,
+  "after_missing": 14,
+  "after_audit": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_full_path_resources_v4.json",
+  "boundary": "Original auxiliary transport/schema only, not WHAM body/network completion. Missing or unvisited members retained; no WHAM joint regressor row semantics guessed. Source budget now exhausted, no retry."
+}

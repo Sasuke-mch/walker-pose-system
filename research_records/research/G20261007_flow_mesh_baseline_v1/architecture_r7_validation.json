@@ -1,0 +1,41 @@
+{
+  "status": "R7_transport_failure_and_budget_enforcement_verified",
+  "resource_acquisition_succeeded": false,
+  "whole_goal_complete": false,
+  "actual_GET_invocations": 1,
+  "historical_HEAD_handoff_report": 1,
+  "transport_failure": "ReadTimeout: HTTPSConnectionPool(host='drive.usercontent.google.com', port=443): Read timed out. (read timeout=20)",
+  "body_stream_bytes": 0,
+  "body_stream_limit": "0 tracks LimitedReader bytes; HTTP headers/TLS/redirecttraffic not measured",
+  "no_installs": true,
+  "default_missing": 14,
+  "missing_member_inventory_limit": "No archive data visited, so not proof of server file absence",
+  "persistent_exclusive_attempt_claim": true,
+  "tests": {
+    "tests": "143",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "new_cases": 2,
+  "warnings": 15,
+  "Ruff": "passed",
+  "AST_files": 51,
+  "author_source_presence_bytecounts": 719,
+  "author_content_comparison": false,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/learning_flow_mesh/missing_history.py",
+    "realtime_app/pose_app/wilor_mano_prior.py"
+  ],
+  "retained_lint_issue": "One import-format issue corrected before final checks",
+  "boundary": "Bounded resource request/failed transport audit, not originalWHAM body/globalrefiner readiness or performance. Source budget exhausted; other original pathways continue."
+}

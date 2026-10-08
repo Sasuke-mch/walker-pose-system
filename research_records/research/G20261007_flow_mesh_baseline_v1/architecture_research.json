@@ -181,7 +181,7 @@
       ]
     }
   ],
-  "next": "Prioritize other original input/fullnetwork paths and exact remaining auxiliary resources; defaultneutral gaps preserved. Shape information pooling remains independent future factor, not forced by source masks.",
+  "next": "Continue author original input/preprocessing and temporal/fullnetwork paths without unavailable assets; WHAM auxiliary source attempt budget exhausted. Neutraldefault/gender and originalregressor gaps remain. Do not relabel source components or alternate male methods as fullmethods.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -338,7 +338,7 @@
     }
   ],
   "sampling_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_protocol.json",
-  "mesh_resource_audit": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_full_path_resources_v3.json",
+  "mesh_resource_audit": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_full_path_resources_v4.json",
   "sampling_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_sampling_validation.json",
   "multiview_protocol": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_multiview_protocol.json",
   "multiview_validation": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_multiview_validation.json",
@@ -462,5 +462,14 @@
     "original_density_AST_executed": true,
     "original_dataset_or_human_SO3_executed": false,
     "exception_zero_not_valid_density": true
+  },
+  "R7": {
+    "protocol": "architecture_r7_protocol.json",
+    "results": "architecture_r7_results_v1.json",
+    "validation": "architecture_r7_validation.json",
+    "status": "WHAM_auxiliary_GET_transport_failed_budget_exhausted",
+    "resources_installed": 0,
+    "default_missing": 14,
+    "automatic_GET_retry_allowed": false
   }
 }
