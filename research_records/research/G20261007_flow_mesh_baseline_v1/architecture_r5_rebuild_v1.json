@@ -1,0 +1,9 @@
+{
+  "status": "saved_rebuild_exact_equality_failed",
+  "mesh_max_error_m": 2.384185791015625e-07,
+  "rebuild_threads": 20,
+  "runner_threads": 2,
+  "faces_equal": true,
+  "declared_protocol_tolerance_m": 2e-05,
+  "within_protocol_tolerance": true
+}

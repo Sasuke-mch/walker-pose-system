@@ -44,7 +44,10 @@
       "source_file_count": 55,
       "local_source": "third_party/architecture_reproduction/ProHMR",
       "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P04_v4.json",
-      "coverage": "Original RGB backbone plus pose-flow/beta/weak-camera head, released 63 random + 1 zero candidates, invertible-flow density roundtrip; original neutral SMPL and full loss/evaluation not run"
+      "coverage": "Original ResNet50/ConditionalGlow density and exact initialize+forward_step AST methods64samples/male SMPL44joints/projection; fresh image-only inference requires SMPL labels, eval topflag not dataActNorm initialization. Neutral/default initializer/renderer/evaluation incomplete.",
+      "additional_checks": [
+        "architecture_r5_results_v2.json"
+      ]
     },
     {
       "id": "P05",
@@ -74,7 +77,10 @@
       "source_file_count": 67,
       "local_source": "third_party/architecture_reproduction/HMR2",
       "check_file": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_checks/P07_v3.json",
-      "coverage": "Original ViT-H/16 (when enabled) and six-layer Transformer SMPL head; neutral SMPL mesh, detector/crop estimation, checkpoint and full evaluation not run"
+      "coverage": "Original full forward_step AST method, ViT-H/16/head/male SMPLLayer44joints/projection; defaultneutral, Lightning initializer, original detector/crop/evaluation remain incomplete.",
+      "additional_checks": [
+        "architecture_r4_results_v2.json"
+      ]
     },
     {
       "id": "P09",
@@ -436,5 +442,14 @@
     "original_forward_step_method_executed": true,
     "original_initializer_executed": false,
     "default_neutral_reproduced": false
+  },
+  "R5": {
+    "protocol": "architecture_r5_protocol.json",
+    "results": "architecture_r5_results_v2.json",
+    "validation": "architecture_r5_validation.json",
+    "original_initialize_forward_methods_executed": true,
+    "default_neutral_reproduced": false,
+    "fresh_image_only_coldstart_supported": false,
+    "data_dependent_actnorm_initialization_executed": false
   }
 }

@@ -1,0 +1,121 @@
+{
+  "status": "R5_original_methods_male_passed",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "source": "third_party\\architecture_reproduction\\ProHMR\\prohmr\\models\\prohmr.py",
+  "source_method_lines": {
+    "initialize": [
+      66,
+      84
+    ],
+    "forward_step": [
+      86,
+      159
+    ]
+  },
+  "asset": "D:\\my_works\\walker_pose_system\\models\\smpl\\basicmodel_m_lbs_10_207_0_v1.0.0.pkl",
+  "gender": "male",
+  "mean": "D:\\my_works\\walker_pose_system\\third_party\\architecture_reproduction\\ProHMR\\data\\smpl_mean_params.npz",
+  "default_neutral_executed": false,
+  "top_level_initializer_executed": false,
+  "parameters": 51513389,
+  "input": "Artificial RGB seed47 and label fixture; sample seed59; CPU float32",
+  "image_only_coldstart_error": "KeyError('smpl_params')",
+  "top_flag_after_author_initialize": true,
+  "internal_actnorm_count": 4,
+  "internal_actnorm_initialized": [
+    false,
+    false,
+    false,
+    false
+  ],
+  "all_network_body_state_dict_unchanged": true,
+  "changed_labels_same_seed_mesh_error_m": 0.0,
+  "repeat_exact": true,
+  "mode_first_zero_latent_exact": true,
+  "candidate_beta_spread": 0.0,
+  "independent_errors": {
+    "mesh_m": 0.0,
+    "joints_m": 1.1920928955078125e-07,
+    "projection_normalized": 0.0
+  },
+  "rotation_check": {
+    "orthogonality_max_error": 3.416091203689575e-06,
+    "determinant_max_error": 3.5762786865234375e-07
+  },
+  "NaN_input_nonfinite_counts": {
+    "pred_cam": 192,
+    "log_prob": 0,
+    "conditioning_feats": 2048,
+    "pred_pose_6d": 9216,
+    "pred_cam_t": 192,
+    "pred_keypoints_3d": 8448,
+    "pred_vertices": 1322880,
+    "pred_keypoints_2d": 5632
+  },
+  "output_shapes": {
+    "pred_cam": [
+      1,
+      64,
+      3
+    ],
+    "log_prob": [
+      1,
+      64
+    ],
+    "conditioning_feats": [
+      1,
+      2048
+    ],
+    "pred_pose_6d": [
+      1,
+      64,
+      144
+    ],
+    "pred_cam_t": [
+      1,
+      64,
+      3
+    ],
+    "pred_keypoints_3d": [
+      1,
+      64,
+      44,
+      3
+    ],
+    "pred_vertices": [
+      1,
+      64,
+      6890,
+      3
+    ],
+    "pred_keypoints_2d": [
+      1,
+      64,
+      44,
+      2
+    ],
+    "smpl_global_orient": [
+      64,
+      1,
+      3,
+      3
+    ],
+    "smpl_body_pose": [
+      64,
+      23,
+      3,
+      3
+    ],
+    "smpl_betas": [
+      64,
+      10
+    ],
+    "faces": [
+      13776,
+      3
+    ]
+  },
+  "joint_semantics": "25OpenPose plus19 regressions; not COCO17/SMPL-H52",
+  "boundary": "Original initialize and forward_step AST methods executed with alternate male body. Eval-mode topflag changes but actual ActNorm remains uninitialized identity parameters; artificial labels test dependency only, no learned or data-calibrated density/accuracy. Original Lightning initializer/renderer/neutral path not run."
+}
