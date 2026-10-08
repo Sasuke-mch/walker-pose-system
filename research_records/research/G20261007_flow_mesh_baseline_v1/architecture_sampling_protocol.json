@@ -1,0 +1,26 @@
+{
+  "id": "S1",
+  "status": "protocol_locked_before_implementation",
+  "training_allowed": false,
+  "mainline_modified": false,
+  "purpose": "Extend original components into their published sampling paths; audit deployment inputs rather than assuming helper docstrings are accurate",
+  "P03": {
+    "source": "FMPose3D original GAMLP, common/utils.py euler_sample, inference_api/fmpose3d.py _run_euler_sample and aggregation_methods.py",
+    "network": "Published human width512/layers5/17 H36M joints; unchanged random initialization",
+    "input": "Declared synthetic normalized H36M17 single-frame fixture; fixed initial noise, no detector or project raw observations",
+    "sampling": "Original Euler with three released steps; original flip-TTA helper with independent branch noise; extra 1/5-step interface probes",
+    "aggregation_audit": "Fixed three root-relative hypotheses, fixed normalized pinhole intrinsics/2D target; change only supplied root translation in gt_3D, then change only nonroot gt_3D values. Test both hard joint selection and released topk3 temperature0.002 RPEA",
+    "success": "Finite shape-correct output, exact repeat with same seed, original-vs-independent Euler arithmetic parity, counted NFE, explicit root-dependence and nonroot-dependence results; no model performance claim",
+    "boundary": "Root-relative skeleton sampling, not SMPL-H; original RPEA camera is H36M perspective with distortion/clamp, not fisheye. Actual observed truth dependency must be recorded even if docstring denies it"
+  },
+  "P02": {
+    "source": "RiemannianFM original sample/sample_all methods, Sphere manifold, projected Euler solvers and configured 512-wide/eight-layer tangent network",
+    "input": "Four declared Sphere S2 starting samples and unchanged random network; not original volcano dataset or human SO(3)",
+    "sampling": "Original train.yaml eval_projx=True/local_coords=False: 1000 projected Euler steps. Full trajectory and last-only paths retain published step count",
+    "success": "Finite output, unit norm, endpoint parity, same initial states reproduce output, correct NFE counts including endpoint velocity query; analytic tangent-field integration control",
+    "boundary": "Sphere sampling architecture only; no training, density/evaluation dataset replication or SO(3) human accuracy claim"
+  },
+  "resources": "Audit exact default mesh asset/regressor paths. Missing neutral SMPL or original regressors remain gaps; do not substitute male/female assets or synthetic regressors and call the original path complete",
+  "failure_stop": "Keep every source/resource mismatch and failed run. No automatic weight downloads, optimization, training, source mutation, hidden root substitution or weakened geometry gates",
+  "planned_outputs": ["architecture_checks/P03_sampling_v1.json", "architecture_checks/P02_sampling_v1.json", "architecture_full_path_resources_v1.json"]
+}
