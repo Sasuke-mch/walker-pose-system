@@ -263,3 +263,13 @@ NativeHandConditioner的参数包括MLP(7→64→64)、2×64视图identity、2×
 12项测试检查精确零控制、shape/T/hidden/noise不变、同手memory/跨手隔离、被mask输入无效、错误帧/节点/掩码/非有限/dtype/人物视图拒绝、body缺失发布、逐帧/分块/未来及真实人体梯度。真实网格/COCO loss反传到当前有效native旋转、框score、projection/节点/视图identity/attention，梯度有限非零；当前缺失相机及其他过去/未来手条件梯度严格0，无优化器，参数不更新。全模块102通过、13个既有资产弃用warning保留，Ruff及38文件AST通过。候选文本逆去_encode委托后与原源码完全相同；原core/主线等8路径文本与已提交版本相同，719作者文件存在及字节数一致。
 
 首次完整v1失败由运行器错误取load_coco17_regressor(...)[0]造成6890向量，修运行器为完整17×6890矩阵；不改回归器/人体层/原阈值，v1 JSON保留。静态检查的TypeError/导入格式/nested-if修正，初轮12行为测试通过后增加“当前masked camera梯度0”覆盖再跑102全套。命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_hand_candidate --output <new.json>`，输出同名NPZ不覆盖。候选为未训练的接线，尚无手形、β可辨识、世界位置/接触精度结论；null-frame GRU、history feature池化及eager hook部署限制不变。后续继续原方法公共辅助资源/完整输入路径，以及独立缺失历史状态对照，不扩大本阶段变量。
+
+## R1 公共辅助资源验收（2026-10-08）
+
+只改变原公共小型辅助资源的可用性和本地验收，不改变模型或正式工程路线。本次接手不再下载：使用`fetch_auxiliary_resources --local-only --output <new.json>`验证v2记录的七个文件，回归器来自HuManiFlow官方raw及ProHMR/HMR2官方包选择性读取；HMR2默认位置为用户.cache/4DHumans/data，早期隔离镜像不算默认路径。来源/字节/实际schema与人工6890顶点原vertices2joints、独立einsum、平移行和响应和有限非零梯度保存在architecture_resources_results_v3.json。最大线性差约2.78e-17、平移差2.22e-16；没有真实关节点精度结论。
+
+获取器不再以循环结束或成员次数表示成功：记录wanted/acquired/missing集合，只有全部唯一目标取得才all_selected_acquired；正常EOF缺项和重复目标分别失败/停止。保留先取得的文件，不展开大型未知成员、不extractall、不读symlink、不覆盖不同字节；读前后检查deadline，原raw8MiB/archive16MiB/request20s限制继续。已有v1/v2记录两次尝试，网络入口读取记录并拒绝第三次，本阶段网络0。历史WHAM HEAD重定向12s ReadTimeout来自接手报告，单列historical_preflight_records；不是本次实际请求或文件/许可缺失证据。
+
+mean原pose144/shape10/cam3，HMR2 heads/smpl_head.py 49–55初始化读取全部三项，ProHMR heads/fc_head.py只读取shape/cam。packed columns根正交残量1.5099581673894136e-7；作者F.normalize默认eps1e-12仍输出合法旋转，项目eps1e-6拒绝节点0，其余节点原decoder与adapter差0。初始化不是有效姿态观测，不修改资产、不放宽门。两个官方mean与旧MMPose fixture的keys/数组/dtype/原字节全相同；不得外推VIBE/MotionBERT其他同名文件。
+
+原audit_mesh_resources入口执行v2，并在明确fixture比较后新建v3（不覆盖v2）；当前默认缺14项，P04/P07/P05各1、P09为3、P10/P12各4，六条mesh都未就绪。raw/原包/早期失败v1/v2全部保留。完整模块实际124测试、R1新增22、14warning、Ruff、40文件AST通过；719作者文件按清单核对存在/字节数，非内容逐字比对。core/主线、H3/H5、原WiLoR读取器10路径未改，无训练/权重加载/optimizer或完整原mesh。验收architecture_resources_validation.json的whole_goal_complete=false；本地提交不含辅助资产、作者源码、模型、原论文或大产物。

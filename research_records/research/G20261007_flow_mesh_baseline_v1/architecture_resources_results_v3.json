@@ -1,0 +1,193 @@
+{
+  "status": "local_auxiliary_resources_verified",
+  "protocol": "architecture_resources_protocol.json",
+  "network_requests_executed": 0,
+  "training_executed": false,
+  "original_mesh_forward_executed": false,
+  "verified": [
+    {
+      "kind": "npy_regressor",
+      "shape": [
+        9,
+        6890
+      ],
+      "dtype": "float64",
+      "negative_weight_count": 0,
+      "row_sum_min": 0.9998616426049328,
+      "row_sum_max": 1.0000491529287447,
+      "original_vertices2joints_vs_independent_einsum_max_error": 1.3877787807814457e-17,
+      "linear_translation_response_max_error": 1.1102230246251565e-16,
+      "artificial_vertex_gradient_finite_nonzero": true,
+      "boundary": "resource/linear map check only; negative weights allowed, no real joint accuracy",
+      "path": "third_party/architecture_reproduction/HuManiFlow/model_files/J_regressor_extra.npy",
+      "bytes": 496160,
+      "provenance_record": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_results_v2.json"
+    },
+    {
+      "kind": "npy_regressor",
+      "shape": [
+        17,
+        6890
+      ],
+      "dtype": "float64",
+      "negative_weight_count": 0,
+      "row_sum_min": 0.999633385693829,
+      "row_sum_max": 1.000049152928745,
+      "original_vertices2joints_vs_independent_einsum_max_error": 2.7755575615628914e-17,
+      "linear_translation_response_max_error": 2.220446049250313e-16,
+      "artificial_vertex_gradient_finite_nonzero": true,
+      "boundary": "resource/linear map check only; negative weights allowed, no real joint accuracy",
+      "path": "third_party/architecture_reproduction/HuManiFlow/model_files/J_regressor_h36m.npy",
+      "bytes": 937168,
+      "provenance_record": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_results_v2.json"
+    },
+    {
+      "kind": "npy_regressor",
+      "shape": [
+        19,
+        6890
+      ],
+      "dtype": "float64",
+      "negative_weight_count": 0,
+      "row_sum_min": 0.9999999999999999,
+      "row_sum_max": 1.0,
+      "original_vertices2joints_vs_independent_einsum_max_error": 1.3877787807814457e-17,
+      "linear_translation_response_max_error": 2.220446049250313e-16,
+      "artificial_vertex_gradient_finite_nonzero": true,
+      "boundary": "resource/linear map check only; negative weights allowed, no real joint accuracy",
+      "path": "third_party/architecture_reproduction/HuManiFlow/model_files/cocoplus_regressor.npy",
+      "bytes": 1047408,
+      "provenance_record": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_results_v2.json"
+    },
+    {
+      "kind": "pickle_regressor",
+      "shape": [
+        19,
+        6890
+      ],
+      "dtype": "float64",
+      "negative_weight_count": 0,
+      "row_sum_min": 0.999633385693829,
+      "row_sum_max": 1.0000491529287447,
+      "original_vertices2joints_vs_independent_einsum_max_error": 2.7755575615628914e-17,
+      "linear_translation_response_max_error": 2.220446049250313e-16,
+      "artificial_vertex_gradient_finite_nonzero": true,
+      "boundary": "resource/linear map check only; negative weights allowed, no real joint accuracy",
+      "path": "third_party/architecture_reproduction/ProHMR/data/SMPL_to_J19.pkl",
+      "bytes": 1047441,
+      "provenance_record": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_results_v2.json"
+    },
+    {
+      "kind": "mean",
+      "keys": [
+        "shape",
+        "pose",
+        "cam"
+      ],
+      "shapes": {
+        "pose": [
+          144
+        ],
+        "shape": [
+          10
+        ],
+        "cam": [
+          3
+        ]
+      },
+      "rotation_layout": "HMR2 published packed-column decoder; raw file unchanged",
+      "HMR2_mean_loader": "hmr2/models/heads/smpl_head.py:49-55; ProHMR FCHead only uses shape/cam",
+      "mean_pose_orthogonal_residual_min": 1.5099581673894136e-07,
+      "existing_project_codec_invalid_init_nodes": [
+        0
+      ],
+      "original_decoder_orthogonality_max_error": 2.4886559826797772e-14,
+      "original_decoder_min_determinant": 0.9999999999999997,
+      "valid_nodes_original_vs_adapter_max_error": 0.0,
+      "boundary": "A learned head initialization file, not a direct pose observation. Original F.normalize eps differs from project degeneracy gate; neither file nor gate changed.",
+      "path": "third_party/architecture_reproduction/ProHMR/data/smpl_mean_params.npz",
+      "bytes": 1310,
+      "provenance_record": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_results_v2.json"
+    },
+    {
+      "kind": "mean",
+      "keys": [
+        "shape",
+        "pose",
+        "cam"
+      ],
+      "shapes": {
+        "pose": [
+          144
+        ],
+        "shape": [
+          10
+        ],
+        "cam": [
+          3
+        ]
+      },
+      "rotation_layout": "HMR2 published packed-column decoder; raw file unchanged",
+      "HMR2_mean_loader": "hmr2/models/heads/smpl_head.py:49-55; ProHMR FCHead only uses shape/cam",
+      "mean_pose_orthogonal_residual_min": 1.5099581673894136e-07,
+      "existing_project_codec_invalid_init_nodes": [
+        0
+      ],
+      "original_decoder_orthogonality_max_error": 2.4886559826797772e-14,
+      "original_decoder_min_determinant": 0.9999999999999997,
+      "valid_nodes_original_vs_adapter_max_error": 0.0,
+      "boundary": "A learned head initialization file, not a direct pose observation. Original F.normalize eps differs from project degeneracy gate; neither file nor gate changed.",
+      "path": "C:/Users/毛晨昊/.cache/4DHumans/data/smpl_mean_params.npz",
+      "bytes": 1310,
+      "provenance_record": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_results_v2.json"
+    },
+    {
+      "kind": "pickle_regressor",
+      "shape": [
+        19,
+        6890
+      ],
+      "dtype": "float64",
+      "negative_weight_count": 0,
+      "row_sum_min": 0.999633385693829,
+      "row_sum_max": 1.0000491529287447,
+      "original_vertices2joints_vs_independent_einsum_max_error": 2.7755575615628914e-17,
+      "linear_translation_response_max_error": 2.220446049250313e-16,
+      "artificial_vertex_gradient_finite_nonzero": true,
+      "boundary": "resource/linear map check only; negative weights allowed, no real joint accuracy",
+      "path": "C:/Users/毛晨昊/.cache/4DHumans/data/SMPL_to_J19.pkl",
+      "bytes": 1047441,
+      "provenance_record": "research_records/research/G20261007_flow_mesh_baseline_v1/architecture_resources_results_v2.json"
+    }
+  ],
+  "specific_official_mean_fixture_comparison": [
+    {
+      "official_path": "third_party/architecture_reproduction/ProHMR/data/smpl_mean_params.npz",
+      "fixture_path": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+      "keys_equal": true,
+      "arrays_and_dtypes_equal": true,
+      "raw_bytes_equal": true
+    },
+    {
+      "official_path": "C:/Users/毛晨昊/.cache/4DHumans/data/smpl_mean_params.npz",
+      "fixture_path": "third_party/architecture_reproduction/smpl_mean_params_mmpose.npz",
+      "keys_equal": true,
+      "arrays_and_dtypes_equal": true,
+      "raw_bytes_equal": true
+    }
+  ],
+  "historical_preflight_records": [
+    {
+      "source": "user-supplied takeover attachment, R1 historical WHAM preflight",
+      "operation": "HEAD redirect before this takeover; not repeated in local verification",
+      "outcome": "12s ReadTimeout on drive.usercontent.google.com",
+      "archive_body_downloaded": false,
+      "boundary": "Historical report, not current network evidence or absence/license verdict"
+    }
+  ],
+  "retained_acquisition_records": [
+    "architecture_resources_results_v1.json",
+    "architecture_resources_results_v2.json"
+  ],
+  "boundary": "Local auxiliary interfaces only; no original mesh/full-method or accuracy validation"
+}

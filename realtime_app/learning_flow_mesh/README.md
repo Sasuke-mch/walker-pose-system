@@ -89,3 +89,9 @@ H4新增`hand_conditions.py`和`reproduction.check_hand_conditions --output <new
 H5在`hand_candidate.py`接入原生手部条件：两视图独立memory含6D/框score、camera ID及30个解剖节点ID，同手15queries读取同手memory，只把残差加到对应30手节点condition，再由原52节点生成器传播。全缺失的手跳过attention并贡献精确零；输入不直接覆盖输出旋转，不进入共享β/平移/GRU。`candidate.py`只增加编码委托接口，其他状态及发布逻辑复用；关闭手条件的完整360帧结果与旧H3保存结果完全相同。
 
 命令：`-m realtime_app.learning_flow_mesh.reproduction.check_hand_candidate --output <new.json>`，CPU2threads，必须已有H2/H4保存契约和本地人体资产。新增分支23616参数、候选总167315；新增12测试，全模块102项/Ruff/AST通过。完整360/分块/未来/真实解码与独立重建检查见`architecture_h5_validation.json`。随机条件影响不能当精度改进；两次分支CPU中位数0.650/0.754ms不包含检测/人体解码/Stage，也不代表整套实时性。首轮误取COCO regressor一行的运行器失败保留；没有训练、模型权重更新或主线更改。原方法默认资源缺口、null帧GRU、shape池化和eager部署限制仍在。
+
+### R1 原辅助资源本地验收
+
+七个已有官方regressor/mean通过schema、人工6890顶点线性/平移/梯度检查；本次不联网。命令`python -B -m realtime_app.learning_flow_mesh.reproduction.fetch_auxiliary_resources --local-only --output <new.json>`；网络入口拒绝记录中已有两次的第三次尝试。归档以唯一目标集合确定完成，EOF缺项和重复成员保留。
+
+实际全模块124测试、14warning及Ruff/40文件AST通过。两个官方mean与MMPose fixture字节一致仅限明确对象；mean根退化与观测codec门不同，不改门。当前architecture_full_path_resources_v3.json仍缺14项，六条默认neutral路径未运行；validation保持whole_goal_complete=false。无训练/权重加载、无主线变化，无精度结论。

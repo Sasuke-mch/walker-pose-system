@@ -3819,6 +3819,14 @@ v1保留float64检查器与原float32 pipeline的框腕距离微差失败，只�
 
 全模块102、Ruff/38文件AST通过，真实native/boxscore/节点与视图identity/attention梯度有限非零，当前masked camera及其他过去/未来手输入梯度0，无优化器。首轮v1误取COCO regressor一行的运行器错误已修并保留失败；13资产warning保留。两次CPU2thread warmed50分支中位0.650/0.754ms，无手0.119/0.146ms；完整8NFE候选另计，不含检测/人体解码/Stage，不能推整套FPS。原core/主线等8路径不变，candidate文本委托外完全相同，719作者文件字节数一致；89既有工作区条目保留，不推送。实现/文献/模块/研究状态同步，长期任务继续，公共原辅助资源/完整路径及null帧历史对照仍待推进。
 
+### 2026-10-08 R1 接手验收与窗口迁移
+
+核对原聊天idle、无本阶段Python进程、暂存为空；旧跟进已PAUSED，使用app工具迁移同一automation到本聊天并恢复ACTIVE，没有复制第二个跟进。长期目标继续，不训练、不加载训练权重，不升级方法证据。七个已有官方辅助文件本地复验通过，本次网络请求0；六条默认路径仍不ready，缺口21→14（P04/P05/P07各1，P09为3，P10/P12各4）。未执行原neutral网格路径。
+
+获取器修正唯一成员计数、EOF缺项、重复成员及读后deadline，保留wanted/acquired/missing和all_selected_acquired；读取既有记录后阻止第三次网络获取。历史WHAM HEAD的12s重定向超时单列历史报告，不冒充当前网络操作。官方ProHMR/HMR2 mean与旧MMPose fixture的keys/数组/dtype/原字节全相同，仅限这两个明确对象。根6D正交残量1.509958e-7，原F.normalize通过，项目1e-6退化门拒绝节点0；不改资产/门，不当有效观测。
+
+全模块实际124通过、14warning保留，Ruff及40文件AST通过。719作者归档文件存在/字节数一致（非逐字比较）；10个core/候选/主线/原WiLoR路径相对现有版本未变。结果v1/v2及初轮Ruff失败保留；新本地v3、full-path v2/v3和validation保存。六个已有说明/状态同步，原89项工作区状态保留，不推送。下一阶段先单因素预注册null-frame历史策略，完整原方法默认neutral资源继续待用户提供合法本机路径；共享beta池化不同时改动。
+
 
 ### 2026-10-08 现有优化主线数学说明（Word简版）
 

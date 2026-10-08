@@ -81,7 +81,16 @@ def mesh_resource_audit():
         ("models/smplx/SMPLX_NEUTRAL.pkl", "SMPL-X neutral, different vertex/parameter topology"),
         ("models/smpl/J_regressor_coco.npy", "project COCO17 surface regressor, not original regressors"),
         (ROOT / "smpl_mean_params_mmpose.npz", "public initialization fixture; original bundle equivalence unconfirmed"))]
+    fixture = ROOT / "smpl_mean_params_mmpose.npz"
+    comparisons = []
+    for original in (ROOT / "ProHMR/data/smpl_mean_params.npz", cache / "smpl_mean_params.npz"):
+        if fixture.is_file() and original.is_file():
+            comparisons.append({"official_path": original.as_posix(), "fixture_path": fixture.as_posix(),
+                                "raw_bytes_equal": original.read_bytes() == fixture.read_bytes()})
+    if len(comparisons) == 2 and all(item["raw_bytes_equal"] for item in comparisons):
+        local_assets[-1]["role"] = "public fixture byte-identical to acquired ProHMR/HMR2 means only; no automatic substitution"
     return {"status": "resource_inventory_completed_with_gaps", "training_executed": False,
+            "specific_fixture_byte_comparisons": comparisons,
             "author_mesh_paths": checked, "smplx_default_gender_verified": "neutral",
             "targeted_resource_names_found": found.stdout.splitlines(), "existing_alternatives": local_assets,
             "automatic_substitutions": [], "mesh_loading_or_weights_loading_executed": False,

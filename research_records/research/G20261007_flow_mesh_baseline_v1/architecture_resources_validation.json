@@ -1,0 +1,69 @@
+{
+  "status": "R1_auxiliary_resource_contract_verified",
+  "whole_goal_complete": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "network_requests_this_takeover": 0,
+  "original_mesh_forward_executed": false,
+  "resources_verified": 7,
+  "default_missing_before": 21,
+  "default_missing_after": 14,
+  "missing_by_paper": {
+    "P04": 1,
+    "P07": 1,
+    "P05": 1,
+    "P09": 3,
+    "P10": 4,
+    "P12": 4
+  },
+  "tests": {
+    "tests": "124",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "R1_new_cases": 22,
+  "warnings_retained": 14,
+  "linter": "uvx --offline ruff passed",
+  "syntax_AST_files": 40,
+  "author_source_file_existence_and_byte_counts_verified": 719,
+  "author_check_limit": "Existing manifest compares presence and byte counts, not full contents. No author edits performed.",
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/infer.py",
+    "realtime_app/learning_flow_mesh/config.json",
+    "realtime_app/learning_flow_mesh/candidate.py",
+    "realtime_app/learning_flow_mesh/hand_candidate.py",
+    "realtime_app/learning_flow_mesh/hand_conditions.py",
+    "realtime_app/learning_flow_mesh/shared_shape.py",
+    "realtime_app/pose_app/wilor_mano_prior.py"
+  ],
+  "retained_results": [
+    "architecture_resources_results_v1.json",
+    "architecture_resources_results_v2.json",
+    "architecture_resources_results_v3.json",
+    "architecture_full_path_resources_v2.json",
+    "architecture_full_path_resources_v3.json"
+  ],
+  "current_audit": "architecture_full_path_resources_v3.json",
+  "mean_specific_fixture_keys_arrays_bytes_equal": true,
+  "mean_root_residual": 1.5099581673894136e-07,
+  "mean_root_project_codec_invalid_node": 0,
+  "acquisition_harness_corrections": [
+    "unique acquired/wanted/missing members and explicit all_selected_acquired",
+    "EOF with missing selection does not pass",
+    "duplicate selected members rejected",
+    "deadline checked after blocking read",
+    "third recorded attempt refused before network",
+    "historical WHAM report explicitly separate from current operations"
+  ],
+  "retained_failures": [
+    "Historical WHAM 12s HEAD redirect ReadTimeout reported in takeover attachment; no new HEAD or archive body operation",
+    "First takeover Ruff import-order failure corrected; 21 cases passed then coverage expanded to22 and actual full suite124 passed",
+    "Full path audit v2 retains old uncertain fixture role; v3 explicit comparisons supersede only that role"
+  ],
+  "boundary": "Artificial vertices and random/no-learned decoder resource checks only; no original neutral mesh, full input/evaluation, real joint/shape/contact accuracy or evidence-level upgrade",
+  "unrelated_workspace_entries_preserved": 89
+}

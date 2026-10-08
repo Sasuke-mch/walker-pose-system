@@ -76,3 +76,7 @@ H5执行：v1运行器误取COCO回归矩阵一行而失败，已修运行器并
 ### R1 原论文公共辅助资源预注册
 
 见`architecture_resources_protocol.json`。按官方仓库/资源脚本获取明确的原regressor/mean，检查形状、数值、单位响应和梯度，再重新核对六个默认人体路径的资源清单。只获取小型辅助文件，限制请求时间/字节，压缩包只读取allowlist常规成员，不展开模型/权重/数据集，不覆盖既有文件、不用同形同名或male/SMPL-H替代默认neutral。失败保留，原源码/core/主线不改。文件存在不代表完整方法或精度通过；许可模型和完整输入/评价仍单列。
+
+### R1 实际验收
+
+七项原公共辅助文件schema及人工线性/梯度本地核验通过，本次网络0，保留v1/v2获取和历史WHAM传输失败。唯一变量仍是辅助资源，未改正式主线、作者原源码或候选。获取器唯一目标完成/EOF缺项/重复成员/读后deadline和已记录两次网络尝试保护已检查。新architecture_resources_results_v3.json与full-path资源v3为当前证据，v2保留。六个默认mesh路径仍缺14项，未执行完整neutral网格或原评价。124测试/14warning、Ruff/40文件AST通过，详细边界与不变路径在architecture_resources_validation.json。长期目标未完成。
