@@ -155,3 +155,19 @@ uvx --offline ruff check realtime_app/learning_flow_mesh/reproduction realtime_a
 验证：全模块38项测试通过（H1新增8项），Ruff/AST通过，原模型/训练/配置及主线文本不变。v1失败由广播数组写入别名导致，将输入clone后才注入缺失修复；v2对不同批大小过度要求逐位相同导致失败，保留误差并增加同批精确公式控制。v3/v4成功，其中v4关闭整个结构运行器的梯度记录；梯度检查只在单元测试中反传，不做参数更新。详见architecture_h1_results_v4.json及architecture_h1_validation.json；NPZ本地保存完整不可用前缀和掩码，不提交数组。
 
 命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_shared_shape --output <new.json>`。输出同名NPZ，均不覆盖。既有条件编码器、历史GRU在缺失帧仍运行，H1只控制shape读出不改这一路；池化历史特征可能重复计入早期信息，尚未证明不偏或可辨识。8帧是工程阈值，需后续质量/时延研究；共享常数本身不证明体型正确。候选保持隔离，后续H2语义适配、原完整方法路径继续。
+
+## 2026-10-08 H2：把作者组件接口接清楚
+
+协议architecture_h2_protocol.json先提交后实现。新增interfaces.py和reproduction/check_interfaces.py，没有更改原model.py/train.py/config.json或current_mainline.json。
+
+关节：COCO17_SURFACE为表面观测，现有17×6890回归器通过原验证；它不等于SMPL-H内置腕/肘节点。SMPLH52_ROTATIONS是根、21身体、30手的局部旋转。MotionBERT H36M17由其dataset_wild.py的halpe2h36m定义，右腿在左腿前，含pelvis/torso/neck/head_top；COCO没有全部这些输入，适配层拒绝因同为17而直接复用、补零或合成头部。WHAM实际检测输入来自COCO ViTPose路径，不拿kp_utils中另一个H36M列表替代它。
+
+旋转：ProHMR/HMR2与当前baseline使用前两列顺序拼接；HuManiFlow默认、MotionBERT使用前两列交错；WHAM人体/root路径rotation_6d_to_matrix使用前两行顺序拼接，其同文件legacy rot6d_to_rotmat又是交错列。显式SixDLayout通过矩阵转换，不凭6维判断。20个非对称float64合法旋转对六个原函数作原样AST运行，结果与适配完全一致。故意将WHAM行布局交给列解码，仍是合法旋转，但最大矩阵差1.74154；正交/行列式检查抓不到这种接线错误。退化、共线、NaN的6D保持invalid/NaN，不替换identity；转换梯度单独检查。
+
+掩码：项目True为存在，WHAM预处理True为缺失，MaskMeaning必须明示；不接受数值mask。相机：PixelDomain明确原始/转正，不能根据raw文件名猜测。复用现有model_to_raw_point和StereoCalibration，先回原鱼眼，再反畸变生成单位射线。R/T遵循Xright=R·Xleft+T；右光心cam0坐标为−RᵀT，右射线为Rᵀdright；mm转m只做一次。弱透视尺度/偏移不能改名成米制XYZ。像素坐标有效、射线反投影一致、冻结严格质量门为三个独立状态；逆变换不一致保留原因，不删除仍有效的二维观测。反投影往返1e-4px为隔离适配器内部数值检查，未替换或放宽原严格门。
+
+真实保存输入：G20261003_repositioned360_cold_smplh_v2左右pmpose_raw.json及该目录calibration/stereo_fisheye.json，严格参考为G20261005_reference25_mainline_view_v2/first_instance_strict.jsonl。360帧0..359、物理pair1157..1516，共6120个逐点槽。331帧关联成功，左右人物索引均0；29帧association_failed，保留493个不可用槽，不给候选选第一人。左右分别162/203帧含多个检测候选，故索引核对必要。与原身体raw_side读取器在全部360帧的逆变换差为0；29帧的原身体软观测行为未修改，严格场景关联与身体软质量是不同协议。
+
+3031个严格接受点与每个原拒绝reason照录；2091个高重投影误差点有限XYZ仍保留诊断，未变成接受点。其余原拒绝为低2D分数369、越界136；关联失败493为无逐点源条目的框架不可用状态，同时保存原pair_outcome。双视图像素/射线有效11118；单位射线范数误差3.33e-16；沿光线点重投影最大误差左6.85e-13px、右2.74e-12px，仅为内部一致性。cal单位mm、基线0.27591249m；世界/动态地面未接入、不借这套检查证明人体准确性。
+
+命令：`.venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_interfaces --output <new.json>`，结果带同名本地NPZ，保留所有槽、人物与拒绝状态且拒绝覆盖。v1通过；v2增加原置信度照录；v3补物理pair范围和置信度范围检查。单元新增16例，全模块54通过；初次故障注入尝试修改frozen校准实例失败，改为测试内临时类方法注入，不改校准类。Ruff初次导入排序及检查器边界标记修正后通过。详见architecture_h2_validation.json。完整原方法网格/输入/评估仍未全部完成；下一阶段先补可运行的原路径与资源清单，再将H1/H2接入一个声明COCO17、52旋转的隔离候选，不能把随机输出当改进精度。

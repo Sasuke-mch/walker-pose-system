@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "training_executed": false,
+  "whole_goal_complete": false,
+  "tests": {
+    "tests": "54",
+    "failures": "0",
+    "errors": "0"
+  },
+  "h2_new_behavior_cases": 16,
+  "linter": "passed",
+  "syntax": "AST passed for three new source files",
+  "mainline_and_baseline_unchanged_after_CRLF_normalization": true,
+  "unchanged_paths": [
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/learning_flow_mesh/model.py",
+    "realtime_app/learning_flow_mesh/train.py",
+    "realtime_app/learning_flow_mesh/config.json"
+  ],
+  "results_file": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_h2_results_v3.json",
+  "prior_results_retained": [
+    "architecture_h2_results_v1.json",
+    "architecture_h2_results_v2.json"
+  ],
+  "initial_failures": [
+    {
+      "stage": "unit test fault-injection fixture",
+      "result": "15 passed, 1 failed",
+      "cause": "Calibration is a frozen dataclass; instance monkeypatch rejected",
+      "resolution": "Temporary class-method monkeypatch only within one test"
+    },
+    {
+      "stage": "static checks",
+      "cause": "Import ordering and intentional AST execution/exception capture diagnostics; semicolon in noqa directive invalid",
+      "resolution": "Imports sorted; exact author function execution and failure capture documented; valid standalone noqa markers"
+    }
+  ],
+  "evidence_boundary": "Interface and saved-input/internal geometry only; original full methods not all reproduced, no trained accuracy/realtime claim",
+  "unrelated_workspace_entries_at_start": 89
+}

@@ -2,6 +2,8 @@
 
 这是隔离的研究模块，不参与正式实时主线。先读20篇原始正文后确定设计，依据和失败记录在 [研究目录](../../research_records/research/G20261007_flow_mesh_baseline_v1/)。需要本地有许可的SMPL-H与匹配MANO资产；不会自动下载数据或模型。
 
+当前推进十篇作者结构研究，按用户要求不训练。下方训练命令属于历史合成baseline，不是当前任务。原model.py与config.json仍为冻结对照；H1前缀共享体型候选在shared_shape.py，H2接口适配在interfaces.py，两者尚未替换主线或原模型默认行为。阶段状态和范围见研究目录architecture_research.json。
+
 ## 网络与坐标
 
 观测二维点/置信度、存在mask、相机原点/单位射线、可选RGB或图像特征 → 52个旋转查询cross-attention → 单向GRU历史 → 条件速度场（帧内全身attention、可切换运动树GCN）→ 6D终点投影 → 真实SMPL-H网格。人体体型beta由初始帧估计后冻结，平移逐帧回归。历史/图开关在config.json。另有同条件编码的确定性回归入口。
@@ -62,3 +64,14 @@ uvx ruff check realtime_app/learning_flow_mesh
 测试检查旋转正交/行列式、零/近共线拒绝、未来扰动不泄露、前缀与流式等价、缺失NaN不污染、全缺失状态、零置信度仍使用坐标、真实网格输入梯度、网络→ODE→网格梯度、checkpoint/seed一致性和划分拒绝。训练损失下降仅是基础学习证据。真实研究下一阶段需要有许可的公开/合成规模数据及真实场景独立测试；当前360/448连续工程拟合不能充当独立三维真值。
 
 最新验收使用上述1000步配置；同容量回归、关闭graph、关闭history均执行，详见研究目录IMPLEMENTATION.md和verification_summary.json。21项测试通过。FM fresh合成顶点一致性110.47mm，回归50.07mm；图/历史没有在这组人工任务证实收益。FM全训练重跑、fresh推理与输入重建均逐位相同（限本环境）；全缺失64帧保留无效。默认模块config.json的200步仅为快速检查，不等同最新1000步结果。
+
+## 不训练的结构与接口检查
+
+原组件运行器在reproduction目录，不能把组件前向当完整论文复现。H1与H2累计后全模块54项测试通过；没有重新训练。H2逐项声明COCO表面观测、MotionBERT H36M顺序、SMPL-H旋转节点、6D排列、掩码极性、原始/转正像素域及相机单位。严格质量门来自冻结文件，射线能计算不代表严格接受。H2读取360帧，保留29个关联失败帧；这些帧不给隔离候选指定人物。现有身体软观测读取器另有契约，未改变。
+
+```powershell
+& .venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh.reproduction.check_interfaces --output research_records/research/G20261007_flow_mesh_baseline_v1/architecture_h2_results_new.json
+& .venv-cuda/Scripts/python.exe -B -m pytest realtime_app/learning_flow_mesh/tests -q
+```
+
+结果JSON与同名NPZ不覆盖已有版本。NPZ含完整帧/物理pair编号、人物索引、原始像素、归一化像素、置信度、cam0米制光心与单位射线、观察/几何/严格掩码、拒绝原因、quality_flags及有限拒绝三维诊断值。未执行真实图像网络前向、拟合或精度评价。

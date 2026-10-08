@@ -1,7 +1,7 @@
 {
   "objective": "Ten primary-paper architecture reproductions without training; incrementally improve an isolated SMPL-H candidate",
   "started": "2026-10-08",
-  "stage": "H1_isolated_candidate_structure_passed_H2_and_full_paths_pending",
+  "stage": "H2_interfaces_and_saved_replay_passed_original_full_paths_pending",
   "training_allowed": false,
   "mainline_frozen": "realtime_app/configs/current_mainline.json",
   "automation_id": "automation",
@@ -164,7 +164,7 @@
       "coverage": "Original sphere geodesic/JVP, configured 512-wide eight-layer time-MLP/tangent projection and exact author rfm_loss_fn; no training, density/ODE evaluation, meshes or SO(3) human pose"
     }
   ],
-  "next": "Lock H2 explicit joint/camera/mask/6D adapter protocol. Complete remaining original input/body/evaluation reproduction paths separately; H1 remains a random structural candidate, not mainline. No training.",
+  "next": "Complete original input/body/evaluation paths or document specific unavailable resources; then preregister real COCO17 candidate integration with H1/H2 and 52 local rotations. No training or mainline replacement.",
   "completed": [
     "Protocol locked before executing source/model checks",
     "Ten source/config/license snapshots acquired with local provenance",
@@ -177,7 +177,8 @@
     "Original HuManiFlow proxy encoder/hierarchical SO(3) sampling and log density",
     "Original HMR2 ViT-H/16 and Transformer SMPL parameter head",
     "Original Riemannian FM sphere geodesic, tangent network and exact loss method",
-    "H1 masked causal eight-admissible-frame calibration using unchanged shape head, explicit unavailable prefix, fixed beta, real SMPL-H ready-segment decode and gradients"
+    "H1 masked causal eight-admissible-frame calibration using unchanged shape head, explicit unavailable prefix, fixed beta, real SMPL-H ready-segment decode and gradients",
+    "H2 explicit joint/6D/mask/pixel/unit contracts, exact parity with six author rotation functions and complete frozen 360-frame strict replay"
   ],
   "failures": [
     "V1 linter found two import-order diagnostics, external-class exec and exception-boundary diagnostics; imports corrected and intentional harness boundaries documented. Final linter passed.",
@@ -190,7 +191,8 @@
     "Initial download guard accessed lazy torch.utils.model_zoo before import and exited before JSON; corrected explicit import inside exception-recording boundary. No model executed in this failed invocation.",
     "SPIN raw mean-parameter URL returned 404; public MMPose fixture acquired and matched existing local copy. Original release-bundle equivalence remains unconfirmed.",
     "H1_v1 fixture writes into broadcast camera-origin storage contaminated valid frames; tensor clone before fault injection fixes harness only, no generator/mainline change.",
-    "H1_v2 bitwise comparison across B=1 versus B=2 GEMM differed by 2.98e-8; identical-batch formula is exact, cross-batch discrepancy recorded below 1e-6 numerical tolerance. No geometric acceptance gate changed."
+    "H1_v2 bitwise comparison across B=1 versus B=2 GEMM differed by 2.98e-8; identical-batch formula is exact, cross-batch discrepancy recorded below 1e-6 numerical tolerance. No geometric acceptance gate changed.",
+    "H2 test fixture attempted to monkeypatch frozen calibration instance; test-local class monkeypatch fixes injection. Initial Ruff import/intentional harness/noqa syntax issues corrected and retained in validation record."
   ],
   "candidate_revisions": [
     {
@@ -217,7 +219,7 @@
     },
     {
       "id": "H2",
-      "status": "planned_not_implemented",
+      "status": "isolated_interface_and_saved_replay_passed_not_mainline",
       "change": "Explicit camera/joint/rotation/units adapters before adopting original modules",
       "sources": [
         "P03",
@@ -235,7 +237,11 @@
         "weak camera parameters never renamed metric translation",
         "missing/presence mask polarity"
       ],
-      "boundary": "Frozen strict geometry/Stage/ground remain external; no learned replacement"
+      "boundary": "54 total tests, six original function checks, 360-frame saved-input replay; neither a trained network, strict gate change nor ten full method completion",
+      "protocol": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_h2_protocol.json",
+      "implementation": "realtime_app/learning_flow_mesh/interfaces.py",
+      "results": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_h2_results_v3.json",
+      "tests": 16
     }
   ]
 }

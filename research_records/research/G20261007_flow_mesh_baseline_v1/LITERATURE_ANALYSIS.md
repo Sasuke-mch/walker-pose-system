@@ -282,3 +282,11 @@ ProHMR概率性集中于姿态6D流；FCHead由图像条件回归β/相机，再
 HMR2公开ViT-H/16和头共6.7046亿参数；结构规模已确认，构造/执行总耗时不能当部署延迟。实时目标下应先测预算，不能直接照搬。HuManiFlow要求18通道边缘/热图代理；借鉴SO(3)层级设计还需处理代理构建及23关节SMPL到52旋转SMPL-H语义，不能直接补零认作相同模型。
 
 Riemannian FM作者支持Sphere/FlatTorus/SPD/Mesh等，不直接提供人体SO(3)条件流。原球面路径和切向网络成功不证明改成SO(3)更准确。下一项隔离H1因果多帧体型校准，保持姿态生成器；随后做H2显式相机/关节/旋转适配。原完整网格/输入/评估缺口另列，长期目标继续。
+
+## 原组件组合之前的语义核对（H2）
+
+同为17点不表示相同监督：MotionBERT dataset_wild.py的halpe2h36m采用右腿在前的H36M序列，并依赖Halpe的颈/髋/头顶；项目为COCO表面点。WHAM CustomDataset初始化以coco根中心处理，detector.py指定COCO ViTPose配置；不能将其工具文件中H36M列表当成实际推理输入。
+
+同为6D也不表示相同旋转：ProHMR/HMR2 geometry.py顺序列，HuManiFlow rigid_transform_utils.py默认交错列，MotionBERT utils_mesh.py交错列；WHAM transforms.py的rotation_6d_to_matrix为顺序行，而另一个rot6d_to_rotmat为交错列。六个原函数已用20个非对称旋转验证，显式适配一致；错误行/列接线仍通过正交和det=+1，必须测试矩阵含义。来源为本地作者原函数，与论文概念性“6D”描述分开。
+
+当前架构更合理的推进顺序是先保证输入/输出约定，再讨论空间图和Flow路径。观察tokens的COCO语义与52个旋转queries分开，连接由条件attention承担，模型侧观测由真实表面回归器产生。它是明确的候选设计，尚未验证学习是否能正确对应；不能从模型骨架里挑相近节点或把弱透视camera直接变成米制平移。H1只修共享形状读出时机，H2只修候选接口；两者均不证明精度改善，也没有替代主线。
