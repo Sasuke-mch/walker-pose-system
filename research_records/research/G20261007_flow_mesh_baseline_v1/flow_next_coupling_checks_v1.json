@@ -1,0 +1,99 @@
+{
+  "stage": "same-capacity coupling information candidate",
+  "protocol": "flow_next_coupling_protocol_v1.json",
+  "code": [
+    "realtime_app/learning_flow_mesh_next/information_encoding.py",
+    "realtime_app/learning_flow_mesh_next/joint_flow.py",
+    "realtime_app/learning_flow_mesh_next/candidate_store.py",
+    "realtime_app/learning_flow_mesh_next/tests/test_encoding.py"
+  ],
+  "commands": [
+    ".venv-cuda/Scripts/python.exe -m pytest realtime_app/learning_flow_mesh_next/tests -q",
+    "uvx --offline ruff check realtime_app/learning_flow_mesh_next",
+    ".venv-cuda/Scripts/python.exe -m compileall -q realtime_app/learning_flow_mesh_next"
+  ],
+  "input_construction": "Lambda=I and I +/- (e_pose0 e_beta0^T + e_beta0 e_pose0^T); all PSD, equal diagonal token blocks, different cross constraint signs/rank",
+  "probe_recipe": {
+    "base_seed": 20261012,
+    "seeds": "base_seed+probe_columns",
+    "distribution": "independent +/-1/sqrt(columns)",
+    "columns_pose_translation": 3,
+    "columns_shape": 10,
+    "projection_precedes_signed_log": true,
+    "fixed_buffers_in_both_controls": true,
+    "state_dict_buffers_persistent": false
+  },
+  "rows": [
+    {
+      "nodes": 22,
+      "learned_parameters": 707603,
+      "same_registered_parameters": true,
+      "fixed_probe_entries": 1027,
+      "fixed_probe_bytes_float64": 8216,
+      "extra_cross_projection_multiply_accumulates_per_velocity": 26623,
+      "baseline_independent_confounded_features_equal": true,
+      "candidate_feature_max_delta": 0.4557463944083262,
+      "candidate_sign_flip_feature_max_delta": 0.9114927888166524,
+      "block_diagonal_velocity_max_delta": 0.0,
+      "coupled_velocity_max_delta_random_init": 0.17557046949774635,
+      "blind_counterexample": {
+        "matrix": "I + .5*(u v^T + v u^T), disjoint pose/shape support; u in null(P10_pose^T), v in null(P3_shape^T)",
+        "cross_max_abs": 0.39447363457138984,
+        "minimum_eigenvalue": 0.5000000000000001,
+        "encoded_feature_max_delta": 9.778167804200752e-17
+      }
+    },
+    {
+      "nodes": 52,
+      "learned_parameters": 711443,
+      "same_registered_parameters": true,
+      "fixed_probe_entries": 2197,
+      "fixed_probe_bytes_float64": 17576,
+      "extra_cross_projection_multiply_accumulates_per_velocity": 102583,
+      "baseline_independent_confounded_features_equal": true,
+      "candidate_feature_max_delta": 0.4557463944083262,
+      "candidate_sign_flip_feature_max_delta": 0.9114927888166524,
+      "block_diagonal_velocity_max_delta": 0.0,
+      "coupled_velocity_max_delta_random_init": 0.23912041746626556,
+      "blind_counterexample": {
+        "matrix": "I + .5*(u v^T + v u^T), disjoint pose/shape support; u in null(P10_pose^T), v in null(P3_shape^T)",
+        "cross_max_abs": 0.37898100397243695,
+        "minimum_eigenvalue": 0.49999999999999956,
+        "encoded_feature_max_delta": 1.8780300293967093e-16
+      }
+    }
+  ],
+  "tests_passed": 41,
+  "ruff": "passed",
+  "compileall": "passed",
+  "failure_history": [
+    "initial test used float32 labels/normalization with float64 model, 2 cases failed dtype; corrected test to run loss/sample in consistent float32",
+    "initial one test import-order lint failure repaired",
+    "two guessed test filenames did not exist; located actual test_joint.py with rg",
+    "author primary PDF URL redirect fetch failed; original Achlioptas paper text accessed via academic mirror"
+  ],
+  "source_checks": [
+    {
+      "url": "https://users.math.msu.edu/users/iwenmark/Teaching/MTH995/Papers/JL_Database_Subgaussian.pdf",
+      "read_scope": "original paper abstract/introduction and binary projection construction, mirrored PDF; theorem requires suitable projection dimension; no claim3/10probes satisfies uniform distance guarantee"
+    },
+    {
+      "url": "https://www.sciencedirect.com/science/article/pii/S0022000003000254",
+      "read_scope": "journal bibliographic and abstract cross-check"
+    }
+  ],
+  "default": "diagonal_blocks; candidate only ModelConfig(information_encoding=cross_block_sketch)",
+  "limitations": [
+    "non-injective and fixed nullspace demonstrated",
+    "random untrained velocity differences not efficacy",
+    "sum of diagonal and cross features may cancel; no exact reconstruction claim",
+    "fixed-probe coordinate/node ordering must remain locked",
+    "same parameter count does not establish equal full walltime; extra arithmetic/buffers reported, no updated whole-chain timing",
+    "no trained checkpoints or real-image accuracy"
+  ],
+  "training_executed": false,
+  "neural_weights_loaded": false,
+  "mainline_modified": false,
+  "efficacy_revision_count_increment": 0,
+  "next_action": "On existing fixed real-surface S3 anchor/J, quantify cross-information mass and sketch visibility under predeclared variable precision and admitted-joint masks. Do not regenerate candidates or choose projection seeds by held-out behavior. Noise calibration and training-heldout gates remain unresolved."
+}

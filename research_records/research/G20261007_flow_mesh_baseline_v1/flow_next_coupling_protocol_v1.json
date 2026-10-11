@@ -1,0 +1,24 @@
+{
+  "stage": "G1 information token coupling candidate",
+  "scope": "isolated learning_flow_mesh_next, no training",
+  "inputs": "explicit symmetric PSD matrices with equal 3x3/10x10 diagonal blocks and different pose-shape cross blocks",
+  "baseline": "original diagonal_blocks signed-log features",
+  "candidate": "cross_block_sketch: retain original diagonal signed-log features, add signed-log of off-block rows multiplied by fixed Rademacher probes; 3 probes for pose/T, 10 for beta; no extra learned parameters",
+  "unique_variable": "information token encoding only",
+  "fixed": "same init seed/state_dict, width128/heads4/blocks4; flow path, conditioning context, heads, sampling and labels unchanged",
+  "capacity": "711443 full52 and707603 body22; no trainable parameter increase; report additional fixed buffer bytes and arithmetic",
+  "candidate_default": "baseline remains default; candidate explicit opt-in, not claimed validated",
+  "success": [
+    "prove baseline collision on independent vs fully confounded and opposite-sign coupling",
+    "candidate distinguishes these specified analytic cases",
+    "block-diagonal information and absent information match baseline exactly",
+    "unknown/future/GT not introduced and information gradients remain detached",
+    "full52/body22, train-loss/sample graph and registered parameters unchanged"
+  ],
+  "negative_control": "construct nonzero PSD cross coupling lying in fixed probe nullspaces; preserve collision evidence and do not assert lossless encoding or JL distance guarantee with 3/10 probes",
+  "stopping": "one fixed seed20261012; no seed search to evade nullspace; no training or accuracy claim; retain failed attempts",
+  "sources": [
+    "Achlioptas2003 binary random-projection construction only; tiny probe budget lacks uniform guarantee"
+  ],
+  "next_gate": "held-out train-authorized strongest matched control required before promotion; numerical distinguishability is not efficacy"
+}

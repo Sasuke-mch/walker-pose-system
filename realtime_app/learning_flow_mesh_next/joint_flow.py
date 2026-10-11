@@ -5,6 +5,7 @@ import torch
 from torch import nn
 
 from .data_firewall import Normalization
+from .information_encoding import fixed_probes, information_features
 from .schema import Topology
 from .state_encoder import StateEncoder
 
@@ -15,11 +16,14 @@ class ModelConfig:
     width: int = 128
     heads: int = 4
     blocks: int = 4
+    information_encoding: str = "diagonal_blocks"
 
     def __post_init__(self):
         Topology(self.nodes)
         if self.width != 128 or self.heads != 4 or self.blocks != 4:
             raise ValueError("first preregistered core is width128/heads4/blocks4")
+        if self.information_encoding not in ("diagonal_blocks", "cross_block_sketch"):
+            raise ValueError("unregistered information encoding")
 
     def to_dict(self):
         return asdict(self)
@@ -39,6 +43,10 @@ class JointFlow(nn.Module):
         self.info_pose = nn.Linear(9, w, bias=False)
         self.info_position = nn.Linear(9, w, bias=False)
         self.info_shape = nn.Linear(100, w, bias=False)
+        # Both matched controls carry the same deterministic buffers. They are
+        # reconstructed from config and never consume global initialization RNG.
+        self.register_buffer("pose_probes", fixed_probes(self.topology.tangent_dimensions, 3), persistent=False)
+        self.register_buffer("shape_probes", fixed_probes(self.topology.tangent_dimensions, 10), persistent=False)
         self.blocks = nn.ModuleList(nn.TransformerEncoderLayer(
             w, config.heads, dim_feedforward=w * 2, dropout=0, activation="gelu",
             batch_first=True, norm_first=True) for _ in range(config.blocks))
@@ -56,16 +64,12 @@ class JointFlow(nn.Module):
         time = torch.stack((flow_time, (2*torch.pi*flow_time).sin(), (2*torch.pi*flow_time).cos()), -1)
         tokens = tokens + self.token_ids + context[:, None] + self.flow_time(time)[:, None]
         if information is not None:
-            m = self.topology.tangent_dimensions
-            if information.shape != (m, m) or not torch.isfinite(information).all():
-                raise ValueError("invalid frozen anchor information")
-            info = information.detach().to(state)
-            # Signed log compression; still a proxy unless noise was calibrated.
-            info = info.sign() * torch.log1p(info.abs())
-            blocks = torch.stack([info[3*i:3*i+3, 3*i:3*i+3].flatten() for i in range(n)])
-            residual = torch.cat((self.info_pose(blocks),
-                                  self.info_position(info[3*n:3*n+3, 3*n:3*n+3].flatten())[None],
-                                  self.info_shape(info[-10:, -10:].flatten())[None]), 0)
+            blocks, shape_information = information_features(
+                information.to(state), n, mode=self.config.information_encoding,
+                pose_probes=self.pose_probes, shape_probes=self.shape_probes)
+            residual = torch.cat((self.info_pose(blocks[:n]),
+                                  self.info_position(blocks[n])[None],
+                                  self.info_shape(shape_information)[None]), 0)
             tokens = tokens + residual[None]
         for block in self.blocks:
             tokens = block(tokens)

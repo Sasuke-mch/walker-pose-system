@@ -140,7 +140,8 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
                   "rejection_reasons": observation.rejection_reasons,
                   "source_masks": {key: getattr(observation, key).cpu().tolist() for key in
                                    ("present", "quality", "geometry", "views")},
-                  "normalization_source": normalization.source, "stream": stream}
+                  "normalization_source": normalization.source, "stream": stream,
+                  "information_encoding": model.config.information_encoding}
     provenance.update(timestamp_kind=observation.timestamp_kind,
                       view_timestamps=observation.view_timestamps)
     candidates = from_parameters(parameters, model.topology,

@@ -4112,3 +4112,14 @@ flow_next_config_v1.json与flow_next_data_manifest_v1.json保留训练禁止、�
 固定J、lambda0=1、lambda_g=0.1，proxy sigma5/10/20px分别选择G1:0:10/G1:0:3/G1:0:3，A5同样切换，不能归因信息机制。改变sigma使B相对变化约7.86%/0/8.08%；按precision比例补偿lambda0后metric变化0，只验证尺度混淆关系，不构成政策校准。G1保持原信息条件未重新生成，因此本轮只支持固定缓存聚合敏感性，不支持生成器效果。raw/数值/动作与全部元数据保持原样，无精度/速度提升声明。详细记录flow_next_sensitivity_v1/v2.json及summary。
 
 下一阶段直接检查G1仅读取Lambda对角块是否遗漏姿态与体型耦合：用相同对角块、不同交叉块的可解析信息矩阵压力测试条件编码，再设计参数不增的候选；独立标签、授权训练及held-out评价仍是方法性能的必要阶段，不能用连续工程审计替代。
+
+
+### 2026-10-11 G1跨块信息编码同规模候选
+
+依据当前joint_flow.py只读取Lambda对角块的实际缺口，先锁定flow_next_coupling_protocol_v1.json。解析PSD信息矩阵I与I±(e_pose0 e_beta0^T+e_beta0 e_pose0^T)具有同一token对角块，原编码完全一致，但分别表示独立约束、只能约束两变量之和/差的不同耦合。不能因为Lambda_ββ非零就认为G1接收了姿态消去后的体型信息。
+
+新增显式cross_block_sketch候选：保留原对角signed-log，跨块行先乘固定Rademacher probes再signed-log叠加到既有9/100维投影输入。参考Achlioptas二值随机投影构造，非作者人体方法复现，也不满足已证明的3/10通道JL统一保证。width128/heads4/blocks4/输出/CFM与采样图保持原样；full52仍711443参数，body22仍707603。两个对照初始化逐值相同，固定缓冲相同，float64 full52额外缓冲17576bytes；每velocity额外约102583乘加及复制/log等操作，未复测整链耗时，不能称同耗时性能提升。原diagonal_blocks继续默认，不替换已冻结缓存及正式主线。新候选配置与cache provenance明确记录编码模式。
+
+候选能区分指定的耦合/反向耦合；块对角及无信息时保持原输出，信息梯度detach、缺失hidden不变/不发布、同参数loss/sample图通过。但压力测试构造了非零交叉块的PSD矩阵I+C，其交叉部分落在固定probe零空间，编码差仅数值舍入量级；失败边界保留，拒绝无损/完整耦合传递声明。随机velocity差异不是精度改进。首次2个测试dtype不一致与1项import-order lint失败已修复，过程与来源获取失败列于flow_next_coupling_checks_v1.json；最终41项累计测试、Ruff及compileall通过，无训练/神经权重加载/主线修改。
+
+下一步复用现有真实SMPL-H解码的S3固定J与候选，预先指定准入关节mask和proxy precision扰动，检查跨块信息量及压缩可见性，不挑seed、不生成新候选；真实独立标签、噪声校准和授权训练held-out评价仍未完成，不能把本轮编码区分能力计为方法收益。
