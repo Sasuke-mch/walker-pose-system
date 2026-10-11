@@ -79,7 +79,7 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
     permit the same callable for licensed SMPL and independent analytic checks.
     """
     check_rig(obs, cameras)
-    noise.validate()
+    noise.validate_for(obs)
     scale.validate(store.topology)
     if step <= 0 or chunk < 1:
         raise ValueError("positive numerical Jacobian step/chunk required")

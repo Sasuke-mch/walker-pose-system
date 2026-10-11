@@ -1,0 +1,30 @@
+{
+  "stage": "independent raw-pixel residual calibration preparation",
+  "inputs": "paired detector raw_fisheye COCO17 pixels and independent reference pixels, original admitted and reference masks, all rejection reasons, subject/original_action/sequence/frame/physical timestamps and PnP camera roles",
+  "forbidden_references": [
+    "current fitted-body self-reprojection",
+    "same detector outputs used as labels",
+    "filled/smoothed labels",
+    "strict triangulation treated as independent3Dtruth"
+  ],
+  "fit_scope": "train only; artificial known-noise fixture allowed only split=fixture. Validation is frozen evaluation, test is not used to fit or tune. Group disjoint before augmentation.",
+  "unique_variable": "reference-residual precision preparation, not network width/depth/path/weights",
+  "controls": [
+    "fixed isotropic10px proxy",
+    "centered covariance vs uncentered second moment under systematic bias",
+    "independent vs temporally correlated artificial errors",
+    "missing frames remain missing in lag-pair construction"
+  ],
+  "statistics": "per-view/joint count, bias, unbiased centered covariance, uncentered second moment E[r r^T]; proxy export uses second moment with explicit numerical eigenfloor0.25px^2 so bias is not silently removed",
+  "minimum_count": 30,
+  "minimum_count_boundary": "engineering sufficiency threshold only; correlated samples are not30 independent observations",
+  "temporal": "within subject/action/sequence; adjacent original frame IDs and positive physical dt<=0.5s; missing entries never compressed into adjacency; centered within sequence; report pair Pearson correlation and dt range, not NIST uniform-grid ACF or effective sample count",
+  "reference_uncertainty": "manual-reference residual covariance includes annotation error; unknown reference uncertainty is retained. No silent subtraction or claim of detector-only Gaussian covariance.",
+  "noise_export": "calibrated=False always at this stage. No promotion from numeric fixtures/record count; independent reference audit, held-out coverage/tails/bias, temporal/cross-view/rig evidence still required. Missing cells block export rather than replacing with10px.",
+  "success": "reject self-reference/test fit/group leakage; retain nonfinite unknown slots; recover bias-vs-second-moment distinction and known covariance; detect temporal correlation without crossing missing frames/sequence boundaries; keep covariance source separate from calibrated claim",
+  "stop": "no real calibration on current360 replay or empty training manifest; no label acquisition/download/training; preserve unmet gates",
+  "sources": [
+    "https://docs.pytorch.org/docs/stable/generated/torch.cov.html",
+    "https://www.itl.nist.gov/div898/handbook/eda/section3/eda35c.htm"
+  ]
+}

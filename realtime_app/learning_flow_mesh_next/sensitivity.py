@@ -22,7 +22,7 @@ from .tangent import TangentScale
 
 def reweight_information(information, observation, noise):
     """Reuse unweighted J at exactly the same observation/anchor, not old Lambda."""
-    noise.validate()
+    noise.validate_for(observation)
     observation.validate()
     expected = {"identity": observation.identity, "sequence": observation.sequence,
                 "frame": observation.frame, "timestamp": observation.timestamp,

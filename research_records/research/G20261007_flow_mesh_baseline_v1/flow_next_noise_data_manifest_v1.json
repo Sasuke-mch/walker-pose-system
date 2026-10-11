@@ -1,0 +1,48 @@
+{
+  "status": "independent calibration reference not acquired",
+  "records": [],
+  "available_observation_only": {
+    "path": "D:\\my_works\\walker_pose_system\\research_records\\research\\G20261007_flow_mesh_baseline_v1\\architecture_h2_results_v3.npz",
+    "path_exists": true,
+    "frame_mapping": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\frames.json",
+    "camera_ids": [
+      "USB\\VID_05A3&PID_9230&MI_00\\6&3405B72D&0&0000",
+      "USB\\VID_05A3&PID_9230&MI_00\\6&214C0688&0&0000"
+    ],
+    "range_original_pairs": [
+      1157,
+      1516
+    ],
+    "frames": 360,
+    "does_not_supply_independent_reference": true
+  },
+  "training_manifest": "flow_next_data_manifest_v1.json",
+  "reference_needed": "independent original raw-fisheye COCO17 label pixels, own availability/uncertainty/evidence and original group split; all missing/failure slots retained",
+  "array_schema": {
+    "detected": "N,2,17,2",
+    "reference": "N,2,17,2",
+    "admitted": "N,2,17 bool",
+    "reference_valid": "N,2,17 bool"
+  },
+  "metadata_schema": [
+    "subjects",
+    "original_actions",
+    "sequences",
+    "frames",
+    "timestamps seconds and timestamp_kind",
+    "PnP camera_ids LEFT/RIGHT",
+    "reasons for every unavailable slot",
+    "split",
+    "detector/reference source paths",
+    "reference_kind/evidence/uncertainty",
+    "raw_fisheye and COCO17_manual_pixel"
+  ],
+  "blocked_stages": [
+    "real reference residual fitting",
+    "noise promotion to calibrated=True",
+    "independent held-out pose/shape efficacy",
+    "neural training"
+  ],
+  "why_not_replay_as_reference": "same current model reprojection and strict geometry are dependent on the observations; 360 frames are replay inputs, not independent labels",
+  "label_access_or_training_authorization_changed": false
+}

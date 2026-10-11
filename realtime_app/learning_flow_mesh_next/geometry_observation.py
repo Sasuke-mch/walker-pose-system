@@ -61,14 +61,23 @@ class NoiseModel:
     precision: torch.Tensor
     source: str
     calibrated: bool = False
+    camera_ids: tuple | None = None
 
     def validate(self):
         if self.precision.shape != (2, 17, 2, 2) or not self.source:
             raise ValueError("explicit per-view COCO17 pixel precision/source required")
+        if self.camera_ids is not None and (len(self.camera_ids) != 2 or len(set(self.camera_ids)) != 2):
+            raise ValueError("distinct noise calibration camera identities required")
         if not torch.isfinite(self.precision).all() or not torch.allclose(self.precision, self.precision.transpose(-1, -2)):
             raise ValueError("finite symmetric noise precision required")
         if (torch.linalg.eigvalsh(self.precision) <= 0).any():
             raise ValueError("noise precision must be positive definite")
+        return self
+
+    def validate_for(self, observation):
+        self.validate()
+        if self.camera_ids is not None and tuple(observation.camera_ids) != tuple(self.camera_ids):
+            raise ValueError("reference-residual noise rig mismatch; explicit transfer required")
         return self
 
     @classmethod
@@ -90,7 +99,7 @@ def check_rig(obs, cameras):
 def observation_errors(points, obs, cameras, noise, *, huber=3.0):
     """K absolute candidate surface points; admitted observation set stays fixed."""
     check_rig(obs, cameras)
-    noise.validate()
+    noise.validate_for(obs)
     if points.ndim != 3 or points.shape[1:] != (17, 3) or huber <= 0:
         raise ValueError("COCO17 surface points and positive Huber threshold required")
     predictions, valid = zip(*(project(points, camera) for camera in cameras))

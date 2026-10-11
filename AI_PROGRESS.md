@@ -4134,3 +4134,14 @@ flow_next_config_v1.json与flow_next_data_manifest_v1.json保留训练禁止、�
 停止把cross_block_sketch晋升为广泛信息条件候选，保留代码/配置作数值对照；不继续挑probe seed、不增加通道/参数。必须区分重建目标与预测目标：低Frobenius重建比例不是Fisher信息/真实精度损失比例，也不能推出训练后必无效；此前可区分特定耦合的证据仍成立。筛选只对标准化坐标、一个人工S3观测及冻结anchor适用，未重新估计遮挡anchor，未完成真实图像数据集评价，不替换任何效果预注册门。当前正式baseline与default编码保持原样。
 
 下一阶段完善噪声校准的数据契约与时序相关误差审计，先检查独立参考、人物/序列split、同族参数与授权资源；禁止用当前拟合自回投影校准 detector noise。真实held-out方法收益仍需独立标签及明确训练授权，不能把继续增加诊断工具当作模型精度已经提高。
+
+
+### 2026-10-11 独立原鱼眼残差校准准备与时序误差门
+
+上一轮已通过固定观测筛选停止当前sketch晋升，属于可验收进展。本轮按flow_next_noise_protocol_v1.json补充ReferencePixels离线契约：detector/reference原鱼眼COCO17像素分开，保留准入/reference masks、全部失败原因、PnP角色、人物/原动作/序列/帧与真实时钟、参考来源/独立性说明/不确定性；当前拟合自回投影禁止作为参考。人工已知像素fixture只能用fixture split；真实统计只允许train，validation/test拒绝拟合；人物/原动作/序列跨用途泄漏拒绝。
+
+noise_calibration.py同时保存每视角/关节偏差、无偏中心化协方差、未中心化二阶矩及count/缺失原因。准备导出的proxy precision使用含偏差的二阶矩，显式数值eigenfloor0.25px²；任何缺失参考cell阻止导出，不偷换10px。64帧已知例子x误差4±1，bias4px、中心化variance1.01587px²、二阶矩17px²；若只取中心化协方差而继续零偏差几何项，会静默忽略系统偏差。本阶段所有导出均calibrated=False，手工参考的不确定性未知时不宣称detector-only covariance。NoiseModel新增可选绑定camera_ids，在几何/残差/reweight路径拒绝跨rig复用；原10px代理默认行为保持。
+
+时序诊断只连接同人物/原动作/序列相邻原帧且0<dt<=0.5s，缺失端点/原帧跳号/序列边界不桥接。按序列中心化的pair Pearson与dt范围分开报告，不伪称NIST等间隔ACF，不由lag1计算独立样本数。256帧AR系数0.95的已知fixture有255对，相关性见flow_next_noise_checks_v1.json，仍不升级calibrated；静态序列偏差及未知NaN也有反例检查。49项累计测试、Ruff与compileall通过；首次两处Ruff pairwise规则失败已修复并记录。无神经训练/权重/模型规模/正式主线修改。
+
+flow_next_noise_data_manifest_v1.json实际核对既有360原观测文件存在，原pair1157..1516和PnP登记沿用flow_next_replay_v1.json；独立参考records为空。没有用当前360拟合、strict XYZ或自回投影补成参考，没有执行真实noise拟合。下一阶段准备冻结held-out覆盖/尾部/偏差评价接口，仍只允许命名人工fixture运行，直到独立参考及训练授权落实；该数据门未满足时，不能继续用架构变体和绿测试替代真实方法收益。

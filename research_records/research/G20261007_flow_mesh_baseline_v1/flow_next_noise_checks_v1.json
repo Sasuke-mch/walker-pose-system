@@ -1,0 +1,114 @@
+{
+  "stage": "noise calibration preparation engineering checks",
+  "protocol": "flow_next_noise_protocol_v1.json",
+  "data_manifest": "flow_next_noise_data_manifest_v1.json",
+  "code": [
+    "realtime_app/learning_flow_mesh_next/noise_calibration.py",
+    "realtime_app/learning_flow_mesh_next/geometry_observation.py",
+    "realtime_app/learning_flow_mesh_next/geometry_information.py",
+    "realtime_app/learning_flow_mesh_next/sensitivity.py",
+    "realtime_app/learning_flow_mesh_next/tests/test_noise_calibration.py"
+  ],
+  "input": "test_noise_calibration.reference_fixture():64 frames of explicitly constructed raw pixels; x errors4+/-1, y errors+/-2; all source labels are analytic, not collected human labels",
+  "example_cell": {
+    "count": 64,
+    "bias": [
+      4.0,
+      0.0
+    ],
+    "covariance": [
+      [
+        1.0158730158730158,
+        0.0
+      ],
+      [
+        0.0,
+        4.063492063492063
+      ]
+    ],
+    "uncentered_second_moment": [
+      [
+        17.0,
+        0.0
+      ],
+      [
+        0.0,
+        4.0
+      ]
+    ],
+    "proxy_precision": [
+      [
+        0.058823529411764705,
+        0.0
+      ],
+      [
+        0.0,
+        0.25
+      ]
+    ],
+    "calibrated": false,
+    "camera_ids": [
+      "PnP_LEFT_fixture",
+      "PnP_RIGHT_fixture"
+    ],
+    "floor_px2": 0.25
+  },
+  "correlated_fixture": {
+    "n_frames": 256,
+    "innovation_seed": 41,
+    "alpha": 0.95,
+    "adjacent_pairs": 255,
+    "pair_correlation_xy": [
+      0.9594182805287436,
+      0.960261651660056
+    ],
+    "dt_range_s": [
+      0.09999999999999787,
+      0.10000000000000142
+    ],
+    "effective_independent_samples_computed": false
+  },
+  "guards_verified": [
+    "no self-reprojection reference",
+    "no synthetic relabeling as real calibration",
+    "no test/validation fit",
+    "subject/raw action/sequence split isolation",
+    "unknown NaNs/missing reference reasons retained",
+    "incomplete cells block noise export",
+    "no pair bridging missing frame/physical gaps/sequence boundaries",
+    "constant per-sequence bias not misclassified as stochastic lag correlation",
+    "noise rig identity mismatch rejected in observation and geometry paths"
+  ],
+  "checks": {
+    "tests_passed": 49,
+    "ruff": "passed",
+    "compileall": "passed"
+  },
+  "failure_history": [
+    "initial Ruff rejected two zip(indices,indices[1:]) loops; replaced with itertools.pairwise and rechecked"
+  ],
+  "sources": [
+    {
+      "url": "https://docs.pytorch.org/docs/2.14/generated/torch.cov.html",
+      "used": "unbiased covariance definition and independent torch.cov comparison; actual local torch runtime not inferred from online docs"
+    },
+    {
+      "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda35c.htm",
+      "used": "standard ACF equal-spacing assumption; our irregular/missing frame pair Pearson diagnostic explicitly distinguished"
+    }
+  ],
+  "training_executed": false,
+  "neural_weights_loaded": false,
+  "real_noise_fit_executed": false,
+  "current360_replay_used_as_label": false,
+  "calibrated_promotion_implemented": false,
+  "limitations": [
+    "declared reference provenance does not itself prove independence; underlying independent labels still require audit",
+    "reference residual dispersion includes unknown annotation error",
+    "second moment is bias-inclusive proxy, not zero-mean Gaussian covariance",
+    "per-joint/view precision does not model cross-view/joint or temporal covariance",
+    "count30 is an engineering threshold, not evidence of independence",
+    "held-out frozen empirical coverage/tail/bias gate not yet executed"
+  ],
+  "next_stage": "Implement frozen held-out residual evaluation with train/validation group isolation and no test-based policy selection. Use only named fixtures until independent reference data are registered; do not add architecture variants to evade missing evidence."
+}
