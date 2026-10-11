@@ -165,10 +165,55 @@ def run_s3(cache_dir=None):
             "boundary": "local numerical information and interface only; neither posterior nor G1 efficacy"}
 
 
+def run_s4(cache_dir):
+    from realtime_app.learning_flow_mesh.body import BodyDecoder
+    from realtime_app.pose_app.smpl_coco_observation import load_coco17_regressor
+
+    from .aggregate import decide
+    from .candidate_store import CandidateStore
+    from .geometry_information import local_information
+    from .geometry_observation import NoiseModel, project
+    from .information_risk import DecisionState, RiskPolicy, decide_information
+    from .tangent import TangentScale
+    from .tests.test_aggregate import rig
+
+    if cache_dir is None:
+        raise ValueError("S4 requires a previously fixed S3 candidate cache directory")
+    torch.set_num_threads(1)
+    g0, store = CandidateStore.load(cache_dir / "G0.npz"), CandidateStore.load(cache_dir / "G1.npz")
+    cfg = json.loads(Path("realtime_app/learning_flow_mesh/config.json").read_text(encoding="utf-8"))
+    surface = SurfaceDecoder(BodyDecoder(**cfg["assets"]).double(), torch.tensor(
+        load_coco17_regressor(Path("models/smpl/J_regressor_coco.npy")), dtype=torch.float64))
+    cameras, noise, scale = rig(), NoiseModel.proxy(), TangentScale.fixture(store.topology)
+    points = surface(torch.eye(3, dtype=torch.float64).expand(1, 52, 3, 3),
+                     torch.tensor([[0., 0., 3.]], dtype=torch.float64), torch.zeros(1, 10, dtype=torch.float64))["coco17"][0]
+    obs = replace(observation(), xy=torch.stack([project(points, c)[0] for c in cameras]))
+    information = local_information(g0, obs, cameras, noise, scale, surface)
+    policies = RiskPolicy(lambda0=1, lambda_g=.1, delta=0, source="analytic_fixture_not_validation_locked")
+    kwargs = {"observation": obs, "cameras": cameras, "noise": noise, "surface": surface}
+    a4 = decide(store, "A4", scale)
+    a5 = decide(store, "A5", scale, lambda_g=.1, **kwargs)
+    a6, _ = decide_information(store, information, scale, policies, **kwargs)
+    previous = DecisionState(obs.identity, obs.sequence, -.1, store.rotations[0],
+                             store.translation[0], store.beta[0], "analytic_previous")
+    a7, _ = decide_information(store, information, scale, policies, method="A7", previous=previous, **kwargs)
+    assert a6.selected_id == a7.selected_id  # delta0 is the no-time-effect control.
+    order = torch.arange(len(store.raw)-1, -1, -1)
+    shuffled, _ = decide_information(store.permuted(order), information, scale, policies, **kwargs)
+    assert shuffled.selected_id == a6.selected_id
+    return {"stage": "S4", "cache_dir": str(cache_dir), "generator_executed": False,
+            "results": {d.method: {"selected_id": d.selected_id, "risk_gap": d.risk_gap,
+                        "ambiguity": d.ambiguity, "reasons": d.reasons} for d in (a4, a5, a6, a7)},
+            "permutation_same_non_tie_selection": True, "A7_delta0_same_A6": True,
+            "risk_policy": vars(policies), "noise": noise.source,
+            "training_executed": False, "checkpoint_loaded": False,
+            "boundary": "fixed random candidates engineering decision only; no risk/time improvement claim"}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--real-body", action="store_true")
-    parser.add_argument("--stage", choices=("S1", "S2", "S3"), default="S1")
+    parser.add_argument("--stage", choices=("S1", "S2", "S3", "S4"), default="S1")
     parser.add_argument("--cache", type=Path)
     parser.add_argument("--cache-dir", type=Path)
     parser.add_argument("--output", type=Path)
@@ -177,8 +222,10 @@ def main():
         report = run_s1(real_body=args.real_body)
     elif args.stage == "S2":
         report = run_s2(args.cache)
-    else:
+    elif args.stage == "S3":
         report = run_s3(args.cache_dir)
+    else:
+        report = run_s4(args.cache_dir)
     text = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

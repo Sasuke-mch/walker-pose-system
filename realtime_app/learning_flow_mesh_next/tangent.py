@@ -67,7 +67,8 @@ def pairwise_tangent(store, anchor, scale):
     scale.validate(store.topology)
     relative = store.rotations[:, None].transpose(-1, -2) @ store.rotations[None]
     logs = shortest_log(relative)
-    anchor_to_k = store.rotations[anchor].transpose(-1, -2) @ store.rotations
+    anchor_rotation = store.rotations[anchor] if isinstance(anchor, int) else anchor
+    anchor_to_k = anchor_rotation.transpose(-1, -2) @ store.rotations
     # Also reject candidate-to-anchor chart ambiguity, independently of pair ambiguity.
     shortest_log(anchor_to_k)
     pose = torch.einsum("knij,klnj->klni", anchor_to_k, logs).flatten(2)

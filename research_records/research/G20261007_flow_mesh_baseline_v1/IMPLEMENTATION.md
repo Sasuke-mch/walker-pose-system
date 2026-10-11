@@ -555,3 +555,9 @@ S0数据和推理/标签防火墙；S1隔离联合G0及同容量回归、多候�
 完成G0数值合法raw集合等权medoid anchor、标准化169维中心差分Jacobian、原鱼眼Lambda=J^TWJ、G1三类token信息块、停止anchor/J梯度、冻结G0及双模型显式state/完整成本。完整K32/Euler8链真实male表面算子运行：每模型711443参数，16网络调用、512候选状态求值，J为68×169、23解码batch/339状态求值；不称一遍推理。18项累计检查/Ruff通过，独立autograd Jacobian/跨块双state/frozen G0检查通过，见flow_next_s3_checks_v2.json。
 
 审查实际发现Gram伪逆会平方条件数：rtol1e-6下nuisance rank32且Schur看似体型有信息；直接白化J同阈值nuisance rank51，消去后体型特征值仅约4e-22至1.4e-19。新增1e-4至1e-10阈值敏感性及白化J残差，保留v1。这是单帧局部混淆反例，不能把截断伪逆产生的非零Schur写成真实体型可辨识。固定噪声仍proxy-only；随机模型+人工尺度无生成收益、后验或真实精度结论。训练与校准仍未执行，完整CPU单次秒级耗时不支持30fps。
+
+### 2026-10-11 Flow next S4 信息风险与近似平局时间
+
+实现A6的完整Lambda谱度量B（明确非后验协方差）、最短成对旋转log经Ad运输到anchor切空间、合法raw期望/动作限制及同一原鱼眼几何项；A7只在当前risk<=min+delta集合按物理dt缩放距离选择，>0.5s关闭，缺测不发布且不回填GRU。无效J/坐标失配/near-pi/跨帧信息失配显式回退等权完整medoid，所有原因保留；决策state可序列化且不改写历史。23项累计测试/Ruff通过，实际复用S3固定缓存运行A4/A5/A6/A7，未运行生成器，见flow_next_s4_checks_v2.json；候选置换选择不变，delta0下A7=A6。
+
+修正A0首候选失败后原实现会跳过失败的选择偏置，现保留不可用；修正将数值非平局误解为物理歧义消除，未校准时各对照保持ambiguity=True，另报决策gap。v1结果保留，v2更新标志。固定lambda0/lambda_g/delta仅人工fixture，不是验证锁定值；真实近邻/信息/时间优势均待训练与独立评价。

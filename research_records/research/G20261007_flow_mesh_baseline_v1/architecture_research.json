@@ -612,9 +612,9 @@
     "automation_recreated": false
   },
   "flow_next_implementation": {
-    "stage": "S3",
-    "status": "two_stage_information_interface_passed_no_efficacy",
-    "validation": "flow_next_s3_checks_v2.json",
+    "stage": "S4",
+    "status": "information_risk_and_tie_time_interfaces_passed",
+    "validation": "flow_next_s4_checks_v2.json",
     "training_executed": false,
     "checkpoint_loaded": false,
     "mainline_changed": false,

@@ -1,4 +1,5 @@
 """Whole-candidate actions and separate joint-only diagnostic controls."""
+import re
 from dataclasses import dataclass, field
 
 import torch
@@ -88,7 +89,12 @@ def decide(store, method, scale, *, observation=None, cameras=None, noise=None, 
     if method in ("A1", "A3"):
         return Decision(method, None, None, costs, True, None, ["joint_only_diagnostic"], diagnostic)
     if method == "A0":
-        selected = min((int(i) for i in actions), key=lambda i: store.ids[i])
+        def original_order(index):
+            tail = re.search(r"(\d+)$", store.ids[index])
+            return (int(tail.group(1)) if tail else 0, store.ids[index])
+        selected = min(range(len(store.raw)), key=original_order)
+        if not store.actions[selected]:
+            return Decision(method, None, None, costs, True, None, ["first_candidate_not_action"])
         costs[selected] = 0
     elif method in ("A4", "A5"):
         # Expectation over all legal raw candidates, including non-action candidates.
@@ -107,5 +113,7 @@ def decide(store, method, scale, *, observation=None, cameras=None, noise=None, 
         return Decision(method, None, None, costs, True, None, ["all_action_costs_nonfinite"])
     ranked = torch.sort(costs[actions][torch.isfinite(costs[actions])]).values
     gap = float(ranked[1]-ranked[0]) if len(ranked) > 1 else None
-    return Decision(method, store.ids[selected], selected, costs, gap is None or gap <= 1e-8,
+    diagnostic.update({"decision_near_tie": gap is None or gap <= 1e-8,
+                       "physical_ambiguity": "unassessed; original multimodal candidates retained"})
+    return Decision(method, store.ids[selected], selected, costs, True,
                     gap, [], diagnostic)

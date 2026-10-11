@@ -1,0 +1,51 @@
+{
+  "stage": "S4",
+  "cache_dir": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\outputs\\flow_next_s3_v1",
+  "generator_executed": false,
+  "results": {
+    "A4": {
+      "selected_id": "G1:0:19",
+      "risk_gap": 0.00014057044077275815,
+      "ambiguity": true,
+      "reasons": []
+    },
+    "A5": {
+      "selected_id": "G1:0:3",
+      "risk_gap": 0.0028008390123677174,
+      "ambiguity": true,
+      "reasons": []
+    },
+    "A6": {
+      "selected_id": "G1:0:3",
+      "risk_gap": 0.010903186541566856,
+      "ambiguity": true,
+      "reasons": []
+    },
+    "A7": {
+      "selected_id": "G1:0:3",
+      "risk_gap": 0.010903186541566856,
+      "ambiguity": true,
+      "reasons": []
+    }
+  },
+  "permutation_same_non_tie_selection": true,
+  "A7_delta0_same_A6": true,
+  "risk_policy": {
+    "lambda0": 1,
+    "lambda_g": 0.1,
+    "delta": 0,
+    "source": "analytic_fixture_not_validation_locked",
+    "ambiguity_calibrated": false
+  },
+  "noise": "proxy-only fixed isotropic sigma=10.0px; not detection-confidence covariance",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "boundary": "fixed random candidates engineering decision only; no risk/time improvement claim",
+  "pytest": "23 passed",
+  "ruff": "passed",
+  "retained_failures": [
+    "A0 skip-first-invalid bias corrected with regression test",
+    "v1 numerical non-tie flags could imply physical ambiguity resolved; v2 retains uncalibrated ambiguity",
+    "import lint fixed"
+  ]
+}

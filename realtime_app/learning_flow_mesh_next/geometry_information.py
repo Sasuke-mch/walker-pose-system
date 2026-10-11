@@ -21,6 +21,7 @@ class Information:
     reasons: list
     diagnostics: dict = field(default_factory=dict)
     resources: dict = field(default_factory=dict)
+    provenance: dict = field(default_factory=dict)
 
 
 def schur_shape(matrix, *, rtol=1e-6):
@@ -63,6 +64,13 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
                  "method": "central_finite_difference", "step_standardized": step}
     result = Information(None, None, None, None, scale.values.detach().clone(), noise.source,
                          noise.calibrated, [], resources=resources)
+    result.provenance = {"identity": obs.identity, "sequence": obs.sequence, "frame": obs.frame,
+                         "timestamp": obs.timestamp, "camera_ids": list(obs.camera_ids),
+                         "operator": obs.operator, "source": obs.source}
+    for key in ("identity", "sequence", "frame", "timestamp"):
+        if key in store.provenance and store.provenance[key] != result.provenance[key]:
+            result.reasons.append(f"candidate_anchor_observation_provenance_mismatch:{key}")
+            return result
     admitted = obs.admitted()
     if not admitted.any():
         result.reasons.append("no_current_observation")
