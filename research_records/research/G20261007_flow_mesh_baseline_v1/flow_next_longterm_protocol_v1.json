@@ -50,7 +50,8 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Inspect exact observation/mask/noise/rig binding of frozen information; frame identity alone may admit stale numerical information. Preserve training/data gates, do not add architecture variants while efficacy labels are absent.",
+  "next_stage": "Bounded readiness audit of existing reference/training gates; no architecture variants while independent references and training authorization are absent. Stay quiet when no actionable evidence changes.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
-  "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records"
+  "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
+  "last_completed_stage": "flow_next_binding_checks_v1.json: exact current observation/rig/noise binding repair; 69 engineering tests; no efficacy claim"
 }

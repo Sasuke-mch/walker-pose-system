@@ -4156,3 +4156,14 @@ flow_next_noise_data_manifest_v1.json实际核对既有360原观测文件存在�
 命名人工fixture一次固定seed21/23，2048拟合与2048holdout、sigma2；均值移位20px与scale×2使用同一holdout错误，无seed搜索。已知Gaussian覆盖接近名义值；10px对照接近100%但面积约25倍，bias/scale移位明显欠覆盖。详细实际数值flow_next_noise_validation_checks_v1.json保留全部34cell覆盖范围及预先声明的view0/joint0样例，不挑有利cell。所有frozen统计逐值未变、始终calibrated=False；不计算不适用于相关帧的像素级binomial区间，不宣称有效独立样本数或真实校准成功。
 
 52项累计测试、Ruff与compileall通过，首次Ruff import-spacing失败已修复并记录。人工metadata切换仅用于role拒绝/允许的契约测试，不冒充真实人工标注；locked_test标签本身也不证明外部政策已预注册。实际独立参考records仍为0，未执行真实noise拟合/人体精度/神经训练，模型规模与正式主线不变。下一轮核查冻结信息是否只绑定frame ID而遗漏确切mask/noise/rig，修复已有接口可靠性；不再用新增架构变体绕过缺失的效果证据。
+
+
+### 2026-10-11 冻结信息绑定真实输入，拒绝同帧失配
+
+本轮先按flow_next_binding_protocol_v1.json复现实际接口缺陷：frame/time保持不变，分别改变mask、pixel、noise或K，旧信息仍被接受，四项失败保存在flow_next_binding_failure_v1.json。仅修复输入绑定，不变更网络、风险策略或模型容量。input_binding.py保存脱离输入tensor的逐值JSON快照，覆盖原观测/有效像素与置信度、mask/ray/时钟/失败原因、实际K/D/R/T/尺寸/PnP角色，以及precision/source/calibrated/rig；缺失槽使用null，present NaN仍按原schema拒绝。
+
+local_information冻结anchor时clone，新的candidate缓存携带当前observation快照；旧G0缓存保留并明确legacy_unverified。decide_information即使lambda_g=0仍检查实际输入，失配或缺资源时明确A4 fallback并保留原因。reweight仅允许原观测逐值不变，更新噪声绑定且深拷贝旧记录；同点数但mask位置改变拒绝。命名analytic未绑定例外要求观测来源与噪声标签同时为fixture，真实来源不能仅改noise_source绕过。
+
+69项累计测试、Ruff及compileall通过。flow_next_binding_checks_v1.json保留四项修复后fallback理由及检查中fixture错误的修复，不把随机未训练候选投影失败记成绑定失败。使用原S3冻结G0/G1运行S4，未执行generator，A4=G1:0:19，A5/A6/A7=G1:0:3，置换不变与A7 delta0一致通过，详见flow_next_s4_binding_v1.json。旧缓存原观测绑定仍未核验。
+
+这是可靠性修复，不是真实精度/校准提升。当前快照不证明全时序历史、独立参考或decoder资产身份，仍由数据/源协议负责。新增CPU复制/序列化成本未测速；infer子阶段total_ms不含provenance序列化，整调用profile包含，旧测速不能认证当前版本。无训练、权重加载、模型扩容、主线修改或远端推送。独立参考records仍为0，下一轮限于已有数据/协议就绪审计；没有新可操作证据时保持安静，不用反复绿测试或继续架构变体替代真实收益。

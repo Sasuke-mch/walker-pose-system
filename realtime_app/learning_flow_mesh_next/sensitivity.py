@@ -5,6 +5,7 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.differentiate.jacobia
 This uses existing central differences, not SciPy's higher-order adaptive routine.
 """
 import argparse
+import copy
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -17,6 +18,7 @@ from .candidate_store import CandidateStore
 from .geometry_information import local_information, local_parameters
 from .geometry_observation import NoiseModel, project
 from .information_risk import RiskPolicy, decide_information, information_metric
+from .input_binding import noise_snapshot, observation_snapshot
 from .tangent import TangentScale
 
 
@@ -30,13 +32,18 @@ def reweight_information(information, observation, noise):
                 "source": observation.source}
     if information.provenance != expected:
         raise ValueError("reweighting requires exactly the original observation provenance")
+    if information.binding.get("observation") != observation_snapshot(observation):
+        raise ValueError("reweighting requires unchanged exact observation binding")
     J = information.jacobian
     if J is None:
         raise ValueError("cannot reweight unavailable Jacobian")
     precision = torch.block_diag(*noise.precision.to(J)[observation.admitted()].unbind(0))
     matrix = J.T @ precision @ J
+    binding = copy.deepcopy(information.binding)
+    binding["noise"] = noise_snapshot(noise)
     return replace(information, matrix=(matrix+matrix.T)/2,
                    noise_source=noise.source, calibrated=noise.calibrated,
+                   binding=binding,
                    diagnostics={"scope": "reweighted J; old noise diagnostics deliberately excluded"})
 
 

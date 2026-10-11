@@ -6,6 +6,7 @@ import torch
 
 from .aggregate import decide
 from .geometry_observation import check_rig, project
+from .input_binding import information_snapshot
 from .tangent import skew
 
 
@@ -22,6 +23,7 @@ class Information:
     diagnostics: dict = field(default_factory=dict)
     resources: dict = field(default_factory=dict)
     provenance: dict = field(default_factory=dict)
+    binding: dict = field(default_factory=dict)
 
 
 def schur_shape(matrix, *, rtol=1e-6):
@@ -94,6 +96,13 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
     result.provenance = {"identity": obs.identity, "sequence": obs.sequence, "frame": obs.frame,
                          "timestamp": obs.timestamp, "camera_ids": list(obs.camera_ids),
                          "operator": obs.operator, "source": obs.source}
+    result.binding = information_snapshot(obs, cameras, noise)
+    candidate_binding = store.provenance.get("observation_binding")
+    binding_status = "legacy_unverified" if candidate_binding is None else "verified"
+    result.diagnostics["candidate_current_observation_binding"] = binding_status
+    if candidate_binding is not None and candidate_binding != result.binding["observation"]:
+        result.reasons.append("candidate_anchor_observation_binding_mismatch")
+        return result
     for key in ("identity", "sequence", "frame", "timestamp"):
         if key in store.provenance and store.provenance[key] != result.provenance[key]:
             result.reasons.append(f"candidate_anchor_observation_provenance_mismatch:{key}")
@@ -110,7 +119,7 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
         "rotations": store.rotations[anchor_choice.selected_index],
         "translation": store.translation[anchor_choice.selected_index],
         "beta": store.beta[anchor_choice.selected_index]}
-    anchor = {key: value.detach() for key, value in anchor.items() if torch.is_tensor(value)}
+    anchor = {key: value.detach().clone() for key, value in anchor.items() if torch.is_tensor(value)}
     result.anchor_id = anchor_choice.selected_id
     result.anchor_rotation = anchor["rotations"]
     m = store.topology.tangent_dimensions
@@ -153,6 +162,7 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
             diagnostic["rank_warning"] = "Gram pseudoinverse thresholds square Jacobian conditioning; apparent nonzero Schur under truncation is not shape identifiability"
             diagnostic["jacobian_rank"] = int(torch.linalg.matrix_rank(jacobian, rtol=1e-6))
             diagnostic["coordinate_scale_source"] = scale.source
+            diagnostic["candidate_current_observation_binding"] = binding_status
             result.diagnostics = diagnostic
     except (ValueError, RuntimeError) as error:
         result.matrix, result.jacobian = None, None

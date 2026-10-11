@@ -1,0 +1,27 @@
+{
+  "stage": "pre-fix coarse-binding counterexamples",
+  "rows": {
+    "changed_mask": {
+      "fallback": false,
+      "reasons": [],
+      "selected": "id2"
+    },
+    "changed_pixels": {
+      "fallback": false,
+      "reasons": [],
+      "selected": "id2"
+    },
+    "changed_noise": {
+      "fallback": false,
+      "reasons": [],
+      "selected": "id2"
+    },
+    "changed_intrinsic": {
+      "fallback": false,
+      "reasons": [],
+      "selected": "id2"
+    }
+  },
+  "same_frame_identity_timestamp": true,
+  "scope": "analytic candidates and surface; no training"
+}

@@ -1,0 +1,68 @@
+{
+  "stage": "frozen information exact input binding",
+  "before": "flow_next_binding_failure_v1.json",
+  "after": {
+    "changed_mask": {
+      "fallback": true,
+      "reasons": [
+        "fallback_isotropic_medoid:information_input_binding_mismatch:observation"
+      ],
+      "selected_id": "id2",
+      "same_frame_time": true
+    },
+    "changed_pixels": {
+      "fallback": true,
+      "reasons": [
+        "fallback_isotropic_medoid:information_input_binding_mismatch:observation"
+      ],
+      "selected_id": "id2",
+      "same_frame_time": true
+    },
+    "changed_noise": {
+      "fallback": true,
+      "reasons": [
+        "fallback_isotropic_medoid:information_input_binding_mismatch:noise"
+      ],
+      "selected_id": "id2",
+      "same_frame_time": true
+    },
+    "changed_intrinsic": {
+      "fallback": true,
+      "reasons": [
+        "fallback_isotropic_medoid:information_input_binding_mismatch:rig"
+      ],
+      "selected_id": "id2",
+      "same_frame_time": true
+    }
+  },
+  "validation": {
+    "pytest": 69,
+    "ruff": "passed",
+    "compileall": "passed",
+    "fixed_candidate_replay": "flow_next_s4_binding_v1.json",
+    "generator_executed_in_replay": false
+  },
+  "negative_checks": [
+    "same-count relocated mask rejects reweight",
+    "missing verification resources rejects lambda_g=0",
+    "analytic noise label alone cannot bypass real observation",
+    "input tensors and rebound snapshots do not alias original",
+    "missing-slot NaN roundtrips as JSON null"
+  ],
+  "repairs_during_checks": [
+    "tuple camera fixture mutation changed to list",
+    "random untrained candidate behind camera is projection failure; positive binding uses known geometric fixture",
+    "NaN test originally set quality=false while present=true; schema correctly rejected present NaN, test now marks present=false",
+    "Ruff import order and unused test unpacking repaired"
+  ],
+  "limitations": [
+    "legacy G0 observation binding explicitly unverified",
+    "current observation only, not full temporal history/source independence/decoder asset certificate",
+    "CPU copies and serialization overhead not benchmarked; infer resources.total_ms excludes provenance serialization, end-to-end profile includes entire call",
+    "old profiling does not certify new version timing"
+  ],
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "model_capacity_changed": false,
+  "accuracy_improvement_demonstrated": false
+}

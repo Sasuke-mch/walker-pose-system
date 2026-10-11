@@ -1,0 +1,17 @@
+{
+  "stage": "frozen information input binding repair",
+  "only_variable": "explicit immutable observation/rig/noise snapshots and stale-info rejection; no model or risk-policy changes",
+  "inputs": "typed Observation; actual camera K/D/R/T/size/roles; noise precision/source/calibrated/camera binding; prior frozen candidate cache",
+  "baseline": "coarse identity/sequence/frame/time/camera/operator/source metadata check",
+  "counterexamples": "same frame/time with altered pixel, confidence, masks, geometric rays, clock provenance, noise precision/calibration status or camera matrix; preserve pre-fix acceptance record",
+  "success": [
+    "unchanged and exact value dtype/device copy accepted",
+    "changed input causes explicit A4 fallback with retained reason",
+    "reweight allows deliberate new precision at unchanged observation and original frozen rig, creates fresh noise binding; old snapshot remains unchanged",
+    "new candidate caches bind their exact observation, legacy caches remain explicitly unverified",
+    "JSON serialization excludes NaN from ignored slots and snapshots do not alias mutable input tensors"
+  ],
+  "fixture_boundary": "unbound analytic information allowed only when both noise_source and observation.source explicitly analytic; no production bypass based on noise label alone",
+  "stop": "fix verified counterexamples only; no data/model training and no claim accuracy improvement",
+  "limitations": "snapshot verifies supplied numerical inputs, not independent truth or licensed body asset identity; caller retains source/decoder protocol duties"
+}

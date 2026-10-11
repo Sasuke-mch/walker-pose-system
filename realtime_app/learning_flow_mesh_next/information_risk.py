@@ -7,6 +7,7 @@ from realtime_app.learning_flow_mesh.rotations import validate_rotation_matrices
 
 from .aggregate import Decision, decide, stable_min
 from .geometry_observation import observation_errors
+from .input_binding import require_information_binding
 from .tangent import angles, pairwise_tangent
 
 
@@ -81,13 +82,16 @@ def decide_information(store, information, scale, policy, *, method="A6", observ
     reasons = []
     try:
         # Unbound information is only allowed in the explicitly named analytic fixture.
-        if information.noise_source != "analytic_fixture_only":
+        analytic_unbound = (information.noise_source == "analytic_fixture_only"
+                            and observation.source == "analytic_fixture" and not information.binding)
+        if not analytic_unbound:
             expected = {"identity": observation.identity, "sequence": observation.sequence,
                         "frame": observation.frame, "timestamp": observation.timestamp,
                         "camera_ids": list(observation.camera_ids), "operator": observation.operator,
                         "source": observation.source}
             if information.provenance != expected:
                 raise ValueError("information_current_observation_provenance_mismatch")
+            require_information_binding(information, observation, cameras, noise)
         if information.scale.shape != scale.values.shape or not torch.allclose(information.scale.to(scale.values), scale.values):
             raise ValueError("information_and_decision_coordinate_scale_mismatch")
         B = information_metric(information, policy).to(store.raw)

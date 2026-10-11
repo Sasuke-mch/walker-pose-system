@@ -10,6 +10,7 @@ import torch
 
 from realtime_app.learning_flow_mesh.rotations import six_to_matrix
 
+from .input_binding import observation_snapshot
 from .schema import Observation, Topology
 
 
@@ -142,6 +143,7 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
                                    ("present", "quality", "geometry", "views")},
                   "normalization_source": normalization.source, "stream": stream,
                   "information_encoding": model.config.information_encoding}
+    provenance["observation_binding"] = observation_snapshot(observation)
     provenance.update(timestamp_kind=observation.timestamp_kind,
                       view_timestamps=observation.view_timestamps)
     candidates = from_parameters(parameters, model.topology,
