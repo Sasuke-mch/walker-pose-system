@@ -1,0 +1,150 @@
+{
+  "stage": "bounded pretraining readiness audit",
+  "prior_turn_classification": "progress: verified frozen-input repair and new failure evidence committed",
+  "scope": "registered sources and isolated evaluation implementation only; no full raw-data scan",
+  "source_files": [
+    "realtime_app/learning_flow_mesh_next/train.py",
+    "realtime_app/learning_flow_mesh_next/evaluate.py",
+    "realtime_app/learning_flow_mesh_next/acceptance.py",
+    "research_records\\research\\G20261007_flow_mesh_baseline_v1\\flow_research_plan_v1.json",
+    "research_records\\research\\G20261007_flow_mesh_baseline_v1\\flow_next_config_v1.json",
+    "research_records\\research\\G20261007_flow_mesh_baseline_v1\\flow_next_data_manifest_v1.json",
+    "research_records\\research\\G20261007_flow_mesh_baseline_v1\\flow_next_noise_data_manifest_v1.json",
+    "research_records\\research\\G20261007_flow_mesh_baseline_v1\\flow_next_binding_checks_v1.json",
+    "research_records\\research\\G20261007_flow_mesh_baseline_v1\\flow_next_s4_binding_v1.json"
+  ],
+  "training": {
+    "authorization": "training_disabled",
+    "enabled": false,
+    "checkpoint_loading_enabled": false,
+    "manifest_result": {
+      "training_data_ready": false,
+      "truth_status": "no_independent_3d_or_scan",
+      "records": 0
+    },
+    "normalization_train_statistics_available": false,
+    "entrypoint_scope": "prepare/configuration/objective only; optimizer loop, dataset loader, training checkpoint lifecycle not exposed",
+    "actual_top_level_functions": [
+      "configuration",
+      "prepare",
+      "objective",
+      "main"
+    ],
+    "ready": false
+  },
+  "resources": {
+    "local_statistical_asset_paths": {
+      "model_path": {
+        "path": "third_party/WiLoR/mano_data/models/SMPLH_male.pkl",
+        "exists": true,
+        "scope": "existing statistical decoding asset; presence alone does not authorize motion dataset or neural weights"
+      },
+      "mano_left": {
+        "path": "third_party/WiLoR/mano_data/models/MANO_LEFT.pkl",
+        "exists": true,
+        "scope": "existing statistical decoding asset; presence alone does not authorize motion dataset or neural weights"
+      },
+      "mano_right": {
+        "path": "third_party/WiLoR/mano_data/models/MANO_RIGHT.pkl",
+        "exists": true,
+        "scope": "existing statistical decoding asset; presence alone does not authorize motion dataset or neural weights"
+      }
+    },
+    "surface_regressor_exists": true,
+    "motion_records": 0,
+    "motion_license_status": "missing",
+    "beta_basis_training_audit": "local_asset_basis_pending_training_audit",
+    "independent_pixel_reference_records": 0,
+    "observation_only_path_exists_now": true,
+    "source_frame_mapping_exists_now": true,
+    "independent_3d_shape_truth": "no_independent_3d_or_scan",
+    "registered_source_scope": "no claim that all drives have been searched"
+  },
+  "engineering_evidence": {
+    "prior_binding_test_count": 69,
+    "tests_rerun_this_audit": false,
+    "fixed_replay_generator_executed": false,
+    "fixed_replay_results": {
+      "A4": {
+        "selected_id": "G1:0:19",
+        "risk_gap": 0.00014057044077275815,
+        "ambiguity": true,
+        "reasons": []
+      },
+      "A5": {
+        "selected_id": "G1:0:3",
+        "risk_gap": 0.0028008390123677174,
+        "ambiguity": true,
+        "reasons": []
+      },
+      "A6": {
+        "selected_id": "G1:0:3",
+        "risk_gap": 0.010903186541566856,
+        "ambiguity": true,
+        "reasons": []
+      },
+      "A7": {
+        "selected_id": "G1:0:3",
+        "risk_gap": 0.010903186541566856,
+        "ambiguity": true,
+        "reasons": []
+      }
+    },
+    "legacy_cache_current_observation_binding": "unverified; no cache rewritten"
+  },
+  "evaluation_readiness": {
+    "basis": "direct source inspection vs flow_research_plan_v1.json metrics/statistics/acceptance",
+    "actual_evaluate_functions": [
+      "energy_score",
+      "distribution",
+      "candidate_metrics",
+      "surface_error",
+      "neutral_shape_metrics",
+      "paired_bootstrap",
+      "online_metrics",
+      "fault_tree",
+      "main"
+    ],
+    "actual_acceptance_functions": [
+      "lock_policy",
+      "preregistered_gates"
+    ],
+    "implemented_components": [
+      "raw/legal/action pool ES and marginal coverage",
+      "point, own-T/root-relative and oracle errors",
+      "same-basis neutral mesh shape diagnostics",
+      "subject/sequence/block paired bootstrap with matched seed sets",
+      "policy validation grid and numeric acceptance thresholds"
+    ],
+    "not_integrated": [
+      "standardized joint versus beta distribution metric contracts using training-only statistics",
+      "preregistered geometry/occlusion strata mapped to labelled evaluation records",
+      "three required training seeds: bootstrap currently requires matching sets, not exactly three",
+      "aggregation paired CI evidence is required by protocol but not a numeric requirement in preregistered_gates",
+      "evidence source/population/budget binding for efficacy claim gate"
+    ],
+    "complete": false
+  },
+  "existing_mechanism_status": "cross_block_sketch promotion suspended by prior fixed-anchor visibility screen; no new architecture variant",
+  "decision": {
+    "overall_efficacy_ready": false,
+    "stop_dependent_paths": [
+      "training without authorization and concrete licensed motion labels",
+      "real noise calibration without independent pixel references",
+      "real pose/shape accuracy claims without independent references"
+    ],
+    "next_independent_stage": "Prepare standardized distribution evaluation and explicit three-seed/evidence claim gates, one evaluation-contract change; named analytic counterexamples only. No generator training or architecture changes.",
+    "why_meaningful": "prevents raw-unit ES, one-seed results or missing aggregation CI from being interpreted as preregistered success",
+    "performance_revisions_used": 0
+  },
+  "audit_errors_retained": [
+    "initial guessed filenames flow_next_s3_v1.json/flow_next_s5_v1.json absent; actual directory lists stage check filenames. Missing guessed names not treated as missing past checks."
+  ],
+  "boundaries": [
+    "no accuracy gain measured",
+    "no models trained or neural weights loaded",
+    "no timing rerun; old profile predates binding overhead",
+    "92 unrelated workspace entries preserved",
+    "no push"
+  ]
+}

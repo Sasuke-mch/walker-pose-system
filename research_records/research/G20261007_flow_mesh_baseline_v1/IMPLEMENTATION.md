@@ -646,3 +646,12 @@ local_information冻结anchor时clone，新的candidate缓存携带当前observa
 69项累计测试、Ruff及compileall通过。flow_next_binding_checks_v1.json保留四项修复后fallback理由及检查中fixture错误的修复，不把随机未训练候选投影失败记成绑定失败。使用原S3冻结G0/G1运行S4，未执行generator，A4=G1:0:19，A5/A6/A7=G1:0:3，置换不变与A7 delta0一致通过，详见flow_next_s4_binding_v1.json。旧缓存原观测绑定仍未核验。
 
 这是可靠性修复，不是真实精度/校准提升。当前快照不证明全时序历史、独立参考或decoder资产身份，仍由数据/源协议负责。新增CPU复制/序列化成本未测速；infer子阶段total_ms不含provenance序列化，整调用profile包含，旧测速不能认证当前版本。无训练、权重加载、模型扩容、主线修改或远端推送。独立参考records仍为0，下一轮限于已有数据/协议就绪审计；没有新可操作证据时保持安静，不用反复绿测试或继续架构变体替代真实收益。
+
+
+### 2026-10-11 训练前就绪审计：效果评价尚未闭环
+
+上一轮冻结输入修复属于真实进展。本轮按当前flow_research_plan_v1.json/config/manifests与train.py/evaluate.py/acceptance.py逐项核查，不重跑已通过的69测试，不启动模型或遍历原始数据。实际结果见flow_next_readiness_audit_v1.json；JSON往返、源码函数清单、registered路径存在性、empty-index与92项原工作区条目检查通过。最初猜测S3/S5输出名不存在，随后按实际目录定位已有checks文件，错误保留，不将猜错文件名写成历史验证缺失。
+
+本地SMPL-H/MANO统计资产与COCO回归器存在，只证明当前可解码资源在场；motion manifest records=0、license=missing、training beta basis待审计、训练mean/scale=null；独立原鱼眼参考records=0，360观测及frame mapping存在但不是独立标签。训练与checkpoint加载均关闭，train.py仅prepare/configuration/objective，不含真实dataset/优化器循环/checkpoint生命周期。此前“S0-S5工程完成”不能解读为原方案训练与效果研究阶段已完成。
+
+效果评价也有独立于数据许可的实现缺口：candidate_metrics的ES当前在输入原单位上计算；尚无按训练统计标准化后分别报告joint/beta的统一契约与真实分层记录。paired_bootstrap要求每block seed集合一致，但不要求预注册三seed；preregistered_gates未接聚合paired CI/数据population/budget证据。不能据已有基础指标或用户填入bool认定预注册效果通过。后续仅推进评价契约这一机制：训练统计标准化、三seed和配对证据门，用明确人工反例验证，不增加模型变体、训练或精度声明。真实参考缺失仅停止依赖路径，当前仍有这一可执行的独立工作，不标记目标完成或阻塞。
