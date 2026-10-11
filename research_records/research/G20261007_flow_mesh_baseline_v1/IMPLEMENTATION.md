@@ -561,3 +561,15 @@ S0数据和推理/标签防火墙；S1隔离联合G0及同容量回归、多候�
 实现A6的完整Lambda谱度量B（明确非后验协方差）、最短成对旋转log经Ad运输到anchor切空间、合法raw期望/动作限制及同一原鱼眼几何项；A7只在当前risk<=min+delta集合按物理dt缩放距离选择，>0.5s关闭，缺测不发布且不回填GRU。无效J/坐标失配/near-pi/跨帧信息失配显式回退等权完整medoid，所有原因保留；决策state可序列化且不改写历史。23项累计测试/Ruff通过，实际复用S3固定缓存运行A4/A5/A6/A7，未运行生成器，见flow_next_s4_checks_v2.json；候选置换选择不变，delta0下A7=A6。
 
 修正A0首候选失败后原实现会跳过失败的选择偏置，现保留不可用；修正将数值非平局误解为物理歧义消除，未校准时各对照保持ambiguity=True，另报决策gap。v1结果保留，v2更新标志。固定lambda0/lambda_g/delta仅人工fixture，不是验证锁定值；真实近邻/信息/时间优势均待训练与独立评价。
+
+### 2026-10-11 Flow next S5 评价接口、360帧重放与资源验收
+
+S0至S5在训练关闭下可完成的隔离代码/配置/工程检查已经完成；不表示数据门、训练实验或方法性能完成。新增离线绝对/根相对MPJPE、PVE、中立体型表面与同基底beta指标、原始/合法/动作池energy score及90%边际区间、固定K oracle与选中差距；非法raw池指标明确不可定义而不静默删样本。人物级配对bootstrap按序列块处理、三训练种子在块内汇总，在线缺失时长/工程恢复滞后、真实模式标签门、有限预算非邻接三角自交诊断、验证政策锁定/预注册门均有接口及反例测试。30项累计测试、Ruff、29 Python AST/compileall、离线评价CLI通过，见flow_next_tests_v2.xml与flow_next_validation_v1.json。未执行真实网格/扫描/运动真值精度评价。
+
+实际K32/Euler8无权重G0重放完整360帧/pair1157..1516，读取原raw_xy而非normalized_xy，不读取strict_xyz诊断标签，保留原PnP身份/3031严格点/mask/全部原因。331帧当前观测、29缺帧，928缺测候选拒绝完整保留；缺帧hidden变化0，块64/11逐值误差0。实际时间来自frames.json双视图host_read_return_perf_counter_ns的均值，保留各视图时刻与非曝光/硬件同步警告；无FPS造时刻。采用同源历史标定逐条射线回投影，最大误差5.68434e-13px，仅内部一致性。首次同源intrinsic带UTF8 BOM导致解析失败，已加utf-8-sig与专门回归测试；失败描述保留。
+
+完整记录像素边界双生成资源实测在RTX5070Ti Laptop GPU/PyTorch2.11.0+cu128，K32+K32/Euler8、warmup1/repeats5：v2 full p50=358.645ms/p95=385.409ms，J p95=294.677ms；16网络调用、512候选状态求值、J339解码状态，连末端/聚合总403解码状态/25batch。峰值torch CUDA allocation约90.24MB，未包含采集/2D检测，也不是设备总显存。v1/v2时间分布保留，不支持30fps。G0 K64/Euler8同总样本控制已实际执行；固定K64按耗时校准NFE的G0控制两次pilot后p50=398.233ms，目标358.645ms，>10%差异，故同耗时门未通过，不做同耗时效果归因。中心差分成本/小样本计时限制明确。
+
+flow_next_config_v1.json与flow_next_data_manifest_v1.json保留训练禁止、统计未落实、模型族/许可/独立真值/噪声校准门；原设计文件与architecture_research只新增本次实现索引，历史失败/暂停记录保留。没有训练、checkpoint/预训练网络权重、下载、主线/自动化或推送；只加载已有合法统计人体资产用于解码检查。后续真实收益、三训练种子/被试与rig heldout、政策验证锁定、噪声/时间相关误差、代表性全系统耗时仍待相应授权和资源。
+
+可运行无训练核查命令（仓库根目录）：`.venv-cuda/Scripts/python.exe -m pytest realtime_app/learning_flow_mesh_next/tests -q`；`-m realtime_app.learning_flow_mesh_next.train --manifest research_records/research/G20261007_flow_mesh_baseline_v1/flow_next_data_manifest_v1.json`仅准备配置；`-m realtime_app.learning_flow_mesh_next.checks --stage S3`仅随机接口审计；`-m realtime_app.learning_flow_mesh_next.checks --stage S4 --cache-dir research_records/research/G20261007_flow_mesh_baseline_v1/outputs/flow_next_s3_v1`固定缓存决策审计；`-m realtime_app.learning_flow_mesh_next.profile --device cuda --repeats 5 --matched-controls`记录像素边界耗时；`-m realtime_app.learning_flow_mesh_next.replay --device cuda --chunk-check`实际360帧重放。写结果时指定新的--output/--cache-dir，旧路径不可覆写。

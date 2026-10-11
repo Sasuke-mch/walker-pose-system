@@ -127,5 +127,12 @@
     {"name":"Adaptive FM","url":"https://proceedings.mlr.press/v267/fotiadis25a.html","read":"primary abstract"},
     {"name":"AMASS","url":"https://amass.is.tue.mpg.de/","read":"official description and primary paper extracts"},
     {"name":"BEDLAM","url":"https://bedlam.is.tue.mpg.de/index.html","read":"official dataset description"}
-  ]
+  ],
+  "isolated_implementation_followup_20261011": {
+    "package": "realtime_app/learning_flow_mesh_next",
+    "validation": "flow_next_validation_v1.json",
+    "config": "flow_next_config_v1.json",
+    "scope": "S0-S5 authorized no-training implementation and engineering checks complete; training/data/efficacy/true accuracy not completed",
+    "historical_design_evidence_preserved": true
+  }
 }

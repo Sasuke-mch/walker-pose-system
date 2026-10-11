@@ -1,0 +1,273 @@
+{
+  "scope": "random-float32 typed-pixel two-generator real-surface engineering timing",
+  "device": "cuda",
+  "hardware": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "torch": "2.11.0+cu128",
+  "repeats": 5,
+  "warmup": 1,
+  "fixed_budget": {
+    "G0_K": 32,
+    "G1_K": 32,
+    "Euler_steps": 8,
+    "TTA": false
+  },
+  "jacobian": "central difference 1e-3 for float32 timing; float64 accuracy audit separate",
+  "summary": {
+    "preprocessing_ms": {
+      "p50": 1.7826000002969522,
+      "p95": 2.006360000814311
+    },
+    "G0_ms": {
+      "p50": 16.872500000317814,
+      "p95": 18.949319999228464
+    },
+    "J_ms": {
+      "p50": 270.1989000015601,
+      "p95": 294.6769800000766
+    },
+    "G1_ms": {
+      "p50": 27.554399999644374,
+      "p95": 28.59589999934542
+    },
+    "decode_ms": {
+      "p50": 5.814500000269618,
+      "p95": 7.822799998393748
+    },
+    "aggregate_ms": {
+      "p50": 23.69360000011511,
+      "p95": 25.3002400015248
+    },
+    "full_ms": {
+      "p50": 358.6447000016051,
+      "p95": 385.4086000006646
+    }
+  },
+  "records": [
+    {
+      "preprocessing_ms": 1.7826000002969522,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 16.562199998588767,
+      "J_ms": 260.1864000025671,
+      "G1_ms": 24.81699999771081,
+      "total_ms": 312.70990000120946,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 5.224099997576559,
+      "aggregate_ms": 20.646799999667564,
+      "full_ms": 340.4253000007884,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 1.315400000748923,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 17.16659999874537,
+      "J_ms": 270.1989000015601,
+      "G1_ms": 27.73189999788883,
+      "total_ms": 327.2940999995626,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 5.489200000738492,
+      "aggregate_ms": 24.488399998517707,
+      "full_ms": 358.6447000016051,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 1.7905999993672594,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 16.027800000301795,
+      "J_ms": 271.84810000107973,
+      "G1_ms": 28.811899999709567,
+      "total_ms": 328.1987999980629,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 7.843799998227041,
+      "aggregate_ms": 23.69360000011511,
+      "full_ms": 361.5882000012789,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 1.5550999996776227,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 16.872500000317814,
+      "J_ms": 300.3841999998258,
+      "G1_ms": 27.554399999644374,
+      "total_ms": 356.50040000109584,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 7.738799999060575,
+      "aggregate_ms": 25.50320000227657,
+      "full_ms": 391.363700000511,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 2.060300001176074,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 19.39499999934924,
+      "J_ms": 268.0419000025722,
+      "G1_ms": 27.52679999684915,
+      "total_ms": 327.1798000023409,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 5.814500000269618,
+      "aggregate_ms": 21.88860000023851,
+      "full_ms": 357.0131999986188,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    }
+  ],
+  "peak_cuda_allocated_bytes": 90242048,
+  "capture_and_2D_detector_included": false,
+  "timing_gate_33_3ms": false,
+  "full_system_30fps_claim_supported": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "boundary": "small timing sample and recorded-pixel boundary; not trained efficacy or production latency certification",
+  "matched_controls": {
+    "equal_total_samples_G0_K64_Euler8": [
+      {
+        "full_ms": 52.28790000182926,
+        "generation_ms": 25.79130000231089,
+        "K": 64,
+        "Euler_steps": 8,
+        "network_calls": 8,
+        "candidate_state_evaluations": 512
+      },
+      {
+        "full_ms": 52.42609999913839,
+        "generation_ms": 26.13550000023679,
+        "K": 64,
+        "Euler_steps": 8,
+        "network_calls": 8,
+        "candidate_state_evaluations": 512
+      },
+      {
+        "full_ms": 49.997500002064044,
+        "generation_ms": 25.63200000076904,
+        "K": 64,
+        "Euler_steps": 8,
+        "network_calls": 8,
+        "candidate_state_evaluations": 512
+      },
+      {
+        "full_ms": 51.5927999986161,
+        "generation_ms": 26.72089999759919,
+        "K": 64,
+        "Euler_steps": 8,
+        "network_calls": 8,
+        "candidate_state_evaluations": 512
+      },
+      {
+        "full_ms": 50.39840000245022,
+        "generation_ms": 25.00979999967967,
+        "K": 64,
+        "Euler_steps": 8,
+        "network_calls": 8,
+        "candidate_state_evaluations": 512
+      }
+    ],
+    "walltime_G0_fixed_K64_NFE_calibrated_without_labels": [
+      {
+        "full_ms": 397.2505000019737,
+        "generation_ms": 368.4018999992986,
+        "K": 64,
+        "Euler_steps": 189,
+        "network_calls": 189,
+        "candidate_state_evaluations": 12096
+      },
+      {
+        "full_ms": 365.5375999987882,
+        "generation_ms": 333.08690000194474,
+        "K": 64,
+        "Euler_steps": 189,
+        "network_calls": 189,
+        "candidate_state_evaluations": 12096
+      },
+      {
+        "full_ms": 398.23299999989104,
+        "generation_ms": 368.51320000278065,
+        "K": 64,
+        "Euler_steps": 189,
+        "network_calls": 189,
+        "candidate_state_evaluations": 12096
+      },
+      {
+        "full_ms": 598.1514999984938,
+        "generation_ms": 569.6578999995836,
+        "K": 64,
+        "Euler_steps": 189,
+        "network_calls": 189,
+        "candidate_state_evaluations": 12096
+      },
+      {
+        "full_ms": 484.28169999897364,
+        "generation_ms": 454.08129999850644,
+        "K": 64,
+        "Euler_steps": 189,
+        "network_calls": 189,
+        "candidate_state_evaluations": 12096
+      }
+    ],
+    "runtime_only_calibration": [
+      {
+        "full_ms": 214.35039999778382,
+        "generation_ms": 188.7148999994679,
+        "K": 64,
+        "Euler_steps": 107,
+        "network_calls": 107,
+        "candidate_state_evaluations": 6848
+      },
+      {
+        "full_ms": 354.84319999886793,
+        "generation_ms": 331.55429999897024,
+        "K": 64,
+        "Euler_steps": 189,
+        "network_calls": 189,
+        "candidate_state_evaluations": 12096
+      }
+    ],
+    "target_p50_ms": 358.6447000016051,
+    "walltime_control_p50_ms": 398.23299999989104,
+    "within_10_percent_p50": false,
+    "comparison_scope": "same recorded-pixel input, explicit decode and A5 decision; time profile only, no efficacy"
+  },
+  "peak_cuda_allocated_bytes_with_controls": 120371712
+}

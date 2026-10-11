@@ -1,0 +1,164 @@
+{
+  "scope": "random-float32 typed-pixel two-generator real-surface engineering timing",
+  "device": "cuda",
+  "hardware": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "torch": "2.11.0+cu128",
+  "repeats": 5,
+  "warmup": 1,
+  "fixed_budget": {
+    "G0_K": 32,
+    "G1_K": 32,
+    "Euler_steps": 8,
+    "TTA": false
+  },
+  "jacobian": "central difference 1e-3 for float32 timing; float64 accuracy audit separate",
+  "summary": {
+    "preprocessing_ms": {
+      "p50": 1.2751999965985306,
+      "p95": 1.4680799991765525
+    },
+    "G0_ms": {
+      "p50": 15.984400000888854,
+      "p95": 16.990379997878335
+    },
+    "J_ms": {
+      "p50": 239.4912000017939,
+      "p95": 270.1680399979523
+    },
+    "G1_ms": {
+      "p50": 25.289100001828047,
+      "p95": 28.80681999886292
+    },
+    "decode_ms": {
+      "p50": 5.966299999272451,
+      "p95": 6.471260000398615
+    },
+    "aggregate_ms": {
+      "p50": 23.046399997838307,
+      "p95": 30.151559998921584
+    },
+    "full_ms": {
+      "p50": 320.0014000030933,
+      "p95": 367.6019799968344
+    }
+  },
+  "records": [
+    {
+      "preprocessing_ms": 1.2751999965985306,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 16.543899997486733,
+      "J_ms": 268.1697999978496,
+      "G1_ms": 29.23219999865978,
+      "total_ms": 329.2916000027617,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 5.966299999272451,
+      "aggregate_ms": 25.831400002061855,
+      "full_ms": 362.42749999655643,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 1.4563999975507613,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 17.101999997976236,
+      "J_ms": 270.66759999797796,
+      "G1_ms": 27.10529999967548,
+      "total_ms": 329.5730999998341,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 6.567500000528526,
+      "aggregate_ms": 31.231599998136517,
+      "full_ms": 368.8955999969039,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 1.4709999995830003,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 15.984400000888854,
+      "J_ms": 234.49260000052163,
+      "G1_ms": 22.963800001889467,
+      "total_ms": 284.00239999973564,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 6.086299999878975,
+      "aggregate_ms": 19.657099997857586,
+      "full_ms": 311.26969999968424,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 1.2741999998979736,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 15.93230000071344,
+      "J_ms": 225.6557000000612,
+      "G1_ms": 23.40899999762769,
+      "total_ms": 276.8915999986348,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 5.227300000115065,
+      "aggregate_ms": 18.877200000133598,
+      "full_ms": 302.3461999982828,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    },
+    {
+      "preprocessing_ms": 1.2695000004896428,
+      "generators": 2,
+      "network_calls": 16,
+      "candidate_state_evaluations": 512,
+      "G0_ms": 15.619800000422401,
+      "J_ms": 239.4912000017939,
+      "G1_ms": 25.289100001828047,
+      "total_ms": 290.7658000003721,
+      "J_decoder_calls": 23,
+      "J_decoder_state_evaluations": 339,
+      "information_fallback_reasons": [],
+      "matched_total_sampling_G0_control_K": 64,
+      "matched_walltime_control": "must measure separately; sample count alone is insufficient",
+      "decode_ms": 4.865899998549139,
+      "aggregate_ms": 23.046399997838307,
+      "full_ms": 320.0014000030933,
+      "all_decoder_batch_calls": 25,
+      "all_decoder_state_evaluations": 403,
+      "selected_id": "G1:0:14",
+      "fallback": false
+    }
+  ],
+  "peak_cuda_allocated_bytes": 90242048,
+  "capture_and_2D_detector_included": false,
+  "timing_gate_33_3ms": false,
+  "full_system_30fps_claim_supported": false,
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "boundary": "small timing sample and recorded-pixel boundary; not trained efficacy or production latency certification"
+}

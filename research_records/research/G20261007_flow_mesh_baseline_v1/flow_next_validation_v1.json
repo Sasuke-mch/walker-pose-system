@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-11",
+  "status": "S0_S5_authorized_no_training_implementation_and_engineering_checks_complete",
+  "package": "D:\\my_works\\walker_pose_system\\realtime_app\\learning_flow_mesh_next",
+  "pytest": {
+    "passed": 30,
+    "xml": "flow_next_tests_v2.xml"
+  },
+  "ruff": "passed",
+  "AST_files": 29,
+  "compileall": "passed",
+  "data_training_ready": false,
+  "evaluation_cli_fixture": {
+    "absolute_mpjpe_m_selected": 2.0,
+    "root_relative_mpjpe_m_selected": 0.0,
+    "fixed_budget_oracle_min_m": 0.0,
+    "selected_minus_oracle_m": 2.0,
+    "raw": {
+      "count": 3,
+      "energy_score": null,
+      "coverage90": null,
+      "width90": null,
+      "status": "undefined_empty_or_nonfinite_pool"
+    },
+    "numerically_legal": {
+      "count": 2,
+      "energy_score": 0.7071067690849304,
+      "coverage90": 0.6666666865348816,
+      "width90": 0.6000000834465027,
+      "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+    },
+    "action_filtered": {
+      "count": 2,
+      "energy_score": 0.7071067690849304,
+      "coverage90": 0.6666666865348816,
+      "width90": 0.6000000834465027,
+      "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+    },
+    "legal_retention": 0.6666666865348816,
+    "action_retention": 0.6666666865348816,
+    "illegal_count": 1,
+    "selected_unavailable": false
+  },
+  "source_projection": {
+    "same_source_projection_max_error_px": 5.684341886080801e-13,
+    "frames": 360,
+    "strict_points": 3031,
+    "calibration": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\calibration\\stereo_fisheye.json",
+    "clock_kind": "host_read_return_perf_counter_ns",
+    "boundary": "internal ray/projection parity, no accuracy"
+  },
+  "replay": {
+    "frames": 360,
+    "K": 32,
+    "Euler_steps": 8,
+    "observed_frames": 331,
+    "missing_frames": 29,
+    "missing_candidate_rejections": {
+      "no_current_observation": 928
+    },
+    "missing_hidden_change": 0.0,
+    "chunk64_vs11_max_error": 0.0,
+    "source_masks_and_reasons_preserved": true
+  },
+  "resource": {
+    "hardware": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+    "repeats": 5,
+    "full_p50_ms": 358.6447000016051,
+    "full_p95_ms": 385.4086000006646,
+    "J_p95_ms": 294.6769800000766,
+    "peak_cuda_allocated_bytes": 90242048,
+    "same_total_sampling_G0_executed": true,
+    "same_walltime_G0_attempted": true,
+    "walltime_p50_match_within_10_percent": false,
+    "walltime_target_p50_ms": 358.6447000016051,
+    "walltime_G0_p50_ms": 398.23299999989104,
+    "full_30fps_supported": false,
+    "upstream_capture_and_detector_included": false
+  },
+  "acceptance": {
+    "ambiguity_energy_relative_improvement": "not_evaluated",
+    "energy_paired_ci_supports_improvement": "not_evaluated",
+    "strong_geometry_relative_degradation": "not_evaluated",
+    "aggregation_relative_improvement": "not_evaluated",
+    "retention_difference_absolute": "not_evaluated",
+    "illegal_rate_increase": "not_evaluated",
+    "coverage90": "not_evaluated",
+    "full_pipeline_p95_ms": "fail",
+    "accuracy_claim": "blocked",
+    "shape_claim": "blocked",
+    "mechanism_revisions_remaining": 2,
+    "direction": "retain_FM; no mechanism efficacy claimed without preregistered evidence"
+  },
+  "retained_failures": [
+    "S0 import collection/lint/whitespace fixes and ignored small evidence staging issue recorded in earlier stages",
+    "S2 A4 squared-risk confusion corrected; v1 retained",
+    "S3 Gram-only Schur conditioning artifact corrected with whitened-J diagnostic; v1 retained",
+    "S4 skip-invalid A0 and uncalibrated ambiguity flags corrected; v1 retained",
+    "S5 RUF007 successive-pair lint corrected",
+    "S5 same-source calibration first failed on UTF8 BOM; utf-8-sig reader and dedicated test added",
+    "S5 full timing gate fails; v1/v2 retained; bounded two-pilot walltime control still differs by over10 percent, no matched-time efficacy claim"
+  ],
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "download_performed": false,
+  "automation_recreated": false,
+  "mainline_changed": false,
+  "author_whole_reproduction_claimed": false,
+  "remaining": [
+    "licensed model-family-matched training records and statistics",
+    "independent detector-noise calibration with view/time correlation audit",
+    "trained G0/regression/G1 experiments and policy locking",
+    "subject/rig heldout performance, shape/3D truth and three training seeds",
+    "well-matched walltime efficacy control; current timing pilot did not pass matching tolerance",
+    "representative full-system latency including capture/detection; current FD J too costly",
+    "real mesh intersection and true-motion diagnostics against applicable independent references"
+  ]
+}

@@ -113,13 +113,16 @@ def observation_errors(points, obs, cameras, noise, *, huber=3.0):
 def load_rig(stereo_path, *, camera_ids, dtype=torch.float64):
     """Resolve existing project calibration and convert extrinsic mm to metres."""
     path = Path(stereo_path)
-    data = json.loads(path.read_text(encoding="utf-8"))
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
     if data["model"] != "opencv_fisheye_stereo" or data["transform_convention"] != "X_cam1 = R_cam0_to_cam1 * X_cam0 + T_cam0_to_cam1":
         raise ValueError("unreviewed stereo calibration convention")
     app_root = path.parent.parent.parent
     cameras = []
     for i, role in enumerate(("LEFT", "RIGHT")):
-        intrinsics = json.loads((app_root / data[f"cam{i}_intrinsics"]).read_text(encoding="utf-8"))
+        declared = Path(data[f"cam{i}_intrinsics"])
+        local_path = path.parent / declared
+        intrinsic_path = local_path if local_path.is_file() else app_root / declared
+        intrinsics = json.loads(intrinsic_path.read_text(encoding="utf-8-sig"))
         K = torch.tensor(intrinsics["K"], dtype=dtype)
         D = torch.tensor(intrinsics["D"], dtype=dtype).flatten()
         R = torch.eye(3, dtype=dtype) if i == 0 else torch.tensor(data["R_cam0_to_cam1"], dtype=dtype)

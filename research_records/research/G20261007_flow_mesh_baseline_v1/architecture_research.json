@@ -612,12 +612,18 @@
     "automation_recreated": false
   },
   "flow_next_implementation": {
-    "stage": "S4",
-    "status": "information_risk_and_tie_time_interfaces_passed",
-    "validation": "flow_next_s4_checks_v2.json",
+    "stage": "S0_S5_no_training",
+    "status": "authorized_isolated_engineering_complete_performance_not_evaluated",
+    "validation": "flow_next_validation_v1.json",
     "training_executed": false,
     "checkpoint_loaded": false,
     "mainline_changed": false,
-    "parameters": 711443
+    "parameters": 711443,
+    "config": "flow_next_config_v1.json",
+    "tests_passed": 30,
+    "parameters52": 711443,
+    "parameters22": 707603,
+    "training_data_ready": false,
+    "full_30fps_supported": false
   }
 }

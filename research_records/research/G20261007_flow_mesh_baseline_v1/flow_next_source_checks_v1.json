@@ -1,0 +1,8 @@
+{
+  "same_source_projection_max_error_px": 5.684341886080801e-13,
+  "frames": 360,
+  "strict_points": 3031,
+  "calibration": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\calibration\\stereo_fisheye.json",
+  "clock_kind": "host_read_return_perf_counter_ns",
+  "boundary": "internal ray/projection parity, no accuracy"
+}

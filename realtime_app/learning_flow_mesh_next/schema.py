@@ -46,6 +46,8 @@ class Observation:
     pixel_domain: str = "raw_fisheye"
     units: str = "metres"
     operator: str = "COCO17_SURFACE_REGRESSOR_6890"
+    timestamp_kind: str = "analytic_fixture_clock"
+    view_timestamps: tuple | None = None
 
     def admitted(self):
         return self.present & self.quality & self.views[:, None]
@@ -75,6 +77,11 @@ class Observation:
             raise ValueError("provenance and nonnegative absolute frame ID required")
         if not torch.isfinite(torch.tensor(self.timestamp)):
             raise ValueError("finite physical timestamp required")
+        if not self.timestamp_kind:
+            raise ValueError("physical clock provenance required")
+        if self.view_timestamps is not None and (len(self.view_timestamps) != 2 or not
+                all(torch.isfinite(torch.tensor(v)) for v in self.view_timestamps)):
+            raise ValueError("two finite source-view timestamps required")
         # Invalid missing slots may contain NaN; never sanitize present slots.
         for value in (self.xy[self.present], self.confidence[self.present]):
             if not torch.isfinite(value).all():

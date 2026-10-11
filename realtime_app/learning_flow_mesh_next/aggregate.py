@@ -92,7 +92,10 @@ def decide(store, method, scale, *, observation=None, cameras=None, noise=None, 
         def original_order(index):
             tail = re.search(r"(\d+)$", store.ids[index])
             return (int(tail.group(1)) if tail else 0, store.ids[index])
-        selected = min(range(len(store.raw)), key=original_order)
+        original_ids = store.provenance.get("original_candidate_ids")
+        if original_ids is not None and original_ids[0] not in store.ids:
+            return Decision(method, None, None, costs, True, None, ["first_candidate_absent_from_pool"])
+        selected = store.ids.index(original_ids[0]) if original_ids else min(range(len(store.raw)), key=original_order)
         if not store.actions[selected]:
             return Decision(method, None, None, costs, True, None, ["first_candidate_not_action"])
         costs[selected] = 0

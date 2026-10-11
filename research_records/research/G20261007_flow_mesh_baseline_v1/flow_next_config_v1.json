@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-11",
+  "status": "no_training_isolated_engineering_implementation",
+  "package": "realtime_app/learning_flow_mesh_next",
+  "formal_mainline_changed": false,
+  "training_enabled": false,
+  "checkpoint_loading_enabled": false,
+  "model52": {
+    "nodes": 52,
+    "width": 128,
+    "heads": 4,
+    "blocks": 4
+  },
+  "model22": {
+    "nodes": 22,
+    "width": 128,
+    "heads": 4,
+    "blocks": 4
+  },
+  "parameters52": 711443,
+  "parameters22": 707603,
+  "normalization": {
+    "mean": null,
+    "scale": null,
+    "require_train_only_statistics": true,
+    "fixture_constants_not_training_configuration": true
+  },
+  "training": {
+    "authorization": "training_disabled",
+    "optimizer": "AdamW",
+    "lr": 0.0003,
+    "weight_decay": 0.01,
+    "gradient_clip": 1,
+    "warmup_steps": 1000,
+    "schedule": "cosine",
+    "effective_batch": 16,
+    "unroll": 32,
+    "smoke_steps": 2000,
+    "main_steps": 50000,
+    "validation_every": 1000,
+    "seeds": [
+      7,
+      17,
+      27
+    ],
+    "objective": "block_equal_weight_linear_CFM",
+    "checkpoint_selection": "validation_energy_score_with_point_and_legality_guards",
+    "normalization": "train_only_required",
+    "no_endpoint_mse": true,
+    "test_locked": true
+  },
+  "sampling": {
+    "K": 32,
+    "Euler_steps": 8,
+    "TTA": false,
+    "K_grid": [
+      1,
+      8,
+      32,
+      64
+    ],
+    "step_grid": [
+      4,
+      8,
+      16
+    ],
+    "frame_noise": "independent",
+    "candidate_sets": "nested",
+    "no_replenishment": true
+  },
+  "information": {
+    "tangent52": 169,
+    "tangent22": 79,
+    "method": "central_finite_difference",
+    "accuracy_audit_dtype": "float64",
+    "accuracy_step": 0.0001,
+    "timing_dtype": "float32",
+    "timing_step": 0.001,
+    "noise_status": "proxy-only",
+    "W_model": "block_diagonal_per_admitted_view_joint_pixel_precision; cross-view/time correlations not modeled",
+    "G0_frozen": true,
+    "anchor_J_gradient_stopped": true,
+    "schur_pinv_rtol_grid": [
+      0.0001,
+      1e-05,
+      1e-06,
+      1e-08,
+      1e-10
+    ],
+    "whitened_J_residual_required_for_conditioning_audit": true
+  },
+  "aggregation": {
+    "methods": [
+      "A0",
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "A6",
+      "A7"
+    ],
+    "A1_A3": "joint-only_diagnostics",
+    "lambda0": "pending_calibrated_information_scale",
+    "lambda_g_grid": [
+      0,
+      0.1,
+      1,
+      10
+    ],
+    "delta_validation_IQR_grid": [
+      0,
+      0.01,
+      0.05
+    ],
+    "time_gap_cutoff_s": 0.5,
+    "formal_output": "one_complete_candidate",
+    "uncalibrated_ambiguity": "retained"
+  },
+  "data_manifest": "flow_next_data_manifest_v1.json",
+  "truth": "no independent 3D/shape truth",
+  "research_plan": "flow_research_plan_v1.json",
+  "performance_revisions_used": 0,
+  "performance_revisions_max": 2,
+  "remaining": "training, independent noise calibration, subject/rig holdouts and efficacy are not executed"
+}

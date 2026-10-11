@@ -98,6 +98,8 @@ def from_parameters(raw, topology, *, ids, seeds, current_observed, provenance, 
         if not current_observed:
             rejected.append("no_current_observation")
         reasons.append(rejected)
+    provenance = {**provenance, "original_candidate_ids": list(ids),
+                  "beta_semantics": "static_identity_shape_current_estimate; no independently averaged beta"}
     return CandidateStore(raw, rotations, translation, beta, numerical,
                           numerical & current_observed, reasons, ids, seeds, topology, provenance, resources)
 
@@ -111,6 +113,8 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
         torch.cuda.synchronize()
         start = time.perf_counter()
     context, state_out, observed = model.encoder(observation, state)
+    if observation.xy.is_cuda:
+        torch.cuda.synchronize()
     encoded_at = time.perf_counter()
     noise, seeds = nested_noise(observation, k, model.topology, stream=stream,
                                device=context.device, dtype=context.dtype)
@@ -137,6 +141,8 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
                   "source_masks": {key: getattr(observation, key).cpu().tolist() for key in
                                    ("present", "quality", "geometry", "views")},
                   "normalization_source": normalization.source, "stream": stream}
+    provenance.update(timestamp_kind=observation.timestamp_kind,
+                      view_timestamps=observation.view_timestamps)
     candidates = from_parameters(parameters, model.topology,
                                  ids=[f"{stream}:{observation.frame}:{i}" for i in range(k)],
                                  seeds=seeds, current_observed=observed, provenance=provenance, resources=resources)
