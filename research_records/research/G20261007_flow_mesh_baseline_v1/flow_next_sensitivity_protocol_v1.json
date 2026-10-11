@@ -1,0 +1,48 @@
+{
+  "stage": "fixed-cache step and proxy-noise sensitivity",
+  "inputs": [
+    "outputs/flow_next_s3_v1/G0.npz",
+    "outputs/flow_next_s3_v1/G1.npz",
+    "existing licensed SMPL-H and COCO17 regressor",
+    "original S3 analytic camera and pixels, explicitly reconstructed"
+  ],
+  "code": "realtime_app/learning_flow_mesh_next/sensitivity.py",
+  "controls": {
+    "baseline_step": 0.0001,
+    "baseline_sigma_px": 10,
+    "lambda0": 1,
+    "lambda_g": 0.1,
+    "fixed_candidates": true,
+    "fixed_G0_anchor": true,
+    "G1_not_reconditioned": true
+  },
+  "axes": [
+    {
+      "only_variable": "finite-difference step",
+      "values": [
+        0.001,
+        0.0001,
+        1e-05,
+        1e-06
+      ],
+      "held_fixed": "proxy sigma10, candidate masks, scale, cameras, policy",
+      "reference": "autograd JVP on four deterministic standardized directions at same anchor; derivative cross-check only"
+    },
+    {
+      "only_variable": "isotropic proxy pixel sigma",
+      "values": [
+        5,
+        10,
+        20
+      ],
+      "held_fixed": "J at 1e-4, candidate masks, scale, cameras, fixed lambda0/lambda_g",
+      "additional_control": "lambda0 multiplied by precision ratio for metric-only scale invariance; never validation tuning"
+    }
+  ],
+  "success": "all cells reported, unavailable cells/reasons retained, no silent resampling; JVP relative error<=1e-4 is engineering check, decision changes are reported rather than scored as failures or successes",
+  "stop": "four steps and three sigma cells only; numerical failures retained, no grid expansion based on desired selection",
+  "training_executed": false,
+  "network_executed": false,
+  "boundary": "cache of random untrained generators; no accuracy, calibration, G1 efficacy or independent truth; G1 fixed at original condition so alternate-Lambda decisions are aggregator-only sensitivity",
+  "source": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.differentiate.jacobian.html"
+}
