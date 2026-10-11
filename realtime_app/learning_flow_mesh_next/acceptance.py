@@ -1,10 +1,11 @@
 """Pre-test validation locks and evidence-aware preregistered decision gates."""
 from collections import defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 import torch
 
 from .evaluate import paired_bootstrap
+from .evaluation_population import validate_paired_population
 from .information_risk import RiskPolicy
 
 
@@ -19,6 +20,8 @@ class PairedEvidence:
     baseline_method: str
     proposed_method: str
     budget_scope: str
+    registry: dict = field(default_factory=dict)
+    statistics: object = None
 
     def summarize(self, *, iterations=2000):
         if self.metric not in ('standardized_joint_energy', 'selected_error') or not all(
@@ -30,6 +33,7 @@ class PairedEvidence:
             raise ValueError('declared held-out or explicit fixture evidence required')
         if self.baseline_method == self.proposed_method:
             raise ValueError('distinct matched methods required')
+        population = validate_paired_population(self)
         report = paired_bootstrap(self.records, iterations=iterations, required_seeds=(7, 17, 27))
         if report['subjects'] < 2:
             raise ValueError('at least two subjects for a subject bootstrap; not a power guarantee')
@@ -53,6 +57,7 @@ class PairedEvidence:
                 'source_kind': self.source_kind, 'split': self.split,
                 'baseline_method': self.baseline_method, 'proposed_method': self.proposed_method,
                 'budget_scope': self.budget_scope,
+                'population': population,
                 'scope_limit': 'declared evidence only; source independence, test lock and budgets require external audit'}
 
 

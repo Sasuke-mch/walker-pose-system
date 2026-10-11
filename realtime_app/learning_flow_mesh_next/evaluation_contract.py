@@ -1,5 +1,6 @@
 """Offline dimensionless distribution scores; labels never enter deployment."""
-from dataclasses import dataclass
+import copy
+from dataclasses import dataclass, field
 
 import torch
 
@@ -18,10 +19,11 @@ class DistributionScale:
     basis: str
     operator: str = 'COCO17_SURFACE_REGRESSOR_6890'
     floor: float = 1e-4
+    population: list = field(default_factory=list)
 
     def to_dict(self):
         self.validate()
-        return {key: value.detach().cpu().tolist() if torch.is_tensor(value) else value
+        return {key: value.detach().cpu().tolist() if torch.is_tensor(value) else copy.deepcopy(value)
                 for key, value in vars(self).items()}
 
     def validate(self):

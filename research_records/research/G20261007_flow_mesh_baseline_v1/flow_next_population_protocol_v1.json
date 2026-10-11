@@ -1,0 +1,15 @@
+{
+  "stage": "registered population binding for paired evaluation",
+  "only_variable": "evaluation provenance registry; no network/metrics/bootstrap formulas change",
+  "inputs": "existing model-family/split manifest extended with explicit record IDs, original frames, nonoverlapping full block partition/strata and comparison identities; statistics train rows; paired block provenance",
+  "controls": [
+    "named fixture can remain numerically unbound but never real efficacy",
+    "nonfixture evidence without registry rejected",
+    "train/heldout subject/action/sequence leakage rejected",
+    "missing or duplicated original blocks/frames/seed records rejected",
+    "stratum/method/budget declaration mismatch rejected",
+    "energy score statistics trace to declared training rows/basis; heldout-origin statistics rejected"
+  ],
+  "limitations": "checks supplied registration, not source independence, data file contents, measured compute matching, clinical truth, power or external test-lock authorization",
+  "stop": "validate named analytic examples; no licensed data fabrication or new training; do not claim all efficacy gates closed"
+}

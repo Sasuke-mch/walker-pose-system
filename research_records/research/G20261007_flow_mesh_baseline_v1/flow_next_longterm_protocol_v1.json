@@ -50,8 +50,8 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Bind evaluation population, training-statistics source and registered strata/block provenance using existing manifest contracts; reject leakage/mismatched evidence with named fixtures, no training or architecture variants.",
+  "next_stage": "Connect original per-frame evaluation scores to registered paired blocks with all failures retained; finish this explicit offline link, then no new model variants or repeated green audits without new data/authorization/verified defect.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "flow_next_evaluation_checks_v1.json: standardized separate joint/beta ES and exact three-seed paired gates; 78 engineering tests, no efficacy claim"
+  "last_completed_stage": "flow_next_population_checks_v1.json: registered population, complete block/seed and training-statistics origin binding; 94 full tests plus 25 focused after final metadata changes; no efficacy claim"
 }

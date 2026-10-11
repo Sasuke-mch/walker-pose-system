@@ -4191,3 +4191,14 @@ PairedEvidence绑定指标/stratum/split/sourcekind/source/对照方法/budget�
 78项累计测试、Ruff、compileall及实际JSON往返通过；首次Ruff import-order已修复。旧源码bool门实际接受50%改善及true，修复后无记录为not_evaluated；缺seed、不齐block、单subject拒绝；已知混合效应CI=[-1,1]不支持改善。原失败/非法raw池/未知beta保留，详见flow_next_evaluation_checks_v1.json。没有执行训练、神经权重加载、主线改动、扩容或push。
 
 当前契约不认证输入source独立性/许可、真实strata范围、样本power、训练与heldout人物/rig不相交或外部test锁；complete statistics及score/CI来源全运行导出仍需实际数据。下一步在已有manifest上绑定评价population/统计来源与原block记录，防止将错误stratum或泄漏统计接入这一数值门；仍仅允许明确人工反例，真实labels与训练授权依赖路径继续停止。
+
+
+### 2026-10-11 评价原始population与统计来源绑定
+
+上一轮分布/三seed评价代码已实际提交，属于进展。本轮先锁定flow_next_population_protocol_v1.json，只补评价登记，不改ES/层级bootstrap/网络/生成/风险公式。evaluation_population.py沿用validate_manifest的SMPL-H同family/basis与train/heldout人物、原动作、序列不相交门；增补唯一record ID、整数原帧、保留全部原帧的有序不重叠block分区、预注册stratum及comparison方法/source/split/budget声明。真实声明路径需登记的locally_authorized；fixture metadata始终明确analytic，不升级真实来源。
+
+fit_registered_statistics要求每统计行对应唯一原train record/frame且与values长度一致，fit后深拷贝origins；DistributionScale.to_dict对新增population也深拷贝，bool不充当整数原帧。PairedEvidence非fixture必须有registry；每block原subject/action/sequence/rig/sourcepath/frames逐项比对，全部预注册stratum blocks及7/17/27必须在场，整block丢弃/重复不能用仍匹配的seed集遮掩。energy evidence另查typed统计的train origins、basis/sourcekind及各row statistics_source；fixture不登记仍只允许命名数值检查，不能成为效果声明。
+
+94项全模块测试通过；后续小改metadata-copy/frame-type通过25项相关测试、Ruff及compileall，JSON实际往返通过。flow_next_population_checks_v1.json保留上一版源码对无registry fitted_reference/validation的接受，以及当前拒绝；wrong_stratum、整block缺失、heldout统计origin、错误原frames的逐项失败。人工正确登记含4个block/3seed，依然只有registered_metadata_verified而无真实认证。当前真实manifest records仍0，本轮未扫描全部原数据/训练/加载网络权重/扩容/改主线/推送。
+
+边界：提供的登记不证明source独立性、许可证明文件、tensor和源数据内容对应、实测相同计算预算、统计power或外部test锁。block均值与原帧score尚由调用方准备，不可把登记门称为全效果闭环完成。下一步限于原帧评价到登记block的导出及失败保留检查；这是最后一段已明确缺失的离线评价连接，不新开模型变体。完成后无新数据/授权/可复现缺陷时保持安静，真实收益阶段按原协议继续等待。

@@ -1,0 +1,408 @@
+{
+  "stage": "original registered population evaluation binding",
+  "before_nonfixture_without_population": {
+    "proposed_minus_baseline": -1.0,
+    "ci95": [
+      -1.0,
+      -1.0
+    ],
+    "subjects": 2,
+    "training_seeds": [
+      7,
+      17,
+      27
+    ],
+    "iterations": 20,
+    "scope": "subject paired; hierarchical sequence blocks; seeds not independent subjects",
+    "relative_improvement": 0.5,
+    "ci_supports_improvement": true,
+    "metric": "standardized_joint_energy",
+    "stratum": "registered_fixture_stratum",
+    "source": "known_fixture_records",
+    "source_kind": "fitted_reference",
+    "split": "validation",
+    "baseline_method": "G0",
+    "proposed_method": "G1",
+    "budget_scope": "same_K32_declared_fixture_budget",
+    "scope_limit": "declared evidence only; source independence, test lock and budgets require external audit"
+  },
+  "after_nonfixture_without_population": "registered population required for nonfixture evidence",
+  "registered_analytic_fixture": {
+    "proposed_minus_baseline": -1.0,
+    "ci95": [
+      -1.0,
+      -1.0
+    ],
+    "subjects": 2,
+    "training_seeds": [
+      7,
+      17,
+      27
+    ],
+    "iterations": 20,
+    "scope": "subject paired; hierarchical sequence blocks; seeds not independent subjects",
+    "relative_improvement": 0.5,
+    "ci_supports_improvement": true,
+    "metric": "standardized_joint_energy",
+    "stratum": "registered_fixture_stratum",
+    "source": "known_fixture_records",
+    "source_kind": "analytic_fixture",
+    "split": "engineering_fixture",
+    "baseline_method": "G0",
+    "proposed_method": "G1",
+    "budget_scope": "same_K32_declared_fixture_budget",
+    "population": {
+      "status": "registered_metadata_verified",
+      "original_blocks": 4,
+      "training_seeds": [
+        7,
+        17,
+        27
+      ],
+      "claim_limit": "declared original population only; file content, compute, independence and external locks not certified"
+    },
+    "scope_limit": "declared evidence only; source independence, test lock and budgets require external audit"
+  },
+  "retained_rejections": {
+    "wrong_stratum": "comparison stratum/method/budget/source/split differs from registration",
+    "whole_block_missing": "all registered stratum blocks and three seeds required",
+    "wrong_statistics_origin": "statistics require unique registered original training rows",
+    "wrong_original_frames": "paired block frames differ from registration"
+  },
+  "registry_fixture": {
+    "manifest": {
+      "source_path": "pending",
+      "license_status": "missing",
+      "family": "SMPL-H",
+      "gender": "male",
+      "beta_basis": "fixture_same_basis",
+      "beta_dimensions": 10,
+      "rotation_convention": "local_matrix_packed_columns6d",
+      "hand_mean": "flat",
+      "dmpl": "excluded_explicitly",
+      "label_scope": "pending",
+      "noise_source": "proxy-only",
+      "records": [
+        {
+          "record_id": "train",
+          "subject": "train",
+          "original_action": "train",
+          "sequence": "train",
+          "rig": "rig_fixture",
+          "source_path": "known_fixture:train",
+          "split": "train",
+          "frames": [
+            0,
+            1
+          ],
+          "blocks": [
+            {
+              "id": 0,
+              "frames": [
+                0
+              ],
+              "stratum": "registered_fixture_stratum"
+            },
+            {
+              "id": 1,
+              "frames": [
+                1
+              ],
+              "stratum": "registered_fixture_stratum"
+            }
+          ]
+        },
+        {
+          "record_id": "a",
+          "subject": "a",
+          "original_action": "a",
+          "sequence": "a",
+          "rig": "rig_fixture",
+          "source_path": "known_fixture:a",
+          "split": "engineering_replay",
+          "frames": [
+            0,
+            1
+          ],
+          "blocks": [
+            {
+              "id": 0,
+              "frames": [
+                0
+              ],
+              "stratum": "registered_fixture_stratum"
+            },
+            {
+              "id": 1,
+              "frames": [
+                1
+              ],
+              "stratum": "registered_fixture_stratum"
+            }
+          ]
+        },
+        {
+          "record_id": "b",
+          "subject": "b",
+          "original_action": "b",
+          "sequence": "b",
+          "rig": "rig_fixture",
+          "source_path": "known_fixture:b",
+          "split": "engineering_replay",
+          "frames": [
+            0,
+            1
+          ],
+          "blocks": [
+            {
+              "id": 0,
+              "frames": [
+                0
+              ],
+              "stratum": "registered_fixture_stratum"
+            },
+            {
+              "id": 1,
+              "frames": [
+                1
+              ],
+              "stratum": "registered_fixture_stratum"
+            }
+          ]
+        }
+      ],
+      "truth_status": "no_independent_3d_or_scan"
+    },
+    "source_kind": "analytic_fixture",
+    "comparisons": {
+      "standardized_joint_energy": {
+        "stratum": "registered_fixture_stratum",
+        "baseline_method": "G0",
+        "proposed_method": "G1",
+        "budget_scope": "same_K32_declared_fixture_budget",
+        "source": "known_fixture_records",
+        "split": "engineering_fixture"
+      }
+    }
+  },
+  "original_paired_fixture_rows": [
+    {
+      "subject": "a",
+      "sequence": "a",
+      "block": 0,
+      "training_seed": 7,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "a",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:a",
+      "record_id": "a",
+      "frames": [
+        0
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "a",
+      "sequence": "a",
+      "block": 0,
+      "training_seed": 17,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "a",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:a",
+      "record_id": "a",
+      "frames": [
+        0
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "a",
+      "sequence": "a",
+      "block": 0,
+      "training_seed": 27,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "a",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:a",
+      "record_id": "a",
+      "frames": [
+        0
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "a",
+      "sequence": "a",
+      "block": 1,
+      "training_seed": 7,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "a",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:a",
+      "record_id": "a",
+      "frames": [
+        1
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "a",
+      "sequence": "a",
+      "block": 1,
+      "training_seed": 17,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "a",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:a",
+      "record_id": "a",
+      "frames": [
+        1
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "a",
+      "sequence": "a",
+      "block": 1,
+      "training_seed": 27,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "a",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:a",
+      "record_id": "a",
+      "frames": [
+        1
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "b",
+      "sequence": "b",
+      "block": 0,
+      "training_seed": 7,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "b",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:b",
+      "record_id": "b",
+      "frames": [
+        0
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "b",
+      "sequence": "b",
+      "block": 0,
+      "training_seed": 17,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "b",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:b",
+      "record_id": "b",
+      "frames": [
+        0
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "b",
+      "sequence": "b",
+      "block": 0,
+      "training_seed": 27,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "b",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:b",
+      "record_id": "b",
+      "frames": [
+        0
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "b",
+      "sequence": "b",
+      "block": 1,
+      "training_seed": 7,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "b",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:b",
+      "record_id": "b",
+      "frames": [
+        1
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "b",
+      "sequence": "b",
+      "block": 1,
+      "training_seed": 17,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "b",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:b",
+      "record_id": "b",
+      "frames": [
+        1
+      ],
+      "statistics_source": "registered_fixture_stats"
+    },
+    {
+      "subject": "b",
+      "sequence": "b",
+      "block": 1,
+      "training_seed": 27,
+      "baseline": 2.0,
+      "proposed": 1.0,
+      "original_action": "b",
+      "rig": "rig_fixture",
+      "source_path": "known_fixture:b",
+      "record_id": "b",
+      "frames": [
+        1
+      ],
+      "statistics_source": "registered_fixture_stats"
+    }
+  ],
+  "statistics_train_origins": [
+    {
+      "record_id": "train",
+      "frame": 0
+    },
+    {
+      "record_id": "train",
+      "frame": 1
+    }
+  ],
+  "validation": {
+    "focused_tests": 25,
+    "ruff": "passed",
+    "compileall": "passed",
+    "full_suite": "94 passed; subsequent snapshot-deep-copy/frame-type changes verified by 25 related tests, Ruff and compileall",
+    "repairs": "metadata snapshot deep-copy and original frame bool rejection added before final validation; no product numerical failure observed"
+  },
+  "boundaries": [
+    "registered metadata checks only, not independent labels or data content certificate",
+    "registry comparisons bind declared source/stratum/method/budget; measured equal wall-time not certified",
+    "statistics train row origins checked; supplied tensor-to-file content relation not certified",
+    "blocks retain registered original frames; block mean extraction/failed reference policy must be checked against actual arrays",
+    "fixture source remains analytic; no real efficacy certification",
+    "no model expansion, training, neural weight loading, mainline changes or push"
+  ],
+  "actual_registered_real_records": 0
+}
