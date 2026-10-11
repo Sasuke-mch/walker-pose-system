@@ -1,0 +1,36 @@
+{
+  "stage": "coupling visibility screening completed",
+  "protocol": "flow_next_visibility_protocol_v1.json",
+  "raw_results": "flow_next_visibility_v1.json",
+  "checks": {
+    "tests_passed": 43,
+    "ruff": "passed",
+    "compileall": "passed",
+    "candidates_and_metadata_unchanged": true,
+    "sigma_global_scale_invariant_projection_fraction": true,
+    "available_cells": 10,
+    "total_cells": 11,
+    "unavailable_cell": "none/no_current_observation retained"
+  },
+  "baseline": {
+    "cross_energy_fraction_of_full": 0.32588193160824425,
+    "projectable_cross_energy_fraction": 0.024708666801583592,
+    "unseen_cross_energy_fraction": 0.9752913331984164,
+    "raw_sketch_energy_ratio_not_retention": 1.3825063087748122
+  },
+  "mask_visibility_range": [
+    0.021659659501305613,
+    0.03098234675417466
+  ],
+  "decision": "predeclared80%unseen engineering screen triggered. Suspend promotion of cross_block_sketch as a broadly informative conditioning candidate; retain mode as explicit numerical control. No probe-seed search or dimension growth.",
+  "important_counterinterpretation": "Random projection can discriminate selected constraints without reconstructing the full matrix. Low projectable energy does not prove poor held-out prediction; the screening threshold is an engineering target only, not an efficacy criterion or fraction of Fisher information. Candidate training efficacy remains untested.",
+  "geometry_scope": "Frozen standard-scaled G0 anchor/J from one S3 analytic observation and existing licensed decoder. Mask cells only select J rows; they do not re-estimate occluded anchor, regenerate candidates, or constitute a real-image dataset test.",
+  "source": {
+    "url": "https://www.netlib.org/lapack/lug/node27.html",
+    "use": "rank-deficient least-squares direct SVD reference for orthogonal reconstruction; independent numpy least-squares comparison in test"
+  },
+  "training_executed": false,
+  "neural_weights_loaded": false,
+  "performance_claim": false,
+  "next_stage": "Complete train-only residual/noise calibration data contract and temporal correlation audit against independent reference requirements. Do not calibrate from current fit self-reprojection or tune validation weights to these fixtures; real held-out efficacy remains blocked by missing labels and training authorization."
+}

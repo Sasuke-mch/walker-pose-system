@@ -1,0 +1,34 @@
+{
+  "stage": "fixed S3 cross-block sketch visibility audit",
+  "inputs": [
+    "outputs/flow_next_s3_v1/G0.npz",
+    "outputs/flow_next_s3_v1/G1.npz",
+    "existing licensed SMPL-H assets and original S3 analytic cameras/pixels"
+  ],
+  "frozen": "G0 numerical medoid anchor and standardized central-difference J at1e-4; original candidates, masks, IDs, reasons and seeds; no neural model execution",
+  "mask_axis": [
+    "all",
+    "left_only",
+    "right_only",
+    "drop_wrists",
+    "upper_body_only",
+    "lower_body_only",
+    "none"
+  ],
+  "mask_definition": "COCO17: wrists9,10; upper5..10; lower11..16. Counterfactual admitted rows only; never alter saved source masks. Coordinates from original full J selected in view-major point xy order. Anchor frozen for all cells; not a new occluded-anchor estimate.",
+  "precision_axis": "full admitted mask only: isotropic sigma5/10/20px plus sigma_x5_y10px anisotropic. Mask axis always sigma10px. Axes varied separately.",
+  "measure": "off-block Frobenius energy; each token row block projected onto column span of the probes restricted to outside-token coordinates. Reconstructed energy / original energy in[0,1]. This is a Euclidean reconstruction diagnostic, not percentage of Fisher information or accuracy retained. Raw sketch norm ratio separately can exceed1.",
+  "projection": "fixed seed20261012 and3/10probes; no seed selection, no candidate resampling",
+  "controls": "baseline discards all cross blocks; full external matrix as reconstruction reference; QR/SVD orthogonal projection checks with known span and nullspace",
+  "success": "all cells and unavailable cases recorded; source caches unchanged; global precision scale invariance of reconstruction fraction checked; geometry metadata explicit",
+  "stop_rule": "if baseline full-mask unseen cross energy exceeds80%, suspend current sketch as a broadly informative conditioning candidate and do not tune more probe seeds. This is an engineering screening rule, not an efficacy gate. Preserve code as diagnostic control.",
+  "boundaries": [
+    "one artificial S3 observation using real statistical decoder",
+    "no genuine independent 3D truth",
+    "no Fisher-information guarantee from Frobenius energy",
+    "no mask-adaptive candidate generation",
+    "no training or neural weights",
+    "no whole-chain speed claim"
+  ],
+  "source": "https://www.netlib.org/lapack/lug/node27.html"
+}

@@ -602,3 +602,14 @@ flow_next_config_v1.json与flow_next_data_manifest_v1.json保留训练禁止、�
 候选能区分指定的耦合/反向耦合；块对角及无信息时保持原输出，信息梯度detach、缺失hidden不变/不发布、同参数loss/sample图通过。但压力测试构造了非零交叉块的PSD矩阵I+C，其交叉部分落在固定probe零空间，编码差仅数值舍入量级；失败边界保留，拒绝无损/完整耦合传递声明。随机velocity差异不是精度改进。首次2个测试dtype不一致与1项import-order lint失败已修复，过程与来源获取失败列于flow_next_coupling_checks_v1.json；最终41项累计测试、Ruff及compileall通过，无训练/神经权重加载/主线修改。
 
 下一步复用现有真实SMPL-H解码的S3固定J与候选，预先指定准入关节mask和proxy precision扰动，检查跨块信息量及压缩可见性，不挑seed、不生成新候选；真实独立标签、噪声校准和授权训练held-out评价仍未完成，不能把本轮编码区分能力计为方法收益。
+
+
+### 2026-10-11 跨块压缩可见性筛选：停止晋升当前sketch
+
+上一轮为可验证进展：编码候选、数值反例、同参数检查及本地提交已改变权威状态。本轮先锁定flow_next_visibility_protocol_v1.json，复用S3固定G0/G1及合法统计人体资产，只求一次原anchor/J，再分别改变准入关节mask或proxy precision，不运行网络、不重采样、不训练。新增visibility.py，以token外部列上的固定probe张成空间做SVD正交投影；与独立numpy最小二乘重建对照、非等方precision/原view-major xy行顺序、零信号及全缺失边界核查。43项累计测试、Ruff和compileall通过，候选参数/mask/ID/seed/拒绝原因/provenance保留。
+
+完整观测下，跨块Frobenius能量占全矩阵32.588%，固定sketch对应张成空间可重建跨块能量2.4709%，未覆盖97.5291%，触发预先80%工程筛选停止条件；left/right/drop_wrists/upper/lower分别2.3919%/2.5494%/2.1660%/3.0982%/2.2363%。isotropic sigma5/10/20下重建比例完全相同；anisotropic sigma_x5_y10为2.2408%。全缺失显式保留no_current_observation。原sketch能量比却为138.25%，故幅度不能误称保留比例。原始结果见flow_next_visibility_v1.json与summary。
+
+停止把cross_block_sketch晋升为广泛信息条件候选，保留代码/配置作数值对照；不继续挑probe seed、不增加通道/参数。必须区分重建目标与预测目标：低Frobenius重建比例不是Fisher信息/真实精度损失比例，也不能推出训练后必无效；此前可区分特定耦合的证据仍成立。筛选只对标准化坐标、一个人工S3观测及冻结anchor适用，未重新估计遮挡anchor，未完成真实图像数据集评价，不替换任何效果预注册门。当前正式baseline与default编码保持原样。
+
+下一阶段完善噪声校准的数据契约与时序相关误差审计，先检查独立参考、人物/序列split、同族参数与授权资源；禁止用当前拟合自回投影校准 detector noise。真实held-out方法收益仍需独立标签及明确训练授权，不能把继续增加诊断工具当作模型精度已经提高。

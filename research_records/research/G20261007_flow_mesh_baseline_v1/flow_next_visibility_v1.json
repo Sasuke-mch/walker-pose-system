@@ -1,0 +1,4351 @@
+{
+  "available": true,
+  "cache_dir": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\outputs\\flow_next_s3_v1",
+  "anchor_id": "G0:0:15",
+  "fixed_J_shape": [
+    68,
+    169
+  ],
+  "provenance": {
+    "identity": "person",
+    "sequence": "sequence",
+    "frame": 0,
+    "timestamp": 0.0,
+    "camera_ids": [
+      "PnP_LEFT_fixture",
+      "PnP_RIGHT_fixture"
+    ],
+    "operator": "COCO17_SURFACE_REGRESSOR_6890",
+    "source": "analytic_fixture"
+  },
+  "cases": [
+    {
+      "axis": "admitted_mask",
+      "case": "all",
+      "admitted_count": 34,
+      "admitted": [
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      ],
+      "available": true,
+      "reasons": [],
+      "diagnostic": {
+        "full_energy": 34992404.40160042,
+        "cross_energy": 11403392.338010373,
+        "cross_energy_fraction_of_full": 0.32588193160824425,
+        "projectable_cross_energy_fraction": 0.024708666801583592,
+        "unseen_cross_energy_fraction": 0.9752913331984164,
+        "raw_sketch_energy_ratio_not_retention": 1.3825063087748122,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 2387656.0013988107,
+            "projectable_fraction": 0.019010077155116215,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 94290.94180824788,
+            "projectable_fraction": 0.023298285067984696,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 91642.51290668844,
+            "projectable_fraction": 0.02121743249636812,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 2577744.9089217167,
+            "projectable_fraction": 0.025035203451495475,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 16828.268915902576,
+            "projectable_fraction": 0.03603372256686198,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 16798.49031677639,
+            "projectable_fraction": 0.02212559116017354,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 1682453.1825359385,
+            "projectable_fraction": 0.023983569729673786,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 7.030696945756023,
+            "projectable_fraction": 0.025557582201827255,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 16.67282798437048,
+            "projectable_fraction": 0.0157640846706861,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 1365493.786939601,
+            "projectable_fraction": 0.03002351212701289,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 20.036586521069747,
+            "projectable_fraction": 0.03365500655229737,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 30.93203475986839,
+            "projectable_fraction": 0.019809725371064305,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 81470.7937655017,
+            "projectable_fraction": 0.026232638403879616,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 134602.5758799374,
+            "projectable_fraction": 0.040169165239250446,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 122759.28733884539,
+            "projectable_fraction": 0.02487799404745928,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 17010.98529881983,
+            "projectable_fraction": 0.022094713411286528,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 69802.75426437432,
+            "projectable_fraction": 0.03582192796266115,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 67011.66599046347,
+            "projectable_fraction": 0.02077335630711899,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 10531.580762701733,
+            "projectable_fraction": 0.04732518414466949,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 9927.77398812904,
+            "projectable_fraction": 0.01527925052530625,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 2.5426035152695223,
+            "projectable_fraction": 0.0332131808417189,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 5.937498547695316,
+            "projectable_fraction": 0.005769795921652956,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 3.0899398297134886e-07,
+            "projectable_fraction": 0.02866221003307289,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 2.6085560295563585e-08,
+            "projectable_fraction": 0.037809583171443124,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 1.2877076589570705e-08,
+            "projectable_fraction": 0.017941144501477525,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 2.576748688464196e-07,
+            "projectable_fraction": 0.04055848714557688,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 3.5259459818897824e-08,
+            "projectable_fraction": 0.0510172204301929,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 4.908791549614528e-09,
+            "projectable_fraction": 0.01979963164503846,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 2.7595655637318416e-05,
+            "projectable_fraction": 0.052354488433760914,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 1.4562486191710863e-06,
+            "projectable_fraction": 0.05009734606959267,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 1.5956542840687898e-07,
+            "projectable_fraction": 0.03931758645103039,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 2.4201403440749156e-06,
+            "projectable_fraction": 0.05430330003233179,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 6.278419757183467e-08,
+            "projectable_fraction": 0.04413710624751811,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 1.0630445688070828e-08,
+            "projectable_fraction": 0.021539187134210783,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.0011319921462032252,
+            "projectable_fraction": 0.04896794906831054,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 2.1929029693634043e-05,
+            "projectable_fraction": 0.04815570799475159,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 5.089230720935878e-07,
+            "projectable_fraction": 0.04478148529309593,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 2.150744376577823e-06,
+            "projectable_fraction": 0.02965033548062333,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 1.4086189981289348e-07,
+            "projectable_fraction": 0.023816378773397807,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 8.875903369752128e-08,
+            "projectable_fraction": 0.03272134989859138,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 1.7708551501248755e-06,
+            "projectable_fraction": 0.024018571328794397,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 1.282674334682068e-07,
+            "projectable_fraction": 0.01182165594865546,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 3.238064639144872e-08,
+            "projectable_fraction": 0.027570702067076198,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 0.00010013575744790538,
+            "projectable_fraction": 0.011076338226389006,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 5.399775332408033e-06,
+            "projectable_fraction": 0.012035528040304033,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 6.483491971988329e-07,
+            "projectable_fraction": 0.021691083081803713,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 7.386917021128997e-06,
+            "projectable_fraction": 0.010054890881860509,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 3.1420508644675357e-07,
+            "projectable_fraction": 0.015779567966624358,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 5.9033683830274214e-08,
+            "projectable_fraction": 0.027885013057508602,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.012738346891598563,
+            "projectable_fraction": 0.014967193308054804,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 0.0002626989720098055,
+            "projectable_fraction": 0.015953446567159732,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 5.356161872590928e-06,
+            "projectable_fraction": 0.0192574509975095,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 2656924.391418983,
+            "projectable_fraction": 0.026280405804354263,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 359.26899922206906,
+            "projectable_fraction": 0.07746163564016342,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "admitted_mask",
+      "case": "left_only",
+      "admitted_count": 17,
+      "admitted": [
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ],
+      "available": true,
+      "reasons": [],
+      "diagnostic": {
+        "full_energy": 8801049.208702978,
+        "cross_energy": 2869051.30201167,
+        "cross_energy_fraction_of_full": 0.3259896898627256,
+        "projectable_cross_energy_fraction": 0.023918772677874466,
+        "unseen_cross_energy_fraction": 0.9760812273221255,
+        "raw_sketch_energy_ratio_not_retention": 1.334570591550144,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 600786.7677887991,
+            "projectable_fraction": 0.018355400603542432,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 23693.98545313268,
+            "projectable_fraction": 0.0232371800103316,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 23118.624435520396,
+            "projectable_fraction": 0.02139738333312156,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 648807.811299351,
+            "projectable_fraction": 0.02456526479113903,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 4225.743008394058,
+            "projectable_fraction": 0.03619562270375796,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 4243.680710316157,
+            "projectable_fraction": 0.022390261980701667,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 423411.3336381362,
+            "projectable_fraction": 0.023177943797343652,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 1.7739438121348647,
+            "projectable_fraction": 0.024920768127221132,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 4.1650713429063435,
+            "projectable_fraction": 0.015497830213254562,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 343606.90543785214,
+            "projectable_fraction": 0.028764435578615317,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 5.101493903357496,
+            "projectable_fraction": 0.03447488902013202,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 7.739234918448511,
+            "projectable_fraction": 0.019772586166617395,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 20539.753869574113,
+            "projectable_fraction": 0.025268919403362934,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 33293.666130570826,
+            "projectable_fraction": 0.039778435012160274,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 31162.8562205458,
+            "projectable_fraction": 0.024753449381584632,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 4280.3991722942665,
+            "projectable_fraction": 0.021203801407936883,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 17259.855747012378,
+            "projectable_fraction": 0.03559944962986371,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 17007.76000557973,
+            "projectable_fraction": 0.020677076655952278,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 2603.576567136599,
+            "projectable_fraction": 0.04681162639520598,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 2519.672684703367,
+            "projectable_fraction": 0.015086533431115271,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 0.6294847299917082,
+            "projectable_fraction": 0.033864507618096784,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 1.4992699043063809,
+            "projectable_fraction": 0.005854079505737845,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 7.253303323756873e-08,
+            "projectable_fraction": 0.027524501228872063,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 6.2652529915146015e-09,
+            "projectable_fraction": 0.03916448041299684,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 3.0253913181847684e-09,
+            "projectable_fraction": 0.01784627174111207,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 6.128033172982709e-08,
+            "projectable_fraction": 0.041535600710648275,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 8.738028759754144e-09,
+            "projectable_fraction": 0.05113778885223017,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 1.1939522012784735e-09,
+            "projectable_fraction": 0.01978382837107102,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 6.904149199219085e-06,
+            "projectable_fraction": 0.05239969379992851,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 3.6078836649332474e-07,
+            "projectable_fraction": 0.050927154438616055,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 3.935210033353808e-08,
+            "projectable_fraction": 0.03951056102902867,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 5.995569906020503e-07,
+            "projectable_fraction": 0.056080323522009756,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 1.5349703335106983e-08,
+            "projectable_fraction": 0.044045760519653795,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 2.6681278812287905e-09,
+            "projectable_fraction": 0.02034251193508137,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.00027947544284409793,
+            "projectable_fraction": 0.04855751337201872,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 5.454620390108435e-06,
+            "projectable_fraction": 0.04786197978981253,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 1.2618205826881918e-07,
+            "projectable_fraction": 0.044374892119291506,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 5.775238697320823e-07,
+            "projectable_fraction": 0.029482148789310995,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 3.784262314857635e-08,
+            "projectable_fraction": 0.023430867834083057,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 2.402536994798499e-08,
+            "projectable_fraction": 0.03132750776453593,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 4.754631661641798e-07,
+            "projectable_fraction": 0.0242049951756419,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 3.276475977231117e-08,
+            "projectable_fraction": 0.011718921425869265,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 8.44520168312082e-09,
+            "projectable_fraction": 0.026234549462814193,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 2.5413761183520822e-05,
+            "projectable_fraction": 0.01065909662920748,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 1.384951723414172e-06,
+            "projectable_fraction": 0.01163712005969836,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 1.6644910709200678e-07,
+            "projectable_fraction": 0.020855153690422488,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 1.9256289627911826e-06,
+            "projectable_fraction": 0.009857810310299161,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 8.038287850812882e-08,
+            "projectable_fraction": 0.015675701409711983,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 1.4900025596788686e-08,
+            "projectable_fraction": 0.02658378165999743,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.0032514881484167228,
+            "projectable_fraction": 0.014911072827692355,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 6.685637792804464e-05,
+            "projectable_fraction": 0.015688711430188296,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 1.369252289798837e-06,
+            "projectable_fraction": 0.0189031910925075,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 668377.5428905388,
+            "projectable_fraction": 0.025178694475068084,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 90.45481061452956,
+            "projectable_fraction": 0.07511732667794323,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "admitted_mask",
+      "case": "right_only",
+      "admitted_count": 17,
+      "admitted": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      ],
+      "available": true,
+      "reasons": [],
+      "diagnostic": {
+        "full_energy": 8715000.530149467,
+        "cross_energy": 2840057.157263768,
+        "cross_energy_fraction_of_full": 0.32588146695328535,
+        "projectable_cross_energy_fraction": 0.025493980558680972,
+        "unseen_cross_energy_fraction": 0.974506019441319,
+        "raw_sketch_energy_ratio_not_retention": 1.4303681734811258,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 594383.1748989642,
+            "projectable_fraction": 0.019662740797863457,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 23535.581813137687,
+            "projectable_fraction": 0.02331877236104864,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 22780.69667939732,
+            "projectable_fraction": 0.02100603131394958,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 641644.8549254129,
+            "projectable_fraction": 0.02550584982324043,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 4203.489601346769,
+            "projectable_fraction": 0.035819518880808796,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 4169.71566342627,
+            "projectable_fraction": 0.021827711113875832,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 418661.8420125662,
+            "projectable_fraction": 0.024797257460522363,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 1.7440348949241913,
+            "projectable_fraction": 0.02620195756221163,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 4.17739460956816,
+            "projectable_fraction": 0.016033935927036388,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 339744.52036414575,
+            "projectable_fraction": 0.031288288507248685,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 4.92406293554496,
+            "projectable_fraction": 0.032799093595947376,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 7.731257284559078,
+            "projectable_fraction": 0.019844448965548,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 20254.368909528075,
+            "projectable_fraction": 0.027209964795396044,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 34059.54659047727,
+            "projectable_fraction": 0.04052045945706156,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 30258.464819406814,
+            "projectable_fraction": 0.025017613453628063,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 4237.229975955128,
+            "projectable_fraction": 0.02299972118046145,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 17666.012851980497,
+            "projectable_fraction": 0.03601549252500049,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 16519.63673428881,
+            "projectable_fraction": 0.020897234677813528,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 2665.4245637747317,
+            "projectable_fraction": 0.047793598511618914,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 2447.1122015141154,
+            "projectable_fraction": 0.015502350749577712,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 0.6453230541456192,
+            "projectable_fraction": 0.03247322441164742,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 1.4706141613293222,
+            "projectable_fraction": 0.005697314973873712,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 8.23795556132316e-08,
+            "projectable_fraction": 0.029744647881473164,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 6.821610671423197e-09,
+            "projectable_fraction": 0.036566994492603984,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 3.4446289258758726e-09,
+            "projectable_fraction": 0.018241313315509246,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 6.797162548139237e-08,
+            "projectable_fraction": 0.03965997085002139,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 8.895958409631768e-09,
+            "projectable_fraction": 0.050887336527628176,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 1.2695820777316212e-09,
+            "projectable_fraction": 0.019957963980920587,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 6.899222561071218e-06,
+            "projectable_fraction": 0.05228310394822234,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 3.678887009963463e-07,
+            "projectable_fraction": 0.049257912973067905,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 4.054994476867169e-08,
+            "projectable_fraction": 0.03912439572156141,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 6.124162719909428e-07,
+            "projectable_fraction": 0.05248540740021444,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 1.607764241887257e-08,
+            "projectable_fraction": 0.04418485852851662,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 2.6614173480224904e-09,
+            "projectable_fraction": 0.02279411704287556,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.0002866093184593436,
+            "projectable_fraction": 0.04936735808431243,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 5.513764220738809e-06,
+            "projectable_fraction": 0.048435063292014996,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 1.2852146657946526e-07,
+            "projectable_fraction": 0.04516477638961535,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 5.005278648688821e-07,
+            "projectable_fraction": 0.029778868615547124,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 3.285440147854352e-08,
+            "projectable_fraction": 0.024182975435466006,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 2.0552267581192415e-08,
+            "projectable_fraction": 0.03414323554732779,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 4.125115914526613e-07,
+            "projectable_fraction": 0.023774684146626472,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 3.14007252115446e-08,
+            "projectable_fraction": 0.011932744220896097,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 7.798516844354534e-09,
+            "projectable_fraction": 0.028903692394449072,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 2.4684392212188836e-05,
+            "projectable_fraction": 0.011508028757128539,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 1.318203404330875e-06,
+            "projectable_fraction": 0.012444136356680829,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 1.5832211954684822e-07,
+            "projectable_fraction": 0.02253192722771842,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 1.7783028685181866e-06,
+            "projectable_fraction": 0.010296528838566082,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 7.694193698537856e-08,
+            "projectable_fraction": 0.015930118330401852,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 1.4684903306713619e-08,
+            "projectable_fraction": 0.029162317532752485,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.0031188757034914063,
+            "projectable_fraction": 0.015028325112897287,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 6.453396514292486e-05,
+            "projectable_fraction": 0.01622557511138904,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 1.3108318971745102e-06,
+            "projectable_fraction": 0.01962150727324487,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 662714.5888251305,
+            "projectable_fraction": 0.027358296333004007,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 90.19963225645506,
+            "projectable_fraction": 0.07946840294840864,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "admitted_mask",
+      "case": "drop_wrists",
+      "admitted_count": 30,
+      "admitted": [
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      ],
+      "available": true,
+      "reasons": [],
+      "diagnostic": {
+        "full_energy": 23778610.043750077,
+        "cross_energy": 6207491.989383621,
+        "cross_energy_fraction_of_full": 0.2610536098603958,
+        "projectable_cross_energy_fraction": 0.021659659501305613,
+        "unseen_cross_energy_fraction": 0.9783403404986943,
+        "raw_sketch_energy_ratio_not_retention": 1.2211685031004524,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 1169084.0400757613,
+            "projectable_fraction": 0.015571922306613233,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 94245.28561298501,
+            "projectable_fraction": 0.02331562430180188,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 91635.82737977066,
+            "projectable_fraction": 0.021224761060514803,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 1402323.5781771275,
+            "projectable_fraction": 0.020432339315275168,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 16833.3225525268,
+            "projectable_fraction": 0.036022763456119114,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 16793.931686074076,
+            "projectable_fraction": 0.02211143265988809,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 821863.3867396013,
+            "projectable_fraction": 0.022191160635668616,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 6.473947629165685,
+            "projectable_fraction": 0.022776873684002257,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 16.69151572562226,
+            "projectable_fraction": 0.015386753834762647,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 623376.2485539655,
+            "projectable_fraction": 0.0244787758032641,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 20.957503900809517,
+            "projectable_fraction": 0.035346144219035425,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 29.04089915979286,
+            "projectable_fraction": 0.02042789277759499,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 81308.76210597335,
+            "projectable_fraction": 0.02626024496475264,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 16979.630138409226,
+            "projectable_fraction": 0.03127640081318024,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 15547.542629855448,
+            "projectable_fraction": 0.025162342236737953,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 16997.015285354413,
+            "projectable_fraction": 0.022035678406588474,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 5144.688680593279,
+            "projectable_fraction": 0.0317400493183043,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 5105.969868949166,
+            "projectable_fraction": 0.016285461074768998,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 2.1233578143044722,
+            "projectable_fraction": 0.02421115242085123,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 1.9183998887841718,
+            "projectable_fraction": 0.007040676903786072,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 1.5577994280457785,
+            "projectable_fraction": 0.024466658049909534,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 1.0923517809020358,
+            "projectable_fraction": 0.02408988253998144,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 1829890.3669675987,
+            "projectable_fraction": 0.02474526454874429,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 282.53715374769257,
+            "projectable_fraction": 0.054652530769663886,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "admitted_mask",
+      "case": "upper_body_only",
+      "admitted_count": 12,
+      "admitted": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ],
+      "available": true,
+      "reasons": [],
+      "diagnostic": {
+        "full_energy": 7655184.395737369,
+        "cross_energy": 4078642.8191001955,
+        "cross_energy_fraction_of_full": 0.5327948496408922,
+        "projectable_cross_energy_fraction": 0.03098234675417466,
+        "unseen_cross_energy_fraction": 0.9690176532458253,
+        "raw_sketch_energy_ratio_not_retention": 1.7084605319705746,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 989925.3638935604,
+            "projectable_fraction": 0.025037504592492855,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 0.7939076435446508,
+            "projectable_fraction": 0.01797680710322173,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 0.41868942853435853,
+            "projectable_fraction": 0.008385742341579402,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 786600.4182342832,
+            "projectable_fraction": 0.03446134561468035,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 0.22978867761951505,
+            "projectable_fraction": 0.027934334585374997,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 0.17400376414861402,
+            "projectable_fraction": 0.03268868187287092,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 572699.8399801722,
+            "projectable_fraction": 0.026479668031317665,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 0.9904934024900667,
+            "projectable_fraction": 0.03358028721618512,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 0.5697917941889266,
+            "projectable_fraction": 0.022691594079028668,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 495947.50579001766,
+            "projectable_fraction": 0.037451945885507355,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 0.7172607535306332,
+            "projectable_fraction": 0.02756827597136871,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 1.2935387978171342,
+            "projectable_fraction": 0.017830447011222238,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 2.284577926264323,
+            "projectable_fraction": 0.02668015742098157,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 135668.4171757363,
+            "projectable_fraction": 0.039982442390304074,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 124096.23134569536,
+            "projectable_fraction": 0.024883809527313273,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 1.067496315327805,
+            "projectable_fraction": 0.030568301598831924,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 69792.38981846637,
+            "projectable_fraction": 0.0357788480125831,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 66710.79808018345,
+            "projectable_fraction": 0.020806725054522142,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 10544.57350537536,
+            "projectable_fraction": 0.04730094361860347,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 9943.126487670279,
+            "projectable_fraction": 0.015315027478857646,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 2.8990523578811334,
+            "projectable_fraction": 0.03889966082729879,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 3.601190065156404,
+            "projectable_fraction": 0.00529740998835454,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 3.0899398297134886e-07,
+            "projectable_fraction": 0.02866221003307289,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 2.6085560295563585e-08,
+            "projectable_fraction": 0.037809583171443124,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 1.2877076589570705e-08,
+            "projectable_fraction": 0.017941144501477525,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 2.576748688464196e-07,
+            "projectable_fraction": 0.04055848714557688,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 3.5259459818897824e-08,
+            "projectable_fraction": 0.0510172204301929,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 4.908791549614528e-09,
+            "projectable_fraction": 0.01979963164503846,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 2.7595655637318416e-05,
+            "projectable_fraction": 0.052354488433760914,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 1.4562486191710863e-06,
+            "projectable_fraction": 0.05009734606959267,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 1.5956542840687898e-07,
+            "projectable_fraction": 0.03931758645103039,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 2.4201403440749156e-06,
+            "projectable_fraction": 0.05430330003233179,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 6.278419757183467e-08,
+            "projectable_fraction": 0.04413710624751811,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 1.0630445688070828e-08,
+            "projectable_fraction": 0.021539187134210783,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.0011319921462032252,
+            "projectable_fraction": 0.04896794906831054,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 2.1929029693634043e-05,
+            "projectable_fraction": 0.04815570799475159,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 5.089230720935878e-07,
+            "projectable_fraction": 0.04478148529309593,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 2.150744376577823e-06,
+            "projectable_fraction": 0.02965033548062333,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 1.4086189981289348e-07,
+            "projectable_fraction": 0.023816378773397807,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 8.875903369752128e-08,
+            "projectable_fraction": 0.03272134989859138,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 1.7708551501248755e-06,
+            "projectable_fraction": 0.024018571328794397,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 1.282674334682068e-07,
+            "projectable_fraction": 0.01182165594865546,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 3.238064639144872e-08,
+            "projectable_fraction": 0.027570702067076198,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 0.00010013575744790538,
+            "projectable_fraction": 0.011076338226389006,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 5.399775332408033e-06,
+            "projectable_fraction": 0.012035528040304033,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 6.483491971988329e-07,
+            "projectable_fraction": 0.021691083081803713,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 7.386917021128997e-06,
+            "projectable_fraction": 0.010054890881860509,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 3.1420508644675357e-07,
+            "projectable_fraction": 0.015779567966624358,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 5.9033683830274214e-08,
+            "projectable_fraction": 0.027885013057508602,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.012738346891598563,
+            "projectable_fraction": 0.014967193308054804,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 0.0002626989720098055,
+            "projectable_fraction": 0.015953446567159732,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 5.356161872590928e-06,
+            "projectable_fraction": 0.0192574509975095,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 816508.1385648292,
+            "projectable_fraction": 0.03388581267802098,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 190.96212184018867,
+            "projectable_fraction": 0.09088412238724324,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "admitted_mask",
+      "case": "lower_body_only",
+      "admitted_count": 12,
+      "admitted": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      ],
+      "available": true,
+      "reasons": [],
+      "diagnostic": {
+        "full_energy": 3786502.75066249,
+        "cross_energy": 1096259.0724233196,
+        "cross_energy_fraction_of_full": 0.28951756927458117,
+        "projectable_cross_energy_fraction": 0.022362754821170245,
+        "unseen_cross_energy_fraction": 0.9776372451788298,
+        "raw_sketch_energy_ratio_not_retention": 1.240672786429576,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 408621.7251824086,
+            "projectable_fraction": 0.025956943252877524,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 94358.24902016863,
+            "projectable_fraction": 0.02328536761217712,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 91904.66904895662,
+            "projectable_fraction": 0.0211288351070284,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 2.3400253726882663,
+            "projectable_fraction": 0.01807467489927685,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 16853.78025864099,
+            "projectable_fraction": 0.03606129073375684,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 16823.20318080303,
+            "projectable_fraction": 0.022150723578920985,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 1.5578588784995748,
+            "projectable_fraction": 0.029020915570771785,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 7.432269374288088,
+            "projectable_fraction": 0.028634222712885408,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 20.193857247968715,
+            "projectable_fraction": 0.015597150390392186,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 4.553171934024444,
+            "projectable_fraction": 0.027124305178654374,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 21.20706102780887,
+            "projectable_fraction": 0.035676408009387116,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 29.076026581348067,
+            "projectable_fraction": 0.016311102459338714,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 0.5316203887909426,
+            "projectable_fraction": 0.004111620380188921,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 6.228731277712439,
+            "projectable_fraction": 0.020422533575101556,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 6.97719212018689,
+            "projectable_fraction": 0.03463057494328867,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 1.6384073768226601,
+            "projectable_fraction": 0.019738752671594986,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 1.2715937101298325,
+            "projectable_fraction": 0.035261179229345865,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 0.9015827440072559,
+            "projectable_fraction": 0.004029123029791703,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 0.5064208762346083,
+            "projectable_fraction": 0.024512233234784877,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 0.7923612855311272,
+            "projectable_fraction": 0.015017785666749375,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 0.12479708668779417,
+            "projectable_fraction": 0.006705385120510264,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 0.36008293979051237,
+            "projectable_fraction": 0.018642893137062248,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 0.0,
+            "projectable_fraction": null,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 466552.8518920657,
+            "projectable_fraction": 0.018733774107828866,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 1038.900780053546,
+            "projectable_fraction": 0.04488642910380316,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "admitted_mask",
+      "case": "none",
+      "admitted_count": 0,
+      "admitted": [
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      ],
+      "available": false,
+      "reasons": [
+        "no_current_observation"
+      ],
+      "diagnostic": null
+    },
+    {
+      "axis": "precision",
+      "case": "isotropic_sigma5",
+      "sigma_px": 5,
+      "available": true,
+      "diagnostic": {
+        "full_energy": 559878470.4256067,
+        "cross_energy": 182454277.40816596,
+        "cross_energy_fraction_of_full": 0.32588193160824425,
+        "projectable_cross_energy_fraction": 0.024708666801583592,
+        "unseen_cross_energy_fraction": 0.9752913331984164,
+        "raw_sketch_energy_ratio_not_retention": 1.3825063087748122,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 38202496.02238097,
+            "projectable_fraction": 0.019010077155116215,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 1508655.068931966,
+            "projectable_fraction": 0.023298285067984696,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 1466280.206507015,
+            "projectable_fraction": 0.02121743249636812,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 41243918.54274747,
+            "projectable_fraction": 0.025035203451495475,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 269252.3026544412,
+            "projectable_fraction": 0.03603372256686198,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 268775.84506842226,
+            "projectable_fraction": 0.02212559116017354,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 26919250.920575015,
+            "projectable_fraction": 0.023983569729673786,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 112.49115113209636,
+            "projectable_fraction": 0.025557582201827255,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 266.76524774992765,
+            "projectable_fraction": 0.0157640846706861,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 21847900.591033615,
+            "projectable_fraction": 0.03002351212701289,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 320.58538433711595,
+            "projectable_fraction": 0.03365500655229737,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 494.91255615789424,
+            "projectable_fraction": 0.019809725371064305,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 1303532.7002480272,
+            "projectable_fraction": 0.026232638403879616,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 2153641.214078998,
+            "projectable_fraction": 0.040169165239250446,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 1964148.5974215262,
+            "projectable_fraction": 0.02487799404745928,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 272175.76478111726,
+            "projectable_fraction": 0.022094713411286528,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 1116844.0682299891,
+            "projectable_fraction": 0.03582192796266115,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 1072186.6558474156,
+            "projectable_fraction": 0.02077335630711899,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 168505.29220322773,
+            "projectable_fraction": 0.04732518414466949,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 158844.38381006464,
+            "projectable_fraction": 0.01527925052530625,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 40.68165624431236,
+            "projectable_fraction": 0.0332131808417189,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 94.99997676312506,
+            "projectable_fraction": 0.005769795921652956,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 4.943903727541582e-06,
+            "projectable_fraction": 0.02866221003307289,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 4.1736896472901737e-07,
+            "projectable_fraction": 0.037809583171443124,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 2.0603322543313128e-07,
+            "projectable_fraction": 0.017941144501477525,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 4.122797901542714e-06,
+            "projectable_fraction": 0.04055848714557688,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 5.641513571023652e-07,
+            "projectable_fraction": 0.0510172204301929,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 7.854066479383245e-08,
+            "projectable_fraction": 0.01979963164503846,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 0.00044153049019709465,
+            "projectable_fraction": 0.052354488433760914,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 2.329997790673738e-05,
+            "projectable_fraction": 0.05009734606959267,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 2.5530468545100636e-06,
+            "projectable_fraction": 0.03931758645103039,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 3.872224550519865e-05,
+            "projectable_fraction": 0.05430330003233179,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 1.0045471611493547e-06,
+            "projectable_fraction": 0.04413710624751811,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 1.7008713100913324e-07,
+            "projectable_fraction": 0.021539187134210783,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.018111874339251603,
+            "projectable_fraction": 0.04896794906831054,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 0.0003508644750981447,
+            "projectable_fraction": 0.04815570799475159,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 8.142769153497404e-06,
+            "projectable_fraction": 0.04478148529309593,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 3.441191002524517e-05,
+            "projectable_fraction": 0.02965033548062333,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 2.2537903970062957e-06,
+            "projectable_fraction": 0.023816378773397807,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 1.4201445391603404e-06,
+            "projectable_fraction": 0.03272134989859138,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 2.833368240199801e-05,
+            "projectable_fraction": 0.024018571328794397,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 2.052278935491309e-06,
+            "projectable_fraction": 0.01182165594865546,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 5.180903422631796e-07,
+            "projectable_fraction": 0.027570702067076198,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 0.0016021721191664862,
+            "projectable_fraction": 0.011076338226389006,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 8.639640531852853e-05,
+            "projectable_fraction": 0.012035528040304033,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 1.0373587155181326e-05,
+            "projectable_fraction": 0.021691083081803713,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 0.00011819067233806396,
+            "projectable_fraction": 0.010054890881860509,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 5.027281383148057e-06,
+            "projectable_fraction": 0.015779567966624358,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 9.445389412843874e-07,
+            "projectable_fraction": 0.027885013057508602,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.20381355026557701,
+            "projectable_fraction": 0.014967193308054804,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 0.004203183552156888,
+            "projectable_fraction": 0.015953446567159732,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 8.569858996145484e-05,
+            "projectable_fraction": 0.0192574509975095,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 42510790.26270373,
+            "projectable_fraction": 0.026280405804354263,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 5748.303987553105,
+            "projectable_fraction": 0.07746163564016342,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "precision",
+      "case": "isotropic_sigma10",
+      "sigma_px": 10,
+      "available": true,
+      "diagnostic": {
+        "full_energy": 34992404.40160042,
+        "cross_energy": 11403392.338010373,
+        "cross_energy_fraction_of_full": 0.32588193160824425,
+        "projectable_cross_energy_fraction": 0.024708666801583592,
+        "unseen_cross_energy_fraction": 0.9752913331984164,
+        "raw_sketch_energy_ratio_not_retention": 1.3825063087748122,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 2387656.0013988107,
+            "projectable_fraction": 0.019010077155116215,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 94290.94180824788,
+            "projectable_fraction": 0.023298285067984696,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 91642.51290668844,
+            "projectable_fraction": 0.02121743249636812,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 2577744.9089217167,
+            "projectable_fraction": 0.025035203451495475,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 16828.268915902576,
+            "projectable_fraction": 0.03603372256686198,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 16798.49031677639,
+            "projectable_fraction": 0.02212559116017354,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 1682453.1825359385,
+            "projectable_fraction": 0.023983569729673786,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 7.030696945756023,
+            "projectable_fraction": 0.025557582201827255,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 16.67282798437048,
+            "projectable_fraction": 0.0157640846706861,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 1365493.786939601,
+            "projectable_fraction": 0.03002351212701289,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 20.036586521069747,
+            "projectable_fraction": 0.03365500655229737,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 30.93203475986839,
+            "projectable_fraction": 0.019809725371064305,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 81470.7937655017,
+            "projectable_fraction": 0.026232638403879616,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 134602.5758799374,
+            "projectable_fraction": 0.040169165239250446,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 122759.28733884539,
+            "projectable_fraction": 0.02487799404745928,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 17010.98529881983,
+            "projectable_fraction": 0.022094713411286528,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 69802.75426437432,
+            "projectable_fraction": 0.03582192796266115,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 67011.66599046347,
+            "projectable_fraction": 0.02077335630711899,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 10531.580762701733,
+            "projectable_fraction": 0.04732518414466949,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 9927.77398812904,
+            "projectable_fraction": 0.01527925052530625,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 2.5426035152695223,
+            "projectable_fraction": 0.0332131808417189,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 5.937498547695316,
+            "projectable_fraction": 0.005769795921652956,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 3.0899398297134886e-07,
+            "projectable_fraction": 0.02866221003307289,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 2.6085560295563585e-08,
+            "projectable_fraction": 0.037809583171443124,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 1.2877076589570705e-08,
+            "projectable_fraction": 0.017941144501477525,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 2.576748688464196e-07,
+            "projectable_fraction": 0.04055848714557688,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 3.5259459818897824e-08,
+            "projectable_fraction": 0.0510172204301929,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 4.908791549614528e-09,
+            "projectable_fraction": 0.01979963164503846,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 2.7595655637318416e-05,
+            "projectable_fraction": 0.052354488433760914,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 1.4562486191710863e-06,
+            "projectable_fraction": 0.05009734606959267,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 1.5956542840687898e-07,
+            "projectable_fraction": 0.03931758645103039,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 2.4201403440749156e-06,
+            "projectable_fraction": 0.05430330003233179,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 6.278419757183467e-08,
+            "projectable_fraction": 0.04413710624751811,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 1.0630445688070828e-08,
+            "projectable_fraction": 0.021539187134210783,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.0011319921462032252,
+            "projectable_fraction": 0.04896794906831054,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 2.1929029693634043e-05,
+            "projectable_fraction": 0.04815570799475159,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 5.089230720935878e-07,
+            "projectable_fraction": 0.04478148529309593,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 2.150744376577823e-06,
+            "projectable_fraction": 0.02965033548062333,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 1.4086189981289348e-07,
+            "projectable_fraction": 0.023816378773397807,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 8.875903369752128e-08,
+            "projectable_fraction": 0.03272134989859138,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 1.7708551501248755e-06,
+            "projectable_fraction": 0.024018571328794397,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 1.282674334682068e-07,
+            "projectable_fraction": 0.01182165594865546,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 3.238064639144872e-08,
+            "projectable_fraction": 0.027570702067076198,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 0.00010013575744790538,
+            "projectable_fraction": 0.011076338226389006,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 5.399775332408033e-06,
+            "projectable_fraction": 0.012035528040304033,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 6.483491971988329e-07,
+            "projectable_fraction": 0.021691083081803713,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 7.386917021128997e-06,
+            "projectable_fraction": 0.010054890881860509,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 3.1420508644675357e-07,
+            "projectable_fraction": 0.015779567966624358,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 5.9033683830274214e-08,
+            "projectable_fraction": 0.027885013057508602,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.012738346891598563,
+            "projectable_fraction": 0.014967193308054804,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 0.0002626989720098055,
+            "projectable_fraction": 0.015953446567159732,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 5.356161872590928e-06,
+            "projectable_fraction": 0.0192574509975095,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 2656924.391418983,
+            "projectable_fraction": 0.026280405804354263,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 359.26899922206906,
+            "projectable_fraction": 0.07746163564016342,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "precision",
+      "case": "isotropic_sigma20",
+      "sigma_px": 20,
+      "available": true,
+      "diagnostic": {
+        "full_energy": 2187025.2751000263,
+        "cross_energy": 712712.0211256483,
+        "cross_energy_fraction_of_full": 0.32588193160824425,
+        "projectable_cross_energy_fraction": 0.024708666801583592,
+        "unseen_cross_energy_fraction": 0.9752913331984164,
+        "raw_sketch_energy_ratio_not_retention": 1.3825063087748122,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 149228.50008742567,
+            "projectable_fraction": 0.019010077155116215,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 5893.1838630154925,
+            "projectable_fraction": 0.023298285067984696,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 5727.6570566680275,
+            "projectable_fraction": 0.02121743249636812,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 161109.0568076073,
+            "projectable_fraction": 0.025035203451495475,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 1051.766807243911,
+            "projectable_fraction": 0.03603372256686198,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 1049.9056447985245,
+            "projectable_fraction": 0.02212559116017354,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 105153.32390849615,
+            "projectable_fraction": 0.023983569729673786,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 0.4394185591097514,
+            "projectable_fraction": 0.025557582201827255,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 1.042051749023155,
+            "projectable_fraction": 0.0157640846706861,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 85343.36168372506,
+            "projectable_fraction": 0.03002351212701289,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 1.2522866575668592,
+            "projectable_fraction": 0.03365500655229737,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 1.9332521724917744,
+            "projectable_fraction": 0.019809725371064305,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 5091.924610343856,
+            "projectable_fraction": 0.026232638403879616,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 8412.660992496087,
+            "projectable_fraction": 0.040169165239250446,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 7672.455458677837,
+            "projectable_fraction": 0.02487799404745928,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 1063.1865811762393,
+            "projectable_fraction": 0.022094713411286528,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 4362.672141523395,
+            "projectable_fraction": 0.03582192796266115,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 4188.229124403967,
+            "projectable_fraction": 0.02077335630711899,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 658.2237976688583,
+            "projectable_fraction": 0.04732518414466949,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 620.485874258065,
+            "projectable_fraction": 0.01527925052530625,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 0.15891271970434515,
+            "projectable_fraction": 0.0332131808417189,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 0.3710936592309573,
+            "projectable_fraction": 0.005769795921652956,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 1.9312123935709304e-08,
+            "projectable_fraction": 0.02866221003307289,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 1.630347518472724e-09,
+            "projectable_fraction": 0.037809583171443124,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 8.04817286848169e-10,
+            "projectable_fraction": 0.017941144501477525,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 1.6104679302901226e-08,
+            "projectable_fraction": 0.04055848714557688,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 2.203716238681114e-09,
+            "projectable_fraction": 0.0510172204301929,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 3.06799471850908e-10,
+            "projectable_fraction": 0.01979963164503846,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 1.724728477332401e-06,
+            "projectable_fraction": 0.052354488433760914,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 9.101553869819289e-08,
+            "projectable_fraction": 0.05009734606959267,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 9.972839275429936e-09,
+            "projectable_fraction": 0.03931758645103039,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 1.5125877150468222e-07,
+            "projectable_fraction": 0.05430330003233179,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 3.924012348239667e-09,
+            "projectable_fraction": 0.04413710624751811,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 6.644028555044267e-10,
+            "projectable_fraction": 0.021539187134210783,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 7.074950913770157e-05,
+            "projectable_fraction": 0.04896794906831054,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 1.3705643558521277e-06,
+            "projectable_fraction": 0.04815570799475159,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 3.1807692005849236e-08,
+            "projectable_fraction": 0.04478148529309593,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 1.3442152353611394e-07,
+            "projectable_fraction": 0.02965033548062333,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 8.803868738305843e-09,
+            "projectable_fraction": 0.023816378773397807,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 5.54743960609508e-09,
+            "projectable_fraction": 0.03272134989859138,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 1.1067844688280472e-07,
+            "projectable_fraction": 0.024018571328794397,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 8.016714591762925e-09,
+            "projectable_fraction": 0.01182165594865546,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 2.023790399465545e-09,
+            "projectable_fraction": 0.027570702067076198,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 6.2584848404940865e-06,
+            "projectable_fraction": 0.011076338226389006,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 3.3748595827550206e-07,
+            "projectable_fraction": 0.012035528040304033,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 4.0521824824927056e-08,
+            "projectable_fraction": 0.021691083081803713,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 4.6168231382056234e-07,
+            "projectable_fraction": 0.010054890881860509,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 1.9637817902922098e-08,
+            "projectable_fraction": 0.015779567966624358,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 3.6896052393921384e-09,
+            "projectable_fraction": 0.027885013057508602,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.0007961466807249102,
+            "projectable_fraction": 0.014967193308054804,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 1.6418685750612844e-05,
+            "projectable_fraction": 0.015953446567159732,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 3.34760117036933e-07,
+            "projectable_fraction": 0.0192574509975095,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 166057.77446368645,
+            "projectable_fraction": 0.026280405804354263,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 22.454312451379316,
+            "projectable_fraction": 0.07746163564016342,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    },
+    {
+      "axis": "precision",
+      "case": "anisotropic_sigma_x5_y10",
+      "available": true,
+      "diagnostic": {
+        "full_energy": 340763895.59759396,
+        "cross_energy": 122138234.34863158,
+        "cross_energy_fraction_of_full": 0.35842480945476657,
+        "projectable_cross_energy_fraction": 0.022408406984935472,
+        "unseen_cross_energy_fraction": 0.9775915930150645,
+        "raw_sketch_energy_ratio_not_retention": 1.2692522587569752,
+        "tokens": [
+          {
+            "token": 0,
+            "kind": "pose",
+            "cross_energy": 23261113.46102292,
+            "projectable_fraction": 0.016316299504826375,
+            "span_rank": 3
+          },
+          {
+            "token": 1,
+            "kind": "pose",
+            "cross_energy": 1438057.6221552454,
+            "projectable_fraction": 0.023209193473175592,
+            "span_rank": 3
+          },
+          {
+            "token": 2,
+            "kind": "pose",
+            "cross_energy": 1376079.0029772671,
+            "projectable_fraction": 0.02280689320024917,
+            "span_rank": 3
+          },
+          {
+            "token": 3,
+            "kind": "pose",
+            "cross_energy": 27847807.566196725,
+            "projectable_fraction": 0.019603479710849952,
+            "span_rank": 3
+          },
+          {
+            "token": 4,
+            "kind": "pose",
+            "cross_energy": 262711.5428214176,
+            "projectable_fraction": 0.03843678223057435,
+            "span_rank": 3
+          },
+          {
+            "token": 5,
+            "kind": "pose",
+            "cross_energy": 260172.26962336744,
+            "projectable_fraction": 0.021929496911275916,
+            "span_rank": 3
+          },
+          {
+            "token": 6,
+            "kind": "pose",
+            "cross_energy": 15517771.61120404,
+            "projectable_fraction": 0.022440491008341747,
+            "span_rank": 3
+          },
+          {
+            "token": 7,
+            "kind": "pose",
+            "cross_energy": 39.88072237783135,
+            "projectable_fraction": 0.022974578624593463,
+            "span_rank": 3
+          },
+          {
+            "token": 8,
+            "kind": "pose",
+            "cross_energy": 100.37869708621497,
+            "projectable_fraction": 0.012364908702459808,
+            "span_rank": 3
+          },
+          {
+            "token": 9,
+            "kind": "pose",
+            "cross_energy": 11364887.157735474,
+            "projectable_fraction": 0.023998729866856087,
+            "span_rank": 3
+          },
+          {
+            "token": 10,
+            "kind": "pose",
+            "cross_energy": 123.03182533674541,
+            "projectable_fraction": 0.0376027915845132,
+            "span_rank": 3
+          },
+          {
+            "token": 11,
+            "kind": "pose",
+            "cross_energy": 104.04145582797965,
+            "projectable_fraction": 0.01804388624369427,
+            "span_rank": 3
+          },
+          {
+            "token": 12,
+            "kind": "pose",
+            "cross_energy": 1126697.91594034,
+            "projectable_fraction": 0.02812136433258784,
+            "span_rank": 3
+          },
+          {
+            "token": 13,
+            "kind": "pose",
+            "cross_energy": 225847.45862162698,
+            "projectable_fraction": 0.03176953888120887,
+            "span_rank": 3
+          },
+          {
+            "token": 14,
+            "kind": "pose",
+            "cross_energy": 173746.1656877637,
+            "projectable_fraction": 0.030119633203315704,
+            "span_rank": 3
+          },
+          {
+            "token": 15,
+            "kind": "pose",
+            "cross_energy": 232715.54687133728,
+            "projectable_fraction": 0.022894010366898584,
+            "span_rank": 3
+          },
+          {
+            "token": 16,
+            "kind": "pose",
+            "cross_energy": 85068.71023175056,
+            "projectable_fraction": 0.0331460370550977,
+            "span_rank": 3
+          },
+          {
+            "token": 17,
+            "kind": "pose",
+            "cross_energy": 81060.6314684436,
+            "projectable_fraction": 0.02156861321248893,
+            "span_rank": 3
+          },
+          {
+            "token": 18,
+            "kind": "pose",
+            "cross_energy": 16421.66424039813,
+            "projectable_fraction": 0.0381577303800315,
+            "span_rank": 3
+          },
+          {
+            "token": 19,
+            "kind": "pose",
+            "cross_energy": 14667.84402367989,
+            "projectable_fraction": 0.021182409833157223,
+            "span_rank": 3
+          },
+          {
+            "token": 20,
+            "kind": "pose",
+            "cross_energy": 16.573535138598423,
+            "projectable_fraction": 0.017108058273676764,
+            "span_rank": 3
+          },
+          {
+            "token": 21,
+            "kind": "pose",
+            "cross_energy": 13.176868328096372,
+            "projectable_fraction": 0.010217167592081659,
+            "span_rank": 3
+          },
+          {
+            "token": 22,
+            "kind": "pose",
+            "cross_energy": 2.9011529694274237e-06,
+            "projectable_fraction": 0.018357700080047456,
+            "span_rank": 3
+          },
+          {
+            "token": 23,
+            "kind": "pose",
+            "cross_energy": 2.248919038017941e-07,
+            "projectable_fraction": 0.017262470162667392,
+            "span_rank": 3
+          },
+          {
+            "token": 24,
+            "kind": "pose",
+            "cross_energy": 2.3339497002922145e-07,
+            "projectable_fraction": 0.01575011646294264,
+            "span_rank": 3
+          },
+          {
+            "token": 25,
+            "kind": "pose",
+            "cross_energy": 1.6935007175838974e-06,
+            "projectable_fraction": 0.019160865332262886,
+            "span_rank": 3
+          },
+          {
+            "token": 26,
+            "kind": "pose",
+            "cross_energy": 3.636216922874832e-08,
+            "projectable_fraction": 0.047373302330033895,
+            "span_rank": 3
+          },
+          {
+            "token": 27,
+            "kind": "pose",
+            "cross_energy": 8.47161885980106e-08,
+            "projectable_fraction": 0.015555835262188377,
+            "span_rank": 3
+          },
+          {
+            "token": 28,
+            "kind": "pose",
+            "cross_energy": 2.7887711926358827e-05,
+            "projectable_fraction": 0.047813296769174105,
+            "span_rank": 3
+          },
+          {
+            "token": 29,
+            "kind": "pose",
+            "cross_energy": 4.197337408310314e-06,
+            "projectable_fraction": 0.024475184500436092,
+            "span_rank": 3
+          },
+          {
+            "token": 30,
+            "kind": "pose",
+            "cross_energy": 1.2241810521363062e-06,
+            "projectable_fraction": 0.01827532554352307,
+            "span_rank": 3
+          },
+          {
+            "token": 31,
+            "kind": "pose",
+            "cross_energy": 7.222761740966678e-06,
+            "projectable_fraction": 0.022624327774478904,
+            "span_rank": 3
+          },
+          {
+            "token": 32,
+            "kind": "pose",
+            "cross_energy": 2.5984834801805904e-07,
+            "projectable_fraction": 0.022489522287038103,
+            "span_rank": 3
+          },
+          {
+            "token": 33,
+            "kind": "pose",
+            "cross_energy": 1.53556212426289e-07,
+            "projectable_fraction": 0.016333413613557533,
+            "span_rank": 3
+          },
+          {
+            "token": 34,
+            "kind": "pose",
+            "cross_energy": 0.001525139990853809,
+            "projectable_fraction": 0.04255817426087537,
+            "span_rank": 3
+          },
+          {
+            "token": 35,
+            "kind": "pose",
+            "cross_energy": 4.068147948066871e-05,
+            "projectable_fraction": 0.033341329467082126,
+            "span_rank": 3
+          },
+          {
+            "token": 36,
+            "kind": "pose",
+            "cross_energy": 1.7549275100905762e-06,
+            "projectable_fraction": 0.024825381491366295,
+            "span_rank": 3
+          },
+          {
+            "token": 37,
+            "kind": "pose",
+            "cross_energy": 1.4586897354401922e-05,
+            "projectable_fraction": 0.03673804034414621,
+            "span_rank": 3
+          },
+          {
+            "token": 38,
+            "kind": "pose",
+            "cross_energy": 1.412259316458972e-06,
+            "projectable_fraction": 0.03451469678362273,
+            "span_rank": 3
+          },
+          {
+            "token": 39,
+            "kind": "pose",
+            "cross_energy": 1.500462393260227e-06,
+            "projectable_fraction": 0.035290015467734324,
+            "span_rank": 3
+          },
+          {
+            "token": 40,
+            "kind": "pose",
+            "cross_energy": 9.865057555032952e-06,
+            "projectable_fraction": 0.03455865413664698,
+            "span_rank": 3
+          },
+          {
+            "token": 41,
+            "kind": "pose",
+            "cross_energy": 2.1123791051366992e-07,
+            "projectable_fraction": 0.016294347832080353,
+            "span_rank": 3
+          },
+          {
+            "token": 42,
+            "kind": "pose",
+            "cross_energy": 5.398958454773462e-07,
+            "projectable_fraction": 0.0342076880676993,
+            "span_rank": 3
+          },
+          {
+            "token": 43,
+            "kind": "pose",
+            "cross_energy": 0.00015606849423450742,
+            "projectable_fraction": 0.01444974452277236,
+            "span_rank": 3
+          },
+          {
+            "token": 44,
+            "kind": "pose",
+            "cross_energy": 2.885586420432066e-05,
+            "projectable_fraction": 0.028928803690707758,
+            "span_rank": 3
+          },
+          {
+            "token": 45,
+            "kind": "pose",
+            "cross_energy": 6.701905947535608e-06,
+            "projectable_fraction": 0.03370510109979744,
+            "span_rank": 3
+          },
+          {
+            "token": 46,
+            "kind": "pose",
+            "cross_energy": 5.684295669070912e-05,
+            "projectable_fraction": 0.029911134630332112,
+            "span_rank": 3
+          },
+          {
+            "token": 47,
+            "kind": "pose",
+            "cross_energy": 1.5612507668805849e-06,
+            "projectable_fraction": 0.030018907748947266,
+            "span_rank": 3
+          },
+          {
+            "token": 48,
+            "kind": "pose",
+            "cross_energy": 8.169157486806121e-07,
+            "projectable_fraction": 0.03478708699657181,
+            "span_rank": 3
+          },
+          {
+            "token": 49,
+            "kind": "pose",
+            "cross_energy": 0.012399065162012515,
+            "projectable_fraction": 0.012428317046852246,
+            "span_rank": 3
+          },
+          {
+            "token": 50,
+            "kind": "pose",
+            "cross_energy": 0.0004081735518705266,
+            "projectable_fraction": 0.022054315693609557,
+            "span_rank": 3
+          },
+          {
+            "token": 51,
+            "kind": "pose",
+            "cross_energy": 1.4691522047472477e-05,
+            "projectable_fraction": 0.030601822766552864,
+            "span_rank": 3
+          },
+          {
+            "token": 52,
+            "kind": "translation",
+            "cross_energy": 38851757.00198796,
+            "projectable_fraction": 0.027152516082354302,
+            "span_rank": 3
+          },
+          {
+            "token": 53,
+            "kind": "shape",
+            "cross_energy": 1254.0780031279296,
+            "projectable_fraction": 0.06663772967375388,
+            "span_rank": 10
+          }
+        ],
+        "boundary": "Euclidean coordinate-dependent reconstruction diagnostic; not retained Fisher information or efficacy"
+      }
+    }
+  ],
+  "candidate_tensors_masks_unchanged": true,
+  "candidate_ids": {
+    "G0": [
+      "G0:0:0",
+      "G0:0:1",
+      "G0:0:2",
+      "G0:0:3",
+      "G0:0:4",
+      "G0:0:5",
+      "G0:0:6",
+      "G0:0:7",
+      "G0:0:8",
+      "G0:0:9",
+      "G0:0:10",
+      "G0:0:11",
+      "G0:0:12",
+      "G0:0:13",
+      "G0:0:14",
+      "G0:0:15",
+      "G0:0:16",
+      "G0:0:17",
+      "G0:0:18",
+      "G0:0:19",
+      "G0:0:20",
+      "G0:0:21",
+      "G0:0:22",
+      "G0:0:23",
+      "G0:0:24",
+      "G0:0:25",
+      "G0:0:26",
+      "G0:0:27",
+      "G0:0:28",
+      "G0:0:29",
+      "G0:0:30",
+      "G0:0:31"
+    ],
+    "G1": [
+      "G1:0:0",
+      "G1:0:1",
+      "G1:0:2",
+      "G1:0:3",
+      "G1:0:4",
+      "G1:0:5",
+      "G1:0:6",
+      "G1:0:7",
+      "G1:0:8",
+      "G1:0:9",
+      "G1:0:10",
+      "G1:0:11",
+      "G1:0:12",
+      "G1:0:13",
+      "G1:0:14",
+      "G1:0:15",
+      "G1:0:16",
+      "G1:0:17",
+      "G1:0:18",
+      "G1:0:19",
+      "G1:0:20",
+      "G1:0:21",
+      "G1:0:22",
+      "G1:0:23",
+      "G1:0:24",
+      "G1:0:25",
+      "G1:0:26",
+      "G1:0:27",
+      "G1:0:28",
+      "G1:0:29",
+      "G1:0:30",
+      "G1:0:31"
+    ]
+  },
+  "resources": {
+    "decoder_batch_calls": 23,
+    "decoder_state_evaluations": 339,
+    "method": "central_finite_difference",
+    "step_standardized": 0.0001,
+    "total_ms": 562.9187000013189
+  },
+  "suspend_sketch_under_preregistered_screen": true,
+  "network_executed": false,
+  "training_executed": false,
+  "neural_weights_loaded": false,
+  "boundary": "one analytic S3 observation and existing licensed decoder; no real accuracy or Fisher-information retention claim"
+}
