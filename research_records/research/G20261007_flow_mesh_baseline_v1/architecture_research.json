@@ -600,5 +600,15 @@
     "whole_author_method_reproduced": false
   },
   "goal_status": "PAUSED",
-  "conclusion": "architecture_conclusion_v1.json"
+  "conclusion": "architecture_conclusion_v1.json",
+  "followup_design_20261011": {
+    "scope": "User resumed bounded research for an FM-primary mature design including multi-hypothesis aggregation; historical reproduction goal remains paused",
+    "status": "design_and_analytic_audit_complete_effectiveness_unverified",
+    "plan": "flow_research_plan_v1.json",
+    "analytic_checks": "flow_research_design_checks_v2.json",
+    "training_executed": false,
+    "checkpoint_loaded": false,
+    "mainline_changed": false,
+    "automation_recreated": false
+  }
 }

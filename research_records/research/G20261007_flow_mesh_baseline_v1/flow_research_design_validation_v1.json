@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-11",
+  "status": "design_artifacts_and_analytic_fixtures_passed",
+  "not_claimed": ["new model implemented", "trained accuracy", "new aggregation effective", "novelty established", "all resource gaps resolved"],
+  "checks": {
+    "analytic_fixtures": "8 passed in flow_research_design_checks_v2.json",
+    "python_ast": "passed",
+    "ruff": "passed via cached uvx --offline ruff",
+    "json_parse_and_issue_stage_counts": "passed; 16 issues, 6 stages",
+    "document_anchor": "passed",
+    "git_diff_whitespace": "passed"
+  },
+  "attempts_retained": [
+    "v1 analytic results retained. The shared-noise illustration used a 1D reflection, which illustrates conditional maps but is not a valid 1D ODE flow. v2 corrects it to a 2D pi rotation, a valid orientation-preserving flow; the conclusion is unchanged.",
+    "First python -m ruff was unavailable in the CUDA environment; cached standalone uvx ruff succeeded without changing that environment."
+  ],
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "model_asset_loaded": false,
+  "mainline_changed": false,
+  "automatic_followup_recreated": false,
+  "records": ["flow_research_plan_v1.json", "IMPLEMENTATION.md", "architecture_research.json", "../../../AI_PROGRESS.md"],
+  "remaining": [
+    "Data/license/model-family/calibration and independent real truth gates",
+    "G0/G1 joint FM and information-conditioned inference implementation",
+    "Complete-candidate aggregation and time-state implementation",
+    "Preregistered trained experiments and measured compute costs",
+    "Independent statistical efficacy and uncertainty calibration"
+  ]
+}
