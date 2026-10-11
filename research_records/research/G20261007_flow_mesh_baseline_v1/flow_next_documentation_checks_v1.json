@@ -1,0 +1,62 @@
+{
+  "stage": "dedicated architecture and detailed result documentation",
+  "date": "2026-10-12",
+  "documents": [
+    "MODEL_ARCHITECTURE.md",
+    "MODEL_RESULTS.md"
+  ],
+  "sources_read": [
+    "verification_summary.json",
+    "architecture_h8_results_v1.json",
+    "flow_next_s3_checks_v2.json",
+    "flow_next_s4_binding_v1.json",
+    "flow_next_replay_v1.json",
+    "flow_next_validation_v1.json",
+    "flow_next_profile_v2.json",
+    "flow_next_shape_audit_v1.json",
+    "flow_next_sensitivity_summary_v1.json",
+    "flow_next_visibility_summary_v1.json",
+    "flow_next_noise_checks_v1.json",
+    "flow_next_noise_validation_checks_v1.json",
+    "flow_next_blocks_checks_v1.json",
+    "flow_next_data_manifest_v1.json",
+    "flow_next_noise_data_manifest_v1.json"
+  ],
+  "code_scope": "JointFlow/StateEncoder/information encoding/candidate cache/surface/geometry/tangent/two-stage/aggregation/risk/label/evaluation and historical synthetic generator",
+  "parameter_counts_current_random_construction": {
+    "52": 711443,
+    "22": 707603
+  },
+  "module_parameter_counts": {
+    "encoder": 137216,
+    "pose_in": 896,
+    "position_in": 512,
+    "shape_in": 1408,
+    "flow_time": 17024,
+    "info_pose": 1152,
+    "info_position": 1152,
+    "info_shape": 12800,
+    "blocks": 529920,
+    "pose_out": 774,
+    "position_out": 387,
+    "shape_out": 1290,
+    "token_ids": 6912
+  },
+  "execution": "module construction and parameter counting only; no model forward, training, checkpoint loading, sampling or timing",
+  "checks": [
+    "balanced Markdown fences",
+    "all included JSON blocks parse",
+    "dedicated local document links resolve",
+    "all referenced result sources parse",
+    "full parameter ledger sums exactly",
+    "both topology counts verified",
+    "past trained and H8 and next identities distinguished",
+    "original actions numeric mask contrasted with proposed calibrated observation gate",
+    "old timings explicitly predating binding overhead",
+    "non-fixture accuracy/test/training gates not promoted"
+  ],
+  "result_document_characters": 24866,
+  "architecture_document_characters": 8286,
+  "revalidation_boundary": "historical results read from actual saved sources, not rerun; current block stage 106 tests executed previous step",
+  "method_performance_claim": false
+}

@@ -690,3 +690,14 @@ fit_registered_statistics要求每统计行对应唯一原train record/frame且�
 106项累计测试、Ruff和compileall通过，最初2项dict.items静态规则修复已记录。已知人工原评价reports为12帧-seed槽/2subject/3seed，原候选数K2；完整导出12个block-seed rows可进入数值配对，输入逆序块结果完全一致。删除一原帧或raw ES非有限各保留1失败block，并使evidence=None；即使legal pool ES=0也不能替代。两帧已知2/4均值=3，缺端点后原frames=[0,1]与None/理由保留，不计算剩余帧均值。详见flow_next_blocks_checks_v1.json，全部为analytic，100%已知人工相对改善不构成真实模型收益。
 
 此导出核对调用方提供的评价reports，不认证报告与源tensor/files对应、独立truth、许可文件、实测计算预算或统计power。真实motion与独立reference清单仍空；无训练、权重、扩容、主线/远端变更。原明确缺失的离线评价连接已补齐，不能将其称为模型精度提升。用户本轮扩充目标：维护详细模型架构文件，并极详细描述模型结果；下一阶段从实际源码与产物整理专门架构文件和结果明细，不重复模型训练或用新绿测试填补真实效果空白。
+
+
+### 2026-10-12 专门架构文件与极详细结果记录
+
+按用户扩充目标，新建MODEL_ARCHITECTURE.md作为持续维护的模型架构入口，MODEL_RESULTS.md作为逐实验条件/原始数值/失败/边界的详细说明；后续模型接口改动须同步修订，不把旧实验重命名为新模型结果。前者约8286字符，涵盖Observation全部shape/原坐标、15维槽特征、StateEncoder/GRU/time状态、325/169与145/79状态、54token/4Transformer、逐模块参数、G0/J/Λ/G1、CFM/回归、Euler/缓存/真实surface/A0-A7、评价与缺失资源。后者约24866字符，分开旧训练/H8/next、360重放、S3/S4、全部速度对照、shape数值误导、sigma/步长敏感性、sketch失败、noise全条件、评价反例、未执行与停止决定。
+
+实际源码揭示的差异明确写入：next没有RGB/原生手部memory/骨架graph，输出52节点不证明手准确；当前actions仅numerical∧current_observed，方案额外校准观测动作门尚未完成；regression接口没有Λ条件；train.py未实现真实优化器循环。历史144019参数训练、H8的167955参数与next的711443参数分开，不能混用旧110.4661/50.0678mm为next性能。旧GPU full p95=385.4086ms/匹配walltime失败和压缩可见性停止都保留，绑定后的新版本未重新测速。
+
+flow_next_documentation_checks_v1.json记录实际源码/结果来源及检查。仅构造fresh随机module计参数，没有forward或权重：52=711443、22=707603，逐模块和含token ID精确一致；Markdown代码围栏、所有嵌入JSON、两个文件链接、15个来源JSON解析通过。原帧导出106tests已在前一阶段实际执行，不重复包装为文档测试；历史训练/360/测速均本次只读产物未重跑。文档不填缺失指标0，不声称FM优势、真精度、真实校准或完整实时，长期目标仍未完成。
+
+下一步仅在新数据、明确训练授权或可复现缺陷出现时推进依赖路径；现有motion与独立reference清单为空，不通过继续架构堆叠/重复绿测试替代真实效果。详细架构与结果维护本身已落实，无网络训练/权重/正式主线修改/远端push。原92条用户工作区改动继续保留。
