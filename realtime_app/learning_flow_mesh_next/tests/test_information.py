@@ -2,7 +2,7 @@ from dataclasses import replace
 
 import torch
 
-from ..geometry_information import local_information, schur_shape
+from ..geometry_information import local_information, schur_shape, whitened_shape_audit
 from ..geometry_observation import NoiseModel, project
 from ..tangent import TangentScale
 from .test_aggregate import rig, store_fixture
@@ -73,6 +73,37 @@ def test_shape_pose_confounding_and_pinv_sensitivity():
     schur, report = schur_shape(J.T@J)
     assert schur.abs().max() < 1e-12
     assert report["nuisance_rank"] == 2
+
+
+def test_weak_nuisance_false_shape_signal_and_svd_cutoff_match():
+    # Shape is exactly explained by a weak nuisance direction. A Gram cutoff
+    # of 1e-6 discards it; the same cutoff applied to J retains it.
+    J = torch.zeros(3, 13, dtype=torch.float64)
+    J[0, 0], J[1, 1], J[1, 3] = 1., 1e-4, 1.
+    gram_schur, old = schur_shape(J.T@J, rtol=1e-6)
+    residual, audit = whitened_shape_audit(J, rtol=1e-6)
+    matched, _ = schur_shape(J.T@J, rtol=1e-12)
+    assert old["nuisance_rank"] == 1 and gram_schur[0, 0] == 1
+    assert audit["nuisance_rank"] == 2
+    assert audit["equivalent_gram_rtol"] == 1e-12
+    assert residual.abs().max() < 1e-14 and torch.allclose(residual, matched, atol=1e-14)
+    assert audit["residual_shape_energy_fraction"] == 0
+    truncated, _ = whitened_shape_audit(J, rtol=1e-3)
+    assert truncated[0, 0] == 1  # SVD also needs threshold sensitivity.
+
+
+def test_svd_shape_audit_independent_direction_and_coordinate_invariance():
+    J = torch.zeros(3, 13, dtype=torch.float64)
+    J[0, 0], J[1, 1], J[0, 3], J[2, 4] = 1., 2., 3., 4.
+    expected, report = whitened_shape_audit(J)
+    assert expected[1, 1] == 16 and expected.count_nonzero() == 1
+    assert abs(report["residual_shape_energy_fraction"] - 16/25) < 1e-14
+    Q = torch.tensor([[0., 1., 0.], [0., 0., 1.], [-1., 0., 0.]], dtype=torch.float64)
+    permuted = J[:, [2, 0, 1, *range(3, 13)]]
+    rotated, _ = whitened_shape_audit(Q @ permuted)
+    assert torch.allclose(expected, rotated, atol=1e-14)
+    empty, report = whitened_shape_audit(torch.zeros_like(J))
+    assert empty.count_nonzero() == 0 and report["residual_shape_energy_fraction"] is None
 
 
 def test_no_measurement_and_bad_projection_information_failure():

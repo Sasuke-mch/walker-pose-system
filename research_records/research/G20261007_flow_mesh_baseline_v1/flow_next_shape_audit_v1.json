@@ -1,0 +1,56 @@
+{
+  "stage": "longterm_first_svd_shape_audit",
+  "input": "3x13 explicitly constructed J; nuisance diag(1,1e-4,0), first shape column exactly aligned with weak nuisance",
+  "dtype": "float64",
+  "control_schur_shape_00": 1.0,
+  "control_nuisance_rank": 1,
+  "svd_shape_00": 0.0,
+  "svd_audit": {
+    "jacobian_rtol": 1e-06,
+    "equivalent_gram_rtol": 1e-12,
+    "nuisance_rank": 2,
+    "nuisance_singular_values": [
+      1.0,
+      0.0001,
+      0.0
+    ],
+    "residual_shape_eigenvalues": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "residual_shape_energy_fraction": 0.0,
+    "shape_signal_present": true,
+    "boundary": "threshold-dependent local linear diagnostic; no prior or identifiability certificate"
+  },
+  "tests": {
+    "targeted_suite_passed": 32,
+    "ruff": "passed"
+  },
+  "training_executed": false,
+  "weights_loaded": false,
+  "accuracy_gain_measured": false,
+  "speed_gain_measured": false,
+  "parameters_full52": 711443,
+  "sources": [
+    {
+      "url": "https://www.netlib.org/lapack/lug/node27.html",
+      "used": "rank-deficient least-squares direct SVD reference; own projection implementation, not claimed novel SVD method"
+    },
+    {
+      "url": "https://gitlab.com/libeigen/eigen/-/blob/master/doc/LeastSquares.dox?ref_type=heads",
+      "used": "official source search excerpt on normal-equation condition-number squaring; page body not readable in current browser fetch"
+    }
+  ],
+  "failure_history": [
+    "first heartbeat tool call required destination=thread; corrected; no research check failures in this stage"
+  ],
+  "boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated"
+}

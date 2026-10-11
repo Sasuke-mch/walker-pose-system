@@ -4094,3 +4094,10 @@ S0至S5在训练关闭下可完成的隔离代码/配置/工程检查已经完�
 flow_next_config_v1.json与flow_next_data_manifest_v1.json保留训练禁止、统计未落实、模型族/许可/独立真值/噪声校准门；原设计文件与architecture_research只新增本次实现索引，历史失败/暂停记录保留。没有训练、checkpoint/预训练网络权重、下载、主线/自动化或推送；只加载已有合法统计人体资产用于解码检查。后续真实收益、三训练种子/被试与rig heldout、政策验证锁定、噪声/时间相关误差、代表性全系统耗时仍待相应授权和资源。
 
 可运行无训练核查命令（仓库根目录）：`.venv-cuda/Scripts/python.exe -m pytest realtime_app/learning_flow_mesh_next/tests -q`；`-m realtime_app.learning_flow_mesh_next.train --manifest research_records/research/G20261007_flow_mesh_baseline_v1/flow_next_data_manifest_v1.json`仅准备配置；`-m realtime_app.learning_flow_mesh_next.checks --stage S3`仅随机接口审计；`-m realtime_app.learning_flow_mesh_next.checks --stage S4 --cache-dir research_records/research/G20261007_flow_mesh_baseline_v1/outputs/flow_next_s3_v1`固定缓存决策审计；`-m realtime_app.learning_flow_mesh_next.profile --device cuda --repeats 5 --matched-controls`记录像素边界耗时；`-m realtime_app.learning_flow_mesh_next.replay --device cuda --chunk-check`实际360帧重放。写结果时指定新的--output/--cache-dir，旧路径不可覆写。
+
+
+### 2026-10-11 同规模长期改进：白化SVD体型混淆审计
+
+用户授权继续长期改进，要求参考已有研究、不堆模型规模，接受暂时无提升。flow_next_longterm_protocol_v1.json锁定full52的width128/heads4/blocks4/711443参数，一次只改变一个机制，同规模强对照，沿用既有独立held-out预注册门与每机制两轮修订限制。新聊天目标已启用；每6小时heartbeat仅在实质完成、失败或需要输入时通知。训练及神经权重加载仍关闭，冻结正式主线不变。
+
+首轮依据LAPACK秩亏最小二乘SVD参考，新增白化J的直接SVD消去姿态/平移干扰审计与五档阈值敏感性，保留旧Gram Schur及单阈值结果；生成器、Lambda、A6/A7决策未修改。解析反例中弱干扰方向与体型完全混淆，Gram rtol1e-6误留体型信息1，J rtol1e-6残差0；对应Gram阈值应为1e-12。正交观测坐标变换、干扰列置换、独立体型方向及零信号检查通过；32项累计测试与Ruff通过，见flow_next_shape_audit_v1.json。不支持真实体型可辨识、精度或速度提升；新增诊断有额外计算，旧耗时不代表新版本。下一轮复用既有固定候选，审计有限差分步长与proxy噪声精度敏感性，不生成新候选、不训练。

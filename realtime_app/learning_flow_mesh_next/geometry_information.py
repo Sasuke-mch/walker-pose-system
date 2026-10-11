@@ -45,6 +45,33 @@ def local_parameters(anchor, displacement, scale):
     return rotations, position, beta
 
 
+def whitened_shape_audit(white, *, rtol=1e-6):
+    """Project out nuisance with SVD, without squaring conditioning first.
+
+    Rank is threshold dependent. A residual is a local linear diagnostic, not
+    an assertion of globally identifiable shape or independent measurement truth.
+    """
+    if (white.ndim != 2 or white.shape[1] <= 10 or white.shape[0] == 0
+            or not torch.isfinite(white).all() or not 0 < rtol < 1):
+        raise ValueError("finite nonempty whitened Jacobian and 0<rtol<1 required")
+    nuisance, shape = white[:, :-10], white[:, -10:]
+    left, singular, _ = torch.linalg.svd(nuisance, full_matrices=False)
+    retained = singular > rtol*singular.max()
+    basis = left[:, retained]
+    residual = shape - basis @ (basis.T @ shape)
+    gram = residual.T @ residual
+    signal = float(shape.square().sum())
+    return gram, {
+        "jacobian_rtol": rtol, "equivalent_gram_rtol": rtol**2,
+        "nuisance_rank": int(retained.sum()),
+        "nuisance_singular_values": singular.cpu().tolist(),
+        "residual_shape_eigenvalues": torch.linalg.eigvalsh(gram).cpu().tolist(),
+        "residual_shape_energy_fraction": float(residual.square().sum())/signal if signal > 0 else None,
+        "shape_signal_present": signal > 0,
+        "boundary": "threshold-dependent local linear diagnostic; no prior or identifiability certificate",
+    }
+
+
 def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, chunk=16):
     """Central finite-difference J in train-scaled coordinates, no anchor/J gradients.
 
@@ -121,6 +148,8 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
             residual = Jb - Ju @ torch.linalg.pinv(Ju, rtol=1e-6) @ Jb
             diagnostic["whitened_J_nuisance_rank_rtol1e-6"] = int(torch.linalg.matrix_rank(Ju, rtol=1e-6))
             diagnostic["whitened_J_residual_shape_eigenvalues"] = torch.linalg.eigvalsh(residual.T@residual).cpu().tolist()
+            diagnostic["whitened_svd_sensitivity"] = [whitened_shape_audit(white, rtol=r)[1]
+                                                      for r in (1e-4, 1e-5, 1e-6, 1e-8, 1e-10)]
             diagnostic["rank_warning"] = "Gram pseudoinverse thresholds square Jacobian conditioning; apparent nonzero Schur under truncation is not shape identifiability"
             diagnostic["jacobian_rank"] = int(torch.linalg.matrix_rank(jacobian, rtol=1e-6))
             diagnostic["coordinate_scale_source"] = scale.source

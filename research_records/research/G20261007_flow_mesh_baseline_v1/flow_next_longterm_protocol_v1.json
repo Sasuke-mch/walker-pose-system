@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-11",
+  "status": "longterm_active_training_closed",
+  "scope": "realtime_app/learning_flow_mesh_next only",
+  "capacity_limit": {
+    "width": 128,
+    "heads": 4,
+    "blocks": 4,
+    "parameters_full52": 711443,
+    "increase_for_performance": false
+  },
+  "workflow": [
+    "read primary research and actual failures",
+    "pre-register one variable with mechanism and strongest same-capacity control",
+    "run bounded engineering checks while training is closed",
+    "retain null results and failures",
+    "evaluate efficacy only with authorized training and independent held-out labels"
+  ],
+  "meaningful_improvement_targets": [
+    "reduce pose/shape ambiguity under limited observations",
+    "improve missing-observation causal behavior",
+    "improve calibrated predictive distribution and complete-state decision",
+    "reduce resources only with retained validation quality"
+  ],
+  "revisions_per_mechanism_max": 2,
+  "inherit_acceptance": "flow_research_plan_v1.json and flow_next_config_v1.json; do not replace held-out criteria by fixture checks",
+  "prohibitions": [
+    "training",
+    "neural checkpoint loading",
+    "formal mainline edits",
+    "unlicensed resources",
+    "remote push",
+    "claiming real accuracy from engineering fixtures"
+  ],
+  "followup": {
+    "automation_id": "flow-matching",
+    "every_hours": 6,
+    "notify_only": [
+      "meaningful stage completion",
+      "meaningful failure",
+      "required user input"
+    ],
+    "no_actionable_change": "quiet; do not repeat passed checks"
+  },
+  "first_stage": {
+    "target": "threshold-dependent false shape information audit",
+    "inputs": "explicit analytic whitened Jacobians and existing local_information output",
+    "control": "Gram Schur pseudoinverse and historical single-threshold whitened-J audit",
+    "only_variable": "additional direct SVD nuisance projection and rank threshold sensitivity; generator, Lambda and A6/A7 choices unchanged",
+    "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
+    "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
+  },
+  "next_stage": "Use fixed existing G0/G1 cache to audit dependence on finite-difference step and proxy observation precision; retain candidate IDs and masks, no regeneration or retraining.",
+  "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated"
+}
