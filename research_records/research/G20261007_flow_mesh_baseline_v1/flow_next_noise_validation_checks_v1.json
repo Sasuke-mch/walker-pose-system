@@ -1,0 +1,272 @@
+{
+  "stage": "frozen independent-reference residual evaluation interface",
+  "protocol": "flow_next_noise_validation_protocol_v1.json",
+  "code": [
+    "realtime_app/learning_flow_mesh_next/noise_validation.py",
+    "realtime_app/learning_flow_mesh_next/noise_calibration.py",
+    "realtime_app/learning_flow_mesh_next/tests/test_noise_validation.py"
+  ],
+  "inputs": "explicit Gaussian raw-pixel error fixtures sigma2 with independent tensor noise across frames/views/joints/xy; seed21 fit andseed23 holdout, n2048 each; distinct artificial groups; shifted/scaled variants reuse the same holdout errors",
+  "fit_origin": {
+    "split": "fixture",
+    "reference_kind": "analytic_known_raw_2d",
+    "subjects": [
+      "train_person"
+    ],
+    "original_actions": [
+      "train_action"
+    ],
+    "sequences": [
+      "train_sequence"
+    ],
+    "pixel_domain": "raw_fisheye",
+    "joint_operator": "COCO17_manual_pixel"
+  },
+  "rows": {
+    "matched_gaussian_sigma2": {
+      "example_view0_joint0": {
+        "view": 0,
+        "joint": 0,
+        "admitted_count": 2048,
+        "reference_usable_count": 2048,
+        "reference_missing_count": 0,
+        "training_count": 2048,
+        "available": true,
+        "reasons": [],
+        "trained_proxy": {
+          "coverage": {
+            "0.5": 0.49072265625,
+            "0.9": 0.9013671875,
+            "0.95": 0.94970703125
+          },
+          "ellipse_area_px2": {
+            "0.5": 17.438738593284082,
+            "0.9": 57.93023567242692,
+            "0.95": 75.36897426571097
+          },
+          "mean_bias_px": [
+            -0.13606063198682924,
+            0.002537576863731683
+          ],
+          "radial_quantile_px": [
+            2.384784252733443,
+            4.281360318155264,
+            4.900800857961595,
+            6.063341321201188
+          ],
+          "quadratic_score_p99": 9.195206044126868,
+          "gaussian_reference_log_score_mean": 4.231494940049107,
+          "reference_boundary": "nominal zero-centered Gaussian ellipse/log score using a proxy second moment; not FM likelihood",
+          "bias_change_from_training_px": [
+            -0.15368756430428793,
+            0.0368622209406049
+          ]
+        },
+        "isotropic10px_control": {
+          "coverage": {
+            "0.5": 1.0,
+            "0.9": 1.0,
+            "0.95": 1.0
+          },
+          "ellipse_area_px2": {
+            "0.5": 435.51721806072044,
+            "0.9": 1446.756882483093,
+            "0.95": 1882.2741005438127
+          },
+          "mean_bias_px": [
+            -0.13606063198682924,
+            0.002537576863731683
+          ],
+          "radial_quantile_px": [
+            2.384784252733443,
+            4.281360318155264,
+            4.900800857961595,
+            6.063341321201188
+          ],
+          "quadratic_score_p99": 0.367641108476961,
+          "gaussian_reference_log_score_mean": 6.483296844837557,
+          "reference_boundary": "nominal zero-centered Gaussian ellipse/log score using a proxy second moment; not FM likelihood"
+        }
+      },
+      "all_available_cells": 34,
+      "calibrated": false,
+      "statistics_updated": false,
+      "coverage90_range_all_cells": [
+        0.88330078125,
+        0.91552734375
+      ]
+    },
+    "bias_shift_x20px": {
+      "example_view0_joint0": {
+        "view": 0,
+        "joint": 0,
+        "admitted_count": 2048,
+        "reference_usable_count": 2048,
+        "reference_missing_count": 0,
+        "training_count": 2048,
+        "available": true,
+        "reasons": [],
+        "trained_proxy": {
+          "coverage": {
+            "0.5": 0.0,
+            "0.9": 0.0,
+            "0.95": 0.0
+          },
+          "ellipse_area_px2": {
+            "0.5": 17.438738593284082,
+            "0.9": 57.93023567242692,
+            "0.95": 75.36897426571097
+          },
+          "mean_bias_px": [
+            19.86393936801317,
+            0.002537576863731683
+          ],
+          "radial_quantile_px": [
+            19.96961371459355,
+            22.52756959197971,
+            23.14018650856207,
+            24.81565255302141
+          ],
+          "quadratic_score_p99": 160.53986986219522,
+          "gaussian_reference_log_score_mean": 55.695373558231985,
+          "reference_boundary": "nominal zero-centered Gaussian ellipse/log score using a proxy second moment; not FM likelihood",
+          "bias_change_from_training_px": [
+            19.84631243569571,
+            0.0368622209406049
+          ]
+        },
+        "isotropic10px_control": {
+          "coverage": {
+            "0.5": 0.0,
+            "0.9": 0.77783203125,
+            "0.95": 0.98486328125
+          },
+          "ellipse_area_px2": {
+            "0.5": 435.51721806072044,
+            "0.9": 1446.756882483093,
+            "0.95": 1882.2741005438127
+          },
+          "mean_bias_px": [
+            19.86393936801317,
+            0.002537576863731683
+          ],
+          "radial_quantile_px": [
+            19.96961371459355,
+            22.52756959197971,
+            23.14018650856207,
+            24.81565255302141
+          ],
+          "quadratic_score_p99": 6.158167694079567,
+          "gaussian_reference_log_score_mean": 8.456084718440191,
+          "reference_boundary": "nominal zero-centered Gaussian ellipse/log score using a proxy second moment; not FM likelihood"
+        }
+      },
+      "all_available_cells": 34,
+      "calibrated": false,
+      "statistics_updated": false,
+      "coverage90_range_all_cells": [
+        0.0,
+        0.0
+      ]
+    },
+    "scale_doubled_sigma4": {
+      "example_view0_joint0": {
+        "view": 0,
+        "joint": 0,
+        "admitted_count": 2048,
+        "reference_usable_count": 2048,
+        "reference_missing_count": 0,
+        "training_count": 2048,
+        "available": true,
+        "reasons": [],
+        "trained_proxy": {
+          "coverage": {
+            "0.5": 0.15966796875,
+            "0.9": 0.42919921875,
+            "0.95": 0.5205078125
+          },
+          "ellipse_area_px2": {
+            "0.5": 17.438738593284082,
+            "0.9": 57.93023567242692,
+            "0.95": 75.36897426571097
+          },
+          "mean_bias_px": [
+            -0.2721212639736585,
+            0.005075153727463366
+          ],
+          "radial_quantile_px": [
+            4.769568505466886,
+            8.562720636310528,
+            9.80160171592319,
+            12.126682642402375
+          ],
+          "quadratic_score_p99": 36.78082417650747,
+          "gaussian_reference_log_score_mean": 7.250358735956615,
+          "reference_boundary": "nominal zero-centered Gaussian ellipse/log score using a proxy second moment; not FM likelihood",
+          "bias_change_from_training_px": [
+            -0.28974819629111714,
+            0.039399797804336584
+          ]
+        },
+        "isotropic10px_control": {
+          "coverage": {
+            "0.5": 0.986328125,
+            "0.9": 1.0,
+            "0.95": 1.0
+          },
+          "ellipse_area_px2": {
+            "0.5": 435.51721806072044,
+            "0.9": 1446.756882483093,
+            "0.95": 1882.2741005438127
+          },
+          "mean_bias_px": [
+            -0.2721212639736585,
+            0.005075153727463366
+          ],
+          "radial_quantile_px": [
+            4.769568505466886,
+            8.562720636310528,
+            9.80160171592319,
+            12.126682642402375
+          ],
+          "quadratic_score_p99": 1.470564433907844,
+          "gaussian_reference_log_score_mean": 6.60404562215792,
+          "reference_boundary": "nominal zero-centered Gaussian ellipse/log score using a proxy second moment; not FM likelihood"
+        }
+      },
+      "all_available_cells": 34,
+      "calibrated": false,
+      "statistics_updated": false,
+      "coverage90_range_all_cells": [
+        0.40966796875,
+        0.47021484375
+      ]
+    }
+  },
+  "frozen_statistic_tensors_unchanged": true,
+  "checks": {
+    "targeted_tests_passed": 52,
+    "ruff": "passed",
+    "compileall": "passed",
+    "chi2_df2_quantile_crosscheck": "fixed levels50/90/95 match independent scipy.stats.chi2.ppf within1e-12",
+    "missing_and_insufficient_cells_preserved": true,
+    "group_rig_role_and_test_lock_guards": true
+  },
+  "failure_history": [
+    "initial Ruff import spacing before LEVELS flagged; corrected and full lint/compile rechecked"
+  ],
+  "source": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.chi2.html",
+  "interpretation": "matched Gaussian fixture tests formulas; broad10px control reaches100%coverage but ellipse area is about25times larger. Bias/scale shift undercoverage proves diagnostic sensitivity in this fixture only, not real noise calibration or pose accuracy.",
+  "limitations": [
+    "frozen population metadata and locked_test mode are explicit caller contracts, not proof of actual human reference independence or external preregistration",
+    "temporal/cross-view covariance and per-subject uncertainty remain outside this per-cell evaluator",
+    "manual annotation error still included",
+    "nominal Gaussian log score is not CFM predictive density",
+    "no calibrated=True promotion"
+  ],
+  "registered_real_reference_records": 0,
+  "training_executed": false,
+  "real_noise_fit_executed": false,
+  "real_accuracy_eval_executed": false,
+  "next_stage": "Inspect exact observation/mask/noise/rig binding of frozen information; frame identity alone may admit stale numerical information. Preserve training/data gates, do not add architecture variants while efficacy labels are absent."
+}

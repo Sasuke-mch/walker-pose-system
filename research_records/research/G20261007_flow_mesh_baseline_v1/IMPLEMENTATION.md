@@ -624,3 +624,14 @@ noise_calibration.py同时保存每视角/关节偏差、无偏中心化协方�
 时序诊断只连接同人物/原动作/序列相邻原帧且0<dt<=0.5s，缺失端点/原帧跳号/序列边界不桥接。按序列中心化的pair Pearson与dt范围分开报告，不伪称NIST等间隔ACF，不由lag1计算独立样本数。256帧AR系数0.95的已知fixture有255对，相关性见flow_next_noise_checks_v1.json，仍不升级calibrated；静态序列偏差及未知NaN也有反例检查。49项累计测试、Ruff与compileall通过；首次两处Ruff pairwise规则失败已修复并记录。无神经训练/权重/模型规模/正式主线修改。
 
 flow_next_noise_data_manifest_v1.json实际核对既有360原观测文件存在，原pair1157..1516和PnP登记沿用flow_next_replay_v1.json；独立参考records为空。没有用当前360拟合、strict XYZ或自回投影补成参考，没有执行真实noise拟合。下一阶段准备冻结held-out覆盖/尾部/偏差评价接口，仍只允许命名人工fixture运行，直到独立参考及训练授权落实；该数据门未满足时，不能继续用架构变体和绿测试替代真实方法收益。
+
+
+### 2026-10-11 冻结参考残差验证接口：覆盖率与范围并报
+
+上一轮独立像素契约/偏差二阶矩/时序与rig门已通过并提交，属于进展。本轮先锁定flow_next_noise_validation_protocol_v1.json，新增noise_validation.py；ResidualStatistics携带拟合population，评价严格检查人物/原动作/序列不相交与rig/operator一致。real train只可评价validation或显式locked_test；人工known-reference保持fixture用途，不升级参考独立性证据。评价不拟合、不改正像素、不更新统计。
+
+使用固定2D Gaussian名义50/90/95椭圆q=-2log(1-p)，与独立SciPy chi2.ppf(df2)核对1e-12；报告每cell覆盖率及椭圆面积、heldout偏差/相对训练偏差变化、径向p50/90/95/99、quadratic p99及明确标为Gaussian reference而非CFM density的log score。原admitted/reference计数、缺参考、缺训练cell原因与全部原帧score/masks/reasons/时钟保留，不以当前可评价cells静默代表全部输入；原10px代理为同数据对照。
+
+命名人工fixture一次固定seed21/23，2048拟合与2048holdout、sigma2；均值移位20px与scale×2使用同一holdout错误，无seed搜索。已知Gaussian覆盖接近名义值；10px对照接近100%但面积约25倍，bias/scale移位明显欠覆盖。详细实际数值flow_next_noise_validation_checks_v1.json保留全部34cell覆盖范围及预先声明的view0/joint0样例，不挑有利cell。所有frozen统计逐值未变、始终calibrated=False；不计算不适用于相关帧的像素级binomial区间，不宣称有效独立样本数或真实校准成功。
+
+52项累计测试、Ruff与compileall通过，首次Ruff import-spacing失败已修复并记录。人工metadata切换仅用于role拒绝/允许的契约测试，不冒充真实人工标注；locked_test标签本身也不证明外部政策已预注册。实际独立参考records仍为0，未执行真实noise拟合/人体精度/神经训练，模型规模与正式主线不变。下一轮核查冻结信息是否只绑定frame ID而遗漏确切mask/noise/rig，修复已有接口可靠性；不再用新增架构变体绕过缺失的效果证据。

@@ -1,0 +1,29 @@
+{
+  "stage": "frozen independent-reference residual validation",
+  "frozen": "fit-reference second moment, eigenfloor and calibration population learned from train/fixture only; evaluation does not fit or correct pixels",
+  "only_variable": "evaluation residual distribution; no architecture, learned parameter, CFM path or default noise change",
+  "policy": "fixed nominal 2D Gaussian ellipse levels50/90/95%, q_p=-2log(1-p); residual zero center because runtime does not apply bias correction; fixed isotropic10px comparator",
+  "roles": "real validation accepts train-origin with group-disjoint validation; test requires explicit locked_test mode and same fixed metrics; synthetic holdout remains splitfixture/modefixture with disjoint source groups",
+  "metrics": [
+    "per-view/joint original admitted count and independent-reference usable count",
+    "empirical ellipse coverage plus ellipse area; no coverage-only promotion",
+    "heldout bias and change from training bias",
+    "raw pixel radial p50/p90/p95/p99 and quadratic-score p99",
+    "Gaussian reference log score explicitly approximate, not FM likelihood",
+    "all missing/insufficient training cells retain unavailable status and frame masks/scores"
+  ],
+  "no_promotion": "calibrated=False even for ideal known-Gaussian fixture; no criteria or hyperparameters selected from test data",
+  "checks": [
+    "same-scale Gaussian reference near nominal coverage",
+    "overly wide proxy near100%coverage but area much larger",
+    "variance shift and bias shift visibly undercovered",
+    "unknown-label and insufficient-train cells retained",
+    "group leakage, rig shift, wrong role or relabeled synthetic reference refused",
+    "frozen tensors unchanged byte values across calls"
+  ],
+  "fixture_budget": "one fixed seed set with2048fit and2048heldout, four prereg distributions: Gaussian sigma2, same sigma shifted20px, scale doubled, wide10px reference comparator; no seed/grid search",
+  "statistics_boundary": "frame dependence is not iid confidence interval; no pixel-binomial intervals or effective-N claims; per-subject/sequence uncertainty remains separate heldout gate",
+  "data_gate": "current registered independent reference records empty; do not execute real calibration/accuracy evaluation",
+  "source": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.chi2.html",
+  "stop": "one bounded evaluation-interface stage; real labels/authorization remain necessary before research efficacy progression"
+}

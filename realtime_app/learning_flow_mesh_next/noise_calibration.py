@@ -119,6 +119,7 @@ class ResidualStatistics:
     source: str
     reference_uncertainty: str
     floor_px2: float
+    population: dict
 
     def proxy_noise(self):
         if not self.eligible.all():
@@ -162,7 +163,12 @@ def fit_reference_statistics(data, *, minimum_count=30, floor_px2=.25):
         reasons.append(tuple(row))
     return ResidualStatistics(bias, covariance, second, counts, eligible, tuple(reasons), data.camera_ids,
                               f'{data.split}:{data.reference_kind}:{data.detector_source}:{data.reference_source}',
-                              data.reference_uncertainty, floor_px2)
+                              data.reference_uncertainty, floor_px2,
+                              {'split': data.split, 'reference_kind': data.reference_kind,
+                               'subjects': tuple(sorted(set(data.subjects))),
+                               'original_actions': tuple(sorted(set(data.original_actions))),
+                               'sequences': tuple(sorted(set(data.sequences))),
+                               'pixel_domain': data.pixel_domain, 'joint_operator': data.joint_operator})
 
 
 def temporal_residual_pairs(data, *, max_gap_s=.5):
