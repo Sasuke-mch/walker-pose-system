@@ -655,3 +655,18 @@ local_information冻结anchor时clone，新的candidate缓存携带当前observa
 本地SMPL-H/MANO统计资产与COCO回归器存在，只证明当前可解码资源在场；motion manifest records=0、license=missing、training beta basis待审计、训练mean/scale=null；独立原鱼眼参考records=0，360观测及frame mapping存在但不是独立标签。训练与checkpoint加载均关闭，train.py仅prepare/configuration/objective，不含真实dataset/优化器循环/checkpoint生命周期。此前“S0-S5工程完成”不能解读为原方案训练与效果研究阶段已完成。
 
 效果评价也有独立于数据许可的实现缺口：candidate_metrics的ES当前在输入原单位上计算；尚无按训练统计标准化后分别报告joint/beta的统一契约与真实分层记录。paired_bootstrap要求每block seed集合一致，但不要求预注册三seed；preregistered_gates未接聚合paired CI/数据population/budget证据。不能据已有基础指标或用户填入bool认定预注册效果通过。后续仅推进评价契约这一机制：训练统计标准化、三seed和配对证据门，用明确人工反例验证，不增加模型变体、训练或精度声明。真实参考缺失仅停止依赖路径，当前仍有这一可执行的独立工作，不标记目标完成或阻塞。
+
+
+### 2026-10-11 标准化分布与三seed配对证据评价契约
+
+上一轮就绪审计改变了下一步。本轮先锁定flow_next_evaluation_protocol_v1.json，只改离线评价契约，生成/采样/网络/风险策略不变。evaluation_contract.py新增DistributionScale，完整train own-T COCO17表面参考与同basis beta10分别计算每坐标population mean/std，数值floor1e-4显式记录；人工fixture只允许engineering_fixture，不冒充训练统计。mean/scale脱离输入tensor，提供逐值JSON保存；统计来源/split/basis/operator明示。缺失label不能静默拟合，使用可用性声明的缺失目标块保留unavailable。
+
+standardized_distributions分别计算joint与beta的ES/边际coverage90/width90，width为训练standard deviation单位，不构造跨块合成分数；raw/legal/action pools、候选原数及拒绝数保留。COCO17使用自身T，不根对齐，rotation/node或真实手部精度不是该指标。已知两点fixture的joint ES=3.570714214271425，metre转millimetre并使用对应统计后完全相同，beta ES=0；这一单位不变检查只覆盖非floor激活例子，floor物理单位变化必须同步声明/换算。
+
+原ES公式与Gneiting/Raftery2007原文4.3式22及5.1定理5核对，使用原文最大化分数的负号、固定K empirical V-statistic；原文总体proper-score理论不认证有限样本训练表现。源链接/正文位置/边界写入flow_next_evaluation_checks_v1.json，不把项目训练标准化选择声称为原论文人体方法。
+
+PairedEvidence绑定指标/stratum/split/sourcekind/source/对照方法/budget说明；计算保持原subject等权、sequence/block层级bootstrap，严格要求每block=7/17/27并至少两subject，后者只是数学最小门而非power设计。相对收益分母采用与配对差值相同层级权重的正baseline，零baseline拒绝。preregistered_gates忽略调用方直接填写的两项改善/CI bool，改由实际配对记录推导，并加入aggregation paired CI门；fixture数值pass也明确blocked_analytic_fixture，真实declared来源仍不自动认证效果。
+
+78项累计测试、Ruff、compileall及实际JSON往返通过；首次Ruff import-order已修复。旧源码bool门实际接受50%改善及true，修复后无记录为not_evaluated；缺seed、不齐block、单subject拒绝；已知混合效应CI=[-1,1]不支持改善。原失败/非法raw池/未知beta保留，详见flow_next_evaluation_checks_v1.json。没有执行训练、神经权重加载、主线改动、扩容或push。
+
+当前契约不认证输入source独立性/许可、真实strata范围、样本power、训练与heldout人物/rig不相交或外部test锁；complete statistics及score/CI来源全运行导出仍需实际数据。下一步在已有manifest上绑定评价population/统计来源与原block记录，防止将错误stratum或泄漏统计接入这一数值门；仍仅允许明确人工反例，真实labels与训练授权依赖路径继续停止。

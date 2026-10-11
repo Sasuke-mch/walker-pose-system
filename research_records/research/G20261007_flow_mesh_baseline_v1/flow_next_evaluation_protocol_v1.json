@@ -1,0 +1,18 @@
+{
+  "stage": "standardized evaluation and paired-evidence contract",
+  "only_variable": "offline evaluation contract; no sampling/training/model/risk change",
+  "baseline": "raw-unit joint ES and bool CI gate; matching seed sets allow one seed",
+  "statistics": "absolute COCO17 surface points with own T and beta10, separate blocks; per-coordinate population std from complete training references only, explicit 1e-4 numerical floor; no rotations or fake independent labels",
+  "missing": "undefined raw nonfinite pool retained; unavailable target block remains unavailable; legal/action pools separated",
+  "controls": [
+    "metres to millimetres with corresponding statistics yields identical standardized ES",
+    "joint and beta block scores separate",
+    "heldout fitting prohibited",
+    "one seed and CI crossing zero cannot pass",
+    "caller-supplied CI bool ignored; paired records required",
+    "analytic fixture numerical pass cannot become real efficacy claim"
+  ],
+  "paired": "equal-subject hierarchical sequence/block bootstrap, 2000 draws default; exactly registered seeds 7/17/27 on every matched block; baseline positive for relative improvement; >=2 subjects mathematical interval gate not power/sample-size guarantee",
+  "source_scope": "declared provenance/budgets/strata attached; code cannot authenticate external independent truth or unseen records",
+  "stop": "keep failed/missing evidence explicit; no real accuracy/efficacy claim from fixture; no model enlargement"
+}

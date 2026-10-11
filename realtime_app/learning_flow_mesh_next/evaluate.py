@@ -78,7 +78,7 @@ def neutral_shape_metrics(surface, candidate_beta, reference_beta, *, basis, ref
             "measurement_scope": "axis extents are not calibrated clinical body measurements"}
 
 
-def paired_bootstrap(records, *, iterations=2000, seed=7):
+def paired_bootstrap(records, *, iterations=2000, seed=7, required_seeds=None):
     """Equal subject weight; seeds averaged within matched sequence blocks first.
 
     Each input is a precomputed contiguous sequence-block metric, not a frame.
@@ -108,6 +108,9 @@ def paired_bootstrap(records, *, iterations=2000, seed=7):
             data[subject][sequence] = np.asarray(values)
     if any(s != all_seed_sets[0] for s in all_seed_sets):
         raise ValueError("matched training seed coverage required across every block")
+    if required_seeds is not None and (len(set(required_seeds)) != len(required_seeds)
+                                      or all_seed_sets[0] != set(required_seeds)):
+        raise ValueError("preregistered training seeds required on every block")
     subjects = sorted(data)
     rng = np.random.default_rng(seed)
     draws = []

@@ -1,0 +1,411 @@
+{
+  "stage": "standardized distribution and paired evidence evaluation contract",
+  "inputs": "known-reference analytic fixtures only; no registered real labels",
+  "before_coarse_bool_gate": {
+    "ambiguity_energy_relative_improvement": "pass",
+    "energy_paired_ci_supports_improvement": "pass",
+    "strong_geometry_relative_degradation": "not_evaluated",
+    "aggregation_relative_improvement": "pass",
+    "retention_difference_absolute": "not_evaluated",
+    "illegal_rate_increase": "not_evaluated",
+    "coverage90": "not_evaluated",
+    "full_pipeline_p95_ms": "not_evaluated",
+    "accuracy_claim": "blocked",
+    "shape_claim": "blocked",
+    "mechanism_revisions_remaining": 2,
+    "direction": "retain_FM; no mechanism efficacy claimed without preregistered evidence"
+  },
+  "after_unbound_gate": {
+    "ambiguity_energy_relative_improvement": "not_evaluated",
+    "energy_paired_ci_supports_improvement": "not_evaluated",
+    "strong_geometry_relative_degradation": "not_evaluated",
+    "aggregation_relative_improvement": "not_evaluated",
+    "aggregation_paired_ci_supports_improvement": "not_evaluated",
+    "retention_difference_absolute": "not_evaluated",
+    "illegal_rate_increase": "not_evaluated",
+    "coverage90": "not_evaluated",
+    "full_pipeline_p95_ms": "not_evaluated",
+    "accuracy_claim": "blocked",
+    "shape_claim": "blocked",
+    "mechanism_revisions_remaining": 2,
+    "direction": "retain_FM; no mechanism efficacy claimed without preregistered evidence",
+    "paired_evidence": {},
+    "mechanism_efficacy_claim": "not_certified_by_numeric_gates"
+  },
+  "known_fixture_paired_gate": {
+    "ambiguity_energy_relative_improvement": "pass",
+    "energy_paired_ci_supports_improvement": "pass",
+    "strong_geometry_relative_degradation": "not_evaluated",
+    "aggregation_relative_improvement": "pass",
+    "aggregation_paired_ci_supports_improvement": "pass",
+    "retention_difference_absolute": "not_evaluated",
+    "illegal_rate_increase": "not_evaluated",
+    "coverage90": "not_evaluated",
+    "full_pipeline_p95_ms": "not_evaluated",
+    "accuracy_claim": "blocked",
+    "shape_claim": "blocked",
+    "mechanism_revisions_remaining": 2,
+    "direction": "retain_FM; no mechanism efficacy claimed without preregistered evidence",
+    "paired_evidence": {
+      "standardized_joint_energy": {
+        "proposed_minus_baseline": -1.0,
+        "ci95": [
+          -1.0,
+          -1.0
+        ],
+        "subjects": 2,
+        "training_seeds": [
+          7,
+          17,
+          27
+        ],
+        "iterations": 2000,
+        "scope": "subject paired; hierarchical sequence blocks; seeds not independent subjects",
+        "relative_improvement": 0.5,
+        "ci_supports_improvement": true,
+        "metric": "standardized_joint_energy",
+        "stratum": "registered_fixture_stratum",
+        "source": "known_fixture_records",
+        "source_kind": "analytic_fixture",
+        "split": "engineering_fixture",
+        "baseline_method": "G0",
+        "proposed_method": "G1",
+        "budget_scope": "same_K32_declared_fixture_budget",
+        "scope_limit": "declared evidence only; source independence, test lock and budgets require external audit"
+      },
+      "selected_error": {
+        "proposed_minus_baseline": -1.0,
+        "ci95": [
+          -1.0,
+          -1.0
+        ],
+        "subjects": 2,
+        "training_seeds": [
+          7,
+          17,
+          27
+        ],
+        "iterations": 2000,
+        "scope": "subject paired; hierarchical sequence blocks; seeds not independent subjects",
+        "relative_improvement": 0.5,
+        "ci_supports_improvement": true,
+        "metric": "selected_error",
+        "stratum": "registered_fixture_stratum",
+        "source": "known_fixture_records",
+        "source_kind": "analytic_fixture",
+        "split": "engineering_fixture",
+        "baseline_method": "G0",
+        "proposed_method": "G1",
+        "budget_scope": "same_K32_declared_fixture_budget",
+        "scope_limit": "declared evidence only; source independence, test lock and budgets require external audit"
+      }
+    },
+    "mechanism_efficacy_claim": "blocked_analytic_fixture"
+  },
+  "ci_crosses_zero_fixture": {
+    "proposed_minus_baseline": 0.0,
+    "ci95": [
+      -1.0,
+      1.0
+    ],
+    "subjects": 2,
+    "training_seeds": [
+      7,
+      17,
+      27
+    ],
+    "iterations": 200,
+    "scope": "subject paired; hierarchical sequence blocks; seeds not independent subjects",
+    "relative_improvement": -0.0,
+    "ci_supports_improvement": false,
+    "metric": "standardized_joint_energy",
+    "stratum": "registered_fixture_stratum",
+    "source": "known_fixture_records",
+    "source_kind": "analytic_fixture",
+    "split": "engineering_fixture",
+    "baseline_method": "G0",
+    "proposed_method": "G1",
+    "budget_scope": "same_K32_declared_fixture_budget",
+    "scope_limit": "declared evidence only; source independence, test lock and budgets require external audit"
+  },
+  "retained_rejections": {
+    "one_seed": "preregistered training seeds required on every block",
+    "unmatched_block_seed": "matched training seed coverage required across every block",
+    "one_subject": "at least two subjects for a subject bootstrap; not a power guarantee"
+  },
+  "unit_invariance": {
+    "metre_score": 3.570714214271425,
+    "millimetre_with_corresponding_statistics_score": 3.570714214271425,
+    "scope": "non-floor-active known fixture; fixed floor is unit-dependent and must be declared/converted if physical units change"
+  },
+  "separate_beta_score": 0.0,
+  "missing_and_raw_illegal": {
+    "statistics_source": "known_reference_fixture",
+    "statistics_split": "engineering_fixture",
+    "source_kind": "analytic_fixture",
+    "basis": "fixture_same_basis",
+    "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+    "legal_retention": 0.5,
+    "action_retention": 0.5,
+    "illegal_count": 1,
+    "original_candidate_count": 2,
+    "joints": {
+      "raw": {
+        "count": 2,
+        "energy_score": null,
+        "coverage90": null,
+        "width90": null,
+        "status": "undefined_empty_or_nonfinite_pool"
+      },
+      "numerically_legal": {
+        "count": 1,
+        "energy_score": 14.2828568570857,
+        "coverage90": 0.0,
+        "width90": 0.0,
+        "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+      },
+      "action_filtered": {
+        "count": 1,
+        "energy_score": 14.2828568570857,
+        "coverage90": 0.0,
+        "width90": 0.0,
+        "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+      },
+      "width_units": "training_standard_deviations"
+    },
+    "beta": {
+      "status": "reference_unavailable",
+      "energy_score": null
+    }
+  },
+  "fixture_statistics": {
+    "joint_mean": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "joint_scale": [
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0,
+        1.0
+      ]
+    ],
+    "beta_mean": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "beta_scale": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "source": "known_reference_fixture",
+    "source_kind": "analytic_fixture",
+    "split": "engineering_fixture",
+    "basis": "fixture_same_basis",
+    "operator": "COCO17_SURFACE_REGRESSOR_6890",
+    "floor": 0.0001
+  },
+  "checks": {
+    "pytest_count": 78,
+    "ruff": "passed",
+    "compileall": "passed",
+    "initial_failure": "Ruff import-order repaired; all focused numeric tests passed first execution"
+  },
+  "primary_source": {
+    "url": "https://sites.stat.washington.edu/people/raftery/Research/PDF/Gneiting2007jasa.pdf",
+    "read": "section4.3 equation22 and section5.1 theorem5, pages367/369",
+    "implementation_orientation": "negative of original maximizing orientation: minimize E distance to target minus half pairwise distance; empirical finite K V-statistic includes diagonals",
+    "boundary": "population proper-score theory is not a finite-sample accuracy/calibration certificate; training-statistics coordinate scaling is project evaluation choice"
+  },
+  "limitations": [
+    "statistics requires complete reference blocks; missing/partial statistics not fabricated",
+    "numeric fit split/source declarations alone do not prove labels licensed or independent",
+    "paired metric/source/stratum/method/budget attached, not externally authenticated",
+    "no automatic subject/rig holdout binding, block-duration choice, effective sample count, population size/power or locked-test certificate",
+    "score/CI extraction from a full registered real evaluation run remains pending",
+    "no real clinical anthropometry or surface accuracy"
+  ],
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "model_capacity_changed": false,
+  "performance_gain_claimed": false
+}
