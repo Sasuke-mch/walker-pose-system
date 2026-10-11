@@ -1,0 +1,114 @@
+{
+  "stage": "S3",
+  "scope": "random two-generator real surface numerical interface",
+  "G0_parameters": 711443,
+  "G1_parameters": 711443,
+  "G0_numerical": 32,
+  "G1_numerical": 32,
+  "anchor_id": "G0:0:15",
+  "information_available": true,
+  "J_shape": [
+    68,
+    169
+  ],
+  "noise": "proxy-only fixed isotropic sigma=10.0px; not detection-confidence covariance",
+  "calibrated": false,
+  "diagnostics": {
+    "pinv_rtol": 1e-06,
+    "nuisance_rank": 32,
+    "shape_schur_eigenvalues": [
+      1.0842127635460635e-06,
+      3.972388222414451e-06,
+      9.492767487505911e-06,
+      2.3904587976138728e-05,
+      3.241925951096655e-05,
+      6.150606681145917e-05,
+      0.00017165894472435649,
+      0.0004623813391155671,
+      0.0014420558012361619,
+      0.014119785569615672
+    ],
+    "shape_schur_rank": 10,
+    "boundary": "local linear diagnostic; prior regularization excluded",
+    "rank_sensitivity": [
+      {
+        "pinv_rtol": 0.0001,
+        "nuisance_rank": 23,
+        "shape_schur_eigenvalues": [
+          9.497157844036446e-06,
+          4.256684987575518e-05,
+          0.00010018056973404256,
+          0.00020746393931096762,
+          0.0005712948092985402,
+          0.0019085451219096816,
+          0.0023821630807745542,
+          0.031604101063622235,
+          0.032678366502544326,
+          0.05779816595258952
+        ],
+        "shape_schur_rank": 10,
+        "boundary": "local linear diagnostic; prior regularization excluded"
+      },
+      {
+        "pinv_rtol": 1e-05,
+        "nuisance_rank": 28,
+        "shape_schur_eigenvalues": [
+          1.468173891216825e-06,
+          1.2030448902469343e-05,
+          1.8329029200414697e-05,
+          0.00010294470507834294,
+          0.00013302629598033273,
+          0.0003052468571012144,
+          0.0010002561320865803,
+          0.0020844425976800697,
+          0.004962375915099924,
+          0.05374755956907585
+        ],
+        "shape_schur_rank": 10,
+        "boundary": "local linear diagnostic; prior regularization excluded"
+      },
+      {
+        "pinv_rtol": 1e-06,
+        "nuisance_rank": 32,
+        "shape_schur_eigenvalues": [
+          1.0842127635460635e-06,
+          3.972388222414451e-06,
+          9.492767487505911e-06,
+          2.3904587976138728e-05,
+          3.241925951096655e-05,
+          6.150606681145917e-05,
+          0.00017165894472435649,
+          0.0004623813391155671,
+          0.0014420558012361619,
+          0.014119785569615672
+        ],
+        "shape_schur_rank": 10,
+        "boundary": "local linear diagnostic; prior regularization excluded"
+      }
+    ],
+    "jacobian_rank": 51,
+    "coordinate_scale_source": "analytic_fixture_only"
+  },
+  "resources": {
+    "generators": 2,
+    "network_calls": 16,
+    "candidate_state_evaluations": 512,
+    "G0_ms": 399.5680000007269,
+    "J_ms": 547.5187999982154,
+    "G1_ms": 4071.2605999979132,
+    "total_ms": 5032.827800001542,
+    "J_decoder_calls": 23,
+    "J_decoder_state_evaluations": 339,
+    "information_fallback_reasons": [],
+    "matched_total_sampling_G0_control_K": 64,
+    "matched_walltime_control": "must measure separately; sample count alone is insufficient"
+  },
+  "state_keys": [
+    "g0",
+    "g1"
+  ],
+  "cache_dir": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\outputs\\flow_next_s3_v1",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "boundary": "local numerical information and interface only; neither posterior nor G1 efficacy"
+}

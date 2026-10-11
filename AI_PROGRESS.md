@@ -4070,3 +4070,9 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 ### 2026-10-11 Flow next S2 固定候选与聚合对照
 
 完成A0首候选、A1坐标均值诊断、A2完整候选原鱼眼最小重投影、A3无GT根的JPMA/RPEA共同表面关节适配、A4等权完整medoid、A5各向同性平方风险加相同几何项。期望集合使用全部数值合法raw候选，动作集合单列；最终仅完整候选发布。A1/A3不返回人体参数；A3按现有作者源码top-k规则适配为候选自身T与固定COCO表面算子、鲁棒白化原鱼眼代价，不声称原作者全方法复现或正确后验。投影与OpenCV fisheye独立数值一致、光轴梯度有限、后方点拒绝；噪声固定proxy-only，不由检测置信度称协方差。14项累计工程测试/Ruff通过，真实male表面解码固定5候选缓存与六对照实际运行见flow_next_s2_checks_v2.json。v1将A4也写成平方风险，审查后v2改为距离medoid以保留A4/A5区别；v1及原缓存保留。此为无训练接口验收，不是聚合收益或准确性。
+
+### 2026-10-11 Flow next S3 局部信息与双生成器接口
+
+完成G0数值合法raw集合等权medoid anchor、标准化169维中心差分Jacobian、原鱼眼Lambda=J^TWJ、G1三类token信息块、停止anchor/J梯度、冻结G0及双模型显式state/完整成本。完整K32/Euler8链真实male表面算子运行：每模型711443参数，16网络调用、512候选状态求值，J为68×169、23解码batch/339状态求值；不称一遍推理。18项累计检查/Ruff通过，独立autograd Jacobian/跨块双state/frozen G0检查通过，见flow_next_s3_checks_v2.json。
+
+审查实际发现Gram伪逆会平方条件数：rtol1e-6下nuisance rank32且Schur看似体型有信息；直接白化J同阈值nuisance rank51，消去后体型特征值仅约4e-22至1.4e-19。新增1e-4至1e-10阈值敏感性及白化J残差，保留v1。这是单帧局部混淆反例，不能把截断伪逆产生的非零Schur写成真实体型可辨识。固定噪声仍proxy-only；随机模型+人工尺度无生成收益、后验或真实精度结论。训练与校准仍未执行，完整CPU单次秒级耗时不支持30fps。

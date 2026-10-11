@@ -115,14 +115,70 @@ def run_s2(cache_path=None):
             "A3_adaptation": "author joint top-k rule with admitted robust-whitened raw-fisheye costs, own T, no artificial zero root; engineering weights only"}
 
 
+def run_s3(cache_dir=None):
+    from realtime_app.learning_flow_mesh.body import BodyDecoder
+    from realtime_app.learning_flow_mesh.rotations import matrix_to_six
+    from realtime_app.pose_app.smpl_coco_observation import load_coco17_regressor
+
+    from .geometry_observation import NoiseModel, project
+    from .pipeline import TwoStageInference
+    from .schema import Topology
+    from .tangent import TangentScale
+    from .tests.test_aggregate import rig
+
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    g0 = JointFlow().double().eval()
+    torch.manual_seed(17)
+    g1 = JointFlow().double().eval()
+    cfg = json.loads(Path("realtime_app/learning_flow_mesh/config.json").read_text(encoding="utf-8"))
+    decoder = BodyDecoder(**cfg["assets"]).double()
+    surface = SurfaceDecoder(decoder, torch.tensor(load_coco17_regressor(
+        Path("models/smpl/J_regressor_coco.npy")), dtype=torch.float64))
+    cameras = rig()
+    # Artificial constants only: not fitted training statistics or an accuracy target.
+    mean = torch.cat((matrix_to_six(torch.eye(3, dtype=torch.float64)).repeat(52),
+                      torch.tensor([0., 0., 3.], dtype=torch.float64), torch.zeros(10, dtype=torch.float64)))
+    normal = Normalization(mean, torch.ones(325, dtype=torch.float64)*.03, Topology(),
+                           "analytic_fixture_identity_R_Tz3_scale0.03_not_train_statistics")
+    scale = TangentScale.fixture(g0.topology)
+    identity = torch.eye(3, dtype=torch.float64).expand(1, 52, 3, 3)
+    points = surface(identity, mean[312:315][None], mean[-10:][None])["coco17"][0]
+    obs = replace(observation(), xy=torch.stack([project(points, c)[0] for c in cameras]))
+    pipeline = TwoStageInference(g0, g1, normal, scale, surface, cameras, NoiseModel.proxy())
+    with torch.no_grad():
+        generated, anchor_candidates, information, state, resources = pipeline(obs)
+    if cache_dir:
+        generated.save(cache_dir / "G1.npz")
+        anchor_candidates.save(cache_dir / "G0.npz")
+    assert not any(p.requires_grad for p in g0.parameters())
+    return {"stage": "S3", "scope": "random two-generator real surface numerical interface",
+            "G0_parameters": sum(p.numel() for p in g0.parameters()),
+            "G1_parameters": sum(p.numel() for p in g1.parameters()),
+            "G0_numerical": int(anchor_candidates.numerical.sum()), "G1_numerical": int(generated.numerical.sum()),
+            "anchor_id": information.anchor_id, "information_available": information.matrix is not None,
+            "J_shape": list(information.jacobian.shape) if information.jacobian is not None else None,
+            "noise": information.noise_source, "calibrated": information.calibrated,
+            "diagnostics": information.diagnostics, "resources": resources,
+            "state_keys": list(state.to_dict()), "cache_dir": str(cache_dir) if cache_dir else None,
+            "training_executed": False, "checkpoint_loaded": False,
+            "boundary": "local numerical information and interface only; neither posterior nor G1 efficacy"}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--real-body", action="store_true")
-    parser.add_argument("--stage", choices=("S1", "S2"), default="S1")
+    parser.add_argument("--stage", choices=("S1", "S2", "S3"), default="S1")
     parser.add_argument("--cache", type=Path)
+    parser.add_argument("--cache-dir", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    report = run_s1(real_body=args.real_body) if args.stage == "S1" else run_s2(args.cache)
+    if args.stage == "S1":
+        report = run_s1(real_body=args.real_body)
+    elif args.stage == "S2":
+        report = run_s2(args.cache)
+    else:
+        report = run_s3(args.cache_dir)
     text = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
