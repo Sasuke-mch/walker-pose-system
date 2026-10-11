@@ -4062,3 +4062,7 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 ### 2026-10-11 Flow next S0 数据与推理防火墙
 
 新增隔离 learning_flow_mesh_next：严格 Observation 无GT字段，保留全部源mask/拒绝原因、相机身份与原鱼眼域；52/22节点联合325/145维与切空间169/79维分开。manifest按人物/原始动作/序列在增强前检查跨用途泄漏，禁止SMPL-X beta直接复制；完整标签默认拒绝缺失手/体型，未知标签保持NaN，归一化只允许训练集。5项针对性检查与Ruff通过；初次导入/格式失败已修正并保留说明。flow_next_data_manifest_v1.json明确训练资源/噪声校准/独立真值尚未落实。无训练、checkpoint、主线/自动化修改；S0代码验收不是数据已经可训。
+
+### 2026-10-11 Flow next S1 联合生成与显式时间接口
+
+已实现联合325维G0、独立BODY22/145维配置、同711443参数回归核心、标准线性CFM三块等权loss、共享流时间与Euler采样。width128/heads4/blocks4；信息分支接口预留不代表G1已验证。GRU只接真实准入测量，age/seen/真实dt与hidden显式携带、序列/相机不兼容要求reset；取消八帧永久冻结，beta随完整候选保留。K嵌套、帧独立噪声及不可覆写缓存，保留数值/动作mask与全部拒绝原因，空观测不发布。10项防火墙/因果/分块序列化/NaN/梯度/缓存检查通过，Ruff通过。flow_next_s1_checks_v1.json记录实际K32/Euler8随机前向及参数数；实际male SMPLH固定表面算子解码与独立直接LBS最大误差0m（3个人工候选），不是准确性。train CLI只准备配置/资源门，未训练、未载checkpoint。当前CPU单次耗时不是p95或实时结论。

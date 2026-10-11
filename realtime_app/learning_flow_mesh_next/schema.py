@@ -99,22 +99,24 @@ class TemporalState:
     age: torch.Tensor
     last_timestamp: float
     last_frame: int
+    seen: torch.Tensor
 
     def detached(self):
         # TBPTT retains values; this is not a reset.
         return TemporalState(self.identity, self.sequence, self.camera_ids,
                              self.hidden.detach(), self.age.detach(),
-                             self.last_timestamp, self.last_frame)
+                             self.last_timestamp, self.last_frame, self.seen.detach())
 
     def to_dict(self):
         return {"identity": self.identity, "sequence": self.sequence,
                 "camera_ids": list(self.camera_ids), "hidden": self.hidden.detach().cpu().tolist(),
                 "age": self.age.detach().cpu().tolist(), "last_timestamp": self.last_timestamp,
-                "last_frame": self.last_frame}
+                "last_frame": self.last_frame, "seen": self.seen.cpu().tolist()}
 
     @classmethod
     def from_dict(cls, value, *, device="cpu", dtype=torch.float32):
         return cls(value["identity"], value["sequence"], tuple(value["camera_ids"]),
                    torch.tensor(value["hidden"], device=device, dtype=dtype),
                    torch.tensor(value["age"], device=device, dtype=dtype),
-                   value["last_timestamp"], value["last_frame"])
+                   value["last_timestamp"], value["last_frame"],
+                   torch.tensor(value["seen"], device=device, dtype=torch.bool))

@@ -1,0 +1,62 @@
+{
+  "stage": "S1",
+  "scope": "random_initialized_engineering_only",
+  "torch": "2.11.0+cu128",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "parameters": 711443,
+  "joint_dimension": 325,
+  "tangent_dimension": 169,
+  "regression_parameters": 711443,
+  "candidates": 32,
+  "numerical": 32,
+  "resources": {
+    "network_calls": 8,
+    "candidate_state_evaluations": 256,
+    "encoder_ms": 64.71779999992577,
+    "total_ms": 281.3066000016988,
+    "solver": "Euler",
+    "k": 32,
+    "steps": 8,
+    "tta": false
+  },
+  "temporal_state_keys": [
+    "identity",
+    "sequence",
+    "camera_ids",
+    "hidden",
+    "age",
+    "last_timestamp",
+    "last_frame",
+    "seen"
+  ],
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "normalization": "analytic_fixture_only_not_training_statistics",
+  "real_body": {
+    "status": "passed",
+    "vertices": [
+      3,
+      6890,
+      3
+    ],
+    "faces": [
+      13776,
+      3
+    ],
+    "direct_lbs_max_error_m": 0.0,
+    "operator": "fixed17x6890_surface_regressor",
+    "assets": [
+      "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+      "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+      "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+    ],
+    "boundary": "random parameter internal decoding consistency, not accuracy"
+  },
+  "pytest": "10 passed",
+  "ruff": "passed",
+  "retained_failures": [
+    "B008 constructor default config lint fixed before commit",
+    "S0 evidence paths initially ignored by repository; explicitly staged only small JSON records",
+    "S0 trailing blank whitespace corrected and commit amended before proceeding"
+  ]
+}
