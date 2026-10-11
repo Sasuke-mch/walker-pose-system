@@ -1,0 +1,104 @@
+{
+  "stage": "S2",
+  "scope": "fixed analytic candidates real licensed surface decoder",
+  "results": {
+    "A0": {
+      "selected_id": "id0",
+      "reasons": [],
+      "diagnostic_keys": [],
+      "costs": [
+        0.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "nonfinite_cost_count": 4
+    },
+    "A1": {
+      "selected_id": null,
+      "reasons": [
+        "joint_only_diagnostic"
+      ],
+      "diagnostic_keys": [
+        "coordinate_mean_coco17_absolute",
+        "scope"
+      ],
+      "costs": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "nonfinite_cost_count": 5
+    },
+    "A2": {
+      "selected_id": "id1",
+      "reasons": [],
+      "diagnostic_keys": [],
+      "costs": [
+        0.47692395876394683,
+        0.0,
+        0.47698516367372124,
+        45.92647804664684,
+        78.79764581128099
+      ],
+      "nonfinite_cost_count": 0
+    },
+    "A3": {
+      "selected_id": null,
+      "reasons": [
+        "joint_only_diagnostic"
+      ],
+      "diagnostic_keys": [
+        "jpma_coco17_absolute",
+        "rpea_coco17_absolute",
+        "joint_candidate_ids",
+        "engineering_weights_not_posterior",
+        "scope"
+      ],
+      "costs": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "nonfinite_cost_count": 5
+    },
+    "A4": {
+      "selected_id": "id3",
+      "reasons": [],
+      "diagnostic_keys": [],
+      "costs": [
+        4.016,
+        3.7709999999999995,
+        3.5480000000000005,
+        2.973,
+        9.936
+      ],
+      "nonfinite_cost_count": 0
+    },
+    "A5": {
+      "selected_id": "id2",
+      "reasons": [],
+      "diagnostic_keys": [],
+      "costs": [
+        4.063692395876394,
+        3.7709999999999995,
+        3.5956985163673725,
+        7.5656478046646845,
+        17.8157645811281
+      ],
+      "nonfinite_cost_count": 0
+    }
+  },
+  "noise": "proxy-only",
+  "cache": "research_records\\research\\G20261007_flow_mesh_baseline_v1\\outputs\\flow_next_s2_v1\\candidates.npz",
+  "distribution_weights": "raw_equal_weight",
+  "training_executed": false,
+  "checkpoint_loaded": false,
+  "boundary": "interface decisions only, no performance comparison",
+  "A3_adaptation": "author joint top-k rule with admitted robust-whitened raw-fisheye costs, own T, no artificial zero root; engineering weights only"
+}

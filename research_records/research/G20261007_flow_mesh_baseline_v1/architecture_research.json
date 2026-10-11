@@ -612,9 +612,9 @@
     "automation_recreated": false
   },
   "flow_next_implementation": {
-    "stage": "S1",
-    "status": "joint_interface_checks_passed_no_training",
-    "validation": "flow_next_s1_checks_v1.json",
+    "stage": "S2",
+    "status": "fixed_candidate_aggregation_interface_passed",
+    "validation": "flow_next_s2_checks_v2.json",
     "training_executed": false,
     "checkpoint_loaded": false,
     "mainline_changed": false,

@@ -2,6 +2,7 @@
 import argparse
 import json
 import platform
+from dataclasses import replace
 from pathlib import Path
 
 import torch
@@ -79,12 +80,49 @@ def run_s1(*, real_body=False):
     return result
 
 
+def run_s2(cache_path=None):
+    from realtime_app.learning_flow_mesh.body import BodyDecoder
+    from realtime_app.pose_app.smpl_coco_observation import load_coco17_regressor
+
+    from .aggregate import decide
+    from .geometry_observation import NoiseModel, project
+    from .tangent import TangentScale
+    from .tests.test_aggregate import rig, store_fixture
+
+    torch.set_num_threads(1)
+    cfg = json.loads(Path("realtime_app/learning_flow_mesh/config.json").read_text(encoding="utf-8"))
+    decoder = BodyDecoder(**cfg["assets"]).double()
+    surface = SurfaceDecoder(decoder, torch.tensor(load_coco17_regressor(
+        Path("models/smpl/J_regressor_coco.npy")), dtype=torch.float64))
+    store = store_fixture()
+    cameras = rig()
+    points = surface(store.rotations, store.translation, store.beta)["coco17"]
+    obs = replace(observation(), xy=torch.stack([project(points[1], c)[0] for c in cameras]))
+    if cache_path:
+        store.save(cache_path)
+    results = {}
+    for method in ("A0", "A1", "A2", "A3", "A4", "A5"):
+        result = decide(store, method, TangentScale.fixture(store.topology),
+                        observation=obs, cameras=cameras, noise=NoiseModel.proxy(), surface=surface, lambda_g=.1)
+        results[method] = {"selected_id": result.selected_id, "reasons": result.reasons,
+                           "diagnostic_keys": list(result.diagnostic),
+                           "costs": [float(v) if torch.isfinite(v) else None for v in result.costs],
+                           "nonfinite_cost_count": int((~torch.isfinite(result.costs)).sum())}
+    return {"stage": "S2", "scope": "fixed analytic candidates real licensed surface decoder",
+            "results": results, "noise": "proxy-only", "cache": str(cache_path) if cache_path else None,
+            "distribution_weights": "raw_equal_weight", "training_executed": False,
+            "checkpoint_loaded": False, "boundary": "interface decisions only, no performance comparison",
+            "A3_adaptation": "author joint top-k rule with admitted robust-whitened raw-fisheye costs, own T, no artificial zero root; engineering weights only"}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--real-body", action="store_true")
+    parser.add_argument("--stage", choices=("S1", "S2"), default="S1")
+    parser.add_argument("--cache", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    report = run_s1(real_body=args.real_body)
+    report = run_s1(real_body=args.real_body) if args.stage == "S1" else run_s2(args.cache)
     text = json.dumps(report, ensure_ascii=False, indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
