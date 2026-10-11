@@ -610,5 +610,13 @@
     "checkpoint_loaded": false,
     "mainline_changed": false,
     "automation_recreated": false
+  },
+  "flow_next_implementation": {
+    "stage": "S0",
+    "status": "firewall_passed_data_pending",
+    "validation": "flow_next_s0_validation_v1.json",
+    "training_executed": false,
+    "checkpoint_loaded": false,
+    "mainline_changed": false
   }
 }

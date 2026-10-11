@@ -4058,3 +4058,7 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 研究目录新增flow_research_plan_v1.json（16问题、10来源及实际阅读范围、6执行阶段、数据/噪声/训练/候选/聚合/评价/验收/停止条件），现有IMPLEMENTATION.md补中文执行方案，architecture_research.json新增本次范围状态，保留旧暂停/失败记录。8项解析fixture实际通过，见flow_research_design_checks_v2.json；覆盖骨长均值、旋转均值、重复观测过度集中、体型姿态混淆、帧相关性、分布与点损失、完整medoid与噪声ID非模式ID。无人体模型/权重或训练参与，不是方法性能验证。
 
 当前可执行的下一阶段是落实模型族一致的数据manifest、独立真值与推理GT防火墙，再按S1至S5隔离实施；缺真实参考则只阻止相关精度声明。当前设计已完成，方法效果、真实体型/三维精度、时间校准和完整系统实时性仍未验证。源码与记录检查结果见flow_research_design_validation_v1.json。
+
+### 2026-10-11 Flow next S0 数据与推理防火墙
+
+新增隔离 learning_flow_mesh_next：严格 Observation 无GT字段，保留全部源mask/拒绝原因、相机身份与原鱼眼域；52/22节点联合325/145维与切空间169/79维分开。manifest按人物/原始动作/序列在增强前检查跨用途泄漏，禁止SMPL-X beta直接复制；完整标签默认拒绝缺失手/体型，未知标签保持NaN，归一化只允许训练集。5项针对性检查与Ruff通过；初次导入/格式失败已修正并保留说明。flow_next_data_manifest_v1.json明确训练资源/噪声校准/独立真值尚未落实。无训练、checkpoint、主线/自动化修改；S0代码验收不是数据已经可训。

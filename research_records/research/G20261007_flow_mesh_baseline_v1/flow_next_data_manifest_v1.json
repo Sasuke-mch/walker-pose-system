@@ -1,0 +1,17 @@
+{
+  "source_path": "not_acquired",
+  "license_status": "missing",
+  "family": "SMPL-H",
+  "gender": "male",
+  "beta_basis": "local_asset_basis_pending_training_audit",
+  "beta_dimensions": 10,
+  "rotation_convention": "local_matrix_packed_columns6d",
+  "hand_mean": "flat",
+  "dmpl": "excluded_explicitly",
+  "label_scope": "no_training_labels_acquired",
+  "noise_source": "proxy-only; independent noise calibration missing",
+  "records": [],
+  "truth_status": "no_independent_3d_or_scan",
+  "engineering_replay": "existing 360 frames are not training/test truth",
+  "rig_extrapolation": "required when data are acquired"
+}

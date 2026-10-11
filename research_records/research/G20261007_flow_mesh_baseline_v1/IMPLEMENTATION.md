@@ -537,3 +537,7 @@ S0数据和推理/标签防火墙；S1隔离联合G0及同容量回归、多候�
 ### 本次实际完成
 
 `reproduction/check_research_design.py` 通过8个解析fixture，见 `flow_research_design_checks_v2.json`：单位骨方向均值长度0.5；合法旋转均值行列式0；重复观测使高斯方差0.5变为1/3；消去姿态后体型信息可为0；8帧等相关0.9的有效样本数约1.096；分布energy score与点MSE偏好不同；完整medoid保持fixture骨长；相同noise编号不保证跨条件模式一致。它们仅验证失败机制，不证明G1或拟议聚合有效。
+
+### 2026-10-11 Flow next S0 数据与推理防火墙
+
+新增隔离 learning_flow_mesh_next：严格 Observation 无GT字段，保留全部源mask/拒绝原因、相机身份与原鱼眼域；52/22节点联合325/145维与切空间169/79维分开。manifest按人物/原始动作/序列在增强前检查跨用途泄漏，禁止SMPL-X beta直接复制；完整标签默认拒绝缺失手/体型，未知标签保持NaN，归一化只允许训练集。5项针对性检查与Ruff通过；初次导入/格式失败已修正并保留说明。flow_next_data_manifest_v1.json明确训练资源/噪声校准/独立真值尚未落实。无训练、checkpoint、主线/自动化修改；S0代码验收不是数据已经可训。
