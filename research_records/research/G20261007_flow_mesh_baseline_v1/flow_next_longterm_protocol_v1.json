@@ -50,8 +50,8 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Connect original per-frame evaluation scores to registered paired blocks with all failures retained; finish this explicit offline link, then no new model variants or repeated green audits without new data/authorization/verified defect.",
+  "next_stage": "New user requirement: maintain a dedicated detailed current model architecture file and extremely detailed verified result descriptions, separating old trained synthetic reference, untrained next candidates and engineering checks. No training or neural weights.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "flow_next_population_checks_v1.json: registered population, complete block/seed and training-statistics origin binding; 94 full tests plus 25 focused after final metadata changes; no efficacy claim"
+  "last_completed_stage": "flow_next_blocks_checks_v1.json: all-original-frame block export with failures retained; 106 tests; no model efficacy claim"
 }

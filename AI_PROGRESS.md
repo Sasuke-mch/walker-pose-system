@@ -4202,3 +4202,12 @@ fit_registered_statistics要求每统计行对应唯一原train record/frame且�
 94项全模块测试通过；后续小改metadata-copy/frame-type通过25项相关测试、Ruff及compileall，JSON实际往返通过。flow_next_population_checks_v1.json保留上一版源码对无registry fitted_reference/validation的接受，以及当前拒绝；wrong_stratum、整block缺失、heldout统计origin、错误原frames的逐项失败。人工正确登记含4个block/3seed，依然只有registered_metadata_verified而无真实认证。当前真实manifest records仍0，本轮未扫描全部原数据/训练/加载网络权重/扩容/改主线/推送。
 
 边界：提供的登记不证明source独立性、许可证明文件、tensor和源数据内容对应、实测相同计算预算、统计power或外部test锁。block均值与原帧score尚由调用方准备，不可把登记门称为全效果闭环完成。下一步限于原帧评价到登记block的导出及失败保留检查；这是最后一段已明确缺失的离线评价连接，不新开模型变体。完成后无新数据/授权/可复现缺陷时保持安静，真实收益阶段按原协议继续等待。
+
+
+### 2026-10-11 原帧评分到登记配对block导出
+
+上一轮population绑定为真实进展。本轮按flow_next_blocks_protocol_v1.json新增evaluation_blocks.py：FrameScores承载原record/frame/seed与baseline/proposed真实评价函数report，按登记的split/stratum/原frames及7/17/27逐项核对，不允许原帧缺失、重复、未知frame或seed。标准化joint ES只取raw pool，不以legal/action pool替换不可用raw分数；selected error取原candidate_metrics字段。每block仅在全部帧两方法均有有限非负值时计算均值，任何失败块/结构错误阻止生成PairedEvidence；所有原report、失败帧/方法/理由与12个原block-seed槽保留。NaN等原数值以显式类型标签存档而非伪造有限值，严格JSON可写，输入tensor/model不在本路径中运行。
+
+106项累计测试、Ruff和compileall通过，最初2项dict.items静态规则修复已记录。已知人工原评价reports为12帧-seed槽/2subject/3seed，原候选数K2；完整导出12个block-seed rows可进入数值配对，输入逆序块结果完全一致。删除一原帧或raw ES非有限各保留1失败block，并使evidence=None；即使legal pool ES=0也不能替代。两帧已知2/4均值=3，缺端点后原frames=[0,1]与None/理由保留，不计算剩余帧均值。详见flow_next_blocks_checks_v1.json，全部为analytic，100%已知人工相对改善不构成真实模型收益。
+
+此导出核对调用方提供的评价reports，不认证报告与源tensor/files对应、独立truth、许可文件、实测计算预算或统计power。真实motion与独立reference清单仍空；无训练、权重、扩容、主线/远端变更。原明确缺失的离线评价连接已补齐，不能将其称为模型精度提升。用户本轮扩充目标：维护详细模型架构文件，并极详细描述模型结果；下一阶段从实际源码与产物整理专门架构文件和结果明细，不重复模型训练或用新绿测试填补真实效果空白。

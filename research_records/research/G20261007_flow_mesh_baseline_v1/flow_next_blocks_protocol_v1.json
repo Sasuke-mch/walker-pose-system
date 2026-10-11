@@ -1,0 +1,15 @@
+{
+  "stage": "original frame report to registered paired blocks",
+  "only_variable": "offline block export; metric/CI/sampler/training/model unchanged",
+  "inputs": "registered comparisons and original blocks, per-frame baseline/proposed evaluator reports with original record/frame/seed, typed training statistics for energy",
+  "energy_pool": "raw joint standardized ES only; legal/action scores do not replace undefined raw pool",
+  "success": [
+    "complete original frame/seed keys; deterministic ordering independent input order",
+    "block mean from every original registered frame, no weighted deletion",
+    "missing frame, duplicate, nonfinite or unavailable metric retained; any failed block prevents paired evidence",
+    "correct output passes original population and three-seed paired gate",
+    "original reports archived without input aliases, nonfinite values explicitly tagged for strict JSON"
+  ],
+  "stop": "named analytic reports only; no independent labels or model training; after explicit offline link complete do not create further model variants without data/authorization or reproduced defects",
+  "limitations": "supplied evaluator reports not authenticated against tensors/files, no sample power or measured compute certificate"
+}

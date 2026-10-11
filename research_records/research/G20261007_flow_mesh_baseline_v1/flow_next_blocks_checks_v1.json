@@ -1,0 +1,5050 @@
+{
+  "stage": "original frame report to registered paired blocks",
+  "complete_fixture_export": {
+    "status": "ready_for_numeric_pairing",
+    "original_frame_reports": [
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      }
+    ],
+    "original_report_count": 12,
+    "expected_frame_report_count": 12,
+    "blocks": [
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      }
+    ],
+    "failed_blocks": [],
+    "input_errors": [],
+    "scope": "registered per-frame report means; no imputation/deletion or actual efficacy certificate"
+  },
+  "complete_fixture_paired_numeric_summary": {
+    "proposed_minus_baseline": -3.570714235305786,
+    "ci95": [
+      -3.570714235305786,
+      -3.570714235305786
+    ],
+    "subjects": 2,
+    "training_seeds": [
+      7,
+      17,
+      27
+    ],
+    "iterations": 20,
+    "scope": "subject paired; hierarchical sequence blocks; seeds not independent subjects",
+    "relative_improvement": 1.0,
+    "ci_supports_improvement": true,
+    "metric": "standardized_joint_energy",
+    "stratum": "registered_fixture_stratum",
+    "source": "known_fixture_records",
+    "source_kind": "analytic_fixture",
+    "split": "engineering_fixture",
+    "baseline_method": "G0",
+    "proposed_method": "G1",
+    "budget_scope": "same_K32_declared_fixture_budget",
+    "population": {
+      "status": "registered_metadata_verified",
+      "original_blocks": 4,
+      "training_seeds": [
+        7,
+        17,
+        27
+      ],
+      "claim_limit": "declared original population only; file content, compute, independence and external locks not certified"
+    },
+    "scope_limit": "declared evidence only; source independence, test lock and budgets require external audit"
+  },
+  "missing_frame_export": {
+    "status": "blocked_failed_or_missing_frames",
+    "original_frame_reports": [
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      }
+    ],
+    "original_report_count": 11,
+    "expected_frame_report_count": 12,
+    "blocks": [
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": null,
+        "proposed": null,
+        "failure_reasons": [
+          {
+            "frame": 0,
+            "reason": "missing_original_frame"
+          }
+        ]
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      }
+    ],
+    "failed_blocks": [
+      {
+        "record_id": "a",
+        "block": 0,
+        "training_seed": 7,
+        "reasons": [
+          {
+            "frame": 0,
+            "reason": "missing_original_frame"
+          }
+        ]
+      }
+    ],
+    "input_errors": [],
+    "scope": "registered per-frame report means; no imputation/deletion or actual efficacy certificate"
+  },
+  "invalid_raw_pool_export": {
+    "status": "blocked_failed_or_missing_frames",
+    "original_frame_reports": [
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": {
+                "unavailable_numeric": "nan"
+              },
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 0,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "a",
+        "frame": 1,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 0,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 7,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 17,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      },
+      {
+        "record_id": "b",
+        "frame": 1,
+        "training_seed": 27,
+        "baseline": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 3.570714235305786,
+              "coverage90": 0.0,
+              "width90": 1.8000000715255737,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        },
+        "proposed": {
+          "statistics_source": "registered_fixture_stats",
+          "statistics_split": "engineering_fixture",
+          "source_kind": "analytic_fixture",
+          "basis": "fixture_same_basis",
+          "scope": "separate dimensionless own-T COCO17 and beta10; no joint-plus-beta composite",
+          "legal_retention": 1.0,
+          "action_retention": 1.0,
+          "illegal_count": 0,
+          "original_candidate_count": 2,
+          "joints": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          },
+          "beta": {
+            "raw": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "numerically_legal": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "action_filtered": {
+              "count": 2,
+              "energy_score": 0.0,
+              "coverage90": 1.0,
+              "width90": 0.0,
+              "scope": "marginal_coordinate_intervals; multivariate_ES; fixed_K_V_statistic"
+            },
+            "width_units": "training_standard_deviations"
+          }
+        }
+      }
+    ],
+    "original_report_count": 12,
+    "expected_frame_report_count": 12,
+    "blocks": [
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": null,
+        "proposed": null,
+        "failure_reasons": [
+          {
+            "frame": 0,
+            "method": "baseline",
+            "reason": "frame_metric_unavailable_or_nonfinite"
+          }
+        ]
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "a",
+        "original_action": "a",
+        "sequence": "a",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:a",
+        "record_id": "a",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 0,
+        "frames": [
+          0
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 7,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 17,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      },
+      {
+        "subject": "b",
+        "original_action": "b",
+        "sequence": "b",
+        "rig": "rig_fixture",
+        "source_path": "known_fixture:b",
+        "record_id": "b",
+        "block": 1,
+        "frames": [
+          1
+        ],
+        "training_seed": 27,
+        "statistics_source": "registered_fixture_stats",
+        "baseline": 3.570714235305786,
+        "proposed": 0.0,
+        "failure_reasons": []
+      }
+    ],
+    "failed_blocks": [
+      {
+        "record_id": "a",
+        "block": 0,
+        "training_seed": 7,
+        "reasons": [
+          {
+            "frame": 0,
+            "method": "baseline",
+            "reason": "frame_metric_unavailable_or_nonfinite"
+          }
+        ]
+      }
+    ],
+    "input_errors": [],
+    "scope": "registered per-frame report means; no imputation/deletion or actual efficacy certificate"
+  },
+  "validation": {
+    "full_suite": "106 passed in 9.53 seconds",
+    "focused_first_run": 11,
+    "ruff_initial_failures": "2 dictionary iteration PLC0206 fixed; nonfinite original keys archive tagging added before full check",
+    "compileall": "passed",
+    "ruff": "passed"
+  },
+  "evidence_level": "analytic fixtures only, numerical comparisons not performance/accuracy",
+  "code": [
+    "realtime_app/learning_flow_mesh_next/evaluation_blocks.py",
+    "realtime_app/learning_flow_mesh_next/tests/test_evaluation_blocks.py"
+  ],
+  "inputs": "actual standardized_distributions and candidate_metrics outputs on named analytic two-candidate/two-subject/three-seed fixture; not frozen neural candidate re-generation",
+  "limitations": [
+    "supplied evaluator report values not authenticated against actual model run or reference files",
+    "no new training, neural weights, mainline replacement or model expansion",
+    "original failures in reports retained; no finite complete-block estimate when any member unavailable",
+    "real registered motion and independent reference records still absent",
+    "no new scientific benefit or realtime claim"
+  ]
+}
