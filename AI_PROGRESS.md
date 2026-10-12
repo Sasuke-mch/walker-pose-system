@@ -4497,3 +4497,11 @@ MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结�
 预登记后扩展现有train.py的LabelFrame/SequenceChunk/SequenceObjective和sequence_objective，显式原帧/时钟/身份/rig标签绑定、最多32帧、全部观测顺序编码；仅当前观测+完整标签进入原CFM/回归，其他原槽保留NaN/原因，不跳过状态推进。目标和chunk carry detach，块内观测梯度保留；均值按监督数加权，非有限已计算目标令整chunk aggregate不可用。无新增模型、optimizer/checkpoint或文件loader。
 
 5帧工程fixture、SO3/ambient×22/52×CFM/回归，21新项先通过；补原逐行API对照与partial/train-gate检查后，仅八扩充+一新增9项通过，共22新项分次覆盖/Ruff通过。context/单帧loss与原接口一致、未来隔离、2/1监督块加权、块内历史及无标签观测梯度、target/carry屏障、全缺失/部分标签/inf失败及10种前向前拒绝均检查。MODEL_RESULTS第34节、架构第17节/台账与协议同步，无额外验收/JSON。下一项实际注册文件→序列接口及来源/资产/划分核对，数据records仍空，真实训练/runner/独立效能保持未完成；长期goal继续active，现有其他改动保留。
+
+## 2026-10-13 D10.3注册数据文件读取接口
+
+预登记后在现有train.py补load_registered_chunks：整表组split/许可声明先检查，仅读取选中train NPZ，asset/PnP/原时钟/标签frame映射/原mask与拒绝原因显式对应，allow_pickle=False。按32原行分chunk，缺失和部分目标不删除、不填补；返回声明来源与authenticity_verified=False。模型/目标/容量未改，无optimizer/checkpoint或正式主线修改。
+
+临时明确合成35帧22/52得到32+3原行，15类文件错误与5类注册错误拒绝，文件→原内存5帧context/state/aggregate相同、逐帧loss allclose含NaN一致。初次括号SyntaxError令22项import失败，修复后22项通过；Ruff类型提示修正后仅补Boolean nodes拒绝1项通过；另发现无符号frame差分回绕误判倒序，改相邻比较，仅补该拒绝1项通过。共24新项分次覆盖、Ruff通过。失败/输入/命令/边界记录在MODEL_RESULTS第35节，架构第18节及协议同步；不新增审计或永久假数据。
+
+真实训练manifest records0/training_data_readyFalse，新读取器明确registered_training_data_unavailable；独立噪声参考records0。声明一致不证明真实标签/clock/basis/统计来源，完整runner/G1/独立效能与训练授权仍缺。下一项D03先推导逐帧beta与共享shape机制，不能把平滑或旧beta拼接称改进；长期goal保持active，既有工作区改动保留。

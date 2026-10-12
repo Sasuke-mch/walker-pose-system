@@ -119,7 +119,7 @@ Sβ=Λββ−Λβu pinv(Λuu)Λuβ只作为局部诊断；Gram会平方J条件�
 
 同capacity regression使用同速度网络、输入状态0和s=1，经block平均MSE。2026-10-12已补齐可选information接口：regression、regression_loss与train.objective透传同一冻结Λ，复用原信息投影和全部参数；默认不传Λ与旧输出逐值一致。损失接口已支持信息条件回归；2026-10-12进一步补齐candidate_store.infer的Λ透传，仍限K1且保留拒绝/状态/资源记录。完整训练评估runner未实现，尚未训练；如比较G1，仍须匹配G0生成anchor/J的完整成本和条件来源，不能只匹配单网络参数。CFM没有默认endpoint MSE、best-of-K loss或独立网格损失。
 
-预置AdamW、lr3e-4、weight_decay0.01、clip1、warmup1000、cosine、effective_batch16、unroll32、smoke2000/main50000、validation每1000、seeds7/17/27。`train.py`已有configuration/prepare/objective及D10.2的内存因果SequenceChunk→sequence_objective路径，无真实数据loader/optimizer循环/训练checkpoint生命周期；预置训练计划均未执行。用户未授权训练、motion labels未取得，不能凭配置或可微目标声称可学习性或完整复现。
+预置AdamW、lr3e-4、weight_decay0.01、clip1、warmup1000、cosine、effective_batch16、unroll32、smoke2000/main50000、validation每1000、seeds7/17/27。`train.py`已有configuration/prepare/objective、D10.2因果SequenceChunk→sequence_objective及D10.3注册train NPZ→原行chunk读取接口；真实注册数据仍0条，无optimizer循环/训练checkpoint生命周期，预置训练计划均未执行。用户未授权训练、motion labels未取得，不能凭配置或可微目标声称可学习性或完整复现。
 
 ## 9. 候选采样、解码与发布
 
@@ -248,7 +248,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 |D07/P2|A4 medoid表达候选群体代表性，不保证最接近真值；算法语义确认，真实误选率未知。|同缓存对比最强可部署决策、保留全槽位与风险覆盖；检查多模态及候选偏置，禁止oracle根位置/逐关节拼接。|原选择误差至少5%配对改善及保留率门；无独立真值不选赢家，不新加learned ranker。|待独立效能。|
 |D08/P1|原local特征在准入age清零/seen置True后构造，实际池化槽的这两维恒定；6组context精确碰撞及真实时间顺序检查确认。更广的连续时间/运动建模仍未证。|local MLP改用incoming_age/prior_seen；输出状态与global time沿原重置规则。无新参数，不添加hidden衰减或人体结果反馈。|重现间隔/首次见到差异，并保留缺失/未来/分块合同；context响应不等于真实姿态收益。|本地特征缺陷已修复，MODEL_RESULTS第31节；实际缺失/采样节奏效能仍待独立验证。|
 |D09/P0|SO3生成仍慢于ambient；全K32 VJP比1.7822超过1.25；第26/29节实测。|保留SO3表示候选，停止现全K32反馈晋升；若有全新有据替代问题先预注册。原核两轮额度不重置。|必须在原K/NFE和全成本口径内达门；不能减K/步数或反复测时制造通过。方向通过不算精度或速度收益。|原路径停止，独立VJP保留。|
-|D10/P1|原train.py只prepare/objective，无因果标签帧连接、真实loader/optimizer/checkpoint；原统计grad与回读来源/dtype缺陷确认。|D10.1固定统计；D10.2已连接内存标签帧绑定→因果context→CFM/回归与TBPTT，保留缺失/失败。实际loader/optimizer/checkpoint逐步推进，训练默认禁止。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；声明不认证真实性，缺资源不伪造已训练成果。|D10.1/2完成；D10.2共22个新检查分次覆盖/Ruff通过，第34节；完整runner及效能仍未完成。|
+|D10/P1|原train.py只prepare/objective，无因果标签帧连接、真实loader/optimizer/checkpoint；原统计grad与回读来源/dtype缺陷确认。|D10.1固定统计；D10.2连接标签帧绑定→因果目标/TBPTT；D10.3注册train文件读取保留全部原行并检查声明对齐。optimizer/checkpoint与真实资源仍缺，训练禁止。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；声明不认证真实性，缺资源不伪造已训练成果。|D10.1/2/3接口完成；D10.3共24个新检查分次覆盖/Ruff通过，第35节。真实records0，声明不认证真实性；完整runner及效能未完成。|
 |D11/P0|训练、独立noise/3D/shape记录为空，未证实生成/shape/选择/校准改善；manifest确认。|取得独立资源后按原energy score、选择误差、coverage-width、无效率和三seed参与者配对协议评价。现有拟合结果不自证准确。|继承原5%改善、CI/coverage/失败门；数据缺口不能靠工程测试补齐，长期目标保持未完成。|资源限制。|
 |D12/P2|当前无后验密度/可信likelihood/校准；全链采集+检测实时与跨rig外推也未认证；源码/既有成本范围确认。|校准/概率与部署分别在相应数据/硬件/完整输入边界评价；先明确采样分布、失败率和时间口径。|不把等权候选、B矩阵、合法旋转或纯网络耗时叫后验/30fps；无证据保留明确未认证状态，不叠加density/MH模块。|待独立概率/部署验证。|
 
@@ -269,3 +269,13 @@ D02限定范围的结果见MODEL_RESULTS第32节/flow_next_encoder_dimension_v1.
 返回`SequenceObjective`含全部原frame绑定、contexts[F,128]、frame_losses[F]、supervised[F]、逐帧unavailable及原观测rejection_reasons、脱图carry和实际frame/target调用计数。正常有监督loss为原有效监督帧的均值；跨chunk/有效batch不能等权平均块均值，应按supervised_count加权。无可监督行loss=None、原槽NaN；已计算目标非有限时保留NaN/原因并将整个chunk loss设None，不选择其他有限行冒充可训练。当前入口是F0，未接G1信息；G1的冻结信息绑定/额外获取成本需另行实现并验证。
 
 块内历史观测→后续loss的梯度保留，块边界的incoming/returned carry脱图，实现TBPTT截断而非重置；没有optimizer、checkpoint读写、文件数据加载或自动训练。5帧原时间[0,.17,.52,.73,1.1]的工程检查含1缺观测、1缺beta、3监督；同种子目标、未来隔离、非均匀分块加权、标签/状态梯度屏障等见MODEL_RESULTS第34节。网络容量不变，所有结果是准备接口证据，不是模型有效性。
+
+## 18. 注册数据文件到因果接口（2026-10-13，真实数据未取得）
+
+`train.load_registered_chunks(manifest_path, record_index, normalization, asset_contract=..., device=..., dtype=...)`读取一个明确注册的train记录；先用现有manifest检查整张登记表的subject/original_action/sequence跨split冲突，再检查许可声明和选中记录。record必须补齐identity、两个明确有序PnP camera_ids、reference source_kind与22/52 nodes；normalization必须通过冻结train统计声明gate。相对source_path以manifest所在目录解析，不扫描其他文件。外部asset_contract与manifest及文件header的family/gender/beta_basis/beta_dimensions/rotation_convention/hand_mean/dmpl声明逐项一致。
+
+NPZ格式`flow_next_sequence_v1`仅使用numeric arrays与JSON文本，allow_pickle=False。原Observation的xy/confidence/present/quality/geometry/views/origins/directions及2×17拒绝原因完整保留；目标为R[F,n,3,3]、T[F,3]、beta[F,10]及显式Boolean masks。原frame_ids/timestamps与另存的label_frame_ids/label_timestamps须逐值相同、严格递增；header明确raw_fisheye、LEFT/RIGHT、cam0_LEFT、metres、COCO17_SURFACE_REGRESSOR_6890与时钟来源，可另存两个原view时钟。禁止整型mask转Boolean、自动重排/补行、pickle或假手/假beta。
+
+按最多32个连续原行切chunk，不按可监督状态筛掉行；Observation/Labels继续使用既有validate/packed，缺失NaN和原拒绝原因仍存在。返回source/manifest路径、全部原frame IDs、组/资产声明及authenticity_verified=False等来源字段。D10.2目标函数与参数容量均未改；它的监督条件、TBPTT、失败及加权口径继续适用。
+
+检查使用pytest临时、明确synthetic_contract_fixture的35帧22/52文件及5帧连接对照，非真实数据：32+3分块保留全部行，文件与独立内存输入的contexts/状态/aggregate相同，逐帧loss按allclose含NaN一致。24个新检查分次覆盖与Ruff通过，失败与命令见MODEL_RESULTS第35节。当前真实训练及独立噪声参考清单records均0，读取真实清单返回registered_training_data_unavailable。声明匹配不认证真实subject/clock/asset basis/标签质量，也不证明统计只由实际train获得；无optimizer或checkpoint操作，完整训练runner和独立效能仍未完成。

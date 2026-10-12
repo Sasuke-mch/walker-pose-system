@@ -1061,3 +1061,19 @@ D01独立完成后继续检查StateEncoder。发现原输入流程先age=where(v
 |对齐能否在forward前拒绝|frame/clock/identity/rig/order/stream/split/statistics/行数/33帧上限十项坏输入均在encoder前拒绝|显式绑定声明不认证实际数据身份或标签真实来源|
 
 命令：`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_joint.py -q --tb=short -k sequence`；追加检查只`-k 'causal_sequence_objective or partial_targets'`。Ruff既有offline入口检查train.py与test_joint.py。无需新JSON/快照/验收文档，记录实际条件/失败状态/原接口对应即可。D10.2完成，下一阶段建立实际数据文件到这个接口的读取/标签与来源绑定，并保持无数据时不执行；真实data loader、划分资产真实性、optimizer/checkpoint生命周期、训练授权及独立有效性仍未满足，长期目标未完成。
+
+## 35. 2026-10-13 D10.3注册文件读取：连接完成，数据可用性仍为否
+
+问题：D10.2只有内存观测/目标连接，没有从已注册文件恢复原行与显式标签绑定的路径。先在现有长期协议登记D10_registered_file_reader，再扩展train.py的load_registered_chunks和现有test_firewall.py，不新增训练或审计框架。唯一变量为文件→原Observation/Labels/LabelFrame/SequenceChunk的读取；encoder、目标公式、容量、缺失/失败语义不改。
+
+注册入口先验证整份manifest的原subject/action/sequence跨split隔离和本地许可声明，再只选择train记录；选中record声明identity/PnP/source_kind/nodes。文件header与record、manifest及调用方asset_contract的family/basis/hand_mean等声明必须一致；raw-fisheye、左右身份顺序、cam0/metres、surface operator、时钟类型显式。numeric NPZ使用allow_pickle=False，Boolean masks不作整型转换；全部原frame/clock/标签frame/clock、观测/目标行数、有限可信标签及原拒绝原因检查后，按32个连续原行分块，不按可监督行筛选。
+
+检查输入为pytest临时目录中的明确synthetic_contract_fixture，不作为训练数据登记：22与52节点各35原帧501–535，时钟1000+i×0.07秒；index=2的原行缺观测并保留NaN/原拒绝原因，index=8的原行beta maskFalse且值NaN。人工subject/action/rig、声明参考标签和train统计仅测试接口合同，beta basis明确synthetic_test_basis_not_real_asset。两种节点均得到32+3原行chunk，全部帧/时间/张量/mask/NaN/原因及optional view时钟保持。没有解码真实人体或采集新数据。
+
+15种坏文件分别覆盖subject、beta basis、camera IDs/roles、coordinate frame、format、label顺序/时钟、原clock顺序、无符号frame倒序、整型mask、缺array、错shape、pickle object及可信NaN；均明确拒绝。empty/license/test record/跨split泄漏/source_kind共5种登记失败用np.load spy检查在文件打开前拒绝。5帧文件→现有JointFlow回归因果目标与独立构造内存输入的contexts、state、aggregate逐值相同，逐帧loss按torch.allclose含NaN一致，监督行[True,True,False,True,False]；该检查只认证连接，不认证真实可学习性。
+
+首次22项因train.py新append少一个闭合括号而在import时报SyntaxError，未进入文件读取，不能称为数据条件失败。修复括号与import排序后22passed/18deselected in2.23s；Ruff随后发现nodes类型异常应为TypeError，修正后仅新增“Boolean nodes在开文件前TypeError拒绝”1passed/40deselected in2.18s，两改动文件Ruff通过。提交前发现np.diff对uint64倒序帧回绕：最小[502,501]控制旧递增判断True、直接相邻比较False。frame/time改用直接比较后，只新增无符号倒序拒绝1passed/41deselected in2.52s，Ruff通过。共24个新检查分次覆盖；已通过22项未为保险重跑。命令：`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_firewall.py -q --tb=short -k registered`；追加项仅`-k 'registry_failure and nodes'`及`-k unsigned_frame_order`。静态检查使用既有uv tool run --offline ruff check。
+
+现场读真实flow_next_data_manifest_v1.json：records0、training_data_ready=False、truth_status=no_independent_3d_or_scan；实际调用新读取器返回registered_training_data_unavailable。flow_next_noise_data_manifest_v1.json的独立参考records同为0，360帧现有观测不升级为训练/验证真值。真实清单未改，临时文件不成为永久假数据。
+
+D10.3解决文件连接与声明对齐，不能认证标签/资产基/人物/物理时钟真实性或统计实际只来自train；caller asset_contract也只是当前显式声明，未做真实资产认证。optimizer/checkpoint生命周期、G1冻结信息路径、真实资源、训练授权及独立效能均未完成，长期目标未完成。下一阶段D03先分析逐帧beta与序列共享shape的合同/机制：估计随新证据变化不等于真实体型变化；不自动冻结、EMA或把旧beta拼到新pose，也不以平滑作收益证据。

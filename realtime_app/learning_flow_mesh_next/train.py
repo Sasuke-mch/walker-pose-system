@@ -4,11 +4,12 @@ import json
 from dataclasses import dataclass, replace
 from pathlib import Path
 
+import numpy as np
 import torch
 
 from .data_firewall import Labels, validate_manifest
 from .joint_flow import JointFlow, ModelConfig, cfm_loss, regression_loss
-from .schema import Observation, TemporalState
+from .schema import Observation, TemporalState, Topology
 
 
 def configuration():
@@ -168,6 +169,141 @@ def sequence_objective(mode, model, chunk, normalization, state=None, *, generat
                               "velocity_batch_calls": computed_count, "target_state_evaluations": computed_count,
                               "nonfinite_objective": nonfinite, "optimizer_steps": 0,
                               "checkpoint_loaded": False, "scope": "in-memory causal F0 objective; no dataset authenticity certification"})
+
+
+def load_registered_chunks(manifest_path, record_index, normalization, *, asset_contract,
+                           device="cpu", dtype=torch.float32):
+    """Read one registered train NPZ into consecutive original-row chunks.
+
+    Metadata agreement is required but does not establish authentic labels,
+    physical accuracy or permission to train. No optimizer/checkpoint operation.
+    """
+    manifest_path = Path(manifest_path).resolve()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
+    gates = validate_manifest(manifest)  # Check all registered group splits first.
+    if not gates["training_data_ready"]:
+        raise ValueError("registered_training_data_unavailable")
+    if not isinstance(record_index, int) or isinstance(record_index, bool) or not 0 <= record_index < len(manifest["records"]):
+        raise ValueError("explicit valid registered record index required")
+    record = manifest["records"][record_index]
+    if record["split"] != "train":
+        raise ValueError("only registered train sequences enter this reader")
+    extras = ("identity", "camera_ids", "source_kind", "nodes")
+    if any(key not in record for key in extras) or not record.get("identity"):
+        raise ValueError("record requires identity/PnP/source_kind/nodes")
+    if record["source_kind"] not in ("fitted_reference", "independent_reference"):
+        raise ValueError("registered train labels require declared reference source")
+    if (not isinstance(record["camera_ids"], list) or len(record["camera_ids"]) != 2
+            or any(not isinstance(value, str) or not value for value in record["camera_ids"])
+            or len(set(record["camera_ids"])) != 2):
+        raise ValueError("two distinct explicitly ordered PnP camera IDs required")
+    if not isinstance(record["nodes"], int) or isinstance(record["nodes"], bool):
+        raise TypeError("explicit integer target topology required")
+    topology = Topology(record["nodes"])
+    if normalization.topology != topology:
+        raise ValueError("registered sequence/statistics topology mismatch")
+    normalization.require_training_statistics()
+    if dtype not in (torch.float32, torch.float64):
+        raise ValueError("float32/64 sequence tensors required")
+    body_fields = ("family", "gender", "beta_basis", "beta_dimensions", "rotation_convention", "hand_mean", "dmpl")
+    for key in body_fields:
+        if key not in asset_contract or asset_contract[key] != manifest[key]:
+            raise ValueError(f"registered target asset contract mismatch:{key}")
+    source = Path(record["source_path"])
+    source = (source if source.is_absolute() else manifest_path.parent/source).resolve()
+    observation_fields = ("xy", "confidence", "present", "quality", "geometry", "views", "origins", "directions")
+    label_fields = ("rotations", "translation", "beta", "pose_mask", "translation_mask", "beta_mask")
+    required = (*observation_fields, *label_fields, "frame_ids", "timestamps", "label_frame_ids", "label_timestamps",
+                "rejection_reasons_json", "metadata_json")
+    with np.load(source, allow_pickle=False) as archive:
+        if missing := set(required)-set(archive.files):
+            raise ValueError(f"registered sequence arrays missing:{sorted(missing)}")
+        if archive["metadata_json"].shape != () or archive["metadata_json"].dtype.kind not in ("U", "S"):
+            raise ValueError("scalar text archive metadata required")
+        metadata = json.loads(archive["metadata_json"].item())
+        if metadata.get("format") != "flow_next_sequence_v1":
+            raise ValueError("unregistered sequence archive format")
+        for key in (*body_fields, "label_scope", "noise_source", "truth_status"):
+            if metadata.get(key) != manifest[key]:
+                raise ValueError(f"archive manifest contract mismatch:{key}")
+        for key in ("subject", "original_action", "sequence", "rig", "split", *extras):
+            if metadata.get(key) != record[key]:
+                raise ValueError(f"archive record binding mismatch:{key}")
+        if (metadata.get("camera_roles"), metadata.get("pixel_domain"), metadata.get("units"),
+                metadata.get("operator"), metadata.get("coordinate_frame")) != (
+                ["LEFT", "RIGHT"], "raw_fisheye", "metres", "COCO17_SURFACE_REGRESSOR_6890", "cam0_LEFT"):
+            raise ValueError("explicit raw-fish LEFT/RIGHT surface/cam0/metres contract required")
+        if not isinstance(metadata.get("timestamp_kind"), str) or not metadata["timestamp_kind"]:
+            raise ValueError("original physical clock provenance required")
+        arrays = {name: archive[name].copy() for name in required if name != "metadata_json"}
+        view_times = archive["view_timestamps"].copy() if "view_timestamps" in archive else None
+    frames = arrays["frame_ids"]
+    if frames.ndim != 1 or not len(frames) or not np.issubdtype(frames.dtype, np.integer):
+        raise ValueError("nonempty original integer frame IDs required")
+    count = len(frames)
+    dimensions = {"xy": (2, 17, 2), "confidence": (2, 17), "present": (2, 17), "quality": (2, 17),
+                  "geometry": (2, 17), "views": (2,), "origins": (2, 17, 3), "directions": (2, 17, 3),
+                  "rotations": (topology.nodes, 3, 3), "translation": (3,), "beta": (10,),
+                  "pose_mask": (topology.nodes,), "translation_mask": (), "beta_mask": (),
+                  "timestamps": (), "label_frame_ids": (), "label_timestamps": (), "rejection_reasons_json": ()}
+    for key, shape in dimensions.items():
+        if arrays[key].shape != (count, *shape):
+            raise ValueError(f"registered sequence array shape mismatch:{key}")
+    for key in ("present", "quality", "geometry", "views", "pose_mask", "translation_mask", "beta_mask"):
+        if arrays[key].dtype != np.bool_:
+            raise ValueError(f"explicit Boolean source mask required:{key}")
+    for key in ("timestamps", "label_timestamps", "xy", "confidence", "origins", "directions", "rotations", "translation", "beta"):
+        if arrays[key].dtype.kind != "f":
+            raise ValueError(f"explicit floating source array required:{key}")
+    if not np.issubdtype(arrays["label_frame_ids"].dtype, np.integer):
+        raise ValueError("integer label frame IDs required")
+    if not np.array_equal(frames, arrays["label_frame_ids"]) or not np.array_equal(arrays["timestamps"], arrays["label_timestamps"]):
+        raise ValueError("original observation/label frame or clock mapping mismatch; no reorder/fill")
+    times = arrays["timestamps"]
+    if (frames < 0).any() or not np.isfinite(times).all() or not (frames[1:] > frames[:-1]).all() or not (times[1:] > times[:-1]).all():
+        raise ValueError("original frames and physical timestamps must strictly increase")
+    if view_times is not None and (view_times.shape != (count, 2) or view_times.dtype.kind != "f" or not np.isfinite(view_times).all()):
+        raise ValueError("optional two-view source clocks must be finite and aligned")
+
+    def tensor(key, index=None):
+        value = arrays[key] if index is None else arrays[key][index]
+        return torch.as_tensor(value, device=device, dtype=torch.bool if arrays[key].dtype == np.bool_ else dtype)
+
+    camera_ids = tuple(record["camera_ids"])
+    observations, bindings = [], []
+    for index, frame in enumerate(frames):
+        raw_reason = arrays["rejection_reasons_json"][index]
+        if arrays["rejection_reasons_json"].dtype.kind not in ("U", "S"):
+            raise ValueError("original rejection reasons must be JSON text")
+        reason = json.loads(raw_reason.item() if hasattr(raw_reason, "item") else raw_reason)
+        if (not isinstance(reason, list) or len(reason) != 2 or any(not isinstance(row, list) or len(row) != 17
+                or any(not isinstance(item, str) for item in row) for row in reason)):
+            raise ValueError("retain2x17 original string rejection reasons")
+        obs = Observation(**{name: tensor(name, index) for name in observation_fields},
+                          rejection_reasons=tuple(tuple(row) for row in reason), camera_ids=camera_ids,
+                          identity=record["identity"], sequence=record["sequence"], frame=int(frame),
+                          timestamp=float(times[index]), source=str(source), timestamp_kind=metadata["timestamp_kind"],
+                          view_timestamps=tuple(float(v) for v in view_times[index]) if view_times is not None else None).validate()
+        observations.append(obs)
+        bindings.append(LabelFrame(obs.identity, obs.sequence, int(arrays["label_frame_ids"][index]),
+                                   float(arrays["label_timestamps"][index]), camera_ids))
+    labels = Labels(**{name: tensor(name) for name in label_fields}, topology=topology,
+                    source_kind=record["source_kind"], split="train")
+    labels.packed(require_complete=False)
+    chunks = []
+    for start in range(0, count, configuration()["unroll"]):
+        stop = min(count, start+configuration()["unroll"])
+        current = replace(labels, **{name: getattr(labels, name)[start:stop] for name in label_fields})
+        chunks.append(SequenceChunk(tuple(observations[start:stop]), current, tuple(bindings[start:stop])))
+    return tuple(chunks), {"manifest_path": str(manifest_path), "source_path": str(source), "record_index": record_index,
+                           "original_frames": count, "original_frame_ids": frames.tolist(), "chunks": len(chunks),
+                           "subject": record["subject"], "original_action": record["original_action"],
+                           "sequence": record["sequence"], "rig": record["rig"], "camera_ids": list(camera_ids),
+                           "source_kind": record["source_kind"], "split": "train", "timestamp_kind": metadata["timestamp_kind"],
+                           "asset_contract": {key: metadata[key] for key in body_fields},
+                           "declared_training_data_ready": gates["training_data_ready"], "authenticity_verified": False,
+                           "training_executed": False, "checkpoint_loaded": False,
+                           "boundary": "registered declaration/file consistency; not independent label, asset-basis or physical clock authenticity certification"}
 
 
 def main():
