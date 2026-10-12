@@ -4412,3 +4412,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 在已有长期协议预注册后实现SO3JointFlow：复用StateEncoder/Transformer和T/beta，仅pose_out6→3、角速度右乘群Euler；Haar源与linear日程在训练/采样一致，冻端点CPU SciPy log只准备目标。公开完整参数经绑定Normalization接回CandidateStore；同网络回归沿用现有损失，错配codec/Lambda/非法源显式拒绝。52/22参数711056/707216，比原各少387，15104信息参数仍不激活；不据此宣称速度、精度或创新。
 
 相关test_joint/test_regression_information实际20通过，近π路径、右更新、非均匀标准化、梯度和既有因果/缺失发布均检查。首次两处导入格式Ruff修正后通过，未重复功能检查或建立额外快照/报告。MODEL_ARCHITECTURE第13节、MODEL_RESULTS第24节保存边界。默认工厂/双阶段/正式主线与训练关闭保留；下一阶段用现有资源工具核算完整单模型生成/解码成本，再判断表示因素是否值得保留，独立数据门仍缺，整体目标未完成。
+
+## 2026-10-12 SO3单模型成本比较：当前实现停止晋升
+
+先在已有长期协议登记固定K32/8及K1/1对照、warmup2/各8次循环测时、1.25倍停止门，再扩展现有profile.py。实际RTX5070Ti Laptop CUDAfloat32、同固定观测/共同参数初始化、原Normalization、完整候选发布+真实SMPLH解码+A4；ambient/SO3生成完整p50为35.20/44.87ms、p95为39.06/52.49ms，回归p50为14.43/15.60ms。SO3比值1.2747未过门，停止当前成本晋升；所有32/1候选及解码均有限、预算计数一致，非人体真实精度。
+
+逐次结果flow_next_so3_cost_v1.json，边界/内存/测前负载/控制台WARNING与JSON解析失败见MODEL_RESULTS第25节；保存结果正常，未重跑。profile.py Ruff通过，没有新增验收脚本或报告。少387参数/169维速度不意味着提速；最多再用有数学依据的指数核替换作第二轮，若仍失败则停成本优化。默认双阶段和正式主线不变，数据缺口与训练关闭继续，长期目标未完成。

@@ -40,7 +40,33 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Use existing inference/resource tools to compare ambientF0, SO3F0 and their deterministic controls at identical observations/K/NFE, including outer API and complete candidate/decoder cost. No new architecture or training; do not equate head/tangent dimension savings with runtime or quality, and do not treat speed alone as permission to deleteG0/G1/J.",
+  "next_stage": "SO3matrix_exp cost promotion failed. At most one justified second revision may replace the3x3 numerical exponential with an endpoint/gradient-equivalent Rodrigues kernel, using existing mathematical and model tests and the same fixed cost comparison; no more modules, capacity, source/schedule changes or timing-only retries. If that still fails, stop representation cost optimization and retain the hypothesis pending independent data rather than inventing further engineering gates. Training/default pipeline stay closed/frozen.",
+  "so3_cost_comparison_20261012": {
+    "status": "completed_cost_promotion_failed",
+    "question": "Does SO3 group integration add unacceptable measured cost despite a smaller velocity head, under the same available input and candidate budget?",
+    "tool": "Extend existing profile.py with an opt-in single-model representation control; no additional benchmark or audit infrastructure",
+    "input": "One fixed typed observation from analytic SMPLH identity/beta0/Tz3 projected by existing fixture rig, float32 CUDA, CPUthreads1; fixture_normalization and authorized local male/MANO/COCO assets. Reset causal state toNone each call; no video/detector/labels/checkpoint.",
+    "controls": ["ambient F0 K32/8Euler", "SO3 F0 K32/8LieEuler", "ambient regression K1/1call", "SO3 regression K1/1call"],
+    "initialization": "Seed7; copy matching StateEncoder/Transformer and other common parameters from ambient toSO3, leaving differently sized pose heads explicit. Random weights measure structure cost only.",
+    "timing": "Two warmups per mode; 8 recorded repetitions per mode with cyclic order to balance execution-order drift. Synchronize at each boundary. Record infer outer API, decode, A4 whole-candidate decision, and complete total; no time-based tuning, repeats or candidate selection.",
+    "memory": "Per mode CUDA allocator baseline and peak/increment; both models and one surface resident for all modes, no process-wide memory claim",
+    "retain": "Every repetition, numerical/action counts and rejection reasons; decode all numeric candidates, no best-run filter. A4 selects one complete candidate, no geometry/J cost or visual quality inferred.",
+    "success": "Positive full results for all four fixed controls with budget/decoder counts consistent. A SO3/ambient fullp50 ratio >1.25 or fewer legal candidates stops cost-based promotion. Report fullp95 versus33.3ms only as this typed-pixel boundary, not full-system30fps.",
+    "stop": "Single fixed run; preserve failures; no repeats merely for stable-looking numbers. Do not removeG0/G1/J or claim efficacy from timings. If extra SO3 cost dominates, only one justified numerical-kernel replacement can be considered under the two-revision rule.",
+    "training": false,
+    "result": {
+      "output": "flow_next_so3_cost_v1.json",
+      "full_p50_ms": {"ambient_F0": 35.20135, "SO3_F0": 44.87190, "ambient_regression": 14.43480, "SO3_regression": 15.59915},
+      "full_p95_ms": {"ambient_F0": 39.06380, "SO3_F0": 52.49368, "ambient_regression": 18.93384, "SO3_regression": 17.22225},
+      "SO3_over_ambient_full_p50": 1.2747209980654168,
+      "cost_promotion_gate": false,
+      "budget_and_decoder_counts_valid": true,
+      "all_F0_candidates_numeric_and_decoded": true,
+      "F0_peak_allocator_increment_bytes_each": 31074304,
+      "regression_peak_allocator_increment_bytes_each": 961024,
+      "scope": "Random weights/small fixedGPUsample only; no capture/detector/G0J/quality comparison. No stable deployed speed or efficacy certification."
+    }
+  },
   "so3_representation_factor_20261012": {
     "status": "opt_in_implementation_engineering_checks_passed_not_trained",
     "mechanism": "SO3 angular velocity replaces ambient6D pose velocity; right group Euler replaces additive pose Euler, with a matched independent Haar base and linear train/inference path. This is one coherent rotation-geometry factor, not independent source/schedule tricks.",
@@ -67,7 +93,7 @@
   },
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 opt-in SO3 F0 angular-velocity/group-Euler prototype with existing encoder/Transformer, matchedHaar source and same-capacity regression. Related20 tests pass; default two-stage and training remain closed. Efficacy/runtime unproved.",
+  "last_completed_stage": "2026-10-12 fixed-budget ambient/SO3 F0 and regression full candidate/realSMPLH/A4 CUDA costs measured. SO3median1.2747x exceeds preregistered1.25 limit; promotion stopped. All candidates/repetitions retained, training/default pipeline unchanged.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {
