@@ -1,0 +1,56 @@
+{
+  "status": "bounded_comparison_completed; neither candidate passes every preregistered gate",
+  "recommendation": "prefer 2D weight0.004 with C300 as simple ankle-fit candidate; do not spend C600 at weight0.002",
+  "reason": "weight2x reduces ankle pixel mean21.8% and P9523.7%; relative ankle excursion amplitude moves from0.399/0.445 to0.620/0.687 of raw2D observations. steps2x has negligible gain.",
+  "tradeoff": "camera-space pelvis-relative ankle D2P95 increases24.89 to40.76mm/frame^2, failing preregistered20% gate; relative roughness grows about2.6%/6.9% across views. Cannot claim fully fixed sliding or jitter.",
+  "simple_parameters": {
+    "body_reprojection_weight": 0.004,
+    "body_reprojection_scale_px": 25,
+    "vposer_prior_weight": 0.01,
+    "joint_steps": 300
+  },
+  "unchanged": "model/regressor/17 points/priors/Stage; no new losses; no distal-foot-point extension in this stage",
+  "verification": [
+    "all448 retained",
+    "exact same cold initializations",
+    "resolved option differences only output and one intended variable",
+    "finite metrics and full448 residual retention",
+    "evaluator AST passed"
+  ],
+  "lint": "ruff unavailable in active environment; no full lint claim",
+  "reproduction": {
+    "weight2x": [
+      ".venv-cuda/Scripts/python.exe",
+      "-B",
+      "realtime_app/tools/run_smplh_reprojection_experiment.py",
+      "--source-args",
+      "research_records/engineering_validation/G20261012_smplh_2d448_view_v1/fit/fit_args.json",
+      "--output",
+      "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\weight2x",
+      "--reprojection-weight",
+      ".004",
+      "--vposer-weight",
+      ".01",
+      "--joint-steps",
+      "300"
+    ],
+    "steps2x": [
+      ".venv-cuda/Scripts/python.exe",
+      "-B",
+      "realtime_app/tools/run_smplh_reprojection_experiment.py",
+      "--source-args",
+      "research_records/engineering_validation/G20261012_smplh_2d448_view_v1/fit/fit_args.json",
+      "--output",
+      "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\steps2x",
+      "--reprojection-weight",
+      ".002",
+      "--vposer-weight",
+      ".01",
+      "--joint-steps",
+      "600"
+    ]
+  },
+  "mainline_or_viewer_replaced": false,
+  "failures": "both preregistered gate failures retained in comparison.json",
+  "limits": "reprojection and relative motion match to model predictions, not independently measured gait/accuracy; no neural network training, only frozen-model SMPL-H parameter fitting"
+}

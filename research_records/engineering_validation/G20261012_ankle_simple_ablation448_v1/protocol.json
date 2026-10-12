@@ -1,0 +1,21 @@
+{
+  "question": "Does ankle underfit improve through only stronger 2D weighting or more iterations?",
+  "baseline": "research_records/engineering_validation/G20261012_smplh_2d448_view_v1/fit",
+  "frames": "all448,0..447",
+  "controls": {
+    "weight2x": {
+      "reprojection_weight": 0.004,
+      "joint_steps": 300
+    },
+    "steps2x": {
+      "reprojection_weight": 0.002,
+      "joint_steps": 600
+    }
+  },
+  "fixed": "same initial seed0, model/regressor, raw observations, priors, A30/B30/D100/D100, no added loss or smoothing",
+  "vposer_weight": 0.01,
+  "criterion": "ankle aggregate mean and P95 pixel residual improve >=15%; other-joint mean worsens <=10%; raw-2D left/right ankle relative excursion amplitude discrepancy improves in both views; camera-space pelvis-relative ankle second-difference P95 grows <=20%",
+  "limits": "2D observations are model predictions, not truth; movement metrics are frame-indexed internal diagnostics, not validated gait or contact",
+  "stop": "two single-variable runs only; nonfinite or source mismatch fails; record all failures; do not combine changes or expand search this round",
+  "next_selection": "prefer the single parameter change that passes; no automatic mainline promotion"
+}
