@@ -138,6 +138,8 @@ SurfaceDecoder使用已有male SMPL-H/MANO统计资产；每候选自己的β/T�
 
 B=λ0(Λ+λ0I)⁻¹，是决策metric而非后验协方差。δ_kl使用两候选最短SO3对数，运输到anchor切空间，并含标准化T/β差；期望l涵盖所有数值合法原候选，不能只对动作子集重归一化后隐去其余状态。Rk=mean_l δᵀBδ+λg Eobs(k)。Eobs为准入点原鱼眼白化Huber成本，threshold3；没有GT-root/DA3/calibrated posterior weights。
 
+2026-10-12修正该Huber成本的零残差反向边界：平方残差在二次区间时，未启用的线性分支使用安全平方根输入，避免sqrt(0)的无限导数污染where反向。前向Huber定义、原始投影/准入和决策规则不变；精确匹配点的代价与一阶导数均为零。此修复只保证相关数值边界，不代表物理反馈架构已经接入。
+
 A7只在Rk≤minR+validation delta的近等价集合中最小化相对上次发布完整人体的距离/dt²；gap>0.5s关时间偏好。delta0对照保持A6，不能凭这一无变化检查证明时间提升。近πchart、失效信息或实际绑定失配明确回A4，保留歧义/理由，不静默平滑或回写历史。低risk gap非真实物理歧义概率，当前ambiguity未校准。
 
 ## 11. 离线评价层与尚缺资源

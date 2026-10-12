@@ -3,10 +3,22 @@ from dataclasses import replace
 import torch
 
 from ..geometry_information import local_information, schur_shape, whitened_shape_audit
-from ..geometry_observation import NoiseModel, project
+from ..geometry_observation import NoiseModel, observation_errors, project
 from ..tangent import TangentScale
 from .test_aggregate import rig, store_fixture
 from .test_firewall import observation
+
+
+def test_exact_observation_cost_has_zero_finite_derivative():
+    cameras = rig()
+    points = torch.tensor([.1, -.05, 3.], dtype=torch.float64).expand(1, 17, 3).clone().requires_grad_()
+    xy = torch.stack([project(points.detach(), camera)[0][0] for camera in cameras])
+    obs = replace(observation(), xy=xy)
+    costs = observation_errors(points, obs, cameras, NoiseModel.proxy())[0]
+    derivative = torch.autograd.grad(costs.sum(), points)[0]
+    assert torch.equal(costs, torch.zeros_like(costs))
+    assert torch.isfinite(derivative).all()
+    assert torch.equal(derivative, torch.zeros_like(derivative))
 
 
 def test_two_stage_frozen_g0_and_state_chunk_roundtrip():

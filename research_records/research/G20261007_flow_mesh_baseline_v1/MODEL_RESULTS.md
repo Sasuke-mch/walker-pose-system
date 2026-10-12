@@ -945,3 +945,11 @@ SO3/ambient完整p50=1.274720998，超过先定1.25门，因此停止当前实�
 TV/KL或Metropolis不是免费后验认证：需要真实定义的prior/likelihood/proposal density，及平稳/大样本/二阶矩等条件。当前raw等权候选/A6风险没有这些接口；合法旋转、有限点、重投影低或32候选不补足它们。小训练MSE的mass-coverage结论也需要额外正则性，不能抄到当前未训练人体模型。继续关闭密度/MH/learned-ranker扩展。
 
 下一可检查阶段：只验证SO3单模型的晚阶段完整参数终点上，真实SMPLH到原鱼眼代价能否用一次VJP返回169维角/T/beta方向，保留无效端点/原观测状态；这是新的反馈输入语义，不冒充原FD邻域合同。只有不增第二生成器、不堆control网络、容量与完整成本可控，才考虑替换现有信息接口并预注册新CFM/回归/零反馈对照。外部noise/operator可用信息必须同条件，未知质量不伪装校准。此处仅方向选择，尚无该物理VJP执行、架构改动、训练或有效性证据，整体目标继续。
+
+## 28. 2026-10-12 原鱼眼Huber成本零残差梯度修复
+
+按现有 endpoint_vjp_feasibility_20261012 的首项前提，使用同一合法点 [0.1,-0.05,3] 扩展为17点、fixture 双鱼眼相机及固定 sigma10px proxy，将投影像素作为观测。新增现有 test_information.py 的精确匹配导数测试；首次实际运行1 failed：代价严格为0，但点坐标的51个导数全部NaN。原因是原未启用Huber线性分支仍对sqrt(0)反传，where的零分支系数不能消除0乘无限导数。
+
+geometry_observation.py 改为直接用平方残差判定二次区间；二次区间内仅给未启用的sqrt分支输入1。前向二次/线性Huber公式不变，不用epsilon制造非零匹配代价，也不把非有限候选改为默认有效。原鱼眼投影、准入掩码、proxy precision和A5/A6决策未改。
+
+实际 test_information.py 与 test_aggregate.py 共11 passed；精确匹配成本和全部导数严格为0，既有投影、缺失、完整候选、FD信息及双阶段接口检查通过。两份修改Python的Ruff通过。没有全套重跑、训练、checkpoint或额外验收文件。该修复是完整端点物理VJP的数值前提，不证明反馈有效或旧FD邻域合同可取消；对应VJP实现与成本检查仍待推进。

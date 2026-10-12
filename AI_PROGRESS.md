@@ -4436,3 +4436,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 按用户要求更新既有 LITERATURE_ANALYSIS.md 开头的精选：保留已影响实现的 FM、HuManiFlow、FMPose3D、ProHMR、HMR2、RFM，补入最近聚焦分析的 FMPE 和 SBI-SIM；逐项区分历史 baseline/H8、当前 next、SO3 显式候选和待验证假设。FrameFlow 与 Bayesian inverse v1 加入有价值但不直接移植的阅读入口，保留失败和额外假设。当前简约目标优先阅读 HuManiFlow/RFM/FMPE/SBI-SIM/Guidance，不能以借鉴数量或已有机制组合证明创新。
 
 本次只整理既有研究，核对原论文标题/链接、现有源码与结果记录中的采用状态，没有新模型实验、训练或权重加载。SBI-SIM 相关物理梯度尚未接入生成器，现有下一阶段预注册与在途检查保留，不标为已完成；数据缺口、冻结主线和训练关闭继续。仅提交本次文献与进度段落，工作区既有其他改动保留，长期目标仍进行。
+
+## 2026-10-12 原鱼眼Huber零残差反向修复
+
+继续现有晚阶段VJP预注册，恢复精确匹配对照的失败原因：17点原鱼眼代价为0，51个坐标导数全部NaN。仅修geometry_observation的未启用sqrt分支，保留原Huber前向与投影/准入；修复后代价和导数严格0。现有information/aggregate相关测试实际11通过，两份Python Ruff通过，无新验证基础设施。
+
+MODEL_ARCHITECTURE成本说明与MODEL_RESULTS第28节同步。该数值修复独立提交；原VJP协议和检查继续在途，不以此宣称物理反馈架构完成。正式主线、候选生成和训练关闭保持，其他工作区改动保留，长期目标继续。

@@ -108,8 +108,11 @@ def observation_errors(points, obs, cameras, noise, *, huber=3.0):
     clean_obs = torch.where(admitted[..., None], obs.xy.to(points), 0)
     difference = torch.where(admitted[None, ..., None], uv - clean_obs, 0)
     square = torch.einsum("kvji,vjil,kvjl->kvj", difference, noise.precision.to(points), difference)
-    norm = square.clamp_min(0).sqrt()
-    robust = torch.where(norm <= huber, .5*square, huber*(norm-.5*huber))
+    quadratic = square <= huber*huber
+    # The inactive linear branch must also have a finite derivative at zero.
+    # sqrt(0) would otherwise contaminate where's backward with 0*inf.
+    norm = torch.where(quadratic, torch.ones_like(square), square).sqrt()
+    robust = torch.where(quadratic, .5*square, huber*(norm-.5*huber))
     usable = projection_valid | ~admitted[None]
     per_joint = robust.sum(1) / admitted.sum(0).clamp_min(1)
     per_joint = torch.where(admitted.any(0)[None], per_joint, torch.inf)
