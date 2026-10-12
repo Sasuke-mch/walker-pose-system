@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-12",
+  "target": "FrameFlow legacy SO3 geodesic, near-pi branch and source transfer gate",
+  "scope": "Official pure rotation functions only; no model, body assets, training, checkpoint or mainline changes",
+  "source": "sources/frameflow_legacy_20261012/so3_utils.py from official legacy branch",
+  "input": {
+    "device": "cpu",
+    "dtypes": ["float64", "float32"],
+    "axes": [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, -2, 3], [-1, 2, -3]],
+    "angles": [0, 1e-8, 0.4, "pi-0.02", "pi-0.005", "pi-0.0005", "pi"],
+    "times": [0, 0.4, 1],
+    "independent_Haar_population": "1024x52 rotations; normalized Gaussian4, torch generator seed7; no rejection or redraw"
+  },
+  "controls": [
+    "Original author functions extracted as complete AST FunctionDef nodes, without edits; no full author package import",
+    "Current project shortest_log as intentionally guarded local decision chart",
+    "SciPy principal rotation vector at fixed endpoints followed by torch.matrix_exp; detached endpoint training-target control, not new learned model"
+  ],
+  "only_variable": "Rotation log/path implementation on the same fixed rotations; no architecture or predictor changes",
+  "success": {
+    "path_contract_float64": "finite and max absolute t1 matrix error <=1e-10; orthogonality/determinant max error <=1e-10",
+    "path_contract_float32": "finite and max absolute t1 matrix error <=3e-5; orthogonality/determinant max error <=3e-5",
+    "time_JVP": "t0.4 identity/regular/near-pi fixed logs; finite and max difference from R(t)*skew(omega) <=1e-10 for float64, <=3e-5 for float32",
+    "source_preservation": "retain all fixed Haar samples including near-pi; report every mismatch, no clipping/resampling",
+    "reading_gate": "Separate paper training/inference schedule and IGSO3 source from project matched-source candidate; syntactic target dependence alone is not a proof of changed law for Haar noise"
+  },
+  "stop": "One bounded audit; preserve author numerical failures and do not patch author source. Do not build SO3 neural model from failed transfer assumptions. At most two reasonable revisions per mechanism under existing longterm protocol.",
+  "boundary": "No global smooth log at the pi cut, endpoint differentiability, anatomical accuracy, calibration, speed or G0/G1/J deletion guarantee. SciPy endpoint preparation is detached/CPU and not suitable for an endpoint-gradient guidance path.",
+  "revision": 1,
+  "training": false,
+  "checkpoint_loading": false
+}

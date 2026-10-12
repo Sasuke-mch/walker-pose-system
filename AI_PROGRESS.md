@@ -4400,3 +4400,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 从已有论文分析、作者源码审查和当前模型中提取6篇优先阅读、6篇设计/判断补充及3篇鱼眼/多视图几何参考，补入现有 LITERATURE_ANALYSIS.md 开头，逐项标明方法价值、实际采用状态、实现/证据入口和阅读范围。另列 Fast and Faithful v1、StableHand、Flower 当前不直接移植的理由；核对到 Fast and Faithful 同一arXiv的v2已更名FIRM，仅更新版本标题，不声称已分析v2方法。同步既有VIBE逐帧beta勘误，避免概览继续把跨帧共享shape错误归给原方法。
 
 本次是文献整理，没有新实验、训练、权重加载或正式主线改动。文献链接、现有代码/证据路径、精选计数及文档diff检查通过；H8/next仍无训练效果。优先研究变量依赖或状态表示的简化，已借鉴的FM/共享shape/图与attention/guidance不作为创新证明。长期研究保持进行，数据门和原停止条件继续有效。
+
+## 2026-10-12 FrameFlow专用SO3路径审查：停止直接移植
+
+按cv-paper-reader读2310.05297方法/主要结果及官方legacy旋转、interpolant与配置。训练目标中心IGSO3、推理Haar及linear/exp日程不能混作同一源/路径；蛋白质全局中心化/IPA/自条件未引入。预注册后只AST执行11个原纯函数，35固定旋转及seed7的1024×52Haar源到I：float64端点4/35、359/53248超过容差，最大矩阵元素误差0.01977859；float32为2/35、283/53248，阈值不同。原冻端点时间JVP均通过，不能泛称导数失败。
+
+独立SciPy冻端点log+matrix_exp控制全量通过，没有拒绝/重抽；仅为CPU训练目标准备，非全局光滑log、精度或性能保证。v1/v2及全量NPZ保留，来源/函数范围/警告/初次lint修正见flow_next_frameflow_so3_sources_v1.json及MODEL_RESULTS第23节。Ruff/AST通过；按用户新增约束停止额外验收材料和检查扩展，只完成本阶段记录与提交。停止修补该作者分支；下一步预注册同条件单模型的角速度/群积分表示替换，保留观测/容量/预算及强回归，不同时改变信息或删去G0/G1/J。现有模型/正式主线未变，训练继续关闭，长期有效性未完成。

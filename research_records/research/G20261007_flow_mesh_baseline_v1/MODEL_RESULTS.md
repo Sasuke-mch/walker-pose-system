@@ -853,3 +853,26 @@ flow_next_quality_bridge_protocol_v1.json先登记精确标量检查。设真值
 第二项失败证据：当前log(Exp(w))在w0前向全0，但对w反向Jacobian九项为NaN，理论应为I。v1/v2用显式nonfinite_NaN保存全部九项，不将有限前向当可微认证。重要的正对照在v2执行前补充登记：固定端点log后，只对Exp(t*skew(omega))的时间求JVP，单位/普通旋转速度均有限，与R(t)*skew(omega)的最大误差0/5.5511e-17。这正是冻源/目标训练路径所需的一种求导，不要求端点log梯度，因此NaN本身不证明RFM训练不可行；它限制的是对端点/当前旋转再求导的用途。
 
 v1/v2原结果与数值/非有限证据保留，Ruff/AST、普通log/概率抽样/timeJVP断言通过。没有优化器、模型推理、人体资产解码、随机模型效果或速度重测。当前决策辅助函数继续保留其近π回退，未把它硬改成全局可微log。停止“只替换6D路径、无改动复用现有局部helper即可获得RFM”的捷径；RFM候选保留，下一阶段审查专用SO3实现对π分支与源测度的处理，尤其避免拒绝/重采样改变训练源；仍需独立数据门，未宣称模型创新或整体完成。
+
+## 23. 2026-10-12 FrameFlow专用SO3实现与匹配源路径门
+
+使用cv-paper-reader聚焦读取 [Fast protein backbone generation with SE(3) flow matching](https://ar5iv.labs.arxiv.org/html/2310.05297) 第2.1/2.2节式2–14、先验/预对齐、第3.1节Table1及第4节讨论；方法图只读图注，不称视觉核验。官方README要求用legacy分支对应该2023短论文；保留其so3_utils.py、interpolant.py、base.yaml和MIT许可，未下载蛋白质数据/权重。源码范围见flow_next_frameflow_so3_sources_v1.json，不把最新main的motif方法混作本轮复现。
+
+论文使用SO3×R3的加性metric和测地路径，以网络预测clean端点，再转换为切向速度。实际_corrupt_rotmats用R0=R1·E、E~IGSO3(1.5)训练，推理_uniform_so3改为Haar；训练linear、推理exp_rate10的指数日程也不同。非Haar目标中心源不等于独立Haar源，源/路径的这些变化不能直接获得匹配条件路径的保证。对Haar噪声乘目标旋转确实不改变其分布，故不能仅凭源码含R1就断言源分布改变。未运行作者IGSO3采样器、密度或训练。蛋白质零中心/全局旋转不变与项目相机锚定米制T不同，IPA、自条件和Kabsch未移植。
+
+先登记flow_next_frameflow_so3_protocol_v1.json，新增audit_frameflow_so3.py。仅AST执行11个完整原纯函数，无修改函数体/模块导入或神经网络。CPU/torch2.11+cu128，float64/32；5个轴×7个角含0/1e-8/0.4/π-0.02/π-0.005/π-0.0005/π，另固定seed7、1024×52独立归一化Gaussian4产生Haar源，目标I。所有53248对保留，没有拒绝、截断或重抽。协议阈值为float64 1e-10、float32 3e-5，包含端点元素误差、正交和行列式。
+
+|检查|float64|float32|
+|---|---:|---:|
+|作者35固定旋转端点超过合同数|4|2|
+|作者固定端点最大矩阵元素误差|0.00801235|0.00801244|
+|作者53248源/目标端点超过合同数|359|283|
+|作者Haar组最大矩阵元素误差|0.01977859|0.01977851|
+|独立控制Haar组最大矩阵元素误差|2.22e-15|3.83e-6|
+|独立控制固定/Haar端点及时间JVP合同|通过|通过|
+
+上述是无量纲矩阵数值误差与协议不符的旋转对数，不是人体错误率或真实精度；两dtype阈值不同，不能据计数声称float32更准确。原近π分支取(I+R)/2对角根与行符号，近π仍有近似误差；对[-1,2,-3]/sqrt14、π-0.005的合法旋转，所选全局符号使端点误差约0.008，强于单纯浮点容差问题。原函数t0返回I，冻端点t0.4的单位/普通/近π时间JVP均有限并符合各自闭式导数；不能把这个端点问题扩大成时间JVP失败。
+
+独立控制仅对固定端点用SciPy principal rotvec，R(t)=R0·matrix_exp(t·skew(omega))，omega冻结；其值检查不要求端点梯度。这里的pi分支仍非唯一，CPU准备不能冒充全局光滑/可微guidance算子，也未证明最快。v1/v2完整JSON与同名NPZ保留；仅本地保存约10MB数组，包含所有源、作者端点/log/误差/合同和对照log。初次Ruff的导入、typing和受控AST执行标记已修正并复跑v2，端点计数和最大误差与v1相同；Ruff/AST通过，5项作者docstring SyntaxWarning保留，未修作者源码。检查仅用于回答路径端点是否一致，未另建验收报告或执行全模型测试。
+
+决定：关闭原FrameFlow分支和源/日程tricks的直接移植，不继续修补作者分支；保留SO3角速度及群积分作独立表示因素。下一阶段可预注册同条件F0的SO3版本：相同StateEncoder/Transformer、R/T/beta联合状态、匹配Haar训练/推理源、相同预算及回归对照，先用固定端点控制检验目标/积分。不要同时改变观测信息、加入IPA/自条件或声称已删去G0/G1/J；其效能仍需当前缺失的数据与训练授权。当前JointFlow、正式主线和训练关闭不变。

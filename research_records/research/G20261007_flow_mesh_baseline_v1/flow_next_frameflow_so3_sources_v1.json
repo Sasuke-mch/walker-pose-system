@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-12",
+  "paper": {
+    "title": "Fast protein backbone generation with SE(3) flow matching",
+    "url": "https://ar5iv.labs.arxiv.org/html/2310.05297",
+    "read": "Section2.1 equations2-12; Section2.2 equations13-14 and prior/pre-alignment paragraphs; Section3.1 Table1 and evaluation definitions; Section4 discussion",
+    "scope": "Focused method/experiment reading; figure1 caption only, no figure visual audit, complete benchmark reproduction or human-accuracy claim"
+  },
+  "official_repository": "https://github.com/microsoft/protein-frame-flow",
+  "branch_selection": "README points to legacy for the 2023 workshop paper; current main describes additional motif-scaffolding work",
+  "local_source_directory": "sources/frameflow_legacy_20261012",
+  "source_files": [
+    {"url": "https://raw.githubusercontent.com/microsoft/protein-frame-flow/legacy/data/so3_utils.py", "local": "so3_utils.py", "bytes": 53843, "read": "rotation log/exp and geodesic helpers; exact executed ranges recorded in audit_v2"},
+    {"url": "https://raw.githubusercontent.com/microsoft/protein-frame-flow/legacy/data/interpolant.py", "local": "interpolant.py", "bytes": 8019, "read": "_uniform_so3, _corrupt_rotmats, rot_sample_kappa, _rots_euler_step and initial source in sample"},
+    {"url": "https://raw.githubusercontent.com/microsoft/protein-frame-flow/legacy/configs/base.yaml", "local": "base.yaml", "bytes": 2377, "read": "min_t, linear/exp schedules, exp_rate and sampling/training defaults"},
+    {"url": "https://raw.githubusercontent.com/microsoft/protein-frame-flow/legacy/README.md", "local": "README.txt", "bytes": 5297, "read": "method/version and official dependency/resource scope"},
+    {"url": "https://raw.githubusercontent.com/microsoft/protein-frame-flow/legacy/LICENSE", "local": "LICENSE", "bytes": 1140, "read": "MIT copyright/license preserved locally"}
+  ],
+  "execution": "Only eleven complete original pure FunctionDef AST nodes, unchanged bodies; not full author package/network, IGSO3 sampler, training or model weights",
+  "mechanism": {
+    "rotations": "R(t)=R0 Exp(t Log(R0^T R1)); translations linear; canonical SO3 metric trace/2",
+    "predictor": "Clean endpoint prediction converted to a tangent vector with log/(1-t); not the project's direct ambient6D velocity head",
+    "training_source": "Official _corrupt_rotmats uses R0=R1*E with E sampled from IGSO3 sigma1.5; non-Haar finite-scale noise is centered relative to the label",
+    "sampling_source": "Rotation.random yields uniformSO3; no equivalent target-centered noise in inference",
+    "schedules": "Linear rotation training, exponential inference at exp_rate10; paper also clips endpoint loss scaling near t1",
+    "source_caveat": "Right multiplying Haar noise by a target would preserve its distribution; target dependence must be assessed at the law level. The reviewed alternative is IGSO3, not Haar.",
+    "pi_branch": "Within approximately0.01rad of pi, sqrt diagonal of(I+R)/2 with row-derived signs approximates axis; this loses directed sign on some near-pi inputs. Exactpi logarithm remains nonunique."
+  },
+  "project_transfer": {
+    "retain": "SO3 tangent angular velocities and group integration as one representation factor, with independently sampled matched Haar source and explicit R/T/beta metric",
+    "stop": "Unchanged author near-pi branch and unqualified copying of source/schedule changes; no author code patching",
+    "do_not_copy": "Protein zero-CoM/global invariance, Kabsch pre-alignment, IPA/self-conditioning stack; current output retains camera-anchored metric translation",
+    "control": "Detached SciPy principal endpoint log plus torch.matrix_exp passes declared endpoint/time-JVP checks without rejecting sampled rotations; CPU target preparation only, no differentiable endpoint guidance or general smooth-log guarantee",
+    "G0_G1": "This geometry result does not establish necessity/removal ofG0/G1/J. No independent observation information is introduced."
+  },
+  "outputs": ["flow_next_frameflow_so3_audit_v1.json", "flow_next_frameflow_so3_audit_v2.json"],
+  "reproduction_limit": "Official branch can change; retained local file paths and byte counts specify the inspected snapshot, no whole-package reproduction claim",
+  "not_executed": ["IGSO3 sampler/density tests", "protein model/weights", "human SO3 learned flow", "training", "heldout accuracy/calibration", "runtime comparison"]
+}

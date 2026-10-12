@@ -40,10 +40,10 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Inspect dedicatedSO3 geodesic implementations for pi-branch and source-measure handling without biased rejection/resampling; separate endpoint gradients from timeJVP. Retain existing local decision fallback. Any manifold representation replacement is a new controlled factor, not evidence G0/G1/J can be removed; training/data gates unchanged.",
+  "next_stage": "Preregister a single conditional F0 SO3 angular-velocity/group-integration representation factor with the existing StateEncoder/Transformer, jointR/T/beta, independent matched Haar training/inference source, explicit metric and same-information regression/budget control. Use detached fixed-endpoint path preparation as bounded control, not endpoint-gradient guidance. Do not simultaneously change conditioning, add IPA/self-conditioning or claim G0/G1/J removal; training/data gates unchanged.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 RFM primary/official source review and currentSO3 log transfer audit; finite-margin batch rejection quantified, endpointNaNs retained, frozen-endpoint timeJVP positive control passed",
+  "last_completed_stage": "2026-10-12 FrameFlow primary/legacy source audit: original nearpi branch fails endpoint contract; timeJVP passes. All53248 Haar sources retained; independent detached endpoint control passes. Direct branch/source/schedule transplantation stopped, no neural model changes.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {
