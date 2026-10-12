@@ -53,6 +53,12 @@ def main():
                                ("j", body["predicted_coco"], (n, 17, 3)),
                                ("t", body["raw_triangulated_points"] / 1000, (n, 17, 3))):
         checks[key + "_fresh_transform_exact"] = equal(decode(key, shape), xf(array).astype(np.float32))
+    if protocol.get("display_smoothing"):
+        checks["explicit_smoothing_with_original_toggle"] = 'id="smoothModel"' in page
+        checks["original_mesh_fresh_transform_exact"] = equal(
+            decode("raw_v", (n, 6890, 3)), xf(body["raw_vertices"]).astype(np.float32))
+        checks["original_coco_fresh_transform_exact"] = equal(
+            decode("raw_j", (n, 17, 3)), xf(body["raw_predicted_coco"]).astype(np.float32))
     checks["strict_mask_exact"] = equal(np.array(data["acc"]).reshape(n, 17), scene["accepted"])
     checks["ankle_trail_strict_xyz_exact"] = equal(decode("a", (n, 2, 3)),
         xf(scene["raw_triangulated_points_mm"] / 1000)[:, [15, 16]].astype(np.float32))

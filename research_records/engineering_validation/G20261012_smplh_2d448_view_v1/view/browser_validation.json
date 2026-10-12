@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "page": "view/body_browser.html",
+  "standalone": "view/body.html",
+  "browser": "Codex in-app browser",
+  "observed_frames": [
+    0,
+    220,
+    447
+  ],
+  "controls": {
+    "frame_slider": true,
+    "smooth_unchecked_then_checked": true,
+    "play_pause": true,
+    "changed_view_angle_visible": true
+  },
+  "render": "real translucent surface, solid walker, black raw observation skeleton, dark XY ground/light surrounding background, cameras/trails and Stage visible",
+  "console_errors": [],
+  "screenshot": "view/preview.jpg",
+  "raw_screenshot": "view/preview_raw.jpg",
+  "limitations": "right-pan and scroll zoom not separately exercised in browser; static installation/reference/contact proxies unchanged",
+  "failures_preserved": [
+    "preparation UTF-8 omission and missing selection in export.log",
+    "closed NPZ accessed after viewer creation in export_v2.log",
+    "recovery initially attempted existing geometry audit and was rejected in export_recovery.log",
+    "initial browser opened before page creation:404",
+    "standalone100MB embedded data exceeded app transport; separate compressed browser variant uses exact same payload",
+    "Playwright check reported failure; fresh AX showed checkbox checked, subsequently verified UI/play-pause state"
+  ],
+  "recovery": "same strict JSON and exact scene command verified; finished current scene reused within this run, no second scene replay"
+}

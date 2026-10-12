@@ -4233,3 +4233,16 @@ flow_next_documentation_checks_v1.json记录实际源码/结果来源及检查�
 pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅修订一次VPoser0.02→0.01；二维weight0.002/scale25px、beta0.001、root0.01、MANO0.1和PCA0.001。完整560步同预算未微调对照与微调结果都保存。统一全像素mean/P95：原reference25=52.4002/111.1750px，未微调二维=53.0955/115.1185px，微调=46.3366/109.1012px；15/34槽变差，特别左视图右肘30.37→57.33px、双视图髋增大。不得称所有关节或真实三维精度提升，不自动主线晋升。详细每槽/形状/运动/梯度在evaluation.json。
 
 54测试+2 subtests、compileall通过；3历史兼容warning；新文件Ruff通过，选定规则与HEAD逐诊断对照22→16，无新增。初次lint环境/范围失败保留validation.json。大结果NPZ及日志仅本地，不提交权重/大产物。既有92条用户改动原样保留，仅提交本轮代码、已有文档追加和小型JSON记录，不push。
+
+
+### 2026-10-12 完整448帧二维拟合与明确授权的小幅SMPL-H平滑显示
+
+按用户要求使用原input_448pairs的0..447全部448帧，保留原采集自己的标定、PMPose及WiLoR来源；运行上一轮微调后的二维观测目标：body3D=0、2D=0.002/25px、VPoser0.01、beta0.001、root0.01、MANO0.1、PCA0.001，预算A30/B30/C300/D100/D100/D3zero。完整原始拟合research_records/engineering_validation/G20261012_smplh_2d448_view_v1/fit/result.npz不改写，未重跑二维检测或改变正式360主线。
+
+用户明确授权“少量平滑”，因此单独生成smoothed/result.npz：在原相机坐标对身体局部旋转及root使用SO3切空间邻帧各0.1，单次修正≤2°；transl同权重，修正≤3mm；仅连续有支持三帧，端点不变，beta/原生手姿不变。重新SMPL-H解码网格/内部关节/手点并regress COCO17，不直接平均网格。原VPoser latent保存raw_vposer_latent，不能宣称平滑后的body_pose仍由原latent解码。原网格/模型COCO亦保留，用页面开关对照。观测、strict mask/失败、Stage、地面、相机、助步器均不平滑、不插值。
+
+本次重新strict三角化/Stage及baseline动态地面，严格点5286；Stage1=214、Stage2=115、transition=114、warming_up=5。22项source/transform核对通过，包含原始和平滑表面的同帧变换。全支持像素left7543/right7607，原始mean/P95=52.4487/124.2100px，平滑后=52.4694/124.0480px；回归网格与保存COCO最大误差1.0901e-7m。原始/平滑仅工程拟合与显示，不是真实3D或接触证据。
+
+页面view/body.html为完整离线页面（约100MB）；App内使用view/body_browser.html+body_data.json.gz，压缩数据逐字解压与原JSON一致，避免App DOM传输体积限制。浏览器实际显示真实6890顶点/13776面、黑色原始COCO骨架、深XY地面/浅背景、实体助步器、双相机、Stage与拒绝原因；0/220/447可访问，平滑开关可切换；截图preview.jpg和preview_raw.jpg、browser_validation.json保存。右键平移/滚轮未另行实测，不冒充全部交互测试。
+
+失败证据保留：中文JSON省略UTF-8导致准备失败；导出对关闭NPZ取R/t失败，已改为关闭前复制；恢复首轮被既有audit拒绝，修订为核对同一strict/scene/audit命令后续接当前已完成场景，仅重建页面，未再次运行地面；初始404和App大页面transport限制，以及checkbox工具报错后AX实际确认，均记录。16项相关测试/3个历史兼容warning、新增helper/runner Ruff及编译通过；正式源/场景不混入旧动态结果。旧92条用户改动保留，小型代码/记录本地提交，NPZ/HTML/GZ/图片仅本地，不push。

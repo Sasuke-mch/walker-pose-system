@@ -233,3 +233,6 @@ Three.js `OrbitControls` 必须支持：
 
 
 2026-10-05旧采集当前逻辑复现页：`research_records/engineering_validation/G20261005_old_capture_reference25_v1/view/body.html`。完整448帧（不是441）；身体重新reference25无腕冷启动，strict/Stage/地面本轮重算；19项来源核对与浏览器记录在同目录。旧采集使用自身标定与静态地面参考，360帧选定主线不变。
+
+
+2026-10-12 明确授权的448帧平滑对照页：research_records/engineering_validation/G20261012_smplh_2d448_view_v1/view/body.html（离线完整页）及body_browser.html（与同目录body_data.json.gz配套）。本次用户明确要求SMPL-H少量平滑，作为本次显示例外：参数邻帧各0.1、旋转修正最多2°、平移最多3mm，重新解码真实模型表面与COCO regressor点；原始版本开关保留。原始观测/Stage/地面/相机/助步器不平滑，其他任务仍默认不使用显示平滑。真实面、同源448帧、当前strict/Stage及动态地面、拒绝理由和黑色骨架规则不变。原VPoser latent不作为平滑姿态参数标签；几何诊断栏针对平滑模型，关闭开关只切换模型显示。文件级22项与浏览器截图核验在同目录，不作为精度或物理接触认证。

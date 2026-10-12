@@ -853,3 +853,10 @@ Stage2使用历史相机系脚点中位数再做0.45平移更新，会引入因�
 工程细节：关闭3D项返回独立零标量，不做NaN×0；支持掩码在范数前索引；无支持槽在投影前使用数值占位camera point而原数据/掩码仍保留，避免Z=0的未使用投影污染梯度；光轴r=0在sqrt前clamp以获得有限导数，保留原投影值；有支持点在相机后方直接失败，不静默删掉；无支持帧/无初始化basis/非有限梯度继续停止。legacy默认模式不切换掩码与Huber，鱼眼光轴修复仅改变奇点导数。54项相关测试、2 subtests及compileall通过（3个历史兼容warning）；新增文件Ruff通过，修改文件对照HEAD检查已有22项→16项风格诊断，无新增。首轮CUDA环境未安装ruff、以及把E501/88字符误套旧源码的检查失败均记录，不冒充全仓库lint通过。
 
 复现微调版本：.venv-cuda/Scripts/python.exe realtime_app/tools/run_smplh_reprojection_experiment.py --output <新且不存在的目录> --vposer-weight .01。默认从冻结fit_args读取其余资源与30/30/300/100/100预算，seed0，不覆盖已有输出。当前微调结果tuned_full/result.npz、未经微调对照control_full/result.npz及pilot/result.npz均只保存本地大型产物，不纳入Git。最终参数见各目录resolved_options.json，图形可视化未在本轮执行。
+
+
+### 448帧复现与显式平滑显示（2026-10-12）
+
+用户指定完整448帧，沿用第26节二维权重重新冷拟合，原始结果G20261012_smplh_2d448_view_v1/fit/result.npz。run_smplh_reprojection_experiment.py新增--source-args读取该448采集自己的原fit_args，默认360入口不变。少量平滑仅派生显示：SO3邻帧切空间各0.1、修正≤2°；平移≤3mm，端点/缺口不变，全片beta与手部局部旋转不变。SMPL-H重新解码并重新回归COCO，保存原始网格/关节点对照；平滑body_pose不附带错误的原VPoser latent标签。全部448原帧保留。
+
+同源原图重新strict/Stage/地面，并将原始或平滑SMPL-H使用同一当前地面变换导出；原始观测/助步器/相机没有平滑。交互页有“少量参数平滑”开关，几何诊断栏以平滑版本计算。原/平滑二维mean52.4487/52.4694px、P95 124.2100/124.0480px，详细条件与失败见该目录protocol、fit_and_smoothing_validation与view/source_validation、browser_validation。离线完整HTML约100MB；App浏览器用相同数据的压缩外置版本，不更换数据或渲染结构。该版本不替换正式主线，不把显示流畅性称真实精度。

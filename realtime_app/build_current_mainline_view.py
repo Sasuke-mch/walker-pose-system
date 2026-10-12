@@ -39,13 +39,18 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--selection", type=Path,
                         help="explicit capture selection using the current reference25/baseline logic")
+    parser.add_argument("--resume-current-export", action="store_true",
+                        help="resume a failed export with its exact same completed current scene")
     cli = parser.parse_args()
     out = cli.output.resolve()
-    if out.exists():
+    if out.exists() and not cli.resume_current_export:
         raise FileExistsError(out)
     cfg = read(ROOT / "realtime_app/configs/current_mainline.json")
     sel = read(cli.selection) if cli.selection else cfg["mainline_selection"]
     body = sel["body"]
+    smoothing = body.get("display_smoothing", False)
+    if smoothing and not cli.selection:
+        raise ValueError("display smoothing requires an explicit isolated selection")
     options = fit_arguments(ROOT / body["reproduction_arguments"])
     if (sel["detector"] != "pmpose" or options.body_weighting != "reference"
             or [options.body_reference_reprojection_px, options.body_reference_ray_gap_mm,
@@ -55,7 +60,14 @@ def main():
     frames = read(ROOT / sel.get("frames_metadata", str(Path(sel["dataset"]) / "frames.json")))
     if len(frames) != sel["frames"]:
         raise ValueError("frame metadata count differs from selection")
-    out.mkdir(parents=True)
+    if cli.resume_current_export:
+        previous = read(out / "protocol.json")
+        if (not (out / "FAILURE.json").exists() or previous["selected_body"] != body
+                or previous["detector_inputs"] != sel["detector_inputs"]
+                or not (out / "scene/scene_transforms.npz").exists()):
+            raise ValueError("resume requires same failed export and completed current scene")
+    else:
+        out.mkdir(parents=True)
     write(out / "protocol.json", {
         "selected_body": body, "frames": sel["frames"], "frame_ids": sel["frame_ids"],
         "source_pair_ids": [int(row["pair_id"]) for row in frames], "scene_profile": "mainline -> baseline",
@@ -65,7 +77,7 @@ def main():
         "success": "Complete real mesh, original/rejected observations, same-frame transforms, solid walker and cameras; file and browser verification",
         "stop": "Missing assets or source/frame/geometry mismatch: preserve failure and stop; no relaxed gates or substituted frames",
         "old_dynamic_inputs_consumed": False, "body_refitted": False,
-        "display_smoothing": False, "interpolation": False,
+        "display_smoothing": smoothing, "interpolation": False,
         "limits": "Engineering display; static installation is an assumption, no independent contact or 3D truth"})
     try:
         observed = observation_snapshot(options)
@@ -92,8 +104,12 @@ def main():
                                "pair_outcome": "matched" if people else "association_failed",
                                "persons_3d": [p.to_dict() for p in people]})
         strict_path = out / "first_instance_strict.jsonl"
-        strict_path.write_text("".join(json.dumps(row, allow_nan=False) + "\n"
-                                       for row in strict), encoding="utf-8")
+        strict_text = "".join(json.dumps(row, allow_nan=False) + "\n" for row in strict)
+        if cli.resume_current_export:
+            if strict_path.read_text(encoding="utf-8") != strict_text:
+                raise ValueError("current strict observations changed during export recovery")
+        else:
+            strict_path.write_text(strict_text, encoding="utf-8")
         command = read(ROOT / sel["scene_reproduction_command"])
         command[0] = sys.executable
         for flag, value in (("--output", str(out / "scene")),
@@ -101,7 +117,11 @@ def main():
                             ("--calibration", str(calibration_path)),
                             ("--scene-profile", "mainline")):
             command[command.index(flag) + 1] = value
-        execute(out, "scene_replay", command)
+        if cli.resume_current_export:
+            if read(out / "scene_replay_command.json") != command:
+                raise ValueError("scene replay command changed during recovery")
+        else:
+            execute(out, "scene_replay", command)
         with np.load(ROOT / body["result"], allow_pickle=False) as archive:
             z = {k: archive[k] for k in archive.files}
         for k, reference in (("pair_id", observed["pair_id"]),
@@ -111,9 +131,17 @@ def main():
             np.testing.assert_array_equal(z[k], reference)
         if z["vertices"].shape != (len(frames), 6890, 3):
             raise ValueError("selected result is not a full same-frame mesh")
+        if cli.resume_current_export:
+            with np.load(out / "result.npz", allow_pickle=False) as existing:
+                for key, value in z.items():
+                    if (key not in existing or not np.array_equal(
+                            value, existing[key], equal_nan=value.dtype.kind in "biufc")):
+                        raise ValueError(f"fitted body changed during export recovery: {key}")
         with np.load(out / "scene/scene_transforms.npz", allow_pickle=True) as scene:
-            z["vertices_ground_m"] = np.einsum("nij,nvj->nvi", scene["rotation_ground_from_left"],
-                                                z["vertices"]) + scene["translation_ground_from_left_mm"][:, None] / 1000
+            scene_rotation = scene["rotation_ground_from_left"].copy()
+            scene_translation = scene["translation_ground_from_left_mm"].copy()
+            z["vertices_ground_m"] = np.einsum("nij,nvj->nvi", scene_rotation,
+                                                z["vertices"]) + scene_translation[:, None] / 1000
         np.savez_compressed(out / "result.npz", **z)
         write(out / "run_metadata.json", {
             "cold_start": True, "detector": "pmpose", "viewer_bundle_only": True,
@@ -127,10 +155,23 @@ def main():
         static_walker = scene_sources["static_walker_model"]
         if read(static_walker) != read(out / "scene/static_walker_model.json"):
             raise ValueError("scene static walker copy differs from declared source")
-        execute(out, "geometry_audit", [sys.executable, "-B", "realtime_app/run_tool.py",
+        audit_command = [sys.executable, "-B", "realtime_app/run_tool.py",
                 "body.audit_constructed_grasp_body", "--result", str(out / "result.npz"),
                 "--walker-model", static_walker,
-                "--output", str(out / "grasp_geometry_audit.json")])
+                "--output", str(out / "grasp_geometry_audit.json")]
+        if cli.resume_current_export:
+            if read(out / "geometry_audit_command.json") != audit_command:
+                raise ValueError("geometry audit command changed during recovery")
+            read(out / "grasp_geometry_audit.json")
+            if (out / "body.html").exists():
+                failed_path = out / "body_failed_initial.html"
+                suffix = 1
+                while failed_path.exists():
+                    failed_path = out / f"body_failed_{suffix}.html"
+                    suffix += 1
+                (out / "body.html").rename(failed_path)
+        else:
+            execute(out, "geometry_audit", audit_command)
         execute(out, "viewer", [sys.executable, "-B", "realtime_app/run_tool.py",
                 "visualization.build_grasp_body_canvas_viewer", "--result", str(out / "result.npz"),
                 "--scene", str(out / "scene"), "--surface-sets",
@@ -148,6 +189,13 @@ def main():
         payload["quality"] = z["body_quality"].tolist()
         payload["fit_weights"] = z["body_fit_weights"].tolist()
         payload["source_pair_ids"] = [int(row["pair_id"]) for row in frames]
+        if smoothing:
+            import base64
+            for key, source_key in (("raw_v", "raw_vertices"), ("raw_j", "raw_predicted_coco")):
+                ground = (np.einsum("nij,nvj->nvi", scene_rotation, z[source_key])
+                          + scene_translation[:, None] / 1000)
+                payload[key] = base64.b64encode(ground.astype("<f4").tobytes()).decode("ascii")
+            payload["display_smoothing"] = smoothing
         # Keep original quality separate from the selected effective fit weights.
         page = page[:match.start(2)] + json.dumps(payload, ensure_ascii=False, allow_nan=False,
                                                 separators=(",", ":")) + page[match.end(2):]
@@ -158,7 +206,47 @@ def main():
                 '<section><h2>reference25 权重</h2><pre id="weights" style="font-size:12px"></pre>'
                 '<p>黑线连接身体原始DLT观测；橙叉为严格场景拒绝。拟合候选门与严格场景门分别记录。'
                 '足底红点为低于参考地面；静态扶手检查仅为几何代理。</p></section><section><h2>操作</h2>')
+        if getattr(options, "body_observation_mode", "legacy") == "reprojection_only":
+            page = page.replace("reference25 权重", "三维诊断权重（不用于二维拟合）")
+            page = page.replace("原质量 → 实际拟合权重", "原质量 → 三维诊断权重")
+        if smoothing:
+            hook = "]).then(([v,w,t,he,c,ankle,model])=>{"
+            if hook not in page:
+                raise ValueError("viewer smoothing toggle hook missing")
+            page = page.replace(hook, hook + "const smoothedV=v,smoothedModel=model,rawV=unpack(d.raw_v),rawModel=unpack(d.raw_j);"
+                                "document.getElementById('smoothModel').onchange=()=>{const enabled=document.getElementById('smoothModel').checked;"
+                                "v=enabled?smoothedV:rawV;model=enabled?smoothedModel:rawModel;draw();window.viewerAudit.smoothing=enabled;};")
+            page = page.replace("<section><h2>操作</h2>",
+                                '<section><h2>SMPL-H 显示</h2><label><input id="smoothModel" type="checkbox" checked>少量参数平滑</label>'
+                                '<p>邻帧权重各0.1；每关节旋转修正最多2°，平移最多3mm。取消可看原始拟合。'
+                                '观测、Stage、地面、相机、助步器不平滑；几何诊断栏针对平滑版本。</p></section><section><h2>操作</h2>')
         page_path.write_text(page, encoding="utf-8")
+        if smoothing:
+            # Keep the standalone page, but avoid embedding ~100MB of JSON
+            # in the app browser's DOM/inspection transport.
+            import gzip
+            packed = re.search(r'<script id="data" type="application/json">(.*?)</script>', page, re.DOTALL)
+            (out / "body_data.json.gz").write_bytes(gzip.compress(packed[1].encode("utf-8"), compresslevel=1))
+            browser_page = page[:packed.start()] + page[packed.end():]
+            browser_page = browser_page.replace(
+                "const d=JSON.parse(document.getElementById('data').textContent),canvas=",
+                "function startViewer(d){const canvas=", 1)
+            browser_page = browser_page.replace("</script></html>",
+                "}fetch('body_data.json.gz').then(async response=>{if(!response.ok)throw Error('viewer data '+response.status);"
+                "return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();})"
+                ".then(startViewer).catch(error=>{document.getElementById('qa').textContent='加载失败：'+error;});</script></html>")
+            (out / "body_browser.html").write_text(browser_page, encoding="utf-8")
+        if smoothing:
+            validation_path = out / "viewer_validation.json"
+            validation = read(validation_path)
+            validation.update(no_display_smoothing=False, explicit_user_requested_smoothing=smoothing,
+                              original_fit_toggle_available=True)
+            write(validation_path, validation)
+        if cli.resume_current_export:
+            write(out / "RECOVERY.json", {"status": "export_recovered", "failure_preserved": "FAILURE.json",
+                  "same_strict_input_and_scene_command_verified": True,
+                  "completed_current_scene_replayed_again": False,
+                  "fix": "copy scene R/t before closing NPZ; render the explicit smoothing toggle"})
         print(page_path, flush=True)
     except Exception as error:
         write(out / "FAILURE.json", {"error": repr(error), "outputs_preserved": True})

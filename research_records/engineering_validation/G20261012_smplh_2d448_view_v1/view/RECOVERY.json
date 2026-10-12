@@ -1,0 +1,7 @@
+{
+  "status": "export_recovered",
+  "failure_preserved": "FAILURE.json",
+  "same_strict_input_and_scene_command_verified": true,
+  "completed_current_scene_replayed_again": false,
+  "fix": "copy scene R/t before closing NPZ; render the explicit smoothing toggle"
+}

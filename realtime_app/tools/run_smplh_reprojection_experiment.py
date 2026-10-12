@@ -21,8 +21,10 @@ def main():
     cli.add_argument("--root-weight", type=float, default=.01)
     cli.add_argument("--joint-steps", type=int, default=300)
     cli.add_argument("--hand-steps", type=int, default=100)
+    cli.add_argument("--source-args", type=Path,
+                     default=Path("research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json"))
     opts = cli.parse_args()
-    source = Path("research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json")
+    source = opts.source_args
     argv = json.loads(source.read_text(encoding="utf-8"))
     argv[argv.index("--output-dir") + 1] = str(opts.output)
     argv[argv.index("--joint-steps") + 1] = str(opts.joint_steps)

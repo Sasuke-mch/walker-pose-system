@@ -1,0 +1,27 @@
+{
+  "scope": "full448 2D-only observation fit with original image pairs and fresh strict/Stage/ground replay",
+  "fit": "fit/result.npz",
+  "display_variant": "smoothed/result.npz",
+  "weights": "same tuned360 setting, no new weight search",
+  "smoothing": {
+    "source": "research_records\\engineering_validation\\G20261012_smplh_2d448_view_v1\\fit",
+    "output": "research_records\\engineering_validation\\G20261012_smplh_2d448_view_v1\\smoothed",
+    "frames": 448,
+    "mode": "explicit_user_requested_display_variant_not_refit",
+    "strength_each_neighbor": 0.1,
+    "rotation_limit_degrees_per_joint": 2.0,
+    "translation_limit_m": 0.003,
+    "eligible_triplets": 446,
+    "endpoints_and_gaps_unchanged": true,
+    "beta_and_hands_unchanged": true,
+    "vertices_redecoded_from_parameters": true,
+    "raw_observations_ground_stage_walker_camera_smoothed": false,
+    "maximum_translation_correction_m": 0.0030000116676092148,
+    "maximum_vertex_correction_m": 0.02239973098039627
+  },
+  "visualization_policy": "root VISUALIZATION_PIPELINE.md; explicit user smoothing exception; obsolete skill right-knee exclusion not applied",
+  "success": "448 original IDs;6890vertices/13776faces; same-run stages/ground/walker; browser image and original/smoothed toggle; raw observation masks/reasons retained",
+  "stop": "source/transform/finite/depth failure retains evidence, no old dynamics",
+  "initial_preparation_failure": "omitted UTF-8 on Chinese selection JSON caused gbk decode failure before selection creation; export.log retains subsequent missing-selection failure, retry export_v2.log",
+  "limits": "engineering display, not true3D/contact accuracy"
+}
