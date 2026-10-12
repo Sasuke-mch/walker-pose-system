@@ -248,7 +248,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 |D07/P2|A4 medoid表达候选群体代表性，不保证最接近真值；算法语义确认，真实误选率未知。|同缓存对比最强可部署决策、保留全槽位与风险覆盖；检查多模态及候选偏置，禁止oracle根位置/逐关节拼接。|原选择误差至少5%配对改善及保留率门；无独立真值不选赢家，不新加learned ranker。|待独立效能。|
 |D08/P1|原local特征在准入age清零/seen置True后构造，实际池化槽的这两维恒定；6组context精确碰撞及真实时间顺序检查确认。更广的连续时间/运动建模仍未证。|local MLP改用incoming_age/prior_seen；输出状态与global time沿原重置规则。无新参数，不添加hidden衰减或人体结果反馈。|重现间隔/首次见到差异，并保留缺失/未来/分块合同；context响应不等于真实姿态收益。|本地特征缺陷已修复，MODEL_RESULTS第31节；实际缺失/采样节奏效能仍待独立验证。|
 |D09/P0|SO3生成仍慢于ambient；全K32 VJP比1.7822超过1.25；第26/29节实测。|保留SO3表示候选，停止现全K32反馈晋升；若有全新有据替代问题先预注册。原核两轮额度不重置。|必须在原K/NFE和全成本口径内达门；不能减K/步数或反复测时制造通过。方向通过不算精度或速度收益。|原路径停止，独立VJP保留。|
-|D10/P1|原train.py只prepare/objective，无因果标签帧连接、真实loader/optimizer/checkpoint；原统计grad与回读来源/dtype缺陷确认。|D10.1固定统计；D10.2连接标签帧绑定→因果目标/TBPTT；D10.3注册train文件读取；D10.4 observation-only冻结G0/J获取与原行G1目标连接，保留信息失败/成本。optimizer/checkpoint与真实资源仍缺，训练禁止。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；声明不认证真实性，缺资源不伪造已训练成果。|D10.1–4准备接口完成，第38节记录G1新26项/原F0相关11项通过与边界。真实records0，来源/历史/资产声明不认证真实性；完整runner及效能未完成。|
+|D10/P1|原train.py只prepare/objective，无因果标签帧连接、真实loader/optimizer/checkpoint；原统计grad与回读来源/dtype缺陷确认。|D10.1固定统计；D10.2连接标签帧绑定→因果目标/TBPTT；D10.3注册train文件读取；D10.4 observation-only冻结G0/J获取与原行G1目标连接，保留信息失败/成本。D10.5已接多stream独立carry及监督帧加权批目标；optimizer/checkpoint与真实资源仍缺，训练禁止。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；声明不认证真实性，缺资源不伪造已训练成果。|D10.1–5准备接口完成，第39节记录批目标/状态/加权和真实文件连接，21新检查分次覆盖。真实records0，来源/历史/资产不认证真实性；完整训练生命周期/runner及效能未完成。|
 |D11/P0|训练、独立noise/3D/shape记录为空，未证实生成/shape/选择/校准改善；manifest确认。|取得独立资源后按原energy score、选择误差、coverage-width、无效率和三seed参与者配对协议评价。现有拟合结果不自证准确。|继承原5%改善、CI/coverage/失败门；数据缺口不能靠工程测试补齐，长期目标保持未完成。|资源限制。|
 |D12/P2|当前无后验密度/可信likelihood/校准；全链采集+检测实时与跨rig外推也未认证；源码/既有成本范围确认。|校准/概率与部署分别在相应数据/硬件/完整输入边界评价；先明确采样分布、失败率和时间口径。|不把等权候选、B矩阵、合法旋转或纯网络耗时叫后验/30fps；无证据保留明确未认证状态，不叠加density/MH模块。|待独立概率/部署验证。|
 
@@ -313,3 +313,15 @@ NPZ格式`flow_next_sequence_v1`仅使用numeric arrays与JSON文本，allow_pic
 resources.information_acquisition汇总该块G0网络调用/候选状态求值、J解码batch/状态及可用/不可用信息原帧数，computed_in_this_objective=False说明这些工作已在获取入口发生，不能把缓存当部署零成本，也不能将同一缓存用于多次目标计算时误认每次重新获取。目标自身encoder/velocity计数仍独立。返回G0 state用于获取分块；G1 state独立用于目标分块，不能互换。快照与数值计数不认证实际G0训练来源、完整历史/真实资产/组划分或缓存真实性；无训练/权重生命周期/后验认证。
 
 26个新检查和11个原F0相关检查分次通过/Ruff通过：人工5帧、ambient22/52、CFM/回归逐行独立API一致，监督0/2/4、缺观测1、缺beta3保留；G0/J分块、future隔离、梯度屏障、全信息失败回退及前置拒绝见MODEL_RESULTS第38节。实际surface为T-only解析控制，不是SMPL-H精度/shape信息验证；未改模型容量/solver/噪声/选候选政策。真实records仍0，完整四法训练runner与独立效能继续未完成。
+
+## 22. 多序列批目标、独立carry与监督权重（2026-10-13，D10.5）
+
+`train.sequence_batch_objective(mode, model, chunks, normalization, states=None, generator=None, information=None)`连接最多16个原SequenceChunk，每chunk保留原1–32帧；16是当前配置的准备窗口上限，不代表已执行effective_batch优化器。按(identity, sequence, ordered PnP IDs)键分别维护TemporalState，允许Afirst/Bwhole/Alast交错。新stream从None开始、已有stream只继承自身state；incoming字典不改，返回脱图状态可继续下一个batch。epoch重置/重采样/stream退休等执行政策未自动定义，不能把不同stream的hidden混用或把批处理顺序当时间排序。
+
+所有原chunk/标签/统计、同stream跨chunk帧号与时钟、提供carry的类型/key/基本向量健康和可选SequenceInformation绑定在首次编码前检查。validation/test标签仍不能进入训练目标，已重放原帧、坏后行/错信息或超过16窗口明确拒绝。随后每窗口调用原sequence_objective，各窗口已有标签/Λ/梯度/缺失/非有限及TBPTT规则不改。默认F0和可选ambient G1共用调度；SO3F0仍拒绝信息条件。
+
+返回SequenceBatchObjective保存全部原chunk结果、各stream末state及汇总原帧/监督/跳过/编码/目标计数。总损失按监督原帧N_c加权：sum_c (N_c/N_total) L_c；先归一化权重避免有限均值先乘count造成float32溢出。全部无监督时None；任何已计算chunk目标非有限或批汇总非有限时整个batch lossNone，保留其余有限结果与原失败原因供检查，不将它们挑成可用批。此为训练帧权重，不是参与者等权held-out统计，更不平均或拼接人体候选。
+
+可选每窗口信息包仍在外部用冻结G0获取；批入口验证并汇总原G0/J计数，computed_in_this_objective=False，不重新获取，不把缓存计为部署免费。G0获取carry与这里的G1目标carry仍独立。模型容量/CFM/回归/solver/噪声来源均不改，generator按调用窗口顺序消费，改变顺序会改变CFM抽样；未新增shuffle/optimizer/checkpoint执行。
+
+21个新检查分次覆盖：8种ambient/SO3×22/52×CFM/回归对照，A/B独立重启/延续与原逐chunk调用一致、监督2/3/1正确加权；跨batch不修改incomingcarry、坏后窗口前置拒绝、全无监督及真实非有限velocity失败保留；float32 3e38均值控制发现并修复权重中间溢出。临时注册35+5文件22/52连接保留40行/36监督，G1批成本/错信息检查通过；详见MODEL_RESULTS第39节。真实注册records仍0，组/标签/资产真实性、训练授权、完整执行生命周期与四法独立效能继续未完成。

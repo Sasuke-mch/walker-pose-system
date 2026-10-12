@@ -40,7 +40,7 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "D10.5 same-group multi-sequence training preparation and execution-lifecycle remaining connections: inspect current code and add one necessary, bounded interface without running optimizer or neural checkpoints. Keep registered sources/test lock/whole candidates/fair four-method costs; actual data0, authorization and independent efficacy remain incomplete.",
+  "next_stage": "Review remaining full training/epoch-stream/checkpoint/selection and four-method paired-runner requirements against actual resources and training ban. Choose the next meaningful executable stage from current evidence; no optimizer/neuralcheckpoint runs, no framework additions solely to create progress. Real records0 and independent efficacy gates remain unmet; full objective unchanged.",
   "deficiency_improvement_20261012": {
     "status": "continuous_thread_goal_active_training_closed",
     "authorization": "Analyze existing model shortcomings, improve individually, and keep detailed long-term records; no scheduled automation",
@@ -272,6 +272,34 @@
       "capacity_changed": false, "optimizer_steps": 0, "training": false, "checkpoint_loaded": false,
       "remaining": "actual registeredtrain/noiserecords0;truthfuldata/asset/history/normalization sources;variable-noisecommonconditions;optimizer/checkpoint lifecycle and4methodtrainingrunner;independenteffectiveness"
     },
+    "D10_multi_stream_batch": {
+      "date": "2026-10-13", "status": "preregistered_before_batch_checks",
+      "problem": "Single SequenceChunk targets exist but caller must manually maintain causal carries across multiple original streams, weight chunk means and avoid cherry-picking failed chunks",
+      "scope": "Existing train.py sequence_batch_objective over1to16 original SequenceChunks; one batch may interleave stream windows, per(identity,sequence,PnP)carry isolated and detached; no optimizer/checkpoint or newdataset/runner framework",
+      "only_variable": "Connect existing single-chunk objectives into bounded multistream target aggregation and resource accounting; same encoder/core/normalization/CFM/rng/input policies",
+      "before_forward": "Validate all typedchunks/label bindings/normalization and within-stream crosschunk frame-clock monotonicity plus optional originalSequenceInformation binding before any batchencoder call; validation/test and replayed same-stream frames rejected",
+      "aggregation": "Aggregate each successful chunk by actual supervised_count; all unsupported givesNone, any computed nonfinite objective blocks whole batch; original rows/chunk values/reasons retained. This is frame-weighted training target, not equal-subject held-out evaluation",
+      "controls": "Existing synthetic5frame chunkA and changedidentity/sequence B interleaved Afirst3/Bwhole/Alast2 with2/3/1 supervision; ambient/SO3 x22/52 xCFM/regression against independent manual per-stream calls and weighted targets. Temp35+5 registered files test realreader connection, not actual data acquisition",
+      "information": "Optional tuple of precomputed per-chunk SequenceInformation uses sameG0/J input as original; no implicit recomputation or free-deployment-cost claim. DistinctG0/G1 carries remain caller-controlled",
+      "checks": ["Interleaved contexts/losses/state match independent original APIs;streamB start/reset and streamA resume;weighted mean differs from equal-chunk mean", "Bad lastchunk clock/order/split/row or information rejects before firstencoder; bounded16chunks and32frames unchanged", "All unsupported chunks and real injected nonfinite velocity retain original reasons and blockaggregate appropriately", "Temp registeredfiles preserve40rows/masks/reasons and readerprovenance in chunks;optionalG1 counts sum originals;gradient-free checks do not certify learning"],
+      "success": "Multistream batch target/carry/weighted mean and source/failure preservation connected to existing APIs; actual training/noise registries remain0 and optimizer/checkpoint lifecycle still incomplete",
+      "stop": "One bounded batch-preparation phase; no optimizer/checkpoint, permanent syntheticdata, capacity/probes, oldoutput smoothing or broadtests. Do not call this a trained4method runner or reinterpret sampleweighting as realaccuracy",
+      "training": false, "checkpoint_loaded": false
+    },
+    "D10_multi_stream_batch_result": {
+      "date": "2026-10-13", "status": "bounded_multistream_batch_targets_completed_not_training_lifecycle",
+      "initial_failure": "8controlsImportError missingsequence_batch_objective before newpath;then8passed1.86s. No data/model accuracy interpretation",
+      "interface": "train.SequenceBatchObjective/sequence_batch_objective;1to16originalchunks;per(identity,sequence,PnP) detachedcarries;interleaving andcrossbatchcarry;precheckwholebatch;nooptimizer/shuffle/checkpoint",
+      "controls": "CPUthreads1seed7CFMrng17;ambient/SO3x22/52xCFM/regression;syntheticAfirst3/Bwhole5/Alast2 with2/3/1supervision;Btargets+100 artificialweightstress;originalcontexts/losses/state match manual APIs",
+      "numeric_failure_and_fix": "Representable float32chunkmeans3e38 overflowed loss*support numerator, yieldingNone;independentmean control1failed1.55s. Normalize support before multiplying then sum, correctfinite3e38;retainfinalnonfiniteguard. Changedweighted values8combinations+1numericcheck9passed1.93s",
+      "failures": "7badlaterchunk/carry inputs fail beforeencoder;allunlabelled10rows retained/None;thirdvelocitycallinf blockswholebatch while retainingfiniteAchunks;no cherry picking",
+      "file_connection": "Temporarysynthetic35+5trainrecords separatedeclaredsubject/action/sequence;22/52oldreader feedsA32/B5/A3;40originalrows/36supervised30/3/3 andpaths/IDs/reasons retained. Authenticity remainsfalse, no permanentregistereddata",
+      "information_connection": "G1boundA/B information retains G0 20calls/40states,J8available/2unavailable/2712states;precomputednotrecomputed/free;badfinalinformationrejectsbeforeG1",
+      "checks": "21newunique checks covered across8initialgreen,10newguards,9weightedaffected/numericgreen,3file/info controls; finalfourfileRuffpassed after2importformat fixes;nofullsuite or cost rerun",
+      "record": "MODEL_RESULTS.mdsection39;MODEL_ARCHITECTURE.mdsection22/D10;AI_PROGRESS.md",
+      "capacity_changed": false, "optimizer_steps": 0, "training": false, "checkpoint_loaded": false,
+      "remaining": "actualtrain/noiserecords0;truthfulsource/asset/split/statistics;epoch/stream/optimizer/checkpoint lifecycle;trainingauthorization;fourmethodpairedrunner;independenteffectiveness"
+    },
     "next_after_D01": "Inspect state/conditioning limitations and identify one discriminating counterexample before any new architecture. Mean pooling, beta variation, no RGB and hand uncertainty are hypotheses/resource limits, not automatic module-addition instructions. Search mechanism overlap before committing to an architectural research direction.",
     "original_stop_rules": "Two justified revisions per mechanism; SO3 kernel allowance exhausted; fullK32 VJP promotion stopped at ratio1.7822233; frozen held-out and fair controls inherited",
     "training": false
@@ -391,7 +419,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-13 D10.4 causal frozen G0/J original-row information toG1 CFM/regression target preparation complete.26new+11existingF0checks across runs/Ruffpassed;original failures retained, unavailable reasons/costs/gradient barriers explicit. Real records0 and trained efficacy/runtime/authenticity remain incomplete;training/checkpoint closed.",
+  "last_completed_stage": "2026-10-13 D10.5 bounded multi-stream causal batch targets and original-source connections complete;21newchecks/Ruffacrossruns. Interleaved carries,frame weighting with finiteoverflow repair,originalfailures and G1 costs retained. Fulltraining lifecycle/pairedrunner/authenticresources/independentefficacy remainincomplete;training/checkpointclosed.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

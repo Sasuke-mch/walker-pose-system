@@ -313,6 +313,152 @@ def chunk_slice(chunk, start, end):
     return SequenceChunk(chunk.observations[start:end], reference, chunk.label_frames[start:end])
 
 
+def multi_stream_chunks(nodes=52):
+    original = sequence_fixture(nodes)
+    observations = tuple(replace(obs, identity="second_person", sequence="second_sequence") for obs in original.observations)
+    bindings = tuple(replace(frame, identity="second_person", sequence="second_sequence") for frame in original.label_frames)
+    second = replace(original, observations=observations, label_frames=bindings,
+                     labels=replace(original.labels, translation=original.labels.translation+100))
+    return chunk_slice(original, 0, 3), second, chunk_slice(original, 3, 5)
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+@pytest.mark.parametrize("geometry", ["ambient", "SO3"])
+@pytest.mark.parametrize("mode", ["CFM", "regression"])
+def test_multi_stream_batch_matches_original_calls_and_frame_weighting(nodes, geometry, mode):
+    from ..train import sequence_batch_objective
+
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    normal = Normalization.fixture(Topology(nodes))
+    model = JointFlow(ModelConfig(nodes=nodes)) if geometry == "ambient" else SO3JointFlow(normal, ModelConfig(nodes=nodes))
+    model.eval()
+    chunks = multi_stream_chunks(nodes)
+    before = {name: value.clone() for name, value in model.state_dict().items()}
+    with torch.no_grad():
+        batch = sequence_batch_objective(mode, model, chunks, normal, generator=torch.Generator().manual_seed(17))
+        states, expected, generator = {}, [], torch.Generator().manual_seed(17)
+        for chunk, actual in zip(chunks, batch.chunks):
+            obs = chunk.observations[0]
+            key = (obs.identity, obs.sequence, obs.camera_ids)
+            value = sequence_objective(mode, model, chunk, normal, states.get(key), generator=generator)
+            states[key] = value.state
+            expected.append(value)
+            assert torch.equal(actual.contexts, value.contexts)
+            assert torch.allclose(actual.frame_losses, value.frame_losses, equal_nan=True)
+            assert actual.reasons == value.reasons and actual.state.to_dict() == value.state.to_dict()
+        counts = [result.resources["supervised_count"] for result in expected]
+        target = sum(result.loss*count for result, count in zip(expected, counts))/sum(counts)
+        equal_chunks = torch.stack([result.loss for result in expected]).mean()
+    assert counts == [2, 3, 1]
+    torch.testing.assert_close(batch.loss, target)
+    assert not torch.allclose(batch.loss, equal_chunks)
+    assert batch.resources["original_frames"] == 10 and batch.resources["supervised_count"] == 6
+    assert batch.resources["streams"] == 2 and batch.resources["chunks"] == 3
+    assert batch.resources["encoder_frame_calls"] == 10 and batch.resources["velocity_batch_calls"] == 6
+    assert {key: value.to_dict() for key, value in batch.states.items()} == {key: value.to_dict() for key, value in states.items()}
+    assert all(value.hidden.grad_fn is None for value in batch.states.values())
+    assert all(torch.equal(value, before[name]) for name, value in model.state_dict().items())
+
+
+def test_multi_stream_batch_carries_across_batches_without_mutating_input():
+    from ..train import sequence_batch_objective
+
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    model, normal = JointFlow().eval(), Normalization.fixture(Topology())
+    chunks = multi_stream_chunks()
+    with torch.no_grad():
+        whole = sequence_batch_objective("regression", model, chunks, normal)
+        first = sequence_batch_objective("regression", model, chunks[:2], normal)
+        original = {key: state.to_dict() for key, state in first.states.items()}
+        last = sequence_batch_objective("regression", model, chunks[2:], normal, first.states)
+    assert torch.equal(last.chunks[0].contexts, whole.chunks[2].contexts)
+    assert {key: state.to_dict() for key, state in last.states.items()} == {key: state.to_dict() for key, state in whole.states.items()}
+    assert {key: state.to_dict() for key, state in first.states.items()} == original
+
+
+@pytest.mark.parametrize("fault", ["later_clock", "overlap", "split", "rows", "too_many", "type", "carry"])
+def test_multi_stream_batch_rejects_bad_later_window_before_any_encoder(monkeypatch, fault):
+    from ..train import sequence_batch_objective
+
+    model, normal, chunks = JointFlow().eval(), Normalization.fixture(Topology()), list(multi_stream_chunks())
+    last, states = chunks[-1], None
+    if fault in ("later_clock", "overlap"):
+        obs, binding = last.observations[0], last.label_frames[0]
+        if fault == "later_clock":
+            obs, binding = replace(obs, timestamp=.01), replace(binding, timestamp=.01)
+        else:
+            obs, binding = replace(obs, frame=102), replace(binding, frame=102)
+        chunks[-1] = replace(last, observations=(obs, last.observations[1]), label_frames=(binding, last.label_frames[1]))
+    elif fault == "split":
+        chunks[-1] = replace(last, labels=replace(last.labels, split="validation"))
+    elif fault == "rows":
+        chunks[-1] = replace(last, label_frames=last.label_frames[:1])
+    elif fault == "too_many":
+        chunks = chunks*6
+    elif fault == "type":
+        chunks[-1] = "not_a_chunk"
+    else:
+        obs = chunks[1].observations[0]
+        key = (obs.identity, obs.sequence, obs.camera_ids)
+        states = {key: TemporalState(obs.identity, obs.sequence, obs.camera_ids,
+                                    torch.full((128,), torch.nan), torch.zeros(2, 17), -.1, 99,
+                                    torch.zeros(2, 17, dtype=torch.bool))}
+    def forbidden(*args, **kwargs):
+        raise AssertionError("bad final window or carry must reject before any batch encoder")
+    monkeypatch.setattr(model.encoder, "forward", forbidden)
+    with pytest.raises((ValueError, TypeError)):
+        sequence_batch_objective("regression", model, chunks, normal, states)
+
+
+def test_multi_stream_batch_unavailable_and_nonfinite_keep_original_windows(monkeypatch):
+    from ..train import sequence_batch_objective
+
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    model, normal, chunks = JointFlow().eval(), Normalization.fixture(Topology()), multi_stream_chunks()
+    unsupported = tuple(replace(chunk, labels=replace(chunk.labels, beta_mask=torch.zeros_like(chunk.labels.beta_mask)))
+                        for chunk in chunks)
+    with torch.no_grad():
+        missing = sequence_batch_objective("regression", model, unsupported, normal)
+    assert missing.loss is None and missing.resources["supervised_count"] == 0
+    assert len(missing.chunks) == 3 and missing.resources["original_frames"] == 10
+    assert all(torch.isnan(result.frame_losses).all() for result in missing.chunks)
+    assert not missing.resources["nonfinite_objective"]
+    original_velocity, calls = model.velocity, []
+    def fail_one_frame(*args, **kwargs):
+        value = original_velocity(*args, **kwargs)
+        calls.append(1)
+        return torch.full_like(value, torch.inf) if len(calls) == 3 else value
+    monkeypatch.setattr(model, "velocity", fail_one_frame)
+    with torch.no_grad():
+        failed = sequence_batch_objective("regression", model, chunks, normal)
+    assert failed.loss is None and failed.resources["nonfinite_objective"]
+    assert failed.chunks[0].loss is not None and failed.chunks[1].loss is None and failed.chunks[2].loss is not None
+    assert failed.chunks[1].reasons[0]["unavailable"] == ["nonfinite_sequence_objective"]
+    assert failed.resources["original_frames"] == 10 and failed.resources["velocity_batch_calls"] == 6
+
+
+def test_multi_stream_batch_avoids_weighted_numerator_overflow(monkeypatch):
+    from .. import train
+
+    model, normal = JointFlow().eval(), Normalization.fixture(Topology())
+    real_objective = train.sequence_objective
+    def large_finite_target(*args, **kwargs):
+        result = real_objective(*args, **kwargs)
+        # The true weighted mean is 3e38, representable in float32. Multiplying
+        # by support before dividing must not destroy that valid mean.
+        result.loss = torch.tensor(3e38)
+        return result
+    monkeypatch.setattr(train, "sequence_objective", large_finite_target)
+    with torch.no_grad():
+        result = train.sequence_batch_objective("regression", model, multi_stream_chunks(), normal)
+    assert all(torch.isfinite(chunk.loss) for chunk in result.chunks)
+    assert result.loss is not None and not result.resources["nonfinite_aggregation"]
+    torch.testing.assert_close(result.loss, torch.tensor(3e38))
+
+
 @pytest.mark.parametrize("nodes", [22, 52])
 @pytest.mark.parametrize("geometry", ["ambient", "SO3"])
 @pytest.mark.parametrize("mode", ["CFM", "regression"])

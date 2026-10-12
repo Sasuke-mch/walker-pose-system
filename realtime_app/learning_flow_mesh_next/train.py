@@ -429,6 +429,94 @@ def load_registered_chunks(manifest_path, record_index, normalization, *, asset_
                            "boundary": "registered declaration/file consistency; not independent label, asset-basis or physical clock authenticity certification"}
 
 
+@dataclass
+class SequenceBatchObjective:
+    loss: torch.Tensor | None
+    chunks: tuple[SequenceObjective, ...]
+    states: dict
+    resources: dict
+
+
+def sequence_batch_objective(mode, model, chunks, normalization, states=None, *, generator=None, information=None):
+    """Bounded original-window targets; no optimizer, checkpoint or stream shuffle.
+
+    Carries are per identity/sequence/PnP stream, even when windows interleave.
+    Means are weighted by supervised original frames, never by window count.
+    """
+    if mode not in ("CFM", "regression"):
+        raise ValueError("unregistered batch objective")
+    if not 1 <= len(chunks) <= configuration()["effective_batch"]:
+        raise ValueError("one to16 original causal chunks required per prepared batch")
+    states = {} if states is None else dict(states)
+    for key, state in states.items():
+        if not isinstance(state, TemporalState):
+            raise TypeError("typed per-stream causal carries required")
+        if key != (state.identity, state.sequence, tuple(state.camera_ids)):
+            raise ValueError("batch carry key differs from its declared stream")
+        if (state.hidden.shape != (model.encoder.width,) or state.age.shape != (2, 17)
+                or state.seen.shape != (2, 17) or state.seen.dtype != torch.bool
+                or not torch.isfinite(state.hidden).all() or not torch.isfinite(state.age).all()
+                or (state.age < 0).any()):
+            raise ValueError("invalid per-stream batch carry")
+    if information is not None:
+        if len(information) != len(chunks) or any(not isinstance(item, SequenceInformation) for item in information):
+            raise ValueError("one typed information bundle per original causal chunk required")
+        if hasattr(model, "rotation_representation"):
+            raise ValueError("SO3 F0 does not define batch G1 information conditioning")
+    if hasattr(model, "validate_normalization"):
+        model.validate_normalization(normalization)
+    previous, keys = dict(states), []
+    for index, chunk in enumerate(chunks):
+        if not isinstance(chunk, SequenceChunk):
+            raise TypeError("typed original SequenceChunks required")
+        chunk.validate(model.topology, normalization)
+        first = chunk.observations[0]
+        key = (first.identity, first.sequence, tuple(first.camera_ids))
+        if key in previous:
+            last = previous[key]
+            frame = last.last_frame if isinstance(last, TemporalState) else last.frame
+            timestamp = last.last_timestamp if isinstance(last, TemporalState) else last.timestamp
+            if first.frame <= frame or first.timestamp <= timestamp:
+                raise ValueError("original batch windows must increase within each stream")
+        if information is not None:
+            information[index].validate(chunk.observations, model.topology)
+        previous[key] = chunk.observations[-1]
+        keys.append(key)
+    # No forward occurs before the entire batch's original-row contracts pass.
+    states = {key: state.detached() for key, state in states.items()}
+    results = []
+    for index, (key, chunk) in enumerate(zip(keys, chunks)):
+        result = sequence_objective(mode, model, chunk, normalization, states.get(key), generator=generator,
+                                    information=None if information is None else information[index])
+        states[key] = result.state
+        results.append(result)
+    count = sum(result.resources["supervised_count"] for result in results)
+    nonfinite = any(result.resources["nonfinite_objective"] for result in results)
+    aggregate = None
+    if count and not nonfinite:
+        # Normalize support first: loss*large_count may overflow even when the
+        # final nonnegative weighted mean is representable in the loss dtype.
+        weighted = [result.loss*(result.resources["supervised_count"]/count)
+                    for result in results if result.loss is not None]
+        aggregate = torch.stack(weighted).sum()
+    nonfinite_aggregation = aggregate is not None and not torch.isfinite(aggregate)
+    if nonfinite_aggregation:
+        aggregate, nonfinite = None, True
+    summed = ("original_frames", "supervised_count", "skipped_count", "encoder_frame_calls",
+              "velocity_batch_calls", "target_state_evaluations")
+    resources = {key: sum(result.resources[key] for result in results) for key in summed}
+    resources.update(streams=len(set(keys)), chunks=len(chunks), nonfinite_objective=nonfinite,
+                     nonfinite_aggregation=bool(nonfinite_aggregation),
+                     aggregation="supervised_original_frame_weighted", optimizer_steps=0, checkpoint_loaded=False,
+                     scope="bounded causal batch targets; not a trained runner or source authenticity certificate")
+    if information is not None:
+        records = [result.resources["information_acquisition"] for result in results]
+        resources["information_acquisition"] = {key: sum(record[key] for record in records)
+                                                 for key in records[0] if key != "computed_in_this_objective"}
+        resources["information_acquisition"]["computed_in_this_objective"] = False
+    return SequenceBatchObjective(aggregate, tuple(results), states, resources)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)

@@ -412,3 +412,40 @@ def test_G1_acquisition_rejects_bad_source_before_encoder(monkeypatch, fault):
     with pytest.raises((ValueError, TypeError)):
         acquire_sequence_information(g0, observations, normal, bundle.scale, rigid_surface,
                                      bundle.cameras, noise, state, anchor_k=2, steps=2)
+
+
+def test_G1_multi_stream_batch_preserves_bound_information_and_acquisition_counts(monkeypatch):
+    from ..train import (
+        acquire_sequence_information,
+        sequence_batch_objective,
+        sequence_objective,
+    )
+    from .test_information import rigid_surface
+    from .test_joint import chunk_slice
+
+    g0, g1, first, normal, first_info, _ = information_sequence_fixture()
+    observations = tuple(replace(obs, identity="second_person", sequence="second_sequence") for obs in first.observations)
+    bindings = tuple(replace(frame, identity="second_person", sequence="second_sequence") for frame in first.label_frames)
+    second = replace(first, observations=observations, label_frames=bindings,
+                     labels=replace(first.labels, translation=first.labels.translation+1))
+    second_info = acquire_sequence_information(g0, observations, normal, first_info.scale, rigid_surface,
+                                               first_info.cameras, first_info.noise, anchor_k=2, steps=2)
+    chunks = (chunk_slice(first, 0, 3), second, chunk_slice(first, 3, 5))
+    information = (replace(first_info, frames=first_info.frames[:3], anchor_resources=first_info.anchor_resources[:3]),
+                   second_info, replace(first_info, frames=first_info.frames[3:], anchor_resources=first_info.anchor_resources[3:]))
+    with torch.no_grad():
+        batch = sequence_batch_objective("regression", g1, chunks, normal, information=information)
+        direct_second = sequence_objective("regression", g1, second, normal, information=second_info)
+    assert torch.equal(batch.chunks[1].contexts, direct_second.contexts)
+    assert torch.equal(batch.chunks[1].loss, direct_second.loss)
+    counts = batch.resources["information_acquisition"]
+    assert counts["G0_network_calls"] == 20 and counts["G0_candidate_state_evaluations"] == 40
+    assert counts["J_decoder_state_evaluations"] == 8*(1+2*g0.topology.tangent_dimensions)
+    assert counts["available_information_frames"] == 8 and counts["unavailable_information_frames"] == 2
+    assert not counts["computed_in_this_objective"]
+    bad = replace(information[-1], frames=information[-1].frames[::-1])
+    def forbidden(*args, **kwargs):
+        raise AssertionError("late stale information must reject before all batch windows")
+    monkeypatch.setattr(g1.encoder, "forward", forbidden)
+    with pytest.raises(ValueError):
+        sequence_batch_objective("regression", g1, chunks, normal, information=(*information[:-1], bad))

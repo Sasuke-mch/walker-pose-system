@@ -4529,3 +4529,11 @@ MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结�
 初4新项因缺接口ImportError失败，补齐后通过；新约束/梯度/未来/分块/失败/前置拒绝共26新项分次通过，原F0相关11项通过/Ruff通过。人工22/52、5原帧、G0 K2 steps2、rigidT-only surface，监督0/2/4但5行获取与状态均保留，G0 10calls/20states和真实J计数独立记录；precomputed信息不视作部署免费输入。MODEL_RESULTS第38节、架构第21节/D10台账、长期协议同步，记录原失败与完整边界，无新流程/审计材料。
 
 真实training/noise-reference records0，来源/历史/资产真实性、四法训练runner与独立效能仍未完成，无optimizer/checkpoint/主线改动。下一D10.5补同组多序列准备和执行生命周期的剩余连接，一次一个可检查接口；训练执行继续关闭，长期goal保持active，既有工作区改动保留。
+
+## 2026-10-13 D10.5多stream批目标与权重计算
+
+预登记后补SequenceBatchObjective/sequence_batch_objective：最多16原chunk，按identity/sequence/PnP独立carry，允许A/B交错；全批元数据/状态/标签/可选信息先检查，已消费帧与坏后行在编码前拒绝。按实际监督帧数加权，保留全部chunk及失败；全无监督None、任何非有限chunk或汇总阻断整批。G1获取资源按原信息包汇总，预计算不当免费，未新增optimizer/checkpoint/epoch/shuffle。
+
+初8种几何/节点/目标组合因缺接口ImportError失败，实现后通过；补跨batch/7坏输入/无监督/inf控制通过。发现有限3e38块均值先乘监督count会溢出，已知正确均值控制red后改先归一化权重，受影响9项通过。临时35+5注册文件22/52保留40行/36监督，G1计数和错信息拒绝通过。21新检查分次覆盖/四文件Ruff通过，失败与具体输入/命令/界限记录MODEL_RESULTS第39节；架构第22节/D10台账与长期协议同步，无额外流程材料。
+
+真实training/noise-reference records均0；同组源真实性、完整训练生命周期/四法runner、训练授权和独立效能仍缺，正式主线/模型容量不改。下一阶段复核剩余要求与可执行资源，不把追加准备代码当独立效果；长期goal保持active，已有工作区改动保留。

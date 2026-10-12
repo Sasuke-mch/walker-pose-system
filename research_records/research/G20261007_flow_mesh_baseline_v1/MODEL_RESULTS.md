@@ -1127,3 +1127,21 @@ D03合同阶段决定：保留现有逐帧联合模型，停止默认嫁接H8冻
 命令：`.\.venv-cuda\Scripts\python.exe -X utf8 -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_regression_information.py -q --tb=short -k 'G1_sequence or G1_acquisition'`；追加仅`-k 'G1_sequence_rejects and nonfinite'`，权重断言仅`-k 'G1_sequence_matches and regression and 22'`。原F0文件test_joint.py仅`-k 'causal_sequence_objective or sequence_gradient or sequence_all_missing'`；改动两文件用既有uv offline Ruff。所有人工数组临时内存、无永久数据/新JSON/验收文档。
 
 D10.4当前G0→原帧信息→G1序列CFM/回归准备路径完成。真实训练与独立噪声reference records现场均0，normalization/资产/数据/完整历史真实性、独立标签、训练授权、optimizer/checkpoint与四法实际训练评价仍缺；矩阵可用或依赖检查不证明真实手/shape/后验/精度。下一D10.5推进同组多序列训练准备与执行生命周期的剩余连接，每次只补一个实际接口缺口，训练/神经checkpoint执行仍关闭，长期目标未完成。
+
+## 39. 2026-10-13 D10.5多stream批目标：状态隔离与监督帧加权连接
+
+问题：原单chunk接口依赖调用者管理多个序列的carry、窗口加权与跨窗口失败，容易串用另一stream状态、重放已消费帧或平均块均值而改变监督权重。按D10_multi_stream_batch预登记，只在train.py新增SequenceBatchObjective/sequence_batch_objective；复用原SequenceChunk/sequence_objective/SequenceInformation/注册文件读取，不增加模型/审计框架。最多16个1–32原帧窗口，按identity/sequence/PnP分组独立carry；先检查整批后计算，caller状态字典不改。未自动定义epoch/shuffle/退休状态或优化器生命周期。
+
+先增加8个ambient/SO3×22/52×CFM/回归控制，原代码全部缺sequence_batch_objective ImportError：8failed/41deselected in1.63s。实现后8passed/41deselected in1.86s/Ruff通过。CPU、threads1、seed7、CFM generator17、原工程Normalization.fixture，未训练模型；A为原5帧100–104/时间[0,.17,.52,.73,1.1]、1缺观测/3缺beta；B另identity/sequence、相同时间原槽，但人为translation+100使窗口损失明显不同，不是人体物理数据。输入顺序A前3/B全5/A后2，共10原帧，监督2/3/1=6。每窗口contexts/逐帧loss/原因与独立原sequence_objective per-stream调用一致、末states相同；监督帧加权结果符合原目标，与等权三窗口均值不同。只比较计算与隔离，不作为精度或序列独立来源证明。
+
+新增跨batch carry控制：先A前3/B全5，后A后2带返回states，A延续值与单批相同、B状态保留且incoming字典内容不改。7类坏输入为后窗口时钟回退/原帧重放/validation split/标签行数/18窗口/非typedchunk/另stream NaNcarry，encoder spy确认首次编码前拒绝。全beta maskFalse保留10原行NaN/原因、总监督0/lossNone，观测状态仍推进；第三次原velocity调用在B第一监督帧注入inf，原sequence_objective保留非有限理由，整个batch lossNone，A的两个有限结果仍存在而不被挑为成功批。上述与初始算术保护共10passed/49deselected in1.65s，其他原41项未默认重跑。
+
+发现的真实数值缺陷：起初sum(N_c*L_c)/sum(N_c)会让有限float32 L_c=3e38在先乘2/3时溢出，即使正确最终均值3e38可表示。最初仅把非有限批值阻断，并不能恢复这个合法目标；改成独立已知均值检查后1failed/58deselected in1.55s，保留None失败。修正为先用N_c/N_total乘各均值再sum，仍保留最终非有限汇总的None保护。重跑受算术改变影响的8种对照及此1控制：9passed/50deselected in1.93s/Ruff通过；均值按浮点容差与独立公式一致，contexts/逐帧原loss/state仍逐值相同。3e38由明确numerical control替换块均值而非伪造人体目标，不能把该值称真实学习损失。此前其余9个状态/失败检查未重复。
+
+真实文件连接测试只用pytest临时、明确synthetic_contract_fixture的声明：A35帧501–535，B5帧501–505另subject/original_action/sequence/identity，两个原NPZ路径；原时钟1000+i×0.07、B已准入xy+55，NaN原行保留。同冻结train来源声明统计仅为synthetic_statistics_contract_not_real_data，不能认证实际train-only来源。既有load_registered_chunks对整份manifest组split检查后选两train记录，A32/B5/A3交错；ambient22/52 float64回归得到40原行、监督30/3/3=36，B context等于独立None重启，A原frame IDs和两路径来源、缺观测reason/缺beta都保留。没有永久训练登记或新增真实采集。
+
+G1批控制复用D10.4五帧52节点工程fixture，A前3/B全5/A后2及各自原帧Information，B独立冻结G0获取；同信息B目标等于独立原API，获取计数G0 20calls/40states、J8可用/2不可用原帧及8×339=2712状态，computed_in_this_objectiveFalse。把末块信息倒序，首次G1 encoder前拒绝；不补J或改precision。两文件临时读取2项+G1批1项：3passed/77deselected in2.61s。Ruff首次指出两新增长import须多行格式，修正后四改动文件Ruff通过，仅格式修改未重跑已过测试。
+
+命令使用`.\.venv-cuda\Scripts\python.exe -X utf8 -B -m pytest`：test_joint.py初`-k multi_stream_batch_matches`，补`-k 'multi_stream_batch and not matches'`，数值red仅`-k avoids_weighted_numerator_overflow`，修复仅`-k 'multi_stream_batch_matches or avoids_weighted_numerator_overflow'`；两现有文件test_firewall.py/test_regression_information.py仅`-k 'registered_files_connect or G1_multi_stream_batch'`。21个新检查分次覆盖，旧其他检查未全套重跑；失败、未改变接口和原数据范围在本节记录，无新脚本/验收报告/快照。
+
+D10.5多stream准备目标完成，训练/神经checkpoint继续关闭；没有参数更新或正式主线改动。实际flow_next_data_manifest_v1.json与flow_next_noise_data_manifest_v1.json现场records均0。完整训练生命周期、epoch与stream政策、四法配对runner、模型/统计/组来源真实性及独立效果仍未完成；窗口16只是准备接口上限，不能据此称优化器effective_batch已实现。下一阶段复核这些剩余要求与训练禁令/资源，选择有实际证据价值且可执行的后续工作；不以新增准备层替代真实训练与held-out验证，长期目标未完成。

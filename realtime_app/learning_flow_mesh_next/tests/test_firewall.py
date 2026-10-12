@@ -332,3 +332,47 @@ def test_registered_file_to_causal_objective_matches_memory_fixture(tmp_path):
     assert from_file.state.to_dict() == in_memory.state.to_dict()
     assert from_file.supervised.tolist() == [True, True, False, True, False]
     assert torch.equal(from_file.loss, in_memory.loss)
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+def test_registered_files_connect_to_multi_stream_batch_without_losing_rows(tmp_path, nodes):
+    from ..joint_flow import JointFlow, ModelConfig
+    from ..train import (
+        load_registered_chunks,
+        sequence_batch_objective,
+        sequence_objective,
+    )
+
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    first_dir, second_dir = tmp_path/"a", tmp_path/"b"
+    first_dir.mkdir()
+    second_dir.mkdir()
+    _, asset, normal, _, manifest, _ = registered_file_fixture(first_dir, nodes, count=35)
+    _, _, _, arrays, other, metadata = registered_file_fixture(second_dir, nodes, count=5)
+    second_record = {**other["records"][0], "subject": "synthetic_subject_B", "original_action": "synthetic_action_B",
+                     "sequence": "synthetic_sequence_B", "identity": "synthetic_person_B", "source_path": "b/sequence.npz"}
+    metadata.update({key: second_record[key] for key in ("subject", "original_action", "sequence", "identity")})
+    arrays["metadata_json"] = np.array(json.dumps(metadata))
+    arrays["xy"] += 55
+    np.savez(second_dir/"sequence.npz", **arrays)
+    manifest["records"] = [{**manifest["records"][0], "source_path": "a/sequence.npz"}, second_record]
+    path = tmp_path/"manifest.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    first, first_source = load_registered_chunks(path, 0, normal, asset_contract=asset, dtype=torch.float64)
+    second, second_source = load_registered_chunks(path, 1, normal, asset_contract=asset, dtype=torch.float64)
+    model = JointFlow(ModelConfig(nodes=nodes)).double().eval()
+    with torch.no_grad():
+        result = sequence_batch_objective("regression", model, (first[0], second[0], first[1]), normal)
+        independently_reset = sequence_objective("regression", model, second[0], normal)
+    assert result.resources["original_frames"] == 40 and result.resources["supervised_count"] == 36
+    assert [row.resources["supervised_count"] for row in result.chunks] == [30, 3, 3]
+    assert [len(row.label_frames) for row in result.chunks] == [32, 5, 3]
+    assert torch.equal(result.chunks[1].contexts, independently_reset.contexts)
+    assert result.chunks[0].reasons[2]["observation_rejection_reasons"][0][0] == "original_missing_fixture"
+    assert result.chunks[0].reasons[8]["unavailable"] == ["beta_label_unavailable"]
+    assert [frame.frame for row in (result.chunks[0], result.chunks[2]) for frame in row.label_frames] == first_source["original_frame_ids"]
+    assert [frame.frame for frame in result.chunks[1].label_frames] == second_source["original_frame_ids"]
+    assert first[0].observations[0].source == first_source["source_path"]
+    assert second[0].observations[0].source == second_source["source_path"]
+    assert not first_source["authenticity_verified"] and not second_source["authenticity_verified"]
