@@ -29,5 +29,12 @@
   "app_page": "body_browser.html",
   "data_file": "body_data.json.gz",
   "performance_tradeoff": "previous ankle D2 gate failure preserved; export checks do not promote contact/gait/accuracy",
-  "preparation_failure": "../export_preparation_failure.json and export.log retained; canonical args preserve exactly parsed effective options"
+  "preparation_failure": "../export_preparation_failure.json and export.log retained; canonical args preserve exactly parsed effective options",
+  "download_file": {
+    "path": "Pose2D.html",
+    "bytes": 100284458,
+    "identical_to_standalone": true,
+    "embedded_data": true,
+    "external_gzip_required": false
+  }
 }
