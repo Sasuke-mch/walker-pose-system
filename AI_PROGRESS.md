@@ -4271,3 +4271,10 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 主线scene_route.default_profile及scene默认入口升级为supported_stop_fixed_lag；旧baseline显式保留。仅提升已验收Stage/地面逻辑，不自动提升448二维身体结果或重跑拟合。原动作标签/strict/旋转/足点门保留；可靠停止独立恢复支撑，未发布0.5秒缓冲内修正，停止即同平地支撑仍是必要采集协议。build_current_mainline_view解除baseline硬绑定，协议与说明按真实解析profile记录，避免mainline别名下丢失协议提示。
 
 49路由/Stage/落地/身体回归测试通过，448实际命令mainline与显式已验收profile参数逐项相同，3文件AST通过，ruff当前不可用，diff检查通过。证据复用已有完整448通过/失败/对照，不重复训练、权重加载或同一场景重放。mainline_promotion.json与CURRENT_STAGE_GROUND_PIPELINE.md更新。身体360及其baseline场景/页面保留为历史参考，本次没有其他采集或实时硬件新验证；run_stereo仍旧因果路径，实时固定延迟发布接入待办。仅本轮代码/配置/记录本地提交，保留原92项工作区改动，不推送。
+
+
+## 2026-10-12 448二维拟合脚部误差审计
+
+完成缓存全448审计，脚部偏差已在相机系拟合存在；391左踝重投影130.31/108.19px、model−DLT世界Y差209.79mm。regressor回算差1.01e-7m，NumPy/Torch投影一致，刚性地面变换不改差范数。原sole低于参考面20mm左右97/119帧，平滑该高度指标最多3.20mm。明确约束/验收缺口：只用COCO17踝点，源额外6点忽略；无远端脚/足底目标，D2_no_contact仅手，C固定预算无脚残差门。VPoser/根先验和Huber全身折中是待同规模消融的解释，不声称唯一因果。45左踝自由点数学对照可从178/154px降至7.17/7.26px，另3次precision-loss退出保留；不是最终拟合或真值。
+
+入口audit_2d448_feet.py，结果G20261012_smplh_2d448_view_v1/foot_logic_audit.json；具体数字及边界追加CURRENT_SMPLH_ALGORITHM_20261002.md。13测试+2subtests/3旧warning、全448缓存断言与AST通过；ruff不可用。未加载神经权重、重拟合或重放Stage，不更改既有结果/主线/页面。下一独立阶段先核验额外6点定义与模型远端映射，再纯二维同规模对照；不自动加三维脚接触。仅本轮代码/既有文档追加/小审计记录提交；原92条改动保留。
