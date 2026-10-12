@@ -1,0 +1,24 @@
+{
+  "stop": "nonfinite, supported negative depth, missing initialization or >one tuning revision; preserve failure evidence",
+  "source": "G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json",
+  "target": "remove 3D observation objective, retain priors and native MANO hand fit",
+  "initialization": "triangulation only for cold rigid initialization/root anchor and diagnostics; not triangulation-free",
+  "regressor": "models/smpl/J_regressor_coco.npy: posed6890vertices -> COCO17 -> raw fisheye",
+  "loss": "per-view confidence normalized Huber, scale25px; independent finite/bounds/confidence support",
+  "pilot": {
+    "weight2d": 0.002,
+    "root": 0.01,
+    "beta": 0.001,
+    "C": 100,
+    "A": 30,
+    "D": 0,
+    "vposer": 0.02,
+    "B": 30
+  },
+  "final_budget": "A30/B30/C300/D100/D100/D3zero seed0",
+  "tuning": "one bounded revision from gradient ratios and complete-frame residuals; no independent accuracy claim",
+  "success": "finite gradients, complete360, no 3D objective gradient; report pixel tails, priors, shape norm, all failure slots",
+  "data": "same PMPose left/right 360 frames and calibration; original pairs1157..1516",
+  "scope": "360-frame isolated body observation ablation; formal selection unchanged",
+  "disabled": "wrist/contact/bone/body-temporal remain at frozen reference25 zero; not inventing new loss terms"
+}

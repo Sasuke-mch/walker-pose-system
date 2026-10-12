@@ -97,7 +97,9 @@ def fisheye_project_torch(points_camera_m: "torch.Tensor", K: Any, D: Any) -> "t
     X, Y, Z = points_camera_m[..., 0], points_camera_m[..., 1], points_camera_m[..., 2]
     x = X / Z
     y = Y / Z
-    r = torch.sqrt(x * x + y * y)
+    # sqrt'(0) is infinite even when torch.where selects the axis limit.
+    # Clamp before sqrt so an exactly on-axis point has finite gradients.
+    r = torch.sqrt(torch.clamp(x * x + y * y, min=1e-24))
     theta = torch.atan(r)
     theta_d = theta * (1.0 + Dt[0] * theta ** 2 + Dt[1] * theta ** 4 + Dt[2] * theta ** 6 + Dt[3] * theta ** 8)
     safe_r = torch.clamp(r, min=1e-12)

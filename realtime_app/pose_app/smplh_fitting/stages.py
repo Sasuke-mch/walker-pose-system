@@ -6,6 +6,11 @@ from numbers import Integral
 
 def validate_optimization_options(args):
     """Reject invalid budgets/scales before loading assets or creating outputs."""
+    if getattr(args, "body_observation_mode", "legacy") == "reprojection_only":
+        if args.body_3d_weight != 0 or args.body_reprojection_weight <= 0:
+            raise ValueError("reprojection_only requires body-3d-weight=0 and positive body-reprojection-weight")
+        if args.wrist_reference_weight > 0 or args.contact_labels is not None:
+            raise ValueError("reprojection_only forbids external 3D wrist/contact observation targets")
     for name, default in (("beta_prior_weight", 1e-3), ("body_3d_weight", 1.0)):
         value = getattr(args, name, default)
         if not math.isfinite(value) or value < 0:

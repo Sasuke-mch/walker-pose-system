@@ -19,21 +19,32 @@ for _name, _value in {"bool": np.bool_, "int": np.int64, "float": np.float64,
         setattr(np, _name, _value)
 
 
+from pose_app import body_observations as raw_clean
+from pose_app import smpl_surface_contact as surface_contact
 from pose_app.fisheye_camera import fisheye_project_torch, load_stereo_fisheye
 from pose_app.smpl_coco_observation import load_coco17_regressor, regress_coco17_torch
 from pose_app.smplx_fitting import load_vposer_explicit
-from pose_app import smpl_surface_contact as surface_contact
 
-from pose_app import body_observations as raw_clean
-
-
-from ..smplh_hand_observation import read_wilor, finite_pixel_values
-from .initialization import initialize_rigid_body
-from .stages import (build_stage_schedule, set_trainable_parameters,
-                     validate_optimization_options, require_finite_tensors)
-from .losses import (body_reprojection_loss, hand_temporal_loss, body_temporal_loss,
-                     weighted_hand_residual, hand_observation_term, observation_weights)
+from ..smplh_hand_observation import finite_pixel_values, read_wilor
 from .contact import load_surface_targets, surface_contact_losses
+from .initialization import initialize_rigid_body
+from .losses import (
+    body_reprojection_loss,
+    body_temporal_loss,
+    enabled_body_observation,
+    hand_observation_term,
+    hand_temporal_loss,
+    observation_weights,
+    raw_pixel_support,
+    supported_camera_points,
+    weighted_hand_residual,
+)
+from .stages import (
+    build_stage_schedule,
+    require_finite_tensors,
+    set_trainable_parameters,
+    validate_optimization_options,
+)
 
 
 def run_fit(args, observer=None) -> int:
@@ -42,11 +53,12 @@ def run_fit(args, observer=None) -> int:
         raise RuntimeError(f"refuse non-empty output: {args.output_dir}")
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    import torch
-    import smplx
     import pickle
-    from smplx.utils import Struct
+
+    import smplx
+    import torch
     from scipy.spatial.transform import Rotation
+    from smplx.utils import Struct
     device = torch.device(args.device)
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA unavailable")
@@ -72,7 +84,10 @@ def run_fit(args, observer=None) -> int:
     wrist_target = None
     wrist_audit = {"enabled": False}
     if args.wrist_reference is not None:
-        from pose_app.independent_wrist_reference import load_reference, wrist_position_loss
+        from pose_app.independent_wrist_reference import (
+            load_reference,
+            wrist_position_loss,
+        )
         wrist_np, wrist_audit = load_reference(args.wrist_reference, args.calibration_dir,
                                              args.allow_diagnostic_wrist_reference)
         wrist_target = torch.tensor(wrist_np, device=device)
@@ -226,7 +241,11 @@ def run_fit(args, observer=None) -> int:
     mano_enabled = args.mano_pose_init or args.mano_pose_weight > 0
     mano_targets = mano_weights = mano_initial = None
     if mano_enabled:
-        from pose_app.wilor_mano_prior import audit_assets, read_parameter_view, encode_pca
+        from pose_app.wilor_mano_prior import (
+            audit_assets,
+            encode_pca,
+            read_parameter_view,
+        )
         with args.canonical_mano_right.open("rb") as handle:
             canonical_right = pickle.load(handle, encoding="latin1")
         asset_audit = audit_assets(model_data, mano_left_data, mano_right_data, canonical_right)
@@ -324,6 +343,14 @@ def run_fit(args, observer=None) -> int:
     raw_right_conf = torch.tensor(np.clip(finite_pixel_values(right[:, :, 2]), 0.0, 1.0), device=device)
     raw_left_valid = torch.isfinite(torch.tensor(left[:, :, :2], device=device)).all(dim=-1) & (raw_left_conf > 0)
     raw_right_valid = torch.isfinite(torch.tensor(right[:, :, :2], device=device)).all(dim=-1) & (raw_right_conf > 0)
+    reprojection_only = getattr(args, "body_observation_mode", "legacy") == "reprojection_only"
+    left_pixel_mask, left_pixel_reasons = raw_pixel_support(left, image_size)
+    right_pixel_mask, right_pixel_reasons = raw_pixel_support(right, image_size)
+    if reprojection_only:
+        raw_left_valid = torch.tensor(left_pixel_mask, device=device)
+        raw_right_valid = torch.tensor(right_pixel_mask, device=device)
+        if not np.all((left_pixel_mask | right_pixel_mask).any(axis=1)):
+            raise RuntimeError("some original frames have no supported raw body pixels")
     obs_ll = torch.tensor(finite_pixel_values(hand_ll), device=device)
     obs_lr = torch.tensor(finite_pixel_values(hand_lr), device=device)
     obs_rl = torch.tensor(finite_pixel_values(hand_rl), device=device)
@@ -352,7 +379,7 @@ def run_fit(args, observer=None) -> int:
     with torch.no_grad():
         _ = decode_body_pose(latent)
     history = []
-    from pose_app.smplh_hand_observation import HAND_JOINTS, validate_smplh, hand21
+    from pose_app.smplh_hand_observation import HAND_JOINTS, hand21, validate_smplh
     validate_smplh(model)
     # Named SMPL-H internal-joint maps; hand21() emits the verified WiLoR
     # OpenPose order and appends five surface fingertip vertices.
@@ -365,6 +392,7 @@ def run_fit(args, observer=None) -> int:
     param_map = {"beta": beta, "root": root, "transl": transl,
                  "latent": latent, "lhand": lhand, "rhand": rhand}
     stage_history = []
+    gradient_audit = []
     np.savez_compressed(args.output_dir / "cold_initialization.npz",
                         betas=beta.detach().cpu().numpy(), global_orient=root.detach().cpu().numpy(),
                         transl=transl.detach().cpu().numpy(), vposer_latent=latent.detach().cpu().numpy(),
@@ -401,8 +429,14 @@ def run_fit(args, observer=None) -> int:
             body_w = torch.tensor(np.asarray(fit_quality, np.float32), device=device).clamp_min(0.0)
             body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
             model_cam1 = (R01 @ coco.transpose(1, 2)).transpose(1, 2) + T01
-            proj_cam0 = fisheye_project_torch(coco, K0, D0)
-            proj_cam1 = fisheye_project_torch(model_cam1, K1, D1)
+            if (reprojection_only and stage_index <= 2
+                    and ((coco[..., 2][raw_left_valid] <= 0).any()
+                         or (model_cam1[..., 2][raw_right_valid] <= 0).any())):
+                raise RuntimeError(f"supported body point behind camera at {stage_name}:{local_step}")
+            proj_cam0 = fisheye_project_torch(
+                supported_camera_points(coco, raw_left_valid) if reprojection_only else coco, K0, D0)
+            proj_cam1 = fisheye_project_torch(
+                supported_camera_points(model_cam1, raw_right_valid) if reprojection_only else model_cam1, K1, D1)
             body_2d_loss, body_2d_px = body_reprojection_loss(
                 args=args, stage_index=stage_index, body_loss=body_loss,
                 proj_cam0=proj_cam0, proj_cam1=proj_cam1,
@@ -480,7 +514,8 @@ def run_fit(args, observer=None) -> int:
                           if wrist_target is not None else body_loss.detach() * 0.0)
             wrist_term = (args.wrist_reference_weight * wrist_loss
                           if stage_index in (0, 1, 2) else wrist_loss.detach() * 0.0)
-            loss = getattr(args, "body_3d_weight", 1.0) * body_term + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
+            observation_3d = enabled_body_observation(body_term, getattr(args, "body_3d_weight", 1.0), stage_index)
+            loss = observation_3d + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
                    args.body_temporal_weight * body_temporal + hand_term + args.mano_pose_weight * mano_pose_loss + pose_reg + getattr(args, "beta_prior_weight", 1e-3) * beta.pow(2).mean() + \
                    (contact_total if stage_index >= 4 else contact_total.detach() * 0.0) + wrist_term
             if not torch.isfinite(loss):
@@ -490,6 +525,22 @@ def run_fit(args, observer=None) -> int:
                          "body_reprojection": reproj_term, "bone": structure_term}
                 failed_terms = [name for name, value in terms.items() if not bool(torch.isfinite(value))]
                 raise RuntimeError(f"nonfinite loss at {stage_name}:{local_step}; terms={failed_terms}")
+            weighted_terms = {"observation_3d": observation_3d, "reprojection_2d": reproj_term,
+                              "vposer_prior": args.vposer_prior_weight * latent.square().mean(),
+                              "beta_prior": getattr(args, "beta_prior_weight", 1e-3) * beta.square().mean(),
+                              "root_anchor": root_term, "bone_prior": structure_term,
+                              "mano_prior": args.mano_pose_weight * mano_pose_loss}
+            if reprojection_only and stage_index <= 2 and local_step in (0, 30):
+                gradients = {}
+                for name, term in weighted_terms.items():
+                    if not term.requires_grad:
+                        gradients[name] = {k: 0.0 for k in train_names}
+                        continue
+                    values = torch.autograd.grad(term, stage_params, retain_graph=True, allow_unused=True)
+                    gradients[name] = {k: float(value.detach().norm()) if value is not None else 0.0
+                                       for k, value in zip(train_names, values)}
+                gradient_audit.append({"stage": stage_name, "step": local_step,
+                                       "weighted_gradient_norms": gradients})
             loss.backward()
             require_finite_tensors({name: param_map[name].grad for name in train_names},
                                    f"gradient at {stage_name}:{local_step}")
@@ -515,6 +566,8 @@ def run_fit(args, observer=None) -> int:
                 row["body_temporal"] = float(torch.sqrt(body_temporal.detach()))
                 row["wrist_reference_rms_mm"] = float(torch.sqrt(wrist_loss.detach()) * 1000) if wrist_target is not None else None
                 history.append(row)
+                if reprojection_only:
+                    row["weighted_terms"] = {k: float(v.detach()) for k, v in weighted_terms.items()}
                 print(json.dumps(row), flush=True)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "hand_3d_term": False,
@@ -586,6 +639,8 @@ def run_fit(args, observer=None) -> int:
                         wilor_left_bounds_ok_full=hand_l_full_bounds, wilor_right_bounds_ok_full=hand_r_full_bounds,
                         body_quality=quality,
                         body_fit_weights=fit_quality,
+                        body_left_2d_valid=left_pixel_mask, body_right_2d_valid=right_pixel_mask,
+                        body_left_2d_reasons=left_pixel_reasons, body_right_2d_reasons=right_pixel_reasons,
                         translation_init_source=np.asarray(init_source, dtype="U32"),
                         root_init=root_init_np,
                         root_init_source=root_init_source,
@@ -650,7 +705,14 @@ def run_fit(args, observer=None) -> int:
                                "mode": "dual_fisheye_raw_pmpose_huber" if args.body_reprojection_weight > 0 else "disabled",
                                "camera_parameters_optimized": False,
                                "stages": ["A_body_vposer", "B_shared_beta", "C_body_vposer_refine"],
-                               "uses_triangulated_3d_term": True},
+                               "uses_triangulated_3d_term": getattr(args, "body_3d_weight", 1.0) > 0,
+                               "observation_mode": getattr(args, "body_observation_mode", "legacy"),
+                               "regressor": str(args.regressor.resolve()),
+                               "regressor_order": "posed_vertices_to_COCO17_then_fisheye_projection",
+                               "triangulation_scope": "initialization_and_diagnostic" if reprojection_only else "observation",
+                               "left_supported_pixels": int(left_pixel_mask.sum()),
+                               "right_supported_pixels": int(right_pixel_mask.sum()),
+                               "gradient_audit": gradient_audit},
         "hand_geometry_audit": {"path": "wilor_hand_geometry_audit.jsonl",
                                 "summary": "wilor_hand_geometry_summary.json",
                                 "used_for_fitting": False},

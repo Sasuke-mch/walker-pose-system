@@ -44,6 +44,8 @@ def build_parser() -> argparse.ArgumentParser:
                     help="explicit ablation; both policies retain one sequence-shared beta")
     ap.add_argument("--beta-prior-weight", type=float, default=1e-3)
     ap.add_argument("--body-3d-weight", type=float, default=1.0)
+    ap.add_argument("--body-observation-mode", choices=("legacy", "reprojection_only"), default="legacy",
+                    help="2D-only data objective; triangulation remains initialization/diagnostic only")
     ap.add_argument("--body-weighting", choices=("quality", "uniform", "no_confidence", "no_ray", "no_reprojection", "reference"), default="quality",
                     help="same accepted mask; uniform removes only soft quality weights")
     ap.add_argument("--body-reference-reprojection-px", type=float, default=25.0,

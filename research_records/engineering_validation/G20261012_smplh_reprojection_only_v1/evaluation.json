@@ -1,0 +1,953 @@
+{
+  "boundary": "in-sample observation agreement only, no independent 3D accuracy",
+  "raw_left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\left_pmpose_raw.json",
+  "raw_right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261003_repositioned360_cold_smplh_v2\\right_pmpose_raw.json",
+  "support_counts": [
+    6120,
+    5949
+  ],
+  "cases": {
+    "reference25": {
+      "path": "research_records\\engineering_validation\\G20261005_reference_weight_fit_v1\\runs\\reference25\\fit\\result.npz",
+      "frames": 360,
+      "views": [
+        {
+          "mean_px": 51.930041340963186,
+          "confidence_weighted_mean_px": 51.08973801035313,
+          "median_px": 45.58824029982412,
+          "p95_px": 110.70664890040334,
+          "max_px": 721.4456810487808,
+          "per_joint_mean_px": [
+            73.12991592992415,
+            41.975343877150294,
+            39.162350461933,
+            21.518354559871845,
+            29.605107329350208,
+            43.64866634767597,
+            20.21343886635832,
+            66.25666731030057,
+            30.370436471821723,
+            114.86913747495099,
+            66.25065400832423,
+            67.54078348322311,
+            73.25019420167979,
+            79.28401386407654,
+            65.81587383464905,
+            24.333528590154195,
+            25.586236184930144
+          ]
+        },
+        {
+          "mean_px": 52.88390775885724,
+          "confidence_weighted_mean_px": 52.83423373010034,
+          "median_px": 49.71459290569309,
+          "p95_px": 111.51047576565973,
+          "max_px": 219.4343258770279,
+          "per_joint_mean_px": [
+            80.01490701093229,
+            51.32014129340232,
+            49.21433546582204,
+            16.972309042349305,
+            18.128577574869244,
+            32.26680245650501,
+            28.554978719779424,
+            67.76356686870062,
+            54.041750018416174,
+            76.83654155192582,
+            80.95922936117898,
+            73.0619452359299,
+            77.87066575567816,
+            61.62047221888743,
+            85.881752814548,
+            16.850303016536337,
+            25.47358293486755
+          ]
+        }
+      ],
+      "mean_px": 52.40021710697957,
+      "median_px": 47.31185423580015,
+      "p95_px": 111.17496238111187,
+      "mean_of_view_confidence_means_px": 51.961985870226734,
+      "betas": [
+        [
+          1.2053683996200562,
+          -0.5119218230247498,
+          -0.28121325373649597,
+          -0.12030453979969025,
+          0.40902233123779297,
+          -0.3286115229129791,
+          -0.10667651891708374,
+          -0.18250571191310883,
+          -0.2189815491437912,
+          0.30035895109176636
+        ]
+      ],
+      "beta_norm": 1.5055471658706665,
+      "relative_leg_second_difference_p95_mm_per_frame2": 56.26202475979279
+    },
+    "pilot": {
+      "path": "research_records\\engineering_validation\\G20261012_smplh_reprojection_only_v1\\pilot\\result.npz",
+      "frames": 360,
+      "views": [
+        {
+          "mean_px": 52.874236503063685,
+          "confidence_weighted_mean_px": 52.2016793984865,
+          "median_px": 43.59448078298954,
+          "p95_px": 124.57824773343602,
+          "max_px": 980.2350822089519,
+          "per_joint_mean_px": [
+            74.90986282658089,
+            45.5222302414991,
+            38.99764374608355,
+            16.11821673116155,
+            23.5676790478513,
+            29.94253503124353,
+            20.936740151688955,
+            74.5724599714228,
+            59.379342831425404,
+            136.14910779114933,
+            23.353408368987573,
+            84.31729147530622,
+            100.08484771421503,
+            57.370560415262325,
+            39.3137084966158,
+            45.24776964595996,
+            29.078616065629355
+          ]
+        },
+        {
+          "mean_px": 54.66996785791817,
+          "confidence_weighted_mean_px": 53.971841292071524,
+          "median_px": 50.814022032894854,
+          "p95_px": 112.01022528776191,
+          "max_px": 166.45618984368917,
+          "per_joint_mean_px": [
+            83.79045130335506,
+            59.470177520368495,
+            56.123610196793756,
+            32.90661500584879,
+            16.75090455586516,
+            19.657619794690948,
+            30.04453189820425,
+            58.331478812091106,
+            65.92161302258778,
+            47.4520665625433,
+            97.06113784576972,
+            98.56174923671657,
+            91.7290722849969,
+            34.194941998269115,
+            66.28855380950166,
+            25.514942976785424,
+            45.63227235414805
+          ]
+        }
+      ],
+      "mean_px": 53.759380742854006,
+      "median_px": 46.954166428947985,
+      "p95_px": 117.02592107927946,
+      "mean_of_view_confidence_means_px": 53.08676034527901,
+      "betas": [
+        [
+          0.4901944696903229,
+          -0.369713693857193,
+          0.48576390743255615,
+          -0.08155898004770279,
+          0.23154203593730927,
+          -0.19828365743160248,
+          0.01299215853214264,
+          0.08422233164310455,
+          -0.15885791182518005,
+          0.16167183220386505
+        ]
+      ],
+      "beta_norm": 0.8781578540802002,
+      "relative_leg_second_difference_p95_mm_per_frame2": 25.043204896969602,
+      "body_reprojection": {
+        "weight": 0.002,
+        "scale_px": 25.0,
+        "mode": "dual_fisheye_raw_pmpose_huber",
+        "camera_parameters_optimized": false,
+        "stages": [
+          "A_body_vposer",
+          "B_shared_beta",
+          "C_body_vposer_refine"
+        ],
+        "uses_triangulated_3d_term": false,
+        "observation_mode": "reprojection_only",
+        "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+        "regressor_order": "posed_vertices_to_COCO17_then_fisheye_projection",
+        "triangulation_scope": "initialization_and_diagnostic",
+        "left_supported_pixels": 6120,
+        "right_supported_pixels": 5949,
+        "gradient_audit": [
+          {
+            "stage": "A_body_vposer",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "transl": 0.0019526821561157703,
+                "latent": 0.00017449905863031745
+              },
+              "vposer_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "beta_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          },
+          {
+            "stage": "B_shared_beta",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00017150102939922363
+              },
+              "vposer_prior": {
+                "beta": 0.0
+              },
+              "beta_prior": {
+                "beta": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0
+              }
+            }
+          },
+          {
+            "stage": "C_body_vposer_refine",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00015864253509789705,
+                "root": 0.0006961838807910681,
+                "transl": 0.00030369614250957966,
+                "latent": 3.9503331208834425e-05
+              },
+              "vposer_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 3.696443309308961e-05
+              },
+              "beta_prior": {
+                "beta": 3.2579908292973414e-05,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          },
+          {
+            "stage": "C_body_vposer_refine",
+            "step": 30,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00023068072914611548,
+                "root": 0.00019420019816607237,
+                "transl": 4.460550189833157e-05,
+                "latent": 4.153844201937318e-05
+              },
+              "vposer_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 3.838010525214486e-05
+              },
+              "beta_prior": {
+                "beta": 0.00010248641774524003,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0,
+                "root": 5.4001473472453654e-05,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          }
+        ]
+      },
+      "last_body_loss_row": {
+        "stage": "C_body_vposer_refine",
+        "stage_step": 99,
+        "step": 159,
+        "loss": 0.003704426111653447,
+        "body_m": 0.11751828342676163,
+        "body_2d_px": 53.102516174316406,
+        "hand_l_px": null,
+        "hand_r_px": null,
+        "hand_l_points": 0,
+        "hand_r_points": 0,
+        "contact_hand": 0.0,
+        "mano_pose_chordal": -0.0,
+        "contact_foot": 0.0,
+        "contact": 0.0,
+        "global_hand_handle": 0.0,
+        "contact_active": false,
+        "bone_m": 0.011002887971699238,
+        "root_anchor": 0.09757442027330399,
+        "hand_temporal": 0.0,
+        "body_temporal": 0.0,
+        "wrist_reference_rms_mm": null,
+        "weighted_terms": {
+          "observation_3d": 0.0,
+          "reprojection_2d": 0.0032989447936415672,
+          "vposer_prior": 0.00023379898630082607,
+          "beta_prior": 7.6474723755382e-05,
+          "root_anchor": 9.520768071524799e-05,
+          "bone_prior": 0.0,
+          "mano_prior": -0.0
+        }
+      },
+      "all_logged_3d_terms_zero": true
+    },
+    "control_full": {
+      "path": "research_records\\engineering_validation\\G20261012_smplh_reprojection_only_v1\\control_full\\result.npz",
+      "frames": 360,
+      "views": [
+        {
+          "mean_px": 52.40940480563665,
+          "confidence_weighted_mean_px": 51.59398244765449,
+          "median_px": 43.705338773811164,
+          "p95_px": 121.6935005920852,
+          "max_px": 976.5374191678405,
+          "per_joint_mean_px": [
+            75.88191703576807,
+            46.3658102775399,
+            39.88240677321919,
+            16.449953901381775,
+            22.83715218737488,
+            29.510011768580952,
+            20.496299322408284,
+            73.1853279323052,
+            59.02089283224711,
+            132.76816743924647,
+            24.61248777433003,
+            82.21317733238921,
+            97.50083594669344,
+            56.74646669547109,
+            39.76701235801235,
+            44.51486320552477,
+            29.207098913330213
+          ]
+        },
+        {
+          "mean_px": 53.80128046861955,
+          "confidence_weighted_mean_px": 52.92687462540706,
+          "median_px": 50.32730152861607,
+          "p95_px": 109.79438278671199,
+          "max_px": 163.1677913311746,
+          "per_joint_mean_px": [
+            84.35260796574873,
+            59.830205557850086,
+            56.5246701623023,
+            32.38955080929533,
+            16.498687963685235,
+            19.782287909401926,
+            29.31029503065169,
+            57.27541317886559,
+            63.42324251506054,
+            45.76626444368341,
+            93.34389358441294,
+            96.14659531329863,
+            90.00125778643428,
+            34.352844712039655,
+            65.61942971062628,
+            25.933963958406835,
+            44.63455155234799
+          ]
+        }
+      ],
+      "mean_px": 53.09548222042538,
+      "median_px": 46.66605188726879,
+      "p95_px": 115.1185170132378,
+      "mean_of_view_confidence_means_px": 52.260428536530775,
+      "betas": [
+        [
+          0.6614923477172852,
+          -0.3773559331893921,
+          0.7431132197380066,
+          -0.07854325324296951,
+          0.23627476394176483,
+          -0.19590875506401062,
+          0.01336820051074028,
+          0.07985524833202362,
+          -0.15834298729896545,
+          0.1621442288160324
+        ]
+      ],
+      "beta_norm": 1.135993242263794,
+      "relative_leg_second_difference_p95_mm_per_frame2": 25.294447456583267,
+      "body_reprojection": {
+        "weight": 0.002,
+        "scale_px": 25.0,
+        "mode": "dual_fisheye_raw_pmpose_huber",
+        "camera_parameters_optimized": false,
+        "stages": [
+          "A_body_vposer",
+          "B_shared_beta",
+          "C_body_vposer_refine"
+        ],
+        "uses_triangulated_3d_term": false,
+        "observation_mode": "reprojection_only",
+        "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+        "regressor_order": "posed_vertices_to_COCO17_then_fisheye_projection",
+        "triangulation_scope": "initialization_and_diagnostic",
+        "left_supported_pixels": 6120,
+        "right_supported_pixels": 5949,
+        "gradient_audit": [
+          {
+            "stage": "A_body_vposer",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "transl": 0.0019526821561157703,
+                "latent": 0.00017449905863031745
+              },
+              "vposer_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "beta_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          },
+          {
+            "stage": "B_shared_beta",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00017150102939922363
+              },
+              "vposer_prior": {
+                "beta": 0.0
+              },
+              "beta_prior": {
+                "beta": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0
+              }
+            }
+          },
+          {
+            "stage": "C_body_vposer_refine",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00015864253509789705,
+                "root": 0.0006961838807910681,
+                "transl": 0.00030369614250957966,
+                "latent": 3.9503331208834425e-05
+              },
+              "vposer_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 3.696443309308961e-05
+              },
+              "beta_prior": {
+                "beta": 3.2579908292973414e-05,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          },
+          {
+            "stage": "C_body_vposer_refine",
+            "step": 30,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00023068072914611548,
+                "root": 0.00019420019816607237,
+                "transl": 4.460550189833157e-05,
+                "latent": 4.153844201937318e-05
+              },
+              "vposer_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 3.838010525214486e-05
+              },
+              "beta_prior": {
+                "beta": 0.00010248641774524003,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0,
+                "root": 5.4001473472453654e-05,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          }
+        ]
+      },
+      "last_body_loss_row": {
+        "stage": "C_body_vposer_refine",
+        "stage_step": 290,
+        "step": 350,
+        "loss": 0.003690945915877819,
+        "body_m": 0.11453317850828171,
+        "body_2d_px": 52.266448974609375,
+        "hand_l_px": null,
+        "hand_r_px": null,
+        "hand_l_points": 0,
+        "hand_r_points": 0,
+        "contact_hand": 0.0,
+        "mano_pose_chordal": -0.0,
+        "contact_foot": 0.0,
+        "contact": 0.0,
+        "global_hand_handle": 0.0,
+        "contact_active": false,
+        "bone_m": 0.014178775250911713,
+        "root_anchor": 0.09716273844242096,
+        "hand_temporal": 0.0,
+        "body_temporal": 0.0,
+        "wrist_reference_rms_mm": null,
+        "weighted_terms": {
+          "observation_3d": 0.0,
+          "reprojection_2d": 0.0032319813035428524,
+          "vposer_prior": 0.00023588005569763482,
+          "beta_prior": 0.00012867858458776027,
+          "root_anchor": 9.440597932552919e-05,
+          "bone_prior": 0.0,
+          "mano_prior": -0.0
+        }
+      },
+      "all_logged_3d_terms_zero": true
+    },
+    "tuned_full": {
+      "path": "research_records\\engineering_validation\\G20261012_smplh_reprojection_only_v1\\tuned_full\\result.npz",
+      "frames": 360,
+      "views": [
+        {
+          "mean_px": 45.58894594550406,
+          "confidence_weighted_mean_px": 44.269557604498566,
+          "median_px": 37.351728285648036,
+          "p95_px": 110.99647198504009,
+          "max_px": 964.5414645778669,
+          "per_joint_mean_px": [
+            76.6704296092968,
+            46.08896541315751,
+            39.67459485991542,
+            16.164298418828835,
+            22.51618339373221,
+            30.978885497243837,
+            17.034893697682488,
+            64.13885932325668,
+            57.33392858487275,
+            76.09139197848903,
+            28.67121174973316,
+            82.19112442830824,
+            91.70174135555169,
+            48.68492596133861,
+            30.463880877765828,
+            29.13312538576558,
+            17.473640538630235
+          ]
+        },
+        {
+          "mean_px": 47.10564832200693,
+          "confidence_weighted_mean_px": 44.956243253551186,
+          "median_px": 40.85075050035567,
+          "p95_px": 108.088045390611,
+          "max_px": 156.7438734642971,
+          "per_joint_mean_px": [
+            86.2831939383133,
+            60.84381891003259,
+            57.71108954434646,
+            31.995984955893352,
+            16.07309805295079,
+            20.89942343989982,
+            26.5666211178582,
+            56.68224166872508,
+            54.70030053432473,
+            36.32201862899077,
+            48.391736549800186,
+            93.76129821831427,
+            88.04134839578681,
+            22.668022576108612,
+            57.4757560079383,
+            15.700612760064995,
+            30.850914353909793
+          ]
+        }
+      ],
+      "mean_px": 46.33655241147601,
+      "median_px": 38.752278289508766,
+      "p95_px": 109.1012418885288,
+      "mean_of_view_confidence_means_px": 44.612900429024876,
+      "betas": [
+        [
+          0.6580938100814819,
+          -0.3015596270561218,
+          0.5266539454460144,
+          -0.0679502859711647,
+          0.20853081345558167,
+          -0.16563819348812103,
+          -0.010134671814739704,
+          0.02146174944937229,
+          -0.150955468416214,
+          0.18106628954410553
+        ]
+      ],
+      "beta_norm": 0.9659525156021118,
+      "relative_leg_second_difference_p95_mm_per_frame2": 33.10031334330832,
+      "body_reprojection": {
+        "weight": 0.002,
+        "scale_px": 25.0,
+        "mode": "dual_fisheye_raw_pmpose_huber",
+        "camera_parameters_optimized": false,
+        "stages": [
+          "A_body_vposer",
+          "B_shared_beta",
+          "C_body_vposer_refine"
+        ],
+        "uses_triangulated_3d_term": false,
+        "observation_mode": "reprojection_only",
+        "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+        "regressor_order": "posed_vertices_to_COCO17_then_fisheye_projection",
+        "triangulation_scope": "initialization_and_diagnostic",
+        "left_supported_pixels": 6120,
+        "right_supported_pixels": 5949,
+        "gradient_audit": [
+          {
+            "stage": "A_body_vposer",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "transl": 0.0019526821561157703,
+                "latent": 0.00017449905863031745
+              },
+              "vposer_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "beta_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          },
+          {
+            "stage": "B_shared_beta",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00016732087533455342
+              },
+              "vposer_prior": {
+                "beta": 0.0
+              },
+              "beta_prior": {
+                "beta": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0
+              }
+            }
+          },
+          {
+            "stage": "C_body_vposer_refine",
+            "step": 0,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.00015540074673481286,
+                "root": 0.0006492203683592379,
+                "transl": 0.0003353893989697099,
+                "latent": 4.648897083825432e-05
+              },
+              "vposer_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 3.1362156732939184e-05
+              },
+              "beta_prior": {
+                "beta": 3.126165029243566e-05,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          },
+          {
+            "stage": "C_body_vposer_refine",
+            "step": 30,
+            "weighted_gradient_norms": {
+              "observation_3d": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "reprojection_2d": {
+                "beta": 0.0002196619607275352,
+                "root": 0.0001690078352112323,
+                "transl": 4.736729169962928e-05,
+                "latent": 4.354092379799113e-05
+              },
+              "vposer_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 3.289454980404116e-05
+              },
+              "beta_prior": {
+                "beta": 9.952852269634604e-05,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "root_anchor": {
+                "beta": 0.0,
+                "root": 5.002800389775075e-05,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "bone_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              },
+              "mano_prior": {
+                "beta": 0.0,
+                "root": 0.0,
+                "transl": 0.0,
+                "latent": 0.0
+              }
+            }
+          }
+        ]
+      },
+      "last_body_loss_row": {
+        "stage": "C_body_vposer_refine",
+        "stage_step": 290,
+        "step": 350,
+        "loss": 0.003340870840474963,
+        "body_m": 0.09844347089529037,
+        "body_2d_px": 44.646244049072266,
+        "hand_l_px": null,
+        "hand_r_px": null,
+        "hand_l_points": 0,
+        "hand_r_points": 0,
+        "contact_hand": 0.0,
+        "mano_pose_chordal": -0.0,
+        "contact_foot": 0.0,
+        "contact": 0.0,
+        "global_hand_handle": 0.0,
+        "contact_active": false,
+        "bone_m": 0.01315970066934824,
+        "root_anchor": 0.0942254513502121,
+        "hand_temporal": 0.0,
+        "body_temporal": 0.0,
+        "wrist_reference_rms_mm": null,
+        "weighted_terms": {
+          "observation_3d": 0.0,
+          "reprojection_2d": 0.0026445137336850166,
+          "vposer_prior": 0.000514164159540087,
+          "beta_prior": 9.340854740003124e-05,
+          "root_anchor": 8.878434891812503e-05,
+          "bone_prior": 0.0,
+          "mano_prior": -0.0
+        }
+      },
+      "all_logged_3d_terms_zero": true
+    }
+  }
+}

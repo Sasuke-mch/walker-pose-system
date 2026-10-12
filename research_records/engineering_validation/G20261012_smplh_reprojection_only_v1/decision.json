@@ -1,0 +1,22 @@
+{
+  "selected_candidate": "tuned_full",
+  "formal_mainline_promoted": false,
+  "reason": "lower complete-frame 2D residual after one prior revision; 15/34 view/joint slots worse vs reference25",
+  "weights": {
+    "body_3d": 0,
+    "body_2d": 0.002,
+    "scale_px": 25,
+    "vposer": 0.01,
+    "beta": 0.001,
+    "root": 0.01,
+    "mano": 0.1,
+    "hand_pca": 0.001
+  },
+  "input_scope": "all360, original pairs1157..1516",
+  "initialization_3d_retained": true,
+  "fit_code": "realtime_app/pose_app/smplh_fitting/pipeline.py",
+  "runner": "realtime_app/tools/run_smplh_reprojection_experiment.py",
+  "result": "tuned_full/result.npz",
+  "comparison": "control_full/result.npz",
+  "limits": "in-sample 2D agreement; hips/right-elbow worsen, independent 3D absent"
+}

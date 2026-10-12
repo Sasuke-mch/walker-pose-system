@@ -4222,3 +4222,14 @@ fit_registered_statistics要求每统计行对应唯一原train record/frame且�
 flow_next_documentation_checks_v1.json记录实际源码/结果来源及检查。仅构造fresh随机module计参数，没有forward或权重：52=711443、22=707603，逐模块和含token ID精确一致；Markdown代码围栏、所有嵌入JSON、两个文件链接、15个来源JSON解析通过。原帧导出106tests已在前一阶段实际执行，不重复包装为文档测试；历史训练/360/测速均本次只读产物未重跑。文档不填缺失指标0，不声称FM优势、真精度、真实校准或完整实时，长期目标仍未完成。
 
 下一步仅在新数据、明确训练授权或可复现缺陷出现时推进依赖路径；现有motion与独立reference清单为空，不通过继续架构堆叠/重复绿测试替代真实效果。详细架构与结果维护本身已落实，无网络训练/权重/正式主线修改/远端push。原92条用户工作区改动继续保留。
+
+
+### 2026-10-12 隔离SMPL-H二维重投影拟合与有界权重微调
+
+按用户新任务暂停Flow Matching研究，核对原reference25的A30/B30/C300/D100/D100、surface COCO17 regressor、原鱼眼投影、共享beta及MANO先验后，新增显式reprojection_only模式。3D观测残差关闭并切断梯度；保留三角化冷初始化及根方向先验，不能称完全无三维初始化。已启用的其他先验保留；原body temporal/bone/腕/contact保持关闭。正式主线与旧结果不替换。
+
+局部协议与完整记录research_records/engineering_validation/G20261012_smplh_reprojection_only_v1；流程、公式和注意事项已追加docs/CURRENT_SMPLH_ALGORITHM_20261002.md第26节。正确链为SMPL-H posed6890vertices→固定17×6890 COCO regressor→left/right标定鱼眼投影。两侧掩码独立finite/bounds/confidence，不沿用triangulation/ray quality；6120/5949点支持，全部原帧及失败槽保留。修复未用NaN/Z0分支、禁用3D残差边及光轴导数，supported非正depth失败。
+
+pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅修订一次VPoser0.02→0.01；二维weight0.002/scale25px、beta0.001、root0.01、MANO0.1和PCA0.001。完整560步同预算未微调对照与微调结果都保存。统一全像素mean/P95：原reference25=52.4002/111.1750px，未微调二维=53.0955/115.1185px，微调=46.3366/109.1012px；15/34槽变差，特别左视图右肘30.37→57.33px、双视图髋增大。不得称所有关节或真实三维精度提升，不自动主线晋升。详细每槽/形状/运动/梯度在evaluation.json。
+
+54测试+2 subtests、compileall通过；3历史兼容warning；新文件Ruff通过，选定规则与HEAD逐诊断对照22→16，无新增。初次lint环境/范围失败保留validation.json。大结果NPZ及日志仅本地，不提交权重/大产物。既有92条用户改动原样保留，仅提交本轮代码、已有文档追加和小型JSON记录，不push。

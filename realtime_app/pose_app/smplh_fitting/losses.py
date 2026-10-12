@@ -3,8 +3,36 @@
 Stage-level total-loss assembly remains explicit in pipeline.py.
 """
 
-import torch
 import numpy as np
+import torch
+
+
+def raw_pixel_support(raw, image_size):
+    """Per-view support independent of triangulation; retain reasons for all slots."""
+    raw = np.asarray(raw)
+    finite = np.isfinite(raw).all(axis=-1)
+    bounds = ((raw[..., 0] >= 0) & (raw[..., 0] < image_size[0])
+              & (raw[..., 1] >= 0) & (raw[..., 1] < image_size[1]))
+    positive = raw[..., 2] > 0
+    valid = finite & bounds & positive
+    reasons = np.full(valid.shape, "accepted", dtype="U32")
+    reasons[~positive] = "nonpositive_confidence"
+    reasons[~bounds] = "out_of_raw_image_bounds"
+    reasons[~finite] = "nonfinite_source"
+    return valid, reasons
+
+
+def enabled_body_observation(body_loss, weight, stage_index):
+    """Disabled 3D term has no autograd edge, including NaN diagnostics."""
+    if weight == 0 or stage_index >= 3:
+        return body_loss.detach().new_zeros(())
+    return weight * body_loss
+
+
+def supported_camera_points(points, valid):
+    """Keep absent points outside singular projection graphs, without filling observations."""
+    placeholder = points.new_tensor([0.0, 0.0, 1.0])
+    return torch.where(valid[..., None], points, placeholder)
 
 
 def observation_weights(quality, terms, accepted, mode, *, reference_reprojection_px=25.0,
@@ -64,6 +92,27 @@ def body_reprojection_loss(
     body_2d_loss = body_loss.detach() * 0.0
     body_2d_px = body_loss.detach() * 0.0
     if args.body_reprojection_weight > 0 and stage_index in (0, 1, 2):
+        if getattr(args, "body_observation_mode", "legacy") == "reprojection_only":
+            losses, pixels = [], []
+            for projection, target, confidence, valid in (
+                (proj_cam0, raw_left_2d, raw_left_conf, raw_left_valid),
+                (proj_cam1, raw_right_2d, raw_right_conf, raw_right_valid),
+            ):
+                if not valid.any():
+                    continue
+                # Select before arithmetic: absent NaN projections must not
+                # poison either values or gradients via NaN * zero.
+                residual = torch.linalg.vector_norm(projection[valid] - target[valid], dim=-1)
+                if not torch.isfinite(residual).all():
+                    raise RuntimeError("nonfinite supported body reprojection")
+                weights = confidence[valid]
+                scaled = residual / args.body_reprojection_scale_px
+                huber = torch.where(scaled <= 1, 0.5 * scaled.square(), scaled - 0.5)
+                losses.append((huber * weights).sum() / weights.sum())
+                pixels.append((residual * weights).sum() / weights.sum())
+            if not losses:
+                raise RuntimeError("no supported raw body pixels")
+            return torch.stack(losses).mean(), torch.stack(pixels).mean()
         e0 = (
             torch.linalg.vector_norm(proj_cam0 - raw_left_2d, dim=-1)
             / args.body_reprojection_scale_px

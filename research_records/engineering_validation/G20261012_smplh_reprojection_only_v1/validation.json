@@ -1,0 +1,87 @@
+{
+  "tests": "54 passed, 3 compatibility warnings, 2 subtests",
+  "compileall": "passed",
+  "new_files_full_ruff": "passed",
+  "changed_files_lint_rules": [
+    "--isolated",
+    "--select",
+    "E9,F,I,UP037,RUF059,SIM102,SIM114,PLC0414",
+    "--output-format",
+    "json"
+  ],
+  "baseline_lint_count": 22,
+  "current_lint_count": 16,
+  "introduced_lint_diagnostics": [],
+  "preexisting_diagnostics": [
+    {
+      "code": "I001",
+      "message": "Import block is un-sorted or un-formatted"
+    },
+    {
+      "code": "I001",
+      "message": "Import block is un-sorted or un-formatted"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "UP037",
+      "message": "Remove quotes from type annotation"
+    },
+    {
+      "code": "RUF059",
+      "message": "Unpacked variable `hand_lr_bounds` is never used"
+    },
+    {
+      "code": "RUF059",
+      "message": "Unpacked variable `hand_rl_bounds` is never used"
+    },
+    {
+      "code": "SIM114",
+      "message": "Combine `if` branches using logical `or` operator"
+    },
+    {
+      "code": "I001",
+      "message": "Import block is un-sorted or un-formatted"
+    },
+    {
+      "code": "I001",
+      "message": "Import block is un-sorted or un-formatted"
+    },
+    {
+      "code": "PLC0414",
+      "message": "Import alias does not rename original package"
+    }
+  ],
+  "initial_lint_failure": "CUDA environment had no ruff; uvx resolved it. First broad lint reported style issues. First isolated baseline comparison incorrectly enabled E501/88 chars and rejected long lines; corrected scope excludes E501 consistently with actual project check. New import/C408/SIM102 findings repaired.",
+  "surface_contract": "actual nonnegative 17x6890 regressor rows sum to one; regress before project; axis gradcheck passed",
+  "fit_runs": "pilot160steps; two full560step runs;360 originals each; no external 3D residual in objective",
+  "masked_projection_fix": "pilot/control predate supported-camera-placeholder helper; tuned includes it; supported forward values unchanged for finite positive-depth inputs",
+  "saved_mesh_regressor_max_abs_error_m": 1.1359825902168552e-07,
+  "all_output_parameters_finite": true
+}
