@@ -887,3 +887,12 @@ Stage2使用历史相机系脚点中位数再做0.45平移更新，会引入因�
 按用户明确选择，当前448展示采用G20261012_ankle_simple_ablation448_v1/weight2x/result.npz，不重复拟合。同目录smoothed以原SO3邻帧0.1/≤2°、transl≤3mm重新解码，保留原网格/COCO/内部关节点开关与固定beta/手姿；最大顶点修正27.34mm如实记录，不称精度提升。selection.json保存当前选择；前轮D2门失败继续保留。正式360身体选择未由本次展示替换。
 
 view以原同源图像重新strict/Stage/背景旋转/地面，使用主线mainline→supported_stop_fixed_lag；标题“二维关节点损失优化”，侧栏完全沿用minimal-text精简样式。原冷实验命令存在重复参数，被导出预检拒绝，export.log及export_preparation_failure.json保留；viewer_fit_args.json规范化末值，完整parser选项逐项一致，无拟合改动。第二次导出成功。22来源/变换检查通过，原开关/冻结字段/端点及当前scene与已验收profile全字段等值检查通过。浏览器0/22/380/391/447、播放/平滑开关、Stage2/过渡闭合/Stage1保持实测，console error为空。当前页view/body_browser.html及配套GZ；离线body.html，截图preview.jpg，记录browser_validation/source_validation。仅小记录与已有文档追加提交，大HTML/NPZ/GZ/图片不提交，不push；92已有工作区改动保留。
+
+
+### 2026-10-12 当前0.004结果的踝点“滞后”分析
+
+当前weight2x与smoothed各448原ID严格对齐、踝/髋二维支持全保留。audit_ankle_phase.py只用缓存与鱼眼投影，不拟合/重放场景。全局相位比较固定12..435的424帧，同一帧区间测试k=-10..10，定义model[t+k]与observed[t]的骨盆相对踝向量相关；正k仅表示这个诊断中模型相位较晚，不是测得硬件延迟。raw/smoothed最佳k均：左视图左踝+2、右踝−1；右视图左踝+2、右踝0。左踝0移位相关raw0.923/0.885→best0.939/0.898，差异小；smooth0.926/0.888→0.942/0.901。不能认定全模型统一错后2帧，也不能通过手动移帧修复。
+
+当前391原始左踝模型左右投影偏差119.33/101.36px，而同观测DLT左右回投7.42/5.79px；右踝36.96/7.12px、DLT4.59/5.03px。说明二维目标有变化，但当前SMPL-H解未充分贴合，尤其左踝坏帧仍严重；DLT仍非独立真值。此前运动幅度仅二维观测62%–69%，幅度压缩与位置偏差比全局最佳移帧更能解释视觉脚部落后。
+
+实现是同帧posed mesh→COCO→两视图鱼眼软损失，与VPoser/根/共享beta先验共同最小化，Huber25px外线性、全身平均；没有逐踝必须对齐门。全身耦合的运动先验及根方向锚会保留折中，不能仅凭这些比较给出唯一逐帧因果。body_temporal=0，无前帧人体预测状态；显示邻帧0.1是双侧平滑，raw/smoothed最佳相位相同；Stage0.5秒缓冲给身体和骨架同帧同变换，已通过来源验证，不解释相对模型/骨架错位。脚骨架只显示位置，SMPL-H须同时满足全身形状/姿态，二维软目标不等价逐点硬投影相等。审计记录ankle_phase_audit.json，AST及缓存ID/finite/支持检查通过，未重跑神经权重或改页面/损失。下一简单阶段应单独评估踝二维权重与坏帧残差门，不靠统一移帧或盲目增加步数。

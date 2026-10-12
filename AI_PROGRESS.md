@@ -4292,3 +4292,10 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 当前448选择G20261012_ankle_simple_ablation448_v1/selection.json，采用已完成weight2x结果，邻帧0.1/2°/3mm少量SMPL-H平滑重新解码；不重拟合。view完整原图fresh strict/Stage/旋转/地面，mainline→supported_stop_fixed_lag，标题“二维关节点损失优化”与原精简侧栏保持。22source检查、原数据开关/冻结字段/端点核对、fresh scene与已验收profile全字段等值核对通过，浏览器0/22/380/391/447、播放/平滑正常且无error，preview.jpg/browser_validation保存。
 
 首次因实验命令重复参数在创建view前失败；规范化viewer_fit_args保证parser所有有效选项逐项相同，原export.log/失败记录保留；export_v2成功。前轮D2变化门未过继续保留，用户选择展示不等于性能/物理真值门晋升；正式360身体选择保留。当前打开view/body_browser.html（配套GZ），离线body.html。仅小JSON/已有文档追加本地提交，92用户改动及旧页面/失败证据保留，未推送。
+
+
+## 2026-10-12 当前踝相位与幅度错位分析
+
+只审计当前0.004/C300缓存raw/smoothed，不拟合、不改页面。audit_ankle_phase固定424中间帧相同支持区间检查−10..10位移：左右视图左踝最佳+2，右踝−1/0；原/平滑完全相同，左踝相关提升仅约0.013..0.016，无统一固定帧索引后移证据。391原左踝仍119.33/101.36px模型残差，同2D DLT回投7.42/5.79px，说明目标已动但拟合未贴合；先前相对踝幅度只有62%–69%，主要视觉落后兼有轻微左侧相位不一致。
+
+软二维目标、Huber尾部、全身VPoser/根/共享形状折中允许大局部残差；body temporal关闭，双侧显示平滑并不增加统一因果延迟，Stage缓冲和显示用同帧/同变换。不能把最佳+2诊断称硬件延迟或自动移帧。记录同实验ankle_phase_audit.json与现有算法文档追加；全448ID/支持、finite与AST检查通过。小源码/JSON/文档本地提交，92原改动保留，不推送。
