@@ -4373,3 +4373,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 现有WiLoR转换仅局部手指旋转，非全局R/T/beta；离线全片共享拟合不是因果起点，next标签records仍0。修正先前“必须完整325D观测”：未知分量q0可保留噪声，但增加WiLoR条件须公平对照。预注册后精确源方差检查q0/.8/.99/1对应1/.04/.0001/0，单位目标标准差线性增益1/5/100/不可行；部分q1可由其他随机维度耦合，不能泛称人体模型必然失败。
 
 证据flow_next_bridge_support_audit_v1.json及MODEL_RESULTS第19节，JSON/断言通过。暂停质量桥实现准备，不添加proposal/质量网络，回到高斯源单模型与G0/G1的最小决定性消融和真实数据门。未训练，正式主线未改，长期目标未完成。
+
+
+## 2026-10-12 JointFlow最小消融与信息回归推理补齐
+
+用户明确回复暂无额外数据，当前validate_manifest实际training_data_ready=false、训练与噪声records0，训练/神经checkpoint开关仍关闭。将Flow/回归×无Λ/有Λ四法、fresh无Λ训练对照、15104未激活信息参数边界、共同anchor/J及实际单模型成本分别记入flow_research_plan_v1.json追加协议，K32主ES与K64预算对照区分，不用免费Λ或推理关闭G1制造公平比较。效能未运行，完整训练/四法runner仍缺。
+
+发现candidate_store.infer回归分支仍拒绝Λ；预注册后两拓扑red为2failed/4passed，最小2行修复透传且保留K1。35相关测试通过、2文件Ruff/AST通过，验证实际候选/非均匀反归一化/确定性/缺失拒绝/非法Λ和1次调用计数，707603/711443参数及值不变。test_candidates.py不存在的读取失败保留validation。详见flow_next_regression_inference_validation_v1.json和MODEL_RESULTS第20节。未训练或改正式主线，长期目标保持进行。

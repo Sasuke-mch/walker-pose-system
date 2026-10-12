@@ -804,3 +804,18 @@ flow_next_quality_bridge_protocol_v1.json先登记精确标量检查。设真值
 预注册flow_next_bridge_support_protocol_v1.json后计算固定y/q的源协方差diag((1-q)^2)。q=0/.8/.99/1时单维方差1/.04/.0001/0；要得到单位标准差目标，线性增益为1/5/100/不可行。全q1时源是点，确定性ODE不能产生条件多解。部分q1只降低源秩，稠密动力学可向该坐标传播其他维度噪声，不能断言这些输出坐标必然不变；规则Lipschitz流的支撑维度限制也不能直接等同325D R6D中的人体内在维度。解析反例不构成StableHand实测失败或JointFlow精度结论。数值与资源入口在flow_next_bridge_support_audit_v1.json，JSON及断言通过。
 
 决定：不将硬q1冻结作为概率模型默认，不增加质量预测器、完整proposal或噪声补丁。质量桥分支暂停实现准备，普通高斯源条件FM继续作为首要强对照。本次纠正可行性推理，但没有满足独立标签、训练授权与有效性门。下一阶段回到G0/G1简约性，明确能真正判别必要性的最小消融及仍缺数据，避免继续凭随机/解析检查迭代新架构。
+
+
+## 20. 2026-10-12 无额外数据确认、最小消融与信息回归推理修复
+
+用户直接回复“暂无”，明确未提供额外未登记标签/噪声参考；实际validate_manifest返回training_data_ready=false、records=0，noise清单records也为0，训练/神经checkpoint开关继续false。不能把当前360/448拟合、已有合法人体资产或随机fixture当作这些缺失数据。上轮被用户回复打断，未运行训练进程；本轮接续同一阶段。
+
+消融收敛为Flow/回归×无Λ/有Λ四个最终学习器，细节追加在现有flow_research_plan_v1.json的decisive_generation_ablation_20261012。主变量为信息是否输入或训练目标，种子7/17/27、每seed同初始参数/数据/配方，CFM固定K32/Euler8，回归K1。F_info必须与重新独立训练、配方匹配的F0比较；不能仅推理关闭已训练G1的Λ，也不能只和训练不同的冻结G0比。信息投影15104参数在无Λ条件中不活跃，711443名义参数相同不等于有效容量完全等同。
+
+生成阶段固定raw own-T COCO17标准化ES和A4完整medoid，beta分开，不同时调A6/A7。输入作用隔离时两边同样计入共同G0/J；实际单模型部署另记可省去的G0/J成本，不能用免费缓存Λ。K64单模型与G0K32+G1K32只能说512候选速度评估相同；前者8批网络调用、后者16批且另有FD最多339状态，wall-time待实测。V-statistic ES受K影响，K32为主比较；K64预算对照报告两个K32面板及原K64结果，不能以增加K本身证明分布更好。效能门继承既有5%收益/配对CI/强几何2%恶化及失败、覆盖等标准；最多两轮有意义性能修订，当前未执行，既不能据缺证据认定G1有用，也不能宣称已证无用。
+
+本轮源码审查发现此前第11节的regression/loss透传未覆盖部署infer：candidate_store.infer回归分支仍拒绝information且不传入model.regression。先登记flow_next_regression_inference_protocol_v1.json，再扩展已有test_regression_information.py；修改前22/52两项都在旧拒绝分支失败，2failed/4passed。仅删除information禁止条件、保留K1门并透传Λ。修复后35相关regression/joint/encoding/binding测试通过（2.88s），两文件Ruff与AST通过；不把本轮35称完整next测试。
+
+新测试通过实际infer确认：非均匀Normalization后raw与直接regression逐值相等；换stream/seed仍确定；none与zeroΛ逐值相等；非零Λ实际改变输出；K2、错维度、NaN拒绝；缺观测不发布、原失败原因保留；一候选、一网络速度调用、一状态计数；参数707603/711443及参数值都不变。未用训练优化器、神经checkpoint或真实数据。审计曾读不存在的test_candidates.py，失败保留于validation，没有当作测试执行。结果见flow_next_regression_inference_validation_v1.json。
+
+当前仅有匹配对照的单帧接口，train.py依然没有数据loader/优化器/权重生命周期，完整四法训练评估runner也未实现，不能称效能消融已可运行。后续阅读仍可继续；新机制必须先说明有何可判别优势及需要什么监督，避免无数据时持续扩架构。效能验证等待资源与训练门满足；长期目标未完成。

@@ -120,9 +120,9 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
     noise, seeds = nested_noise(observation, k, model.topology, stream=stream,
                                device=context.device, dtype=context.dtype)
     if regression:
-        if k != 1 or information is not None:
+        if k != 1:
             raise ValueError("regression is a single deterministic control")
-        normalized = model.regression(context[None])
+        normalized = model.regression(context[None], information)
         calls = 1
     else:
         normalized = model.sample(context, noise, steps=steps, information=information)

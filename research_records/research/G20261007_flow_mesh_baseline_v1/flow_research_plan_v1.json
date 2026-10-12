@@ -134,5 +134,93 @@
     "config": "flow_next_config_v1.json",
     "scope": "S0-S5 authorized no-training implementation and engineering checks complete; training/data/efficacy/true accuracy not completed",
     "historical_design_evidence_preserved": true
+  },
+  "decisive_generation_ablation_20261012": {
+    "status": "preregistered_not_executed_training_closed",
+    "question": "Does frozen local information conditioning justify the extra G0/J route compared to a freshly trained single conditional model and same-information regression?",
+    "final_learners": [
+      {
+        "id": "F0",
+        "objective": "CFM",
+        "information": false,
+        "final_K": 32,
+        "Euler_steps": 8,
+        "deployment": "one model; no G0/J if plain A4 used"
+      },
+      {
+        "id": "F_info",
+        "objective": "CFM",
+        "information": true,
+        "final_K": 32,
+        "Euler_steps": 8,
+        "deployment": "frozen G0 K32/Euler8 -> localJ -> independently trained final model"
+      },
+      {
+        "id": "R0",
+        "objective": "regression",
+        "information": false,
+        "final_K": 1,
+        "velocity_calls": 1,
+        "deployment": "one deterministic model"
+      },
+      {
+        "id": "R_info",
+        "objective": "regression",
+        "information": true,
+        "final_K": 1,
+        "velocity_calls": 1,
+        "deployment": "same frozen G0/J -> deterministic regression; infer now forwards information"
+      }
+    ],
+    "pairing": {
+      "training_seeds": [
+        7,
+        17,
+        27
+      ],
+      "final_initial_weights": "identical per seed and matched core before each independent training; no assumption that frozen G0 is the same learner as freshly trained F0",
+      "data_recipe": "same subject/action/sequence splits, matched optimizer/steps/checkpoint rule within objective, corrected identity-binding encoder, Gaussian source for CFM",
+      "final_CFM_noise": "same observation/frame/candidate key and final stream, K32 prefix; does not identify temporal mode",
+      "external_conditions": "fixed registered rig/noise first; varying-noise is separate equal-input experiment"
+    },
+    "controlled_contrasts": [
+      "F_info versus freshly trained F0: information representation; observational source unchanged but derived input added; not evidence of new independent measurement",
+      "R_info versus freshly trained R0: information representation with deterministic objective",
+      "F_info versus R_info, and F0 versus R0: objective distinction at matched nominal core and information; regression remains K1 point output, not 32 independent samples",
+      "F_info system versus practical single F0: full deployment utility/resource tradeoff including anchor/J"
+    ],
+    "do_not_use_as_primary": [
+      "turn off information only at inference of trained F_info",
+      "compare only against differently trained frozen G0",
+      "tune selection A6/A7 together with generator",
+      "call K64 single model equal wall-time because candidate evaluations match",
+      "claim equal effective capacity solely from equal parameter tensors"
+    ],
+    "capacity": {
+      "nominal_core52": 711443,
+      "info_projection_weights": 15104,
+      "note": "information=None leaves existing information projections unused; equal nominal parameters do not prove equal active capacity",
+      "two_model_stored_total52": 1422886
+    },
+    "generation_primary": "fixedK32 raw standardized own-T COCO17 energy score with training-only scale; beta separately; A4 complete medoid for selected-error guard; no selector tuning and no joint-wise averaging",
+    "distribution_evaluation": "all raw/legal/action failures retained; K1 regression is explicitly deterministic; missing raw score blocks keep unavailable status and prevent complete-evidence claim",
+    "information_isolation_cost": "shared G0/J also computed and reported on no-information controls when isolating information usage; additionally report practical no-G0/J F0/R0 cost. Never call cached information free at deployment.",
+    "sampling_budget_secondary": {
+      "single_F0_K64": "8 batch velocity calls,512 candidate velocity evaluations",
+      "F_info": "16 batch velocity calls,512 candidate velocity evaluations plus339 FD decoder states at full52/all-admitted anchor; final decoding/scoring extra",
+      "ES_comparison": "fixedK32 primary; ifK64 budget control reported, use two fixedK32 score panels separately and explicitly retain actualK64 result because V-statistic expectation depends onK",
+      "walltime": "measure actual encoder/G0/J/final decoding/selection and device memory; no matched-walltime claim without measurement"
+    },
+    "decision": "retain G1 route only with >=5percent ambiguity-stratum energy improvement and paired95percentCI versus fresh F0 plus applicable non-degradation/retention/legality guards; system simplification decided from practical cost-quality curve. Negative evidence after at most2 meaningful revisions closes route; an unrun gate supports neither retain nor remove for efficacy.",
+    "inheritance": "flow_research_plan_v1 acceptance and flow_next_config_v1 criteria retained: strong-geometry degradation<=2percent, illegal-rate increase<=.005, same-cache selector stage separate, coverage/width and independent-truth gates; real-time requires full pipelinep95<=33.3ms",
+    "unresolved_before_effect_run": [
+      "legal complete matched-family/basis target data and independent calibration records",
+      "training authorization and real data-loader/optimizer/checkpoint loop",
+      "four-method paired runner",
+      "pretest ambiguity/strong-geometry strata and participant-level sample-size rationale from real pilot; two subjects is validation minimum, not power assurance"
+    ],
+    "current_run_results": null,
+    "user_extra_data": "暂无",
+    "independent_efficacy_established": false
   }
 }

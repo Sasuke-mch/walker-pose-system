@@ -40,10 +40,10 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Consolidate the smallest decisive G0/G1 ablation with Gaussian-source single-generator/regression controls and matched information/cost; verify actual data and training gates. Avoid further random/analytic architecture expansion in place of efficacy evidence.",
+  "next_stage": "Continue bounded primary human-pose mechanism research with explicit supervision and causal requirements; prioritize whether a shared legal geometry representation can replace redundant stages. Efficacy ablations wait for data and training authorization; do not ask repeatedly for unavailable data, expand random variants, or claim four-method runner exists.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 partial source resource audit; corrected full-state-observation requirement; source variance collapse quantified; quality bridge implementation preparation stopped",
+  "last_completed_stage": "2026-10-12 user confirmed no additional data; decisive 2x2 objective/information controls preregistered; regression infer information path fixed with2red and35green relevant tests",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {
@@ -66,5 +66,16 @@
     "variable_noise": "equal declared noise inputs or label as combined architecture-plus-information comparison",
     "same_information": "include complete anchor/J acquisition cost, never free cached Lambda",
     "confidence": "not a calibrated precision substitute"
+  },
+  "data_resource_confirmation": {
+    "date": "2026-10-12",
+    "user_reply": "暂无",
+    "training_records": 0,
+    "noise_reference_records": 0,
+    "training_data_ready": false,
+    "training_enabled": false,
+    "checkpoint_loading_enabled": false,
+    "effectiveness_runs": "not_executed",
+    "control_protocol": "flow_research_plan_v1.json::decisive_generation_ablation_20261012"
   }
 }
