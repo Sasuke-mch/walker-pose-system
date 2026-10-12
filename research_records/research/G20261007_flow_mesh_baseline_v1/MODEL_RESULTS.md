@@ -754,3 +754,18 @@ test_identity_binding.py使用CPU float64固定seed7/19/31、全准入34槽、�
 相关文献本轮读取[Solving physics-constrained inverse problems with conditional flow matching](https://arxiv.org/html/2603.14135v1)第2.2节式18–21及附录A的MLP条件注入描述：以联合样本学习直接条件速度场，不要求每次推理额外求导；目标依赖所用联合数据与条件。本文中这些理想条件不能认证我们128维压缩条件、有限网络和Euler8就是正确后验。仅核对论文文本，未定位并核验该作者实现，不计复现。Deep Sets会议摘要作为集合模型背景读过，不以摘要认证本项目修复；置换缺陷与修复依据为上面的源码代数和实际red/green测试。
 
 决定：先修复条件表达，再评价G1是否提供表示收益。保留双阶段候选但不认定其必要；单生成器直接条件FM是已有方法类别，不称创新。下一阶段核对官方条件FM实现及当前encoder没有显式表达的相机/噪声信息，避免把删除G1造成的输入差异误判为网络数量差异。训练关闭、独立有效性门仍未满足。
+
+
+## 16. 2026-10-12 外部噪声条件审查与公平对照约束
+
+先登记flow_next_noise_condition_protocol_v1.json，再扩展已有audit_conditioning.py。固定obs、解析rigid_surface、store_fixture完整候选、人工rig与尺度，唯一变量NoiseModel.proxy的sigma1/2；CPU，encoder float32、几何float64。G0 encoder输入没有noise参数，两次context逐值相等；实际local_information的J逐值相等，Λ(sigma2)=Λ(sigma1)/4最大误差0。G1 information_features最大差1.386285502。精确标量例prior N(0,1)、y=1，噪声方差1/4对应后验mean0.5/0.2、variance0.5/0.8，说明同观测不决定不同已知噪声条件下的同一后验。没有训练或候选采样，不证明G1实际校准。固定噪声可隐含在权重中，confidence也不能未经标定充当precision。
+
+结果flow_next_conditioning_audit_v3.json及旧v2保留：v2沿用旧boundary误写no neural model，实际调用了随机未训练encoder；v3修正文案并重新执行。两版数值相同；Ruff与AST通过。旧v1仅标量审查范围不被改写。当前改变的仅审计脚本，不增加生成器输入或参数。
+
+相机信息需区别对待：encoder已有origins/directions，不能说完全没有rig；但未显式输入完整K/D或NoiseModel.precision。G1的Λ依赖surface、rig、scale、anchor及precision，也不是这些来源的可逆编码。PnP ID用于绑定，不自动编码校准参数。当前records=0的独立噪声校准清单仍未满足。
+
+公平对照约束：固定rig/noise训练与测试可比较同encoder的单生成器与双阶段；变化noise实验必须对两边提供同一登记noise条件，否则只能称“架构加额外条件”的组合比较。给单生成器相同冻结Λ的对照须完整计入产生anchor/J的成本，不能把G0开销隐藏；独立共享anchor或无Λ方案是不同控制。参数数、总网络调用、候选数和wall-time不能同时用一个K数宣称匹配，需分别登记。暂不新增noise MLP或把noise偷塞入confidence槽。
+
+官方实现核对：[Meta Flow Matching条件教学代码](https://facebookresearch.github.io/flow_matching/notebooks/standalone_flow_matching.html)，实际阅读conditional段Flow.forward/step、训练及采样：训练和采样均显式提供c，c与t/x在首层前拼接；step为两次速度调用的中点法，不是一次Euler。只读取源码，未运行训练、未复制代码；这是类别标签教学例，不是2603.14135作者代码或人体逆问题复现。该逆问题论文作者仓库本轮检索未定位，不声称不存在。
+
+决定：将输入信息公平性列为后续G0/G1消融前提，继续关闭训练门。下一轮回到先进论文的可迁移机制与官方实现，重点比较单模型条件化与推理时修正的目标分布、合法人体表示和总成本；不继续用条件接口检查代替效能研究。

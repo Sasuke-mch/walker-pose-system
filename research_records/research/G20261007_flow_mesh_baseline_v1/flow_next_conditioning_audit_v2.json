@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-12",
+  "kind": "exact_scalar_analytic_counterexamples",
+  "noise_input_contract": {
+    "operator": "actual local_information on analytic rigid_surface and artificial rig",
+    "context_dtype": "float32",
+    "geometry_dtype": "float64",
+    "device": "cpu",
+    "sigmas_px": [
+      1,
+      2
+    ],
+    "G0_context_identical": true,
+    "J_identical": true,
+    "information_quarter_max_error": 0.0,
+    "G1_feature_max_difference": 1.3862855020369054,
+    "scalar_posterior": {
+      "model": "prior N(0,1), y=x+eta, observed y=1",
+      "variance1": {
+        "mean": 0.5,
+        "variance": 0.5
+      },
+      "variance4": {
+        "mean": 0.2,
+        "variance": 0.8
+      }
+    },
+    "conclusion": "G0 has no explicit external precision input; G1 receives noise through information; a variable-noise comparison confounds conditioning with generator count",
+    "limit": "fixed-noise models may encode noise in weights; this is not proof G1 learns calibrated posterior or that confidence identifies noise"
+  },
+  "curvature_only": {
+    "model": "y=x+eta, W=1, anchor=0",
+    "cases": [
+      {
+        "measurement": -1,
+        "anchor": 0,
+        "curvature": 1,
+        "gradient": 1,
+        "gauss_newton_step": -1
+      },
+      {
+        "measurement": 1,
+        "anchor": 0,
+        "curvature": 1,
+        "gradient": -1,
+        "gauss_newton_step": 1
+      }
+    ],
+    "conclusion": "curvature alone has no residual direction; current context also contains observations, so this is not a full G1 indistinguishability claim"
+  },
+  "likelihood_reuse": {
+    "prior": "N(0,1)",
+    "measurement": 1,
+    "noise_variance": 1,
+    "once": {
+      "mean": 0.5,
+      "variance": 0.5
+    },
+    "twice": {
+      "mean": 0.6666666666666666,
+      "variance": 0.3333333333333333
+    },
+    "variance_relative_change": -0.3333333333333333,
+    "conclusion": "ideal observation-conditional posterior multiplied by the same likelihood changes its target; this is not evidence that present A6 decision risk reweights the generator"
+  },
+  "boundary": "no neural model, data replay, training, posterior calibration or measured runtime improvement",
+  "next": "audit residual-aware operator conditioning on current nonlinear endpoint with legality and total-cost controls before any new generator"
+}

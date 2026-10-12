@@ -1,0 +1,13 @@
+{
+  "only_variable": "external NoiseModel proxy sigma 1 versus 2 at identical observation, candidates, rig and scale",
+  "checks": [
+    "G0 context exactly unchanged",
+    "J unchanged",
+    "information sigma2 = information sigma1 /4",
+    "G1 encoded information differs",
+    "analytic prior N(0,1), y1 posteriors differ at noise variances1 and4"
+  ],
+  "success": "all exact structural/numerical conditions pass; document fixed-noise versus variable-noise ablation distinction",
+  "stop": "no architecture modification or inferred accuracy; no assertion confidence is calibrated noise",
+  "training": false
+}

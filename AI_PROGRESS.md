@@ -4345,3 +4345,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 发现旧StateEncoder将joint/view身份加在MLP后再均值池化，同掩码槽位特征交换会产生相同条件。预注册identity协议后6交换测试先失败、旧公式恒等式通过；仅将已有身份移到GELU前绑定内容，参数仍711443，完整next117测试通过、两文件Ruff和AST通过。无新模块/训练/神经checkpoint，非真实精度提升。各seed差值与red/green结果见flow_next_identity_audit_v1.json、MODEL_RESULTS第15节；MODEL_ARCHITECTURE主描述同步。
 
 新读2603.14135v1条件FM推导及MLP条件注入文本，未核验作者实现。后续单/双生成器及回归对照统一采用修复后encoder，继续审查相机/噪声条件缺口后再谈删除G1，避免不公平对照。长期目标继续，正式主线不变。
+
+
+## 2026-10-12 JointFlow外部噪声条件公平性审查
+
+预注册后固定obs/store/rig，sigma1→2使G0 context逐值不变、J逐值不变、Λ精确变为1/4，G1信息特征改变。审计运行通过，见flow_next_conditioning_audit_v3.json；v2旧边界文案错误保留并修正，实际只有随机encoder未训练/未采样。Ruff/AST通过。固定噪声可由权重学习，变化噪声需显式同条件对照；不能把confidence当precision，或给单模型免费缓存Λ而隐藏G0/J成本。
+
+阅读Meta官方条件FM示例实际forward/step/train/sample源码，确认c训练/采样一致与中点法双调用；未运行，不是人体逆问题复现。MODEL_RESULTS第16节、架构与长期协议同步；下一轮继续论文机制/官方实现审查，训练关闭及正式主线保留。

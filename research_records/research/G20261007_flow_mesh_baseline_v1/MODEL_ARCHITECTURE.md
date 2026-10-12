@@ -160,3 +160,6 @@ A7只在Rk≤minR+validation delta的近等价集合中最小化相对上次发�
 
 
 2026-10-12邻域门审查：实际local_information的解析边界反例确认“锚点投影合法+AD有限”不等于原FD邻域合法；MODEL_RESULTS第14节保存原拒绝。关闭anchor-only直接替换捷径，暂停局部AD性能替换，不新增边界启发式；后续转回单生成器条件机制的简约性审查。
+
+
+2026-10-12输入公平性补充：G0的Observation条件不含外部NoiseModel.precision，G1经Λ间接接收；已有码origins/directions不能忽略，也不能等同完整K/D和噪声条件。变化noise的单/双阶段对照必须登记相同可用信息；相同Λ控制需计入anchor/J成本。实际sigma1/2审计见MODEL_RESULTS第16节，未新增条件模块。
