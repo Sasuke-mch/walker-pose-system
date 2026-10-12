@@ -1,0 +1,25 @@
+{
+  "stage": "licensed surface Jacobian audit",
+  "outputs": [
+    "flow_next_jacobian_audit_v2.json",
+    "flow_next_jacobian_audit_v3.json"
+  ],
+  "startup_failure": "flow_next_jacobian_failure_v1.json",
+  "lint_initial_failure": "B023 closure captured anchor and zero; defaults now bind per-anchor values",
+  "lint_final": "offline Ruff passed",
+  "syntax": "ast.parse passed",
+  "metadata_correction": {
+    "affected_outputs": [
+      "flow_next_jacobian_audit_v2.json",
+      "flow_next_jacobian_audit_v3.json"
+    ],
+    "incorrect": "camera_source says pinhole-limit fisheye D0",
+    "actual": "tests.test_aggregate.rig K fx300 fy290 cx320 cy240; D=[.03,-.01,.001,0]; baseline .2; image640x480",
+    "scope": "output text only; both numerical runs used actual imported nonzero-D rig; historical output retained; runner corrected after v3 started",
+    "information": "H=J.T@J unweighted, not calibrated precision-weighted information"
+  },
+  "timing_limit": "v3 much slower than v2; no controlled load/power evidence to attribute change; no stable speedup factor or whole-chain speed claim",
+  "guard_limit": "FD plus AD is a conservative one-shot implementation and also constructs FD J; not an optimized guard benchmark; no rejected-anchor parity test executed",
+  "decision": "numerical gate passed at two artificial anchors; no default replacement",
+  "training": false
+}

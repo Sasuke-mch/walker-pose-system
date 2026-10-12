@@ -1,0 +1,180 @@
+{
+  "device": "cuda",
+  "dtype": "float64",
+  "torch": "2.11.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "assets": [
+    "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+    "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+    "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+  ],
+  "regressor": "models/smpl/J_regressor_coco.npy",
+  "camera_source": "tests.test_aggregate.rig artificial pinhole-limit fisheye D0",
+  "anchors": [
+    {
+      "index": 0,
+      "beta": 0.0,
+      "local_node3_standardized_rotation_x": 0,
+      "results": {
+        "finite": {
+          "records": [
+            {
+              "ms": 384.89270000718534,
+              "decoder_states": 339,
+              "peak_extra_cuda_bytes": 31260672
+            },
+            {
+              "ms": 397.3026000021491,
+              "decoder_states": 339,
+              "peak_extra_cuda_bytes": 31260672
+            },
+            {
+              "ms": 359.3834000057541,
+              "decoder_states": 339,
+              "peak_extra_cuda_bytes": 31260672
+            }
+          ],
+          "finite": true,
+          "median_ms": 384.89270000718534,
+          "J_relative_frobenius": 0.0,
+          "H_relative_frobenius": 0.0
+        },
+        "reverse_scalar": {
+          "records": [
+            {
+              "ms": 764.171200004057,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 2579456
+            },
+            {
+              "ms": 793.1057999958284,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 2579456
+            },
+            {
+              "ms": 701.9542000052752,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 2579456
+            }
+          ],
+          "finite": true,
+          "median_ms": 764.171200004057,
+          "J_relative_frobenius": 1.2497101741415719e-09,
+          "H_relative_frobenius": 2.048191286375696e-09
+        },
+        "reverse_vectorized": {
+          "records": [
+            {
+              "ms": 102.05329999735113,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 106131456
+            },
+            {
+              "ms": 99.53789999417495,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 106131456
+            },
+            {
+              "ms": 103.03630000271369,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 106131456
+            }
+          ],
+          "finite": true,
+          "median_ms": 102.05329999735113,
+          "J_relative_frobenius": 1.249710173467537e-09,
+          "H_relative_frobenius": 2.0481912691376744e-09
+        },
+        "reverse_vectorized_with_existing_neighborhood_guard": {
+          "single_ms": 424.2394999891985,
+          "note": "runs existing probe evaluation plus reverse Jacobian; cannot count raw AD as guard-equivalent"
+        }
+      }
+    },
+    {
+      "index": 1,
+      "beta": 0.15,
+      "local_node3_standardized_rotation_x": 0.2,
+      "results": {
+        "finite": {
+          "records": [
+            {
+              "ms": 317.3507999890717,
+              "decoder_states": 339,
+              "peak_extra_cuda_bytes": 31260672
+            },
+            {
+              "ms": 317.69680000434164,
+              "decoder_states": 339,
+              "peak_extra_cuda_bytes": 31260672
+            },
+            {
+              "ms": 318.1878999894252,
+              "decoder_states": 339,
+              "peak_extra_cuda_bytes": 31260672
+            }
+          ],
+          "finite": true,
+          "median_ms": 317.69680000434164,
+          "J_relative_frobenius": 0.0,
+          "H_relative_frobenius": 0.0
+        },
+        "reverse_scalar": {
+          "records": [
+            {
+              "ms": 628.882800010615,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 2579456
+            },
+            {
+              "ms": 620.6079999974463,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 2579456
+            },
+            {
+              "ms": 624.541400000453,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 2579456
+            }
+          ],
+          "finite": true,
+          "median_ms": 624.541400000453,
+          "J_relative_frobenius": 1.210741245018054e-09,
+          "H_relative_frobenius": 1.9585841451479117e-09
+        },
+        "reverse_vectorized": {
+          "records": [
+            {
+              "ms": 96.47860001132358,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 106131456
+            },
+            {
+              "ms": 95.60060000512749,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 106131456
+            },
+            {
+              "ms": 104.52249999798369,
+              "decoder_states": 1,
+              "peak_extra_cuda_bytes": 106131456
+            }
+          ],
+          "finite": true,
+          "median_ms": 96.47860001132358,
+          "J_relative_frobenius": 1.2107412439766394e-09,
+          "H_relative_frobenius": 1.958584140463254e-09
+        },
+        "reverse_vectorized_with_existing_neighborhood_guard": {
+          "single_ms": 418.56689999985974,
+          "note": "runs existing probe evaluation plus reverse Jacobian; cannot count raw AD as guard-equivalent"
+        }
+      }
+    }
+  ],
+  "training": false,
+  "checkpoint_loaded": false,
+  "boundary": "actual surface on artificial anchors; no efficacy or whole-chain speed evidence",
+  "numerical_gate": true,
+  "default_replacement_authorized": false
+}

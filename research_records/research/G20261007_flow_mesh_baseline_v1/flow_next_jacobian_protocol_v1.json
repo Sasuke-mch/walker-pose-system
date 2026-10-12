@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-12",
+  "input": "local licensed SMPLH male/MANO assets from learning_flow_mesh/config.json; COCO17 regressor; artificial declared camera rig and two legal known anchors",
+  "scope": "real surface operator derivative and local resource audit, no pretrained neural checkpoint",
+  "only_variable": "central finite difference versus reverse-mode scalar/vectorized Jacobian",
+  "fixed": "float64; TangentScale.fixture; local right-multiplied Exp; cameras/masks/anchors identical",
+  "success": {"jacobian_relative_frobenius": 0.0001, "information_relative_frobenius": 0.0001, "finite": true},
+  "timing": "one warmup then three repeats per method on same device; synchronized CUDA; per-method allocated peak above baseline",
+  "guard": "finite difference validates all positive/negative perturbations; raw autograd only anchor. Report distinction and guarded autograd cost separately; cannot remove existing rejection semantics",
+  "stop": "nonfinite gradients, mismatch, memory/runtime failure preserved; no default replacement without neighborhood rejection parity and measured full-cost benefit",
+  "boundary": "known artificial anchors with real body decoder, not real accuracy, trained candidate population or full-system runtime"
+}

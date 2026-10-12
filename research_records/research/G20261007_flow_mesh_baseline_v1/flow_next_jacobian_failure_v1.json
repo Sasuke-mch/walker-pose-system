@@ -1,0 +1,1 @@
+{"date":"2026-10-12","stage":"audit startup","failure":"FileNotFoundError: models/smpl/J_regressor_coco17.npy","cause":"runner used incorrect filename; existing profile uses models/smpl/J_regressor_coco.npy","correction":"use actual existing declared regressor, not substitute model","derivative_comparison_executed":false}

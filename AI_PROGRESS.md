@@ -4324,3 +4324,10 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 仅现有COCO15/16 Huber分子乘2保留原confidence分母，默认1不变；支持reprojection_only预检，无新loss/网络/3D约束。G20261012_ankle_weight448_v1完整448同初始化一轮：踝mean25.82→12.32px、P9580.41→23.71；幅度比左右0.620/0.687→0.885/0.977，最佳相位四条全部0，D2P9540.76→39.57。其他关节mean+3.05%及391右图右踝7.12→8.17px保留，5预注册门全通过，不升级真实步态/接触或跨采集精度。正式360身体选择保留。
 
 14+41相关tests、E9/F六文件、compileall通过，错误测试路径检查无test执行失败保留decision。按旧方式少量平滑重新解码，view当前主线同原图fresh Stage/ground，场景全字段与control相同；22source/原toggle检查通过，浏览器0/22/380/391/447/播放/平滑正常且无error。当前新view/body_browser.html，单文件view/Pose2D.html，标题侧栏保持，preview.jpg保存。协议/比较/决定和代码可复现；只提交本轮小文件/现有文档追加，原92改动/旧结果保留，未推送。
+
+
+## 2026-10-12 JointFlow局部Jacobian替换审计（不晋升）
+
+实际本地SMPL-H male/MANO、COCO17回归器、两个人工锚点和非零畸变测试rig，float64有限差分对标量/向量化反向微分，J/H=JᵀJ误差约1e-9，预注册1e-4数值门通过。向量反向额外显存106131456 bytes对FD31260672；v2约96–102ms对318–385ms，v3约787–791ms对1341–1395ms，跨运行耗时不稳定，不宣称稳定加速或实时。FD+AD单次保守guard实现两次均未获收益；raw AD缺邻域338状态拒绝检查，未通过拒绝等价门。默认FD和G0/G1保留，不将局部导数一致宣称真实精度。
+
+flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及validation_v1.json保留原数据和错误：首次回归器文件名错误；B023闭包修复后实际复跑；历史输出误写D0但实际调用非零D测试rig，更正已记录，runner元数据已修复。离线Ruff及AST通过。详见MODEL_RESULTS第13节。下一阶段检查邻域拒绝能否简约保留且降低完整成本，无收益则停止替换并转回单生成器机制研究。训练关闭、无神经checkpoint、未动正式主线；长期目标继续。
