@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "frames_visited": [
+    0,
+    22,
+    380,
+    391,
+    447
+  ],
+  "playback_and_smoothing_toggle_verified": true,
+  "console_errors": [],
+  "title": "二维关节点损失优化",
+  "sidebar": "same minimal labels",
+  "screenshot": "preview.jpg",
+  "standalone_file": "Pose2D.html",
+  "identical_to_body_html": true,
+  "embedded_payload": true,
+  "approx_size_mib": 95.6
+}

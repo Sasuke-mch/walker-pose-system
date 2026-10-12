@@ -1,0 +1,13 @@
+{
+  "status": "all preregistered same-source engineering gates passed, one attempt",
+  "selected": "ankle2x/result.npz; smoothed/result.npz display",
+  "mechanism": "only existing COCO15/16 2D Huber loss multiply2 with original confidence denominator; all other slot gradients/priors unchanged; default1 preserves objective",
+  "options": "--body-ankle-reprojection-multiplier 2; global2D0.004;C300;VPoser0.01",
+  "comparison": "comparison.json",
+  "source": "view/source_validation.json:22 checks passed",
+  "fresh_scene_exact_control_match": true,
+  "raw_toggle_exact": true,
+  "validation": "14 reprojection tests +41 component tests passed,3 legacy NumPy warnings each run; six files E9/F and compileall passed",
+  "initial_check_failure": "test_smplh_fitting_stages.py did not exist; no tests ran for that command; retried actual tests and passed",
+  "limits": "2D/phase/roughness consistency only. Other joints mean error grows3.05%, preserved. Not independent gait/contact or generalization proof. No3D loss/no shift/no model parameter increase. Historical formal360 body selection not replaced."
+}

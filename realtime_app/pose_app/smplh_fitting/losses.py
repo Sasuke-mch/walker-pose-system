@@ -108,6 +108,15 @@ def body_reprojection_loss(
                 weights = confidence[valid]
                 scaled = residual / args.body_reprojection_scale_px
                 huber = torch.where(scaled <= 1, 0.5 * scaled.square(), scaled - 0.5)
+                multiplier = getattr(args, "body_ankle_reprojection_multiplier", 1.0)
+                if multiplier != 1:
+                    if valid.shape[-1] != 17:
+                        raise ValueError("ankle multiplier requires COCO17 order")
+                    joint_weights = torch.ones_like(confidence)
+                    joint_weights[..., 15:17] = multiplier
+                    huber = huber * joint_weights[valid]
+                # Keep the original confidence denominator: this changes only
+                # ankle influence, without reducing other joints or prior scale.
                 losses.append((huber * weights).sum() / weights.sum())
                 pixels.append((residual * weights).sum() / weights.sum())
             if not losses:

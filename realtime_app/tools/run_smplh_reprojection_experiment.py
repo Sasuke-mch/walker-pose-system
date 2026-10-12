@@ -20,6 +20,7 @@ def main():
     cli.add_argument("--beta-weight", type=float, default=.001)
     cli.add_argument("--root-weight", type=float, default=.01)
     cli.add_argument("--joint-steps", type=int, default=300)
+    cli.add_argument("--ankle-multiplier", type=float, default=1.0)
     cli.add_argument("--hand-steps", type=int, default=100)
     cli.add_argument("--source-args", type=Path,
                      default=Path("research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json"))
@@ -33,7 +34,8 @@ def main():
     argv += ["--body-observation-mode", "reprojection_only", "--body-3d-weight", "0",
              "--body-reprojection-weight", str(opts.reprojection_weight),
              "--body-reprojection-scale-px", "25", "--vposer-prior-weight", str(opts.vposer_weight),
-             "--beta-prior-weight", str(opts.beta_weight), "--root-anchor-weight", str(opts.root_weight)]
+             "--beta-prior-weight", str(opts.beta_weight), "--root-anchor-weight", str(opts.root_weight),
+             "--body-ankle-reprojection-multiplier", str(opts.ankle_multiplier)]
     args = build_parser().parse_args(argv)
     if opts.output.exists():
         raise RuntimeError("refuse existing experiment output")

@@ -4317,3 +4317,10 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 先注册flow_next_operator_transfer_protocol_v1.json，再执行audit_operator_transfer.py。实际项目鱼眼投影CPU float64人工[x,0,1]例：原cost4306.591569，完整GN步令线性残差0但实际cost5637.473602；0.5步仍5038.720978，0.25才2557.989629，三次均投影合法，尝试完整保留。−90/+90°旋转各自合法而columns6D算术均值退化被原门拒绝。全部断言、离线Ruff、暂存AST/JSON与diff检查通过；没有训练/权重/主线变更或性能结论。
 
 停止线性HQS直接移植、无保护端点GN和均值人体天然合法论证；单生成器仍待验证。MODEL_ARCHITECTURE/MODEL_RESULTS/longterm_protocol同步，结果flow_next_operator_transfer_audit_v1.json。下一阶段先审查现有局部J的反向微分/VJP替代，对实际人体surface和鱼眼逐项核对导数、拒绝、完整耗时与显存；不能只用68对339计数称速度提升。长期goal保持active，独立有效性仍未证明。
+
+
+## 2026-10-12 踝二维倍率2的简单修正与展示
+
+仅现有COCO15/16 Huber分子乘2保留原confidence分母，默认1不变；支持reprojection_only预检，无新loss/网络/3D约束。G20261012_ankle_weight448_v1完整448同初始化一轮：踝mean25.82→12.32px、P9580.41→23.71；幅度比左右0.620/0.687→0.885/0.977，最佳相位四条全部0，D2P9540.76→39.57。其他关节mean+3.05%及391右图右踝7.12→8.17px保留，5预注册门全通过，不升级真实步态/接触或跨采集精度。正式360身体选择保留。
+
+14+41相关tests、E9/F六文件、compileall通过，错误测试路径检查无test执行失败保留decision。按旧方式少量平滑重新解码，view当前主线同原图fresh Stage/ground，场景全字段与control相同；22source/原toggle检查通过，浏览器0/22/380/391/447/播放/平滑正常且无error。当前新view/body_browser.html，单文件view/Pose2D.html，标题侧栏保持，preview.jpg保存。协议/比较/决定和代码可复现；只提交本轮小文件/现有文档追加，原92改动/旧结果保留，未推送。

@@ -1,0 +1,8 @@
+{
+  "input": "G20261012_ankle_simple_ablation448_v1/weight2x/result.npz control, exact same448 input and seed0",
+  "mechanism": "only COCO15/16 multiply2 in existing confidence-normalized raw2D Huber; original denominator keeps all other joint gradients unchanged",
+  "parameters": "2D0.004/scale25,VPoser0.01,C300,A30B30D100D100; no new losses or model parameters",
+  "criteria": "ankle mean/P95 >=15% improvement vs current0.004; otherjointmean <=10% worse; relative ankle amplitude closer to2D in both views; pelvis-relativeD2P95 <=20%worse. Report391 and phase; no shift or smoothing for acceptance",
+  "stop": "one multiplier2 run; at most one lower-multiplier revision if warranted, no architecture or added loss",
+  "limits": "2D consistency, not real accuracy/gait/contact; preserve rejected gates and old output"
+}

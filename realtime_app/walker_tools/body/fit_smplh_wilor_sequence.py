@@ -92,6 +92,8 @@ def build_parser() -> argparse.ArgumentParser:
                     help="dual-fisheye body 2-D reprojection term; 0 preserves the audited baseline")
     ap.add_argument("--body-reprojection-scale-px", type=float, default=100.0,
                     help="pixel scale used to make the body reprojection Huber term dimensionless")
+    ap.add_argument("--body-ankle-reprojection-multiplier", type=float, default=1.0,
+                    help="COCO15/16 relative 2D loss multiplier; reprojection_only mode, 1 keeps original objective")
     ap.add_argument("--wrist-reference", type=Path, default=None)
     ap.add_argument("--wrist-reference-weight", type=float, default=0.0,
                     help="independent manual wrist mean squared metre residual in body stages A/B/C")

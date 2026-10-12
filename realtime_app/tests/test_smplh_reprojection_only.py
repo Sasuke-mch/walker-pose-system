@@ -92,3 +92,38 @@ def test_2d_mode_rejects_mixed_or_missing_objective_before_asset_loading(tmp_pat
     with pytest.raises(ValueError, match="reprojection_only"):
         run_fit(build_parser().parse_args(argv))
     assert not (tmp_path / "fit").exists()
+
+
+def test_ankle_multiplier_changes_only_ankle_gradient_not_confidence_denominator():
+    projection = torch.full((1, 17, 2), 10., requires_grad=True)
+    confidence = torch.ones(1, 17)
+    valid = torch.ones(1, 17, dtype=torch.bool)
+    args = SimpleNamespace(body_reprojection_weight=.004, body_reprojection_scale_px=25.,
+                           body_observation_mode="reprojection_only", body_ankle_reprojection_multiplier=1.)
+    kwargs = dict(args=args, stage_index=2, body_loss=torch.tensor(0.),
+                  proj_cam0=projection, proj_cam1=projection,
+                  raw_left_2d=torch.zeros_like(projection), raw_right_2d=torch.zeros_like(projection),
+                  raw_left_conf=confidence, raw_right_conf=confidence,
+                  raw_left_valid=valid, raw_right_valid=valid)
+    base, pixels = body_reprojection_loss(**kwargs)
+    gradient = torch.autograd.grad(base, projection)[0]
+    args.body_ankle_reprojection_multiplier = 2.
+    changed, changed_pixels = body_reprojection_loss(**kwargs)
+    updated = torch.autograd.grad(changed, projection)[0]
+    torch.testing.assert_close(updated[:, :15], gradient[:, :15])
+    torch.testing.assert_close(updated[:, 15:], 2 * gradient[:, 15:])
+    torch.testing.assert_close(changed_pixels, pixels)
+    torch.testing.assert_close(changed / base, torch.tensor(19 / 17))
+
+
+@pytest.mark.parametrize("value", [0., -1., float("nan"), float("inf")])
+def test_invalid_ankle_multiplier_fails_before_assets(tmp_path, value):
+    from pose_app.smplh_fitting.stages import validate_optimization_options
+    with pytest.raises(ValueError, match="ankle reprojection multiplier"):
+        validate_optimization_options(SimpleNamespace(body_ankle_reprojection_multiplier=value))
+
+
+def test_nondefault_ankle_multiplier_rejects_legacy_mode():
+    from pose_app.smplh_fitting.stages import validate_optimization_options
+    with pytest.raises(ValueError, match="requires reprojection_only"):
+        validate_optimization_options(SimpleNamespace(body_ankle_reprojection_multiplier=2., body_observation_mode="legacy"))

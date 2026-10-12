@@ -6,6 +6,11 @@ from numbers import Integral
 
 def validate_optimization_options(args):
     """Reject invalid budgets/scales before loading assets or creating outputs."""
+    ankle_multiplier = getattr(args, "body_ankle_reprojection_multiplier", 1.0)
+    if not math.isfinite(ankle_multiplier) or ankle_multiplier <= 0:
+        raise ValueError("ankle reprojection multiplier must be finite and positive")
+    if ankle_multiplier != 1 and getattr(args, "body_observation_mode", "legacy") != "reprojection_only":
+        raise ValueError("ankle reprojection multiplier requires reprojection_only")
     if getattr(args, "body_observation_mode", "legacy") == "reprojection_only":
         if args.body_3d_weight != 0 or args.body_reprojection_weight <= 0:
             raise ValueError("reprojection_only requires body-3d-weight=0 and positive body-reprojection-weight")
