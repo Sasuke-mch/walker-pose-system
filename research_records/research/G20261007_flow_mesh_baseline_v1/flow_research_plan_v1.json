@@ -169,7 +169,7 @@
         "information": true,
         "final_K": 1,
         "velocity_calls": 1,
-        "deployment": "same frozen G0/J -> deterministic regression; infer now forwards information"
+        "deployment": "same frozen G0/J -> deterministic regression; TwoStageInference(..., regression=True, k=1) now executes acquisition and one regression call"
       }
     ],
     "pairing": {

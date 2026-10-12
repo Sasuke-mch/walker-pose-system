@@ -110,3 +110,82 @@ def test_information_regression_through_candidate_inference(nodes):
     for invalid in (information[:-1, :-1], torch.full_like(information, torch.nan)):
         with pytest.raises(ValueError, match="invalid frozen anchor information"):
             infer(model, normal, obs, k=1, regression=True, information=invalid)
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+def test_frozen_information_regression_path_matches_acquisition_and_direct_control(nodes):
+    from realtime_app.learning_flow_mesh.rotations import matrix_to_six
+
+    from ..geometry_observation import NoiseModel
+    from ..pipeline import TwoStageInference, TwoStageState
+    from ..tangent import TangentScale
+    from .test_aggregate import rig
+    from .test_information import rigid_surface
+
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    g0, g1 = JointFlow(ModelConfig(nodes=nodes)).double().eval(), JointFlow(ModelConfig(nodes=nodes)).double().eval()
+    mean = torch.cat((matrix_to_six(torch.eye(3, dtype=torch.float64)).repeat(nodes),
+                      torch.tensor([0., 0., 3.], dtype=torch.float64), torch.zeros(10, dtype=torch.float64)))
+    normal = Normalization(mean, torch.ones_like(mean)*.03, g0.topology, "analytic_pipeline_not_real_labels",
+                           split="engineering_fixture", source_kind="analytic_fixture")
+    decoded = []
+    def counted_surface(rotations, translation, beta):
+        decoded.append(len(rotations))
+        return rigid_surface(rotations, translation, beta)
+    pipeline = TwoStageInference(g0, g1, normal, TangentScale.fixture(g0.topology),
+                                 counted_surface, rig(), NoiseModel.proxy())
+    before = {key: value.clone() for key, value in g0.state_dict().items()}
+    obs = replace(observation(), xy=observation().xy.double())
+    with torch.no_grad():
+        result, anchor, info, state, report = pipeline(obs, k=1, anchor_k=2, steps=2, regression=True)
+        acquisition_calls = decoded.copy()
+        decoded.clear()
+        _, flow_anchor, flow_info, flow_state, flow_report = pipeline(obs, k=3, anchor_k=2, steps=2)
+        context, _, _ = g1.encoder(obs)
+        expected = normal.denormalize(g1.regression(context[None], info.matrix))
+        restored = TwoStageState.from_dict(state.to_dict(), dtype=torch.float64)
+        next_obs = replace(observation(1, .1), xy=obs.xy.clone())
+        next_result, _, _, next_state, _ = pipeline(next_obs, state, k=1, anchor_k=2, steps=2, regression=True)
+        replayed = pipeline(next_obs, restored, k=1, anchor_k=2, steps=2, regression=True)[0]
+        missing = replace(next_obs, frame=2, timestamp=.2, present=torch.zeros_like(obs.present),
+                          xy=torch.full_like(obs.xy, torch.nan))
+        unavailable, _, missing_info, missing_state, missing_report = pipeline(
+            missing, next_state, k=1, anchor_k=2, steps=2, regression=True)
+    assert info.matrix is not None and torch.count_nonzero(info.matrix) > 0
+    assert torch.equal(anchor.raw, flow_anchor.raw) and anchor.ids == flow_anchor.ids
+    assert torch.equal(info.matrix, flow_info.matrix) and info.anchor_id == flow_info.anchor_id
+    assert state.to_dict() == flow_state.to_dict()
+    assert torch.equal(result.raw, expected) and torch.equal(next_result.raw, replayed.raw)
+    assert result.resources["solver"] == "regression" and result.raw.shape == (1, g0.topology.dimensions)
+    assert report["generators"] == report["regressors"] == 1 and report["second_stage_objective"] == "regression"
+    assert report["network_calls"] == 3 and report["candidate_state_evaluations"] == 5
+    assert report["J_decoder_calls"] == len(acquisition_calls)
+    assert report["J_decoder_state_evaluations"] == sum(acquisition_calls)
+    assert report["J_decoder_state_evaluations"] == flow_report["J_decoder_state_evaluations"]
+    assert report["matched_total_sampling_G0_control_K"] is None
+    assert flow_report["generators"] == 2 and flow_report["regressors"] == 0
+    assert flow_report["matched_total_sampling_G0_control_K"] == 5
+    assert not unavailable.actions.any() and "no_current_observation" in unavailable.reasons[0]
+    assert missing_info.matrix is None and missing_report["J_decoder_state_evaluations"] == 0
+    assert torch.equal(missing_state.g1.hidden, next_state.g1.hidden)
+    assert result.provenance["information"]["calibrated"] is False
+    assert not any(p.requires_grad for p in g0.parameters())
+    assert all(torch.equal(value, before[key]) for key, value in g0.state_dict().items())
+
+
+def test_frozen_information_regression_path_rejects_multiple_outputs_before_anchor(monkeypatch):
+    from ..geometry_observation import NoiseModel
+    from ..pipeline import TwoStageInference
+    from ..tangent import TangentScale
+    from .test_aggregate import rig
+    from .test_information import rigid_surface
+
+    g0, g1 = JointFlow().eval(), JointFlow().eval()
+    pipeline = TwoStageInference(g0, g1, Normalization.fixture(g0.topology),
+                                 TangentScale.fixture(g0.topology), rigid_surface, rig(), NoiseModel.proxy())
+    def forbidden(*args, **kwargs):
+        raise AssertionError("invalid regression budget must fail before anchor work")
+    monkeypatch.setattr(g0.encoder, "forward", forbidden)
+    with pytest.raises(ValueError, match="single deterministic"):
+        pipeline(observation(), k=2, regression=True)

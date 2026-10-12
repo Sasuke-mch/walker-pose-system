@@ -40,7 +40,7 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "D05 noise information availability and fair F0/G1 input contract: inspect current code and prior noise controls, distinguish fixed proxy precision from genuinely calibrated varying noise, and avoid attributing added input information to architecture. No default new precision module, calibration/efficacy claim or training/checkpoint.",
+  "next_stage": "D10.4 causal G1 sequence objective preparation: connect typed per-frame frozen information to original-row chunks with explicit source/frame binding and detached G0/J. Preserve F0 default, same-information CFM/regression and missing/failure rows; count acquisition explicitly. Training/checkpoint and actual resources remain unavailable; do not claim completed trained runner.",
   "deficiency_improvement_20261012": {
     "status": "continuous_thread_goal_active_training_closed",
     "authorization": "Analyze existing model shortcomings, improve individually, and keep detailed long-term records; no scheduled automation",
@@ -219,6 +219,31 @@
       "training": false, "checkpoint_loaded": false, "architecture_changed": false,
       "remaining": "shared-shape sequence generator/filter and controls;real labels/held-out effectiveness;no calibrated posterior evidence"
     },
+    "D05_information_regression_pipeline": {
+      "date": "2026-10-13", "status": "preregistered_before_pipeline_controls",
+      "existing_evidence": "MODEL_RESULTS section16 already establishes external precision absent from F0 context and indirect through G1Lambda; no rerun of that noise audit. Current R_info primitive works but TwoStageInference always calls G1 generative sampling",
+      "problem": "Preregistered R_info requires frozen G0 anchor/J plus one regression call; full pipeline cannot select that mode. Manual matrix-only inference can hide anchor/J acquisition cost and mismatch information source",
+      "scope": "Extend existing TwoStageInference call with explicit regression=False default; regression=True requires k1 before anchor work, shares unchanged G0/J/noise and calls existing information regression inference",
+      "only_variable": "Second-stage CFM sampling versus same-core regression, with fixed G0/core tensors/observation/noise/anchorK/steps/carry. No new noise feature/precision module or matrix approximation",
+      "controls": "Two current ambient topologies22/52, fixed random weights and explicit analytic normalization centered identityR/Tz3, scale0.03; artificial raw-fisheye rig and rigid COCO17 surface. Same G0 anchors and nonemptyLambda compared; independent direct regression target; no body accuracy claim",
+      "checks": ["New mode exists;G0 candidate tensors/IDs andLambda match CFM path; regression raw matches existing manual encoder/regression API", "Network/candidate counts include full G0 plus one regression and originalJ decoder work; regression not counted as extra sampled candidates or sampled generator", "State roundtrip and original missing observations/reasons/publication preserved; G0 parameters remain frozen", "Regression k>1 rejects before G0 encoder or J; original default two-stage CFM test remains passed"],
+      "success": "Executable R_info full acquisition path with same information and explicit resources; no new seed/parameter/source/gate change; existing default retained",
+      "stop": "Do not call input-matched primitive a completed trained4method runner, claim noise calibration, equalwalltime or efficacy, accept k32 deterministic repetition, or alter SO3F0 Lambda refusal. True labels/noise references remain0, training/checkpoint closed",
+      "training": false, "checkpoint_loaded": false
+    },
+    "D05_information_regression_pipeline_result": {
+      "date": "2026-10-13", "status": "same_information_full_inference_path_ready_not_trained_runner",
+      "original_failure": "3new controls failedTypeError unexpected regression keyword before new path; confirms missing TwoStageInference mode",
+      "change": "TwoStageInference regression=True requiresk1 beforeanchor, unchanged frozenG0/localJ then original information regression infer; defaultFalse keepsCFM",
+      "controls": "CPUfloat64/threads1/seed7 ambient22/52 engineering identityR/Tz3/beta0 mean,scale0.03; artificial rawfisheye rig, proxy sigma10 and rigidT-only surface; anchorK2/steps2, regressionK1 vsCFMK3",
+      "values": "G0raw/IDs/anchor/nonzeroLambda/observationstate exact; regressionraw equals independent original manual API;carryrestore exact;G0weights unchanged/frozen",
+      "resources": "regression3networkcalls/5candidate states plus actualJ surfacecalls/states counted; matches independent surface counters; generations1+regressors1;sample-budget fieldNone;no equalwalltime claim",
+      "missing": "original rows/reasons/publication preserved;missingLambdaNone/Jstates0/g1hidden frozen;regressionk2 rejects beforeG0encoder",
+      "checks": "3new plus1originalCFM checks4passed2.09s/18deselected; changed-file Ruff passed; no oldnoise/cost/fullsuite rerun",
+      "limits": "R_info needs independently regression-trained core and common frozenG0. Variable-noise F0/R0 lack externalprecision; calibrated noise/real labels records0, no trained4method effectiveness or fullsystem cost",
+      "record": "MODEL_RESULTS.md section37; MODEL_ARCHITECTURE.md section20; flow_research_plan_v1.json R_info deployment;AI_PROGRESS.md",
+      "capacity_changed": false, "training": false, "checkpoint_loaded": false, "optimizer_steps": 0
+    },
     "next_after_D01": "Inspect state/conditioning limitations and identify one discriminating counterexample before any new architecture. Mean pooling, beta variation, no RGB and hand uncertainty are hypotheses/resource limits, not automatic module-addition instructions. Search mechanism overlap before committing to an architectural research direction.",
     "original_stop_rules": "Two justified revisions per mechanism; SO3 kernel allowance exhausted; fullK32 VJP promotion stopped at ratio1.7822233; frozen held-out and fair controls inherited",
     "training": false
@@ -338,7 +363,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-13 D03 shape temporal contract stage completed: analytic controls reject automatic freeze/splice, current per-frame joint model retained. Infer/cache scope explicit,1extended existing test/Ruff passed. Shared-sequence model/real effectiveness remain incomplete; training/checkpoint closed.",
+  "last_completed_stage": "2026-10-13 D05 full same-information regression inference acquisition path complete;3new+1defaultCFM checks/Ruff passed. Original G0/J input and costs retained, regression singleoutput. Noise calibration/shared varying condition and real trained efficacy remain open; nextD10.4G1causal objective;training/checkpoint closed.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

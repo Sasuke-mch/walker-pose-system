@@ -4513,3 +4513,11 @@ MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结�
 仅在infer/cache provenance声明current-frame unit、cross-frame law未定义、无显式beta carry/slot非轨迹。原cache测试扩展1passed/Ruff通过，旧无声明临时缓存不自动升级；参数/种子/求解/发布未改，无optimizer/checkpoint或新audit JSON/流程脚本。MODEL_RESULTS第36节、架构第19节/台账、论文来源范围和长期协议同步。
 
 保留逐帧联合模型，停止默认移植H8冻结/EMA/旧beta拼接/固定seed当共享轨迹。真正共享序列模型须有一致联合目标、因果发布政策、同信息/预算对照与独立数据；D03效能未完成，records0/训练关闭。下一项D05核对噪声信息共同可用性与F0/G1公平输入合同；长期goal继续active，现有其他工作区改动保留。
+
+## 2026-10-13 D05完整同信息回归推理入口
+
+旧第16节noise不对称证据保留且未重跑，本轮确认原TwoStageInference只生成、R_info只有传矩阵的原语。预登记后新增第二阶段regression=True/k1路径：原冻结G0→原J/Λ→原信息回归，无效k先于anchor拒绝；report包含G0/J与回归工作，区分generator/regressor，回归不能用anchorK+1冒称匹配采样预算。默认CFM、网络/precision/候选拒绝与SO3F0信息合同未改。
+
+原3新测试均unsupported keyword失败；实现后仅3新+1原CFM测试4passed/Ruff通过。22/52、固定工程统计/rigid surface/G0 K2 steps2，真实Λ、anchor/state与CFM逐值相同，回归等于手动API；计数3calls/5states加实际J、carry恢复、缺失/理由与前置k拒绝验证。详细输入、失败、命令、边界记录MODEL_RESULTS第37节，架构第20节/D05台账、四法计划和长期协议同步，无新流程/验收材料。
+
+真实training/noise-reference records0，R_info仍须独立回归训练且共享冻结G0来源，不把同随机weights的接口测试当效能比较。变化noise的共同输入条件/校准、完整四法训练runner仍缺；下一D10.4补G1序列目标/逐帧信息来源连接，训练/checkpoint继续关闭，长期goal保持active，旧工作区改动保留。

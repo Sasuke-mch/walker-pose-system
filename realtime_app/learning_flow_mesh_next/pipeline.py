@@ -1,4 +1,4 @@
-"""Two explicit generators, frozen G0 anchor/J and counted complete work."""
+"""Frozen G0 anchor/J then CFM or regression, with acquisition work counted."""
 import time
 from dataclasses import dataclass
 
@@ -37,7 +37,11 @@ class TwoStageInference:
         self.normalization, self.scale, self.surface = normalization, scale, surface
         self.cameras, self.noise = cameras, noise
 
-    def __call__(self, observation, state=None, *, k=32, steps=8, anchor_k=32, jacobian_step=1e-4):
+    def __call__(self, observation, state=None, *, k=32, steps=8, anchor_k=32, jacobian_step=1e-4,
+                 regression=False):
+        # Reject invalid control budgets before paying for the shared anchor/J.
+        if regression and k != 1:
+            raise ValueError("regression is a single deterministic control; use k=1")
         state = state or TwoStageState()
         if observation.xy.is_cuda:
             torch.cuda.synchronize()
@@ -48,17 +52,19 @@ class TwoStageInference:
             information = local_information(g0, observation, self.cameras, self.noise,
                                             self.scale, self.surface, step=jacobian_step)
         g1, state1 = infer(self.g1, self.normalization, observation, state.g1,
-                           k=k, steps=steps, stream="G1", information=information.matrix)
+                           k=k, steps=steps, stream="G1", information=information.matrix, regression=regression)
         if observation.xy.is_cuda:
             torch.cuda.synchronize()
-        report = {"generators": 2, "network_calls": g0.resources["network_calls"] + g1.resources["network_calls"],
+        report = {"generators": 1 if regression else 2, "regressors": 1 if regression else 0,
+                  "second_stage_objective": "regression" if regression else "CFM",
+                  "network_calls": g0.resources["network_calls"] + g1.resources["network_calls"],
                   "candidate_state_evaluations": g0.resources["candidate_state_evaluations"] + g1.resources["candidate_state_evaluations"],
                   "G0_ms": g0.resources["total_ms"], "J_ms": information.resources.get("total_ms", 0),
                   "G1_ms": g1.resources["total_ms"], "total_ms": (time.perf_counter()-start)*1000,
                   "J_decoder_calls": information.resources.get("decoder_batch_calls", 0),
                   "J_decoder_state_evaluations": information.resources.get("decoder_state_evaluations", 0),
                   "information_fallback_reasons": information.reasons,
-                  "matched_total_sampling_G0_control_K": anchor_k+k,
+                  "matched_total_sampling_G0_control_K": None if regression else anchor_k+k,
                   "matched_walltime_control": "must measure separately; sample count alone is insufficient"}
         g1.provenance["information"] = {"anchor_id": information.anchor_id, "noise_source": information.noise_source,
                                         "calibrated": information.calibrated, "reasons": information.reasons}

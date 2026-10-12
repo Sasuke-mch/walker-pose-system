@@ -1093,3 +1093,17 @@ D10.3解决文件连接与声明对齐，不能认证标签/资产基/人物/物
 唯一代码改动是infer缓存temporal_sampling声明当前帧完整候选、cross-frame law未定义、没有显式beta carry、slot不是轨迹。所有参数、随机种子、encoder/solver/损失、R/T/beta tensor和原不可用/发布路径未改。仅扩展原test_nested_independent_frame_noise_and_cache：K8/K32嵌套及跨帧noise不同、raw/IDs缓存一致、声明保存、无声明旧临时缓存不自动升级。实际1passed/40deselected in2.25s，两文件Ruff通过；无失败和全套重跑。命令`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_joint.py -q --tb=short -k nested_independent_frame_noise_and_cache`；三个解析控制在一次PowerShell here-string送同Python进程执行，结果stdout，公式/输入/head/代码路径在本节可追溯，不另建流程脚本。
 
 D03合同阶段决定：保留现有逐帧联合模型，停止默认嫁接H8冻结、EMA、跨模式旧beta拼接或固定seed当共享轨迹的提案；没有独立证据时不添加shape容量。后续若提出共享序列模型，必须定义一个beta与全历史R/T的联合目标、因果在线发布政策、配套条件采样训练/原标签来源；对照为同输入/预算逐帧联合及真实实施的因果条件shape政策，完整计算额外采样/初始化/重建成本，不以平滑挑赢家。H8固定8认可帧仅是工程阈值，shape可辨识、真实优劣、序列训练与独立held-out仍缺，当前真实records0/训练关闭。下一项D05审查噪声信息的共同可用性与F0/G1输入公平合同，沿用既有noise检查，不默认接新precision模块；长期目标未完成。
+
+## 37. 2026-10-13 D05同信息回归：完整G0/J推理入口补齐
+
+核对geometry_observation.NoiseModel、StateEncoder、旧conditioning audit第16节、已有regression信息原语、TwoStageInference与四法预注册。外部precision的旧sigma1/2控制已确认，不重复；本轮新发现是pipeline.__call__没有regression选择，R_info只能由调用方手工提供Λ，不能用同一入口保持G0/J获取路径和计数。按长期协议D05_information_regression_pipeline先登记，只改第二阶段选择，不给F0增加噪声条件或改precision来源。
+
+先在test_regression_information.py加2个topology完整路径控制与1个k限制控制，原代码3failed/6deselected in3.61s，全部TypeError unexpected keyword regression，未进入新回归路径。随后pipeline.__call__新增regression=False，True明确要求k1且先拒绝无效预算；执行原G0/local_information，再透传原infer的信息回归。report区分1generator+1regressor或原2generators，记second_stage_objective；R_info的sample-budget匹配字段None，不将确定性点误记为额外抽样预算。默认CFM原采样和所有参数/门未改。
+
+实际输入：CPU float64/threads1/seed7，ambient22/52各两份未训练JointFlow；工程Normalizer mean为节点identity6D/T=[0,0,3]/beta0，scale全0.03，明确engineering_fixture/analytic_fixture；原人工raw-fisheye PnP rig、原observations和proxy sigma10px，非真实标定/标签。surface=原rigid_surface仅复制T到17点，pose/beta不影响这个几何控制；不作为真实SMPL-H或shape可辨识验证。G0 anchorK2/steps2，R_info finalK1/1次；同输入F_info finalK3/steps2。第一帧0/time0，恢复frame1/time0.1，缺失frame2/time0.2。
+
+通过控制：两topology G0 raw/IDs与anchor_id、非零Λ、全部观测state逐值一致；R_info raw等于独立手动g1.encoder→regression→denormalize；carry恢复后下一帧raw逐值相同。R_info网络调用3、候选状态求值5，原F_info调用4/求值10来自原预算；J报告调用/状态逐项等于独立surface收集的实际batch数量/行数，与F_info的J工作一致。没有测时或声称这两个不同候选数的wall-time相等。缺失时保留全部原reason/槽、不可发布，ΛNone、J states0、g1 hidden冻结；k2回归在g0 encoder前拒绝。G0所有参数保持逐值相同且requires_gradFalse，calibratedFalse保存。原CFM双阶段/state检查也通过。
+
+改动后仅相关3新项加原1项：4passed/18deselected in2.09s，pipeline.py/test_regression_information.py Ruff通过。命令：`.\.venv-cuda\Scripts\python.exe -X utf8 -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_regression_information.py realtime_app/learning_flow_mesh_next/tests/test_information.py -q --tb=short -k 'frozen_information_regression_path or two_stage_frozen_g0_and_state_chunk_roundtrip'`。初次仅新文件-k frozen_information_regression_path。未重跑旧noise/J审计、全套测试或K32耗时，也未创建额外JSON/验收报告/脚本。
+
+四法计划R_info部署接口同步为完整TwoStageInference回归入口；状态仍preregistered_not_executed_training_closed。推理接口不是已完成四法训练评估，R_info未来需独立回归训练、使用同一个已冻结G0/源/统计/rig/noise；不能直接拿CFM训练weights调用regression作为强基线。F0/R0与F_info/R_info在变化noise时输入不匹配问题继续存在，比较只能按预注册的输入因素解释；G1接Λ不认证covariance或后验。当前真实training/noise-reference records仍0，无optimizer/checkpoint/人体解码或正式主线改动。D05完整推理准备路径完成、校准/共同外部noise条件及效能未完成；下一项D10.4接G1因果序列目标与逐帧冻结信息来源，默认训练继续关闭，长期目标未完成。

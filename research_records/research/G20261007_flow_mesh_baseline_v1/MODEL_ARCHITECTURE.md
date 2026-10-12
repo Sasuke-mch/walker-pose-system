@@ -117,7 +117,7 @@ Sβ=Λββ−Λβu pinv(Λuu)Λuβ只作为局部诊断；Gram会平方J条件�
 
 2026-10-13 D10.1修复Normalization统计合同：fit仍用原mean/std和1e-4 floor，但结果detach；序列化保留dtype/split/source_kind。训练来源声明只能是train+fitted_reference/independent_reference，工程常量明确engineering_fixture+analytic_fixture，旧四字段记录保持legacy_unverified、原float32默认，不能由source字串自动认证训练来源。require_training_statistics检查声明，不认证独立数据或划分。float32/64回读值逐值保持；mean/scale必须冻结且同dtype，推理入口和回归loss明确validate，SO3 codec绑定来源字段，候选provenance保存这些字段。数据统计真实性仍待真实loader与注册数据证据。
 
-同capacity regression使用同速度网络、输入状态0和s=1，经block平均MSE。2026-10-12已补齐可选information接口：regression、regression_loss与train.objective透传同一冻结Λ，复用原信息投影和全部参数；默认不传Λ与旧输出逐值一致。损失接口已支持信息条件回归；2026-10-12进一步补齐candidate_store.infer的Λ透传，仍限K1且保留拒绝/状态/资源记录。完整训练评估runner未实现，尚未训练；如比较G1，仍须匹配G0生成anchor/J的完整成本和条件来源，不能只匹配单网络参数。CFM没有默认endpoint MSE、best-of-K loss或独立网格损失。
+同capacity regression使用同速度网络、输入状态0和s=1，经block平均MSE。2026-10-12已补齐可选information接口：regression、regression_loss与train.objective透传同一冻结Λ，复用原信息投影和全部参数；默认不传Λ与旧输出逐值一致。损失接口已支持信息条件回归；2026-10-12补齐candidate_store.infer的Λ透传；2026-10-13补齐TwoStageInference(..., regression=True, k=1)的原G0/J获取加回归第二阶段入口，保留拒绝/状态并计入全部获取调用。完整训练评估runner未实现，尚未训练；如比较G1，仍须匹配G0生成anchor/J的完整成本和条件来源，不能只匹配单网络参数。CFM没有默认endpoint MSE、best-of-K loss或独立网格损失。
 
 预置AdamW、lr3e-4、weight_decay0.01、clip1、warmup1000、cosine、effective_batch16、unroll32、smoke2000/main50000、validation每1000、seeds7/17/27。`train.py`已有configuration/prepare/objective、D10.2因果SequenceChunk→sequence_objective及D10.3注册train NPZ→原行chunk读取接口；真实注册数据仍0条，无optimizer循环/训练checkpoint生命周期，预置训练计划均未执行。用户未授权训练、motion labels未取得，不能凭配置或可微目标声称可学习性或完整复现。
 
@@ -243,7 +243,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 |D02/P1|34槽经均值池化/GRU到context128，人体tokens接共同条件；实际局部关系受损未证。第32节窄102D像素/score输入三seed局部满列秩，初始化敏感性不均。|区分输入自由度、全局非单射与训练后任务充分性；保留原结构，不从34×15原特征槽数推导必须扩容。身份路由仅为数学控制，未移植。|当前结论排除“均值池化/128维本身已经证明该输入范围丢信息”的理由；不认证全局/实际ray/history信息充分，真实对照仍需数据。|维数直接扩容停止；原结构保留，效能问题待独立训练/数据。|
 |D03/P1|next定义当前帧联合候选，没有跨帧joint law或显式beta carry；编号不是轨迹。静态真实体型不要求各时刻后验估计相同，实际劣化未证。|已补infer/cache采样范围声明；解析对照拒绝直接嫁接H8冻结、旧beta拼接及仅复用随机种子。保留逐帧模型；共享shape须配套条件/序列生成和同信息对照。|独立shape/姿态效能才可晋升；不泄漏未来、不回写、不以平滑证明收益，当前声明不称真实后验。|合同阶段完成，第36节；共享序列模型与真实效能仍待数据/训练。|
 |D04/P1|COCO17输入、52旋转输出，但无独立手部/shape监督和验证；源码及空manifest确认。|逐项声明可观察输入与标签范围；BODY22只能作部分输出对照。额外WiLoR/RGB是信息增加，必须另登记匹配输入，不自动叠加。|取得同family/basis/手均值的真实完整标签并独立评价；不以合法手旋转或表面投影证明真实手姿。数据未获则效果项未完成。|资源限制，暂无新数据。|
-|D05/P1|F0不接收NoiseModel.precision，G1通过Λ间接接收；已有第16节noise控制，输入公平性边界确认。|固定noise时保留；变化noise时先明确共同可用信息与接口，再做噪声因素/架构因素分离对照。confidence不得当校准协方差。|信息来源、容量和完整获取成本均匹配；无独立噪声校准数据不晋升概率/置信度结论。|待输入协议与校准资源。|
+|D05/P1|F0缺外部precision、G1经Λ接收的边界已确认；原双阶段只生成，R_info仅有单矩阵原语，不能统一执行获取成本对照。|已接TwoStageInference回归第二阶段，共享原G0/J/noise并计入实际获取调用。固定/变化noise协议仍区分，confidence不当协方差。|信息来源与完整成本必须明确匹配；R_info须独立回归训练，不把接口或proxy噪声认证为后验/效能。|同信息完整推理入口完成，第37节；变noise共同条件与校准/效能待资源。|
 |D06/P2|默认Λ对角块丢交叉耦合，固定sketch非单射且原晋升已停；实测反例/第7节确认。|优先问任务是否需要Λ及其耦合，而非不断扩展编码；继承Flow/回归×有/无Λ对照和全部anchor/J成本。|按原held-out门证明收益，不能用sketch重建可见性代替任务效能；不恢复已停跨块扩展。|保留对照，未证明信息必要性。|
 |D07/P2|A4 medoid表达候选群体代表性，不保证最接近真值；算法语义确认，真实误选率未知。|同缓存对比最强可部署决策、保留全槽位与风险覆盖；检查多模态及候选偏置，禁止oracle根位置/逐关节拼接。|原选择误差至少5%配对改善及保留率门；无独立真值不选赢家，不新加learned ranker。|待独立效能。|
 |D08/P1|原local特征在准入age清零/seen置True后构造，实际池化槽的这两维恒定；6组context精确碰撞及真实时间顺序检查确认。更广的连续时间/运动建模仍未证。|local MLP改用incoming_age/prior_seen；输出状态与global time沿原重置规则。无新参数，不添加hidden衰减或人体结果反馈。|重现间隔/首次见到差异，并保留缺失/未来/分块合同；context响应不等于真实姿态收益。|本地特征缺陷已修复，MODEL_RESULTS第31节；实际缺失/采样节奏效能仍待独立验证。|
@@ -291,3 +291,13 @@ NPZ格式`flow_next_sequence_v1`仅使用numeric arrays与JSON文本，allow_pic
 共享轨迹目标须明确为一个beta与全部$R_{1:t},T_{1:t}$的联合分布，并区分“当前时刻重建过去的轨迹”与“已发布在线动作不可回写”。可以依链式法则分解shape分布与以shape为条件的轨迹分布；该数学分解不保证当前速度网络能直接实现条件采样。[HuManiFlow](https://arxiv.org/abs/2305.06968)式8–10/3.6先采shape再以它条件化姿态，但它是单图像方法，H8也不是作者完整复现；不能照搬成next共享序列有效性证明。冻结beta速度、固定seed或把旧beta拼到新pose/T均不是条件分布推导。
 
 本轮仅在infer.provenance新增temporal_sampling：unit=current_frame_complete_candidate，cross_frame_joint_law=not_defined，explicit_beta_carry=False，slot_is_trajectory=False。缓存roundtrip保留字段；旧缓存没有字段时仍未声明，不静默认证。种子、参数、目标、求解、发布和候选选择未改，from_parameters的完整候选beta语义保留。既有cache测试扩展1passed/Ruff通过；解析支持反例、失败访问与边界见MODEL_RESULTS第36节。保留当前逐帧生成，停止无条件冻结/拼接提案；共享序列机制与真实收益保持未完成，训练/神经checkpoint关闭。
+
+## 20. 同信息回归的完整获取路径（2026-10-13，D05）
+
+`TwoStageInference(...)(observation, state, k=1, anchor_k=32, steps=8, regression=True)`执行原冻结G0采样和同一local_information，再调用原infer(..., information=matrix, regression=True)。steps仍控制G0；回归仅1次，不将它重复K次当分布候选。regression默认False沿原双阶段CFM路径；True且k非1在encoder/J前报错。没有修改NoiseModel/precision来源、encoder、core容量、Λ计算或SO3F0拒绝Λ的合同。实际验收为ambient22/52，未扩展SO3G1信息模式。
+
+报告区分generators和regressors及second_stage_objective，network_calls与candidate_state_evaluations为两阶段之和，J_decoder_calls/states沿原Information报告照录。R_info的matched_total_sampling_G0_control_K=None，不能把一个确定性输出加到G0样本数就称匹配生成预算；CFM默认该字段仍anchor_k+k。wall-time仍需实测，不由K数推导。该路径覆盖G0/J/参数推理，不包含相机采集/检测或最终真实网格解码，不能称全系统成本。
+
+两个方法复用相同G0、观测、rig/noise、统计与anchor预算才能构成F_info/R_info输入对照；训练评价时R_info的g1必须独立按回归目标训练，不能把CFM权重切换方法当强回归基线。本轮同随机权重仅隔离接口因子。最小测试验证真实local_information非空、G0 raw/IDs、Λ和观测state逐值相同、回归输出等于手动API、状态恢复/缺失和独立surface调用计数；3新检查及1原CFM检查通过，见MODEL_RESULTS第37节。
+
+固定noise的比较可在共同固定条件下登记；变化noise时F0/R0没有外部precision、F_info/R_info通过Λ接收，仍是输入因素，不得解释为纯生成器数量效应。sigma10px继续proxy/calibratedFalse，真实训练/独立噪声参考均0；全四法训练runner、G1序列目标/来源连接与独立效能未完成，不新增precision神经模块。
