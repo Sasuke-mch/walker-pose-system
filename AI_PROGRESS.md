@@ -4366,3 +4366,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 实际阅读StableHand式1–11、官方flow_matching.py及infer_clips质量调用；论文训练q*x1与推理q*y起点差=q*(y-x1)，发布版另用截断min(q)起始时间，不能混称同一版本。预注册精确标量q0/.8/1检查通过，原数值与来源见flow_next_quality_bridge_audit_v1.json；未加载作者模型/训练。
 
 保留b=q*y+(1-q)*epsilon、训练/推理同起点的普通条件桥候选，速度x1-b使q1仍可纠错；非创新或效果认证。现有COCO17非325D，下一步先查不新增生成器的完整起点是否实际可得，未知beta/手姿不伪装已知；若要堆proposal网络则放弃。PoseD-Flow正文/仓库仍不可用，不计精读。MODEL_RESULTS第18节与架构/协议同步，长期目标继续。
+
+
+## 2026-10-12 部分质量起点资源与随机性审查
+
+现有WiLoR转换仅局部手指旋转，非全局R/T/beta；离线全片共享拟合不是因果起点，next标签records仍0。修正先前“必须完整325D观测”：未知分量q0可保留噪声，但增加WiLoR条件须公平对照。预注册后精确源方差检查q0/.8/.99/1对应1/.04/.0001/0，单位目标标准差线性增益1/5/100/不可行；部分q1可由其他随机维度耦合，不能泛称人体模型必然失败。
+
+证据flow_next_bridge_support_audit_v1.json及MODEL_RESULTS第19节，JSON/断言通过。暂停质量桥实现准备，不添加proposal/质量网络，回到高斯源单模型与G0/G1的最小决定性消融和真实数据门。未训练，正式主线未改，长期目标未完成。

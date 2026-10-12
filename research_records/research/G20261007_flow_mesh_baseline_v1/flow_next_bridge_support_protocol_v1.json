@@ -1,0 +1,12 @@
+{
+  "target": "partial observed source feasibility and stochastic support loss",
+  "before_check": "b=q*y+(1-q)*epsilon conditioned on fixed observation and q; epsilon standard Gaussian; linear full-rank target transport control",
+  "checks": [
+    "unknown slots q0 retain unit source variance",
+    "q1 removes conditional source variance",
+    "q approaching1 requires large linear amplification to retain target variance"
+  ],
+  "success": "exact covariance and scalar amplification computed; distinguish dense mixing from isolated channels",
+  "stop": "do not infer all q1 output coordinates deterministic when other channels remain random; no learned accuracy claim",
+  "training": false
+}

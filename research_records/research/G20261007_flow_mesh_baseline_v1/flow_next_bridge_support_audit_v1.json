@@ -1,0 +1,57 @@
+{
+  "sources": [
+    {
+      "source": "Observation COCO17",
+      "evidence": "realtime_app/learning_flow_mesh_next/schema.py",
+      "use": "conditioning only; no direct local R/beta correspondence"
+    },
+    {
+      "source": "WiLoR local hand prior",
+      "evidence": "realtime_app/pose_app/wilor_mano_prior.py::convert_record and audit_assets",
+      "use": "15 local rotations per hand after convention/mirror checks; no global R/T/beta transfer; association remains required"
+    },
+    {
+      "source": "offline complete fits",
+      "evidence": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md shared beta/hand and joint sequence optimization",
+      "use": "not a causal deployment initializer or independent training truth"
+    },
+    {
+      "source": "next training labels",
+      "evidence": "flow_next_data_manifest_v1.json",
+      "use": "records empty; no registered training or independent target"
+    }
+  ],
+  "correction_to_previous_gate": "full measured325D state is unnecessary: unknown coordinates may use q0/noise; dimension/normalization/convention and available observation binding still required",
+  "conditional_source_covariance": "diag((1-q)^2), for fixed y and q and independent standard Gaussian epsilon",
+  "scalar_checks": [
+    {
+      "q": 0,
+      "conditional_source_variance": 1,
+      "linear_gain_for_unit_target_std": 1.0
+    },
+    {
+      "q": 0.8,
+      "conditional_source_variance": 0.03999999999999998,
+      "linear_gain_for_unit_target_std": 5.000000000000001
+    },
+    {
+      "q": 0.99,
+      "conditional_source_variance": 0.00010000000000000018,
+      "linear_gain_for_unit_target_std": 99.99999999999991
+    },
+    {
+      "q": 1,
+      "conditional_source_variance": 0,
+      "linear_gain_for_unit_target_std": null
+    }
+  ],
+  "mathematical_scope": "all q1 implies a point source and deterministic ODE gives a point output at fixed conditioning. Partial q1 lowers source rank, but dense dynamics may transfer noise to frozen coordinates. Under regular Lipschitz deterministic flow, support dimension cannot exceed initial source dimension; manifold targets may intrinsically have lower dimension. No blanket impossibility for SMPLH R6D target.",
+  "decision": "do not adopt hard q1 as generic calibrated posterior source; no free full-state observed initializer established. Retain plain Gaussian conditional FM as baseline; partial source bridge requires same-condition full-support analysis and evidence before implementation",
+  "not_run": [
+    "training",
+    "model inference",
+    "asset decoding",
+    "offline fitting"
+  ],
+  "checks": "exact source covariance and scalar gain assertions passed"
+}
