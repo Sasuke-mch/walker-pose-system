@@ -1,9 +1,16 @@
 from dataclasses import replace
 
+import pytest
 import torch
 
-from ..geometry_information import local_information, schur_shape, whitened_shape_audit
+from ..geometry_information import (
+    endpoint_cost_vjp,
+    local_information,
+    schur_shape,
+    whitened_shape_audit,
+)
 from ..geometry_observation import NoiseModel, observation_errors, project
+from ..input_binding import observation_snapshot
 from ..tangent import TangentScale
 from .test_aggregate import rig, store_fixture
 from .test_firewall import observation
@@ -54,6 +61,142 @@ def test_two_stage_frozen_g0_and_state_chunk_roundtrip():
 def rigid_surface(rotations, translation, beta):
     points = translation[:, None].expand(-1, 17, -1)
     return {"coco17": points}
+
+
+def endpoint_fixture():
+    from ..candidate_store import from_parameters
+
+    original = store_fixture()
+    raw = original.raw.clone()
+    raw[:, 312] = torch.arange(5, dtype=raw.dtype)*.01
+    store = from_parameters(raw, original.topology, ids=original.ids, seeds=original.seeds,
+                            current_observed=True, provenance={}, resources={})
+    points = torch.tensor([.017, -.015, 3.05], dtype=torch.float64).expand(17, 3)
+    xy = torch.stack([project(points, camera)[0] for camera in rig()])
+    obs = replace(observation(), xy=xy)
+    store.provenance["observation_binding"] = observation_snapshot(obs)
+    return store, obs
+
+
+def analytic_pixel_jacobian(point, camera):
+    """Closed equidistant derivative; no AD, FD or helper implementation."""
+    xyz = camera.R @ point + camera.T
+    x, y, z = xyz
+    radius = (x*x+y*y+1e-24).sqrt()
+    theta = torch.atan2(radius, z)
+    dr = torch.stack((x/radius, y/radius, z*0))
+    dt = (z*dr-torch.tensor([0., 0., 1.], dtype=point.dtype)*radius)/(radius*radius+z*z)
+    f = theta + sum(d*theta**(2*i+3) for i, d in enumerate(camera.D))
+    fp = 1 + sum((2*i+3)*d*theta**(2*i+2) for i, d in enumerate(camera.D))
+    da = fp/radius*dt-f/radius**2*dr
+    planar = torch.tensor([[1., 0., 0.], [0., 1., 0.]], dtype=point.dtype)
+    return camera.K[:2, :2] @ (f/radius*planar+xyz[:2, None]*da) @ camera.R
+
+
+def test_endpoint_analytic_scaled_masked_direction_and_batch_independence():
+    from ..candidate_store import from_parameters
+
+    store, obs = endpoint_fixture()
+    present, quality = obs.present.clone(), obs.quality.clone()
+    present[0, ::2], quality[1, 1::3] = False, False
+    xy = obs.xy.clone()
+    xy[~present] = torch.nan
+    obs = replace(obs, xy=xy, present=present, quality=quality)
+    store.provenance["observation_binding"] = observation_snapshot(obs)
+    precision = torch.tensor([[.02, .004], [.004, .03]], dtype=torch.float64).expand(2, 17, 2, 2).clone()
+    noise = NoiseModel(precision, "analytic_fixture_anisotropic")
+    values = torch.full((169,), .1, dtype=torch.float64)
+    values[156:159] = torch.tensor([.2, .4, .3])
+    scale = TangentScale(values, "analytic_fixture_nonuniform")
+    result = endpoint_cost_vjp(store, obs, rig(), noise, scale, rigid_surface)
+    assert result.available.all() and not result.gradient.requires_grad
+    for index, point in enumerate(store.translation):
+        expected = torch.zeros(3, dtype=torch.float64)
+        for view, camera in enumerate(rig()):
+            mask = obs.admitted()[view]
+            residual = project(point.expand(17, 3), camera)[0][mask]-obs.xy[view, mask]
+            assert (torch.einsum("ji,jil,jl->j", residual, precision[view, mask], residual) < 9).all()
+            expected += analytic_pixel_jacobian(point, camera).T @ (precision[view, mask] @ residual[..., None]).sum(0)[:, 0]
+        expected *= values[156:159]/obs.admitted().sum()
+        assert torch.allclose(result.gradient[index, 156:159], expected, atol=1e-12, rtol=1e-10)
+        assert result.gradient[index, :156].count_nonzero() == 0
+        assert result.gradient[index, -10:].count_nonzero() == 0
+    single = from_parameters(store.raw[2:3], store.topology, ids=[store.ids[2]], seeds=[2],
+                             current_observed=True, provenance=store.provenance, resources={})
+    alone = endpoint_cost_vjp(single, obs, rig(), noise, scale, rigid_surface)
+    assert torch.equal(result.gradient[2], alone.gradient[0])  # No division by K.
+    assert result.resources["decoder_state_evaluations"] == 5 and result.resources["reverse_calls"] == 1
+
+
+@pytest.mark.parametrize("mode", ["no_grad", "inference_mode"])
+def test_endpoint_zero_gradient_available_and_frozen_inputs(mode):
+    store, obs = endpoint_fixture()
+    with getattr(torch, mode)():
+        store = replace(store, raw=store.raw.clone(), rotations=store.rotations.clone(),
+                        translation=store.translation.clone(), beta=store.beta.clone())
+        store.translation[:] = store.translation[0].clone()
+        points = rigid_surface(store.rotations, store.translation, store.beta)["coco17"][0]
+        obs = replace(obs, xy=torch.stack([project(points, camera)[0] for camera in rig()]))
+        store.provenance["observation_binding"] = observation_snapshot(obs)
+        result = endpoint_cost_vjp(store, obs, rig(), NoiseModel.proxy(),
+                                   TangentScale.fixture(store.topology), rigid_surface)
+    assert result.available.all() and result.gradient.count_nonzero() == 0
+    assert result.costs.count_nonzero() == 0 and torch.isfinite(result.gradient).all()
+    assert not result.gradient.requires_grad and not result.costs.requires_grad
+
+
+def test_endpoint_missing_stale_binding_and_no_observations_unavailable():
+    store, obs = endpoint_fixture()
+    for fixture, bound, reason in (
+        (obs, None, "candidate_observation_binding_missing"),
+        (replace(obs, frame=1), store.provenance["observation_binding"], "candidate_observation_binding_mismatch"),
+        (replace(obs, xy=obs.xy+1), store.provenance["observation_binding"], "candidate_observation_binding_mismatch"),
+    ):
+        bad = replace(store, provenance={} if bound is None else {"observation_binding": bound})
+        result = endpoint_cost_vjp(bad, fixture, rig(), NoiseModel.proxy(),
+                                   TangentScale.fixture(store.topology), rigid_surface)
+        assert not result.available.any() and result.gradient.isnan().all()
+        assert all(reason in row for row in result.reasons) and result.resources["decoder_batch_calls"] == 0
+    missing = replace(obs, present=torch.zeros_like(obs.present))
+    store.provenance["observation_binding"] = observation_snapshot(missing)
+    result = endpoint_cost_vjp(store, missing, rig(), NoiseModel.proxy(),
+                               TangentScale.fixture(store.topology), rigid_surface)
+    assert not result.available.any() and result.gradient.isnan().all()
+    assert all("no_current_observation" in row for row in result.reasons)
+
+
+def test_endpoint_invalid_slots_retained_and_batch_exception_not_retried():
+    store, obs = endpoint_fixture()
+    store.translation[1, 2] = -1  # Numerically finite, invalid admitted projection.
+    store.beta[2, 0] = torch.nan  # Detect actual tensors even if cached numerical flag is True.
+    store.rotations[3, 0] *= 2  # Finite but not a proper rotation.
+    store.reasons[2].append("existing_failure")
+    result = endpoint_cost_vjp(store, obs, rig(), NoiseModel.proxy(),
+                               TangentScale.fixture(store.topology), rigid_surface)
+    assert result.ids == store.ids and result.available.tolist() == [True, False, False, False, True]
+    assert result.gradient[1:4].isnan().all() and result.resources["decoder_state_evaluations"] == 3
+    assert "admitted_projection_invalid" in result.reasons[1]
+    assert "existing_failure" in result.reasons[2] and "numerically_invalid_endpoint" in result.reasons[3]
+    calls = []
+    def broken(rotations, translation, beta):
+        calls.append(len(beta))
+        raise RuntimeError("test_batch_failure")
+    failed = endpoint_cost_vjp(store, obs, rig(), NoiseModel.proxy(),
+                               TangentScale.fixture(store.topology), broken)
+    assert calls == [3] and not failed.available.any() and failed.gradient.isnan().all()
+    assert all("test_batch_failure" in failed.reasons[index][-1] for index in (0, 1, 4))
+
+
+def test_endpoint_nonfinite_gradient_is_not_usable_zero():
+    store, obs = endpoint_fixture()
+    def singular(rotations, translation, beta):
+        # Forward value is finite; derivative of sqrt(0) is not.
+        extra = (beta-beta.detach()).square().sum(-1).sqrt()
+        return {"coco17": translation[:, None].expand(-1, 17, -1)+extra[:, None, None]}
+    result = endpoint_cost_vjp(store, obs, rig(), NoiseModel.proxy(),
+                               TangentScale.fixture(store.topology), singular)
+    assert not result.available.any() and result.gradient.isnan().all()
+    assert all("nonfinite_endpoint_gradient" in row for row in result.reasons)
 
 
 def test_jacobian_against_independent_autograd_and_scaled_coordinates():

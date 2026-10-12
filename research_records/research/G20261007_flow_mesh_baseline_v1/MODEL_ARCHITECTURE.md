@@ -6,7 +6,7 @@
 
 当前研究实现为 JointFlow：在一个联合状态中表达 SMPL-H 局部姿态旋转 R、人物整体位置 T 和体型系数 β，用条件线性 Flow Matching 建模。当前尚未训练，未加载神经网络 checkpoint。测试中的随机模型只能验证接口、依赖和数学行为。正式主线仍为 PMPose 原鱼眼→严格双目→Stage/动态地面→reference25→WiLoR；本模块没有替换其调用。
 
-必须区分三种身份：
+必须区分四种身份：
 
 - `learning_flow_mesh/` 的历史 144019 参数模型：曾完成合成训练；其结果是人工任务参考一致性。
 - 同目录后续 H8 167955 参数隔离工程候选：具有原生手条件、共享体型与 beta 条件接口；不得将旧 baseline 的训练数值归到 H8。
@@ -14,6 +14,8 @@
 - 同目录 `so3_flow.SO3JointFlow` 是显式构造的 F0 表示替换候选，52节点711056参数；当前默认工厂和双阶段管线仍构造上述欧氏模型。它同样未训练，不能继承任何历史训练数值。
 
 当前 next 实现没有 RGB 特征提取器、预训练视觉模型、独立手部条件 memory、骨架 parent graph、动态地面或接触损失。观测是 COCO17；全模型输出包括52个局部旋转节点，不代表这些手部旋转已从当前观测中被独立约束或准确恢复。
+
+2026-10-12最新状态：研究单模型候选为第13节的SO3JointFlow，默认ambient JointFlow与既有G0/J/G1仍保留。完整端点物理代价VJP已独立实现，方向对照通过，但全K32成本门失败，未接入生成器并停止该反馈晋升；接口与结果见第14节/MODEL_RESULTS第29节。第2节描述默认双阶段数据流，不能当作单模型SO3候选已启用第二生成器的证据。
 
 ## 2. 总数据流
 
@@ -204,3 +206,13 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 2026-10-12第二轮核替换已完成，见MODEL_RESULTS第26节。Rodrigues用K²=wwᵀ−||w||²I及half-angle sinc省去通用矩阵指数；θ²<1e-4用四阶A/B Taylor、regular分支先clamp再sqrt，避免零角 inactive 分支的除零/导数非有限。网络参数、噪声源、日程和步数不变。17项相关测试通过；同次全链p50闭式38.33ms、旧核43.63ms、ambient33.23ms，1.1536倍通过成本门，仍慢于ambient，显存增量未下降。保留显式构造的研究候选；两轮已耗尽，结束核优化，未将其晋升默认、宣称精度或改变G0/G1/J。
 
 2026-10-12统一机制阅读见MODEL_RESULTS第27节：FMPE/条件transport支持当前F0的离线joint配对、在线无G0/J采样，但该通用机制已有先例且数据/噪声充分性未满足。SBI-SIM另加控制网与逐步物理反馈，当前不叠加；只考察以单次晚阶段代价/角向VJP替换anchor信息输入的可行性，尚未实现。A6不等同后验校准/密度/MH，当前无log_prob或真实prior/likelihood；不根据论文的density/覆盖论证升级证据。训练和默认架构继续保持。
+
+## 14. 独立端点代价余切量：已实现，未接入神经网络
+
+`geometry_information.endpoint_cost_vjp` 接收当前完整CandidateStore、严格绑定的原鱼眼Observation、Camera、NoiseModel、TangentScale及独立逐行surface callable。只允许SMPLH52，K个原槽位输出gradient[K,169]、available[K]、costs[K]、原ID/原因、绑定快照和实际解码/reverse计数；不改actions、不选anchor、不建立J或Λ。缺失/过期绑定与无当前观测在解码前不可用；数值非法计算行先排除，全部原输出槽位保留。准入投影失败、非有限代价/梯度及批异常明确记录，unavailable梯度NaN，合法零梯度available。
+
+对每个冻结端点(Rhat,That,betahat)，只对零标准化delta169求导：R(delta)=Rhat Exp(S_pose delta_pose)，T(delta)=That+S_T delta_T，beta(delta)=betahat+S_beta delta_beta。复用Rodrigues右乘核，不用可微log；端点、观测、相机、precision和尺度全部detach。E是当前准入点mean Huber原鱼眼代价，对候选E求和一次reverse，使每行返回各自gradient，不被K缩小。二次区g=JᵀWr/N_admitted；全局真实LBS逐样本独立是批求和成立前提。
+
+该输出是标准化坐标下的代价梯度/余切量。将它变为更新需要明确metric/步长/日程；本阶段没有物理修正、control网络或velocity条件接口。它不能保留Λ的rank/Schur/全耦合，也没有验证FD邻域，不能作为旧information的语义等价替换。
+
+晚阶段s=7/8沿base velocity预测到s=1，正好等于原8步LieEuler最后一步端点，不额外调用速度网络。成本可行性因此在原端点上测旁路；VJP解码仍不能冒充任何未来修正后人体的最终解码。一次真实CPUfloat64对照relative_error=3.9459897e-11、pose/T/beta均有限；同次CUDAfloat32 K32/8完整p50无VJP45.61805ms、有VJP81.30155ms，ratio1.7822233>1.25，停止全K32晚反馈晋升。后者实际网络8batch/256状态、人体2batch/64状态、reverse1；前者人体1batch/32状态、reverse0。详细记录和边界见MODEL_RESULTS第29节与flow_next_endpoint_vjp_cost_v1.json。训练、神经checkpoint和正式主线继续关闭/不变。

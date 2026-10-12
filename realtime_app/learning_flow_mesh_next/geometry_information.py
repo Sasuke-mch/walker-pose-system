@@ -5,7 +5,7 @@ from dataclasses import dataclass, field, replace
 import torch
 
 from .aggregate import decide
-from .geometry_observation import check_rig, project
+from .geometry_observation import check_rig, observation_errors, project
 from .input_binding import information_snapshot
 from .tangent import skew
 
@@ -24,6 +24,126 @@ class Information:
     resources: dict = field(default_factory=dict)
     provenance: dict = field(default_factory=dict)
     binding: dict = field(default_factory=dict)
+
+
+@dataclass
+class EndpointCostVJP:
+    """Endpoint-only cost covectors; unavailable slots stay NaN, never zero."""
+    gradient: torch.Tensor
+    available: torch.Tensor
+    costs: torch.Tensor
+    reasons: list
+    ids: list
+    scale: torch.Tensor
+    noise_source: str
+    calibrated: bool
+    binding: dict
+    resources: dict
+
+
+def endpoint_cost_vjp(store, obs, cameras, noise, scale, surface, *, huber=3.0):
+    """One cost-sum reverse pass for independent full SMPLH52 candidate rows.
+
+    Only standardized local delta is differentiated. This is a covector, not
+    an angular velocity, covariance or replacement for FD neighborhood guards.
+    The surface callable must decode rows independently (as real SMPL LBS does).
+    """
+    from .so3_flow import rotation_exp
+
+    if store.topology.nodes != 52:
+        raise ValueError("endpoint VJP requires complete SMPLH52")
+    k, m = len(store.raw), store.topology.tangent_dimensions
+    if (store.rotations.shape != (k, 52, 3, 3) or store.translation.shape != (k, 3)
+            or store.beta.shape != (k, 10) or store.numerical.shape != (k,)
+            or len(store.reasons) != k or len(store.ids) != k):
+        raise ValueError("complete candidate slot shapes required")
+    if not 0 < huber < float("inf"):
+        raise ValueError("positive finite Huber threshold required")
+    # no_grad and inference_mode differ: make ordinary detached tensors here,
+    # including when both callers and their candidate tensors are in inference mode.
+    with torch.inference_mode(False), torch.enable_grad():
+        obs = replace(obs, **{name: getattr(obs, name).detach().clone() for name in
+                              ("xy", "confidence", "present", "quality", "geometry",
+                               "views", "origins", "directions")})
+        cameras = tuple(replace(camera, **{name: getattr(camera, name).detach().clone()
+                                          for name in ("K", "D", "R", "T")}) for camera in cameras)
+        noise = replace(noise, precision=noise.precision.detach().clone())
+        scale = replace(scale, values=scale.values.detach().clone())
+        binding = information_snapshot(obs, cameras, noise)
+        scale.validate(store.topology)
+        result = EndpointCostVJP(
+            store.raw.new_full((k, m), torch.nan),
+            torch.zeros(k, device=store.raw.device, dtype=torch.bool),
+            store.raw.new_full((k,), torch.nan), [list(row) for row in store.reasons],
+            list(store.ids), scale.values, noise.source, noise.calibrated, binding,
+            {"decoder_batch_calls": 0, "decoder_state_evaluations": 0, "reverse_calls": 0,
+             "method": "endpoint_cost_sum_reverse", "admitted_count": int(obs.admitted().sum()),
+             "boundary": "independent decoder rows; endpoint-only validity; no FD probes"})
+
+        def reject(indices, reason):
+            for index in indices:
+                result.reasons[index].append(reason)
+
+        candidate_binding = store.provenance.get("observation_binding")
+        if candidate_binding is None or candidate_binding != binding["observation"]:
+            reject(range(k), "candidate_observation_binding_missing" if candidate_binding is None
+                   else "candidate_observation_binding_mismatch")
+            return result
+        for key in ("identity", "sequence", "frame", "timestamp"):
+            if key in store.provenance and store.provenance[key] != binding["observation"][key]:
+                reject(range(k), f"candidate_observation_provenance_mismatch:{key}")
+                return result
+        if not obs.admitted().any():
+            reject(range(k), "no_current_observation")
+            return result
+        rotations = store.rotations.detach().clone()
+        translation, beta = store.translation.detach().clone(), store.beta.detach().clone()
+        finite = (torch.isfinite(rotations).flatten(1).all(-1)
+                  & torch.isfinite(translation).all(-1) & torch.isfinite(beta).all(-1)
+                  & torch.isfinite(store.raw).all(-1))
+        legal = store.numerical.detach().clone() & finite
+        rows = legal.nonzero().flatten()
+        if len(rows):
+            identity = torch.eye(3, device=rotations.device, dtype=rotations.dtype)
+            proper = ((rotations[rows].transpose(-1, -2) @ rotations[rows]-identity)
+                      .abs().flatten(1).amax(-1) <= 1e-4)
+            proper &= (torch.linalg.det(rotations[rows])-1).abs().amax(-1) <= 1e-4
+            legal[rows] &= proper
+        reject((~legal).nonzero().flatten().tolist(), "numerically_invalid_endpoint")
+        rows = legal.nonzero().flatten()
+        if not len(rows):
+            return result
+        try:
+            delta = store.raw.new_zeros(len(rows), m, requires_grad=True)
+            physical = delta * scale.values.to(delta)
+            perturbed = rotations[rows] @ rotation_exp(physical[:, :156].reshape(-1, 52, 3))
+            position = translation[rows] + physical[:, 156:159]
+            shape = beta[rows] + physical[:, -10:]
+            result.resources["decoder_batch_calls"] += 1
+            result.resources["decoder_state_evaluations"] += len(rows)
+            points = surface(perturbed, position, shape)["coco17"]
+            costs, _, uv, valid = observation_errors(points, obs, cameras, noise, huber=huber)
+            projected = (valid[:, obs.admitted()].all(-1)
+                         & torch.isfinite(uv[:, obs.admitted()]).flatten(1).all(-1))
+            reject(rows[~projected].tolist(), "admitted_projection_invalid")
+            cost_finite = torch.isfinite(costs)
+            reject(rows[projected & ~cost_finite].tolist(), "nonfinite_endpoint_cost")
+            usable = projected & cost_finite
+            if not usable.any():
+                return result
+            result.resources["reverse_calls"] += 1
+            # Sum candidate means: dividing by K would shrink each covector.
+            gradient = torch.autograd.grad(costs[usable].sum(), delta, create_graph=False)[0]
+            finite_gradient = torch.isfinite(gradient).all(-1)
+            reject(rows[usable & ~finite_gradient].tolist(), "nonfinite_endpoint_gradient")
+            good = usable & finite_gradient
+            result.gradient[rows[good]] = gradient[good].detach()
+            result.costs[rows[usable]] = costs[usable].detach()
+            result.available[rows[good]] = True
+        except (ValueError, RuntimeError) as error:
+            # One failed batch affects its slots; never retry or redraw privately.
+            reject(rows.tolist(), f"endpoint_vjp_unavailable:{type(error).__name__}:{error}")
+        return result
 
 
 def schur_shape(matrix, *, rtol=1e-6):

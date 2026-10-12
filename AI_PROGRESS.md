@@ -4449,3 +4449,11 @@ MODEL_ARCHITECTURE成本说明与MODEL_RESULTS第28节同步。该数值修复�
 按用户要求新增 HANDOFF_MODEL_RESEARCH_20261012.md，整理长期目标、冻结主线、模型身份、论文采用边界、成本结果、已停止路线、运行恢复与下一阶段执行顺序。精确断点为原鱼眼Huber零残差修复已完成，端点VJP及其真实人体/成本对照尚未实现；已有18行VJP预登记仍在工作区，训练与checkpoint加载继续关闭，用户暂无额外数据。
 
 本次仅交接文档与本进度段落，核对关键文件路径、协议和实际diff，不重复模型测试。既有空行及其他工作区改动保留；长期有效性目标未完成，接手后先推进最小算子正确性，再按预登记成本门决定继续或停止。
+
+## 2026-10-12 完整端点VJP方向通过，K32成本门失败
+
+接续已有预登记，实现geometry_information.endpoint_cost_vjp：冻结完整52节点端点/观测/rig/noise/scale，只对标准化delta169的原鱼眼meanHuber求一次批代价和reverse；严格当前绑定、全槽位/原因、unavailableNaN与合法零梯度区分保留，局部支持no_grad/inference_mode，不改网络或FD信息。现有information相关13测试通过，初次测试import格式lint修正后通过，没有重复功能检查。
+
+一次真实maleSMPLH/MANO+COCO表面CPU64端点，同尺度FD339状态方向对照相对误差3.9459897e-11，pose/T/beta均有限；方向门通过。既有profile扩展后同次SO3同模型K32/8、warmup2/每组8次CUDA32交替：完整p50无VJP45.61805ms/有VJP81.30155ms，p95为74.93429/120.12344ms；比1.7822233超过1.25门。峰分配增量30.50/40.72MB，实际网络均8/256、人体1/32与2/64、reverse0/1，全部32槽位可用。停止全K32晚反馈晋升，不减少预算或重测追分；独立算子保留，未接神经反馈。
+
+flow_next_endpoint_vjp_cost_v1.json与MODEL_RESULTS第29节、MODEL_ARCHITECTURE第14节、长期协议结果同步。用户中断等待后现场确认测量已完成且无后台进程，直接读保存JSON，无重复启动。用户转向现方案讲解/架构图，停止新增实验和第二轮修订；训练/独立数据缺口与冻结主线保持，长期效能目标未完成。

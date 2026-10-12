@@ -953,3 +953,24 @@ TV/KL或Metropolis不是免费后验认证：需要真实定义的prior/likeliho
 geometry_observation.py 改为直接用平方残差判定二次区间；二次区间内仅给未启用的sqrt分支输入1。前向二次/线性Huber公式不变，不用epsilon制造非零匹配代价，也不把非有限候选改为默认有效。原鱼眼投影、准入掩码、proxy precision和A5/A6决策未改。
 
 实际 test_information.py 与 test_aggregate.py 共11 passed；精确匹配成本和全部导数严格为0，既有投影、缺失、完整候选、FD信息及双阶段接口检查通过。两份修改Python的Ruff通过。没有全套重跑、训练、checkpoint或额外验收文件。该修复是完整端点物理VJP的数值前提，不证明反馈有效或旧FD邻域合同可取消；对应VJP实现与成本检查仍待推进。
+
+## 29. 2026-10-12 完整端点物理代价VJP：方向通过，K32成本未通过
+
+按已有 endpoint_vjp_feasibility_20261012 预登记，在 geometry_information.py 实现 endpoint_cost_vjp。输入严格绑定当前 CandidateStore/原鱼眼Observation、Camera、NoiseModel 和 TangentScale；仅完整52节点，端点与全部外部条件 detach，局部标准化 delta169 求导。右乘 Rodrigues Exp、T/beta 物理尺度与既有定义一致，独立候选的 mean Huber 代价求和后一次 reverse，不除候选数K。输出为代价余切量，不是角速度、协方差或后验；未改变神经网络或原J/Λ接口。
+
+全部候选槽位、ID和已有原因保留。缺失/错误/过期 observation_binding、无当前观测、实际非法R/T/beta、准入点投影无效、非有限代价/梯度均明确 unavailable，梯度NaN；合法精确匹配的梯度0仍available。数值计算行可先筛出，输出还原全部槽位；批解码异常影响原计算槽位，不重试/重抽。局部关闭inference_mode并enable_grad，使外层no_grad/inference_mode及其张量可用；真实SMPL LBS逐行独立是批代价求和成立的前提。端点合法不认证FD邻域合法。
+
+现有 test_information.py 共13 passed in4.02s。新检查独立解析鱼眼Jacobian的 JᵀWr/N、各向异性precision/非均匀T尺度、准入mask、单行与5行方向逐值一致、零梯度、无观测/缺失及过期绑定、负深度/非有限beta/非法旋转、批异常不重试、有限前向而非有限导数。Ruff先后报告测试导入格式、profile多余dict展开，均作等价格式修正；三份改动Python最终通过，未因此重复功能测试或测时。
+
+扩展既有 profile.py --endpoint-feedback-controls。先用真实本地maleSMPLH/MANO及COCO17表面回归器做一个CPU float64端点对照：seed7、各节点Exp(0.03 Gaussian3)、T=[0.04,-0.02,3]米、beta从-0.05到0.05、尺度pose0.1/T[0.2,0.4,0.3]/beta0.08，34准入观测。VJP与同端点中心FD J（step1e-4/chunk16）的 JᵀWr/N 相对误差 **3.9459897e-11**，通过≤1e-4门；pose/T/beta三块均有限且非零。FD339人体状态仅用于正确性，不纳入两种运行模式成本。
+
+方向通过后同次配对成本：RTX5070Ti Laptop、Torch2.11.0+cu128、CUDA float32、CPUthreads1、seed7、K32/8步、warmup2/每模式8次交替次序，同一SO3模型实例/权重/原观测/源/Normalization、每次state=None，真实人体解码+A4。VJP模式只计算旁路方向，没有修正候选或接入控制网；仍保留最终人体解码，以计入未来修正后需要解码的成本。
+
+|同次模式|完整p50 ms|完整p95 ms|峰分配增量 bytes|网络batch/状态|人体batch/状态|reverse|
+|---|---:|---:|---:|---|---|---:|
+|SO3 F0，无VJP|45.61805|74.93429|30504960|8/256|1/32|0|
+|同SO3，加独立端点VJP|81.30155|120.12344|40720384|8/256|2/64|1|
+
+VJP阶段自身p50为34.70410ms；完整p50比 **1.7822233**，超过先定1.25门，停止全K32晚反馈晋升。所有记录32候选数值合法，VJP均available，最终vertices有限，实际计数通过；失败原因数组完整保存于 flow_next_endpoint_vjp_cost_v1.json。该负结果属于计算可行性，不能解释为反馈准确度差；也不能因方向误差小就忽略成本。8次小样本p95与未锁负载只支持本次停止判断，不认证生产延迟或真实人体精度。
+
+测前GPU16%/1921MiB/21.33W。工具等待被用户新消息中断时进程已完成并保存结果，现场检查无相关后台进程，直接读取JSON，没有重复启动/重跑以选较好耗时。用户转向方案解释与架构图，当前停止新增实验，保留独立算子供研究；未开启第二轮修订、训练、checkpoint或默认主线晋升。数据门仍缺，长期效能目标未完成。
