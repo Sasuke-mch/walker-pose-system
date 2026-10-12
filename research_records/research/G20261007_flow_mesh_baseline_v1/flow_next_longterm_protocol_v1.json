@@ -40,10 +40,10 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Return to G0/G1 simplification: read primary papers and official implementations on a single generator with observation residual/operator conditioning; test mechanism overlap and double-conditioning assumptions before any network changes. Local AD performance replacement paused; no new heuristic guard layers. Training remains closed.",
+  "next_stage": "Audit official direct conditional FM implementation and rig/noise input sufficiency before G0/G1 ablations. All single/two-generator and regression controls must use corrected identity-binding encoder. Do not call ordinary conditional FM novel; training closed.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 actual local_information boundary counterexample: finite anchor AD but rejected FD perturbation; anchor-only replacement shortcut closed",
+  "last_completed_stage": "2026-10-12 fixed identity-content binding before pooling; old feature-permutation collision reproduced; same 711443 parameters; 117 tests passed",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

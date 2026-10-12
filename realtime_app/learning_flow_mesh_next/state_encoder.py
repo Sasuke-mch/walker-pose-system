@@ -50,7 +50,10 @@ class StateEncoder(nn.Module):
                               ages, seen[..., None].to(obs.xy),
                               obs.xy.new_full((2, 17, 1), dt)), -1)
         if valid.any():
-            tokens = self.local(features) + self.joint_ids[None] + self.view_roles[:, None]
+            # Bind identity to content before the nonlinearity. Adding identity
+            # after the MLP loses feature-to-slot association under mean pooling.
+            embedded = self.local[0](features) + self.joint_ids[None] + self.view_roles[:, None]
+            tokens = self.local[2](self.local[1](embedded))
             # Missing/nonadmitted slots never update the GRU, even via pooling.
             measurement = tokens[valid].mean(0)
             hidden = self.gru(measurement, hidden)

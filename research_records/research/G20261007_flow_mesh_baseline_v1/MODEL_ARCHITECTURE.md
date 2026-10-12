@@ -53,7 +53,7 @@ present槽必须有限；真正缺失槽可NaN，不能把present但质量拒绝
 
 源码 `state_encoder.py`：每槽15维，顺序为xy2/1000、confidence1、origin3、direction3、present1、quality1、有效geometry1、log1p(age)1、seen1、dt1。xy/score仅在admitted时进入；射线仅在有效geometry时进入。除以1000是固定输入尺度，非训练得到的图像归一化。
 
-34槽经Linear15→128、GELU、Linear128→128，加17×128关节身份与2×128视图角色参数。只有准入槽参与均值池化，池化观测经GRUCell128→128更新hidden。没有准入槽时完全不更新hidden；年龄按dt增加，不发布人体。初始hidden/age为0，seen为False，未知age由seen明确区分。
+34槽经Linear15→128后加17×128关节身份与2×128视图角色参数，再经GELU、Linear128→128。身份必须在非线性之前与内容结合；旧版MLP后相加会在均值池化中丢失槽位与观测的对应。2026-10-12修复仅调整既有算子顺序，参数仍不变。只有准入槽参与均值池化，池化观测经GRUCell128→128更新hidden。没有准入槽时完全不更新hidden；年龄按dt增加，不发布人体。初始hidden/age为0，seen为False，未知age由seen明确区分。
 
 另一个时间分支输入 `[dt, mean(age), admitted_fraction, seen_fraction]` 的log1p值，经Linear4→128、GELU、Linear128→128。context=hidden+time_context；全缺失时context可因时间变化，但观测hidden仍冻结，不能混淆这两者。
 

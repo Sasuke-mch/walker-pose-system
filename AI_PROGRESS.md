@@ -4338,3 +4338,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 预注册flow_next_guard_protocol_v1.json后，audit_guard.py在CPU float64解析刚体surface上调用实际project/local_information。内部点AD有限且FD可用；边界点原u255.99999合法、AD有限，正向1e-4平移扰动后u256.000812034越界，原FD明确返回anchor_or_perturbation_projection_invalid。Ruff/AST及两组断言通过，原数值与拒绝保存flow_next_guard_audit_v1.json，非真实人体失败频率。
 
 关闭anchor-only AD直接替换FD捷径；先前保守完整guard无收益，暂停该局部性能替换，不新增边界启发式。下一阶段回到单生成器的残差/算子条件及G0/G1必要性文献和源码审查。默认FD、训练关闭及正式主线保留，长期目标仍在进行。MODEL_RESULTS第14节及MODEL_ARCHITECTURE已同步。
+
+
+## 2026-10-12 JointFlow条件编码身份碰撞修复
+
+发现旧StateEncoder将joint/view身份加在MLP后再均值池化，同掩码槽位特征交换会产生相同条件。预注册identity协议后6交换测试先失败、旧公式恒等式通过；仅将已有身份移到GELU前绑定内容，参数仍711443，完整next117测试通过、两文件Ruff和AST通过。无新模块/训练/神经checkpoint，非真实精度提升。各seed差值与red/green结果见flow_next_identity_audit_v1.json、MODEL_RESULTS第15节；MODEL_ARCHITECTURE主描述同步。
+
+新读2603.14135v1条件FM推导及MLP条件注入文本，未核验作者实现。后续单/双生成器及回归对照统一采用修复后encoder，继续审查相机/噪声条件缺口后再谈删除G1，避免不公平对照。长期目标继续，正式主线不变。

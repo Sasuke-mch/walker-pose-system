@@ -1,0 +1,45 @@
+{
+  "red_phase": "6 failed, 1 passed before fix; historical encoder invariant to feature swaps",
+  "fix": "existing identities moved before existing GELU; no parameters added",
+  "rows": [
+    {
+      "seed": 7,
+      "swap": "joint",
+      "context_max_abs_difference": 2.8990690143712583e-05
+    },
+    {
+      "seed": 7,
+      "swap": "view",
+      "context_max_abs_difference": 0.0002635715294754676
+    },
+    {
+      "seed": 19,
+      "swap": "joint",
+      "context_max_abs_difference": 3.468542742224301e-05
+    },
+    {
+      "seed": 19,
+      "swap": "view",
+      "context_max_abs_difference": 0.0003971359937380778
+    },
+    {
+      "seed": 31,
+      "swap": "joint",
+      "context_max_abs_difference": 2.582789345736969e-05
+    },
+    {
+      "seed": 31,
+      "swap": "view",
+      "context_max_abs_difference": 0.0002665402778487258
+    }
+  ],
+  "parameters52": 711443,
+  "preexisting_search_failure": "rg Windows wildcard test_*.py not expanded; no test execution affected",
+  "training": false,
+  "claim": "removes fixed structural collision on declared fixtures; no injectivity or efficacy proof",
+  "validation": {
+    "full_next_pytest": "117 passed in 82.45s",
+    "ruff": "2 changed Python files passed offline",
+    "syntax": "AST passed"
+  }
+}

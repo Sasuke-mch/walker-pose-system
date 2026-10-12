@@ -1,0 +1,9 @@
+{
+  "target": "retain association between observation features and joint/view identity before pooling",
+  "hypothesis": "current additive identity after local MLP cancels under feature-slot permutations with same mask",
+  "only_variable": "move existing joint/view identity into existing MLP before GELU; same weights, dimensions, parameter count",
+  "controls": "historical additive-after-MLP; identical observations; swapped joint packets; swapped view packets; fully missing and temporal regression suite",
+  "success": "old encoder collision reproduced float64; corrected encoder distinguishes joint and view swaps for fixed seeds 7,19,31; parameter count unchanged; missing-data and temporal tests pass",
+  "stop": "no new modules; fail if masking semantics changes; no trained efficacy claim",
+  "training": false
+}

@@ -741,3 +741,16 @@ flow_next_guard_protocol_v1.json先登记，audit_guard.py调用实际project与
 内部点原像素[128,128]，正向平移扰动后u=128.00999999997；自动微分有限且原FD信息可用。边界点x=3.34134876465，原u=255.99999合法，自动微分仍有限，但正向扰动后u=256.00081203408越界，原local_information返回information_unavailable:ValueError:anchor_or_perturbation_projection_invalid。所有断言、Ruff、AST通过，原输出保存在flow_next_guard_audit_v1.json。此为可复现存在性反例，不代表真实人体边界失败频率；也不证明FD数值邻域门本身是最佳统计设计。
 
 决定：关闭“anchor-only AD直接替换FD并保持原拒绝语义”的捷径。精确保留现有探针语义的直接实现仍需评估原扰动；此前保守FD+AD实现未见全成本收益，但并未排除未来有证明的界限或专门优化。当前不新增近边界阈值、回退分支或检查网络来追逐这项局部速度；暂停该性能替换方向，保留原FD。下一阶段回到G0/G1简约性：审查单个生成器如何表达残差方向与算子条件，优先已有条件表示的替换/合并，先核对论文假设与现有信息接口，训练和主线仍冻结。真实方法收益尚未完成。
+
+
+## 15. 2026-10-12 观测身份在池化中丢失：同参数修复
+
+flow_next_identity_protocol_v1.json在测试前登记。本轮逐行读取state_encoder.py、information_encoding.py及joint_flow.py发现：旧tokens=MLP(feature)+joint_id+view_role，随后对准入槽取mean。对固定同一准入集合，任意槽位特征排列π满足sum MLP(feature_π(i))+sum id_i不变，因此“哪些特征属于哪些关节/视图”无法由这段编码恢复。相同完整历史逐帧做此排列也不能靠GRU恢复身份对应。此结论针对特征包置换与相同掩码/年龄，不能泛称任意物理相机变换都不变。
+
+修复把已有joint/view嵌入移到Linear15→128之后、GELU之前，随后执行原Linear128→128；没有增加网络、参数、候选或额外几何计算。相同权重张量形状不代表新旧推理语义兼容；当前next无训练checkpoint，历史随机数值仍归旧版本。G0/G1和regression共用此修复，后续对照不可一方使用旧错误encoder。
+
+test_identity_binding.py使用CPU float64固定seed7/19/31、全准入34槽、人造不同xy；分别交换0/16关节和两视图xy，其他特征常量。修改前6失败/1通过，旧additive公式的置换等式测试通过，确认不是抽样不足。修改后context最大差：关节2.58e-5至3.47e-5，视图2.64e-4至3.97e-4，均超过预注册1e-8；完整next117测试通过（82.45s），含既有缺失/时间/分块状态和回归控制。Ruff两文件、AST通过，JointFlow52仍711443参数。详细seed数值、初次失败及Windows rg通配符检索失败在flow_next_identity_audit_v1.json。没有训练、优化器或效果测量；这些差值只排除指定结构性碰撞，不证明编码可逆、信息充分或真实准确性。
+
+相关文献本轮读取[Solving physics-constrained inverse problems with conditional flow matching](https://arxiv.org/html/2603.14135v1)第2.2节式18–21及附录A的MLP条件注入描述：以联合样本学习直接条件速度场，不要求每次推理额外求导；目标依赖所用联合数据与条件。本文中这些理想条件不能认证我们128维压缩条件、有限网络和Euler8就是正确后验。仅核对论文文本，未定位并核验该作者实现，不计复现。Deep Sets会议摘要作为集合模型背景读过，不以摘要认证本项目修复；置换缺陷与修复依据为上面的源码代数和实际red/green测试。
+
+决定：先修复条件表达，再评价G1是否提供表示收益。保留双阶段候选但不认定其必要；单生成器直接条件FM是已有方法类别，不称创新。下一阶段核对官方条件FM实现及当前encoder没有显式表达的相机/噪声信息，避免把删除G1造成的输入差异误判为网络数量差异。训练关闭、独立有效性门仍未满足。
