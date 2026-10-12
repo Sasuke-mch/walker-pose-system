@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "tests": "33 relevant tests passed",
+  "lint": "E9/F checks passed for changed source/tests; no full-repository lint claim",
+  "compileall": "passed",
+  "source": "view_v4/source_validation.json,22 checks passed",
+  "browser": "actual0/380/391/447 visited; transition380 shows protocol-support-closed,391 shows Stage1 held; mesh/walker/ground visible; console error list empty",
+  "screenshots": [
+    "view_v4/preview_stop.jpg",
+    "view_v4/preview_stage1.jpg"
+  ],
+  "first_failed_regression": "unconfirmed_brief_stops_do_not_erase_prior_camera_motion_episode:1failed15passed; fixed before33-test pass",
+  "retained_failure": "v2/v3 both Stage1 maxheight error63.8004mm; not promoted",
+  "non_improved_metrics": "maximum XY frame translation30.5061\u219233.2377mm; old-anchor ankle residual up to99.5798mm diagnostic kept",
+  "boundary": "same user-supported-stop capture only; static installation prior; body unchanged; no independently validated contact/accuracy or realtime claim"
+}

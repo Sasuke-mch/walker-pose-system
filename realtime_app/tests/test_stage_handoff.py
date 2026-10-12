@@ -37,6 +37,16 @@ def evidence(moving=False, static=False, instant=1.8):
 
 
 class HandoffTests(unittest.TestCase):
+    def test_separate_camera_regime_preserves_motion_labels_and_original_stage2_gate(self):
+        policy = StageHandoffPolicy(preserve_motion_labels=True)
+        for _ in range(3):
+            row = policy.update(evidence(moving=True))
+        self.assertEqual(row["stage"]["operational"], "transition")
+        self.assertEqual(row["stage"]["handoff"]["ground_stage"], "transition")
+        row = policy.update(evidence(static=True, instant=0))
+        self.assertEqual(row["stage"]["operational"], "transition")
+        self.assertEqual(row["stage"]["handoff"]["ground_stage"], STAGE1)
+
     def test_ankle_bearings_recover_metric_translation(self):
         K = np.array([[1000, 0, 960], [0, 1000, 540], [0, 0, 1.0]])
         cal = StereoCalibration(

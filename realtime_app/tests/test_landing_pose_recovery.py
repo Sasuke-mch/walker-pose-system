@@ -21,10 +21,11 @@ class RecoveryTests(unittest.TestCase):
         ankles=True,
         actions=None,
         human_frames=None,
+        protocol="flat_ground_supported_after_motion",
     ):
         initial = WorldPose(np.eye(3), np.array([0.0, 0.0, 700.0]))
         recovery = LandingPoseRecovery(
-            initial, mode=mode, protocol="flat_ground_supported_after_motion"
+            initial, mode=mode, protocol=protocol
         )
         yaw = cv2.Rodrigues(np.array([0.0, 0.0, 0.2]))[0]
         rotation = yaw @ cv2.Rodrigues(np.array([tilt, 0.0, 0.0]))[0]
@@ -63,7 +64,8 @@ class RecoveryTests(unittest.TestCase):
             }
             stage = {
                 "stage": {
-                    "handoff": {"ground_stage": action},
+                    "handoff": {"ground_stage": action, "instantaneous_stop": moving and action == STAGE1},
+                    "background": {"fused": {"available": True, "motion_active": moving}},
                     "pose_motion": {
                         "left": {
                             "upper_body_keypoints": 8,
@@ -205,6 +207,46 @@ class RecoveryTests(unittest.TestCase):
         initial = WorldPose(np.eye(3), np.zeros(3))
         with self.assertRaises(ValueError):
             LandingPoseRecovery(initial, mode="fixed_lag", protocol=None)
+        for mode in ("causal", "joint_window"):
+            with self.assertRaises(ValueError):
+                LandingPoseRecovery(initial, mode=mode, protocol="supported_at_camera_stop")
+
+    def test_camera_stop_protocol_restores_without_human_resumption(self):
+        _, estimator, recovery, _, emitted = self.simulate(
+            human=False, ankles=False, protocol="supported_at_camera_stop")
+        self.assertTrue(recovery.events)
+        self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 700)
+        self.assertEqual(len(emitted), 18)
+
+    def test_legacy_protocol_still_rejects_no_human_resumption(self):
+        _, estimator, recovery, _, _ = self.simulate(human=False)
+        self.assertFalse(recovery.events)
+        self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 764)
+
+    def test_camera_stop_retains_short_deceleration_but_not_long_unknown_gap(self):
+        _, estimator, recovery, _, _ = self.simulate(
+            human=False, protocol="supported_at_camera_stop", actions={9: "transition"})
+        self.assertTrue(recovery.events)
+        self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 700)
+        _, estimator, recovery, _, _ = self.simulate(
+            human=False, protocol="supported_at_camera_stop",
+            actions={i: "transition" for i in range(9, 16)})
+        self.assertFalse(recovery.events)
+        self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 764)
+
+    def test_camera_motion_evidence_does_not_require_human_stage2_label(self):
+        _, estimator, recovery, _, _ = self.simulate(
+            human=False, protocol="supported_at_camera_stop",
+            actions={i: "transition" for i in range(1, 9)})
+        self.assertTrue(recovery.events)
+        self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 700)
+
+    def test_unconfirmed_brief_stops_do_not_erase_prior_camera_motion_episode(self):
+        _, estimator, recovery, _, _ = self.simulate(
+            human=False, protocol="supported_at_camera_stop",
+            actions={i: STAGE1 for i in [2, 4, 6, 8]})
+        self.assertTrue(recovery.events)
+        self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 700)
 
     def test_unknown_stage_breaks_landing_evidence(self):
         _, estimator, recovery, _, _ = self.simulate(actions={10: "transition"})

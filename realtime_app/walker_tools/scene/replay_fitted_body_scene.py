@@ -82,7 +82,7 @@ def args() -> argparse.Namespace:
         choices=["none", "causal", "fixed_lag", "joint_window"],
         default="none",
     )
-    p.add_argument("--landing-protocol", choices=["flat_ground_supported_after_motion"])
+    p.add_argument("--landing-protocol", choices=["flat_ground_supported_after_motion", "supported_at_camera_stop"])
     parsed = p.parse_args()
     parsed.resolved_scene_profile = parsed.scene_profile
     if parsed.scene_profile == "mainline":
@@ -106,8 +106,11 @@ def args() -> argparse.Namespace:
         p.error(
             "landing recovery requires --stage-handoff and explicit --landing-protocol"
         )
+    if parsed.landing_protocol == "supported_at_camera_stop" and parsed.landing_recovery != "fixed_lag":
+        p.error("supported-at-camera-stop protocol requires verified fixed-lag recovery")
     if parsed.stage_handoff and (
-        parsed.frames_metadata is None or parsed.continuous_stage
+        (parsed.frames_metadata is None and parsed.landing_protocol != "supported_at_camera_stop")
+        or parsed.continuous_stage
     ):
         p.error(
             "--stage-handoff requires frames metadata and cannot combine with --continuous-stage"
@@ -285,7 +288,9 @@ def main() -> int:
             foot_observation_mode=a.foot_observation_mode,
         )
     )
-    handoff_policy = StageHandoffPolicy() if a.stage_handoff else None
+    handoff_policy = StageHandoffPolicy(
+        preserve_motion_labels=a.landing_protocol == "supported_at_camera_stop"
+    ) if a.stage_handoff else None
     timing = (
         load_pair_timing(a.frames_metadata, len(ids), input_pair_dir=a.input_pair_dir)
         if a.frames_metadata

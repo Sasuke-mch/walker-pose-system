@@ -41,6 +41,8 @@ def main():
                         help="explicit capture selection using the current reference25/baseline logic")
     parser.add_argument("--resume-current-export", action="store_true",
                         help="resume a failed export with its exact same completed current scene")
+    parser.add_argument("--scene-profile", default="mainline",
+                        help="explicit isolated scene candidate; default retains formal mainline")
     cli = parser.parse_args()
     out = cli.output.resolve()
     if out.exists() and not cli.resume_current_export:
@@ -70,7 +72,8 @@ def main():
         out.mkdir(parents=True)
     write(out / "protocol.json", {
         "selected_body": body, "frames": sel["frames"], "frame_ids": sel["frame_ids"],
-        "source_pair_ids": [int(row["pair_id"]) for row in frames], "scene_profile": "mainline -> baseline",
+        "source_pair_ids": [int(row["pair_id"]) for row in frames],
+        "scene_profile": "mainline -> baseline" if cli.scene_profile == "mainline" else cli.scene_profile,
         "detector_inputs": sel["detector_inputs"],
         "implementation": "realtime_app/build_current_mainline_view.py",
         "variable": "Visualization export of selected body; fresh strict geometry and baseline replay, no fitting changes",
@@ -115,7 +118,7 @@ def main():
         for flag, value in (("--output", str(out / "scene")),
                             ("--strict-jsonl", str(strict_path)),
                             ("--calibration", str(calibration_path)),
-                            ("--scene-profile", "mainline")):
+                            ("--scene-profile", cli.scene_profile)):
             command[command.index(flag) + 1] = value
         if cli.resume_current_export:
             if read(out / "scene_replay_command.json") != command:
@@ -209,6 +212,13 @@ def main():
         if getattr(options, "body_observation_mode", "legacy") == "reprojection_only":
             page = page.replace("reference25 权重", "三维诊断权重（不用于二维拟合）")
             page = page.replace("原质量 → 实际拟合权重", "原质量 → 三维诊断权重")
+        if cli.scene_profile == "supported_stop_fixed_lag":
+            page = page.replace("held:'保持',", "protocol_support_restored:'协议支撑闭合',"
+                                "protocol_support_window_reestimated:'过渡窗口重估',held:'保持',")
+            page = page.replace("<section><h2>操作</h2>",
+                '<section><h2>相机停止与支撑协议</h2><p>动作Stage标签保留；相机可靠停止时按用户采集协议恢复平地支撑，'
+                '不等待人体重新运动。固定延迟为15帧（名义30FPS约0.5秒）；这是先验辅助的位姿重估，不是触地测量。'
+                '缺失观测、原失败及修正前位姿均保留。</p></section><section><h2>操作</h2>')
         if smoothing:
             hook = "]).then(([v,w,t,he,c,ankle,model])=>{"
             if hook not in page:

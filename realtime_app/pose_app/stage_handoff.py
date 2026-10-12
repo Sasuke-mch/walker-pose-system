@@ -17,8 +17,9 @@ from .two_stage_motion import WorldPose
 
 
 class StageHandoffPolicy:
-    def __init__(self):
+    def __init__(self, *, preserve_motion_labels=False):
         self.regime = None
+        self.preserve_motion_labels = preserve_motion_labels
         self.moving_streak = self.static_streak = 0
 
     def update(self, original):
@@ -66,11 +67,26 @@ class StageHandoffPolicy:
                 else "uncertain_pose_hold"
             )
             ground_stage = TRANSITION
+        if self.preserve_motion_labels:
+            # Only the support-stop trigger is new. Motion pose updates still
+            # require the original Stage2/foot-stationarity classification.
+            if static:
+                ground_stage = STAGE1
+                action = "protocol_static_support_confirmation"
+            elif stage["operational"] == STAGE2:
+                ground_stage = STAGE2
+                action = "original_stage2_strict_pose_update"
+            else:
+                ground_stage = TRANSITION
+                action = "original_transition_bounded_carry"
         stage["legacy_operational"] = stage["operational"]
         stage["legacy_confirmed"] = stage.get("confirmed")
-        stage["confirmed"] = confirmed
-        stage["operational"] = confirmed
+        if not self.preserve_motion_labels:
+            stage["confirmed"] = confirmed
+            stage["operational"] = confirmed
         stage["handoff"] = {
+            "camera_regime": confirmed,
+            "motion_labels_preserved": self.preserve_motion_labels,
             "action": action,
             "ground_stage": ground_stage,
             "moving_streak": self.moving_streak,
@@ -131,7 +147,7 @@ class StageHandoffGroundWriter:
         proxy = copy.deepcopy(stage_status)
         handoff = proxy["stage"]["handoff"]
         proxy["stage"]["operational"] = handoff["ground_stage"]
-        if handoff["ground_stage"] == STAGE2:
+        if handoff["ground_stage"] == STAGE2 and not handoff.get("motion_labels_preserved", False):
             # The action is triggered by camera-motion evidence, not legacy votes.
             proxy["stage"]["vote_confidence"] = 1.0
         time = float(payload["pair_timestamp_sec"])

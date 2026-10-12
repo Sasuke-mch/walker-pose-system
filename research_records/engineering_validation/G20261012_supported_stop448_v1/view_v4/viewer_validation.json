@@ -1,0 +1,192 @@
+{
+  "status": "file_checks_passed_browser_pending",
+  "vertices": 6890,
+  "faces": 13776,
+  "index_entries": 41328,
+  "frames": 448,
+  "joints": {
+    "0": {
+      "finite": 448,
+      "strict_accepted": 256,
+      "finite_rejected": 192,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 191
+      }
+    },
+    "1": {
+      "finite": 433,
+      "strict_accepted": 244,
+      "finite_rejected": 189,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "out_of_raw_image_bounds": 17,
+        "high_reprojection_error": 186
+      }
+    },
+    "2": {
+      "finite": 439,
+      "strict_accepted": 234,
+      "finite_rejected": 205,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "out_of_raw_image_bounds": 9,
+        "high_reprojection_error": 204
+      }
+    },
+    "3": {
+      "finite": 390,
+      "strict_accepted": 295,
+      "finite_rejected": 95,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "out_of_raw_image_bounds": 57,
+        "high_reprojection_error": 95
+      }
+    },
+    "4": {
+      "finite": 448,
+      "strict_accepted": 356,
+      "finite_rejected": 92,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 91
+      }
+    },
+    "5": {
+      "finite": 448,
+      "strict_accepted": 300,
+      "finite_rejected": 148,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 147
+      }
+    },
+    "6": {
+      "finite": 448,
+      "strict_accepted": 414,
+      "finite_rejected": 34,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 33
+      }
+    },
+    "7": {
+      "finite": 448,
+      "strict_accepted": 265,
+      "finite_rejected": 183,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 182
+      }
+    },
+    "8": {
+      "finite": 448,
+      "strict_accepted": 377,
+      "finite_rejected": 71,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 70
+      }
+    },
+    "9": {
+      "finite": 448,
+      "strict_accepted": 278,
+      "finite_rejected": 170,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "low_2d_score": 2,
+        "high_reprojection_error": 167
+      }
+    },
+    "10": {
+      "finite": 448,
+      "strict_accepted": 430,
+      "finite_rejected": 18,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 17
+      }
+    },
+    "11": {
+      "finite": 448,
+      "strict_accepted": 326,
+      "finite_rejected": 122,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 121
+      }
+    },
+    "12": {
+      "finite": 448,
+      "strict_accepted": 325,
+      "finite_rejected": 123,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 122
+      }
+    },
+    "13": {
+      "finite": 448,
+      "strict_accepted": 356,
+      "finite_rejected": 92,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 91
+      }
+    },
+    "14": {
+      "finite": 448,
+      "strict_accepted": 84,
+      "finite_rejected": 364,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 363
+      }
+    },
+    "15": {
+      "finite": 448,
+      "strict_accepted": 317,
+      "finite_rejected": 131,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 130
+      }
+    },
+    "16": {
+      "finite": 448,
+      "strict_accepted": 429,
+      "finite_rejected": 19,
+      "rejection_reasons": {
+        "association_failed": 1,
+        "high_reprojection_error": 18
+      }
+    }
+  },
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261012_supported_stop448_v1\\view_v4\\result.npz",
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261012_supported_stop448_v1\\view_v4\\scene",
+  "stage_counts": {
+    "stage1_walker_static_human_moving": 214,
+    "stage2_feet_static_walker_moving": 115,
+    "transition": 114,
+    "warming_up": 5
+  },
+  "no_display_smoothing": false,
+  "explicit_user_requested_smoothing": {
+    "source": "research_records\\engineering_validation\\G20261012_smplh_2d448_view_v1\\fit",
+    "output": "research_records\\engineering_validation\\G20261012_smplh_2d448_view_v1\\smoothed",
+    "frames": 448,
+    "mode": "explicit_user_requested_display_variant_not_refit",
+    "strength_each_neighbor": 0.1,
+    "rotation_limit_degrees_per_joint": 2.0,
+    "translation_limit_m": 0.003,
+    "eligible_triplets": 446,
+    "endpoints_and_gaps_unchanged": true,
+    "beta_and_hands_unchanged": true,
+    "vertices_redecoded_from_parameters": true,
+    "raw_observations_ground_stage_walker_camera_smoothed": false,
+    "maximum_translation_correction_m": 0.0030000116676092148,
+    "maximum_vertex_correction_m": 0.02239973098039627
+  },
+  "original_fit_toggle_available": true
+}

@@ -1,6 +1,24 @@
 {
   "schema": "stage_ground_profiles_v1",
   "profiles": {
+    "supported_stop_fixed_lag": {
+      "level": "experimental_user_declared_supported_stop_protocol",
+      "options": {
+        "processing_width": 480,
+        "foot_observation_mode": "causal_median",
+        "continuous_stage": false,
+        "stage_handoff": true,
+        "disable_stage1_reanchor": true,
+        "predict_camera_dropout": false,
+        "ankle_bearing_fallback": false,
+        "single_ankle_fallback": false,
+        "latest_anchor": false,
+        "landing_recovery": "fixed_lag",
+        "landing_protocol": "supported_at_camera_stop",
+        "background_vo_diagnostic": false,
+        "background_vo_rectified": false
+      }
+    },
     "baseline": {
       "level": "retained_engineering_baseline_not_physical_validation",
       "options": {

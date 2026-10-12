@@ -1,0 +1,21 @@
+{
+  "user_declared_capture_contract": "every walker camera stop means four feet supported on same flat ground; no stationary hover",
+  "variable": "support restoration qualification uses preceding Stage2 motion and reliable sustained background stop, independent of resumed human motion",
+  "retained": "original motion Stage labels, Stage2 foot vote/strict gates, static reference, yaw/XY, median foot input, no dropout/single ankle/bearing fallback, frozen body",
+  "baseline": "G20261012_smplh_2d448_view_v1/view/scene; read-only comparison, not dynamic candidate input",
+  "implementation": "LandingPoseRecovery explicit supported_at_camera_stop mode; StageHandoffPolicy preserve_motion_labels; profile supported_stop_fixed_lag",
+  "budget": "one fresh448 same-images Stage/rotation/strict replay;0.5sec fixed lag; no body refit or renderer scene smoothing",
+  "criteria": "all original frames; support-stop static runs closed in height/tilt; reduced Stage1 boundary pose jump; report correction/ankle residuals and all unqualified/gated events",
+  "stop": "150mm/8degree correction gate; >0.3sec uncertain camera transition breaks chain; no extrapolation over long or unavailable gaps; retain failed closure",
+  "limitations": "uses user capture protocol and static installation; prior-assisted estimator relocalization, not independently measured landing/accuracy, not zero-latency online; avoid interpreting corrected poses as measured descent",
+  "actual_runs": [
+    "view: argument validation failed before replay",
+    "view_v2: first candidate failed Stage1 support closure",
+    "view_v3: independent background-motion revision still failed episode continuity",
+    "view_v4: targeted transient-stop reset bug repaired; full closure passed"
+  ],
+  "final_candidate": "view_v4",
+  "timestamp_scope": "old448 has no host/exposure timestamps; explicit nominal30FPS accepted only for this offline supported-stop protocol; lag is15 nominal frames",
+  "qualification": "preceding reliable camera motion episode, >=0.12s sustained stop, <=0.3s uncertain gap; transient unconfirmed stops do not erase motion episode; original Stage2 pose/foot gates unchanged",
+  "latency_scope": "fixed lag buffer, no already released frame rewrite; nominal0.5sec is not hardware latency certification"
+}

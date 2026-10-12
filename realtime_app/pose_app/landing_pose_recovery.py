@@ -1,8 +1,8 @@
 """Protocol-qualified support restoration in the pose estimator, not rendering.
 
-Fixed-lag outputs can change only while buffered. A static image alone never
-triggers recovery: preceding motion, sustained stop and resumed human motion
-are required, together with an explicit flat-ground capture-protocol prior.
+Fixed-lag outputs can change only while buffered. The legacy protocol requires
+human resumption; the explicitly declared camera-stop support protocol instead
+uses preceding motion and a sustained background stop. Neither infers contact.
 """
 
 import json
@@ -46,19 +46,23 @@ class LandingPoseRecovery:
     def __init__(self, initial, *, mode, protocol, lag_sec=0.5):
         if mode not in ("causal", "fixed_lag", "joint_window"):
             raise ValueError("invalid landing recovery mode")
-        if protocol != "flat_ground_supported_after_motion":
+        if protocol not in ("flat_ground_supported_after_motion", "supported_at_camera_stop"):
             raise ValueError(
                 "landing recovery requires explicit capture-protocol prior"
             )
+        if protocol == "supported_at_camera_stop" and mode != "fixed_lag":
+            raise ValueError("camera-stop support closure requires the verified fixed-lag mode")
         if not np.isfinite(lag_sec) or lag_sec < 0.5:
             raise ValueError("landing buffer must be at least 0.5 seconds")
         self.initial, self.mode, self.lag = initial, mode, lag_sec
+        self.protocol = protocol
         self.buffer = deque()
         self.motion_start = self.stop_start = None
         self.motion_samples = self.human_samples = 0
         self.recovering = False
         self.events = []
         self.previous_time = None
+        self.last_motion_time = None
 
     def update(self, estimator, row, payload, stage):
         time = float(payload["pair_timestamp_sec"])
@@ -72,12 +76,20 @@ class LandingPoseRecovery:
         audit = {
             "applied": False,
             "mode": self.mode,
-            "support_source": "capture_protocol_with_motion_stop_human_resume_not_contact_truth",
+            "support_source": ("explicit_supported_at_camera_stop_capture_protocol_not_contact_truth"
+                               if self.protocol == "supported_at_camera_stop"
+                               else "capture_protocol_with_motion_stop_human_resume_not_contact_truth"),
             "nominal_output_lag_sec": self.lag if self.mode != "causal" else 0.0,
         }
         row["pose_audit"]["landing_recovery"] = audit
-        if action == STAGE2:
-            if self.motion_start is None or self.stop_start is not None:
+        background = stage["stage"].get("background", {}).get("fused", {})
+        camera_moving = (self.protocol == "supported_at_camera_stop"
+                         and background.get("available") and background.get("motion_active")
+                         and not stage["stage"]["handoff"].get("instantaneous_stop", False))
+        if action == STAGE2 or camera_moving:
+            self.last_motion_time = time
+            if (self.motion_start is None
+                    or (self.stop_start is not None and self.protocol != "supported_at_camera_stop")):
                 self.motion_start = time
                 self.motion_samples = 0
             self.motion_samples += 1
@@ -101,7 +113,7 @@ class LandingPoseRecovery:
                 self.motion_samples >= 2
                 and self.stop_start - self.motion_start >= 0.1
                 and time - self.stop_start >= 0.12
-                and self.human_samples >= 2
+                and (self.protocol == "supported_at_camera_stop" or self.human_samples >= 2)
             )
             audit.update(
                 stop_duration_sec=time - self.stop_start,
@@ -170,6 +182,10 @@ class LandingPoseRecovery:
                                 blend_support(old, self.initial, weight),
                                 weight,
                             )
+                            if self.protocol == "supported_at_camera_stop" and weight > 0:
+                                saved["pose_audit"]["status"] = (
+                                    "protocol_support_restored" if weight == 1
+                                    else "protocol_support_window_reestimated")
                         estimator.pose = target
                         self._reanchor(estimator, payload)
                         self.events.append(
@@ -198,6 +214,15 @@ class LandingPoseRecovery:
                         self.motion_start = None
                         self.recovering = False
                     return True
+        elif (self.protocol == "supported_at_camera_stop" and self.motion_start is not None
+              and self.last_motion_time is not None
+              and time - self.last_motion_time <= 0.3
+              and stage["stage"].get("background", {}).get("fused", {}).get("available")):
+            # A short deceleration ambiguity must not erase observed preceding
+            # motion. It never supplies stop evidence or relaxes foot gates.
+            audit["reason"] = "bounded_camera_transition_wait"
+            self.stop_start = None
+            self.human_samples = 0
         else:
             # An unavailable/ambiguous action breaks the landing evidence chain.
             # Do not use elapsed wall time across a gap as observed motion.

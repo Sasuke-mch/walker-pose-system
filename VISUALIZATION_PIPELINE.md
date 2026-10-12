@@ -236,3 +236,6 @@ Three.js `OrbitControls` 必须支持：
 
 
 2026-10-12 明确授权的448帧平滑对照页：research_records/engineering_validation/G20261012_smplh_2d448_view_v1/view/body.html（离线完整页）及body_browser.html（与同目录body_data.json.gz配套）。本次用户明确要求SMPL-H少量平滑，作为本次显示例外：参数邻帧各0.1、旋转修正最多2°、平移最多3mm，重新解码真实模型表面与COCO regressor点；原始版本开关保留。原始观测/Stage/地面/相机/助步器不平滑，其他任务仍默认不使用显示平滑。真实面、同源448帧、当前strict/Stage及动态地面、拒绝理由和黑色骨架规则不变。原VPoser latent不作为平滑姿态参数标签；几何诊断栏针对平滑模型，关闭开关只切换模型显示。文件级22项与浏览器截图核验在同目录，不作为精度或物理接触认证。
+
+
+2026-10-12 停止支撑协议过渡候选：research_records/engineering_validation/G20261012_supported_stop448_v1/view_v4/body_browser.html及body.html。用户确认每次助步器停止即已放在同一平地；supported_stop_fixed_lag独立于人体动作标签恢复停止支撑，在15帧名义固定延迟估计缓冲中完成过渡位姿重估，非显示层插值。原动作Stage、strict masks与原失败保留，所有人体/助步器/相机使用同一当前重新重放的地面变换。原始及少量平滑身体开关仍在；此协议仅限本次保证条件，默认baseline及正式360页面不替换。33测试、22来源检查、380过渡已支撑闭合/391Stage1保持的浏览器截图见同目录及父目录transition_comparison.json。

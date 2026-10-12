@@ -4246,3 +4246,16 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 页面view/body.html为完整离线页面（约100MB）；App内使用view/body_browser.html+body_data.json.gz，压缩数据逐字解压与原JSON一致，避免App DOM传输体积限制。浏览器实际显示真实6890顶点/13776面、黑色原始COCO骨架、深XY地面/浅背景、实体助步器、双相机、Stage与拒绝原因；0/220/447可访问，平滑开关可切换；截图preview.jpg和preview_raw.jpg、browser_validation.json保存。右键平移/滚轮未另行实测，不冒充全部交互测试。
 
 失败证据保留：中文JSON省略UTF-8导致准备失败；导出对关闭NPZ取R/t失败，已改为关闭前复制；恢复首轮被既有audit拒绝，修订为核对同一strict/scene/audit命令后续接当前已完成场景，仅重建页面，未再次运行地面；初始404和App大页面transport限制，以及checkbox工具报错后AX实际确认，均记录。16项相关测试/3个历史兼容warning、新增helper/runner Ruff及编译通过；正式源/场景不混入旧动态结果。旧92条用户改动保留，小型代码/记录本地提交，NPZ/HTML/GZ/图片仅本地，不push。
+
+
+### 2026-10-12 Stage2→Stage1过渡机制修订：停止支撑协议隔离候选
+
+用户指出448页过渡悬空、进入Stage1突降。实际baseline第86/156/217/302/391帧分别恢复高度69.52/45.37/35.30/30.90/34.97mm；最后一段372..390保持旧位姿。源码Stage1要求背景静止且人体补偿运动≥1.2px，二者都静止仍transition；Stage2退出只延续4帧足点更新，随后held；第一次Stage1又硬恢复初始高度/roll/pitch。这是动作分类与平台停止/支撑状态耦合，不是SMPL-H平滑问题。
+
+用户明确确认本段采集“每次助步器停止移动，四脚已落在同一平地，不悬停”。据此新增supported_stop_fixed_lag显式候选与supported_at_camera_stop协议：保留原动作Stage标签；单独以可靠背景运动/停止组织支撑恢复证据。原Stage2足点投票与严格几何门保留，foot模式causal_median不变，不开启单踝/bearing/prediction。停止稳定≥0.12s，≤0.3s未知减速等待，校正>150mm/8°仍拒绝。0.5秒名义固定延迟只改未发布缓冲，停止前最多0.3秒的SE3支撑修正重新估计；停止帧height/roll/pitch闭合，XY/yaw保留。原始观测、失败理由、修正前位姿/anchor残差保留。这是带用户采集约束的估计器修订，不是渲染层单独压低助步器。旧448无host时间，按原30FPS明确名义计时，15帧延迟不声称硬件/实时认证。
+
+全部来源research_records/engineering_validation/G20261012_supported_stop448_v1。view最初参数门拒绝，未运行Stage；view_v2首版、view_v3背景独立版仍留63.8004mm Stage1高度误差，未交付为通过。实际原因是短暂未确认停止后重新运动会清空整段运动samples，导致最后停止只有一个有效样本；新synthetic回归先1fail15pass明确复现，修复协议专用episode续接，旧协议不变；view_v4重新完整448当前图像/strict/Stage/旋转/地面重放验证。
+
+最终view_v4：原动作标签逐帧与baseline相同，strict5286；11个原Stage1切换点高度步长全0，Stage1全部214帧参考高度误差0，四助步器脚Z为4.55e-13..2.84e-12mm数值零。最大单帧高度69.5156→13.6119mm，旋转5.8358→1.8908°，助步器任一节点位移96.6519→49.4509mm。停止段7次确认，85缓冲帧重估；第380确认并恢复停止段，第391进入动作Stage1不再下降。完整对照transition_comparison.json保留首版失败及每个边界。最大XY帧差30.5061→33.2377mm略增，旧anchor足残差最多99.5798mm，不隐藏，不把支撑先验称外部足接触真值。
+
+33相关测试、E9/F与compileall通过；22来源/transform检查通过；浏览器实际0/380/391/447、380显示“过渡/协议支撑闭合”、391显示Stage1保持、真实模型/黑骨架/实体助步器/深XY地面可见，console error为空，截图preview_stop.jpg/preview_stage1.jpg及validation.json保存。新页面view_v4/body_browser.html（与GZ配套），离线完整body.html。既有SMPL-H拟合/少量显示平滑、baseline页面、360正式配置和92项用户改动保留。本轮独立小文件提交，不提交大数据/HTML/GZ或推送。新协议仅适用于用户保证的平地停止支撑，不把默认mainline静默切换。
