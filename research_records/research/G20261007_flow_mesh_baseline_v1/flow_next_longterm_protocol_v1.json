@@ -40,10 +40,10 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Prioritize human pose and egocentric conditional-flow primary papers and official code, with legal geometric state and ambiguity representations that may replace G0/G1. Generic linear inverse solver transfers are not an implementation priority; do not add nonlinear patch modules. Training closed.",
+  "next_stage": "Audit whether existing legal deployment resources can provide a full-state proposal for a matched-source bridge without a new generator, future frames or GT leakage. Explicitly handle unknown beta/hands. Reject if it requires stacking proposal modules; training remains closed.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 Flower primary method and official code audit; direct transplant rejected; two CG stopping-expression counterexamples preserved",
+  "last_completed_stage": "2026-10-12 StableHand paper/released sampler audit and exact source mismatch checks; matched observation-source conditional bridge retained only as gated candidate",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

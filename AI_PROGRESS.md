@@ -4359,3 +4359,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 实际阅读2509.26287v2假设/Algorithm1/非线性扩展及官方flower.py、flower_cov.py、flower.yaml。默认500次速度调用加逐步CG及图像均值，不构成当前条件JointFlow的低成本替代；非线性人体/R6D合法性不由原理论覆盖。CPU float64复现源码CG先all再比容差的两种误判，证据见flow_next_flower_source_audit_v1.json；未运行作者包/训练/权重，未发外部消息。
 
 本轮只更新研究记录，无模型改动。下一轮转向直接人体/第一视角条件flow与几何表示，避免继续为通用线性solver堆非线性补丁。MODEL_RESULTS第17节及架构/长期协议同步；整体有效性仍未完成。
+
+
+## 2026-10-12 StableHand条件桥候选与起点门
+
+实际阅读StableHand式1–11、官方flow_matching.py及infer_clips质量调用；论文训练q*x1与推理q*y起点差=q*(y-x1)，发布版另用截断min(q)起始时间，不能混称同一版本。预注册精确标量q0/.8/1检查通过，原数值与来源见flow_next_quality_bridge_audit_v1.json；未加载作者模型/训练。
+
+保留b=q*y+(1-q)*epsilon、训练/推理同起点的普通条件桥候选，速度x1-b使q1仍可纠错；非创新或效果认证。现有COCO17非325D，下一步先查不新增生成器的完整起点是否实际可得，未知beta/手姿不伪装已知；若要堆proposal网络则放弃。PoseD-Flow正文/仓库仍不可用，不计精读。MODEL_RESULTS第18节与架构/协议同步，长期目标继续。

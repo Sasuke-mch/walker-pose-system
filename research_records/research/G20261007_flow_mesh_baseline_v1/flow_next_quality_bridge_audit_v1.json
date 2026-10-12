@@ -1,0 +1,50 @@
+{
+  "paper": "https://arxiv.org/html/2605.18553v1",
+  "sections_read": [
+    "3.1-3.3 equations1-11",
+    "implementation setup"
+  ],
+  "code_read": [
+    "https://raw.githubusercontent.com/huajian-zeng/stablehand/main/diffusion/flow_matching.py",
+    "https://raw.githubusercontent.com/huajian-zeng/stablehand/main/sample/infer_clips.py (quality broadcast/call lines337-362)",
+    "https://raw.githubusercontent.com/huajian-zeng/stablehand/main/docs/enhanced_version.md"
+  ],
+  "source_gap_checks": [
+    {
+      "q": 0.0,
+      "paper_training_start": 0.0,
+      "paper_inference_start": 0.0,
+      "source_gap": 0.0,
+      "paper_samplewise_velocity_target": 1.0,
+      "matched_source_velocity_target": 1.0,
+      "matched_path_endpoint": 1.0
+    },
+    {
+      "q": 0.8,
+      "paper_training_start": 0.8,
+      "paper_inference_start": 0.96,
+      "source_gap": 0.16,
+      "paper_samplewise_velocity_target": 0.2,
+      "matched_source_velocity_target": 0.04,
+      "matched_path_endpoint": 1.0
+    },
+    {
+      "q": 1.0,
+      "paper_training_start": 1.0,
+      "paper_inference_start": 1.2,
+      "source_gap": 0.2,
+      "paper_samplewise_velocity_target": 0.0,
+      "matched_source_velocity_target": -0.2,
+      "matched_path_endpoint": 1.0
+    }
+  ],
+  "released_schedule": "q proposal + (1-q)noise; t_start=clip(min(q),0,.95); effective time q+(1-q)t, differs from paper tau0 integration",
+  "alternative": "b=q*y+(1-q)*epsilon; x_tau=(1-tau)*b+tau*x1; target velocity=x1-b. Same source at training/inference; q1 does not force velocity0 for erroneous observations. Generic conditional bridge, not novelty claim.",
+  "project_gate": "requires deployable same-state proposal plus independent training targets and reliable quality; current COCO17 is not 325D full state; no implementation promotion",
+  "other_sources": {
+    "PoseDFlow": "project read; paper button unavailable and official GitHub URL404; no body/code review claimed",
+    "FMPose3D": "already audited historically; no duplicate reproduction this round"
+  },
+  "boundary": "exact scalar identity only; not empirical failure of StableHand or learned transport guarantee; no training/model import/weights",
+  "decision": "retain matched-source bridge as conditional candidate; do not port full quality network, global scene model or noncausal clip stack"
+}

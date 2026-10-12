@@ -1,0 +1,6 @@
+{
+  "target": "StableHand equation8 versus11 source mismatch; matched observation-source alternative",
+  "inputs": "exact scalar x1=1, observation=6/5, epsilon=0, q in {0,4/5,1}",
+  "success": "source discrepancy q*(observation-x1); matched-source path reaches target at all q, including imperfect q1 observation",
+  "stop": "no learned ODE failure claim; no network/checkpoint/training; alternative not claimed novel or usable without same-state observations"
+}
