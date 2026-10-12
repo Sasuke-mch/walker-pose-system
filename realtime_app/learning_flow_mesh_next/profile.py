@@ -151,7 +151,7 @@ def run(*, repeats=5, warmup=1, device="cpu", matched_controls=False):
     return report
 
 
-def run_representation_controls(*, repeats=8, warmup=2, device="cuda"):
+def run_representation_controls(*, repeats=8, warmup=2, device="cuda", compare_rotation_kernels=False):
     """Same fixed-input single-model cost comparison; never tunes model budget."""
     from realtime_app.learning_flow_mesh.body import BodyDecoder
     from realtime_app.pose_app.smpl_coco_observation import load_coco17_regressor
@@ -171,6 +171,10 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda"):
     common = {key: value for key, value in ambient.state_dict().items() if not key.startswith("pose_out.")}
     manifold.load_state_dict(common, strict=False)
     models = {"ambient": ambient, "SO3": manifold}
+    if compare_rotation_kernels:
+        matrix_model = SO3JointFlow(normal, rotation_kernel="matrix_exp").to(device).eval()
+        matrix_model.load_state_dict(manifold.state_dict())
+        models["SO3_matrix_exp"] = matrix_model
     config = json.loads(Path("realtime_app/learning_flow_mesh/config.json").read_text(encoding="utf-8"))
     surface = CountedSurface(SurfaceDecoder(BodyDecoder(**config["assets"]).to(device),
                                             torch.tensor(load_coco17_regressor(Path("models/smpl/J_regressor_coco.npy")),
@@ -184,6 +188,8 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda"):
     obs = replace(fixture, xy=raw, **{name: getattr(fixture, name).to(device) for name in
                                     ("confidence", "present", "quality", "geometry", "views", "origins", "directions")}).validate()
     modes = [("ambient", False), ("SO3", False), ("ambient", True), ("SO3", True)]
+    if compare_rotation_kernels:
+        modes = [(representation, regression) for regression in (False, True) for representation in models]
 
     def control(mode, repetition):
         representation, regression = mode
@@ -220,6 +226,7 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda"):
                 "numeric_candidates": int(legal.sum()), "action_candidates": int(candidates.actions.sum()),
                 "decoded_vertices_finite": decoded_finite, "rejection_reasons": candidates.reasons,
                 "selected_id": decision.selected_id, "solver": candidates.resources["solver"],
+                "rotation_kernel": getattr(model, "rotation_kernel", "ambient_additive"),
                 "cuda_baseline_bytes": baseline, "cuda_peak_bytes": peak,
                 "cuda_peak_increment_bytes": peak-baseline if peak is not None else None}
 
@@ -231,7 +238,7 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda"):
         order = modes[repetition % len(modes):]+modes[:repetition % len(modes)]
         records.extend(control(mode, repetition) for mode in order)
     summary = {}
-    for name in ("ambient_F0", "SO3_F0", "ambient_regression", "SO3_regression"):
+    for name in (representation+("_regression" if regression else "_F0") for representation, regression in modes):
         rows = [row for row in records if row["mode"] == name]
         metrics = ("generation_outer_ms", "generation_internal_ms", "decode_ms", "decision_ms", "full_ms")
         summary[name] = {key: {"p50": float(np.quantile([row[key] for row in rows], .5)),
@@ -254,9 +261,11 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda"):
             "budgets": {"F0": {"K": 32, "steps": 8}, "regression": {"K": 1, "calls": 1}, "decision": "A4"},
             "parameters": {name: sum(parameter.numel() for parameter in model.parameters()) for name, model in models.items()},
             "common_initialization_copied_except_pose_head": True, "state_reset_per_call": True,
+            "rotation_kernels": {name: getattr(model, "rotation_kernel", "ambient_additive") for name, model in models.items()},
+            "SO3_kernel_control_weights_identical": compare_rotation_kernels,
             "summary": summary, "records": records, "budget_and_decoder_counts_valid": counts_valid,
             "SO3_over_ambient_full_p50": ratio, "cost_promotion_gate": counts_valid and legal_equal and ratio <= 1.25,
-            "memory_scope": "per-call allocator peak/increment; both models and surface resident; process/driver usage excluded",
+            "memory_scope": "per-call allocator peak/increment; all compared models and surface resident; process/driver usage excluded",
             "training": False, "checkpoint_loaded": False, "full_system_30fps_claim_supported": False,
             "boundary": "small fixed random-model timing sample; clocks/power/concurrent load uncontrolled; no accuracy or calibration conclusion"}
 
@@ -269,11 +278,15 @@ def main():
     parser.add_argument("--output", type=Path)
     parser.add_argument("--matched-controls", action="store_true")
     parser.add_argument("--representation-controls", action="store_true")
+    parser.add_argument("--compare-rotation-kernels", action="store_true")
     args = parser.parse_args()
+    if args.compare_rotation_kernels and not args.representation_controls:
+        parser.error("rotation kernel comparison requires representation controls")
     if args.representation_controls:
         if args.matched_controls:
             parser.error("representation and two-stage matched controls are separate experiments")
-        report = run_representation_controls(repeats=args.repeats, warmup=args.warmup, device=args.device)
+        report = run_representation_controls(repeats=args.repeats, warmup=args.warmup, device=args.device,
+                                             compare_rotation_kernels=args.compare_rotation_kernels)
     else:
         report = run(repeats=args.repeats, warmup=args.warmup, device=args.device, matched_controls=args.matched_controls)
     text = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False)

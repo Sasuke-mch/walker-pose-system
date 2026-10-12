@@ -40,7 +40,37 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "SO3matrix_exp cost promotion failed. At most one justified second revision may replace the3x3 numerical exponential with an endpoint/gradient-equivalent Rodrigues kernel, using existing mathematical and model tests and the same fixed cost comparison; no more modules, capacity, source/schedule changes or timing-only retries. If that still fails, stop representation cost optimization and retain the hypothesis pending independent data rather than inventing further engineering gates. Training/default pipeline stay closed/frozen.",
+  "next_stage": "Rotation-kernel optimization is closed after revision2. Retain Rodrigues SO3 F0 as an opt-in untrained candidate; return to the research question of G0/J/G1 necessity and a unified observation-conditioned mechanism, starting with primary-method/novelty analysis rather than another kernel or budget tweak. Keep same-information regression and independent data efficacy gates; no default promotion or training.",
+  "so3_kernel_revision2_20261012": {
+    "status": "completed_numeric_checks_and_cost_gate_passed_no_efficacy_claim",
+    "question": "Can an algebraically equivalent rotation-specific exponential avoid the extra measured cost while preserving endpoint/gradient/publication behavior?",
+    "source": "https://raw.githubusercontent.com/facebookresearch/pytorch3d/main/pytorch3d/transforms/rotation_conversions.py axis_angle_to_matrix(fast=True), inspected lines427-464; FrameFlow legacy so3_utils.py Rodrigues reference. No author model/dependency/source snapshot added.",
+    "only_variable": "Use R=(1-B*theta_squared)*I+A*skew(w)+B*w*wT, A=sinc(theta/pi), B=sinc(theta/(2pi))^2/2. For theta_squared<1e-4 use fourth-order A/B Taylor, safe regular angle evaluated with clamp before sqrt; no zero division or nonfinite inactive branch.",
+    "scope": "so3_flow.py helper replaces exponential for path/sample/regression; static matrix_exp option preserves the old kernel control, no parameters/modules added. Extend existing test_joint.py and profile.py only.",
+    "checks": [
+      "CPUfloat64 and CUDAfloat32 values vs independent torch.matrix_exp for zero/tiny/threshold sides/regular/nearpi/pi/multiple turns; finite and matrix error <=1e-10/3e-5, orthogonality/determinant <=1e-10/3e-5",
+      "CPUfloat64 first Jacobian at identity/regular/nearpi matches matrix_exp within1e-10; nonfinite input does not become identity",
+      "Existing path/CFM/regression/sampling/publication/casual-state tests; one same-weights complete sampler comparison <=3e-5 on packed normalized output",
+      "One existing fixed cost run, two warmups and8 records per mode; six controls ambient/matrix_exp/Rodrigues by F0K32/8 and regressionK1/1, shared SO3 weights, cyclic order and completeSMPLH/A4 costs; no timing retuning"
+    ],
+    "success": "Correctness checks pass, all candidates retained and decoded, Rodrigues/ambient fullp50 <=1.25. Report same-run matrix_exp ratio too; no general speed or efficacy claim.",
+    "stop": "This is the second and final revision of this representation-cost mechanism. If cost fails, stop further kernel/step/module optimizations; preserve results. No training, default pipeline promotion or deleteG0/J decision based only on speed.",
+    "revision": 2,
+    "training": false,
+    "result": {
+      "related_test_joint_passed": 17,
+      "changed_file_ruff": "passed",
+      "output": "flow_next_so3_cost_v2.json",
+      "same_run_full_p50_ms": {"ambient_F0": 33.22960, "SO3_Rodrigues_F0": 38.33285, "SO3_matrix_exp_F0": 43.63495, "ambient_regression": 13.78675, "SO3_Rodrigues_regression": 13.74395, "SO3_matrix_exp_regression": 15.58830},
+      "SO3_Rodrigues_over_ambient_full_p50": 1.1535754266708376,
+      "cost_gate": true,
+      "budget_and_decoder_counts_valid": true,
+      "all_numeric_candidates_and_decode_finite": true,
+      "parameters52": 711056,
+      "kernel_optimization_closed": true,
+      "boundary": "small random-weight fixedGPU sample; geometry values/first derivatives checked, no endpoint log replacement or trained accuracy/calibration/realtime claim"
+    }
+  },
   "so3_cost_comparison_20261012": {
     "status": "completed_cost_promotion_failed",
     "question": "Does SO3 group integration add unacceptable measured cost despite a smaller velocity head, under the same available input and candidate budget?",
@@ -89,11 +119,11 @@
     "novelty": "SO3 flow matching and group integration have RFM/FrameFlow/FoldFlow precedents; this implementation alone is not a research novelty claim.",
     "revision": 1,
     "training": false,
-    "result": {"parameters52": 711056, "parameters22": 707216, "parameters_reduced_from_ambient": 387, "matched_SO3_regression_capacity": true, "related_tests_passed": 20, "ruff": "passed_after_import_format_fix", "efficacy_and_runtime": "not_tested"}
+    "result": {"parameters52": 711056, "parameters22": 707216, "parameters_reduced_from_ambient": 387, "matched_SO3_regression_capacity": true, "initial_related_tests_passed": 20, "ruff": "passed_after_import_format_fix", "efficacy": "not_tested", "runtime": "cost_v1 matrix_exp gate failed; cost_v2 Rodrigues gate passed, no deployed performance claim", "kernel_revision": 2}
   },
-  "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
+  "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 fixed-budget ambient/SO3 F0 and regression full candidate/realSMPLH/A4 CUDA costs measured. SO3median1.2747x exceeds preregistered1.25 limit; promotion stopped. All candidates/repetitions retained, training/default pipeline unchanged.",
+  "last_completed_stage": "2026-10-12 second/final SO3 kernel revision: Rodrigues with squared-angle Taylor replaces genericmatrix_exp. Related17 tests pass; same-run fullp50 Rodrigues38.33ms versus matrix_exp43.63 and ambient33.23; ratio1.1536 passes1.25 cost gate. Retained opt-in/untrained; kernel optimization closed, no default promotion or training.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

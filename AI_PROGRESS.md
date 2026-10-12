@@ -4418,3 +4418,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 先在已有长期协议登记固定K32/8及K1/1对照、warmup2/各8次循环测时、1.25倍停止门，再扩展现有profile.py。实际RTX5070Ti Laptop CUDAfloat32、同固定观测/共同参数初始化、原Normalization、完整候选发布+真实SMPLH解码+A4；ambient/SO3生成完整p50为35.20/44.87ms、p95为39.06/52.49ms，回归p50为14.43/15.60ms。SO3比值1.2747未过门，停止当前成本晋升；所有32/1候选及解码均有限、预算计数一致，非人体真实精度。
 
 逐次结果flow_next_so3_cost_v1.json，边界/内存/测前负载/控制台WARNING与JSON解析失败见MODEL_RESULTS第25节；保存结果正常，未重跑。profile.py Ruff通过，没有新增验收脚本或报告。少387参数/169维速度不意味着提速；最多再用有数学依据的指数核替换作第二轮，若仍失败则停成本优化。默认双阶段和正式主线不变，数据缺口与训练关闭继续，长期目标未完成。
+
+## 2026-10-12 SO3第二轮Rodrigues核替换：成本门通过，核优化结束
+
+预注册后按官方PyTorch3D fast轴角实现及Rodrigues恒等式，用向量外积/half-angle sinc替代通用指数，小角用θ²四阶Taylor和safe regular分支保持零角导数。网络/噪声/日程/参数不变，原matrix_exp选项保留对照。现有test_joint实际17通过，CPU64/CUDA32值、零/普通/近πJacobian、同权重完整采样与既有目标/因果/发布验证，三文件Ruff通过；未扩展验证基础设施。
+
+同次6模式、每组8记录，原F0/闭式SO3/旧核SO3完整p50为33.23/38.33/43.63ms，闭式/ambient1.1536通过1.25门，闭式较旧核约低12.2%但仍慢于ambient；F0峰分配增量各31.07MB，无显存收益。所有候选和实际SMPLH解码有限，计数正确；随机模型/固定观测、负载未锁，不认证精度或实时。逐次flow_next_so3_cost_v2.json及MODEL_RESULTS第26节保存边界。两轮核优化结束，保留显式研究候选，转回统一单生成器/局部信息必要性机制分析；默认主线与训练关闭保持，独立有效性未完成。

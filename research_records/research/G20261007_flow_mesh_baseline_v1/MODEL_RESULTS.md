@@ -910,3 +910,26 @@ v1/v2原结果与数值/非有限证据保留，Ruff/AST、普通log/概率抽�
 SO3/ambient完整p50=1.274720998，超过先定1.25门，因此停止当前实现的成本晋升。生成internal p50为27.05/17.68ms；额外时间主要位于生成段，但未作算子剖析，不能全部归因matrix_exp。两生成p95在这个窄范围也超过33.3ms，capture/2D detector未计入，不支持30fps。回归p95较小不证明相同输出质量，也不能据8次样本的p95微差认为SO3回归稳定更快。测前GPU15%/1885MiB/20.62W，功耗、时钟与其他应用负载未锁定；小样本比值是本轮停止依据，非跨设备稳定性能规律。
 
 实际测量完成，profile.py Ruff通过。控制台含人体层WARNING，外部PowerShell将全部stdout作JSON解析失败；保存JSON完整可读，直接读取结果收尾，没有重跑测时。无新测试/快照/验收报告。保留角速度候选的结构合法性研究价值，但速度优势未成立。下一步最多一次有数学依据的3×3指数核替换，复用已有模型/旋转测试和固定成本比较，若仍不满足成本门则停止这条成本优化，等待独立数据验证。禁止把删去G0/J的运行差异当新表示收益；正式主线、训练关闭及长期目标继续。
+
+## 26. 2026-10-12 Rodrigues闭式旋转核：第二轮通过成本门，停止核优化
+
+按已有长期协议在so3_kernel_revision2_20261012先登记最后一次合理修订。阅读 [PyTorch3D官方rotation_conversions.py](https://raw.githubusercontent.com/facebookresearch/pytorch3d/main/pytorch3d/transforms/rotation_conversions.py) 的axis_angle_to_matrix(fast=True)，实际检验到K²=wwᵀ−θ²I和half-angle sinc实现；没有导入作者包或增加依赖/源码快照。此前FrameFlow已给出Rodrigues公式，该数值优化不是架构创新。PyTorch sinc文档页面读取仅返回redirect，公式/实现依据为实际取得的官方源码。
+
+在so3_flow.py添加rotation_exp，K=skew(w)、q=||w||²：R=(1−Bq)I+AK+Bwwᵀ。regular A=sinc(sqrt(q)/π)，B=sinc(sqrt(q)/(2π))²/2；q<1e-4时使用A=1−q/6+q²/120、B=1/2−q/24+q²/720，regular的sqrt先clamp到1e-4。小角Taylor有截断误差，数值等价只按声明容差检查；不是全精度代数恒等。该做法保留零点有限导数，省去通用matrix_exp；训练路径、sample和regression使用闭式核，显式matrix_exp选项仅保留旧核推理对照，固定端点SciPy log继续保留。网络、源、日程、预算和711056/707216参数未变。
+
+本次仅test_joint.py实际17 passed in6.58s，其中新检查CPUfloat64/CUDAfloat32的0、1e-8、阈值两侧0.0099/0.0101、普通、近π、π、2π、10π矩阵值、正交/行列式；float64零/普通/近πJacobian与独立torch.matrix_exp对照，非有限输入不变成identity。新完整同权重采样/回归对照在3e-5内一致；既有CFM/梯度/端点/因果/发布检查仍通过。检查覆盖值/一阶导数与该范围，不认证全部高阶导数/全局误差界。三份改动Python Ruff通过，没有全套、额外验收报告或重复功能运行。
+
+扩展已有profile.py的--compare-rotation-kernels，同次6模式ambient/Rodrigues/matrix_exp×F0 K32/8及回归K1/1；SO3两核复制完全相同权重，ambient与SO3除不同维姿态头共享初始化。其他输入/Normal/真实maleSMPLH/表面算子/A4/warmup2/每组8次与第25节一致，六模式循环执行，所有48记录与失败槽保存flow_next_so3_cost_v2.json。增加第三个常驻模型，但各模式共用同一allocator基线口径。
+
+|同次模式|生成外层p50 ms|完整p50 ms|完整p95 ms|
+|---|---:|---:|---:|
+|ambient F0|22.85|33.23|37.74|
+|SO3 Rodrigues F0|28.17|38.33|45.69|
+|SO3 matrix_exp F0|32.12|43.63|48.26|
+|ambient回归|7.44|13.79|16.42|
+|SO3 Rodrigues回归|7.48|13.74|16.82|
+|SO3 matrix_exp回归|8.12|15.59|16.98|
+
+闭式/ambient完整p50=1.1535754，通过先定1.25成本门；同次闭式相对旧核完整中位数约减少12.2%，但仍慢于ambient约15.4%。只作本次随机固定GPU样本的工程判断，不能将跨v1/v2差值全部归为核收益。所有F0每组32、回归1候选数值准入并真实解码有限，预算/decoder计数正确；F0峰allocator增量仍各31,074,304bytes、回归961,024bytes，没有显存收益。测前GPU16%/1801MiB/21.39W，时钟功耗/竞争负载未锁，三个生成p95仍高于33.3ms且不含检测采集，不支持整系统30fps。控制台WARNING通过读取保存JSON绕过，未触发追加测时。
+
+决定：保留Rodrigues SO3候选供今后独立效能对照，结束本机制两轮核/成本优化。成本通过只排除当前过高开销阻碍，没有准确度、校准或概率表达优越性结论；旧核与v1失败保留，默认欧氏工厂、G0/J/G1和正式主线未晋升。下一阶段转回单生成器/局部信息必要性的新机制与新颖性分析，保留同信息强回归和数据门，不继续靠数值核、减K或堆模块制造收益。

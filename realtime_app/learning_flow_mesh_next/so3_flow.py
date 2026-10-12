@@ -12,6 +12,25 @@ from .joint_flow import JointFlow
 from .tangent import skew
 
 
+def rotation_exp(vector):
+    """Rodrigues with finite small-angle derivatives and no matrix square.
+
+    K^2 = ww^T - |w|^2 I; use the half-angle sinc identity for its coefficient.
+    Taylor terms depend on |w|^2 so the derivative at zero needs no norm divide.
+    """
+    if vector.shape[-1] != 3:
+        raise ValueError("rotation exponential requires three angular coordinates")
+    square = vector.square().sum(-1)
+    angle = square.clamp_min(1e-4).sqrt()
+    small = square < 1e-4
+    a = torch.where(small, 1-square/6+square.square()/120, torch.sinc(angle/torch.pi))
+    b = torch.where(small, .5-square/24+square.square()/720, .5*torch.sinc(angle/(2*torch.pi)).square())
+    identity = torch.eye(3, device=vector.device, dtype=vector.dtype)
+    outer = vector[..., :, None]*vector[..., None, :]
+    return ((1-b*square)[..., None, None]*identity
+            + a[..., None, None]*skew(vector)+b[..., None, None]*outer)
+
+
 def haar_rotations(gaussian):
     """Normalized iid Gaussian4 induces Haar SO3; malformed input is not redrawn."""
     if gaussian.shape[-1] != 4:
@@ -39,7 +58,7 @@ def geodesic_path(source, target, time):
     relative = source.transpose(-1, -2)@target
     vectors = Rotation.from_matrix(relative.cpu().double().numpy().reshape(-1, 3, 3)).as_rotvec()
     omega = torch.from_numpy(vectors.copy()).to(source).reshape(*source.shape[:-2], 3)
-    return source@torch.matrix_exp(time[:, None, None, None]*skew(omega)), omega
+    return source@rotation_exp(time[:, None, None]*omega), omega
 
 
 class SO3JointFlow(JointFlow):
@@ -53,12 +72,18 @@ class SO3JointFlow(JointFlow):
     rotation_representation = "SO3_body_angular_velocity"
     solver_name = "LieEuler"
 
-    def __init__(self, normalization, config=None):
+    def __init__(self, normalization, config=None, *, rotation_kernel="rodrigues"):
+        if rotation_kernel not in ("rodrigues", "matrix_exp"):
+            raise ValueError("unregistered SO3 rotation kernel")
         super().__init__(config)
         if normalization.topology != self.topology:
             raise ValueError("SO3 normalization topology mismatch")
         self.normalization = normalization.validate()
         self.pose_out = nn.Linear(self.config.width, 3)
+        self.rotation_kernel = rotation_kernel
+
+    def _rotation_exp(self, vector):
+        return rotation_exp(vector) if self.rotation_kernel == "rodrigues" else torch.matrix_exp(skew(vector))
 
     def validate_normalization(self, normalization):
         normalization.validate()
@@ -102,7 +127,7 @@ class SO3JointFlow(JointFlow):
             velocity = self.velocity(self._internal(rotations, auxiliary),
                                      initial.new_full((len(initial),), step/steps), context)
             omega = velocity[:, :n].reshape(-1, self.config.nodes, 3)
-            rotations = rotations@torch.matrix_exp(skew(omega)/steps)
+            rotations = rotations@self._rotation_exp(omega/steps)
             auxiliary = auxiliary+velocity[:, n:]/steps
         return self._export(rotations, auxiliary)
 
@@ -111,7 +136,7 @@ class SO3JointFlow(JointFlow):
         velocity = self.velocity(self._internal(rotations, context.new_zeros(len(context), 13)),
                                  context.new_ones(len(context)), context, information)
         n = self.config.nodes*3
-        endpoint = torch.matrix_exp(skew(velocity[:, :n].reshape(-1, self.config.nodes, 3)))
+        endpoint = self._rotation_exp(velocity[:, :n].reshape(-1, self.config.nodes, 3))
         return self._export(endpoint, velocity[:, n:])
 
     def flow_loss(self, context, labels, normalization, *, generator=None, information=None):

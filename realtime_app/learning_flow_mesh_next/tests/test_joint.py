@@ -13,7 +13,7 @@ from ..candidate_store import CandidateStore, infer, nested_noise
 from ..data_firewall import Normalization
 from ..joint_flow import JointFlow, ModelConfig, cfm_loss
 from ..schema import TemporalState, Topology
-from ..so3_flow import SO3JointFlow, geodesic_path, haar_rotations
+from ..so3_flow import SO3JointFlow, geodesic_path, haar_rotations, rotation_exp
 from ..tangent import skew
 from ..train import objective
 from .test_firewall import labels, observation
@@ -190,3 +190,37 @@ def test_so3_candidate_interface_rejects_wrong_codec_and_information():
         infer(model, normal, observation(), k=1, information=torch.eye(169))
     with pytest.raises(ValueError, match="invalid SO3 base"):
         haar_rotations(torch.zeros(1, 52, 4))
+
+
+@pytest.mark.parametrize("device,dtype,tolerance", [("cpu", torch.float64, 1e-10), ("cuda", torch.float32, 3e-5)])
+def test_rotation_exp_closed_form_values_and_gradients(device, dtype, tolerance):
+    if device == "cuda" and not torch.cuda.is_available():
+        pytest.skip("CUDA kernel value check requires CUDA")
+    axis = torch.tensor([-1., 2., -3.], device=device, dtype=dtype)
+    axis = axis/axis.norm()
+    angles = axis.new_tensor([0, 1e-8, .0099, .0101, .4, torch.pi-.0005, torch.pi, 2*torch.pi, 10*torch.pi])
+    vectors = angles[:, None]*axis
+    actual = rotation_exp(vectors)
+    expected = torch.matrix_exp(skew(vectors))
+    assert torch.allclose(actual, expected, atol=tolerance, rtol=0)
+    validate_rotation_matrices(actual, atol=tolerance)
+    if device == "cpu":
+        for vector in (vectors[0], vectors[4], vectors[5]):
+            gradient = torch.autograd.functional.jacobian(rotation_exp, vector)
+            reference = torch.autograd.functional.jacobian(lambda w: torch.matrix_exp(skew(w)), vector)
+            assert torch.isfinite(gradient).all()
+            assert torch.allclose(gradient, reference, atol=tolerance, rtol=0)
+    assert not torch.isfinite(rotation_exp(axis.new_full((3,), torch.nan))).all()
+
+
+def test_so3_complete_sampler_matches_matrix_exp_kernel():
+    normal = Normalization.fixture(Topology())
+    model = SO3JointFlow(normal).eval()
+    reference = SO3JointFlow(normal, rotation_kernel="matrix_exp").eval()
+    reference.load_state_dict(model.state_dict())
+    gaussian = torch.randn(3, 325, generator=torch.Generator().manual_seed(19))
+    context = torch.zeros(128)
+    with torch.no_grad():
+        assert torch.allclose(model.sample(context, gaussian, steps=8),
+                              reference.sample(context, gaussian, steps=8), atol=3e-5, rtol=0)
+        assert torch.allclose(model.regression(context[None]), reference.regression(context[None]), atol=3e-5, rtol=0)

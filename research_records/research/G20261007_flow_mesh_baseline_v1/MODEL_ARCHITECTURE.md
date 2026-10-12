@@ -189,12 +189,14 @@ A7只在Rk≤minR+validation delta的近等价集合中最小化相对上次发�
 
 2026-10-12按已有长期协议先登记该因素，再实现 `so3_flow.py`。构造时必须传入现有Normalization和ModelConfig；StateEncoder、54token、128width/4heads/4blocks、T/beta输入输出及观测信息保持现有设计。仅pose_out从128→6改为128→3。角速度只表达方向变化，旋转长度和正交关系由群更新维持。旧单模型F0和SO3候选是两个表示对照，未将当前G0/G1/J删除。
 
-数学状态为SO3^N×R3×R10，内部网络仍读取旋转矩阵前两列的6维嵌入，T/beta为原标准化量。速度为3N+13维：52节点169，22节点79。每步右更新 R_next=R·matrix_exp(dt·skew(omega))，T/beta保留Euler。实际携带完整3×3矩阵并计算matrix_exp；速度维度减少不代表内存或运行成本降低。
+数学状态为SO3^N×R3×R10，内部网络仍读取旋转矩阵前两列的6维嵌入，T/beta为原标准化量。速度为3N+13维：52节点169，22节点79。每步右更新 R_next=R·Exp(dt·skew(omega))，T/beta保留Euler。实际携带完整3×3矩阵；默认旋转指数核经第26节检查后使用Rodrigues，显式rotation_kernel="matrix_exp"保留原核对照。速度维度减少本身不代表内存或运行成本降低。
 
-训练和采样均从同一Haar SO3源开始。现有每候选seed及6N+13 Gaussian噪声接口复用，每节点只取前4个独立Gaussian并归一化为wxyz四元数；另外2个分量不进入动力学。四元数到矩阵不取近π拒绝门、不重抽；外部零/非有限源显式报错并给出索引。训练路径使用冻结端点SciPy principal log及R0·Exp(t·omega)，线性日程与推理一致。CPU目标准备需要传输与求log，不能作为端点可微guidance接口或训练加速结论。
+训练和采样均从同一Haar SO3源开始。现有每候选seed及6N+13 Gaussian噪声接口复用，每节点只取前4个独立Gaussian并归一化为wxyz四元数；另外2个分量不进入动力学。四元数到矩阵不取近π拒绝门、不重抽；外部零/非有限源显式报错并给出索引。训练路径使用冻结端点SciPy principal log及R0·Exp(t·omega)，训练路径/sample/regression复用Rodrigues闭式核，线性日程与推理一致。CPU目标准备需要传输与求log，不能作为端点可微guidance接口或训练加速结论。
 
 CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metric的常数缩放）、标准化T3和beta10 MSE。确定性对照使用同一SO3网络，一次前向预测相对I的角向量并Exp成合法旋转，再调用现有regression_loss；其标准化6D损失与角速度CFM损失不用于横比效果。两种目标参数完全相同。52候选711056参数，22候选707216，均比对应ambient模型少387；15104个信息投影参数仍分配但F0不激活，任何Lambda输入拒绝。
 
 公开输出按绑定Normalization导出完整6D/T/beta，沿用CandidateStore的完整候选、原掩码、缺失观测禁止发布、来源和seed。objective与infer增加显式codec检查，防止另一套均值/尺度把合法列错误解释；资源标记LieEuler和表示身份。现有prepare/config、训练开关、作者代码及正式主线未修改。相关20项测试与改动文件Ruff通过；无训练、权重加载、真实网格效果或速度证据，详见MODEL_RESULTS第24节。
 
 2026-10-12固定预算成本已测，见MODEL_RESULTS第25节：同K32/8调用、真实SMPL-H解码及A4决策，SO3matrix_exp完整p50为44.87ms，对照35.20ms，1.2747倍未过预注册1.25门。少387参数和169维速度未给当前实现提速；候选继续隔离，不晋升。后续最多一次有数学依据的指数核替换，不改变模型、源或日程。结果属于固定人工观测/随机网络成本，非正式系统速度或精度。
+
+2026-10-12第二轮核替换已完成，见MODEL_RESULTS第26节。Rodrigues用K²=wwᵀ−||w||²I及half-angle sinc省去通用矩阵指数；θ²<1e-4用四阶A/B Taylor、regular分支先clamp再sqrt，避免零角 inactive 分支的除零/导数非有限。网络参数、噪声源、日程和步数不变。17项相关测试通过；同次全链p50闭式38.33ms、旧核43.63ms、ambient33.23ms，1.1536倍通过成本门，仍慢于ambient，显存增量未下降。保留显式构造的研究候选；两轮已耗尽，结束核优化，未将其晋升默认、宣称精度或改变G0/G1/J。
