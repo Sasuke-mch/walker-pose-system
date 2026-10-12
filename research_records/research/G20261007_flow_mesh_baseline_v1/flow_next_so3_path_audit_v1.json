@@ -1,0 +1,92 @@
+{
+  "device": "cpu",
+  "dtype": "float64",
+  "training": false,
+  "local_helper": "tangent.shortest_log",
+  "pi_margin_rad": 0.001,
+  "regular_log": [
+    [
+      0.0,
+      0.0,
+      0.4000000000000001
+    ]
+  ],
+  "mixed_legal_rotations_rejection": "near_pi_rotation_chart",
+  "Haar_angle_cdf": "(theta-sin(theta))/pi for theta in[0,pi]",
+  "tail_probability": 0.0006366197193159363,
+  "independent_tensor_populations": [
+    {
+      "independent_rotation_pairs": 22,
+      "probability_any_rejected": 0.013912409206892004
+    },
+    {
+      "independent_rotation_pairs": 52,
+      "probability_any_rejected": 0.03257247580812545
+    },
+    {
+      "independent_rotation_pairs": 832,
+      "probability_any_rejected": 0.41129865395591986
+    },
+    {
+      "independent_rotation_pairs": 1664,
+      "probability_any_rejected": 0.6534307251658882
+    }
+  ],
+  "MonteCarlo": {
+    "source": "normalized iid Gaussian4 quaternion",
+    "seed": 7,
+    "draws": 200000,
+    "tail_count": 126,
+    "fraction": 0.00063,
+    "binomial_standard_error": 5.64009944348907e-05,
+    "within5_standard_errors": true
+  },
+  "identity": {
+    "forward": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "backward_finite": false,
+    "backward_J": [
+      [
+        "nonfinite_NaN",
+        "nonfinite_NaN",
+        "nonfinite_NaN"
+      ],
+      [
+        "nonfinite_NaN",
+        "nonfinite_NaN",
+        "nonfinite_NaN"
+      ],
+      [
+        "nonfinite_NaN",
+        "nonfinite_NaN",
+        "nonfinite_NaN"
+      ]
+    ],
+    "expected_J": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "decision": "local decision chart is not a drop-in global/differentiable SO3 path",
+  "limits": [
+    "not learned JointFlow or dependent pairwiseA6 rejection frequencies",
+    "endpoint gradients are not required for frozen source/target time-only JVP",
+    "existing decision fallback retained; no model or probability calibration claim"
+  ]
+}

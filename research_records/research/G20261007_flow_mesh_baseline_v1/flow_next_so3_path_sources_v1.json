@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-12",
+  "paper": {
+    "title": "Flow Matching on General Geometries",
+    "url": "https://arxiv.org/html/2302.03660v3",
+    "read": "3.1 equations3-10/Algorithm1; 3.2 conditions/equation13; AppendixE limitations; not full theorem/proof/benchmark review"
+  },
+  "official_sources": [
+    {
+      "url": "https://raw.githubusercontent.com/facebookresearch/riemannian-fm/main/manifm/model_pl.py",
+      "read": "rfm_loss_fn lines553-615; sample lines388-414; no author code execution"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/facebookresearch/riemannian-fm/main/manifm/manifolds/__init__.py",
+      "read": "public manifold exports including ProductManifold; no explicitSO3 export in inspected file"
+    },
+    {
+      "url": "https://facebookresearch.github.io/flow_matching/_modules/flow_matching/path/geodesic.html",
+      "read": "GeodesicProbPath.sample timeJVP and vmap"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/facebookresearch/flow_matching/main/flow_matching/utils/manifolds/utils.py",
+      "read": "geodesic constructs logmap then expmap"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/facebookresearch/flow_matching/main/flow_matching/solver/riemannian_ode_solver.py",
+      "read": "sample, tangent/state projections; Euler/midpoint/RK4/interp"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/facebookresearch/flow_matching/main/flow_matching/utils/manifolds/__init__.py",
+      "read": "public Euclidean/Sphere/FlatTorus exports; no explicitSO3 type in inspected file"
+    }
+  ],
+  "paper_transfer": {
+    "requirements": "chosen manifold base/target measure, endpoint-consistent conditional path, tangent velocity and appropriate metric; training/data still required",
+    "simulation_free_scope": "training target path on simple geometry; inference still integrates learned velocity",
+    "hypothetical_SMPLH_domain": "SO3^52 x R3 x R10 has intrinsic169 dimensions; existing325D6D representation is an embedding. Intrinsic dimension alone proves neither reduced parameters nor runtime.",
+    "possible_simplification": "replace ambient rotation velocities with tangent angular velocities plus group integration; unifies rotation geometry but does not automatically removeG0/G1/J",
+    "limitations": "legal rotation group not anatomical pose validity; observed conditioning and beta basis must remain; no new measured information from representation alone"
+  },
+  "solver_cost": "Meta Euler/midpoint/RK4 use1/2/4 velocity evaluations per step plus projections; no empirical speed claim; geodesic timeJVP is target generation, not full numerical inverse-problemJacobians",
+  "local_helper_boundary": "existing shortest_log is an intentionally guarded decision chart; nearPi fallback in decisions remains. Endpoint Jacobian at identityNaN limits endpoint differentiation; frozen source/target time-onlyJVP can still be finite.",
+  "Haar_probability_derivation": "isotropicGaussian4 normalized to S3 gives uniform unit quaternion. Fold antipodes: theta=2acos(abs(qw)); density=(1-cos(theta))/pi. Integrate to F=(theta-sin(theta))/pi; finite-margin tail=(epsilon+sin(epsilon))/pi.",
+  "probability_scope": "independentHaar source relative to fixed target rotations only; do not apply independentN calculation to dependent pairwiseA6 or learned JointFlow candidate pools",
+  "outputs": [
+    "flow_next_so3_path_audit_v1.json",
+    "flow_next_so3_path_audit_v2.json"
+  ],
+  "validation": {
+    "MC": "200000/seed7,126 tail samples; analytic probability within5binomialSE",
+    "regular/mixed": "regular log matches target and legal nearPi tensor rejected",
+    "endpoint_identity_gradient": "9 NaNs explicitly retained; no false differentiability pass",
+    "time_JVP": "identity0/regular5.55e-17 maximum error against closedform; both finite",
+    "ruff": "offline passed",
+    "AST": "passed"
+  },
+  "retrieval_failures": [
+    "ar5iv2302.03660 web unavailable; arxivHTMLv3 succeeded",
+    "Meta solver documentation page unavailable; official raw code succeeded"
+  ],
+  "not_executed": [
+    "author package or trained vector fields",
+    "training or checkpoint loading",
+    "full humanSO3 probability model",
+    "runtime improvement or heldout efficacy"
+  ],
+  "decision": "retain RFM as representation-replacement candidate, stop direct reuse of local decision log as global differentiable path; source measure/branch/gradient/integrator contract must be verified first"
+}

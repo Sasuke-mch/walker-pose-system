@@ -836,3 +836,20 @@ flow_next_quality_bridge_protocol_v1.json先登记精确标量检查。设真值
 同时压力测试“任意非退化姿态都使每条骨段的条件均值缩短”的过强用法：对骨段向量d，精确恒等式||E[d]||²=E||d||²−trCov(d)，严格缩短需该骨段Cov非零。两组合法单位边总体分布中，一条边歧义、另一条固定时均值长度为0/1；两条都歧义时0/0。总体姿态非退化不能推出每条边都随机。该解析检查不否定作者实验，也不支持取消本项目参数回归强对照（其损失针对packedR/T/beta，并非自由Cartesian joint MSE）。
 
 决定：不接入COCO骨长恒定损失，保留真实surface与内部FK角色区分，ManiPose作为结构与决策强对照继续记录；本轮取得的是排除不合适约束的算子证据，非生成精度成果。下一阶段对SO3概率路径本身阅读原始RFM与官方实现，先检验合法旋转/可微路径是否足以支持概率与成本结论；不以骨架流形名称代替实质分析。数据门和训练关闭继续有效。
+
+
+## 22. 2026-10-12 RFM概率路径、SO3局部chart与导数边界
+
+聚焦阅读[Flow Matching on General Geometries v3](https://arxiv.org/html/2302.03660v3)3.1式3–10/Algorithm1、3.2条件/式13、AppendixE；未计完整证明和基准复现。RFM要求源/目标测度、端点一致的条件路径、切向速度与相应metric一致。“简单几何simulation-free”针对训练目标路径，不表示推理无需ODE或速度调用，也不认证有限训练模型的真实后验。
+
+作者riemannian-fm的rfm_loss_fn实际调用random_base、geodesic、timeJVP和manifold.inner；Meta新版GeodesicProbPath同样由log/exp路径作时间JVP。实际读两个仓库的manifold导出、Meta geodesic和RiemannianODESolver源码，读取范围/URL在flow_next_so3_path_sources_v1.json。已查导出没有专门SO3类型，不据此声称理论不支持SO3或其它包没有实现。新版Euler/midpoint/RK4每步为1/2/4次速度调用并带点/切向投影；几何路径的timeJVP不能等同完整人体/鱼眼观测Jacobian成本。没有运行作者包、训练或权重。ar5iv和solver文档读取失败后arxivHTML/官方raw成功，失败记录保留。
+
+可保留的简约方向是替换旋转表示：SO3^52×R3×R10的内在维数169，而当前6D嵌入状态为325；用角速度与群积分可让生成和局部信息采用一致的旋转几何，但需要新的路径/尺度/输入输出/积分合同，不能靠维数宣称参数或耗时减少，更不能据此删除G0/G1/J。合法SO3也不等于解剖/接触合法。本轮未实施新生成器。
+
+在先登记flow_next_so3_path_protocol_v1.json后，audit_so3_path.py用CPU float64调用当前shortest_log/skew。0.4rad普通旋转通过；另一输入π−0.0005rad仍通过SO3合法门，合并后整个log张量明确返回near_pi_rotation_chart。默认margin0.001rad排除的是正测度邻域，不能解释成仅处理概率零的π点。
+
+对假设独立Haar源与固定目标，单位四元数可由标准Gaussian4归一化得到；θ=2acos(|qw|)，角密度(1−cosθ)/π，CDF=(θ−sinθ)/π。因此p近π=(epsilon+sin epsilon)/π=0.0006366197193。独立22/52/16×52/32×52旋转对的整张量拒绝概率分别1.3912%/3.2572%/41.1299%/65.3431%。seed7的200000次抽样出现126次尾部，比例0.00063，与解析值在5binomialSE内。此为假设源的局部门适配证据，不是当前归一化6D源、学到的候选或有相依性的A6两两风险失败率；不能把独立公式直接套到K²两两比较。
+
+第二项失败证据：当前log(Exp(w))在w0前向全0，但对w反向Jacobian九项为NaN，理论应为I。v1/v2用显式nonfinite_NaN保存全部九项，不将有限前向当可微认证。重要的正对照在v2执行前补充登记：固定端点log后，只对Exp(t*skew(omega))的时间求JVP，单位/普通旋转速度均有限，与R(t)*skew(omega)的最大误差0/5.5511e-17。这正是冻源/目标训练路径所需的一种求导，不要求端点log梯度，因此NaN本身不证明RFM训练不可行；它限制的是对端点/当前旋转再求导的用途。
+
+v1/v2原结果与数值/非有限证据保留，Ruff/AST、普通log/概率抽样/timeJVP断言通过。没有优化器、模型推理、人体资产解码、随机模型效果或速度重测。当前决策辅助函数继续保留其近π回退，未把它硬改成全局可微log。停止“只替换6D路径、无改动复用现有局部helper即可获得RFM”的捷径；RFM候选保留，下一阶段审查专用SO3实现对π分支与源测度的处理，尤其避免拒绝/重采样改变训练源；仍需独立数据门，未宣称模型创新或整体完成。

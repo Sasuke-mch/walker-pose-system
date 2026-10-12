@@ -4387,3 +4387,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 使用cv-paper-reader聚焦阅读ManiPose方法/理论/消融/附录及官方decoder/FK/旋转/聚合/loss/config。它是共享骨长的骨架多解方法，非SO3概率流；weighted_ave、oracle和非因果窗口/容量不同的边界保留。未运行作者网络或训练。源码范围在flow_next_pose_manifold_sources_v1.json，未声称全文/当前SOTA复现。
 
 预注册后实际本地SMPLH male/MANO与COCO regressor仅解码2合法姿态，同beta0/T不变。51内部骨段最大长度变化2.78e-16米，8条COCO表面连线最大变化6.4614mm，全项保存，数值门/解析骨段协方差恒等式/Ruff/AST通过。结果flow_next_pose_manifold_audit_v1.json；因此不加COCO骨长恒定损失或额外骨长头，不把合法表面变化称真实误差。MODEL_RESULTS第21节与架构/长期协议同步，下一步阅读实际SO3概率路径及成本；数据暂无、训练关闭、长期有效性未完成。
+
+
+## 2026-10-12 RFM概率路径与现有SO3局部函数适配门
+
+实际读2302.03660v3条件路径/metric/基本假设及官方rfm_loss_fn、Meta geodesic/timeJVP/投影积分器。保留RFM作表示替换候选，不由169内在维数宣称低成本或删去G0/G1。预注册CPU float64检查：现有shortest_log拒绝混合合法近π张量；假设独立Haar源的52及32×52旋转整组拒绝概率3.2572%/65.3431%，200000次seed7抽样126尾部，非当前候选/A6失败率。
+
+单位旋转端点Jacobian九NaN全部显式保留；v2冻端点时间JVP正对照有限，闭式误差0/5.55e-17，故不把端点NaN称RFM训练不可能。Ruff/AST及数值/概率/timeJVP检查通过；原v1/v2与失败输出保留，见flow_next_so3_path_audit_v2.json及sources_v1.json、MODEL_RESULTS第22节。下一步核验专用SO3的π分支/源测度处理，保留决策回退，未训练/改主线，长期有效性未完成。

@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-12",
+  "target": "SO3 RFM path transfer compatibility of current shortest_log",
+  "input": "CPU float64 mathematical rotations; no body assets/data/network; current project shortest_log/skew/rotation validator",
+  "checks": [
+    "regular rotation passes; mixed regular/near-pi legal rotation tensor rejected wholly",
+    "normalized4D isotropic Gaussian gives hypothetical uniformHaar SO3 source; fixed target independent from source",
+    "near-pi tail probability p=(epsilon+sin(epsilon))/pi for epsilon1e-3; tensor-any rejection1-(1-p)^N for independent pairs only",
+    "MonteCarlo200000 quaternion draws seed7 agrees with analytic tail within5 binomial standard errors",
+    "identity log(exp(w)) backward Jacobian checked against identity; any nonfinite derivative retained as explicit failure evidence"
+  ],
+  "only_variable": "regular versus near-pi/identity inputs and source population size; no state/model modification",
+  "stop": "single bounded computation; if a check fails preserve it. No default manifold representation or stochastic resampling/failure masking.",
+  "boundary": "hypothetical independentHaar source-target pairs, not learned JointFlow candidates or dependent pairwiseA6 failure frequency. Gradient of endpoint log is unnecessary when source/target frozen and onlytimeJVP is required.",
+  "training": false,
+  "success": "identify whether local decision chart can be reused unchanged for a global/differentiable path; not an efficacy gate",
+  "additional_positive_control_before_v2": "fixed identity/regular endpoint log; time-only JVP through Exp(t*skew(omega)) must be finite and agree with R(t)*skew(omega) within1e-13. A NaN endpoint derivative alone cannot be used to reject frozen-endpoint RFM."
+}
