@@ -40,7 +40,7 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "D10.4 causal G1 sequence objective preparation: connect typed per-frame frozen information to original-row chunks with explicit source/frame binding and detached G0/J. Preserve F0 default, same-information CFM/regression and missing/failure rows; count acquisition explicitly. Training/checkpoint and actual resources remain unavailable; do not claim completed trained runner.",
+  "next_stage": "D10.5 same-group multi-sequence training preparation and execution-lifecycle remaining connections: inspect current code and add one necessary, bounded interface without running optimizer or neural checkpoints. Keep registered sources/test lock/whole candidates/fair four-method costs; actual data0, authorization and independent efficacy remain incomplete.",
   "deficiency_improvement_20261012": {
     "status": "continuous_thread_goal_active_training_closed",
     "authorization": "Analyze existing model shortcomings, improve individually, and keep detailed long-term records; no scheduled automation",
@@ -244,6 +244,34 @@
       "record": "MODEL_RESULTS.md section37; MODEL_ARCHITECTURE.md section20; flow_research_plan_v1.json R_info deployment;AI_PROGRESS.md",
       "capacity_changed": false, "training": false, "checkpoint_loaded": false, "optimizer_steps": 0
     },
+    "D10_G1_sequence_information": {
+      "date": "2026-10-13", "status": "preregistered_before_G1_sequence_checks",
+      "problem": "SequenceObjective accepts no per-frame information/source binding or G0/J acquisition accounting; original objective is F0-only while inference now supports matched information regression",
+      "scope": "Existing train.py adds typed SequenceInformation and observation-only acquire_sequence_information; reuse infer/local_information/require_information_binding. Explicitly frozen evalG0, no labels as acquisition input, original1to32 observations and detached carry retained",
+      "only_variable": "Optional original-frame frozenLambda into existing causal G1 CFM/regression objective with full binding/scale and counted acquisition; F0 default, core/CFM/normalization/masks/solver unchanged",
+      "binding": "All Information observation/rig/noise snapshots and declared provenance/coordinate scale verified before any G1 encoding. Same-frame pixels or externalnoise/rig change is rejected, not oldLambda fallback. AvailabilityNone only with original recorded reasons; no row removal or zero-matrix substitution",
+      "failure_policy": "Legitimate unavailable current information reuses original noLambda fallback; frame still advances observation state and retains original target/observation reasons plus separate information reasons. Known invalid/unbound/corrupt/mutable-gradient matrix is rejected before encoding; SO3F0 is not silently madeG1",
+      "controls": "Temporary explicit synthetic5frame22/52 observations/labels, original rigidT-only surface/artificialrig/proxy noise, frozen randomG0 and untrainedG1. Fixed sameG0/J forCFM/regression; original supervised0/2/4, missing1 and partialbeta3 retained. No real precision/3D/shape claim",
+      "checks": ["Original F0 sequence control still passes; G1 CFM/regression values match independent manual existing objective and carry chunks", "G0 acquisition does not take target labels, retains all5 rows and actualcalls/states;g0/J frozen, realweights unchanged", "Input binding/topology/clock/order/cost/statistics issues reject beforeG1;SO3F0 information refusal remains", "Within-chunk gradients reach observation/G1 projections but not target/G0/J/carry; future observation/info changes leave earlier contexts/losses fixed", "All unavailable information/original missing/partial targets retain slots/reasons; independent surface counts match reportedJ and originalG0 counts"],
+      "success": "Actual currentG0-to-information-to-G1 sequence path connects original rows, same-information targets and acquisition evidence with explicit failure semantics; no trained4method runner or efficacy certification",
+      "stop": "Stop after connected path and related checks; nooptimizer/checkpoint, permanent syntheticdataset, fabricated noise labels, new matrix/probe/capacity or fullcost rerun. Actualsource/asset/history authenticity and full runtime remain separate requirements",
+      "training": false, "checkpoint_loaded": false
+    },
+    "D10_G1_sequence_information_result": {
+      "date": "2026-10-13", "status": "causal_G0_information_G1_objective_preparation_complete_not_training_runner",
+      "failure": "Initial4checks ImportError missing acquire_sequence_information, before any acquisition; interface then4passed2.84s. Preserved original failure without claiming data/model inaccuracy",
+      "interface": "train.SequenceInformation/acquire_sequence_information and sequence_objective optionalinformation; observation-only explicitly frozen evalG0; original1to32 rows; detachedG0/J/carry",
+      "binding": "Whole original-frame info/rig/noise/scale/anchor snapshots and counts checked beforeG1; changed source rejected; unavailableNone requires originalreasons and uses original noLambda fallback;SO3F0 refusesG1",
+      "inputs": "CPUfloat64/threads1/seed7 ambient22/52 synthetic5frames100-104/time0,.17,.52,.73,1.1;engineeringmeanidentityR/Tz3/beta0 scale0.03;proxy10px and artificialrig/T-onlysurface;anchorK2/steps2;CFMrng17",
+      "values": "G1context/loss matches independent original APIs;3+2G0/G1carry values/state preserved;future last2obs/labels with newacquisition keeps prefix;supervised0/2/4;missing1/partialbeta3 retained",
+      "resources": "5originalframes acquireG0 10calls/20states;J4available frames,22nodes636states/52nodes1356states;actualbatch/row counters match; target3calls/states;precomputed acquisition explicitly not rerun/free in objective",
+      "gradients": "G1position info projection/GRU and past observed/unlabelled input gradients nonzero;target/G0/J/incomingcarry no gradient;returned carries detached;g0weights unchanged",
+      "rejections": "14badG1cases fail beforeencoder;4badG0sources fail beforeacquisitionencoder;all5None retains reasons and same noLambda values without removing original target failures",
+      "checks": "25new checks passed8.86s after typed/verifiedconstraints;1nonfinite guard passed1.85s;11originalF0related checks passed2.06s;after acquisitionweights assertion2existing22-node checks passed1.97s;26new+11old unique checks covered;changed-fileRuffpassed",
+      "record": "MODEL_RESULTS.md section38;MODEL_ARCHITECTURE.md section21/D10;AI_PROGRESS.md",
+      "capacity_changed": false, "optimizer_steps": 0, "training": false, "checkpoint_loaded": false,
+      "remaining": "actual registeredtrain/noiserecords0;truthfuldata/asset/history/normalization sources;variable-noisecommonconditions;optimizer/checkpoint lifecycle and4methodtrainingrunner;independenteffectiveness"
+    },
     "next_after_D01": "Inspect state/conditioning limitations and identify one discriminating counterexample before any new architecture. Mean pooling, beta variation, no RGB and hand uncertainty are hypotheses/resource limits, not automatic module-addition instructions. Search mechanism overlap before committing to an architectural research direction.",
     "original_stop_rules": "Two justified revisions per mechanism; SO3 kernel allowance exhausted; fullK32 VJP promotion stopped at ratio1.7822233; frozen held-out and fair controls inherited",
     "training": false
@@ -363,7 +391,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-13 D05 full same-information regression inference acquisition path complete;3new+1defaultCFM checks/Ruff passed. Original G0/J input and costs retained, regression singleoutput. Noise calibration/shared varying condition and real trained efficacy remain open; nextD10.4G1causal objective;training/checkpoint closed.",
+  "last_completed_stage": "2026-10-13 D10.4 causal frozen G0/J original-row information toG1 CFM/regression target preparation complete.26new+11existingF0checks across runs/Ruffpassed;original failures retained, unavailable reasons/costs/gradient barriers explicit. Real records0 and trained efficacy/runtime/authenticity remain incomplete;training/checkpoint closed.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

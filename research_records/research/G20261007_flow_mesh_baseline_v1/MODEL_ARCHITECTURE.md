@@ -248,7 +248,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 |D07/P2|A4 medoid表达候选群体代表性，不保证最接近真值；算法语义确认，真实误选率未知。|同缓存对比最强可部署决策、保留全槽位与风险覆盖；检查多模态及候选偏置，禁止oracle根位置/逐关节拼接。|原选择误差至少5%配对改善及保留率门；无独立真值不选赢家，不新加learned ranker。|待独立效能。|
 |D08/P1|原local特征在准入age清零/seen置True后构造，实际池化槽的这两维恒定；6组context精确碰撞及真实时间顺序检查确认。更广的连续时间/运动建模仍未证。|local MLP改用incoming_age/prior_seen；输出状态与global time沿原重置规则。无新参数，不添加hidden衰减或人体结果反馈。|重现间隔/首次见到差异，并保留缺失/未来/分块合同；context响应不等于真实姿态收益。|本地特征缺陷已修复，MODEL_RESULTS第31节；实际缺失/采样节奏效能仍待独立验证。|
 |D09/P0|SO3生成仍慢于ambient；全K32 VJP比1.7822超过1.25；第26/29节实测。|保留SO3表示候选，停止现全K32反馈晋升；若有全新有据替代问题先预注册。原核两轮额度不重置。|必须在原K/NFE和全成本口径内达门；不能减K/步数或反复测时制造通过。方向通过不算精度或速度收益。|原路径停止，独立VJP保留。|
-|D10/P1|原train.py只prepare/objective，无因果标签帧连接、真实loader/optimizer/checkpoint；原统计grad与回读来源/dtype缺陷确认。|D10.1固定统计；D10.2连接标签帧绑定→因果目标/TBPTT；D10.3注册train文件读取保留全部原行并检查声明对齐。optimizer/checkpoint与真实资源仍缺，训练禁止。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；声明不认证真实性，缺资源不伪造已训练成果。|D10.1/2/3接口完成；D10.3共24个新检查分次覆盖/Ruff通过，第35节。真实records0，声明不认证真实性；完整runner及效能未完成。|
+|D10/P1|原train.py只prepare/objective，无因果标签帧连接、真实loader/optimizer/checkpoint；原统计grad与回读来源/dtype缺陷确认。|D10.1固定统计；D10.2连接标签帧绑定→因果目标/TBPTT；D10.3注册train文件读取；D10.4 observation-only冻结G0/J获取与原行G1目标连接，保留信息失败/成本。optimizer/checkpoint与真实资源仍缺，训练禁止。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；声明不认证真实性，缺资源不伪造已训练成果。|D10.1–4准备接口完成，第38节记录G1新26项/原F0相关11项通过与边界。真实records0，来源/历史/资产声明不认证真实性；完整runner及效能未完成。|
 |D11/P0|训练、独立noise/3D/shape记录为空，未证实生成/shape/选择/校准改善；manifest确认。|取得独立资源后按原energy score、选择误差、coverage-width、无效率和三seed参与者配对协议评价。现有拟合结果不自证准确。|继承原5%改善、CI/coverage/失败门；数据缺口不能靠工程测试补齐，长期目标保持未完成。|资源限制。|
 |D12/P2|当前无后验密度/可信likelihood/校准；全链采集+检测实时与跨rig外推也未认证；源码/既有成本范围确认。|校准/概率与部署分别在相应数据/硬件/完整输入边界评价；先明确采样分布、失败率和时间口径。|不把等权候选、B矩阵、合法旋转或纯网络耗时叫后验/30fps；无证据保留明确未认证状态，不叠加density/MH模块。|待独立概率/部署验证。|
 
@@ -266,7 +266,7 @@ D02限定范围的结果见MODEL_RESULTS第32节/flow_next_encoder_dimension_v1.
 
 `sequence_objective(mode, model, chunk, normalization, state=None, generator=...)`先detach incoming carry，再按原帧顺序调用同一个Observation-only StateEncoder。每帧context只依赖截至该帧的观测；标签R/T/beta及mask切为本帧一行且detach，不送入encoder。只有当前有准入观测且完整标签的行调用原CFM/回归目标，每行一次velocity batch。无观测帧仍推进时钟/age并保留hidden，标签不完整但有观测的帧仍更新hidden，不伪造目标、不从序列删除。
 
-返回`SequenceObjective`含全部原frame绑定、contexts[F,128]、frame_losses[F]、supervised[F]、逐帧unavailable及原观测rejection_reasons、脱图carry和实际frame/target调用计数。正常有监督loss为原有效监督帧的均值；跨chunk/有效batch不能等权平均块均值，应按supervised_count加权。无可监督行loss=None、原槽NaN；已计算目标非有限时保留NaN/原因并将整个chunk loss设None，不选择其他有限行冒充可训练。当前入口是F0，未接G1信息；G1的冻结信息绑定/额外获取成本需另行实现并验证。
+返回`SequenceObjective`含全部原frame绑定、contexts[F,128]、frame_losses[F]、supervised[F]、逐帧unavailable及原观测rejection_reasons、脱图carry和实际frame/target调用计数。正常有监督loss为原有效监督帧的均值；跨chunk/有效batch不能等权平均块均值，应按supervised_count加权。无可监督行loss=None、原槽NaN；已计算目标非有限时保留NaN/原因并将整个chunk loss设None，不选择其他有限行冒充可训练。本节记录D10.2的F0初始接口；2026-10-13 D10.4已接可选G1逐帧信息，来源绑定/获取成本规则见第21节。
 
 块内历史观测→后续loss的梯度保留，块边界的incoming/returned carry脱图，实现TBPTT截断而非重置；没有optimizer、checkpoint读写、文件数据加载或自动训练。5帧原时间[0,.17,.52,.73,1.1]的工程检查含1缺观测、1缺beta、3监督；同种子目标、未来隔离、非均匀分块加权、标签/状态梯度屏障等见MODEL_RESULTS第34节。网络容量不变，所有结果是准备接口证据，不是模型有效性。
 
@@ -300,4 +300,16 @@ NPZ格式`flow_next_sequence_v1`仅使用numeric arrays与JSON文本，allow_pic
 
 两个方法复用相同G0、观测、rig/noise、统计与anchor预算才能构成F_info/R_info输入对照；训练评价时R_info的g1必须独立按回归目标训练，不能把CFM权重切换方法当强回归基线。本轮同随机权重仅隔离接口因子。最小测试验证真实local_information非空、G0 raw/IDs、Λ和观测state逐值相同、回归输出等于手动API、状态恢复/缺失和独立surface调用计数；3新检查及1原CFM检查通过，见MODEL_RESULTS第37节。
 
-固定noise的比较可在共同固定条件下登记；变化noise时F0/R0没有外部precision、F_info/R_info通过Λ接收，仍是输入因素，不得解释为纯生成器数量效应。sigma10px继续proxy/calibratedFalse，真实训练/独立噪声参考均0；全四法训练runner、G1序列目标/来源连接与独立效能未完成，不新增precision神经模块。
+固定noise的比较可在共同固定条件下登记；变化noise时F0/R0没有外部precision、F_info/R_info通过Λ接收，仍是输入因素，不得解释为纯生成器数量效应。sigma10px继续proxy/calibratedFalse，真实训练/独立噪声参考均0；2026-10-13 D10.4补齐G1序列目标/原帧信息连接；全四法训练runner、来源真实性与独立效能未完成，不新增precision神经模块。
+
+## 21. 因果序列G1冻结信息准备路径（2026-10-13，D10.4）
+
+`train.acquire_sequence_information(g0, observations, normalization, scale, surface, cameras, noise, state=None, anchor_k=32, steps=8, jacobian_step=1e-4)`只接收1–32个原Observation，不接Labels。g0必须eval且所有参数requires_gradFalse；原观测同identity/sequence/PnP stream、严格递增frame/time、rig/noise与统计拓扑先核对，再在no_grad内逐行调用原infer G0及local_information。缺观测行仍保留G0内部计算/时钟/原因，目标不完整不会过滤观测或信息；incoming/returned G0 carry脱图，分块须传其state。当前一个调用使用同一rig/noise，可在块间明确更换，未实现随意逐帧噪声列表。
+
+`SequenceInformation`保存全部原行Information、原G0资源、实际rig/noise/scale和G0返回状态。`sequence_objective(..., information=bundle)`在任何G1编码前核对全部行数、typed Information、原观测provenance与observation/rig/noise完整快照、scale、冻结matrix/J/anchor、矩阵有限/形状/对称及anchor拓扑、已记录anchor观测绑定状态和非负整数获取计数。复用require_information_binding，不通过固定frame ID替代像素/mask/ray/clock检查。篡改、错帧或旧未验证anchor不回退成可接受信息；SO3F0拒绝整个G1信息接口，原ambient22/52为本阶段实现范围。
+
+合法的matrix=None必须保存原原因；仍调用同一个G1网络的无Λ路径，与既有推理回退一致，不删除原行或用零矩阵伪造有效信息。逐帧reasons另存information_unavailable/anchor_id/noise_source/calibrated，不混作观测/标签失败。仅当前观测可用且R/T/beta标签完整的原行计算CFM/回归，标签和matrix均detach；块内观测/目标网络梯度、TBPTT边界、监督计数加权与非有限目标阻断沿原规则。默认information=None保持F0原接口。
+
+resources.information_acquisition汇总该块G0网络调用/候选状态求值、J解码batch/状态及可用/不可用信息原帧数，computed_in_this_objective=False说明这些工作已在获取入口发生，不能把缓存当部署零成本，也不能将同一缓存用于多次目标计算时误认每次重新获取。目标自身encoder/velocity计数仍独立。返回G0 state用于获取分块；G1 state独立用于目标分块，不能互换。快照与数值计数不认证实际G0训练来源、完整历史/真实资产/组划分或缓存真实性；无训练/权重生命周期/后验认证。
+
+26个新检查和11个原F0相关检查分次通过/Ruff通过：人工5帧、ambient22/52、CFM/回归逐行独立API一致，监督0/2/4、缺观测1、缺beta3保留；G0/J分块、future隔离、梯度屏障、全信息失败回退及前置拒绝见MODEL_RESULTS第38节。实际surface为T-only解析控制，不是SMPL-H精度/shape信息验证；未改模型容量/solver/噪声/选候选政策。真实records仍0，完整四法训练runner与独立效能继续未完成。

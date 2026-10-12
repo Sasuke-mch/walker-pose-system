@@ -189,3 +189,226 @@ def test_frozen_information_regression_path_rejects_multiple_outputs_before_anch
     monkeypatch.setattr(g0.encoder, "forward", forbidden)
     with pytest.raises(ValueError, match="single deterministic"):
         pipeline(observation(), k=2, regression=True)
+
+
+def information_sequence_fixture(nodes=52):
+    from realtime_app.learning_flow_mesh.rotations import matrix_to_six
+
+    from ..geometry_observation import NoiseModel
+    from ..tangent import TangentScale
+    from ..train import acquire_sequence_information
+    from .test_aggregate import rig
+    from .test_information import rigid_surface
+    from .test_joint import sequence_fixture
+
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    g0 = JointFlow(ModelConfig(nodes=nodes)).double().eval().requires_grad_(False)
+    g1 = JointFlow(ModelConfig(nodes=nodes)).double().eval()
+    mean = torch.cat((matrix_to_six(torch.eye(3, dtype=torch.float64)).repeat(nodes),
+                      torch.tensor([0., 0., 3.], dtype=torch.float64), torch.zeros(10, dtype=torch.float64)))
+    normal = Normalization(mean, torch.ones_like(mean)*.03, g0.topology, "synthetic_G1_sequence_not_training_data",
+                           split="engineering_fixture", source_kind="analytic_fixture")
+    original = sequence_fixture(nodes)
+    chunk = replace(original, observations=tuple(replace(obs, xy=obs.xy.double()) for obs in original.observations),
+                    labels=replace(original.labels, rotations=original.labels.rotations.double(),
+                                   translation=original.labels.translation.double(), beta=original.labels.beta.double()))
+    calls = []
+    def surface(rotations, translation, beta):
+        calls.append(len(rotations))
+        return rigid_surface(rotations, translation, beta)
+    before_acquisition = {key: value.clone() for key, value in g0.state_dict().items()}
+    bundle = acquire_sequence_information(g0, chunk.observations, normal, TangentScale.fixture(g0.topology),
+                                          surface, rig(), NoiseModel.proxy(), anchor_k=2, steps=2)
+    assert all(torch.equal(value, before_acquisition[key]) for key, value in g0.state_dict().items())
+    return g0, g1, chunk, normal, bundle, calls
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+@pytest.mark.parametrize("mode", ["CFM", "regression"])
+def test_G1_sequence_matches_manual_objective_and_counted_acquisition(nodes, mode):
+    from ..train import sequence_objective
+    from .test_joint import chunk_slice
+
+    g0, g1, chunk, normal, bundle, decoded = information_sequence_fixture(nodes)
+    before = {key: value.clone() for key, value in g0.state_dict().items()}
+    generator = torch.Generator().manual_seed(17)
+    with torch.no_grad():
+        result = sequence_objective(mode, g1, chunk, normal, information=bundle, generator=generator)
+        state, generator, expected = None, torch.Generator().manual_seed(17), []
+        for index, obs in enumerate(chunk.observations):
+            context, state, _ = g1.encoder(obs, state)
+            assert torch.equal(context, result.contexts[index])
+            if index in (0, 2, 4):
+                options = {"generator": generator} if mode == "CFM" else {}
+                loss, _ = objective(mode, g1, context[None], chunk_slice(chunk, index, index+1).labels,
+                                    normal, information=bundle.frames[index].matrix, **options)
+                expected.append(loss)
+                assert torch.equal(loss, result.frame_losses[index])
+        assert torch.equal(result.loss, torch.stack(expected).mean())
+        generator = torch.Generator().manual_seed(17)
+        first_info = replace(bundle, frames=bundle.frames[:3], anchor_resources=bundle.anchor_resources[:3])
+        last_info = replace(bundle, frames=bundle.frames[3:], anchor_resources=bundle.anchor_resources[3:])
+        first = sequence_objective(mode, g1, chunk_slice(chunk, 0, 3), normal,
+                                   information=first_info, generator=generator)
+        last = sequence_objective(mode, g1, chunk_slice(chunk, 3, 5), normal, first.state,
+                                  information=last_info, generator=generator)
+    assert torch.equal(result.contexts, torch.cat((first.contexts, last.contexts)))
+    assert torch.allclose(result.frame_losses, torch.cat((first.frame_losses, last.frame_losses)), equal_nan=True)
+    assert result.state.to_dict() == last.state.to_dict()
+    assert result.supervised.tolist() == [True, False, True, False, True]
+    assert len(bundle.frames) == 5 and bundle.frames[1].matrix is None
+    assert bundle.state.hidden.grad_fn is None and not bundle.state.hidden.requires_grad
+    assert "no_current_observation" in result.reasons[1]["information_unavailable"]
+    resources = result.resources["information_acquisition"]
+    assert resources["G0_network_calls"] == 10 and resources["G0_candidate_state_evaluations"] == 20
+    assert resources["J_decoder_batch_calls"] == len(decoded)
+    assert resources["J_decoder_state_evaluations"] == sum(decoded) == 4*(1+2*g0.topology.tangent_dimensions)
+    assert resources["available_information_frames"] == 4
+    assert not resources["computed_in_this_objective"]
+    assert all(torch.equal(value, before[key]) for key, value in g0.state_dict().items())
+
+
+@pytest.mark.parametrize("fault", ["frame", "pixels", "clock", "rig", "noise", "scale", "shape", "nonfinite", "rows", "gradient",
+                                  "counts", "reason", "legacy_anchor", "SO3"])
+def test_G1_sequence_rejects_bad_information_before_encoding(monkeypatch, fault):
+    from ..geometry_observation import NoiseModel
+    from ..so3_flow import SO3JointFlow
+    from ..train import sequence_objective
+
+    _, g1, chunk, normal, bundle, _ = information_sequence_fixture()
+    frames = list(bundle.frames)
+    info = frames[-1]
+    if fault == "frame":
+        frames[-1] = replace(info, provenance={**info.provenance, "frame": 105})
+    elif fault in ("pixels", "clock"):
+        obs = chunk.observations[-1]
+        altered = replace(obs, xy=obs.xy+1) if fault == "pixels" else replace(obs, timestamp_kind="other_clock")
+        chunk = replace(chunk, observations=(*chunk.observations[:-1], altered))
+    elif fault == "rig":
+        camera = bundle.cameras[0]
+        bundle = replace(bundle, cameras=(replace(camera, T=camera.T+.01), bundle.cameras[1]))
+    elif fault == "noise":
+        bundle = replace(bundle, noise=NoiseModel.proxy(5))
+    elif fault == "scale":
+        frames[-1] = replace(info, scale=info.scale*2)
+    elif fault == "shape":
+        frames[-1] = replace(info, matrix=info.matrix[:-1, :-1])
+    elif fault == "nonfinite":
+        frames[-1] = replace(info, matrix=torch.full_like(info.matrix, torch.nan))
+    elif fault == "rows":
+        frames = frames[:-1]
+    elif fault == "gradient":
+        frames[-1] = replace(info, matrix=info.matrix.clone().requires_grad_())
+    elif fault == "counts":
+        frames[-1] = replace(info, resources={**info.resources, "decoder_state_evaluations": -1})
+    elif fault == "reason":
+        frames[1] = replace(frames[1], reasons=[])
+    elif fault == "legacy_anchor":
+        frames[-1] = replace(info, diagnostics={**info.diagnostics, "candidate_current_observation_binding": "legacy_unverified"})
+    else:
+        g1 = SO3JointFlow(normal).double().eval()
+    bundle = replace(bundle, frames=tuple(frames))
+    def forbidden(*args, **kwargs):
+        raise AssertionError("all original information must validate before any G1 encoding")
+    monkeypatch.setattr(g1.encoder, "forward", forbidden)
+    with pytest.raises(ValueError):
+        sequence_objective("regression", g1, chunk, normal, information=bundle)
+
+
+def test_G1_sequence_gradients_reach_observation_and_core_but_not_acquisition():
+    from ..schema import TemporalState
+    from ..train import sequence_objective
+
+    g0, g1, original, normal, bundle, _ = information_sequence_fixture()
+    observations = tuple(replace(obs, xy=obs.xy.clone().requires_grad_()) for obs in original.observations)
+    targets = replace(original.labels, translation=original.labels.translation.clone().requires_grad_(),
+                      beta=original.labels.beta.clone().requires_grad_())
+    chunk = replace(original, observations=observations, labels=targets)
+    first = observations[0]
+    carry = TemporalState(first.identity, first.sequence, first.camera_ids,
+                          torch.zeros(128, dtype=torch.float64, requires_grad=True), torch.zeros(2, 17, dtype=torch.float64),
+                          -.1, 99, torch.zeros(2, 17, dtype=torch.bool))
+    result = sequence_objective("regression", g1, chunk, normal, carry, information=bundle)
+    result.frame_losses[-1].backward()  # Dependency verification, not optimization.
+    assert observations[0].xy.grad is not None and observations[0].xy.grad.abs().sum() > 0
+    assert observations[3].xy.grad is not None and observations[3].xy.grad.abs().sum() > 0
+    assert observations[1].xy.grad is None or observations[1].xy.grad.count_nonzero() == 0
+    assert targets.translation.grad is None and targets.beta.grad is None and carry.hidden.grad is None
+    assert g1.info_position.weight.grad.abs().sum() > 0 and g1.encoder.gru.weight_hh.grad.abs().sum() > 0
+    assert all(parameter.grad is None for parameter in g0.parameters())
+    assert all(info.matrix is None or info.matrix.grad is None for info in bundle.frames)
+    assert bundle.state.hidden.grad_fn is None and result.state.hidden.grad_fn is None
+
+
+@pytest.mark.parametrize("mode", ["CFM", "regression"])
+def test_G1_sequence_acquisition_future_isolation_and_chunk_carry(mode):
+    from ..train import acquire_sequence_information, sequence_objective
+    from .test_information import rigid_surface
+
+    g0, g1, chunk, normal, bundle, _ = information_sequence_fixture()
+    acquire = lambda observations, state=None: acquire_sequence_information(
+        g0, observations, normal, bundle.scale, rigid_surface, bundle.cameras, bundle.noise,
+        state, anchor_k=2, steps=2)
+    first = acquire(chunk.observations[:3])
+    last = acquire(chunk.observations[3:], first.state)
+    for expected, actual in zip(bundle.frames, (*first.frames, *last.frames)):
+        assert expected.binding == actual.binding
+        assert (expected.matrix is actual.matrix is None) or torch.equal(expected.matrix, actual.matrix)
+    assert bundle.state.to_dict() == last.state.to_dict()
+    observations = chunk.observations[:3]+tuple(replace(obs, xy=obs.xy*2) for obs in chunk.observations[3:])
+    targets = chunk.labels.translation.clone()
+    targets[3:] += 1
+    future = replace(chunk, observations=observations, labels=replace(chunk.labels, translation=targets))
+    changed = acquire(future.observations)
+    with torch.no_grad():
+        before = sequence_objective(mode, g1, chunk, normal, information=bundle,
+                                    generator=torch.Generator().manual_seed(17))
+        after = sequence_objective(mode, g1, future, normal, information=changed,
+                                   generator=torch.Generator().manual_seed(17))
+    assert torch.equal(before.contexts[:3], after.contexts[:3])
+    assert torch.allclose(before.frame_losses[:3], after.frame_losses[:3], equal_nan=True)
+
+
+def test_G1_sequence_unavailable_information_keeps_fallback_rows_and_reasons():
+    from ..train import acquire_sequence_information, sequence_objective
+
+    g0, g1, chunk, normal, bundle, _ = information_sequence_fixture()
+    def unavailable_surface(*args):
+        raise ValueError("controlled_surface_unavailable_not_missing_target")
+    unavailable = acquire_sequence_information(g0, chunk.observations, normal, bundle.scale, unavailable_surface,
+                                               bundle.cameras, bundle.noise, anchor_k=2, steps=2)
+    assert all(info.matrix is None and info.reasons for info in unavailable.frames)
+    with torch.no_grad():
+        f0 = sequence_objective("regression", g1, chunk, normal)
+        fallback = sequence_objective("regression", g1, chunk, normal, information=unavailable)
+    assert torch.equal(f0.loss, fallback.loss) and torch.equal(f0.contexts, fallback.contexts)
+    assert torch.allclose(f0.frame_losses, fallback.frame_losses, equal_nan=True)
+    assert fallback.supervised.tolist() == [True, False, True, False, True]
+    assert fallback.resources["information_acquisition"]["unavailable_information_frames"] == 5
+    assert fallback.reasons[3]["unavailable"] == ["beta_label_unavailable"]
+    assert "controlled_surface_unavailable" in fallback.reasons[3]["information_unavailable"][0]
+    assert "no_current_observation" in fallback.reasons[1]["information_unavailable"]
+
+
+@pytest.mark.parametrize("fault", ["unfrozen", "order", "noise_rig", "carry_type"])
+def test_G1_acquisition_rejects_bad_source_before_encoder(monkeypatch, fault):
+    from ..train import acquire_sequence_information
+    from .test_information import rigid_surface
+
+    g0, _, chunk, normal, bundle, _ = information_sequence_fixture()
+    observations, noise, state = chunk.observations, bundle.noise, None
+    if fault == "unfrozen":
+        g0.requires_grad_(True)
+    elif fault == "order":
+        observations = observations[:-2]+(observations[-1], observations[-2])
+    elif fault == "noise_rig":
+        noise = replace(noise, camera_ids=("other_LEFT", "other_RIGHT"))
+    else:
+        state = "not_a_temporal_state"
+    def forbidden(*args, **kwargs):
+        raise AssertionError("acquisition prerequisites must fail before any G0 frame")
+    monkeypatch.setattr(g0.encoder, "forward", forbidden)
+    with pytest.raises((ValueError, TypeError)):
+        acquire_sequence_information(g0, observations, normal, bundle.scale, rigid_surface,
+                                     bundle.cameras, noise, state, anchor_k=2, steps=2)

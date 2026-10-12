@@ -1107,3 +1107,23 @@ D03合同阶段决定：保留现有逐帧联合模型，停止默认嫁接H8冻
 改动后仅相关3新项加原1项：4passed/18deselected in2.09s，pipeline.py/test_regression_information.py Ruff通过。命令：`.\.venv-cuda\Scripts\python.exe -X utf8 -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_regression_information.py realtime_app/learning_flow_mesh_next/tests/test_information.py -q --tb=short -k 'frozen_information_regression_path or two_stage_frozen_g0_and_state_chunk_roundtrip'`。初次仅新文件-k frozen_information_regression_path。未重跑旧noise/J审计、全套测试或K32耗时，也未创建额外JSON/验收报告/脚本。
 
 四法计划R_info部署接口同步为完整TwoStageInference回归入口；状态仍preregistered_not_executed_training_closed。推理接口不是已完成四法训练评估，R_info未来需独立回归训练、使用同一个已冻结G0/源/统计/rig/noise；不能直接拿CFM训练weights调用regression作为强基线。F0/R0与F_info/R_info在变化noise时输入不匹配问题继续存在，比较只能按预注册的输入因素解释；G1接Λ不认证covariance或后验。当前真实training/noise-reference records仍0，无optimizer/checkpoint/人体解码或正式主线改动。D05完整推理准备路径完成、校准/共同外部noise条件及效能未完成；下一项D10.4接G1因果序列目标与逐帧冻结信息来源，默认训练继续关闭，长期目标未完成。
+
+## 38. 2026-10-13 D10.4原帧冻结G0/J到G1序列目标连接
+
+问题与预注册：D10.2序列目标只有F0条件，D05推理已有完整R_info，但还不能把当前逐帧Λ/来源与获取成本连到CFM/回归序列目标。先登记D10_G1_sequence_information，再扩展现有train.py的SequenceInformation、observation-only acquire_sequence_information和可选sequence_objective information。重用infer/local_information/require_information_binding；不另建数据或审计框架，不改core参数/CFM/solver/选候选。第一次4个新22/52×CFM/回归检查ImportError缺acquire_sequence_information，4failed/9deselected in3.65s，尚未执行任何获取；原失败保留。实现后首4passed/9deselected in2.84s，Ruff通过。
+
+实现范围：冻结eval G0只接原typed观测，先验证整块身份/物理时钟/rig/noise/拓扑，不接labels；no_grad逐行获取anchor/J，返回全行Information、原获取资源及脱图carry。信息包绑定实数观测/mask/ray/clock、实际K/D/R/T/PnP和noise/scale，目标编码前检查整块；它只认证声明/当前数值一致，不能认证G0真实训练来源、过去history/decoder资产或数据真实性。当前块内固定rig/noise，变噪声跨块需显式提供新来源；不因此解决F0外部precision输入不足。信息matrix/J/scale/anchor要求冻结，SO3F0信息合同保持拒绝。
+
+实际输入：CPU float64、threads1、seed7，ambient22/52各独立随机g0/g1，g0在获取前eval+requires_gradFalse；Normalizer工程source=synthetic_G1_sequence_not_training_data，identityR/Tz3/beta0 mean、scale全0.03、engineering_fixture/analytic_fixture。复用原5帧100–104、物理时间[0,.17,.52,.73,1.1]，1缺观测、3缺beta；标签为既有人工R/T/beta，非真实参考。原artificial raw-fisheye rig、proxy sigma10px/calibratedFalse；surface=rigid_surface只复制T为17点，不含真实pose/shape依赖或SMPL-H解码。G0 anchorK2/steps2，CFM generator17；目标仅0/2/4三行，但原5行均推进观测与获取状态。
+
+实际连接：CFM/回归×22/52的G1 context/逐帧目标与独立调用原encoder和原objective含本帧Λ逐值相同，aggregate为原3行均值。目标3+2分块同generator/carry得到同contexts/state、loss含NaN allclose；G0获取也按3+2传独立G0 carry后逐帧矩阵/快照和末state相同。扰动最后两帧观测及标签并重新因果获取信息，前3帧contexts/loss保持；整块的前置metadata校验仍会拒绝坏后行，这不等于在线输出在未来任意坏文件下保证可得。
+
+每块实际获取5原帧，G0 10网络调用/20候选状态求值；有观测4帧产生J，独立surface记录batch数/行数与返回计数一致，J states为22节点4×159=636、52节点4×339=1356。目标仅3 velocity calls/3 target states，与G0/J成本分开。部分标签第3行仍有信息与获取成本，不为少监督省略。未运行K32/8成本或测时，不用小预算估算部署速度。信息包重用时computed_in_this_objective=False记录预计算，完整runner须按实际复用/部署边界聚合成本。
+
+失败与反传：14个G1坏输入分别frame/pixels/clock/rig/noise/scale/matrix shape/nonfinite/rows/gradient/counts/无None原因/legacy anchor/SO3，均用encoder spy证明全部原信息在首次G1编码前拒绝。4个获取坏源为未冻结G0、倒序后行、noise rig不符、非typed carry，均在首次G0 encoder前拒绝。原合法缺观测matrixNone保留no_current_observation；另用controlled_surface_unavailable产生所有5行有原原因的matrixNone，目标保留原观测/标签失败和独立信息原因，无Λ回退contexts/loss等于原F0，监督0/2/4不变。回归末行反传到第0/无标签第3观测和G1 info_position/GRU，缺观测无输入梯度；target/G0/J/incomingcarry无grad，returned G0/G1 carry脱图。只验证依赖关系，无optimizer步。
+
+完善typed noise/scale及所有anchor绑定后只覆盖新路径25passed/9deselected in8.86s（含此前4项因新增约束重新覆盖）；追加非有限matrix一项1passed/34deselected in1.85s，其余新25项未重跑。默认F0原值/梯度/全缺失/非有限目标相关11passed/30deselected in2.06s，确保这次连接没有改变default。补获取前后G0权重逐值断言后仅两个22节点CFM/回归连接检查2passed/33deselected in1.97s，Ruff通过。26个新检查与11个既有F0相关检查分次覆盖，记录具体目的，未全套重跑。
+
+命令：`.\.venv-cuda\Scripts\python.exe -X utf8 -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_regression_information.py -q --tb=short -k 'G1_sequence or G1_acquisition'`；追加仅`-k 'G1_sequence_rejects and nonfinite'`，权重断言仅`-k 'G1_sequence_matches and regression and 22'`。原F0文件test_joint.py仅`-k 'causal_sequence_objective or sequence_gradient or sequence_all_missing'`；改动两文件用既有uv offline Ruff。所有人工数组临时内存、无永久数据/新JSON/验收文档。
+
+D10.4当前G0→原帧信息→G1序列CFM/回归准备路径完成。真实训练与独立噪声reference records现场均0，normalization/资产/数据/完整历史真实性、独立标签、训练授权、optimizer/checkpoint与四法实际训练评价仍缺；矩阵可用或依赖检查不证明真实手/shape/后验/精度。下一D10.5推进同组多序列训练准备与执行生命周期的剩余连接，每次只补一个实际接口缺口，训练/神经checkpoint执行仍关闭，长期目标未完成。

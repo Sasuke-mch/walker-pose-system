@@ -4521,3 +4521,11 @@ MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结�
 原3新测试均unsupported keyword失败；实现后仅3新+1原CFM测试4passed/Ruff通过。22/52、固定工程统计/rigid surface/G0 K2 steps2，真实Λ、anchor/state与CFM逐值相同，回归等于手动API；计数3calls/5states加实际J、carry恢复、缺失/理由与前置k拒绝验证。详细输入、失败、命令、边界记录MODEL_RESULTS第37节，架构第20节/D05台账、四法计划和长期协议同步，无新流程/验收材料。
 
 真实training/noise-reference records0，R_info仍须独立回归训练且共享冻结G0来源，不把同随机weights的接口测试当效能比较。变化noise的共同输入条件/校准、完整四法训练runner仍缺；下一D10.4补G1序列目标/逐帧信息来源连接，训练/checkpoint继续关闭，长期goal保持active，旧工作区改动保留。
+
+## 2026-10-13 D10.4逐帧冻结信息到G1序列目标
+
+预登记后扩展现有train.py：SequenceInformation、observation-only acquire_sequence_information、可选sequence_objective information。冻结eval G0仅按全部原观测获取J，无标签/目标反馈；G0/J carry脱图，原信息快照/scale/当前anchor绑定及计数在G1编码前逐行检查。合法None保留原原因并沿原无Λ回退；bad binding/未冻结/矩阵错误明确拒绝。CFM/回归共享同原帧信息，目标和Λ不反传，F0默认与SO3F0拒绝信息合同保留。
+
+初4新项因缺接口ImportError失败，补齐后通过；新约束/梯度/未来/分块/失败/前置拒绝共26新项分次通过，原F0相关11项通过/Ruff通过。人工22/52、5原帧、G0 K2 steps2、rigidT-only surface，监督0/2/4但5行获取与状态均保留，G0 10calls/20states和真实J计数独立记录；precomputed信息不视作部署免费输入。MODEL_RESULTS第38节、架构第21节/D10台账、长期协议同步，记录原失败与完整边界，无新流程/审计材料。
+
+真实training/noise-reference records0，来源/历史/资产真实性、四法训练runner与独立效能仍未完成，无optimizer/checkpoint/主线改动。下一D10.5补同组多序列准备和执行生命周期的剩余连接，一次一个可检查接口；训练执行继续关闭，长期goal保持active，既有工作区改动保留。

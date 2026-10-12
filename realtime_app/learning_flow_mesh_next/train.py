@@ -8,8 +8,12 @@ import numpy as np
 import torch
 
 from .data_firewall import Labels, validate_manifest
+from .geometry_information import Information, local_information
+from .geometry_observation import NoiseModel, check_rig
+from .input_binding import require_information_binding
 from .joint_flow import JointFlow, ModelConfig, cfm_loss, regression_loss
 from .schema import Observation, TemporalState, Topology
+from .tangent import TangentScale
 
 
 def configuration():
@@ -114,8 +118,109 @@ class SequenceObjective:
     resources: dict
 
 
-def sequence_objective(mode, model, chunk, normalization, state=None, *, generator=None):
-    """Causal F0 target path with TBPTT carry; no optimizer or checkpoint I/O.
+@dataclass(frozen=True)
+class SequenceInformation:
+    """Original-row acquisition evidence; declarations do not certify history or assets."""
+    frames: tuple[Information, ...]
+    anchor_resources: tuple[dict, ...]
+    cameras: tuple
+    noise: NoiseModel
+    scale: TangentScale
+    state: TemporalState
+
+    def validate(self, observations, topology):
+        if not isinstance(self.noise, NoiseModel) or not isinstance(self.scale, TangentScale):
+            raise TypeError("typed acquisition noise and tangent scale required")
+        if len(self.frames) != len(observations) or len(self.anchor_resources) != len(observations):
+            raise ValueError("information requires every original observation row")
+        self.scale.validate(topology)
+        for obs, info, resources in zip(observations, self.frames, self.anchor_resources):
+            if not isinstance(info, Information):
+                raise TypeError("typed original Information required")
+            expected = {"identity": obs.identity, "sequence": obs.sequence, "frame": obs.frame,
+                        "timestamp": obs.timestamp, "camera_ids": list(obs.camera_ids),
+                        "operator": obs.operator, "source": obs.source}
+            if info.provenance != expected:
+                raise ValueError("sequence information observation provenance mismatch")
+            require_information_binding(info, obs, self.cameras, self.noise)
+            if info.diagnostics.get("candidate_current_observation_binding") != "verified":
+                raise ValueError("unverified sequence candidate observation binding")
+            if (info.scale.shape != self.scale.values.shape
+                    or not torch.equal(info.scale.to(self.scale.values), self.scale.values)):
+                raise ValueError("sequence information coordinate scale mismatch")
+            if info.noise_source != self.noise.source or info.calibrated != self.noise.calibrated:
+                raise ValueError("sequence information noise declaration mismatch")
+            for value in (info.matrix, info.jacobian, info.scale, info.anchor_rotation):
+                if value is not None and value.requires_grad:
+                    raise ValueError("sequence information must be frozen")
+            if info.matrix is None:
+                if not info.reasons:
+                    raise ValueError("unavailable information requires original reasons")
+            elif (info.matrix.shape != (topology.tangent_dimensions,)*2
+                  or not torch.isfinite(info.matrix).all() or not torch.allclose(info.matrix, info.matrix.T)
+                  or info.anchor_id is None or info.anchor_rotation is None
+                  or info.anchor_rotation.shape != (topology.nodes, 3, 3)):
+                raise ValueError("invalid or unverified sequence information")
+            for record, keys in ((resources, ("network_calls", "candidate_state_evaluations")),
+                                 (info.resources, ("decoder_batch_calls", "decoder_state_evaluations"))):
+                if any(type(record.get(key)) is not int or record[key] < 0 for key in keys):
+                    raise ValueError("explicit original acquisition counts required")
+        return self
+
+    def counts(self):
+        return {"G0_network_calls": sum(r["network_calls"] for r in self.anchor_resources),
+                "G0_candidate_state_evaluations": sum(r["candidate_state_evaluations"] for r in self.anchor_resources),
+                "J_decoder_batch_calls": sum(info.resources["decoder_batch_calls"] for info in self.frames),
+                "J_decoder_state_evaluations": sum(info.resources["decoder_state_evaluations"] for info in self.frames),
+                "available_information_frames": sum(info.matrix is not None for info in self.frames),
+                "unavailable_information_frames": sum(info.matrix is None for info in self.frames),
+                "computed_in_this_objective": False}
+
+
+def acquire_sequence_information(g0, observations, normalization, scale, surface, cameras, noise, state=None,
+                                 *, anchor_k=32, steps=8, jacobian_step=1e-4):
+    """Acquire frozen information from observations only, never from target labels."""
+    from .candidate_store import infer
+
+    if state is not None and not isinstance(state, TemporalState):
+        raise TypeError("typed acquisition carry required")
+    if g0.training or any(parameter.requires_grad for parameter in g0.parameters()):
+        raise ValueError("explicit frozen eval G0 required")
+    if not 1 <= len(observations) <= configuration()["unroll"]:
+        raise ValueError("one to32 original acquisition observations required")
+    normalization.validate()
+    if normalization.topology != g0.topology:
+        raise ValueError("acquisition normalization topology mismatch")
+    scale.validate(g0.topology)
+    previous = state
+    for obs in observations:
+        if not isinstance(obs, Observation):
+            raise TypeError("typed acquisition observation required")
+        check_rig(obs, cameras)
+        noise.validate_for(obs)
+        first = observations[0]
+        if (obs.identity, obs.sequence, obs.camera_ids) != (first.identity, first.sequence, first.camera_ids):
+            raise ValueError("one acquisition observation stream required")
+        if previous is not None:
+            previous_frame = previous.last_frame if isinstance(previous, TemporalState) else previous.frame
+            previous_time = previous.last_timestamp if isinstance(previous, TemporalState) else previous.timestamp
+            if ((previous.identity, previous.sequence, previous.camera_ids) != (obs.identity, obs.sequence, obs.camera_ids)
+                    or obs.frame <= previous_frame or obs.timestamp <= previous_time):
+                raise ValueError("incompatible or nonincreasing acquisition stream; explicit reset required")
+        previous = obs
+    state = None if state is None else state.detached()
+    frames, resources = [], []
+    with torch.no_grad():
+        for obs in observations:
+            anchor, state = infer(g0, normalization, obs, state, k=anchor_k, steps=steps, stream="G0")
+            frames.append(local_information(anchor, obs, cameras, noise, scale, surface, step=jacobian_step))
+            resources.append(anchor.resources)
+    result = SequenceInformation(tuple(frames), tuple(resources), tuple(cameras), noise, scale, state.detached())
+    return result.validate(observations, g0.topology)
+
+
+def sequence_objective(mode, model, chunk, normalization, state=None, *, generator=None, information=None):
+    """Causal F0/G1 target path with TBPTT carry; no optimizer or checkpoint I/O.
 
     Missing rows are retained and still advance observation state. Chunk means
     must be reduced with supervised_count, never with total frames or equally.
@@ -128,6 +233,12 @@ def sequence_objective(mode, model, chunk, normalization, state=None, *, generat
     chunk.validate(model.topology, normalization, state)
     if hasattr(model, "validate_normalization"):
         model.validate_normalization(normalization)
+    if information is not None:
+        if not isinstance(information, SequenceInformation):
+            raise TypeError("typed SequenceInformation required")
+        if hasattr(model, "rotation_representation"):
+            raise ValueError("SO3 F0 does not define sequence G1 information conditioning")
+        information.validate(chunk.observations, model.topology)
     state = None if state is None else state.detached()
     contexts, losses, supported, reasons = [], [], [], []
     computed_count, nonfinite = 0, False
@@ -150,6 +261,9 @@ def sequence_objective(mode, model, chunk, normalization, state=None, *, generat
         loss = context.new_full((), torch.nan)
         if usable:
             options = {"generator": generator} if mode == "CFM" else {}
+            if information is not None:
+                matrix = information.frames[index].matrix
+                options["information"] = None if matrix is None else matrix.detach()
             loss, _ = objective(mode, model, context[None], target, normalization, **options)
             computed_count += 1
             if not torch.isfinite(loss):
@@ -158,17 +272,26 @@ def sequence_objective(mode, model, chunk, normalization, state=None, *, generat
                 loss = context.new_full((), torch.nan)
         losses.append(loss)
         supported.append(usable)
-        reasons.append({"unavailable": rejected, "observation_rejection_reasons": obs.rejection_reasons})
+        row = {"unavailable": rejected, "observation_rejection_reasons": obs.rejection_reasons}
+        if information is not None:
+            info = information.frames[index]
+            row.update(information_unavailable=list(info.reasons), information_anchor_id=info.anchor_id,
+                       information_noise_source=info.noise_source, information_calibrated=info.calibrated)
+        reasons.append(row)
     frame_losses = torch.stack(losses)
     supervised = torch.tensor(supported, dtype=torch.bool, device=frame_losses.device)
     aggregate = frame_losses[supervised].mean() if supervised.any() and not nonfinite else None
+    resources = {"original_frames": len(losses), "supervised_count": int(supervised.sum()),
+                 "skipped_count": int((~supervised).sum()), "encoder_frame_calls": len(losses),
+                 "velocity_batch_calls": computed_count, "target_state_evaluations": computed_count,
+                 "nonfinite_objective": nonfinite, "optimizer_steps": 0,
+                 "checkpoint_loaded": False, "scope": "in-memory causal F0 objective; no dataset authenticity certification"}
+    if information is not None:
+        resources.update(information_acquisition=information.counts(),
+                         scope="causal G1 objective with precomputed frozen G0/J; no history/asset authenticity certification")
     return SequenceObjective(aggregate, frame_losses, torch.stack(contexts), supervised, reasons,
                              chunk.label_frames, state.detached(),
-                             {"original_frames": len(losses), "supervised_count": int(supervised.sum()),
-                              "skipped_count": int((~supervised).sum()), "encoder_frame_calls": len(losses),
-                              "velocity_batch_calls": computed_count, "target_state_evaluations": computed_count,
-                              "nonfinite_objective": nonfinite, "optimizer_steps": 0,
-                              "checkpoint_loaded": False, "scope": "in-memory causal F0 objective; no dataset authenticity certification"})
+                             resources)
 
 
 def load_registered_chunks(manifest_path, record_index, normalization, *, asset_contract,
