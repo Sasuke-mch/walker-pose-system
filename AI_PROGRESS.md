@@ -4380,3 +4380,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 用户明确回复暂无额外数据，当前validate_manifest实际training_data_ready=false、训练与噪声records0，训练/神经checkpoint开关仍关闭。将Flow/回归×无Λ/有Λ四法、fresh无Λ训练对照、15104未激活信息参数边界、共同anchor/J及实际单模型成本分别记入flow_research_plan_v1.json追加协议，K32主ES与K64预算对照区分，不用免费Λ或推理关闭G1制造公平比较。效能未运行，完整训练/四法runner仍缺。
 
 发现candidate_store.infer回归分支仍拒绝Λ；预注册后两拓扑red为2failed/4passed，最小2行修复透传且保留K1。35相关测试通过、2文件Ruff/AST通过，验证实际候选/非均匀反归一化/确定性/缺失拒绝/非法Λ和1次调用计数，707603/711443参数及值不变。test_candidates.py不存在的读取失败保留validation。详见flow_next_regression_inference_validation_v1.json和MODEL_RESULTS第20节。未训练或改正式主线，长期目标保持进行。
+
+
+## 2026-10-12 ManiPose骨架约束移植审查与COCO表面反例
+
+使用cv-paper-reader聚焦阅读ManiPose方法/理论/消融/附录及官方decoder/FK/旋转/聚合/loss/config。它是共享骨长的骨架多解方法，非SO3概率流；weighted_ave、oracle和非因果窗口/容量不同的边界保留。未运行作者网络或训练。源码范围在flow_next_pose_manifold_sources_v1.json，未声称全文/当前SOTA复现。
+
+预注册后实际本地SMPLH male/MANO与COCO regressor仅解码2合法姿态，同beta0/T不变。51内部骨段最大长度变化2.78e-16米，8条COCO表面连线最大变化6.4614mm，全项保存，数值门/解析骨段协方差恒等式/Ruff/AST通过。结果flow_next_pose_manifold_audit_v1.json；因此不加COCO骨长恒定损失或额外骨长头，不把合法表面变化称真实误差。MODEL_RESULTS第21节与架构/长期协议同步，下一步阅读实际SO3概率路径及成本；数据暂无、训练关闭、长期有效性未完成。

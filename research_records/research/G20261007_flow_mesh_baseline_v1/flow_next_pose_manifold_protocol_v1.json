@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-12",
+  "target": "ManiPose rigid-skeleton constraint transfer to current COCO17 surface operator",
+  "inputs": "actual licensed SMPLH male/MANO config assets and existing J_regressor_coco.npy; two artificial poses, same beta0/T[0,0,3]; no network",
+  "only_variable": "identity rotations versus elbows z +/-70deg, knees x60/45deg; all other state components fixed",
+  "controls": "52 internal FK joint distances to registered parents versus declared COCO17 surface limb edges on the same meshes",
+  "success": {
+    "all_rotations_and_points_finite": true,
+    "internal_bone_length_max_change_m_upper": 1e-07,
+    "surface_limb_max_change_m_lower": 0.0001
+  },
+  "coverage": "all51 internal edges and all8 declared COCO limb edges, no failure filtering",
+  "reason": "if identical beta with rigid internal bones permits surface-length changes, constant COCO limb loss would impose a different operator contract",
+  "analytic_addendum": "two2-edge populations: one ambiguous edge/one fixed edge versus both ambiguous; check mean-edge squared length = expected squared length - trace covariance; nondegenerate full pose does not force every edge to shrink",
+  "stop": "one bounded two-state decode; preserve mismatch/nonfinite/failure; do not replace generator or train a skeleton head",
+  "boundary": "operator consistency and exact identity only; no real anatomy, accuracy or learned model benefit claim",
+  "source": "paper2312.06386v2 methods3.1/3.2, theory4.1/B.1, Table4, AppendixD; official manifold decoder/FK/rotation/aggregation/config read"
+}

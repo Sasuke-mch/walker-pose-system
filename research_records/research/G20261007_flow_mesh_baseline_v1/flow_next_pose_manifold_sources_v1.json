@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-12",
+  "paper": {
+    "url": "https://arxiv.org/html/2312.06386v2",
+    "ar5iv": "https://ar5iv.labs.arxiv.org/html/2312.06386",
+    "read": "methods3.1-3.2, formal4.1 and AppendixB.1, experimental5.1-5.3 and Table4, AppendixD.1-D.4; partial focused reading, not complete paper/proof review"
+  },
+  "official_root": "https://github.com/cedricrommel/manipose",
+  "implementation_read": [
+    {
+      "path": "hpe/mh_so3_hpe/architectures/pose_decoder.py",
+      "range": "full class and forward/representation/length conversion"
+    },
+    {
+      "path": "hpe/mh_so3_hpe/architectures/utils/forward_kinematics.py",
+      "range": "entire forward_kinematics"
+    },
+    {
+      "path": "hpe/mh_so3_hpe/architectures/utils/rotation_tools.py",
+      "range": "6D normalization and conversion; hardcoded CUDA epsilon and no project-style validity output"
+    },
+    {
+      "path": "hpe/mh_so3_hpe/architectures/rmcl_manifold_mix_ste.py",
+      "range": "forward, multi-head score softmax, aggregate best_score/weighted_ave/oracle"
+    },
+    {
+      "path": "hpe/mh_so3_hpe/metrics/losses.py",
+      "range": "wta_l2_loss_and_activate_head and wta_with_scoring_loss"
+    },
+    {
+      "path": "hpe/conf/config.yaml",
+      "range": "full config; temporal243, width512/depth8; segments128/depth2; K5/TTA/scorebeta.1/smooth.5/velocity2"
+    }
+  ],
+  "comparison_scope": {
+    "state": "root-relative17-joint skeleton, shared bone lengths; not fullSMPLH52/ownT/beta state",
+    "geometry": "6D embeddings plus FK, not manifold probability flow",
+    "aggregation": "weighted_ave averages decoded coordinates; best_score selects a whole skeleton; oracle requires ground truth",
+    "training_loss": "WTA plus predicted winner score, unlike linearCFM; full supervision still required",
+    "causality": "published sequence-shared lengths and temporal243 do not establish an online causal contract",
+    "budget": "Table4 reports34.44M withK5, versus current nominal711443; no equal-resource or speed claim",
+    "metrics": "oracle coverage versus deployable aggregate distinguished; no current globalSOTA verification"
+  },
+  "source_variants": {
+    "score_loss": "paper writes cross-entropy; code uses binary_cross_entropy on softmax scores with winner one-hot, do not assume multiclassNLL implementation",
+    "FK_order": "paper Algorithm2 writes local*parent, code uses parent*local; do not transfer local pose coordinates without convention audit"
+  },
+  "derivation_limit": "strict mean-bone shrinkage requires nonzero covariance of that bone vector; a nondegenerate complete pose need not imply every bone vector has nonzero covariance; current regression optimizes packedR/T/beta, not unrestrictedCartesian joint MSE",
+  "not_executed": [
+    "author network or losses",
+    "pretrained checkpoint",
+    "Human3.6M or3DHP benchmark",
+    "training"
+  ],
+  "project_audit": "flow_next_pose_manifold_audit_v1.json uses existing decoder and local licensed assets, not author code",
+  "validation": {
+    "Ruff": "new audit Python file passed offline",
+    "AST": "passed",
+    "all51_internal_edges": "fixed-beta internal lengths preserved",
+    "all8_surface_edges": "all retained, maximum6.461397707mm change",
+    "analytic": "ambiguous-edge/fixed-edge counterexample and covariance identity passed"
+  },
+  "decision": "preserve surfaceCOCO versus internalFK distinction; do not add rigidCOCO limb loss, extra segment module or multi-head stack; retain source as strong skeletal consistency/multi-hypothesis control"
+}

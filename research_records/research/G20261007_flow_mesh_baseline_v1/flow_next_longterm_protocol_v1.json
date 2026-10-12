@@ -40,10 +40,10 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Continue bounded primary human-pose mechanism research with explicit supervision and causal requirements; prioritize whether a shared legal geometry representation can replace redundant stages. Efficacy ablations wait for data and training authorization; do not ask repeatedly for unavailable data, expand random variants, or claim four-method runner exists.",
+  "next_stage": "Review primary RiemannianFlowMatching SO3 probability path and official implementation; distinguish legal rotations/FK from probability transport, local chart limitations and solver cost before any state-representation replacement. No training or arbitrary new network modules; data remains unavailable.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 user confirmed no additional data; decisive 2x2 objective/information controls preregistered; regression infer information path fixed with2red and35green relevant tests",
+  "last_completed_stage": "2026-10-12 ManiPose focused paper/official source review and licensed surface operator counterexample: fixed-beta internal bones constant but surfaceCOCO edges change6.4614mm; no rigidCOCO constraint adopted",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

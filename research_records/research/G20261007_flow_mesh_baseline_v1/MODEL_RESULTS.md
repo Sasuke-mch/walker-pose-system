@@ -819,3 +819,20 @@ flow_next_quality_bridge_protocol_v1.json先登记精确标量检查。设真值
 新测试通过实际infer确认：非均匀Normalization后raw与直接regression逐值相等；换stream/seed仍确定；none与zeroΛ逐值相等；非零Λ实际改变输出；K2、错维度、NaN拒绝；缺观测不发布、原失败原因保留；一候选、一网络速度调用、一状态计数；参数707603/711443及参数值都不变。未用训练优化器、神经checkpoint或真实数据。审计曾读不存在的test_candidates.py，失败保留于validation，没有当作测试执行。结果见flow_next_regression_inference_validation_v1.json。
 
 当前仅有匹配对照的单帧接口，train.py依然没有数据loader/优化器/权重生命周期，完整四法训练评估runner也未实现，不能称效能消融已可运行。后续阅读仍可继续；新机制必须先说明有何可判别优势及需要什么监督，避免无数据时持续扩架构。效能验证等待资源与训练门满足；长期目标未完成。
+
+
+## 21. 2026-10-12 ManiPose骨架流形审查与真实表面算子反例
+
+按cv-paper-reader作聚焦审查：阅读[ManiPose v2](https://arxiv.org/html/2312.06386v2)3.1/3.2、4.1/B.1、5.1–5.3及Table4、AppendixD；不是全文/全部证明复现。作者模型把2D窗口映射为共享骨长与K组6D旋转，经FK得到根相对骨架；WTA训练最佳头，score预测头的胜出概率。它不是SO3概率流，也不等于解剖合法性。其结构一致性来源于rigid skeleton输出约束，缺完整T/beta/SMPLH表面语义。
+
+实际阅读作者pose_decoder、forward_kinematics、rotation_tools、rmcl_manifold_mix_ste、losses中的WTA/score与config.yaml。weighted_ave在解码坐标上求平均；best_score选一个整骨架，oracle需GT。代码score采用softmax后binary_cross_entropy，不能按多类NLL假定同一实现；论文Algorithm2的local×parent与代码parent×local顺序不同，需要坐标审计，未据此认定作者整体错误。6D转换有硬编码CUDA epsilon且没有本项目退化返回valid门，不移除现有合法性检查。源码读取范围/URL见flow_next_pose_manifold_sources_v1.json，未运行作者包/训练/权重。
+
+公平性：配置T243、旋转宽512/8层、骨长宽128/2层、K5及TTA与项目因果GRU128/Euler8不同；Table4名义34.44M与本项目711443也非同规模。Table4使用oracle，不能替代实际发布输出表现。当前3D关键点数据标签不能凭此成为完整52节点/手/beta标签。未核验当前全局SOTA，不声称复现作者指标。作为多候选强对照有价值，暂不堆其骨长网络或多头分支；CFM是否必要仍须同信息/预算效能比较。
+
+本地反例在执行前登记flow_next_pose_manifold_protocol_v1.json。audit_pose_manifold.py只解码两个完整人工姿态：同beta0、T[0,0,3]，第一组identity；第二组节点18/19绕z±70°、节点4/5绕x60/45°。实际使用已登记本地SMPLH male/MANO和J_regressor_coco.npy，CPU float64、无神经网络/优化器。全部51内部父子骨段与8条COCO四肢连线逐项保存，不筛失败；投影未执行，所有旋转通过现有SO3合法门，网格与点有限。内部骨长最大变化2.77555756e-16米；COCO连线最大变化0.006461397707米（6.4614mm），均通过预注册1e-7/1e-4门。结果见flow_next_pose_manifold_audit_v1.json；Ruff/AST通过。
+
+这证明固定体型且内部骨架刚性的合法人体仍可产生不同COCO表面连线长度。把其当刚体骨段强制恒定会改变既定观测算子的契约，不能把6.46mm称实际人体误差，也不能把骨长损失直接搬来改善重建。原SMPLH已经承担内部骨架约束，再加一个独立骨长预测头未获必要性证据。本轮不修改模型或正式主线。
+
+同时压力测试“任意非退化姿态都使每条骨段的条件均值缩短”的过强用法：对骨段向量d，精确恒等式||E[d]||²=E||d||²−trCov(d)，严格缩短需该骨段Cov非零。两组合法单位边总体分布中，一条边歧义、另一条固定时均值长度为0/1；两条都歧义时0/0。总体姿态非退化不能推出每条边都随机。该解析检查不否定作者实验，也不支持取消本项目参数回归强对照（其损失针对packedR/T/beta，并非自由Cartesian joint MSE）。
+
+决定：不接入COCO骨长恒定损失，保留真实surface与内部FK角色区分，ManiPose作为结构与决策强对照继续记录；本轮取得的是排除不合适约束的算子证据，非生成精度成果。下一阶段对SO3概率路径本身阅读原始RFM与官方实现，先检验合法旋转/可微路径是否足以支持概率与成本结论；不以骨架流形名称代替实质分析。数据门和训练关闭继续有效。

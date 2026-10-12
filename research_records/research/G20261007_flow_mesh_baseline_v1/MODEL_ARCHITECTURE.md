@@ -175,3 +175,6 @@ A7只在Rk≤minR+validation delta的近等价集合中最小化相对上次发�
 
 
 2026-10-12消融前提更新：用户确认暂无额外数据，训练与噪声参考records仍0；四法Flow/回归×无Λ/有Λ及名义容量/完整成本约束见flow_research_plan_v1.json追加消融和MODEL_RESULTS第20节。仅修复信息回归infer透传，不据接口通过提升模型效果。
+
+
+2026-10-12骨架流形移植门：同beta两合法姿态，51内部FK边长度变化约数值零，8条COCO表面边最大变化6.4614mm。因此不额外施加COCO骨长恒定，不用骨架一致性宣称SO3概率流。ManiPose作者代码/范围与实际解码反例见MODEL_RESULTS第21节。
