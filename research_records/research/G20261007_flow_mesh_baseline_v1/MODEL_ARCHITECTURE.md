@@ -163,3 +163,6 @@ A7只在Rk≤minR+validation delta的近等价集合中最小化相对上次发�
 
 
 2026-10-12输入公平性补充：G0的Observation条件不含外部NoiseModel.precision，G1经Λ间接接收；已有码origins/directions不能忽略，也不能等同完整K/D和噪声条件。变化noise的单/双阶段对照必须登记相同可用信息；相同Λ控制需计入anchor/J成本。实际sigma1/2审计见MODEL_RESULTS第16节，未新增条件模块。
+
+
+2026-10-12 Flower审查不接入新模块：其无条件先验、逐步线性求解与图像样本平均不能直接替代当前观测条件JointFlow及完整人体决策。官方源码范围、默认调用成本和CG停止表达式反例见MODEL_RESULTS第17节。后续文献检索转向直接人体/第一视角条件flow与几何表示。

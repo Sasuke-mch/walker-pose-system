@@ -1,0 +1,6 @@
+{
+  "target": "Flower source transfer audit, no upstream execution",
+  "gate": "unconditional-prior versus observation-conditional target; nonlinear operator; legal rotation state; full solve cost; actual CG stopping expression",
+  "stop": "do not integrate if assumptions differ; do not treat source bug as paper invalidity",
+  "training": false
+}

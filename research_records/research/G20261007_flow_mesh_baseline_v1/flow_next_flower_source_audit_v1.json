@@ -1,0 +1,58 @@
+{
+  "paper": "https://arxiv.org/html/2509.26287v2",
+  "read_sections": [
+    "introduction assumptions",
+    "method Gaussian approximation",
+    "Algorithm1",
+    "section6 equations21-23"
+  ],
+  "official_sources": [
+    "https://raw.githubusercontent.com/mehrsapo/Flower/main/pnpflow/methods/flower.py",
+    "https://raw.githubusercontent.com/mehrsapo/Flower/main/pnpflow/methods/flower_cov.py",
+    "https://raw.githubusercontent.com/mehrsapo/Flower/main/config/method_config/flower.yaml"
+  ],
+  "read_functions": [
+    "model_forward",
+    "BtB",
+    "cg",
+    "solve_ip"
+  ],
+  "default_config": {
+    "steps": 100,
+    "num_samples": 5
+  },
+  "source_cost": {
+    "flower": "one velocity and one CG(max50) per step/sample",
+    "flower_cov": "one velocity and two CG(max100 each) per step/sample",
+    "flower_default_velocity_calls": 500,
+    "aggregation": "arithmetic average of 5 complete image samples; cannot transplant as R6D state average"
+  },
+  "cg_expression": "r_norm.sqrt().all() < eps",
+  "minimal_expression_check": [
+    {
+      "residual_norms": [
+        1e-06,
+        1e-06
+      ],
+      "source_expression_result": false,
+      "all_norms_below_threshold": true
+    },
+    {
+      "residual_norms": [
+        0.0,
+        1.0
+      ],
+      "source_expression_result": true,
+      "all_norms_below_threshold": false
+    }
+  ],
+  "not_executed": [
+    "author package",
+    "pretrained checkpoints",
+    "image experiments",
+    "nonlinear SMPLH sampling"
+  ],
+  "decision": "do not directly integrate; approximate prior-based linear method is not drop-in observation-conditioned nonlinear JointFlow replacement",
+  "retrieval_failure": "web GitHub API internal error; public PowerShell REST tree and raw reads succeeded",
+  "validation": "two CPU float64 expression counterexamples passed; not an upstream end-to-end failure rate"
+}

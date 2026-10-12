@@ -769,3 +769,14 @@ test_identity_binding.py使用CPU float64固定seed7/19/31、全准入34槽、�
 官方实现核对：[Meta Flow Matching条件教学代码](https://facebookresearch.github.io/flow_matching/notebooks/standalone_flow_matching.html)，实际阅读conditional段Flow.forward/step、训练及采样：训练和采样均显式提供c，c与t/x在首层前拼接；step为两次速度调用的中点法，不是一次Euler。只读取源码，未运行训练、未复制代码；这是类别标签教学例，不是2603.14135作者代码或人体逆问题复现。该逆问题论文作者仓库本轮检索未定位，不声称不存在。
 
 决定：将输入信息公平性列为后续G0/G1消融前提，继续关闭训练门。下一轮回到先进论文的可迁移机制与官方实现，重点比较单模型条件化与推理时修正的目标分布、合法人体表示和总成本；不继续用条件接口检查代替效能研究。
+
+
+## 17. 2026-10-12 Flower方法与官方实现移植审查
+
+实际读取[Flower v2](https://arxiv.org/html/2509.26287v2)的先验假设、局部Gaussian近似、Algorithm1和第6节式21–23；读取[flower.py](https://raw.githubusercontent.com/mehrsapo/Flower/main/pnpflow/methods/flower.py)、flower_cov.py中model_forward/BtB/cg/solve_ip及flower.yaml。路径、范围、执行边界在flow_next_flower_source_audit_v1.json；GitHub API网页读取失败后公开REST/raw成功。未运行作者包或下载权重。
+
+其核心是无条件先验的终点估计、观测修正、时间推进；线性假设下Gaussian近似成立，非线性扩展提出额外Langevin类采样。当前JointFlow已条件于观测，不可直接当该先验；人体非线性和R6D合法性也不由线性理论覆盖。默认100步×5轨迹为500次网络调用；flower每步一次CG(max50)，cov版两次(max100各)，最后平均图像样本。少一套网络参数不代表总成本更少；本项目需完整人体候选，不能直接平均R6D。此为移植限制，未作速度实测或方法效果复现。
+
+源码CG判断r_norm.sqrt().all()<eps先产生布尔值，并非所有残差小于容差。预注册后CPU float64独立检查eps1e-5：残差[1e-6,1e-6]实际False/期望True；[0,1]实际True/期望False。两个断言通过，保留原数值；仅复现表达式，不声称已测作者整体失败率，也不因此否定论文理论。无外部写入或提交作者仓库。
+
+决定：不移植Flower端点/CG/重噪声机制。保留“区分先验与观测条件后验、计入全部求解成本”的评价原则。本轮没有修改模型。通用线性逆问题路线已出现重复的不适配，下一轮检索直接相关的人体姿态/第一视角条件flow及几何表示，优先寻找能替换当前表示或双阶段的统一机制；不继续为线性solver添加非线性修补模块。训练及正式主线继续冻结。

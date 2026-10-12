@@ -4352,3 +4352,10 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 预注册后固定obs/store/rig，sigma1→2使G0 context逐值不变、J逐值不变、Λ精确变为1/4，G1信息特征改变。审计运行通过，见flow_next_conditioning_audit_v3.json；v2旧边界文案错误保留并修正，实际只有随机encoder未训练/未采样。Ruff/AST通过。固定噪声可由权重学习，变化噪声需显式同条件对照；不能把confidence当precision，或给单模型免费缓存Λ而隐藏G0/J成本。
 
 阅读Meta官方条件FM示例实际forward/step/train/sample源码，确认c训练/采样一致与中点法双调用；未运行，不是人体逆问题复现。MODEL_RESULTS第16节、架构与长期协议同步；下一轮继续论文机制/官方实现审查，训练关闭及正式主线保留。
+
+
+## 2026-10-12 Flower论文及源码审查：不直接移植
+
+实际阅读2509.26287v2假设/Algorithm1/非线性扩展及官方flower.py、flower_cov.py、flower.yaml。默认500次速度调用加逐步CG及图像均值，不构成当前条件JointFlow的低成本替代；非线性人体/R6D合法性不由原理论覆盖。CPU float64复现源码CG先all再比容差的两种误判，证据见flow_next_flower_source_audit_v1.json；未运行作者包/训练/权重，未发外部消息。
+
+本轮只更新研究记录，无模型改动。下一轮转向直接人体/第一视角条件flow与几何表示，避免继续为通用线性solver堆非线性补丁。MODEL_RESULTS第17节及架构/长期协议同步；整体有效性仍未完成。
