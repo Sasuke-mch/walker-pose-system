@@ -40,10 +40,34 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Preregister a single conditional F0 SO3 angular-velocity/group-integration representation factor with the existing StateEncoder/Transformer, jointR/T/beta, independent matched Haar training/inference source, explicit metric and same-information regression/budget control. Use detached fixed-endpoint path preparation as bounded control, not endpoint-gradient guidance. Do not simultaneously change conditioning, add IPA/self-conditioning or claim G0/G1/J removal; training/data gates unchanged.",
+  "next_stage": "Use existing inference/resource tools to compare ambientF0, SO3F0 and their deterministic controls at identical observations/K/NFE, including outer API and complete candidate/decoder cost. No new architecture or training; do not equate head/tangent dimension savings with runtime or quality, and do not treat speed alone as permission to deleteG0/G1/J.",
+  "so3_representation_factor_20261012": {
+    "status": "opt_in_implementation_engineering_checks_passed_not_trained",
+    "mechanism": "SO3 angular velocity replaces ambient6D pose velocity; right group Euler replaces additive pose Euler, with a matched independent Haar base and linear train/inference path. This is one coherent rotation-geometry factor, not independent source/schedule tricks.",
+    "inputs": "Existing Observation/StateEncoder context, complete Labels and existing training-only Normalization. Tests use explicit analytic fixtures; no optimizer or weights.",
+    "controls": "Existing ambient F0 and same SO3 model deterministic regression using existing regression_loss; both retain original128width/4heads/4blocks and observations. Information projections remain allocated but inactive inF0; noLambda is passed.",
+    "capacity": "Only pose_out changes128to6 to128to3, reducing387parameters; remaining architecture unchanged. SO3 regression andCFM exactly same capacity; report difference from ambient rather than calling it an exact capacity match.",
+    "source": "Reuse existing per-candidate seeded6N+13 Gaussian noise, first4 iid components per rotation normalized to a unit quaternion; two unused Gaussian components per rotation do not enter dynamics. Same law used for CFM and sampling; retain explicit failure for invalid externally supplied base, never redraw.",
+    "path": "Frozen endpoint CPU SciPy principal log; R(t)=R0*Exp(t*skew(omega)), body angular targetomega. Standardized T/beta use original linear Gaussian path; no label-derived inference input.",
+    "loss": "Equal three blocks: mean angular-coordinate squared error (scaled canonical SO3 metric, fixed1rad units), standardized T3 MSE, standardized beta10 MSE. Regression retains existing standardized6D/T/beta MSE; training losses are not an efficacy comparison.",
+    "scope": "New isolated so3_flow.py; small opt-in loss dispatch and normalization/solver metadata in existing train.py/candidate_store.py; existing test_joint.py extended. No default model/config/mainline/checkpoint changes.",
+    "checks": [
+      "Frozen identity/regular/nearpi path reaches source/target; rejects endpoint gradients rather than silently using CPU detach for guidance",
+      "Constant angular/body velocity and T/beta velocity reach independently specified closed-form endpoint; right/left update convention and nonuniform normalization checked",
+      "CFM and regression finite with active gradients inpose/T/beta and Transformer; incomplete labels rejected; no optimizer updates",
+      "Existing candidate publication masks/no-current-observation and causal state reused; wrong normalization rejected; measured head capacity within ceiling",
+      "New branch and directly affected existing tests only, plus changed-file Ruff/syntax checks"
+    ],
+    "success": "A coherent opt-in angular-velocity model with same-condition regression and existing publication interface; endpoint/gradient/legal-state checks pass without extra neural modules. This does not establish accuracy, calibration, runtime or necessity ofG0/G1/J.",
+    "stop": "Stop if geometry requires extra proposal/quality models, fails legal/endpoints or exceeds capacity; at most2 reasonable revisions. Do not promote or train without existing independent data/authorization gates.",
+    "novelty": "SO3 flow matching and group integration have RFM/FrameFlow/FoldFlow precedents; this implementation alone is not a research novelty claim.",
+    "revision": 1,
+    "training": false,
+    "result": {"parameters52": 711056, "parameters22": 707216, "parameters_reduced_from_ambient": 387, "matched_SO3_regression_capacity": true, "related_tests_passed": 20, "ruff": "passed_after_import_format_fix", "efficacy_and_runtime": "not_tested"}
+  },
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 FrameFlow primary/legacy source audit: original nearpi branch fails endpoint contract; timeJVP passes. All53248 Haar sources retained; independent detached endpoint control passes. Direct branch/source/schedule transplantation stopped, no neural model changes.",
+  "last_completed_stage": "2026-10-12 opt-in SO3 F0 angular-velocity/group-Euler prototype with existing encoder/Transformer, matchedHaar source and same-capacity regression. Related20 tests pass; default two-stage and training remain closed. Efficacy/runtime unproved.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

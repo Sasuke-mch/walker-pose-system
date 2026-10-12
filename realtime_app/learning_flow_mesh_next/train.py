@@ -31,8 +31,12 @@ def prepare(manifest, nodes=52):
 
 def objective(mode, model, context, labels, normalization, **kwargs):
     if mode == "CFM":
+        if hasattr(model, "flow_loss"):
+            return model.flow_loss(context, labels, normalization, **kwargs)
         return cfm_loss(model, context, labels, normalization, **kwargs)
     if mode == "regression":
+        if hasattr(model, "validate_normalization"):
+            model.validate_normalization(normalization)
         return regression_loss(model, context, labels, normalization, **kwargs), {}
     raise ValueError("unregistered objective")
 

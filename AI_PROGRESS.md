@@ -4406,3 +4406,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 按cv-paper-reader读2310.05297方法/主要结果及官方legacy旋转、interpolant与配置。训练目标中心IGSO3、推理Haar及linear/exp日程不能混作同一源/路径；蛋白质全局中心化/IPA/自条件未引入。预注册后只AST执行11个原纯函数，35固定旋转及seed7的1024×52Haar源到I：float64端点4/35、359/53248超过容差，最大矩阵元素误差0.01977859；float32为2/35、283/53248，阈值不同。原冻端点时间JVP均通过，不能泛称导数失败。
 
 独立SciPy冻端点log+matrix_exp控制全量通过，没有拒绝/重抽；仅为CPU训练目标准备，非全局光滑log、精度或性能保证。v1/v2及全量NPZ保留，来源/函数范围/警告/初次lint修正见flow_next_frameflow_so3_sources_v1.json及MODEL_RESULTS第23节。Ruff/AST通过；按用户新增约束停止额外验收材料和检查扩展，只完成本阶段记录与提交。停止修补该作者分支；下一步预注册同条件单模型的角速度/群积分表示替换，保留观测/容量/预算及强回归，不同时改变信息或删去G0/G1/J。现有模型/正式主线未变，训练继续关闭，长期有效性未完成。
+
+## 2026-10-12 SO3单模型表示替换候选：已实现，未训练
+
+在已有长期协议预注册后实现SO3JointFlow：复用StateEncoder/Transformer和T/beta，仅pose_out6→3、角速度右乘群Euler；Haar源与linear日程在训练/采样一致，冻端点CPU SciPy log只准备目标。公开完整参数经绑定Normalization接回CandidateStore；同网络回归沿用现有损失，错配codec/Lambda/非法源显式拒绝。52/22参数711056/707216，比原各少387，15104信息参数仍不激活；不据此宣称速度、精度或创新。
+
+相关test_joint/test_regression_information实际20通过，近π路径、右更新、非均匀标准化、梯度和既有因果/缺失发布均检查。首次两处导入格式Ruff修正后通过，未重复功能检查或建立额外快照/报告。MODEL_ARCHITECTURE第13节、MODEL_RESULTS第24节保存边界。默认工厂/双阶段/正式主线与训练关闭保留；下一阶段用现有资源工具核算完整单模型生成/解码成本，再判断表示因素是否值得保留，独立数据门仍缺，整体目标未完成。

@@ -109,6 +109,8 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
           information=None, stream="G0", regression=False):
     if normalization.topology != model.topology:
         raise ValueError("inference normalization topology mismatch")
+    if hasattr(model, "validate_normalization"):
+        model.validate_normalization(normalization)
     start = time.perf_counter()
     if observation.xy.is_cuda:
         torch.cuda.synchronize()
@@ -133,7 +135,7 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
     elapsed = time.perf_counter() - start
     resources = {"network_calls": calls, "candidate_state_evaluations": calls*k,
                  "encoder_ms": (encoded_at-start)*1000, "total_ms": elapsed*1000,
-                 "solver": "regression" if regression else "Euler", "k": k,
+                 "solver": "regression" if regression else getattr(model, "solver_name", "Euler"), "k": k,
                  "steps": calls, "tta": False}
     provenance = {"identity": observation.identity, "sequence": observation.sequence,
                   "frame": observation.frame, "timestamp": observation.timestamp,
@@ -143,6 +145,8 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
                                    ("present", "quality", "geometry", "views")},
                   "normalization_source": normalization.source, "stream": stream,
                   "information_encoding": model.config.information_encoding}
+    if hasattr(model, "rotation_representation"):
+        provenance["rotation_representation"] = model.rotation_representation
     provenance["observation_binding"] = observation_snapshot(observation)
     provenance.update(timestamp_kind=observation.timestamp_kind,
                       view_timestamps=observation.view_timestamps)

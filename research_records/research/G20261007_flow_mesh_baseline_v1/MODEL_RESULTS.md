@@ -1,6 +1,6 @@
 # Flow Matching 模型结果详细记录与解释
 
-更新时间2026-10-12。配套 [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md)。本文件读取已保存产物和当前源码；本次没有重跑历史训练、360重放、采样或测速，也未加载神经权重。唯一本轮架构执行是创建随机模块统计参数；当前原帧评价导出新增检查为106项通过。下列数字须按各自实验条件理解，不拼成同一个模型的训练结果。
+更新时间2026-10-12。配套 [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md)。各节按实际执行条件持续追加；历史训练、360重放及测速在本阶段未重跑，未加载神经权重。本阶段新增SO3候选的工程检查见第24节，早先106项评价检查保留为当时的范围。下列数字不拼成同一个模型的训练结果。
 
 ## 1. 总判断与证据层次
 
@@ -876,3 +876,18 @@ v1/v2原结果与数值/非有限证据保留，Ruff/AST、普通log/概率抽�
 独立控制仅对固定端点用SciPy principal rotvec，R(t)=R0·matrix_exp(t·skew(omega))，omega冻结；其值检查不要求端点梯度。这里的pi分支仍非唯一，CPU准备不能冒充全局光滑/可微guidance算子，也未证明最快。v1/v2完整JSON与同名NPZ保留；仅本地保存约10MB数组，包含所有源、作者端点/log/误差/合同和对照log。初次Ruff的导入、typing和受控AST执行标记已修正并复跑v2，端点计数和最大误差与v1相同；Ruff/AST通过，5项作者docstring SyntaxWarning保留，未修作者源码。检查仅用于回答路径端点是否一致，未另建验收报告或执行全模型测试。
 
 决定：关闭原FrameFlow分支和源/日程tricks的直接移植，不继续修补作者分支；保留SO3角速度及群积分作独立表示因素。下一阶段可预注册同条件F0的SO3版本：相同StateEncoder/Transformer、R/T/beta联合状态、匹配Haar训练/推理源、相同预算及回归对照，先用固定端点控制检验目标/积分。不要同时改变观测信息、加入IPA/自条件或声称已删去G0/G1/J；其效能仍需当前缺失的数据与训练授权。当前JointFlow、正式主线和训练关闭不变。
+
+## 24. 2026-10-12 单模型SO3角速度候选：实现检查通过，效能未测
+
+先在已有flow_next_longterm_protocol_v1.json的so3_representation_factor_20261012登记唯一因素和停止条件，再新增so3_flow.py。SO3JointFlow继承现有core，pose_out由6维缩为3维，保持StateEncoder/Transformer/T/beta。内部合法矩阵列+标准化辅助量组成网络输入，body角速度作右乘群Euler，公开输出转换回绑定Normalization供现有CandidateStore读取。默认欧氏模型、G0/G1/J、数据门与训练工厂保留；单模型本身已有F0先例，不把这一候选视为已删除双阶段的成果。
+
+源使用现有固定候选seed的前4个独立Gaussian分量/节点归一化四元数，训练与采样均Haar、线性日程；不用原FrameFlow的目标中心IGSO3或指数推理。冻结端点由SciPy准备principal omega，不对端点求梯度；网络和群采样仍由Torch反传。角速度MSE按每坐标均值取固定1rad单位，T/beta标准化照旧。强确定性对照使用同一模型和现有regression_loss，CFM/回归优化的量不同，训练损失不能作为优势证据。RFM/FrameFlow已涵盖旋转流机制，本次没有新颖性结论。
+
+本次只运行test_joint.py与直接受objective/infer改动影响的test_regression_information.py：20 passed in 2.82s。既有因果/序列化、无观测不发布测试增加SO3分支；新问题对应检查为22/52节点近π端点和时间导数、非交换源旋转下右更新闭式结果、非均匀输出标准化、CFM/回归/采样梯度、不完整标签拒绝、codec错配与Lambda/非法源拒绝。所有矩阵检查是数学/接口证据，没有新人体训练数据、optimizer、checkpoint、原视频重放或真实mesh解码。首次Ruff仅两处长导入格式错误，修正后四个改动Python文件通过；未为导入换行重复功能测试，也未执行全套或新建验收报告。
+
+|候选|完整52节点参数|部分22节点参数|生成/点预测调用|
+|---|---:|---:|---|
+|原ambient F0|711443|707603|8步默认Euler或1次回归|
+|SO3 F0及其同容量回归|711056|707216|8步默认LieEuler或1次回归|
+
+387参数差异来自输出头，不能称与原ambient严格等容量。SO3内部保存3×3矩阵，matrix_exp及CPU训练目标准备有额外代价，未测内存/耗时，不据169维速度声称更快。当前仍缺独立训练与噪声标签；下一步只核算同观测、同K/NFE和完整候选/解码的实际成本，使用现有资源工具，优先判断这个表示因素是否值得保留。成本通过也不能替代既有heldout效能门，未证明G0/G1/局部信息必要或不必要，长期目标未完成。
