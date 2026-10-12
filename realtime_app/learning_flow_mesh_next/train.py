@@ -33,7 +33,7 @@ def objective(mode, model, context, labels, normalization, **kwargs):
     if mode == "CFM":
         return cfm_loss(model, context, labels, normalization, **kwargs)
     if mode == "regression":
-        return regression_loss(model, context, labels, normalization), {}
+        return regression_loss(model, context, labels, normalization, **kwargs), {}
     raise ValueError("unregistered objective")
 
 

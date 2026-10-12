@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-12",
+  "stage": "matched_information_regression_control",
+  "input": "existing JointFlow, analytic labels and fixed information tensors",
+  "problem": "train.objective regression silently discards information kwargs; regression lacks an information path",
+  "only_variable": "forward optional frozen information through regression and its objective",
+  "controls": ["existing regression without information", "explicit velocity at state zero and time one", "zero information", "malformed information and unexpected kwargs"],
+  "success": ["default outputs exactly unchanged", "information changes outputs and trains existing information projections through numerical backward only", "information remains detached", "malformed information and unexpected options rejected", "parameter count unchanged"],
+  "stop": "preserve failures; do not commit until related checks pass",
+  "prohibitions": ["optimizer steps", "training", "checkpoint loading", "mainline edits", "efficacy claims"],
+  "boundary": "fairer control interface only, not trained regression or architecture improvement evidence"
+}

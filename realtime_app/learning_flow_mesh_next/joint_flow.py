@@ -76,10 +76,10 @@ class JointFlow(nn.Module):
         return torch.cat((self.pose_out(tokens[:, :n]).flatten(1),
                           self.position_out(tokens[:, n]), self.shape_out(tokens[:, n+1])), -1)
 
-    def regression(self, context):
+    def regression(self, context, information=None):
         # Same registered core and exact parameter count; only the objective changes.
         return self.velocity(context.new_zeros(len(context), self.topology.dimensions),
-                             context.new_ones(len(context)), context)
+                             context.new_ones(len(context)), context, information)
 
     def sample(self, context, initial, *, steps=8, information=None):
         if not isinstance(steps, int) or steps < 1 or not torch.isfinite(initial).all():
@@ -109,10 +109,10 @@ def cfm_loss(model, context, labels, normalization: Normalization, *, generator=
     return sum(parts.values()) / 3, parts
 
 
-def regression_loss(model, context, labels, normalization):
+def regression_loss(model, context, labels, normalization, *, information=None):
     target, _ = labels.packed(require_complete=True)
     if labels.topology != model.topology or normalization.topology != model.topology:
         raise ValueError("regression topology mismatch")
-    error = (model.regression(context) - normalization.normalize(target)).square()
+    error = (model.regression(context, information) - normalization.normalize(target)).square()
     n = model.config.nodes*6
     return (error[:, :n].mean() + error[:, n:n+3].mean() + error[:, -10:].mean())/3

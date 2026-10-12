@@ -110,7 +110,7 @@ Sβ=Λββ−Λβu pinv(Λuu)Λuβ只作为局部诊断；Gram会平方J条件�
 
 标准化目标x来自完整标签R/T/β；Normalization仅允许train真实声明统计，工程fixture单位常数不是训练配置。ε~N(0,I)，s~Uniform[0,1]，z_s=(1−s)ε+sx，目标速度x−ε。L=(mean_pose MSE + mean_T MSE + mean_beta MSE)/3，各块按自身维数平均，避免312维pose自动压过3维T与10维β。
 
-同capacity regression使用同速度网络、输入状态0和s=1，经block平均MSE训练；当前regression接口无Λ参数，是单确定性控制，不是G1完整信息条件回归对照。CFM没有默认endpoint MSE、best-of-K loss或独立网格损失。
+同capacity regression使用同速度网络、输入状态0和s=1，经block平均MSE。2026-10-12已补齐可选information接口：regression、regression_loss与train.objective透传同一冻结Λ，复用原信息投影和全部参数；默认不传Λ与旧输出逐值一致。该接口使信息条件回归对照可执行，尚未训练；如比较G1，仍须匹配G0生成anchor/J的完整成本和条件来源，不能只匹配单网络参数。CFM没有默认endpoint MSE、best-of-K loss或独立网格损失。
 
 预置AdamW、lr3e-4、weight_decay0.01、clip1、warmup1000、cosine、effective_batch16、unroll32、smoke2000/main50000、validation每1000、seeds7/17/27。`train.py`只有configuration/prepare/objective，无真实数据loader/optimizer循环/训练checkpoint生命周期；以上均未执行。用户未授权训练、motion labels未取得，不能凭配置声称可学习性或完整复现。
 

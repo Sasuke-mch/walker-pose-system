@@ -4299,3 +4299,12 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 只审计当前0.004/C300缓存raw/smoothed，不拟合、不改页面。audit_ankle_phase固定424中间帧相同支持区间检查−10..10位移：左右视图左踝最佳+2，右踝−1/0；原/平滑完全相同，左踝相关提升仅约0.013..0.016，无统一固定帧索引后移证据。391原左踝仍119.33/101.36px模型残差，同2D DLT回投7.42/5.79px，说明目标已动但拟合未贴合；先前相对踝幅度只有62%–69%，主要视觉落后兼有轻微左侧相位不一致。
 
 软二维目标、Huber尾部、全身VPoser/根/共享形状折中允许大局部残差；body temporal关闭，双侧显示平滑并不增加统一因果延迟，Stage缓冲和显示用同帧/同变换。不能把最佳+2诊断称硬件延迟或自动移帧。记录同实验ankle_phase_audit.json与现有算法文档追加；全448ID/支持、finite与AST检查通过。小源码/JSON/文档本地提交，92原改动保留，不推送。
+
+
+## 2026-10-12 长期目标首轮：双阶段审查与公平回归对照
+
+按用户纠正停用六小时automation，当前聊天使用连续active goal。核对最新JointFlow架构/结果/协议和G0/G1源码；精读2609.12953算子条件速度与2502.02150能量guidance正文，后者官方README已核对，作者具体源码仍待读。G1的Λ没有增加独立测量，但可能提供几何归纳偏置，不能据此直接删掉G1；线性算子论文不覆盖SMPL-H非线性鱼眼后验保证。停止天然增信息论证，下一阶段审查单生成器中残差/算子是否足够及完整成本。
+
+修复train.objective regression静默忽略information：regression/loss透传冻结Λ，使用原projection，不增参数；未知选项拒绝。先落flow_next_regression_information_protocol_v1.json。新增4测试、targeted9及完整next110实际通过，22/52默认及zero信息逐值不变、参数707603/711443不变、条件梯度与detach检查通过；无优化器/训练/checkpoint。ruff环境首次缺包失败保留，离线uv工具四文件lint通过。audit_conditioning.py实际执行：同曲率相反修正，以及条件后验再乘同似然的mean/variance从0.5/0.5变为2/3、1/3；不把标量反例称人体效能，不认定A6决策已重加权分布。
+
+现有MODEL_ARCHITECTURE/MODEL_RESULTS与longterm_protocol同步；完整来源、输入、代码/命令、结果/失败见同研究目录flow_next_regression_information_validation_v1.json和flow_next_conditioning_audit_v1.json。先保留G1为待验证候选；未通过非线性合法性和完整预算前不新增网络。正式主线与原工程结果不变，不重复重放/测时；独立数据、训练和真实效果仍待，长期goal保持active。

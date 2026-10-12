@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-12",
+  "protocol": "flow_next_regression_information_protocol_v1.json",
+  "targeted": {"command": ".venv-cuda/Scripts/python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_regression_information.py realtime_app/learning_flow_mesh_next/tests/test_joint.py -q", "passed": 9},
+  "full_related": {"command": ".venv-cuda/Scripts/python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests -q", "passed": 110},
+  "lint": {"first_attempt": "environment Python: No module named ruff", "final_command": "uv tool run --offline ruff check realtime_app/learning_flow_mesh_next/joint_flow.py realtime_app/learning_flow_mesh_next/train.py realtime_app/learning_flow_mesh_next/audit_conditioning.py realtime_app/learning_flow_mesh_next/tests/test_regression_information.py", "status": "passed"},
+  "analytic": {"command": ".venv-cuda/Scripts/python.exe -B -m realtime_app.learning_flow_mesh_next.audit_conditioning --output research_records/research/G20261007_flow_mesh_baseline_v1/flow_next_conditioning_audit_v1.json", "result": "exact scalar assertions passed"},
+  "training": false,
+  "optimizer_steps": 0,
+  "checkpoint_loaded": false,
+  "parameters52": 711443,
+  "parameters22": 707603,
+  "mainline_changed": false,
+  "efficacy_verified": false,
+  "whole_goal_complete": false
+}

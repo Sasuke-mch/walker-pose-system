@@ -32,7 +32,21 @@
     "remote push",
     "claiming real accuracy from engineering fixtures"
   ],
-  "followup": {
+  "first_stage": {
+    "target": "threshold-dependent false shape information audit",
+    "inputs": "explicit analytic whitened Jacobians and existing local_information output",
+    "control": "Gram Schur pseudoinverse and historical single-threshold whitened-J audit",
+    "only_variable": "additional direct SVD nuisance projection and rank threshold sensitivity; generator, Lambda and A6/A7 choices unchanged",
+    "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
+    "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
+  },
+  "next_stage": "Read author operator/guidance implementations; audit nonlinear residual-aware single-generator alternatives with complete cost and target-distribution checks. No new architecture until analytic and legality counterexamples pass; training remains closed.",
+  "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
+  "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
+  "last_completed_stage": "2026-10-12 matched information-regression interface; 110 tests; analytic conditioning audit; effectiveness unverified",
+  "architecture_document": "MODEL_ARCHITECTURE.md",
+  "detailed_results_document": "MODEL_RESULTS.md",
+  "historical_scheduled_followup": {
     "automation_id": "flow-matching",
     "every_hours": 6,
     "notify_only": [
@@ -42,18 +56,9 @@
     ],
     "no_actionable_change": "quiet; do not repeat passed checks"
   },
-  "first_stage": {
-    "target": "threshold-dependent false shape information audit",
-    "inputs": "explicit analytic whitened Jacobians and existing local_information output",
-    "control": "Gram Schur pseudoinverse and historical single-threshold whitened-J audit",
-    "only_variable": "additional direct SVD nuisance projection and rank threshold sensitivity; generator, Lambda and A6/A7 choices unchanged",
-    "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
-    "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
-  },
-  "next_stage": "Maintain verified architecture/results with every substantive update. Resume dependent efficacy paths only on new licensed references, explicit training authorization or reproduced actionable defect; do not add variants or repeat passing audits to substitute for missing evidence.",
-  "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
-  "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "flow_next_documentation_checks_v1.json: dedicated detailed architecture/result files with current parameter ledger and original saved numerical outcomes; no efficacy claim",
-  "architecture_document": "MODEL_ARCHITECTURE.md",
-  "detailed_results_document": "MODEL_RESULTS.md"
+  "followup": {
+    "mode": "continuous_thread_goal",
+    "status": "active",
+    "scheduled_automation": "paused_by_user_correction_20261012"
+  }
 }

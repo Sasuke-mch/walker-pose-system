@@ -686,3 +686,19 @@ frozen validation fixture：train seed21、holdout seed23，各2048帧，已知s
 继续FM研究方向及同规模强对照，但停止当前sketch晋升，不替换mainline。两次performance revision规则尚未消耗为真实效果改版：工程修复不算性能回合。后续只有新数据/授权或可复现缺陷允许推进相应可验收工作；不能不断叠架构或重复工程通过来宣称长期目标达到。
 
 维护要求：每新实验追加输入/范围/模型/种子/预算/对照/数值/失败/CI单位/资源/结论，单独写未执行和旧版本边界。历史结果不可更名为新模型结果，速度重测不可抹去旧失败。独立数据门缺失时，只能给出工程结论。
+
+## 11. 2026-10-12 双阶段必要性审查与信息条件回归修复
+
+协议flow_next_regression_information_protocol_v1.json先于修改落盘。本轮实际核对pipeline.py、state_encoder.py、geometry_information.py、information_encoding.py、joint_flow.py与train.py。G0候选、anchor与Λ来自同一观测历史和已有rig/noise/surface；条件于这些来源及独立采样随机数，计算Λ不会新增独立测量。显式几何表示仍可能补偿encoder压缩、提供原encoder未完整编码的算子或噪声信息，不能从数据处理关系直接推出G1无用或两者上下文等价。
+
+核对到可复现接口缺口：objective("regression", ..., information=Λ)原先静默丢弃kwargs，regression也没有信息参数。现已透传冻结Λ并拒绝意外选项，复用原投影。新增4个测试：22/52节点默认及零信息逐值相等、完整objective与手算分块loss相等、三个信息projection梯度非零而Λ无梯度且参数未更新、非法信息与拼错参数拒绝。完整next测试实际110 passed；参数仍707603/711443。只做数值反传，没有优化器、训练或checkpoint。首次环境内ruff缺包退出；随后uv tool run --offline ruff对四个改动Python文件通过。未安装新依赖。旧106测试是历史范围，不能用本轮覆盖更新其历史结果。
+
+audit_conditioning.py执行并独占保存flow_next_conditioning_audit_v1.json。固定anchor=0、y=x+eta、W=1，y=-1/+1的曲率均1，梯度+1/-1，修正-1/+1；只证明曲率不包含残差方向，当前context仍读取y，不是整个G1输入不可区分的反例。先验N(0,1)、y=1、噪声方差1，正确后验mean/variance=0.5/0.5，再乘同一似然后变为2/3、1/3，方差相对减少1/3。它警示未来guidance目标的重复条件化；当前A6是动作风险，不据此认定A6已改变生成分布。
+
+论文证据及适配决定：
+
+- [Fast and Faithful](https://arxiv.org/html/2609.12953v1)，实际阅读3.1–3.4、式12–23与附录D：将观测算子置入速度估计，内循环共享权重。其线性算子/高斯噪声前提及多次内部求解，不能迁移为本项目非线性鱼眼算子的后验保证或低成本保证。只保留“单生成器中显式残差/算子”作为待检验方向；官方算法文本已读，未核验作者实现源码、未复现性能。
+- [On the Guidance of Flow Matching](https://arxiv.org/html/2502.02150v3)，实际阅读3.1–3.2、式1–3及近似条件，并核对[作者仓库说明](https://github.com/AI4Science-WestlakeU/flow_guidance)。guidance指定的是对基准分布的能量倾斜，不能直接把已有观测条件后验当无条件先验再次加同一似然。作者README训练/评价路径已核对，具体guidance源码尚未核验、未运行。
+- 新检索到2610.02377，但HTML读取失败，仅保留待读线索；不计为精读成果，不据摘要作实现决定。
+
+继续/停止决定：停止“两个生成器天然增加独立观测信息”的论证；保留G1为未证实的表示/归纳偏置候选。先补齐强回归对照，再审查单生成器的残差方向、完整耦合及算子成本，未通过数学/合法性/预算门前不新增网络。旧profile的J p50约270.20ms、全链p95约385.41ms来自保存测时，本轮没有重测；逐步调用算子可能更慢。创新不能只写“FM+几何guidance”，已有工作已覆盖此通用机制。下一阶段先核对作者具体实现，并对非线性局部更新构造可失败的对照；真实效能门、三seed独立标签和30fps仍未通过。

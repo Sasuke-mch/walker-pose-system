@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-12",
+  "kind": "exact_scalar_analytic_counterexamples",
+  "curvature_only": {
+    "model": "y=x+eta, W=1, anchor=0",
+    "cases": [
+      {
+        "measurement": -1,
+        "anchor": 0,
+        "curvature": 1,
+        "gradient": 1,
+        "gauss_newton_step": -1
+      },
+      {
+        "measurement": 1,
+        "anchor": 0,
+        "curvature": 1,
+        "gradient": -1,
+        "gauss_newton_step": 1
+      }
+    ],
+    "conclusion": "curvature alone has no residual direction; current context also contains observations, so this is not a full G1 indistinguishability claim"
+  },
+  "likelihood_reuse": {
+    "prior": "N(0,1)",
+    "measurement": 1,
+    "noise_variance": 1,
+    "once": {
+      "mean": 0.5,
+      "variance": 0.5
+    },
+    "twice": {
+      "mean": 0.6666666666666666,
+      "variance": 0.3333333333333333
+    },
+    "variance_relative_change": -0.3333333333333333,
+    "conclusion": "ideal observation-conditional posterior multiplied by the same likelihood changes its target; this is not evidence that present A6 decision risk reweights the generator"
+  },
+  "boundary": "no neural model, data replay, training, posterior calibration or measured runtime improvement",
+  "next": "audit residual-aware operator conditioning on current nonlinear endpoint with legality and total-cost controls before any new generator"
+}
