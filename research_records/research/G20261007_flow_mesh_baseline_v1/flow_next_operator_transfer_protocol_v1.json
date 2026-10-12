@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-12",
+  "stage": "operator_transfer_counterexamples",
+  "input": "actual geometry_observation.project with analytic single point and declared synthetic Camera; legal rotations about z",
+  "unique_variable": "unprotected full Gauss-Newton step versus fixed finite backtracking; no learned generator changed",
+  "controls": ["zero update", "linearized predicted decrease", "actual nonlinear residual", "individual legal rotation states versus their arithmetic 6D mean"],
+  "success": ["reproduce actual nonlinear residual increase despite linearized zero residual", "bounded backtracking returns a legal decreasing point or explicit failure", "reproduce degenerate mean of individually legal rotations"],
+  "stop": "do not integrate a geometry-guided generator from these fixtures; preserve all attempted steps and rejections",
+  "boundary": "counterexamples and transfer restrictions only; no neural weights, training, independent accuracy, posterior guarantee or speed claim"
+}

@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-12",
+  "sources": [
+    {
+      "paper": "On the Guidance of Flow Matching",
+      "url": "https://arxiv.org/html/2502.02150v3",
+      "author_repository": "https://github.com/AI4Science-WestlakeU/flow_guidance",
+      "files_actually_read": [
+        {"url": "https://raw.githubusercontent.com/AI4Science-WestlakeU/flow_guidance/main/image/gflow_img/inverse/inverse_problems.py", "lines_total": 396, "ranges": [[112,175],[248,292],[325,351]], "symbols": ["get_J", "guide_fn", "solve_ip_pgdm", "mc_guide_fn"]},
+        {"url": "https://raw.githubusercontent.com/AI4Science-WestlakeU/flow_guidance/main/synthetic/guided_flow/guidance/gradient_guidance.py", "lines_total": 25, "ranges": [[1,25]], "symbols": ["wrap_grad_fn"]}
+      ],
+      "source_discovery": "public GitHub recursive tree API; main branch paths, not immutable snapshot",
+      "findings": [
+        "guide_fn distinguishes energy gradient at current state, energy gradient at estimated endpoint, and derivative through endpoint prediction to current state",
+        "estimated endpoint is xt+(1-t)*v; derivative through predictor recomputes the model and differs from endpoint gradient",
+        "PiGDM applies a model VJP; PiGDM+ drops that VJP; inverse solves are image-operator specific",
+        "MC branch uses terminal support, path weights and normalized energy weights, not simple best-of-K reprojection selection",
+        "guidance scale and time schedule are explicit hyperparameters"
+      ],
+      "transfer": "Do not equate these gradients, reuse image operator inverses for SMPLH/fisheye, or report MC guide as existing A6 decision.",
+      "execution": "source inspection only; no author code imported or run",
+      "failures": ["web tree URL restricted; succeeded via public GitHub API and raw source requests"]
+    },
+    {
+      "paper": "Fast and Faithful: Principled Conditional Flow Matching for Inverse Problems",
+      "url": "https://arxiv.org/html/2609.12953v1",
+      "read": "Appendix B.1-B.3 equations69-80 and Algorithm3, Appendix D network/solver",
+      "findings": ["linear Gaussian normal-equation solve followed by shared learned estimator and damping", "each velocity evaluation uses K data-consistency solves and K estimator calls, default K=5", "parameter sharing reduces unique parameters but not number of network evaluations", "exact posterior-mean theorem does not certify arbitrary finite learned HQS iterate"],
+      "transfer": "retain shared-weight operator-aware design as research lead, stop direct linear-HQS transplantation and unqualified speed/posterior claims",
+      "author_code": "not acquired or verified in this pass; paper algorithm only"
+    }
+  ],
+  "current_project": {
+    "files_read": ["realtime_app/learning_flow_mesh_next/geometry_observation.py", "realtime_app/learning_flow_mesh_next/body.py", "realtime_app/learning_flow_mesh_next/audit_operator_transfer.py"],
+    "counterexample_result": "flow_next_operator_transfer_audit_v1.json",
+    "training": false,
+    "generator_replaced": false,
+    "next_stage": "Audit reverse-mode or vector-Jacobian computation on licensed SMPLH surface/fisheye versus existing finite difference, with gradient validity, rank, full memory/time and rejected anchors retained. Do not assume 68 reverse outputs versus 339 finite-difference states implies measured speedup."
+  }
+}

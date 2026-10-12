@@ -40,10 +40,10 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Read author operator/guidance implementations; audit nonlinear residual-aware single-generator alternatives with complete cost and target-distribution checks. No new architecture until analytic and legality counterexamples pass; training remains closed.",
+  "next_stage": "Audit reverse-mode or VJP Jacobian on actual licensed SMPLH surface/fisheye versus finite difference: numerical validity, rejected anchors, full time/memory; no architecture expansion or speed claim from dimension counts. Training remains closed.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 matched information-regression interface; 110 tests; analytic conditioning audit; effectiveness unverified",
+  "last_completed_stage": "2026-10-12 author guidance source audit and actual-fisheye/rotation-mean counterexamples; direct transplant rejected",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

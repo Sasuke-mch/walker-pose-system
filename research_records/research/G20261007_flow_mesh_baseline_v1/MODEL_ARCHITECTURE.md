@@ -149,6 +149,8 @@ A7只在Rk≤minR+validation delta的近等价集合中最小化相对上次发�
 
 ## 12. 文件对应与后续维护
 
+2026-10-12移植审查：作者guidance的端点梯度与经过速度网络回到flow state的梯度并不相同。实际鱼眼project反例中完整GN步虽令线性残差为0，真实残差却增加；合法投影也不能替代下降检验。两个合法旋转的欧氏6D均值可能退化。当前没有接入端点修正/HQS或替换G0/G1，详见MODEL_RESULTS第12节；不可把论文的线性Gaussian理论直接称本模块非线性后验保证。下一阶段先审查冻结局部J计算的自动微分替代及完整成本，再决定是否改变生成器。
+
 直接架构：schema.py、state_encoder.py、joint_flow.py、information_encoding.py。候选与几何：candidate_store.py、body.py、geometry_observation.py、geometry_information.py、tangent.py。双生成与决策：pipeline.py、aggregate.py、information_risk.py。标签/评价：data_firewall.py、train.py、evaluate.py、evaluation_contract.py、evaluation_population.py、evaluation_blocks.py、acceptance.py。
 
 结果描述必须记录：输入范围和来源、model身份/参数/是否训练、seed与候选预算、唯一变量与对照、所有适用指标单位、失败/不可用、统计单位、测时边界、是否重跑，以及结论所能与不能支持的内容。变更后只重跑相关检查，不能用重复绿测试替代真实效果。下一轮在新数据、授权或复现缺陷出现前，不主动扩容或新开无法验收的架构变体。

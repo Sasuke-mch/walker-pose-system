@@ -4308,3 +4308,12 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 修复train.objective regression静默忽略information：regression/loss透传冻结Λ，使用原projection，不增参数；未知选项拒绝。先落flow_next_regression_information_protocol_v1.json。新增4测试、targeted9及完整next110实际通过，22/52默认及zero信息逐值不变、参数707603/711443不变、条件梯度与detach检查通过；无优化器/训练/checkpoint。ruff环境首次缺包失败保留，离线uv工具四文件lint通过。audit_conditioning.py实际执行：同曲率相反修正，以及条件后验再乘同似然的mean/variance从0.5/0.5变为2/3、1/3；不把标量反例称人体效能，不认定A6决策已重加权分布。
 
 现有MODEL_ARCHITECTURE/MODEL_RESULTS与longterm_protocol同步；完整来源、输入、代码/命令、结果/失败见同研究目录flow_next_regression_information_validation_v1.json和flow_next_conditioning_audit_v1.json。先保留G1为待验证候选；未通过非线性合法性和完整预算前不新增网络。正式主线与原工程结果不变，不重复重放/测时；独立数据、训练和真实效果仍待，长期goal保持active。
+
+
+## 2026-10-12 长期目标第二阶段：作者guidance与非线性移植门
+
+实际读取flow_guidance官方inverse_problems.py梯度/PiGDM/MC路径及gradient_guidance.py时间日程；核对Fast and Faithful附录B式69–80/Algorithm3，共享参数但每velocity仍K次求解/K次网络。公开web tree受限后经公开API/raw源码成功；源码范围/链接和未执行项保存在flow_next_operator_sources_v1.json，不将作者源码阅读称性能复现。
+
+先注册flow_next_operator_transfer_protocol_v1.json，再执行audit_operator_transfer.py。实际项目鱼眼投影CPU float64人工[x,0,1]例：原cost4306.591569，完整GN步令线性残差0但实际cost5637.473602；0.5步仍5038.720978，0.25才2557.989629，三次均投影合法，尝试完整保留。−90/+90°旋转各自合法而columns6D算术均值退化被原门拒绝。全部断言、离线Ruff、暂存AST/JSON与diff检查通过；没有训练/权重/主线变更或性能结论。
+
+停止线性HQS直接移植、无保护端点GN和均值人体天然合法论证；单生成器仍待验证。MODEL_ARCHITECTURE/MODEL_RESULTS/longterm_protocol同步，结果flow_next_operator_transfer_audit_v1.json。下一阶段先审查现有局部J的反向微分/VJP替代，对实际人体surface和鱼眼逐项核对导数、拒绝、完整耗时与显存；不能只用68对339计数称速度提升。长期goal保持active，独立有效性仍未证明。

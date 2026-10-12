@@ -702,3 +702,13 @@ audit_conditioning.py执行并独占保存flow_next_conditioning_audit_v1.json�
 - 新检索到2610.02377，但HTML读取失败，仅保留待读线索；不计为精读成果，不据摘要作实现决定。
 
 继续/停止决定：停止“两个生成器天然增加独立观测信息”的论证；保留G1为未证实的表示/归纳偏置候选。先补齐强回归对照，再审查单生成器的残差方向、完整耦合及算子成本，未通过数学/合法性/预算门前不新增网络。旧profile的J p50约270.20ms、全链p95约385.41ms来自保存测时，本轮没有重测；逐步调用算子可能更慢。创新不能只写“FM+几何guidance”，已有工作已覆盖此通用机制。下一阶段先核对作者具体实现，并对非线性局部更新构造可失败的对照；真实效能门、三seed独立标签和30fps仍未通过。
+
+## 12. 2026-10-12 作者guidance源码与非线性移植反例
+
+本轮先落flow_next_operator_transfer_protocol_v1.json。通过公开GitHub tree API定位作者路径，实际读取flow_guidance的image/gflow_img/inverse/inverse_problems.py与synthetic/guided_flow/guidance/gradient_guidance.py；范围/函数/链接和web受限后raw读取路径记录于flow_next_operator_sources_v1.json。未导入或运行作者代码。guide_fn明确区分当前状态梯度、终点梯度、经过终点预测器回到当前状态的梯度；PiGDM计算model VJP，PiGDM+省略，MC分支依赖支持样本、path权重与能量归一化，不能冒充A6全候选决策。尺度/时间日程也是成本及超参数。Fast and Faithful附录B式69–80/Algorithm3进一步核对：每次velocity含K次算子求解和K次共享网络，默认K5；只减少独立参数并不意味着网络调用减少。未核验该论文作者源码。
+
+audit_operator_transfer.py调用项目实际geometry_observation.project，CPU float64，明确人工相机K焦距70/c128、D0、R=I/T0、256×256；单点[x,0,1]从x4修正至目标x0。原像素半平方cost4306.591569，局部Jacobian4.117647，完整GN步−22.538900令线性预测残差精确0，却使实际cost升至5637.473602；alpha0.5仍5038.720978，alpha0.25才降至2557.989629。所有这三次点投影仍合法，说明仅合法性门也不能保证非线性下降。原点/目标加三次尝试共5次projection调用，未测wall-time；原微小扰动/J与完整人体解码成本不由此估计。
+
+第二个反例：绕Z的−90°/+90°旋转均通过原six_to_matrix合法门，平均columns6D约为零并被拒绝。欧氏条件均值可能不对应合法人体旋转，不能把xt+(1−t)v的平均终点当作无需检查的可解码人体；不是当前随机模型发生该故障的频率证据。两反例断言通过、Ruff离线通过；结果保存flow_next_operator_transfer_audit_v1.json；没有网络、优化器、训练、checkpoint或正式主线改动。
+
+决定：停止直接移植线性HQS、未经保护的端点GN和“均值人体天然合法”三项方案。单生成器方向仍待验证；增加逐候选/逐步非线性解码、回溯、时间尺度可能反而比一次冻结J更贵，暂不新增此生成模块。下一阶段优先检查现有339状态有限差分能否以实际surface/鱼眼反向微分替换，并比较真实Jacobian、拒绝边界、耗时/显存；维数68对169本身不证明速度优势。方法效果和总体目标仍未完成。

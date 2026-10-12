@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-12",
+  "kind": "actual_operator_analytic_fixture",
+  "fisheye": {
+    "operator": "geometry_observation.project",
+    "camera": "analytic K70/c128, D0, R=I, T=0, image256x256",
+    "point": "[x,0,1] metres",
+    "initial_x": 4.0,
+    "target_x": 0.0,
+    "initial_cost": 4306.591569370692,
+    "jacobian": 4.117647058823529,
+    "full_step": -22.538900282356554,
+    "linearized_residual": 0.0,
+    "attempts": [
+      {
+        "alpha": 1.0,
+        "x": -18.538900282356554,
+        "cost": 5637.473602181958,
+        "legal": true,
+        "accepted": false
+      },
+      {
+        "alpha": 0.5,
+        "x": -7.269450141178277,
+        "cost": 5038.720978389718,
+        "legal": true,
+        "accepted": false
+      },
+      {
+        "alpha": 0.25,
+        "x": -1.6347250705891385,
+        "cost": 2557.9896287166644,
+        "legal": true,
+        "accepted": true
+      }
+    ],
+    "projection_calls": 5,
+    "interpretation": "local solve is not nonlinear decrease certificate; bounded actual-operator checks incur extra cost"
+  },
+  "rotation_mean": {
+    "individual_angles_deg": [
+      -90,
+      90
+    ],
+    "individual_valid": [
+      true,
+      true
+    ],
+    "mean6d": [
+      6.123233995736766e-17,
+      0.0,
+      0.0,
+      0.0,
+      6.123233995736766e-17,
+      0.0
+    ],
+    "mean_valid": false,
+    "interpretation": "conditional Euclidean mean may lie outside legal decoded rotations; endpoint predictor is not a guaranteed legal mean human"
+  },
+  "training": false,
+  "mainline_changed": false,
+  "efficacy_verified": false,
+  "decision": "do not directly transplant linear HQS or unprotected endpoint guidance; audit candidate legality and full nonlinear cost before generator replacement"
+}
