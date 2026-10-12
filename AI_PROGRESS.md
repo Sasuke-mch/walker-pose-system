@@ -4394,3 +4394,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 实际读2302.03660v3条件路径/metric/基本假设及官方rfm_loss_fn、Meta geodesic/timeJVP/投影积分器。保留RFM作表示替换候选，不由169内在维数宣称低成本或删去G0/G1。预注册CPU float64检查：现有shortest_log拒绝混合合法近π张量；假设独立Haar源的52及32×52旋转整组拒绝概率3.2572%/65.3431%，200000次seed7抽样126尾部，非当前候选/A6失败率。
 
 单位旋转端点Jacobian九NaN全部显式保留；v2冻端点时间JVP正对照有限，闭式误差0/5.55e-17，故不把端点NaN称RFM训练不可能。Ruff/AST及数值/概率/timeJVP检查通过；原v1/v2与失败输出保留，见flow_next_so3_path_audit_v2.json及sources_v1.json、MODEL_RESULTS第22节。下一步核验专用SO3的π分支/源测度处理，保留决策回退，未训练/改主线，长期有效性未完成。
+
+## 2026-10-12 按用户要求整理项目高价值论文
+
+从已有论文分析、作者源码审查和当前模型中提取6篇优先阅读、6篇设计/判断补充及3篇鱼眼/多视图几何参考，补入现有 LITERATURE_ANALYSIS.md 开头，逐项标明方法价值、实际采用状态、实现/证据入口和阅读范围。另列 Fast and Faithful v1、StableHand、Flower 当前不直接移植的理由；核对到 Fast and Faithful 同一arXiv的v2已更名FIRM，仅更新版本标题，不声称已分析v2方法。同步既有VIBE逐帧beta勘误，避免概览继续把跨帧共享shape错误归给原方法。
+
+本次是文献整理，没有新实验、训练、权重加载或正式主线改动。文献链接、现有代码/证据路径、精选计数及文档diff检查通过；H8/next仍无训练效果。优先研究变量依赖或状态表示的简化，已借鉴的FM/共享shape/图与attention/guidance不作为创新证明。长期研究保持进行，数据门和原停止条件继续有效。

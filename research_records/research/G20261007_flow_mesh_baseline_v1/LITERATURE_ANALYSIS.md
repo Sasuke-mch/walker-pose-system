@@ -2,6 +2,54 @@
 
 日期：2026-10-07。这是分析记录，不是复现结果或已训练模型。每篇链接指向原始论文；本地公开HTML与带行号文本位于sources/。阅读完成指方法与主要实验/消融正文已检查，不代表逐项重证全部附录证明或已核验所有SOTA排名。方法图说明来自正文图注，尚未逐图进行视觉审计。没有核对的超参数/硬件或数值明确留作缺口，不用猜测补全。不同论文的指标和输入不可直接排成统一准确率榜。
 
+## 2026-10-12 对项目有较大价值的论文精选
+
+本节按用户要求，从已有分析中整理方法来源和研究价值。排序针对当前双鱼眼、因果 SMPL-H 恢复目标；不是论文声望或统一精度排名。原文标题与链接已核对，方法采用状态以当前源码、IMPLEMENTATION.md 和 MODEL_RESULTS.md 为准。本轮只整理文献，没有新模型实验、训练或神经权重加载。
+
+“已借鉴”表示思路已进入隔离实现或设计约束。历史合成 baseline、H8、当前 JointFlow next 是三套不同模型；H8 和 next 尚无训练效果，不能将借鉴写成已证实的真实精度改进。next 当前没有 RGB memory、运动树图或独立手部条件 memory。
+
+### 最值得优先读的六篇
+
+|论文|对项目最有价值的思想|实际采用状态|对应实现或证据入口|
+|---|---|---|---|
+|[Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747)，P01|指定噪声到人体参数的条件路径，回归速度场；把训练目标、采样积分与网络结构分别讨论。|已用于历史 baseline 和 next 的线性 CFM、速度 MSE、Euler 采样。next 将 R/T/beta 放在同一状态；联合变量选择是本项目设计，原论文不提供 SMPL-H 架构。|`realtime_app/learning_flow_mesh_next/joint_flow.py` 的 `cfm_loss`、`velocity`、`sample`；历史 `learning_flow_mesh/model.py`、`train.py`。|
+|[HuManiFlow: Ancestor-Conditioned Normalising Flows on SO(3) Manifolds for Human Pose and Shape Distribution Estimation](https://arxiv.org/abs/2305.06968)，P05|让体型参与姿态条件，并用运动学依赖组织关节分布；对我们最重要的是补全变量依赖关系。|直接启发 H8：共享 beta 经无偏置 Linear(10,64) 进入姿态条件，仅增加 640 参数，关闭后恢复 H7。next 已改为联合 R/T/beta 生成，不能把 H8 的前缀冻结机制归到 next；原祖先自回归 SO(3) 流未移植。|`realtime_app/learning_flow_mesh/beta_conditioning.py`；`architecture_h8_results_v1.json`、`architecture_h8_validation.json`。|
+|[FMPose3D: monocular 3D pose estimation via flow matching](https://arxiv.org/abs/2602.05755v1)，P03|将二维条件到三维姿态写成条件分布输运；分开编码条件、生成时间与状态，用少步积分生成多个候选。|历史 baseline 借鉴局部图与全局 attention 并联、条件缓存及 FM 采样。next 保留多候选生成，但没有图分支。原 RPEA 含 GT-root 对齐，项目必须使用自己的 T 和原鱼眼投影；完整人体候选不能按关节拼接。|历史 `learning_flow_mesh/model.py`；next `joint_flow.py`、`aggregate.py`、`candidate_store.py`；原采样检查 `architecture_sampling_protocol.json`。|
+|[Probabilistic Modeling for Human Mesh Recovery（ProHMR）](https://arxiv.org/abs/2108.11944)，P04|对遮挡和深度歧义保留姿态分布；以人体参数经真实人体层解码，明确形状、相机和姿态的角色。|历史模型借鉴姿态生成与 shape/translation 分支的组织方式；原 ProHMR 的同图 shape 与跨帧前缀冻结是不同机制。next 改为联合生成；仍保留确定性回归强对照。FM 的零噪声输出不能直接套用其 mode 解释。|历史 `learning_flow_mesh/model.py`、`shared_shape.py`；next `joint_flow.py`、`body.py`；`architecture_conclusion_v1.json`。|
+|[Humans in 4D: Reconstructing and Tracking Humans with Transformers（HMR 2.0 / 4DHumans）](https://arxiv.org/abs/2305.20091)，P07|用人体查询读取图像特征，通过 cross-attention 连接观测与参数；二维骨架之外的外观信息对体型有价值。|历史模型采用 52 个人体查询与观测/RGB memory 交互。其小 CNN 没有预训练，不能继承 HMR2 的视觉能力；next 当前没有 RGB 分支。另已运行作者保存图裁剪到完整随机网络/male 网格子路径，未复现训练精度或完整 detector/demo。|`learning_flow_mesh/model.py` 的 `ConditionEncoder`；`architecture_r16_results_v2.json`、`architecture_r16_validation.json`。|
+|[Flow Matching on General Geometries（Riemannian Flow Matching）](https://arxiv.org/abs/2302.03660)，P02|让概率路径、速度和损失符合状态的几何结构；为替换欧氏 6D 旋转表示提供理论入口。|尚未移植 SO(3) 生成器。已读条件路径/metric 与官方 geodesic/time-JVP 实现，并审查现有 SO(3) 局部函数的近 pi 分支和导数。当前 guarded 6D 解码只检查合法性，不建立 SO(3) 概率流。优先检验表示替换能否简化系统。|`flow_next_so3_path_sources_v1.json`、`flow_next_so3_path_audit_v2.json`；`MODEL_RESULTS.md` 第22节。|
+
+建议阅读顺序：P01 → P03 → P04 → P05 → P07 → P02。若已掌握 FM 基础，优先重读 HuManiFlow 的条件依赖与 RFM 的路径/度量：这两条线索更适合考察结构上的简约改进。
+
+### 已影响设计或判断的六篇补充
+
+|论文|项目价值|采用与阅读边界|
+|---|---|---|
+|[WHAM: Reconstructing World-grounded Humans with Accurate 3D Motion](https://arxiv.org/abs/2312.07531)，P10|用单向运动状态整合历史，显式区分局部姿态、相机运动与全局轨迹。|借鉴因果历史和坐标分离。历史 GRU 与 next 的 `state_encoder.py` 是项目实现；作者 MotionEncoder/Decoder/TrajectoryDecoder 组件已检查，完整世界运动、脚接触和 refiner 尚未复现。|
+|[MotionAGFormer: Enhancing 3D Human Pose Estimation with a Transformer-GCNFormer Network](https://arxiv.org/abs/2310.16288)，P14|局部图与全局 attention 的互补必须通过消融证明，图结构应匹配输出对象。|历史 `SpatialBlock` 的图开关受其启发。作者骨架网络及未来依赖已检查；当前 next 没有图，现有合成结果也未证明加入图有收益，不据论文给新模型继续加图。|
+|[MotionBERT: A Unified Perspective on Learning Human Motion Representations](https://arxiv.org/abs/2210.06551)，P12|缺失/噪声运动预训练、空间与时间关系；其 mesh head 提醒我们显式讨论跨帧共享 shape。|缺失 mask 与 confidence 分离已进入输入契约。原 DSTformer 组件已运行；全 clip 时间 attention 和 beta pooling 使用未来，H1/H7 的因果前缀冻结属于项目改造。二维关节仍缺体型信息。|
+|[Score-Guided Diffusion for 3D Human Recovery（ScoreHMR）](https://arxiv.org/abs/2403.09623)，P06|通过可微人体参数到观测的映射，把二维、多视图或时间证据用于生成过程的精修。|已影响真实可微人体层与后续 guidance 的设计。当前没有接入其 diffusion/guidance；仅分析方法/主要实验和部分训练入口，未运行完整作者方法。鱼眼投影、初始化和额外迭代成本需单独检验。|
+|[ManiPose: Manifold-Constrained Multi-Hypothesis 3D Human Pose Estimation](https://arxiv.org/abs/2312.06386)，NeurIPS 2024|用共享骨长和 FK 从输出参数化保证骨架一致性；适合检查多候选生成与聚合是否保持结构。|2026-10-12 聚焦读方法、理论、消融、部分附录及官方 decoder/FK/loss/aggregation，未运行作者网络。本地真实 SMPL-H 审查发现同 beta 的合法姿态仍可改变 COCO 表面连线长度，因此不接入 COCO 骨长恒定损失或额外骨长头。该模型不是概率流。|
+|[On the Guidance of Flow Matching](https://arxiv.org/abs/2502.02150)，ICML 2025|明确能量引导改变的目标分布，以及当前状态梯度、终点梯度和经过预测器的梯度之间的区别。|已用于审查重复观测条件化和 guidance 成本。聚焦阅读方法/近似条件及作者 `guide_fn`、PiGDM、MC 分支源码，未运行作者包。当前 A6 是候选动作风险，不能称已实现论文的 MC guidance 或后验采样。|
+
+### 与双鱼眼几何直接相关的配套参考
+
+- [Fish2Mesh Transformer: 3D Human Mesh Recovery from Egocentric Vision](https://arxiv.org/abs/2503.06089)，P20：鱼眼成像几何应显式编码。项目使用本地标定产生的原点/单位射线；没有移植其头戴球面位置编码、Swin 或伪标签流程。已分析方法/主要实验，未完成作者代码复现。
+- [Multiple View Geometry Transformers for 3D Human Pose Estimation（MVGFormer）](https://arxiv.org/abs/2311.10983)，P15：用标定投影连接三维查询、多视图图像特征与几何更新。已有显式相机条件设计受其启发；可作为未来图像与几何交互参考。其透视投影、多人查询和可微三角化未移植到当前鱼眼质量门，已读方法/主要实验，未运行完整作者方法。
+- [Learnable Triangulation of Human Pose](https://arxiv.org/abs/1905.05754)，P16：明确各视角观测、权重和标定几何的角色。作者 DLT/体素/RANSAC 子路径及退化行为已审查；零 confidence 仍返回有限点的反例支持保留项目拒绝状态。没有替换正式严格三角化；数值有限不能作为观测有效的依据。
+
+### 已分析但当前不直接移植的三条路线
+
+|论文|保留的价值|当前决定及理由|
+|---|---|---|
+|[Fast and Faithful: Principled Conditional Flow Matching for Inverse Problems，v1](https://arxiv.org/abs/2609.12953v1)|在单一速度估计器内显式使用观测算子和残差，内循环共享权重。|停止直接移植线性 Gaussian/HQS 求解到非线性 SMPL-H 鱼眼问题；共享权重仍需多次前向。已读正文3.1–3.4、相关附录与算法，未核验作者源码。2026-10-12 核对到同一 arXiv 的 v2 标题改为 [FIRM: Flow-based Imaging via Regularized Minimization](https://arxiv.org/abs/2609.12953v2)；本项目方法分析仍依据 v1，不声称已读 v2 方法。|
+|[StableHand: Quality-Aware Flow Matching for World-Space Dual-Hand Motion Estimation from Egocentric Video](https://arxiv.org/abs/2605.18553v1)|按观测质量组织生成起点，值得审查训练/推理路径与随机支撑。|读方法式1–11和官方相关采样源码；论文与发布实现的起点/时间日程需区分。完整质量网络、整段时间特征未移植；匹配起点的简化桥实现准备已暂停，缺独立质量标签，q=1 的随机支撑限制也必须明确。不据这些检查否定原论文实验。|
+|[Flower: A Flow-Matching Solver for Inverse Problems](https://arxiv.org/abs/2509.26287v2)|区分无条件先验、观测条件分布与数据一致性求解，完整计算求解成本。|读相关方法/算法及官方 `flower.py`、`flower_cov.py`、配置，未运行作者包。当前条件 JointFlow、非线性鱼眼及人体合法性不满足直接替换前提；默认设置需500次速度调用和逐步CG，停止移植端点/CG/重噪声机制。|
+
+创新表述应落在可检验的新依赖、新参数化或更简洁的统一机制上。FM、多候选、共享体型、图加 attention、重投影 guidance 均已有明确先例；论文被采用的数量不能支持创新或模型优越性。后续每次只检验一个机制，并保留同信息确定性回归与完整成本对照。
+
+上述 P01–P20 的原阅读范围见 `papers.json` 和下方逐篇记录；作者结构审查见 `IMPLEMENTATION.md`。ManiPose、Guidance、StableHand、Flower 和算子论文属于聚焦阅读，正文/源码具体范围分别见相应 `flow_next_*sources*` 或 `*source_audit*` 记录。D3DP、Dual-Diffusion、EMBR、PoseD-Flow 等仅有摘要、片段或项目页的线索没有计入本节核心已分析清单。
+
 ## P01 — Flow Matching for Generative Modeling
 
 [原文](https://arxiv.org/abs/2210.02747)。正文依据：sources/P01.txt L0094–L0230；实验L0255–L0386，尤其Table 1、Figures 5–7。
@@ -86,11 +134,11 @@
 
 [原文](https://arxiv.org/abs/1912.05656)。正文依据：P09 L0135–L0196、L0315–L0331、L0379–L0412，Tables 1–3。
 
-- 流程：冻结图像特征 → 双向GRU → SMPL迭代回归；整个clip平均beta。AMASS运动GRU/attention判别器约束序列；训练clip长度16。
+- 流程：图像特征 → TemporalEncoder → 逐帧SMPL迭代回归；AMASS运动GRU/attention判别器约束序列，训练clip长度16。2026-10-12同步既有源码勘误：released配置为单向GRU，原regressor逐帧输出beta；此前“整个clip平均beta”判断错误，具体证据见下方2026-10-08勘误。
 - 监督：2D/3D/SMPL损失，加运动对抗损失；AMASS运动与视频标签来源不同。MPoser作为另一种先验对照。
 - 实验检查：含/不含3DPW训练要分开；单靠时间模块可能更平滑而逐帧误差更差。运动判别器帮助泛化，强先验也会压掉罕见运动。
-- 采用：形状跨帧共享；分别报告位置、加速度及运动多样性，禁止只凭平滑度选模型。
-- 缺口：双向GRU和整clip形状平均使用未来帧；不可原样称实时因果模型。第一版不加入GAN判别器。
+- 采用：参考序列运动编码；分别报告位置、加速度及运动多样性，禁止只凭平滑度选模型。项目因果前缀共享shape不能归为原VIBE机制。
+- 缺口：原TemporalEncoder接口不接收/返回流式hidden，分窗口会重置状态；单向网络仍需核验状态carry、缺失与物理时间合同。第一版不加入GAN判别器。
 
 ## P10 — WHAM
 
@@ -214,7 +262,7 @@
 |P06 ScoreHMR|SMPL6D姿态|图像、观测guidance|可微解码/后续guidance|
 |P07 HMR2|SMPL参数|图像cross-attention|图像输入支路|
 |P08 SPIN|SMPL参数|拟合伪标签|标签来源契约|
-|P09 VIBE|SMPL参数|双向GRU|共享shape、未来泄露检查|
+|P09 VIBE|SMPL参数|发布版单向GRU、逐帧beta|流式carry/缺失检查；共享shape为项目改造|
 |P10 WHAM|SMPL+世界运动|单向RNN、相机运动|因果历史与坐标分离|
 |P11 GVHMR|SMPL-X身体+轨迹|双向RoPE、重力|世界坐标后续适配|
 |P12 MotionBERT|关节/SMPL任务头|双向空间时间|缺失增强、形状信息缺口|
@@ -252,9 +300,9 @@ PoseD-Flow项目页：https://circle-group.github.io/research/PoseD-Flow/。页�
 |[ProHMR](https://github.com/nkolot/ProHMR)|heads/fc_head.py 7–51；heads/smpl_flow.py 12–90|图像特征MLP输出beta/camera，沿候选轴重复；概率姿态与确定性shape分开。camera不是双鱼眼米制translation。作者使用修改版nflows的ConditionalGlow，标准nflows不够|原ResNet50/flow/head及密度往返通过；neutral网格及原评价待完成|
 |[HuManiFlow](https://github.com/akashsengupta1997/HuManiFlow)|models/humaniflow_model.py 33–340|shape均值/标准差定义分布；shape、root、camera及祖先旋转共同条件化关节SO(3)分布，默认采样shape会随候选变化，use_shape_mode_for_samples另有语义。不是FM，也不是我们的并行图平均|原proxy/SO(3)层级采样/密度通过；原网格/输入代理/评价待完成|
 |[HMR2](https://github.com/shubham-goel/4D-Humans)|heads/smpl_head.py 17–111；utils/geometry.py 47–62|单查询cross-attention看完整图像patch，输出pose/beta/camera残差；不等于52个独立姿态查询或多帧shape。6D先按两组三维向量排列，必须核对转换函数而非只看名字|原ViT-H/Transformer参数头通过；neutral网格/检测裁剪/评价待完成|
-|[VIBE](https://github.com/mkocabas/VIBE)|lib/models/vibe.py 27–117；spin.py 209–293；configs/config.yaml|正文P09 L137/L143–144描述双向GRU和整段平均shape；当前发布配置BIDIRECTIONAL=false，VIBE.forward把N,T特征展平，Regressor逐帧输出shape，这条代码路径未做平均。必须区分论文版本与发布实现|原TemporalEncoder完成；完整SMPL回归路径未执行|
+|[VIBE](https://github.com/mkocabas/VIBE)|lib/models/vibe.py 27–117；spin.py 209–293；configs/config.yaml|当前发布配置BIDIRECTIONAL=false，VIBE.forward把N,T特征展平，Regressor逐帧输出shape；原论文描述T个逐帧regressor。此前将其归为整段平均shape的判断已在下方2026-10-08勘误纠正，项目共享shape不能归为原VIBE机制|原TemporalEncoder完成；完整SMPL回归路径未执行|
 |[WHAM](https://github.com/yohanshin/WHAM)|lib/models/wham.py 15–201；layers/modules.py 98–217|MotionEncoder/Decoder/TrajectoryDecoder均按过去递归；beta实际为B,T,10，不天然全片共享。preprocess的mask=True表示缺失，与本项目presence mask相反。世界轨迹/脚修正需真实人体层及外部相机语义|原网络构造、三个原组件和mask完成；真实人体层及全局脚/精修未执行|
-|[MotionBERT](https://github.com/Walter0807/MotionBERT)|DSTformer.py 269–361及forward_temporal 188–200；model_mesh.py 9–80|姿态主干空间/时间两顺序分支融合；时间attention看整clip。mesh head先平均时间特征再预测一套beta，随后广播；与VIBE论文先预测beta再平均不同。shape池化使用未来，实时适配必须单列|原H36M姿态网络243帧、512宽、5层完成；mesh分支未执行|
+|[MotionBERT](https://github.com/Walter0807/MotionBERT)|DSTformer.py 269–361及forward_temporal 188–200；model_mesh.py 9–80|姿态主干空间/时间两顺序分支融合；时间attention看整clip。mesh head先平均时间特征再预测一套beta，随后广播；原VIBE逐帧输出beta，见下方既有勘误。shape池化使用未来，实时适配必须单列|原H36M姿态网络243帧、512宽、5层完成；mesh分支未执行|
 |[MotionAGFormer](https://github.com/TaatiTeam/MotionAGFormer)|MotionAGFormer.py 68–160/196–284；attention.py 50–62；graph.py 10–128|attention与图分支各含空间和时间操作，再自适应融合；时间attention及相似图没有因果屏蔽。原图为H36M17且图层有节点BatchNorm，不能将我们的52节点相邻平均称原结构复现|原xsmall网络27帧、64宽、12层完成|
 |[FMPose3D](https://github.com/AdaptiveMotorControlLab/FMPose3D)|model_GAMLP.py 111–152/216–247；scripts/FMPose3D_train.sh|2D、3D状态与生成时间拼接，B,F展平成B×F后执行图/attention，网络是帧内速度场，不含我们的GRU，也不输出mesh/beta。完整论文另有采样、RPEA及评价预算|原速度网络、Euler、flip-TTA及RPEA依赖通过；发布聚合读取GT根，原数据/检测评价待完成|
 |[Learnable Triangulation](https://github.com/karfly/learnable-triangulation-pytorch)|mvn/models/triangulation.py 18–129/131–200/203–355；utils/multiview.py；experiments/human36m/eval/|原ResNet152、heatmap积分、跨相机归一化confidence和加权DLT；体素分支依赖预测人体中心，实际从batch相机重建P。RANSAC半距离门、强制保留抽中的视图。透视P不能直接处理原始鱼眼像素，也没有项目严格门|原代数、64³体素/V2V完整前向通过；原RANSAC经显式Python集合采样兼容后通过；人工针孔输入、随机权重，原数据/检测/预测中心流程及性能待完成|
