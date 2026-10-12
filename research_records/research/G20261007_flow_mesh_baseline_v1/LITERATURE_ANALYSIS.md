@@ -572,3 +572,31 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 预注册后原so3_utils.py的11个纯函数以完整AST节点实际执行。近π对角根/行符号分支在固定合法负轴输入出现约0.008端点矩阵误差；固定53248个Haar源到I端点，float64有359对超过1e-10，最大元素误差0.01978。所有源/失败保留，不是人体精度结果；冻端点时间JVP实际通过。独立SciPy冻端点log与matrix_exp控制全部满足端点/时间合同，只用于训练目标准备，不认证端点可微或全局唯一log。
 
 对项目保留角速度与群积分这一表示替换思路，停止原分支及源/日程的直接移植，不继续叠加蛋白质模块。机制已有RFM/FrameFlow等先例，不能据采用SO3本身宣称创新。出处/原函数范围见flow_next_frameflow_so3_sources_v1.json，数据与边界见MODEL_RESULTS第23节。当前325D JointFlow未替换，效能、成本和G0/G1必要性仍待独立验证。
+
+## 2026-10-12 单生成器后验与模拟器反馈：三篇聚焦阅读
+
+本轮沿用cv-paper-reader的正文/代码对照，但没有做完整证明、全部实验或方法图视觉审查。ar5iv/arXiv HTML获取失败后直接读原始PDF；bundled Python/pypdf在内存中提取正文，没有保存新PDF副本、快照或额外报告。如下结论是模型选择和证据边界，当前模型未改动、未训练。
+
+### Flow Matching for Scalable Simulation-Based Inference（FMPE）
+
+[原始论文](https://arxiv.org/pdf/2305.17161)。聚焦阅读第3节式7–9/网络/时间分布，第5.2–5.3节及Appendix D.2–D.3的容量、conditioning和速度对照；第2节相关密度/路径定义也核对。论文从真实定义的先验p(theta)和模拟器p(y|theta)产生参数—观测配对，以观测为条件学习速度场。在线采样只解条件ODE，不要求预先生成anchor或计算物理观测Jacobian。它支持当前F0作为强对照，但这个基础机制已经公开，不能以“一个FM直接从观测恢复参数”作为新贡献。无似然评估不表示无需可信先验、标签或观测生成过程。
+
+网络的重点是让生成状态/时间参与观测特征的读取。论文比较早/晚GLU conditioning：晚进入时观测前部可缓存，早进入有质量优势并增加每步计算。引力波主比较FMPE约190M参数、NPE约130M，不能把全部效果归为目标差异；附录另给匹配架构消融。AppendixD Table5在同4096batch/A100、dopri5容差1e-7下报告采样248次网络调用、采样加密度350次，不能据论文直接保证当前8步或实时。该论文mass-covering分析需要正则性条件，不等同有限网络已校准；论文亦区分覆盖支持与保守置信区间。
+
+官方 [Dingo实现](https://github.com/dingo-gw/dingo) 实际读取 `dingo/core/posterior_models/flow_matching.py` 全文（87行）、`cflow_base.py` 的sample/联合散度ODE/log_prob/trace函数（52–109、118–198、199–273），及`dingo/core/nn/cfnets.py`的定义选读、缓存和GLU路径（75–169）。loss的context配对与source/path系数一致；sampler使用dopri5，不是8步Euler；log_prob另计算速度场对参数的散度，exact分支逐输出autograd、可选Hutchinson。context缓存为eval默认策略，状态/时间条件仍逐步进入；早conditioning和缓存的不同设置须分列。只是读当前main源码，未导入/运行作者包、加载权重或认证原发布版本。当前F0已经逐步读取生成状态，其观测context仍独立编码后缓存；这些事实不能证明该压缩必然充分或G1必然无用。
+
+### Flow Matching for Fast Posterior Sampling in Bayesian Inverse Problems
+
+[原始v1](https://arxiv.org/pdf/2610.02377v1)。实际读取PDF第6–11页、第3.1–3.4节（Theorem3.1，式6–19及Remark3.1/3.2）及前述引言问题/限制；没有完整数值研究或附录复现。原先只能取得摘要的线索现在升级为聚焦方法阅读。固定观测的block-triangular transport将独立source和观测边缘映射到参数—观测联合律，在理想准确输运下给出几乎处处条件后验；实际有限训练、容量和数值积分误差不由这个论证自动控制。联合配对训练/在线不用forward模型与当前F0重合，是简化的理论依据，不是新增测量或新的生成结构。
+
+其Metropolis修正和TV/KL诊断与普通条件采样是两个层次：前者需要可评估的未归一化先验×似然、可计算proposal密度、合法积分及适用的平稳/大样本或有限二阶矩条件；likelihood-free样本生成不自动提供这些诊断。当前没有可信注册先验/独立噪声模型、inverse/log_prob或群散度实现。ambient6D到SO3的多对一解码也不允许将ambient密度直接叫人体密度，SO3群积分合法性本身不能替代密度推导。不加入MCMC、重要性重加权或密度网络来给现有候选制造后验认证。
+
+另有一处局部来源问题：内存PDF文本中第7页式10写dlogp/dt=−div(v)，式11的前向0→1散度积分却是加号。截图工具无法读取该PDF，故这里明确依据公式文本提取，并用数学控制独立核对，不声称整篇论文或未公开实现错误。取v=a*x、a=ln2，sourceN(0,1)、终点x1=2*x0，则正确q=N(0,4)；在x=2，logq=−2.1120857。负散度积分一致，加号给−0.7257914并令密度全空间积分为4，不能照抄。Dingo原代码的联合ODE/最终符号与负散度控制一致；尚未执行作者代码。该文章写明接受后公开代码，本轮没有取得可核验实现。
+
+### Flow Matching for Posterior Inference with Simulator Feedback（SBI-SIM）
+
+[原始论文](https://arxiv.org/pdf/2410.22573)。实际读取PDF第4–6/8–9页，第4/4.1/4.2节式7/9/10、第5.3节zero-controls及模拟器预算、第6.1节指标/速度。冻结预训练条件流，先预测终点，再将模拟器代价及终点梯度交给额外control网络；不可微模拟器另用learned encoder。小控制网也约10–11%参数，在线使用模拟器，文中只在t>=0.8启用控制。它避免full物理Jacobian但仍有逐步forward/VJP及控制成本，不是当前无需新增网络的自动简化。
+
+文中zero-controls对照有价值：保留control容量和finetuning但置零反馈，帮助分开额外容量/训练与物理信号。lensing的建模时间从无反馈10s到反馈19s，主要参照MCMC不是原flow提速。所称53%是相对GT参考残差平台的chi2改善（1.83→1.48，参考1.17），低重投影/模拟残差并不能独立认证整个人体后验或置信区间。LV另有C2ST独立分布参考，不能把它的分布证据转成lensing/本项目证据。
+
+实际核对 [官方仓库](https://github.com/tum-pbs/sbi-sim) README和公开tree，本轮只有README/LICENSE/banner，README称源码将公开；不虚报原control实现已读或已运行。不直接增加control/quality/encoder模块。只保留一个替换假设：能否在单模型现有信息输入处使用晚阶段代价/角向梯度，通过一次VJP提供状态相关物理反馈，替代G0 anchor/J/Lambda路线；它已有SBI-SIM/ScoreHMR等机制先例，不能称通用创新。下一阶段先审查实际SO3终点/原鱼眼/拒绝和成本前提，不进入神经实现或训练。

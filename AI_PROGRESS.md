@@ -4424,3 +4424,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 预注册后按官方PyTorch3D fast轴角实现及Rodrigues恒等式，用向量外积/half-angle sinc替代通用指数，小角用θ²四阶Taylor和safe regular分支保持零角导数。网络/噪声/日程/参数不变，原matrix_exp选项保留对照。现有test_joint实际17通过，CPU64/CUDA32值、零/普通/近πJacobian、同权重完整采样与既有目标/因果/发布验证，三文件Ruff通过；未扩展验证基础设施。
 
 同次6模式、每组8记录，原F0/闭式SO3/旧核SO3完整p50为33.23/38.33/43.63ms，闭式/ambient1.1536通过1.25门，闭式较旧核约低12.2%但仍慢于ambient；F0峰分配增量各31.07MB，无显存收益。所有候选和实际SMPLH解码有限，计数正确；随机模型/固定观测、负载未锁，不认证精度或实时。逐次flow_next_so3_cost_v2.json及MODEL_RESULTS第26节保存边界。两轮核优化结束，保留显式研究候选，转回统一单生成器/局部信息必要性机制分析；默认主线与训练关闭保持，独立有效性未完成。
+
+## 2026-10-12 单条件流/模拟器反馈阅读：停止通用创新与免费后验认证论证
+
+聚焦读FMPE正文/匹配conditioning附录及Dingo实际loss/sample/log_prob/cache/GLU，2610.02377v1第3.1–3.4节、SBI-SIM控制/zero-control/lensing成本。单条件joint配对流已有先例，当前F0不能凭省G0/J宣称创新；SBI-SIM另增10–11%控制网、lensing10→19s，不直接叠加。官方SBI-SIM尚无实现，2610接受后放代码，未运行任何作者模型；正文在内存解析，没有新增PDF/源码副本或报告。
+
+预登记后一次解析缩放控制核对提取的密度符号：v=ln2*x、sourceN(0,1)，正确q=N(0,4)且x2 logq=-2.11209，加号式会把总质量变4，停止照抄；只针对所取公式文本，不声称全文/未公开代码错误。TV/KL/MH需要可信prior/likelihood/proposal density及条件，当前不具备，不用于升级A6或候选置信度。MODEL_RESULTS第27节/LITERATURE同步。下一步仅审查晚阶段SO3端点的169维物理代价VJP能否替代anchor信息、保持失败与预算，再决定是否实现；当前模型/主线/训练关闭保留，长期有效性未完成。

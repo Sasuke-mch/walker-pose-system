@@ -40,7 +40,25 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Rotation-kernel optimization is closed after revision2. Retain Rodrigues SO3 F0 as an opt-in untrained candidate; return to the research question of G0/J/G1 necessity and a unified observation-conditioned mechanism, starting with primary-method/novelty analysis rather than another kernel or budget tweak. Keep same-information regression and independent data efficacy gates; no default promotion or training.",
+  "next_stage": "Assess one late-stage SO3 complete-parameter endpoint physical-cost VJP in169D on the realSMPLH/raw-fisheye operator, without fullJ, a second generator or a control network. Pre-register validity/failure/noise/operator/fair-budget semantics first; this is a new feedback input, not an unchanged FD-neighborhood contract. If feasibility needs extra modules or unacceptable full cost, stop. Only then consider replacing existing information inputs with matchedCFM/regression/zero-feedback controls; no model/default promotion or training now.",
+  "unified_posterior_review_20261012": {
+    "status": "focused_primary_review_and_scalar_sign_control_completed",
+    "question": "Which conditional-flow mechanisms actually avoid an online second generator and full physical Jacobian, and what would be required to preserve posterior or calibration claims?",
+    "primary_methods_read": [
+      "2610.02377v1 Section3.1-3.4, PDFpages6-11; conditional transport, joint-pair training, density/MH/error assumptions",
+      "2305.17161 Section3/5.2-5.3 and AppendixD.2-D.3; FMPE conditioning/time sampling and matched capacity/caching costs",
+      "2410.22573 Sections4/4.1/4.2/5.3/6.1, PDFpages4-6/8-9; learned simulator controls and runtime/metric scope"
+    ],
+    "author_implementation": "Dingo flow_matching.py, cflow_base.py and cfnets.py actual loss/sample/divergence/context/GLU code inspected; not executed or exact paper-release reproduction. SBI-SIM official tree currently contains README/license/banner only; no runnable implementation. 2610 paper says code will be released on acceptance, no verified author code.",
+    "bounded_check": "Scalar expansion v=a*x, a=ln2, Gaussian base; analytical inverse/scaling log-density versus extracted2610 Eq10/Eq11 signs. No network/data/optimizer or new verification script.",
+    "success": "Derive an action-changing transfer decision from actual methods/code and distinguish source laws, conditional sampling, density diagnostics, learned feedback and current candidate decision. Scalar true density integrates1; a wrong sign must remain a rejected formula.",
+    "stop": "One analytical check; no likelihood/density/MH implementation or new feedback network from incomplete assumptions. Continue current training closure and capacity/independent-data gates.",
+    "training": false,
+    "density_sign_control": {"flow": "v=ln2*x, x1=2*x0, sourceN(0,1)", "point": 2, "true_log_density": -2.112085713764618, "negative_divergence_result": -2.112085713764618, "extracted_positive_sign_result": -0.7257913526447274, "wrong_total_mass": 4, "scope": "PDF textEq10/11 mismatch plus analytical control; screenshot unavailable; no author-code/whole-paper failure claim"},
+    "decision": "Single conditional transport duplicates existingF0 mechanism; stop novelty claim, new feedback/control networks and automatic density/MH certification. Retain a bounded one-VJP information-replacement hypothesis, not a new proved architecture.",
+    "retrieval": "ar5iv/arxivHTML unavailable and some PDFweb rereads failed; direct public PDF bytes parsed with bundledpypdf in memory. Zhai official rawPDF not parsed in this round, remains abstract-only.",
+    "model_changed": false
+  },
   "so3_kernel_revision2_20261012": {
     "status": "completed_numeric_checks_and_cost_gate_passed_no_efficacy_claim",
     "question": "Can an algebraically equivalent rotation-specific exponential avoid the extra measured cost while preserving endpoint/gradient/publication behavior?",
@@ -123,7 +141,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 second/final SO3 kernel revision: Rodrigues with squared-angle Taylor replaces genericmatrix_exp. Related17 tests pass; same-run fullp50 Rodrigues38.33ms versus matrix_exp43.63 and ambient33.23; ratio1.1536 passes1.25 cost gate. Retained opt-in/untrained; kernel optimization closed, no default promotion or training.",
+  "last_completed_stage": "2026-10-12 FMPE/conditional posterior/SBI-SIM focused primary-and-Dingo review plus analytical density sign control; existingF0 mechanism overlap and feedback/network/diagnostic costs identified. New boundedVJP-replacement hypothesis selected, no model/author-code execution or training.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {
