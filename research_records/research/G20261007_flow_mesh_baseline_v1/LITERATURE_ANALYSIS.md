@@ -4,11 +4,11 @@
 
 ## 2026-10-12 对项目有较大价值的论文精选
 
-本节按用户要求，从已有分析中整理方法来源和研究价值。排序针对当前双鱼眼、因果 SMPL-H 恢复目标；不是论文声望或统一精度排名。原文标题与链接已核对，方法采用状态以当前源码、IMPLEMENTATION.md 和 MODEL_RESULTS.md 为准。本轮只整理文献，没有新模型实验、训练或神经权重加载。
+本节按用户要求，从已有分析中整理方法来源和研究价值，并补入最近的单模型与物理反馈阅读。价值针对当前双鱼眼、因果 SMPL-H 恢复及简约改进目标；不是论文声望或统一精度排名。原文标题与链接已核对，方法采用状态以当前源码、IMPLEMENTATION.md 和 MODEL_RESULTS.md 为准。本次整理没有新模型实验、训练或神经权重加载。
 
 “已借鉴”表示思路已进入隔离实现或设计约束。历史合成 baseline、H8、当前 JointFlow next 是三套不同模型；H8 和 next 尚无训练效果，不能将借鉴写成已证实的真实精度改进。next 当前没有 RGB memory、运动树图或独立手部条件 memory。
 
-### 最值得优先读的六篇
+### 已借鉴到研究实现的六篇
 
 |论文|对项目最有价值的思想|实际采用状态|对应实现或证据入口|
 |---|---|---|---|
@@ -19,7 +19,16 @@
 |[Humans in 4D: Reconstructing and Tracking Humans with Transformers（HMR 2.0 / 4DHumans）](https://arxiv.org/abs/2305.20091)，P07|用人体查询读取图像特征，通过 cross-attention 连接观测与参数；二维骨架之外的外观信息对体型有价值。|历史模型采用 52 个人体查询与观测/RGB memory 交互。其小 CNN 没有预训练，不能继承 HMR2 的视觉能力；next 当前没有 RGB 分支。另已运行作者保存图裁剪到完整随机网络/male 网格子路径，未复现训练精度或完整 detector/demo。|`learning_flow_mesh/model.py` 的 `ConditionEncoder`；`architecture_r16_results_v2.json`、`architecture_r16_validation.json`。|
 |[Flow Matching on General Geometries（Riemannian Flow Matching）](https://arxiv.org/abs/2302.03660)，P02|让概率路径、速度和损失符合状态的几何结构；为替换欧氏 6D 旋转表示提供理论入口。|已据测地路径/切向速度实现显式SO3 F0候选；第二轮Rodrigues核通过固定预算成本门，但仍慢于ambient，精度/校准未证实。已读条件路径/metric及官方geodesic/time-JVP，原全作者方法未复现。原默认guarded6D路线仍保留，核优化已结束。|`realtime_app/learning_flow_mesh_next/so3_flow.py`；`MODEL_RESULTS.md` 第24–26节，原路径/函数边界见第22节。|
 
-建议阅读顺序：P01 → P03 → P04 → P05 → P07 → P02。若已掌握 FM 基础，优先重读 HuManiFlow 的条件依赖与 RFM 的路径/度量：这两条线索更适合考察结构上的简约改进。
+这六篇解释已有实现的主要方法来源。入门阅读可按 P01 → P03 → P04 → P05 → P07 → P02；HMR2 的查询机制与 FMPose3D 的局部/全局结构主要进入历史模型，不能因此给当前 next 继续加分支。
+
+### 最近分析中，对单模型简化直接有价值的两篇
+
+|论文|对当前问题的具体价值|项目采用状态|阅读与证据入口|
+|---|---|---|---|
+|[Flow Matching for Scalable Simulation-Based Inference（FMPE）](https://arxiv.org/abs/2305.17161)|从参数—观测配对直接学习观测条件速度场，在线只积分一个模型；比较生成状态进入条件编码的位置，以及观测特征缓存的质量/成本取舍。它给审查 G0/J/G1 必要性提供强对照。|已影响当前单模型路线的判断；F0 本已有同类机制，不把它写成新移植或创新。没有由论文证明 G1 无用，也没有新增 GLU 网络、密度计算或训练。|已聚焦读第3/5.2/5.3节、Appendix D.2–D.3和官方 Dingo 的 loss/sample/log_prob/cache/GLU 源码；未运行作者模型。下文 FMPE 卡片；`MODEL_RESULTS.md` 第27节。|
+|[Flow Matching for Posterior Inference with Simulator Feedback（SBI-SIM）](https://arxiv.org/abs/2410.22573)|用预测终点的物理代价及其梯度反馈给生成过程；一次反向传播可取得代价对参数的方向，而不必构造完整观测 Jacobian。zero-control 消融帮助区分物理信号与新增容量的收益。|仅借鉴为下一阶段的替换假设：晚阶段、完整人体参数、原鱼眼物理代价，审查能否替代 anchor/J 信息。尚未接入速度网络；原额外 control 网络与不可微模拟器 encoder 不直接加入。|已聚焦读第4/4.1/4.2/5.3/6.1节及相关预算。原方案有额外参数和明显反馈耗时，不能称免费简化；未运行作者方法。下文 SBI-SIM 卡片；`MODEL_RESULTS.md` 第27节及现有长期协议。|
+
+若已掌握 FM 基础，针对当前简约目标优先重读：**HuManiFlow → RFM → FMPE → SBI-SIM → On the Guidance of Flow Matching**。依次回答“变量应如何依赖”“旋转应如何生成”“第二生成器是否必要”“物理信息如何随候选状态进入”“引导到底改变什么分布”。这是当前研究顺序，不是这些机制有效性的排名。
 
 ### 已影响设计或判断的六篇补充
 
@@ -38,17 +47,19 @@
 - [Multiple View Geometry Transformers for 3D Human Pose Estimation（MVGFormer）](https://arxiv.org/abs/2311.10983)，P15：用标定投影连接三维查询、多视图图像特征与几何更新。已有显式相机条件设计受其启发；可作为未来图像与几何交互参考。其透视投影、多人查询和可微三角化未移植到当前鱼眼质量门，已读方法/主要实验，未运行完整作者方法。
 - [Learnable Triangulation of Human Pose](https://arxiv.org/abs/1905.05754)，P16：明确各视角观测、权重和标定几何的角色。作者 DLT/体素/RANSAC 子路径及退化行为已审查；零 confidence 仍返回有限点的反例支持保留项目拒绝状态。没有替换正式严格三角化；数值有限不能作为观测有效的依据。
 
-### 已分析但当前不直接移植的三条路线
+### 已分析但当前不直接移植的五条路线
 
 |论文|保留的价值|当前决定及理由|
 |---|---|---|
 |[Fast and Faithful: Principled Conditional Flow Matching for Inverse Problems，v1](https://arxiv.org/abs/2609.12953v1)|在单一速度估计器内显式使用观测算子和残差，内循环共享权重。|停止直接移植线性 Gaussian/HQS 求解到非线性 SMPL-H 鱼眼问题；共享权重仍需多次前向。已读正文3.1–3.4、相关附录与算法，未核验作者源码。2026-10-12 核对到同一 arXiv 的 v2 标题改为 [FIRM: Flow-based Imaging via Regularized Minimization](https://arxiv.org/abs/2609.12953v2)；本项目方法分析仍依据 v1，不声称已读 v2 方法。|
 |[StableHand: Quality-Aware Flow Matching for World-Space Dual-Hand Motion Estimation from Egocentric Video](https://arxiv.org/abs/2605.18553v1)|按观测质量组织生成起点，值得审查训练/推理路径与随机支撑。|读方法式1–11和官方相关采样源码；论文与发布实现的起点/时间日程需区分。完整质量网络、整段时间特征未移植；匹配起点的简化桥实现准备已暂停，缺独立质量标签，q=1 的随机支撑限制也必须明确。不据这些检查否定原论文实验。|
 |[Flower: A Flow-Matching Solver for Inverse Problems](https://arxiv.org/abs/2509.26287v2)|区分无条件先验、观测条件分布与数据一致性求解，完整计算求解成本。|读相关方法/算法及官方 `flower.py`、`flower_cov.py`、配置，未运行作者包。当前条件 JointFlow、非线性鱼眼及人体合法性不满足直接替换前提；默认设置需500次速度调用和逐步CG，停止移植端点/CG/重噪声机制。|
+|[Fast protein backbone generation with SE(3) flow matching（FrameFlow）](https://arxiv.org/abs/2310.05297)|角速度、旋转群积分和旋转/位置联合路径，直接帮助形成 SO3 表示替换候选。|读方法及官方 legacy 的旋转/插值源码，并保留近π分支端点失败；停止照搬该分支与训练/推理源、日程差异。SO3 候选采用独立冻端点 log 与一致路径，未叠加蛋白质 IPA、自条件或预对齐模块。见下文 FrameFlow 卡片、`so3_flow.py` 和 `MODEL_RESULTS.md` 第23–26节。|
+|[Flow Matching for Fast Posterior Sampling in Bayesian Inverse Problems，v1](https://arxiv.org/abs/2610.02377v1)|条件输运的理论解释，以及区分条件样本与需要额外条件的密度、Metropolis 和后验误差诊断。|聚焦第3.1–3.4节，不是全文及数值实验复现。现有模型缺少可信 prior/likelihood/proposal density，不能直接借用后验认证；提取公式的局部符号问题已明确限定范围并保留。方法价值主要是澄清边界，不据它添加 MCMC 或密度网络。见下文卡片及 `MODEL_RESULTS.md` 第27节。|
 
 创新表述应落在可检验的新依赖、新参数化或更简洁的统一机制上。FM、多候选、共享体型、图加 attention、重投影 guidance 均已有明确先例；论文被采用的数量不能支持创新或模型优越性。后续每次只检验一个机制，并保留同信息确定性回归与完整成本对照。
 
-上述 P01–P20 的原阅读范围见 `papers.json` 和下方逐篇记录；作者结构审查见 `IMPLEMENTATION.md`。ManiPose、Guidance、StableHand、Flower 和算子论文属于聚焦阅读，正文/源码具体范围分别见相应 `flow_next_*sources*` 或 `*source_audit*` 记录。D3DP、Dual-Diffusion、EMBR、PoseD-Flow 等仅有摘要、片段或项目页的线索没有计入本节核心已分析清单。
+上述 P01–P20 的原阅读范围见 `papers.json` 和下方逐篇记录；作者结构审查见 `IMPLEMENTATION.md`。ManiPose、Guidance、StableHand、Flower、FrameFlow、FMPE、SBI-SIM 和算子论文属于聚焦阅读，正文/源码范围见下文卡片及对应现有记录；阅读源码不等于运行完整作者方法。D3DP、Dual-Diffusion、EMBR、PoseD-Flow 等仅有摘要、片段或项目页的线索没有计入本节核心已分析清单。
 
 ## P01 — Flow Matching for Generative Modeling
 

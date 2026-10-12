@@ -4430,3 +4430,9 @@ flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及valid
 聚焦读FMPE正文/匹配conditioning附录及Dingo实际loss/sample/log_prob/cache/GLU，2610.02377v1第3.1–3.4节、SBI-SIM控制/zero-control/lensing成本。单条件joint配对流已有先例，当前F0不能凭省G0/J宣称创新；SBI-SIM另增10–11%控制网、lensing10→19s，不直接叠加。官方SBI-SIM尚无实现，2610接受后放代码，未运行任何作者模型；正文在内存解析，没有新增PDF/源码副本或报告。
 
 预登记后一次解析缩放控制核对提取的密度符号：v=ln2*x、sourceN(0,1)，正确q=N(0,4)且x2 logq=-2.11209，加号式会把总质量变4，停止照抄；只针对所取公式文本，不声称全文/未公开代码错误。TV/KL/MH需要可信prior/likelihood/proposal density及条件，当前不具备，不用于升级A6或候选置信度。MODEL_RESULTS第27节/LITERATURE同步。下一步仅审查晚阶段SO3端点的169维物理代价VJP能否替代anchor信息、保持失败与预算，再决定是否实现；当前模型/主线/训练关闭保留，长期有效性未完成。
+
+## 2026-10-12 高价值论文清单补齐与当前采用状态核对
+
+按用户要求更新既有 LITERATURE_ANALYSIS.md 开头的精选：保留已影响实现的 FM、HuManiFlow、FMPose3D、ProHMR、HMR2、RFM，补入最近聚焦分析的 FMPE 和 SBI-SIM；逐项区分历史 baseline/H8、当前 next、SO3 显式候选和待验证假设。FrameFlow 与 Bayesian inverse v1 加入有价值但不直接移植的阅读入口，保留失败和额外假设。当前简约目标优先阅读 HuManiFlow/RFM/FMPE/SBI-SIM/Guidance，不能以借鉴数量或已有机制组合证明创新。
+
+本次只整理既有研究，核对原论文标题/链接、现有源码与结果记录中的采用状态，没有新模型实验、训练或权重加载。SBI-SIM 相关物理梯度尚未接入生成器，现有下一阶段预注册与在途检查保留，不标为已完成；数据缺口、冻结主线和训练关闭继续。仅提交本次文献与进度段落，工作区既有其他改动保留，长期目标仍进行。
