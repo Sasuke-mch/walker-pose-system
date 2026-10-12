@@ -68,3 +68,90 @@ def test_split_and_family_firewall():
                for s in ("train", "test")]
     with pytest.raises(ValueError, match="leakage"):
         validate_manifest({**m, "records": records})
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+def test_fitted_statistics_are_frozen_and_roundtrip_declared_origin(nodes, dtype):
+    # Artificial tensors with declared train/reference metadata test the
+    # contract only; they are not independently acquired reference data.
+    target = labels(nodes)
+    target = replace(target, rotations=target.rotations.to(dtype), beta=target.beta.to(dtype),
+                     translation=torch.tensor([[0., 0., 3.], [.123456789, .05, 3.123456789]],
+                                              dtype=dtype, requires_grad=True),
+                     split="train", source_kind="fitted_reference")
+    expected, _ = target.packed()
+    fitted = Normalization.fit(target, source_path="declared_contract_fixture")
+    assert torch.equal(fitted.mean, expected.mean(0))
+    assert torch.equal(fitted.scale, expected.std(0, unbiased=False).clamp_min(1e-4))
+    assert not fitted.mean.requires_grad and not fitted.scale.requires_grad
+    assert fitted.mean.grad_fn is None and fitted.scale.grad_fn is None
+    assert target.translation.grad is None
+    assert fitted.require_training_statistics() is fitted
+    restored = Normalization.from_dict(fitted.to_dict())
+    assert restored.split == "train" and restored.source_kind == "fitted_reference"
+    assert restored.mean.dtype == restored.scale.dtype == dtype
+    assert torch.equal(fitted.mean, restored.mean) and torch.equal(fitted.scale, restored.scale)
+    assert restored.require_training_statistics() is restored
+
+
+def test_fixture_and_legacy_statistics_do_not_claim_train_origin():
+    fixture = Normalization.fixture(Topology())
+    assert fixture.split == "engineering_fixture" and fixture.source_kind == "analytic_fixture"
+    current = fixture.to_dict()
+    legacy = {key: current[key] for key in ("mean", "scale", "nodes", "source")}
+    restored = Normalization.from_dict(legacy)
+    assert restored.split == restored.source_kind == "legacy_unverified"
+    assert restored.mean.dtype == torch.float32
+    assert torch.equal(restored.normalize(torch.ones(325)), fixture.normalize(torch.ones(325)))
+    for value in (fixture, restored):
+        with pytest.raises(ValueError, match="declared training statistics"):
+            value.require_training_statistics()
+    with pytest.raises(ValueError, match="provenance"):
+        Normalization.from_dict({**legacy, "split": "train"})
+
+
+@pytest.mark.parametrize("split,kind", [("validation", "fitted_reference"), ("test", "independent_reference"),
+                                        ("train", "analytic_fixture"), ("engineering_fixture", "fitted_reference")])
+def test_nontrain_and_conflicting_statistics_provenance_rejected(split, kind):
+    fixture = Normalization.fixture(Topology())
+    with pytest.raises(ValueError, match="provenance"):
+        replace(fixture, split=split, source_kind=kind).validate()
+
+
+def test_gradient_bearing_or_unsupported_statistics_rejected():
+    fixture = Normalization.fixture(Topology())
+    with pytest.raises(ValueError, match="must be frozen"):
+        replace(fixture, mean=fixture.mean.clone().requires_grad_()).validate()
+    with pytest.raises(ValueError, match="dtype"):
+        Normalization.from_dict({**fixture.to_dict(), "dtype": "float16"})
+
+
+def test_so3_codec_and_candidate_provenance_bind_statistics_origin():
+    from ..candidate_store import infer
+    from ..so3_flow import SO3JointFlow
+
+    torch.set_num_threads(1)
+    normal = Normalization.fixture(Topology())
+    model = SO3JointFlow(normal).eval()
+    with torch.no_grad():
+        store, _ = infer(model, normal, observation(), k=1, regression=True)
+    assert store.provenance["normalization_split"] == "engineering_fixture"
+    assert store.provenance["normalization_source_kind"] == "analytic_fixture"
+    relabeled = replace(normal, split="legacy_unverified", source_kind="legacy_unverified")
+    assert torch.equal(relabeled.mean, normal.mean) and relabeled.source == normal.source
+    with pytest.raises(ValueError, match="normalization mismatch"):
+        model.validate_normalization(relabeled)
+
+
+@pytest.mark.parametrize("geometry", ["ambient", "SO3"])
+def test_inference_rejects_unfrozen_statistics_before_encoding(geometry):
+    from ..candidate_store import infer
+    from ..joint_flow import JointFlow
+    from ..so3_flow import SO3JointFlow
+
+    normal = Normalization.fixture(Topology())
+    model = JointFlow() if geometry == "ambient" else SO3JointFlow(normal)
+    unsafe = replace(normal, mean=normal.mean.clone().requires_grad_())
+    with pytest.raises(ValueError, match="must be frozen"):
+        infer(model, unsafe, observation(), k=1, steps=1)

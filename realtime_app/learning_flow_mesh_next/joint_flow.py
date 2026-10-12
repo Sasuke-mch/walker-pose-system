@@ -113,6 +113,7 @@ def regression_loss(model, context, labels, normalization, *, information=None):
     target, _ = labels.packed(require_complete=True)
     if labels.topology != model.topology or normalization.topology != model.topology:
         raise ValueError("regression topology mismatch")
+    normalization.validate()
     error = (model.regression(context, information) - normalization.normalize(target)).square()
     n = model.config.nodes*6
     return (error[:, :n].mean() + error[:, n:n+3].mean() + error[:, -10:].mean())/3

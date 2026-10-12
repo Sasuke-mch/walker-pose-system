@@ -107,6 +107,7 @@ def from_parameters(raw, topology, *, ids, seeds, current_observed, provenance, 
 
 def infer(model, normalization, observation: Observation, state=None, *, k=32, steps=8,
           information=None, stream="G0", regression=False):
+    normalization.validate()
     if normalization.topology != model.topology:
         raise ValueError("inference normalization topology mismatch")
     if hasattr(model, "validate_normalization"):
@@ -144,6 +145,8 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
                   "source_masks": {key: getattr(observation, key).cpu().tolist() for key in
                                    ("present", "quality", "geometry", "views")},
                   "normalization_source": normalization.source, "stream": stream,
+                  "normalization_split": normalization.split,
+                  "normalization_source_kind": normalization.source_kind,
                   "information_encoding": model.config.information_encoding}
     if hasattr(model, "rotation_representation"):
         provenance["rotation_representation"] = model.rotation_representation

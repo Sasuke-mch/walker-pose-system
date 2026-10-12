@@ -4485,3 +4485,9 @@ D01独立提交后发现StateEncoder在localMLP前将准入age清零/seen置True
 CPU64 seeds7/17/27，实际encoder128×102J在rtol1e-8/1e-10/1e-12/1e-14均秩102，smin/smax6.30–6.58e-7，固定方向FD相对误差1.49–1.65e-10。身份路由102D mean数学控制在full/sparse/zero-score/empty恢复准入mask和值；不是新模型。flow_next_encoder_dimension_v1.json保留输入/全谱/控制，Ruff通过，无新增镜像测试、人体解码或成本重跑。
 
 MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结果只否定“仅凭池化/维数就必须扩容”的理由，不证全局可逆、真实ray/history充分或精度；随机初始化敏感性不均保留。当前架构不加cross-attention/RGB/宽度，D02效能仍待独立数据。下一项D10检查实际训练准备与因果合同，训练/神经checkpoint继续关闭；长期goal仍active，既有工作区改动保留。
+
+## 2026-10-13 D10.1归一化统计合同完成
+
+接续上轮已通过未提交修改，现场确认原Normalizer拟合保留grad，float64回读降为float32且mean差8.2978027e-8。按已有预登记完成fit统计detach、split/source_kind/dtype序列化、train来源声明gate；fixture与旧四字段legacy明确不能升级训练来源，数值公式与floor不变。regression/infer验证冻结统计，SO3 codec和候选记录来源。不把metadata一致认证为真实独立数据。
+
+原三文件41tests/五文件Ruff已通过，无重跑；新增infer入口验证仅补2tests通过及两文件lint，43项分次覆盖。MODEL_RESULTS第33节、架构第8/16节与协议同步。数据records仍空，无训练/optimizer/checkpoint/解码/测时或新审计材料。下一项D10.2补显式标签帧绑定、保留缺失的因果unroll和现有目标；完整loader/循环与真实效能继续未完成，长期goal保持active，旧工作区改动保留。

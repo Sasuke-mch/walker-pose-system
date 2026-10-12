@@ -100,6 +100,7 @@ class SO3JointFlow(JointFlow):
         normalization.validate()
         bound = self.normalization
         if (normalization.topology != bound.topology or normalization.source != bound.source
+                or normalization.split != bound.split or normalization.source_kind != bound.source_kind
                 or not torch.equal(normalization.mean, bound.mean)
                 or not torch.equal(normalization.scale, bound.scale)):
             raise ValueError("SO3 output codec normalization mismatch")

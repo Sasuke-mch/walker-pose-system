@@ -95,6 +95,8 @@ class Normalization:
     scale: torch.Tensor
     topology: Topology
     source: str
+    split: str = "legacy_unverified"
+    source_kind: str = "legacy_unverified"
 
     def validate(self):
         shape = (self.topology.dimensions,)
@@ -102,6 +104,22 @@ class Normalization:
             raise ValueError("normalization dimension mismatch")
         if not torch.isfinite(self.mean).all() or not torch.isfinite(self.scale).all() or (self.scale <= 0).any():
             raise ValueError("finite positive normalization required")
+        if self.mean.dtype != self.scale.dtype or self.mean.dtype not in (torch.float32, torch.float64):
+            raise ValueError("matching float32/float64 statistics dtype required")
+        if self.mean.requires_grad or self.scale.requires_grad:
+            raise ValueError("normalization statistics must be frozen")
+        origins = {"train": ("fitted_reference", "independent_reference"),
+                   "engineering_fixture": ("analytic_fixture",),
+                   "legacy_unverified": ("legacy_unverified",)}
+        if not self.source or self.source_kind not in origins.get(self.split, ()):
+            raise ValueError("normalization provenance requires train, explicit fixture or legacy-unverified origin")
+        return self
+
+    def require_training_statistics(self):
+        """Check declared origin only; authentic data/splits need loader evidence."""
+        self.validate()
+        if self.split != "train":
+            raise ValueError("declared training statistics required; fixture/legacy origin is insufficient")
         return self
 
     @classmethod
@@ -109,13 +127,14 @@ class Normalization:
         if labels.split != "train" or labels.source_kind == "analytic_fixture":
             raise ValueError("representation statistics require declared training data")
         values, _ = labels.packed()
-        return cls(values.mean(0), values.std(0, unbiased=False).clamp_min(1e-4),
-                   labels.topology, str(source_path)).validate()
+        return cls(values.mean(0).detach(), values.std(0, unbiased=False).clamp_min(1e-4).detach(),
+                   labels.topology, str(source_path), split="train", source_kind=labels.source_kind).validate()
 
     @classmethod
     def fixture(cls, topology):
         return cls(torch.zeros(topology.dimensions), torch.ones(topology.dimensions),
-                   topology, "analytic_fixture_only_not_training_statistics")
+                   topology, "analytic_fixture_only_not_training_statistics",
+                   split="engineering_fixture", source_kind="analytic_fixture")
 
     def normalize(self, value):
         return (value - self.mean.to(value)) / self.scale.to(value)
@@ -124,10 +143,19 @@ class Normalization:
         return value * self.scale.to(value) + self.mean.to(value)
 
     def to_dict(self):
+        self.validate()
         return {"mean": self.mean.tolist(), "scale": self.scale.tolist(),
-                "nodes": self.topology.nodes, "source": self.source}
+                "nodes": self.topology.nodes, "source": self.source,
+                "split": self.split, "source_kind": self.source_kind,
+                "dtype": str(self.mean.dtype).removeprefix("torch.")}
 
     @classmethod
     def from_dict(cls, value):
-        return cls(torch.tensor(value["mean"]), torch.tensor(value["scale"]),
-                   Topology(value["nodes"]), value["source"]).validate()
+        dtypes = {"float32": torch.float32, "float64": torch.float64}
+        if value.get("dtype", "float32") not in dtypes:
+            raise ValueError("unregistered normalization statistics dtype")
+        dtype = dtypes[value.get("dtype", "float32")]
+        return cls(torch.tensor(value["mean"], dtype=dtype), torch.tensor(value["scale"], dtype=dtype),
+                   Topology(value["nodes"]), value["source"],
+                   split=value.get("split", "legacy_unverified"),
+                   source_kind=value.get("source_kind", "legacy_unverified")).validate()

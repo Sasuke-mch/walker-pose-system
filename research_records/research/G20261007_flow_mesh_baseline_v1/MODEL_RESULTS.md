@@ -1028,3 +1028,15 @@ D01独立完成后继续检查StateEncoder。发现原输入流程先age=where(v
 数值检查通过，结果flow_next_encoder_dimension_v1.json保存每个输入/控制/谱；actual Jac有限，方向误差≤1e-4。小奇异值比揭示该初始化/单位范围内的敏感性不均，并不证明训练后的观测丢失、实际误差或float32失败。局部满列秩不等于全局单射，不排除另一输入域、缺失组合、ray/history或真实数据上的不足。没有扩大参数、token或attention，未执行人体解码/J339/网络K32成本，也未添加镜像测试/验收框架。
 
 实际命令：`.\.venv-cuda\Scripts\python.exe -B -m realtime_app.learning_flow_mesh_next.audit_conditioning --encoder-dimension --output research_records/research/G20261007_flow_mesh_baseline_v1/flow_next_encoder_dimension_v1.json`；改动文件Ruff通过。保存JSON独占创建；stdout截断后直接读保存JSON汇总，没有重复运行。决定保留当前mean/GRU，停止只凭维数/均值池化就增加cross-attention/RGB/宽度的提案；D02的真实信息充分性留待独立训练/对照。下一项D10检查真实训练准备接口与资源合同，训练和神经checkpoint继续关闭，长期目标未完成。
+
+## 33. 2026-10-13 D10.1归一化统计固定与来源/dtype往返修复
+
+上轮已按长期协议登记D10_normalization_check，未提交的五份Python修改本轮现场确认、继续收尾；没有把中断视为失败重跑41项。原Normalization.fit在声明train/fitted_reference的人工梯度输入上mean/scale均requires_grad=True，mean_grad_fn=MeanBackward1；to_dict仅mean/nodes/scale/source四字段。另一个float64人工值回读为float32，mean最大绝对差8.2978027e-8。两次最小现场输出为失败证据，未新建JSON/报告，人工声明仅测试合同而非真实参考数据。
+
+保留原拟合mean/std及1e-4 floor，结果detach；新增split/source_kind和float32/float64 dtype保存与回读。fixture()明确engineering_fixture/analytic_fixture；旧四字段从字串或旧数值均不升级，仍legacy_unverified、原float32 loader默认。require_training_statistics仅认可显式train+fitted_reference/independent_reference元数据，其他来源明确拒绝。validate拒绝mean/scale梯度、混合/未知dtype、validation/test统计和不一致声明；它不判断声明是真实还是伪造，独立源/组划分证据仍缺。
+
+相关传播：regression_loss与candidate_store.infer明确验证统计；SO3 output codec同时绑定来源，避免同数值但换split静默调用；候选来源记录normalization_split/source_kind。不改状态维度、源、损失或网络容量。旧工程人工构造未填写新增字段的Normalizer仍可用作legacy工程记录，不能通过新训练统计gate；没有加载neural checkpoint。
+
+上轮三现有测试文件test_firewall.py/test_joint.py/test_regression_information.py实际41passed in7.69s、五文件Ruff通过；覆盖22/52、float32/64值/来源往返、detach、fixture/legacy拒绝、不一致split、dtype、codec和现有生成/回归/因果接口。新增infer.validate后只运行test_firewall -k inference_rejects：2passed/16deselected in3.34s，两文件Ruff通过。41项未重复；合计43相关检查分次覆盖，新增问题对应新增检查，不将其当独立真实验证。
+
+命令均使用`.\.venv-cuda\Scripts\python.exe -B -m pytest`，三文件`-q --tb=short`；新增入口检查`-k inference_rejects`。Ruff使用既有uv offline入口。没有训练、optimizer、人体解码、成本重跑、数据下载或新验收材料。D10.1完成；下一阶段在train.py把逐帧观测历史、显式标签帧绑定和缺失行保留接到现有目标计算，实际数据loader/训练循环/效能仍未完成。

@@ -40,7 +40,7 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "D02 bounded dimensional reason for expansion rejected; actual fixed102D encoder J has full column rank at3seeds but uneven initialization conditioning. Keep current architecture and independent effectiveness question open. Next D10: inspect real training input/preparation/causal-unroll contract before implementing a runner, with training/checkpoint execution still closed and no fabricated labels.",
+  "next_stage": "D10.1 frozen statistics and provenance/dtype contract passed. Next D10.2: bind each target row to explicit observation frame/clock/identity and unroll causal contexts through original missing frames into CFM/regression objectives. Preserve every slot/reason and TBPTT boundaries; no optimizer, real-data claims or checkpoint execution.",
   "deficiency_improvement_20261012": {
     "status": "continuous_thread_goal_active_training_closed",
     "authorization": "Analyze existing model shortcomings, improve individually, and keep detailed long-term records; no scheduled automation",
@@ -122,6 +122,26 @@
       "output": "flow_next_encoder_dimension_v1.json; MODEL_RESULTS.md section32",
       "scope": "local fixed-input family/random weights; no global, ray/history, trained quality or speed guarantee",
       "architecture_changed": false, "training": false
+    },
+    "D10_normalization_check": {
+      "status": "preregistered_before_new_checks",
+      "question": "Are declared train statistics frozen, and can serialized statistics distinguish train origin from fixture constants or old unverified records?",
+      "source": "Normalization.fit returns means/std with no detach; Normalization stores only mean/scale/topology/source and from_dict loses computation origin",
+      "inputs": "Synthetic tensors with explicit fitted-reference/train metadata solely for contract testing; optional gradient-bearing targets; real manifests still empty. No independent-label claim",
+      "only_variable": "Frozen representation-statistics and serialization contract: detach means/scales, record split/source_kind and float32/64 dtype, explicit train-statistics gate. Numeric fitting formula/floor and model dimensions unchanged",
+      "controls": "Existing numeric mean/std/floor; exact float32/64 values/dtype and provenance roundtrip. Old4-field record stays legacy_unverified with original float32 loader default; fixture cannot qualify as train; validation/test/contradictory provenance and gradient-bearing statistics rejected",
+      "success": "Train-derived values equal old formula but no grad_fn/requires_grad; source metadata roundtrips; fixture/legacy usable only as declared engineering records, not automatically upgraded to train. Existing objective/codec interfaces remain valid",
+      "stop": "Do not certify metadata as truthful data origin; only future real loader/group split checks can verify that. No optimizer or neural checkpoint operation, downloads or timing rerun. Keep actual data/runner/effectiveness gaps open",
+      "training": false
+    },
+    "D10_normalization_result": {
+      "date": "2026-10-13", "status": "frozen_provenance_dtype_contract_completed",
+      "red_evidence": "fit mean/scale both required gradients; float64 record restored float32 with8.2978027e-8 max mean difference; no extra report",
+      "repair": "Detach fitted statistics; explicit split/source_kind/float32-or64 dtype serialization. Fixture and legacy stay separate from declared train origin; infer/regression validate; SO3 binding and candidates retain origin",
+      "checks": "41passed in7.69s on3existingfiles; after new infer validation only2new checks passed in3.34s.43checks covered across runs; changed-file Ruff passed",
+      "record": "MODEL_RESULTS.md section33 and MODEL_ARCHITECTURE.md sections8/16",
+      "limits": "metadata consistency is not authentic provenance or independent label/split evidence; loader/optimizer/checkpoint lifecycle and real efficacy missing",
+      "training": false
     },
     "next_after_D01": "Inspect state/conditioning limitations and identify one discriminating counterexample before any new architecture. Mean pooling, beta variation, no RGB and hand uncertainty are hypotheses/resource limits, not automatic module-addition instructions. Search mechanism overlap before committing to an architectural research direction.",
     "original_stop_rules": "Two justified revisions per mechanism; SO3 kernel allowance exhausted; fullK32 VJP promotion stopped at ratio1.7822233; frozen held-out and fair controls inherited",
@@ -242,7 +262,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 D02 fixed102D input-family dimension/encoder-J check passed; all3seed128x102J locally full rank, identity routing control exact, poor initialization conditioning retained. Stop dimension-only architecture expansion; no actual-effectiveness claim. D01/D08 retained, no training/checkpoint/mainline change.",
+  "last_completed_stage": "2026-10-13 D10.1 statistics detach and dtype/provenance roundtrip repaired;43related checks across runs plus Ruff. Train/fixture/legacy origin declarations distinct, not certified data authenticity. No training/checkpoint/mainline change, full runner/effectiveness remains missing.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

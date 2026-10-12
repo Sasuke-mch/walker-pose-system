@@ -115,6 +115,8 @@ Sβ=Λββ−Λβu pinv(Λuu)Λuβ只作为局部诊断；Gram会平方J条件�
 
 标准化目标x来自完整标签R/T/β；Normalization仅允许train真实声明统计，工程fixture单位常数不是训练配置。ε~N(0,I)，s~Uniform[0,1]，z_s=(1−s)ε+sx，目标速度x−ε。L=(mean_pose MSE + mean_T MSE + mean_beta MSE)/3，各块按自身维数平均，避免312维pose自动压过3维T与10维β。
 
+2026-10-13 D10.1修复Normalization统计合同：fit仍用原mean/std和1e-4 floor，但结果detach；序列化保留dtype/split/source_kind。训练来源声明只能是train+fitted_reference/independent_reference，工程常量明确engineering_fixture+analytic_fixture，旧四字段记录保持legacy_unverified、原float32默认，不能由source字串自动认证训练来源。require_training_statistics检查声明，不认证独立数据或划分。float32/64回读值逐值保持；mean/scale必须冻结且同dtype，推理入口和回归loss明确validate，SO3 codec绑定来源字段，候选provenance保存这些字段。数据统计真实性仍待真实loader与注册数据证据。
+
 同capacity regression使用同速度网络、输入状态0和s=1，经block平均MSE。2026-10-12已补齐可选information接口：regression、regression_loss与train.objective透传同一冻结Λ，复用原信息投影和全部参数；默认不传Λ与旧输出逐值一致。损失接口已支持信息条件回归；2026-10-12进一步补齐candidate_store.infer的Λ透传，仍限K1且保留拒绝/状态/资源记录。完整训练评估runner未实现，尚未训练；如比较G1，仍须匹配G0生成anchor/J的完整成本和条件来源，不能只匹配单网络参数。CFM没有默认endpoint MSE、best-of-K loss或独立网格损失。
 
 预置AdamW、lr3e-4、weight_decay0.01、clip1、warmup1000、cosine、effective_batch16、unroll32、smoke2000/main50000、validation每1000、seeds7/17/27。`train.py`只有configuration/prepare/objective，无真实数据loader/optimizer循环/训练checkpoint生命周期；以上均未执行。用户未授权训练、motion labels未取得，不能凭配置声称可学习性或完整复现。
@@ -246,7 +248,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 |D07/P2|A4 medoid表达候选群体代表性，不保证最接近真值；算法语义确认，真实误选率未知。|同缓存对比最强可部署决策、保留全槽位与风险覆盖；检查多模态及候选偏置，禁止oracle根位置/逐关节拼接。|原选择误差至少5%配对改善及保留率门；无独立真值不选赢家，不新加learned ranker。|待独立效能。|
 |D08/P1|原local特征在准入age清零/seen置True后构造，实际池化槽的这两维恒定；6组context精确碰撞及真实时间顺序检查确认。更广的连续时间/运动建模仍未证。|local MLP改用incoming_age/prior_seen；输出状态与global time沿原重置规则。无新参数，不添加hidden衰减或人体结果反馈。|重现间隔/首次见到差异，并保留缺失/未来/分块合同；context响应不等于真实姿态收益。|本地特征缺陷已修复，MODEL_RESULTS第31节；实际缺失/采样节奏效能仍待独立验证。|
 |D09/P0|SO3生成仍慢于ambient；全K32 VJP比1.7822超过1.25；第26/29节实测。|保留SO3表示候选，停止现全K32反馈晋升；若有全新有据替代问题先预注册。原核两轮额度不重置。|必须在原K/NFE和全成本口径内达门；不能减K/步数或反复测时制造通过。方向通过不算精度或速度收益。|原路径停止，独立VJP保留。|
-|D10/P1|train.py只有prepare/objective，无真实loader/optimizer/checkpoint生命周期；源码确认。|在标签/划分合同明确后，按一个环节补齐runner并保持训练默认禁止。允许纯输入/状态合同检查，不自动执行训练。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；缺资源不伪造已训练成果。|资源与授权门保持关闭。|
+|D10/P1|train.py只有prepare/objective，无真实loader/optimizer/checkpoint生命周期；原Normalization.fit保留grad并回读丢dtype/来源，实测确认。|D10.1已固定统计计算图及dtype/来源序列化；接续补因果序列context→匹配目标loss。实际loader/optimizer/checkpoint仍需逐步完成且训练默认禁止。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；声明不认证真实性，缺资源不伪造已训练成果。|D10.1完成，41原相关项+2新增入口项/Ruff通过；完整runner仍未实现/数据门关闭。|
 |D11/P0|训练、独立noise/3D/shape记录为空，未证实生成/shape/选择/校准改善；manifest确认。|取得独立资源后按原energy score、选择误差、coverage-width、无效率和三seed参与者配对协议评价。现有拟合结果不自证准确。|继承原5%改善、CI/coverage/失败门；数据缺口不能靠工程测试补齐，长期目标保持未完成。|资源限制。|
 |D12/P2|当前无后验密度/可信likelihood/校准；全链采集+检测实时与跨rig外推也未认证；源码/既有成本范围确认。|校准/概率与部署分别在相应数据/硬件/完整输入边界评价；先明确采样分布、失败率和时间口径。|不把等权候选、B矩阵、合法旋转或纯网络耗时叫后验/30fps；无证据保留明确未认证状态，不叠加density/MH模块。|待独立概率/部署验证。|
 
