@@ -205,7 +205,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 
 2026-10-12第二轮核替换已完成，见MODEL_RESULTS第26节。Rodrigues用K²=wwᵀ−||w||²I及half-angle sinc省去通用矩阵指数；θ²<1e-4用四阶A/B Taylor、regular分支先clamp再sqrt，避免零角 inactive 分支的除零/导数非有限。网络参数、噪声源、日程和步数不变。17项相关测试通过；同次全链p50闭式38.33ms、旧核43.63ms、ambient33.23ms，1.1536倍通过成本门，仍慢于ambient，显存增量未下降。保留显式构造的研究候选；两轮已耗尽，结束核优化，未将其晋升默认、宣称精度或改变G0/G1/J。
 
-2026-10-12统一机制阅读见MODEL_RESULTS第27节：FMPE/条件transport支持当前F0的离线joint配对、在线无G0/J采样，但该通用机制已有先例且数据/噪声充分性未满足。SBI-SIM另加控制网与逐步物理反馈，当前不叠加；只考察以单次晚阶段代价/角向VJP替换anchor信息输入的可行性，尚未实现。A6不等同后验校准/密度/MH，当前无log_prob或真实prior/likelihood；不根据论文的density/覆盖论证升级证据。训练和默认架构继续保持。
+2026-10-12统一机制阅读见MODEL_RESULTS第27节：FMPE/条件transport支持当前F0的离线joint配对、在线无G0/J采样，但该通用机制已有先例且数据/噪声充分性未满足。SBI-SIM另加控制网与逐步物理反馈，当前不叠加；当时提出单次晚阶段代价/角向VJP替换anchor信息输入的假设，现已完成独立算子而成本晋升失败，见第14节。A6不等同后验校准/密度/MH，当前无log_prob或真实prior/likelihood；不根据论文的density/覆盖论证升级证据。训练和默认架构继续保持。
 
 ## 14. 独立端点代价余切量：已实现，未接入神经网络
 
@@ -216,3 +216,13 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 该输出是标准化坐标下的代价梯度/余切量。将它变为更新需要明确metric/步长/日程；本阶段没有物理修正、control网络或velocity条件接口。它不能保留Λ的rank/Schur/全耦合，也没有验证FD邻域，不能作为旧information的语义等价替换。
 
 晚阶段s=7/8沿base velocity预测到s=1，正好等于原8步LieEuler最后一步端点，不额外调用速度网络。成本可行性因此在原端点上测旁路；VJP解码仍不能冒充任何未来修正后人体的最终解码。一次真实CPUfloat64对照relative_error=3.9459897e-11、pose/T/beta均有限；同次CUDAfloat32 K32/8完整p50无VJP45.61805ms、有VJP81.30155ms，ratio1.7822233>1.25，停止全K32晚反馈晋升。后者实际网络8batch/256状态、人体2batch/64状态、reverse1；前者人体1batch/32状态、reverse0。详细记录和边界见MODEL_RESULTS第29节与flow_next_endpoint_vjp_cost_v1.json。训练、神经checkpoint和正式主线继续关闭/不变。
+
+## 15. 当前研究方案架构图与阅读顺序
+
+按用户要求生成当前源码对应的中文论文风格图：[可编辑SVG](figures/jointflow_so3_current_20261012.svg)、[矢量PDF](figures/jointflow_so3_current_20261012.pdf)。白底黑线，中文字与数学符号已实际查看PNG并修正；不使用历史H8图替代next，也不添加当前不存在的RGB、手部memory、运动树图、contact或控制网络。
+
+![当前SO3JointFlow架构](figures/jointflow_so3_current_20261012.png)
+
+图a为原鱼眼34槽位特征的准入池化/观测GRU/时间条件；图b为Haar源、54tokens联合速度场与8步右乘LieEuler；图c保留每条候选完整R/T/beta、真实SMPL-H解码及A4整候选选择。图d明确为独立端点VJP算子，未回连生成器且成本门失败；图e表示既有ambient G0/J/G1对照仍保留，不代表单模型SO3内部包含两个生成器。图中参数与模块来自当前源码，不代表已训练、已验证人体精度或正式主线切换。
+
+当前研究计算链为Observation/历史观测状态→context128→条件SO3JointFlow→K32完整候选→真实解码与整候选决策。旋转读取6D嵌入、实际携带3×3矩阵，输出3D角速度；T/beta沿标准化接口，公开状态325维、局部方向169维。物理人体beta应跨时间不变，但next未实现H8的prefix冻结；当前只是联合生成每帧的beta估计。仅COCO17观测也不直接提供独立手部/shape标签。下一项研究应先证明这种条件分布与整候选决策的任务价值，而不因图形完整或SO3合法就认定创新/有效。

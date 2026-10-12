@@ -26,7 +26,7 @@
 |论文|对当前问题的具体价值|项目采用状态|阅读与证据入口|
 |---|---|---|---|
 |[Flow Matching for Scalable Simulation-Based Inference（FMPE）](https://arxiv.org/abs/2305.17161)|从参数—观测配对直接学习观测条件速度场，在线只积分一个模型；比较生成状态进入条件编码的位置，以及观测特征缓存的质量/成本取舍。它给审查 G0/J/G1 必要性提供强对照。|已影响当前单模型路线的判断；F0 本已有同类机制，不把它写成新移植或创新。没有由论文证明 G1 无用，也没有新增 GLU 网络、密度计算或训练。|已聚焦读第3/5.2/5.3节、Appendix D.2–D.3和官方 Dingo 的 loss/sample/log_prob/cache/GLU 源码；未运行作者模型。下文 FMPE 卡片；`MODEL_RESULTS.md` 第27节。|
-|[Flow Matching for Posterior Inference with Simulator Feedback（SBI-SIM）](https://arxiv.org/abs/2410.22573)|用预测终点的物理代价及其梯度反馈给生成过程；一次反向传播可取得代价对参数的方向，而不必构造完整观测 Jacobian。zero-control 消融帮助区分物理信号与新增容量的收益。|仅借鉴为下一阶段的替换假设：晚阶段、完整人体参数、原鱼眼物理代价，审查能否替代 anchor/J 信息。尚未接入速度网络；原额外 control 网络与不可微模拟器 encoder 不直接加入。|已聚焦读第4/4.1/4.2/5.3/6.1节及相关预算。原方案有额外参数和明显反馈耗时，不能称免费简化；未运行作者方法。下文 SBI-SIM 卡片；`MODEL_RESULTS.md` 第27节及现有长期协议。|
+|[Flow Matching for Posterior Inference with Simulator Feedback（SBI-SIM）](https://arxiv.org/abs/2410.22573)|用预测终点的物理代价及其梯度反馈给生成过程；一次反向传播可取得代价对参数的方向，而不必构造完整观测 Jacobian。zero-control 消融帮助区分物理信号与新增容量的收益。|启发晚阶段完整参数原鱼眼代价的替换假设。现已实现独立endpoint VJP，真实人体方向对照通过，但K32完整成本1.7822倍超过1.25门，停止晋升。未接入速度网络；原control网络与不可微模拟器encoder不加入。|已聚焦读第4/4.1/4.2/5.3/6.1节及相关预算。未运行作者方法；本地算子不等于复现SBI-SIM。下文卡片；`MODEL_RESULTS.md` 第27/29节、`MODEL_ARCHITECTURE.md` 第14节及现有长期协议。|
 
 若已掌握 FM 基础，针对当前简约目标优先重读：**HuManiFlow → RFM → FMPE → SBI-SIM → On the Guidance of Flow Matching**。依次回答“变量应如何依赖”“旋转应如何生成”“第二生成器是否必要”“物理信息如何随候选状态进入”“引导到底改变什么分布”。这是当前研究顺序，不是这些机制有效性的排名。
 
