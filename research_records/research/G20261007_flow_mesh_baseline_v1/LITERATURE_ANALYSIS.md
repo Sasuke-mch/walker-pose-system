@@ -611,3 +611,11 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 文中zero-controls对照有价值：保留control容量和finetuning但置零反馈，帮助分开额外容量/训练与物理信号。lensing的建模时间从无反馈10s到反馈19s，主要参照MCMC不是原flow提速。所称53%是相对GT参考残差平台的chi2改善（1.83→1.48，参考1.17），低重投影/模拟残差并不能独立认证整个人体后验或置信区间。LV另有C2ST独立分布参考，不能把它的分布证据转成lensing/本项目证据。
 
 实际核对 [官方仓库](https://github.com/tum-pbs/sbi-sim) README和公开tree，本轮只有README/LICENSE/banner，README称源码将公开；不虚报原control实现已读或已运行。不直接增加control/quality/encoder模块。只保留一个替换假设：能否在单模型现有信息输入处使用晚阶段代价/角向梯度，通过一次VJP提供状态相关物理反馈，替代G0 anchor/J/Lambda路线；它已有SBI-SIM/ScoreHMR等机制先例，不能称通用创新。下一阶段先审查实际SO3终点/原鱼眼/拒绝和成本前提，不进入神经实现或训练。
+
+### 2026-10-12 D02集合压缩判别的原始理论参考（聚焦阅读）
+
+[Deep Sets](https://arxiv.org/pdf/1703.06114)，Zaheer等，NeurIPS2017：本轮实际读第2.2/3.1节，区分可数域Theorem2、连续域限定及逐元素非线性→sum→读出的结构。它说明集合聚合应结合元素编码来讨论；并未认证当前128宽MLP/GRU全局可逆或任务充分。当前关节/相机身份已在非线性前绑定，不能把原身份后加碰撞继续归罪于mean。未读整篇实验/作者代码，不标完整精读或复现。
+
+[On the Limitations of Representing Functions on Sets](https://proceedings.mlr.press/v97/wagstaff19a/wagstaff19a.pdf)，Wagstaff等，ICML2019：实际读第2/4/4.1节，连续标量集合通用sum表示的维数条件及其适用范围。通用表达能力、指定任务和带身份的向量槽不同，不能把其M/N条件直接换成34×15/128来证本项目必须扩容。本文也不证明随机训练或观测条件足够。没有运行作者median实验。
+
+本地D02结果见MODEL_RESULTS第32节/flow_next_encoder_dimension_v1.json：仅当前帧像素与score的固定102D输入族，实际context128在3seed局部满列秩，另有identity-routed102D表示控制；二者都不证明全局/真实ray/history信息充分。采用状态是约束错误的“池化必然失败/必须扩容”推理，保留当前架构；没有将论文机制作为新的模块或创新。

@@ -1,4 +1,4 @@
-"""Scalar counterexamples for curvature-only information and reused likelihood."""
+"""Bounded conditioning and encoder diagnostics without training or extra models."""
 import argparse
 import json
 from fractions import Fraction
@@ -74,11 +74,108 @@ def audit():
     }
 
 
+def encoder_dimension_contract():
+    """Narrow fixed-slot input family, not trained information sufficiency."""
+    from dataclasses import replace
+
+    import torch
+
+    from .state_encoder import StateEncoder
+    from .tests.test_firewall import observation
+
+    torch.set_num_threads(1)
+    dtype = torch.float64
+    j = torch.arange(17, dtype=dtype)
+    left = torch.stack((120+19*j, 100+11*(j % 7)), -1)
+    xy = torch.stack((left, left+torch.tensor([-8., 6.], dtype=dtype)))
+    score = torch.stack((.4+.02*j, .75-.015*j))
+    fixture = observation()
+    base = replace(fixture, xy=xy, confidence=score, origins=fixture.origins.double(),
+                   directions=fixture.directions.double(), geometry=torch.zeros_like(fixture.geometry)).validate()
+    packed = torch.cat((xy.flatten()/1000, score.flatten()))
+    control_cases = []
+    features = torch.cat((xy.reshape(34, 2)/1000, score.reshape(34, 1)), -1)
+    for name in ("full", "sparse", "zero_confidence", "empty"):
+        admitted = torch.ones(34, dtype=torch.bool)
+        values = features.clone()
+        if name == "sparse":
+            admitted[:] = False
+            admitted[[0, 4, 16, 19, 33]] = True
+            values[~admitted] = torch.nan
+        elif name == "zero_confidence":
+            values[:, 2] = 0
+        elif name == "empty":
+            admitted[:] = False
+            values[:] = torch.nan
+        # Each identity routes three values to its own coordinates. Adding1 to
+        # score distinguishes admitted score0 from a missing slot's empty block.
+        routed = torch.zeros(34, 102, dtype=dtype)
+        indices = admitted.nonzero().flatten()
+        if len(indices):
+            coordinates = 3*indices[:, None]+torch.arange(3)
+            routed[indices[:, None], coordinates] = values[admitted]+torch.tensor([0., 0., 1.], dtype=dtype)
+            pooled = routed[admitted].mean(0).reshape(34, 3)
+        else:
+            pooled = torch.zeros(34, 3, dtype=dtype)
+        recovered_mask = pooled[:, 2] > 0
+        recovered = pooled*recovered_mask.sum()-torch.tensor([0., 0., 1.], dtype=dtype)
+        error = float((recovered[admitted]-values[admitted]).abs().max()) if admitted.any() else 0.
+        control_cases.append({"case": name, "admitted_count": int(admitted.sum()),
+                              "mask_recovered": bool(torch.equal(recovered_mask, admitted)),
+                              "admitted_value_max_error": error,
+                              "current_observation_available": bool(admitted.any())})
+    permutation = torch.arange(34)
+    permutation[0], permutation[16] = 16, 0
+    swapped = features[permutation]
+    permutation_free_collision = bool(torch.allclose(features.mean(0), swapped.mean(0), atol=1e-15, rtol=0))
+    routed_identity_distinguishes = bool((features-swapped).abs().max() > 0)
+    records = []
+    for seed in (7, 17, 27):
+        torch.manual_seed(seed)
+        model = StateEncoder().double().eval()
+        def context(value, model=model):
+            current = replace(base, xy=value[:68].reshape(2, 17, 2)*1000,
+                              confidence=value[68:].reshape(2, 17))
+            return model(current, state=None)[0]
+        jacobian = torch.autograd.functional.jacobian(context, packed, vectorize=True)
+        singular = torch.linalg.svdvals(jacobian)
+        direction = torch.randn(102, dtype=dtype, generator=torch.Generator().manual_seed(19))
+        direction = direction/direction.norm()
+        with torch.no_grad():
+            central = (context(packed+1e-4*direction)-context(packed-1e-4*direction))/(2e-4)
+        expected = jacobian@direction
+        relative = float((expected-central).norm()/expected.norm())
+        finite = bool(torch.isfinite(jacobian).all() and torch.isfinite(singular).all())
+        records.append({"seed": seed, "parameters": sum(p.numel() for p in model.parameters()),
+                        "jacobian_shape": list(jacobian.shape), "finite": finite,
+                        "singular_values": singular.tolist(),
+                        "rank_sensitivity": {str(rtol): int((singular > rtol*singular[0]).sum())
+                                             for rtol in (1e-8, 1e-10, 1e-12, 1e-14)},
+                        "smin_over_smax": float(singular[-1]/singular[0]),
+                        "FD_direction_step_standardized": 1e-4, "FD_direction_relative_error": relative,
+                        "direction_check": finite and relative <= 1e-4})
+    return {"date": "2026-10-12", "scope": "D02 pooling/dimension hypothesis; current-frame fixed102D input family",
+            "code": "audit_conditioning.encoder_dimension_contract and corrected state_encoder.StateEncoder",
+            "device": "cpu", "dtype": "float64", "xy": xy.tolist(), "confidence": score.tolist(),
+            "family": "rawxy/1000(68)+score(34); fixed mask/rig/geometry=False and initial temporal state",
+            "control_width": 102, "context_width": 128, "identity_routing_is_model_change": False,
+            "control_cases": control_cases, "permutation_free_mean_collision": permutation_free_collision,
+            "routed_identity_distinguishes_slot_swap": routed_identity_distinguishes,
+            "actual_encoder_records": records,
+            "numeric_checks_passed": all(r["mask_recovered"] and r["admitted_value_max_error"] <= 1e-12
+                                         for r in control_cases) and permutation_free_collision
+                                     and routed_identity_distinguishes and all(r["direction_check"] for r in records),
+            "boundary": "Identity routing is an analytic control, not a proposed trained encoder. Local rank at random weights neither certifies global information sufficiency nor proves effect loss; ray/history/calibration inputs and data distribution excluded",
+            "training": False, "checkpoint_loaded": False, "architecture_changed": False}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--encoder-dimension", action="store_true",
+                        help="only bounded fixed-slot encoder dimension/sensitivity checks; no surface/J/noise audit")
     args = parser.parse_args()
-    result = audit()
+    result = encoder_dimension_contract() if args.encoder_dimension else audit()
     with args.output.open("x", encoding="utf-8") as stream:
         json.dump(result, stream, ensure_ascii=False, indent=2)
         stream.write("\n")

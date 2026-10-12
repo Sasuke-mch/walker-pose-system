@@ -4477,3 +4477,11 @@ SBI-SIM采用状态同步为独立算子方向通过、K32成本失败、未接�
 D01独立提交后发现StateEncoder在localMLP前将准入age清零/seen置True，实际池化槽这两维恒定。先登记D08对照，CPU64 seeds7/17/27、同incoming hidden和时钟，6组年龄/此前seen不同但旧context最大差严格0；首次出现/0.2秒缺失/0.9秒恢复的顺序检查也失败，新检查初次7failed。
 
 只改原15维特征的age/seen读出为重置前incoming_age/prior_seen；返回状态与global time保留原更新规则，GRU函数/容量/准入/缺失发布不改。修复后27相关项通过、6项因错误要求hidden也相同失败；纠正测试和协议为age/seen/metadata相同、hidden合法响应新信息，仅重跑6项通过，33项分次覆盖，两文件Ruff通过。失败原因/命令/边界详见MODEL_RESULTS第31节，架构第4/16节和长期协议同步；这是输入路径修复，无真实缺失精度/运行收益。旧hidden/输出不混入新语义，无训练/权重/解码/测时或新验收材料。下一项D02先做信息丢失判别，长期goal继续active。
+
+## 2026-10-12 D02有限维数判别：保留池化，停止无依据扩容
+
+现场核对D01/D08与原身份修复，聚焦读Deep Sets第2.2/3.1节及Wagstaff2019第2/4/4.1节原文；理论条件不直接认证或拒绝本项目带身份的向量槽。先登记后扩展既有audit_conditioning --encoder-dimension，仅当前帧像素68+score34固定102D族；不能把34×15所有特征当自由连续变量。
+
+CPU64 seeds7/17/27，实际encoder128×102J在rtol1e-8/1e-10/1e-12/1e-14均秩102，smin/smax6.30–6.58e-7，固定方向FD相对误差1.49–1.65e-10。身份路由102D mean数学控制在full/sparse/zero-score/empty恢复准入mask和值；不是新模型。flow_next_encoder_dimension_v1.json保留输入/全谱/控制，Ruff通过，无新增镜像测试、人体解码或成本重跑。
+
+MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结果只否定“仅凭池化/维数就必须扩容”的理由，不证全局可逆、真实ray/history充分或精度；随机初始化敏感性不均保留。当前架构不加cross-attention/RGB/宽度，D02效能仍待独立数据。下一项D10检查实际训练准备与因果合同，训练/神经checkpoint继续关闭；长期goal仍active，既有工作区改动保留。

@@ -1008,3 +1008,23 @@ D01独立完成后继续检查StateEncoder。发现原输入流程先age=where(v
 实际验证命令：首次红检查为`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_identity_binding.py -q --tb=short -k 'freshness or elapsed_age'`；修复后两文件使用相同pytest入口/`-q --tb=short`；测试约束更正后仅该测试文件`-k freshness`。Ruff检查state_encoder.py/test_identity_binding.py，测试调整后只追加该测试文件lint；没有重跑27项或原成本。
 
 结论：local编码现在可以接收再次观测前的槽位时间间隔/首次出现标志。六组context区分超过1e-8是随机网络的输入路径证据，不是缺失人体准确度改善；更广的运动/采样节奏效能尚未执行。既有模型checkpoint/旧hidden不在新语义下混用，原历史成本与图保持历史记录；无训练、权重加载、人体解码或额外测时。D08这一具体局部缺陷完成，长期台账其他假设和独立有效性继续未完成，下一步转D02的信息压缩必要性判别。
+
+## 32. 2026-10-12 D02维数与局部信息判别：不支持仅凭池化扩容
+
+开始核对实际D01/D08提交、当前encoder和已有身份碰撞修复，未重复旧检查。聚焦读取两原始论文：[Deep Sets](https://arxiv.org/pdf/1703.06114)第2.2/3.1节（Theorem2可数域、连续域限定）与[Wagstaff2019](https://proceedings.mlr.press/v97/wagstaff19a/wagstaff19a.pdf)第2/4/4.1节（连续scalar-set sum-decomposition维数条件、不是每个任务都需要通用表达）。NeurIPS一个Reviewed.pdf地址读取失败后用原arXiv正文，无新PDF副本。没有读取/运行作者网络或训练实验；来源范围补入既有LITERATURE_ANALYSIS。
+
+不能从34槽×15特征大于128就推出当前必然丢失关键关系：固定mask/rig/geometry关闭/初始时间状态时，像素68+score34只有102连续维；全特征中身份/掩码是离散项，射线与真实像素/标定也不总是自由独立。这个计数仅针对本次固定输入族，不覆盖所有ray/history/rig条件；论文通用sum表示定理也不直接认证本模型的固定小MLP/GRU。按已有长期协议D02_dimension_check先登记三竞争解释、控制与停止条件，再扩展现有audit_conditioning.py --encoder-dimension，不改生成器/encoder。
+
+数学控制：用已知34槽身份把每槽[u/1000,v/1000,score+1]路由至独占3维，准入集合取mean，共102维。score+1严格正，把真实score0和缺失块0区分；非零第三坐标恢复mask，计数N后乘N恢复准入值。full34、sparse5、zero-score34、empty0四例均恢复mask和值（≤1e-12），empty保持无观测；无身份3维mean在0/16槽交换下相同，而固定身份路由可区分。该控制是限定输入族的表示存在性反例，不是实际网络、最强人体对照或已实现新的encoder。
+
+实际当前StateEncoder检查：CPUfloat64、threads1、seeds7/17/27、137216参数；LEFT像素u=120+19j/v=100+11(j mod7)，RIGHT相对[-8,+6]像素；score分别0.4+0.02j/0.75−0.015j。全部准入、geometry=False、state=None，不宣称点来自真实人体或已同步双目。计算context128对[xy/1000的68维,score34]的Jacobian128×102。全部奇异值保留，rank阈值1e-8/1e-10/1e-12/1e-14均102；固定seed19单位方向与central FD step1e-4对照。
+
+|seed|四档局部秩|smin/smax|FD方向相对误差|
+|---|---|---:|---:|
+|7|均102|6.5779121e-7|1.6207567e-10|
+|17|均102|6.4009348e-7|1.4936306e-10|
+|27|均102|6.2981912e-7|1.6491970e-10|
+
+数值检查通过，结果flow_next_encoder_dimension_v1.json保存每个输入/控制/谱；actual Jac有限，方向误差≤1e-4。小奇异值比揭示该初始化/单位范围内的敏感性不均，并不证明训练后的观测丢失、实际误差或float32失败。局部满列秩不等于全局单射，不排除另一输入域、缺失组合、ray/history或真实数据上的不足。没有扩大参数、token或attention，未执行人体解码/J339/网络K32成本，也未添加镜像测试/验收框架。
+
+实际命令：`.\.venv-cuda\Scripts\python.exe -B -m realtime_app.learning_flow_mesh_next.audit_conditioning --encoder-dimension --output research_records/research/G20261007_flow_mesh_baseline_v1/flow_next_encoder_dimension_v1.json`；改动文件Ruff通过。保存JSON独占创建；stdout截断后直接读保存JSON汇总，没有重复运行。决定保留当前mean/GRU，停止只凭维数/均值池化就增加cross-attention/RGB/宽度的提案；D02的真实信息充分性留待独立训练/对照。下一项D10检查真实训练准备接口与资源合同，训练和神经checkpoint继续关闭，长期目标未完成。
