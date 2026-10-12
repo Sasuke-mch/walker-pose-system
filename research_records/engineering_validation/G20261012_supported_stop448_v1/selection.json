@@ -37,5 +37,6 @@
       "maximum_vertex_correction_m": 0.02239973098039627
     }
   },
-  "frame_count_resolution": "explicit user request: full448 original image pairs"
+  "frame_count_resolution": "explicit user request: full448 original image pairs",
+  "minimal_visualization_title": "二维关节点损失优化"
 }

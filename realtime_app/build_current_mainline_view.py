@@ -43,6 +43,8 @@ def main():
                         help="resume a failed export with its exact same completed current scene")
     parser.add_argument("--scene-profile", default="mainline",
                         help="explicit isolated scene candidate; default retains formal mainline")
+    parser.add_argument("--minimal-text", action="store_true",
+                        help="compact title and sidebar; retain diagnostics under details")
     cli = parser.parse_args()
     out = cli.output.resolve()
     if out.exists() and not cli.resume_current_export:
@@ -230,6 +232,9 @@ def main():
                                 '<section><h2>SMPL-H 显示</h2><label><input id="smoothModel" type="checkbox" checked>少量参数平滑</label>'
                                 '<p>邻帧权重各0.1；每关节旋转修正最多2°，平移最多3mm。取消可看原始拟合。'
                                 '观测、Stage、地面、相机、助步器不平滑；几何诊断栏针对平滑版本。</p></section><section><h2>操作</h2>')
+        if cli.minimal_text:
+            from walker_tools.visualization.minimal_viewer_text import minimal_viewer_text
+            page = minimal_viewer_text(page, sel.get("minimal_visualization_title", "人体与助步器"))
         page_path.write_text(page, encoding="utf-8")
         if smoothing:
             # Keep the standalone page, but avoid embedding ~100MB of JSON

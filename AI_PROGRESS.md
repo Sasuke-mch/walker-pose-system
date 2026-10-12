@@ -4259,3 +4259,8 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 最终view_v4：原动作标签逐帧与baseline相同，strict5286；11个原Stage1切换点高度步长全0，Stage1全部214帧参考高度误差0，四助步器脚Z为4.55e-13..2.84e-12mm数值零。最大单帧高度69.5156→13.6119mm，旋转5.8358→1.8908°，助步器任一节点位移96.6519→49.4509mm。停止段7次确认，85缓冲帧重估；第380确认并恢复停止段，第391进入动作Stage1不再下降。完整对照transition_comparison.json保留首版失败及每个边界。最大XY帧差30.5061→33.2377mm略增，旧anchor足残差最多99.5798mm，不隐藏，不把支撑先验称外部足接触真值。
 
 33相关测试、E9/F与compileall通过；22来源/transform检查通过；浏览器实际0/380/391/447、380显示“过渡/协议支撑闭合”、391显示Stage1保持、真实模型/黑骨架/实体助步器/深XY地面可见，console error为空，截图preview_stop.jpg/preview_stage1.jpg及validation.json保存。新页面view_v4/body_browser.html（与GZ配套），离线完整body.html。既有SMPL-H拟合/少量显示平滑、baseline页面、360正式配置和92项用户改动保留。本轮独立小文件提交，不提交大数据/HTML/GZ或推送。新协议仅适用于用户保证的平地停止支撑，不把默认mainline静默切换。
+
+
+## 2026-10-12 当前448帧页面文字精简
+
+按用户要求，supported_stop448_v1/view_v4页面标题改为“二维关节点损失优化”，侧栏仅保留地面、显示开关和平滑；质量与拒绝信息收进“详情”，移除权重/协议/参考来源/操作长说明。新增可选--minimal-text及selection.minimal_visualization_title，默认正式导出行为不变。当前body.html与body_browser.html同步更新，内嵌数值载荷逐字不变、全部运行控件ID保留、GZ未改；未重跑拟合或场景。浏览器391帧真实网格可见，平滑开关往返正常，无console error，preview_minimal.jpg保留。相关Python语法检查通过；当前CUDA环境未安装ruff，未宣称lint通过。本轮仅提交小代码、选择和文字验证记录；已有用户改动保留，大型页面/数据不入Git。
