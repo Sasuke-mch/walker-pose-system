@@ -1,0 +1,33 @@
+{
+  "status": "passed_engineering_export",
+  "selected_reprojection_weight": 0.004,
+  "joint_steps": 300,
+  "frames": 448,
+  "scene_profile": "mainline -> supported_stop_fixed_lag",
+  "same_run_source_checks": "source_validation.json:22 passed",
+  "fresh_scene_matches_verified_profile": true,
+  "raw_toggle_fields_match_original": true,
+  "smoothing_frozen_fields_and_endpoints_match": true,
+  "browser_frames": [
+    0,
+    22,
+    380,
+    391,
+    447
+  ],
+  "browser_states": {
+    "22": "Stage2 / 重估",
+    "380": "过渡 / 闭合",
+    "391": "Stage1 / 保持"
+  },
+  "playback_and_smoothing_toggle": "verified",
+  "console_errors": [],
+  "title": "二维关节点损失优化",
+  "sidebar": "same minimal labels, collapsed details",
+  "screenshot": "preview.jpg",
+  "standalone_page": "body.html",
+  "app_page": "body_browser.html",
+  "data_file": "body_data.json.gz",
+  "performance_tradeoff": "previous ankle D2 gate failure preserved; export checks do not promote contact/gait/accuracy",
+  "preparation_failure": "../export_preparation_failure.json and export.log retained; canonical args preserve exactly parsed effective options"
+}

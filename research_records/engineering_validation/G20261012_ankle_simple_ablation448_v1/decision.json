@@ -50,7 +50,15 @@
       "600"
     ]
   },
-  "mainline_or_viewer_replaced": false,
+  "mainline_or_viewer_replaced": true,
   "failures": "both preregistered gate failures retained in comparison.json",
-  "limits": "reprojection and relative motion match to model predictions, not independently measured gait/accuracy; no neural network training, only frozen-model SMPL-H parameter fitting"
+  "limits": "reprojection and relative motion match to model predictions, not independently measured gait/accuracy; no neural network training, only frozen-model SMPL-H parameter fitting",
+  "formal_body_mainline_replaced": false,
+  "user_adoption": {
+    "date": "2026-10-12",
+    "request": "adopt proposed simple adjustment and visualize with previous title/text",
+    "selected_view": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\view\\body_browser.html",
+    "selection": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\selection.json",
+    "performance_gate_failures_retained": true
+  }
 }

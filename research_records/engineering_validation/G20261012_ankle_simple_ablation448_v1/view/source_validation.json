@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "checks": {
+    "source_body_all_fields_identical": true,
+    "mesh_shapes": true,
+    "faces_from_selected_body": true,
+    "v_fresh_transform_exact": true,
+    "j_fresh_transform_exact": true,
+    "t_fresh_transform_exact": true,
+    "explicit_smoothing_with_original_toggle": true,
+    "original_mesh_fresh_transform_exact": true,
+    "original_coco_fresh_transform_exact": true,
+    "strict_mask_exact": true,
+    "ankle_trail_strict_xyz_exact": true,
+    "ankle_trail_mask_exact": true,
+    "fit_weights_exact": true,
+    "old_quality_separate_exact": true,
+    "source_pair_ids_exact": true,
+    "stage_counts_current": true,
+    "old_scene_not_consumed": true,
+    "strict_points_count": true,
+    "strict_accepted_xyz_current_records": true,
+    "both_camera_centers_exact": true,
+    "all_walker_nodes_exact": true,
+    "all_walker_edges_exact": true
+  },
+  "stage_counts": {
+    "warming_up": 5,
+    "transition": 114,
+    "stage2_feet_static_walker_moving": 115,
+    "stage1_walker_static_human_moving": 214
+  },
+  "strict_accepted_points": 5286,
+  "limits": "Source/transform consistency; not independent accuracy or contact truth"
+}

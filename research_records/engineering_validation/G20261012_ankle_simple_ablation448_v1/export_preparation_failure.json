@@ -1,0 +1,7 @@
+{
+  "error": "duplicate options in stored experimental command rejected before view creation",
+  "evidence": "export.log",
+  "repair": "viewer_fit_args.json preserves effective last-value options exactly; original command retained",
+  "parsed_options_identical": true,
+  "model_refit": false
+}

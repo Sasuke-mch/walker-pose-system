@@ -880,3 +880,10 @@ Stage2使用历史相机系脚点中位数再做0.45平移更新，会引入因�
 原/weight2x/steps2x踝像素mean=33.021/25.822/32.801，P95=105.333/80.412/105.293；其余关节点mean55.055/43.405/54.608。左右视图踝差向量去均值RMS幅度/原2D幅度：原0.399/0.445，weight2x0.620/0.687，steps2x0.400/0.447。该指标消去共同二维平移，更针对迈步相对运动，但不等于真实步长。结果支持优先调整数据/先验平衡，单纯增加步数收益很小。
 
 代价：相机系骨盆相对踝二阶差分P95=24.893/40.761/32.869mm/frame²，两组均未通过预设≤20%增幅门，不能宣布全门通过或已消除滑步。补充事后诊断：2D踝差向量D2RMS/运动幅度，weight2x相比原左右增加2.6%/6.9%；绝对二阶差分部分随运动幅度放大，但不能据此排除抖动或修改既定门。推荐0.004/C300作为下一简单候选，保留当前平滑参数，先审看脚部尾帧；不继续盲目加迭代、不引入新几何约束。当前比较使用未平滑原始结果。评估脚本evaluate_ankle_simple_ablation.py的完整帧/单变量/finite检查和AST通过；无拟合器代码改动，ruff不可用，不重复已通过内核测试。
+
+
+### 2026-10-12 用户采用0.004/C300并完成同样式448可视化
+
+按用户明确选择，当前448展示采用G20261012_ankle_simple_ablation448_v1/weight2x/result.npz，不重复拟合。同目录smoothed以原SO3邻帧0.1/≤2°、transl≤3mm重新解码，保留原网格/COCO/内部关节点开关与固定beta/手姿；最大顶点修正27.34mm如实记录，不称精度提升。selection.json保存当前选择；前轮D2门失败继续保留。正式360身体选择未由本次展示替换。
+
+view以原同源图像重新strict/Stage/背景旋转/地面，使用主线mainline→supported_stop_fixed_lag；标题“二维关节点损失优化”，侧栏完全沿用minimal-text精简样式。原冷实验命令存在重复参数，被导出预检拒绝，export.log及export_preparation_failure.json保留；viewer_fit_args.json规范化末值，完整parser选项逐项一致，无拟合改动。第二次导出成功。22来源/变换检查通过，原开关/冻结字段/端点及当前scene与已验收profile全字段等值检查通过。浏览器0/22/380/391/447、播放/平滑开关、Stage2/过渡闭合/Stage1保持实测，console error为空。当前页view/body_browser.html及配套GZ；离线body.html，截图preview.jpg，记录browser_validation/source_validation。仅小记录与已有文档追加提交，大HTML/NPZ/GZ/图片不提交，不push；92已有工作区改动保留。

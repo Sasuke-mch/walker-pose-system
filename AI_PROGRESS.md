@@ -4285,3 +4285,10 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 按用户纠正，优先踝点位置与迈步幅度，暂停脚尖/额外6点扩展。新隔离G20261012_ankle_simple_ablation448_v1完整448两次同种子冷拟合：仅二维权重0.002→0.004/C300；仅C300→600/权重0.002。冷初始化逐值相同，其他选项一致，未训练网络或增加模型。踝mean原33.02→weight25.82/steps32.80px；P95原105.33→80.41/105.29。相对踝运动幅度/原二维观测，原40%–45%，weight62%–69%，steps40%–45%。支持权重平衡问题优先，纯加步数几乎无效。
 
 原/weight/steps踝骨盆相对D2P95=24.89/40.76/32.87mm/frame²；两组均未过预注册20%增幅门，失败保留，不宣称抖动或滑步完全解决。事后按运动幅度归一的2D粗糙度weight增加2.6%/6.9%，不能替换原验收门。建议简单候选二维0.004、C300、VPoser0.01，其余保持；已有候选结果可用于下一可视检查，当前页面与主线未替换。protocol/comparison/decision与完整fit_args/选项记录，eval脚本全帧/有限/单变量检查及AST通过；无内核改动，不重复内核测试，ruff不可用。仅本轮小代码/文档追加/JSON提交，原92改动保留。
+
+
+## 2026-10-12 用户采用0.004/C300并更新448展示
+
+当前448选择G20261012_ankle_simple_ablation448_v1/selection.json，采用已完成weight2x结果，邻帧0.1/2°/3mm少量SMPL-H平滑重新解码；不重拟合。view完整原图fresh strict/Stage/旋转/地面，mainline→supported_stop_fixed_lag，标题“二维关节点损失优化”与原精简侧栏保持。22source检查、原数据开关/冻结字段/端点核对、fresh scene与已验收profile全字段等值核对通过，浏览器0/22/380/391/447、播放/平滑正常且无error，preview.jpg/browser_validation保存。
+
+首次因实验命令重复参数在创建view前失败；规范化viewer_fit_args保证parser所有有效选项逐项相同，原export.log/失败记录保留；export_v2成功。前轮D2变化门未过继续保留，用户选择展示不等于性能/物理真值门晋升；正式360身体选择保留。当前打开view/body_browser.html（配套GZ），离线body.html。仅小JSON/已有文档追加本地提交，92用户改动及旧页面/失败证据保留，未推送。

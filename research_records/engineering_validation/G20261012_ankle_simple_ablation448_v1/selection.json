@@ -1,0 +1,43 @@
+{
+  "dataset": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1",
+  "frames": 448,
+  "frame_ids": "0..447",
+  "source_pair_ids": "0..447",
+  "frames_metadata": "research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\frames.json",
+  "scene_reproduction_command": "research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\scene_template_command.json",
+  "visualization_title": "二维关节点损失优化",
+  "detector": "pmpose",
+  "detector_inputs": {
+    "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "images": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs"
+  },
+  "body": {
+    "result": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\smoothed\\result.npz",
+    "reproduction_arguments": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\viewer_fit_args.json",
+    "resolved_options": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\weight2x\\resolved_options.json",
+    "body_weighting": "reference",
+    "wrist_reference_enabled": false,
+    "accepted_for_main_fit": false,
+    "fresh_cold_fit": true,
+    "display_smoothing": {
+      "source": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\weight2x",
+      "output": "research_records\\engineering_validation\\G20261012_ankle_simple_ablation448_v1\\smoothed",
+      "frames": 448,
+      "mode": "explicit_user_requested_display_variant_not_refit",
+      "strength_each_neighbor": 0.1,
+      "rotation_limit_degrees_per_joint": 2.0,
+      "translation_limit_m": 0.003,
+      "eligible_triplets": 446,
+      "endpoints_and_gaps_unchanged": true,
+      "beta_and_hands_unchanged": true,
+      "vertices_redecoded_from_parameters": true,
+      "raw_observations_ground_stage_walker_camera_smoothed": false,
+      "maximum_translation_correction_m": 0.0030000116676092148,
+      "maximum_vertex_correction_m": 0.02733846753835678
+    }
+  },
+  "frame_count_resolution": "explicit user request: full448 original image pairs",
+  "minimal_visualization_title": "二维关节点损失优化",
+  "user_selection": "2026-10-12 explicitly adopts weight0.004/C300 with prior minimal viewer labels and bounded SMPL-H smoothing; prior gate tradeoff retained"
+}
