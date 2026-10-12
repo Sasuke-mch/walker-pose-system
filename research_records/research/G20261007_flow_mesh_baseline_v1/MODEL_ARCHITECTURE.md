@@ -54,11 +54,13 @@ present槽必须有限；真正缺失槽可NaN，不能把present但质量拒绝
 
 ## 4. 观测与因果状态编码
 
-源码 `state_encoder.py`：每槽15维，顺序为xy2/1000、confidence1、origin3、direction3、present1、quality1、有效geometry1、log1p(age)1、seen1、dt1。xy/score仅在admitted时进入；射线仅在有效geometry时进入。除以1000是固定输入尺度，非训练得到的图像归一化。
+源码 `state_encoder.py`：每槽15维，顺序为xy2/1000、confidence1、origin3、direction3、present1、quality1、有效geometry1、log1p(incoming_age)1、prior_seen1、dt1。D08修复后，incoming_age是上一状态age加当前dt、但尚未因本观测清零的测量间隔；prior_seen是在当前观测之前是否曾见过该槽。xy/score仅在admitted时进入；射线仅在有效geometry时进入。除以1000是固定输入尺度，非训练得到的图像归一化。
 
 34槽经Linear15→128后加17×128关节身份与2×128视图角色参数，再经GELU、Linear128→128。身份必须在非线性之前与内容结合；旧版MLP后相加会在均值池化中丢失槽位与观测的对应。2026-10-12修复仅调整既有算子顺序，参数仍不变。只有准入槽参与均值池化，池化观测经GRUCell128→128更新hidden。没有准入槽时完全不更新hidden；年龄按dt增加，不发布人体。初始hidden/age为0，seen为False，未知age由seen明确区分。
 
 另一个时间分支输入 `[dt, mean(age), admitted_fraction, seen_fraction]` 的log1p值，经Linear4→128、GELU、Linear128→128。context=hidden+time_context；全缺失时context可因时间变化，但观测hidden仍冻结，不能混淆这两者。
+
+D08修复区分两个时间位置：local MLP读取重置前的incoming_age/prior_seen；返回TemporalState与上述global timing仍使用本次观测后的age/seen（准入age0、seenTrue，缺失age继续增加）。旧实现在清零/置True后才构造local特征，所有实际池化槽位的age/seen恒为0/True。新顺序不增加参数，不改变age/seen或GRU的更新方程，但hidden/context数值因收到新信息而合法改变。旧版本已保存的hidden/模型输出不作为新版本结果使用；已有历史成本不改写成新输入语义性能。
 
 TemporalState保存identity、sequence、camera_ids、hidden128、age2×17、seen2×17、last_timestamp和last_frame；身份/序列/rig改变必须显式reset。时间和frame严格递增。序列化/分块carry保存真实状态，detach用于截断梯度而非清空状态。模块不处理未来帧，不用最终选中候选更新这段memory。
 
@@ -219,7 +221,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 
 ## 15. 当前研究方案架构图与阅读顺序
 
-按用户要求生成第24–29节原SO3分配版本对应的中文论文风格图：[可编辑SVG](figures/jointflow_so3_current_20261012.svg)、[矢量PDF](figures/jointflow_so3_current_20261012.pdf)。白底黑线，中文字与数学符号已实际查看PNG并修正；不使用历史H8图替代next，也不添加当前不存在的RGB、手部memory、运动树图、contact或控制网络。该图保留D01之前711056参数版本；D01只移除图中未画出的不可达信息分配，主计算链不变，当前默认容量以第1/13/16节为准，不覆盖历史图或成本。
+按用户要求生成第24–29节原SO3分配版本对应的中文论文风格图：[可编辑SVG](figures/jointflow_so3_current_20261012.svg)、[矢量PDF](figures/jointflow_so3_current_20261012.pdf)。白底黑线，中文字与数学符号已实际查看PNG并修正；不使用历史H8图替代next，也不添加当前不存在的RGB、手部memory、运动树图、contact或控制网络。该图保留D01/D08之前711056参数及旧时间输入语义版本；主模块连接不变，当前默认容量以第1/13/16节、当前age/seen语义以第4节为准，不覆盖历史图或成本。
 
 ![当前SO3JointFlow架构](figures/jointflow_so3_current_20261012.png)
 
@@ -242,7 +244,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 |D05/P1|F0不接收NoiseModel.precision，G1通过Λ间接接收；已有第16节noise控制，输入公平性边界确认。|固定noise时保留；变化noise时先明确共同可用信息与接口，再做噪声因素/架构因素分离对照。confidence不得当校准协方差。|信息来源、容量和完整获取成本均匹配；无独立噪声校准数据不晋升概率/置信度结论。|待输入协议与校准资源。|
 |D06/P2|默认Λ对角块丢交叉耦合，固定sketch非单射且原晋升已停；实测反例/第7节确认。|优先问任务是否需要Λ及其耦合，而非不断扩展编码；继承Flow/回归×有/无Λ对照和全部anchor/J成本。|按原held-out门证明收益，不能用sketch重建可见性代替任务效能；不恢复已停跨块扩展。|保留对照，未证明信息必要性。|
 |D07/P2|A4 medoid表达候选群体代表性，不保证最接近真值；算法语义确认，真实误选率未知。|同缓存对比最强可部署决策、保留全槽位与风险覆盖；检查多模态及候选偏置，禁止oracle根位置/逐关节拼接。|原选择误差至少5%配对改善及保留率门；无独立真值不选赢家，不新加learned ranker。|待独立效能。|
-|D08/P1|观测GRU与age/time编码不等同人体运动状态/连续时间动力学；无观测hidden冻结，源码确认。|先检查真实时间间隔、缺失长度和采样节奏对context的可辨识与依赖；区分合理的时间条件变化和错误的记忆污染。|确定可复现合同问题才修复；不把missing输出冻结或平滑旧人体当补救。未来隔离、状态carry和缺失拒绝保留。|待最小判别检查。|
+|D08/P1|原local特征在准入age清零/seen置True后构造，实际池化槽的这两维恒定；6组context精确碰撞及真实时间顺序检查确认。更广的连续时间/运动建模仍未证。|local MLP改用incoming_age/prior_seen；输出状态与global time沿原重置规则。无新参数，不添加hidden衰减或人体结果反馈。|重现间隔/首次见到差异，并保留缺失/未来/分块合同；context响应不等于真实姿态收益。|本地特征缺陷已修复，MODEL_RESULTS第31节；实际缺失/采样节奏效能仍待独立验证。|
 |D09/P0|SO3生成仍慢于ambient；全K32 VJP比1.7822超过1.25；第26/29节实测。|保留SO3表示候选，停止现全K32反馈晋升；若有全新有据替代问题先预注册。原核两轮额度不重置。|必须在原K/NFE和全成本口径内达门；不能减K/步数或反复测时制造通过。方向通过不算精度或速度收益。|原路径停止，独立VJP保留。|
 |D10/P1|train.py只有prepare/objective，无真实loader/optimizer/checkpoint生命周期；源码确认。|在标签/划分合同明确后，按一个环节补齐runner并保持训练默认禁止。允许纯输入/状态合同检查，不自动执行训练。|真数据来源、train-only统计、同条件回归、验证选点与test锁均落实；缺资源不伪造已训练成果。|资源与授权门保持关闭。|
 |D11/P0|训练、独立noise/3D/shape记录为空，未证实生成/shape/选择/校准改善；manifest确认。|取得独立资源后按原energy score、选择误差、coverage-width、无效率和三seed参与者配对协议评价。现有拟合结果不自证准确。|继承原5%改善、CI/coverage/失败门；数据缺口不能靠工程测试补齐，长期目标保持未完成。|资源限制。|
@@ -251,3 +253,5 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 D01的竞争解释为：不可达分配可无损删除；存在隐藏依赖；输出差异其实来自构造RNG偏移。唯一变量为SO3 inactive信息层/buffer分配。保留原super构造和姿态头初始化顺序，显式retain_inactive_information=True作为旧分配模式；默认删除分配，不改变函数、观测、Normalization、Haar源、8步或完整候选接口。严格state_dict不自动忽略旧层，旧已保存结果继续按原容量解释。当前所有下一项均为待判别/资源状态，不能提前写成改进完成。
 
 D01实际通过：默认SO3删除info_pose/info_position/info_shape，并将非持久pose/shape probes置None。原ambient构造不变，profile共同参数复制只取两个模型实际共有的keys。构造仍先创建旧层再移除，保持活跃参数初始化逐值相同，故不宣称减少初始化峰值；原分配模式用于历史比较，不是另一个生成器。float32三组权重常驻/serialized张量减少60416bytes，固定probes移除13M个元素（原float64时52节点17576bytes、22节点8216bytes；随to(dtype)改变原buffer字节）。活跃容量不变，无新性能测量；旧strict state_dict在新默认模式显式报unexpected keys，未加入隐式迁移或加载checkpoint。
+
+D08先在现有协议登记时间特征碰撞控制，CPUfloat64 seeds7/17/27、同incoming hidden/观测/时钟，仅一个准入槽的age或prior_seen不同。旧版六组context差严格0，实际0→缺失0.2→恢复0.9秒序列的local输入也错把第一次seen设True。修复后六组context均可区分（测试阈值1e-8），重置后的age/seen/身份/时钟相同，hidden按新观测特征变化；首次age0/prior_seenFalse、恢复gap0.9/prior_seenTrue正确。27相关项先通过；6项因错误要求hidden相同而失败，修正测试约束后仅该6项通过，两文件Ruff通过。共有33相关检查分次覆盖，不重复此前27项。无训练、checkpoint、测时或真实缺失姿态收益结论。

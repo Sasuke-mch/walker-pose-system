@@ -40,7 +40,7 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "D01 storage-only SO3 cleanup passed with identical active computation. Next choose one discriminating source-grounded D02 observation-compression or D08 missing/elapsed-time question before changing architecture; do not treat random context differences as accuracy or add modules by default. No timing rerun, neural feedback, training or mainline promotion; previous K32 VJP stop remains in force.",
+  "next_stage": "D01 and concrete D08 feature-order repair completed independently. Next inspect D02: determine what task-relevant observation information the corrected global context loses, with a discriminating counterexample and same-capacity rival before any attention/RGB addition. Search overlap for a proposed research mechanism; keep no-training/no-checkpoint and previous timing stops.",
   "deficiency_improvement_20261012": {
     "status": "continuous_thread_goal_active_training_closed",
     "authorization": "Analyze existing model shortcomings, improve individually, and keep detailed long-term records; no scheduled automation",
@@ -72,6 +72,30 @@
       "changed_file_ruff": "passed", "result_record": "MODEL_RESULTS.md section30",
       "efficacy_or_latency_improvement_claimed": false,
       "training": false
+    },
+    "D08_first_check": {
+      "status": "preregistered_before_collision_checks",
+      "question": "Does resetting slot age/seen before the localMLP erase incoming measurement-gap/first-seen information even when returned TemporalState is correct?",
+      "source": "state_encoder.py sets age=where(valid,0,age), seen=seen|valid; then embeds only tokens[valid]",
+      "hypotheses": ["Admitted local age/seen are always0/True; matched hidden and post-reset timing yield exact context collision", "The local path retains incoming age/seen and already separates the fixtures", "History may encode some freshness implicitly, so this local collision alone does not prove accuracy loss"],
+      "inputs": "Valid typed analytic TemporalState pairs with same incoming hidden/identity/rig/frame/clock; one incoming age or prior-seen differs at a currently admitted slot. Post-reset age/seen/metadata match; output hidden may legitimately differ after repaired measurement embedding. Seeds7/17/27 CPUfloat64. Actual observed/missing/reappearance sequence checks feature chronology.",
+      "only_variable_if_repair_needed": "Use pre-reset incoming age and prior seen for existing local feature coordinates12/13; retain post-reset age/seen for output state and global timing. Same15 input dimensions,128width and parameter tensors; no new branch",
+      "success": "Preserve finite incoming elapsed age/previous seen at admitted slots; distinguish controlled collisions while post-reset age/seen/clock metadata agree; changed hidden follows changed measurement. Chronological features and missing/future/chunk contracts pass. This is a feature-contract repair, not an efficacy claim",
+      "stop": "If no exact collision, retain current semantics and do not change model. If repair needs extra capacity or changes age/seen update rules, GRU update rule or publication, stop and narrow the contract. Hidden numeric values are expected to change with the repaired input. Do not read context differences as task improvement or force hidden-state decay.",
+      "revision": 1,
+      "training": false
+    },
+    "D08_result": {
+      "status": "concrete_slot_feature_order_repaired_no_effectiveness_claim",
+      "before": "Six age/prior-seen fixture pairs had exactly identical context; local pooled age0/seenTrue; initial7failed",
+      "repair": "Embed pre-reset incoming_age/prior_seen in existing15Dlocal features; post-reset age/seen/time and GRU update equations retained, hidden legitimately responds",
+      "capacity_change": 0,
+      "tests": "27passed/6failed due erroneous hidden-equality test; correct metadata-only equality, rerun only6:6passed.33 related checks covered across runs",
+      "ruff": "both changed Python files passed",
+      "record": "MODEL_RESULTS.md section31; MODEL_ARCHITECTURE.md sections4/16",
+      "old_outputs_and_hidden": "historical pre-repair semantics; not mixed into new execution",
+      "training": false,
+      "accuracy_or_latency_measured": false
     },
     "next_after_D01": "Inspect state/conditioning limitations and identify one discriminating counterexample before any new architecture. Mean pooling, beta variation, no RGB and hand uncertainty are hypotheses/resource limits, not automatic module-addition instructions. Search mechanism overlap before committing to an architectural research direction.",
     "original_stop_rules": "Two justified revisions per mechanism; SO3 kernel allowance exhausted; fullK32 VJP promotion stopped at ratio1.7822233; frozen held-out and fair controls inherited",
@@ -192,7 +216,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 D01 SO3 unreachable info allocations removed by default; explicit old-allocation control retains identical active parameters/candidates/causal state/losses/gradients. Default52/22=695952/692112,25 related tests and Ruff passed. No latency/accuracy claim, training/checkpoint/mainline change or VJP promotion.",
+  "last_completed_stage": "2026-10-12 D08 StateEncoder local gap/prior-seen feature-order repair after exact old collision; corrected local inputs, unchanged capacity and post-reset age/seen/clock rules.33 related checks covered across runs and Ruff passed; D01 storage simplification remains. No true accuracy, runtime, training, checkpoint, mainline or VJP promotion.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

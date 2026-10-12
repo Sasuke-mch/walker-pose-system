@@ -991,4 +991,20 @@ VJP阶段自身p50为34.70410ms；完整p50比 **1.7822233**，超过先定1.25�
 
 先运行新对照测试两拓扑，2failed/17deselected是新增legacy构造参数尚未实现的TypeError，不是原模型精度失败。实现后只运行test_joint.py/test_regression_information.py：25passed in7.55s；三份改动Python Ruff通过。新22/52逐值对照检查同seed活跃参数、所有state_dict差异恰为三组信息权重、buffer大小；K32/8在观测→全缺失→恢复三帧的raw/R/T/beta/numerical/actions/IDs/seeds/reasons/网络计数与完整serialized state均一致；两目标loss及每个活跃参数梯度逐值相同，旧不可达权重gradNone；Lambda仍拒绝。严格加载原模式随机state_dict到新模式明确unexpected keys，未隐式吞旧层；这是内存随机模块的键合同检查，没有读取checkpoint、训练或optimizer运行。
 
+实际验证命令：`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_joint.py realtime_app/learning_flow_mesh_next/tests/test_regression_information.py -q --tb=short`；`uv tool run --offline ruff check realtime_app/learning_flow_mesh_next/so3_flow.py realtime_app/learning_flow_mesh_next/profile.py realtime_app/learning_flow_mesh_next/tests/test_joint.py`。
+
 此前架构图与SO3成本v1/v2/VJPv1保留原711056容量并在架构文档标为历史分配；未因删参数重跑测时或覆盖结果。D01完成，下一步优先判别D02观测压缩或D08缺失时间处理是否存在新的具体问题，先排除已修复身份碰撞和“context不同就是精度改善”的错误推理。其余设计/效能不足仍未完成，长期目标保持active。
+
+## 31. 2026-10-12 D08局部时间特征修复：先编码incoming age/seen，再保留原状态重置
+
+D01独立完成后继续检查StateEncoder。发现原输入流程先age=where(valid,0,age)、seen=seen|valid，然后构造15维local特征，且只池化tokens[valid]。因此进入GRU的每个准入槽，其local age永远0、seen永远True；mean(age)和seen_fraction的global time分支仅看到重置后的统计。这是两个槽位特征失效的源码问题，不等于证明GRU无法隐式保留任何历史或真实误差已恶化。
+
+先登记长期协议D08_first_check。typed人工TemporalState对照固定identity/rig/frame/clock与incoming hidden，当前所有点准入；只改变一个槽的incoming age或prior_seen，post-reset age/seen/metadata一样。CPUfloat64 seeds7/17/27，两类共6组旧context最大差严格0。第7项真实顺序0秒观测→0.2秒全缺失→0.9秒恢复，原第一次local seen为True，不提供首次出现信息。新检查首次7failed/7deselected，保持原失败说明，不将这些人工状态pair当真实轨迹/精度样本。
+
+修复state_encoder.py仅保存incoming measurement_age/prior_seen用于原特征12/13，输出状态和global timing使用原post-observation age/seen。特征维度15、StateEncoder137216参数及各模型容量不变，原槽位身份绑定、准入池化、GRU更新函数和全缺失hidden冻结不变。首次观测输入age0/prior_seenFalse；缺失后恢复的gap=累计物理dt，previous seenTrue。未知槽gap是序列累计时间，prior_seenFalse明确它不是已知的上次检测时间，不伪造可靠观测历史。
+
+修复后一次test_identity_binding.py/test_joint.py为27passed/6failed in8.22s：6项测试仍错误要求完整返回state（含hidden）相同，而新时间信息本应影响GRU hidden。明确纠正测试为post-reset age/seen/身份/时钟相同、incoming状态不被修改，hidden可随新特征改变；相应协议说明同步。这是测试约束错误，不是再次修模型或调阈值。只重跑这6项：6passed/8deselected in1.52s；其余27通过保持有效，没有重复功能检查。两份改动Python Ruff通过。33相关项分次覆盖包括原关节/视图身份、未来隔离、serialized carry、无观测不发布、两模型CFM/回归与D01计算等价。
+
+实际验证命令：首次红检查为`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_identity_binding.py -q --tb=short -k 'freshness or elapsed_age'`；修复后两文件使用相同pytest入口/`-q --tb=short`；测试约束更正后仅该测试文件`-k freshness`。Ruff检查state_encoder.py/test_identity_binding.py，测试调整后只追加该测试文件lint；没有重跑27项或原成本。
+
+结论：local编码现在可以接收再次观测前的槽位时间间隔/首次出现标志。六组context区分超过1e-8是随机网络的输入路径证据，不是缺失人体准确度改善；更广的运动/采样节奏效能尚未执行。既有模型checkpoint/旧hidden不在新语义下混用，原历史成本与图保持历史记录；无训练、权重加载、人体解码或额外测时。D08这一具体局部缺陷完成，长期台账其他假设和独立有效性继续未完成，下一步转D02的信息压缩必要性判别。

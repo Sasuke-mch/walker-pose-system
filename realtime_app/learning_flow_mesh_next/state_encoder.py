@@ -38,16 +38,19 @@ class StateEncoder(nn.Module):
             hidden, age, seen = state.hidden, state.age + dt, state.seen
         valid = obs.admitted()
         geom = valid & obs.geometry
+        # Encode the elapsed gap and whether this slot was seen *before* this
+        # measurement. Resetting first makes every pooled slot's age0/seenTrue.
+        measurement_age, prior_seen = age, seen
         age = torch.where(valid, 0, age)
         seen = seen | valid
         # Unknown ages are time since sequence start, accompanied by explicit seen=False.
-        ages = torch.log1p(age).unsqueeze(-1)
+        ages = torch.log1p(measurement_age).unsqueeze(-1)
         features = torch.cat((torch.where(valid[..., None], obs.xy / 1000.0, 0),
                               torch.where(valid, obs.confidence, 0)[..., None],
                               torch.where(geom[..., None], obs.origins, 0),
                               torch.where(geom[..., None], obs.directions, 0),
                               torch.stack((obs.present, obs.quality, geom), -1).to(obs.xy),
-                              ages, seen[..., None].to(obs.xy),
+                              ages, prior_seen[..., None].to(obs.xy),
                               obs.xy.new_full((2, 17, 1), dt)), -1)
         if valid.any():
             # Bind identity to content before the nonlinearity. Adding identity
