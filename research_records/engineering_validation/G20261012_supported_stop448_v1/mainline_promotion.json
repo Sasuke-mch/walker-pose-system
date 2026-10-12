@@ -1,0 +1,31 @@
+{
+  "decision_date": "2026-10-12",
+  "authorization": "user requests current Stage1/2 continuous transition logic become mainline",
+  "selected_profile": "supported_stop_fixed_lag",
+  "default_entry": "scene.replay_fitted_body_scene; omitted --scene-profile and explicit mainline resolve selected profile",
+  "retained_control": "explicit --scene-profile baseline",
+  "capture_contract": "Every walker stop is supported on same flat ground, no stationary hover",
+  "evidence": [
+    "view_v4/source_validation.json",
+    "transition_comparison.json",
+    "validation.json"
+  ],
+  "validation": {
+    "mainline_actual448_command_matches_verified_profile_options": true,
+    "tests": 49,
+    "python_syntax": true,
+    "no_neural_weights_loaded": true,
+    "no_fitting_or_scene_replay_repeated": true,
+    "live_capture_not_integrated": true
+  },
+  "changed_files": [
+    "realtime_app/build_current_mainline_view.py",
+    "realtime_app/walker_tools/scene/replay_fitted_body_scene.py",
+    "realtime_app/tests/test_scene_replay_contract.py",
+    "realtime_app/configs/current_mainline.json",
+    "realtime_app/configs/stage_ground_profiles.json"
+  ],
+  "body_selection": "360 reference25 selection unchanged; 448 2D fit not promoted by this scene-only request",
+  "limits": "0.5sec fixed lag; live run_stereo integration and other-capture validation pending; ground prior is not contact truth",
+  "lint": "ruff unavailable in current runtime; AST and diff checks performed"
+}

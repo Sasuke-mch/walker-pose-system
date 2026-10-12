@@ -95,20 +95,29 @@ class SceneReplayContractTests(unittest.TestCase):
             return args()
 
     def test_baseline_keeps_algorithm_defaults(self):
-        original, profile = self.parse([]), self.parse(["--scene-profile", "baseline"])
-        for key in vars(original):
-            if key not in {"scene_profile", "resolved_scene_profile"}:
-                self.assertEqual(getattr(original, key), getattr(profile, key))
+        profile = self.parse(["--scene-profile", "baseline"])
+        self.assertFalse(profile.stage_handoff)
+        self.assertFalse(profile.disable_stage1_reanchor)
+        self.assertEqual(profile.landing_recovery, "none")
+        self.assertIsNone(profile.landing_protocol)
+        self.assertEqual(profile.foot_observation_mode, "causal_median")
 
-    def test_mainline_resolves_to_frozen_baseline(self):
+    def test_mainline_and_default_use_verified_supported_stop(self):
         selected = self.parse(["--scene-profile", "mainline"])
-        baseline = self.parse(["--scene-profile", "baseline"])
-        self.assertEqual(selected.resolved_scene_profile, "baseline")
-        for key in vars(baseline):
+        supported = self.parse(["--scene-profile", "supported_stop_fixed_lag"])
+        self.assertEqual(selected.resolved_scene_profile, "supported_stop_fixed_lag")
+        self.assertEqual(vars(self.parse([])), vars(selected))
+        for key in vars(supported):
             if key != "scene_profile":
-                self.assertEqual(getattr(selected, key), getattr(baseline, key))
+                self.assertEqual(getattr(selected, key), getattr(supported, key))
+        self.assertTrue(selected.stage_handoff)
+        self.assertTrue(selected.disable_stage1_reanchor)
+        self.assertEqual(selected.landing_protocol, "supported_at_camera_stop")
+        self.assertEqual(selected.landing_recovery, "fixed_lag")
         with self.assertRaises(SystemExit):
-            self.parse(["--scene-profile", "mainline", "--stage-handoff"])
+            self.parse(["--scene-profile", "mainline", "--landing-recovery", "none"])
+        with self.assertRaises(SystemExit):
+            self.parse(["--scene-profile", "mainline", "--single-ankle-fallback"])
 
     def test_candidate_requires_real_timing_and_rejects_conflicting_flag(self):
         with self.assertRaises(SystemExit):

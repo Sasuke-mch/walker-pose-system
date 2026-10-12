@@ -39,7 +39,8 @@ def args() -> argparse.Namespace:
     profiles = json.loads(
         (APP / "configs" / "stage_ground_profiles.json").read_text(encoding="utf-8")
     )
-    p.add_argument("--scene-profile", choices=["mainline", *profiles["profiles"]])
+    p.add_argument("--scene-profile", choices=["mainline", *profiles["profiles"]],
+                   default="mainline")
     p.add_argument("--left-video", type=Path, required=True)
     p.add_argument("--right-video", type=Path, required=True)
     p.add_argument(

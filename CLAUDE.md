@@ -1,5 +1,10 @@
 # Walker Pose System - Claude 工作指南
 
+## 2026-10-12 场景主线更新
+
+用户已将448帧验收的Stage1/2连续过渡逻辑选为场景主线：默认场景入口及`--scene-profile mainline`解析为`supported_stop_fixed_lag`。停止时四脚已落在同一平地是必要采集前提；采用0.5秒固定延迟发布，实时采集入口接入仍待验证。旧baseline显式保留，身体选择不随本次场景提升改变。下方2026-10-05的baseline主线决定为历史记录；当前配置、边界和验证见`AI_PROGRESS.md`与`docs/CURRENT_STAGE_GROUND_PIPELINE.md`。
+
+
 ## 2026-10-05 正式工程主线决定
 
 当前正式工程路线固定为 **PMPose 原始鱼眼观测 → 严格双目几何 → 原 Stage 1/2 识别 → 完整 SE(3) 动态地面基线 → 同源 SMPL-H 冷启动身体及 WiLoR 原生局部手姿**。选择清单位于 `realtime_app/configs/current_mainline.json` 的 `mainline_selection`，场景调用使用 `--scene-profile mainline`，实际解析为 `baseline`。这是一项可复现版本决定，不是物理接触、独立三维精度或整套实时部署认证。

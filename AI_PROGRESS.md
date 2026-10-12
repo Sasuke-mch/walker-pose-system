@@ -4264,3 +4264,10 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 ## 2026-10-12 当前448帧页面文字精简
 
 按用户要求，supported_stop448_v1/view_v4页面标题改为“二维关节点损失优化”，侧栏仅保留地面、显示开关和平滑；质量与拒绝信息收进“详情”，移除权重/协议/参考来源/操作长说明。新增可选--minimal-text及selection.minimal_visualization_title，默认正式导出行为不变。当前body.html与body_browser.html同步更新，内嵌数值载荷逐字不变、全部运行控件ID保留、GZ未改；未重跑拟合或场景。浏览器391帧真实网格可见，平滑开关往返正常，无console error，preview_minimal.jpg保留。相关Python语法检查通过；当前CUDA环境未安装ruff，未宣称lint通过。本轮仅提交小代码、选择和文字验证记录；已有用户改动保留，大型页面/数据不入Git。
+
+
+## 2026-10-12 用户将连续过渡逻辑选为主线
+
+主线scene_route.default_profile及scene默认入口升级为supported_stop_fixed_lag；旧baseline显式保留。仅提升已验收Stage/地面逻辑，不自动提升448二维身体结果或重跑拟合。原动作标签/strict/旋转/足点门保留；可靠停止独立恢复支撑，未发布0.5秒缓冲内修正，停止即同平地支撑仍是必要采集协议。build_current_mainline_view解除baseline硬绑定，协议与说明按真实解析profile记录，避免mainline别名下丢失协议提示。
+
+49路由/Stage/落地/身体回归测试通过，448实际命令mainline与显式已验收profile参数逐项相同，3文件AST通过，ruff当前不可用，diff检查通过。证据复用已有完整448通过/失败/对照，不重复训练、权重加载或同一场景重放。mainline_promotion.json与CURRENT_STAGE_GROUND_PIPELINE.md更新。身体360及其baseline场景/页面保留为历史参考，本次没有其他采集或实时硬件新验证；run_stereo仍旧因果路径，实时固定延迟发布接入待办。仅本轮代码/配置/记录本地提交，保留原92项工作区改动，不推送。

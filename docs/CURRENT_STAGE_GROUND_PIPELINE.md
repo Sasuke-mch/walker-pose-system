@@ -1,5 +1,16 @@
 # 当前两阶段与动态地面主线
 
+## 2026-10-12 连续过渡逻辑进入工程主线
+
+按用户明确选择，场景默认入口和`--scene-profile mainline`现在解析为`supported_stop_fixed_lag`；旧算法通过`--scene-profile baseline`显式保留。当前唯一变量是Stage/地面路由及导出兼容性，原Stage动作标签、严格脚点/旋转门、身体拟合选择和历史结果保留。下方2026-10-05及此前的baseline主线说明是历史决定。
+
+主线使用用户采集前提：助步器每次停止时四脚已落在同一平地，不会悬停。稳定背景停止独立触发支撑恢复，不等待人体运动；0.5秒固定延迟内只修正未发布帧的高度/倾角，保留XY/yaw，原失败/原位姿与修正原因继续记录。超过150mm/8°修正门或长缺测仍拒绝，不能把该先验恢复称独立触地测量。
+
+依据`G20261012_supported_stop448_v1/view_v4`已完成448验证：11个Stage1边界高度步长全零，助步器节点最大帧位移96.65→49.45mm，最大XY步长略增且保留。此次49相关测试通过，实际448重放命令经mainline解析与已验收显式profile全部参数一致，导出器已解除baseline硬绑定并按解析后的profile显示协议。记录在该实验`mainline_promotion.json`；不重复模型/场景运行。实时`run_stereo.py`仍是旧因果路径，0.5秒缓冲尚未接入硬件发布；本次不宣称实时部署完成。
+
+身体360 reference25选择保持；其旧baseline页面/scene_reference仍为历史同源对照，不能当新算法的360验证结果。新场景导出采用主线新profile；其他采集须满足相同停止支撑协议，否则显式baseline。
+
+
 ## 2026-10-05 正式工程主线决定
 
 当前正式工程路线固定为 **PMPose 原始鱼眼观测 → 严格双目几何 → 原 Stage 1/2 识别 → 完整 SE(3) 动态地面基线 → 同源 SMPL-H 冷启动身体及 WiLoR 原生局部手姿**。选择清单位于 `realtime_app/configs/current_mainline.json` 的 `mainline_selection`，场景调用使用 `--scene-profile mainline`，实际解析为 `baseline`。这是一项可复现版本决定，不是物理接触、独立三维精度或整套实时部署认证。

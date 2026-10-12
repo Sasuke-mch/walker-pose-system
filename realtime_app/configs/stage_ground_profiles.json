@@ -2,7 +2,7 @@
   "schema": "stage_ground_profiles_v1",
   "profiles": {
     "supported_stop_fixed_lag": {
-      "level": "experimental_user_declared_supported_stop_protocol",
+      "level": "selected_engineering_mainline_user_declared_supported_stop_protocol",
       "options": {
         "processing_width": 480,
         "foot_observation_mode": "causal_median",

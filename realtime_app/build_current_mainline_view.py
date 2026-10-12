@@ -38,7 +38,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--selection", type=Path,
-                        help="explicit capture selection using the current reference25/baseline logic")
+                        help="explicit capture selection using the selected body and scene route")
     parser.add_argument("--resume-current-export", action="store_true",
                         help="resume a failed export with its exact same completed current scene")
     parser.add_argument("--scene-profile", default="mainline",
@@ -50,6 +50,11 @@ def main():
     if out.exists() and not cli.resume_current_export:
         raise FileExistsError(out)
     cfg = read(ROOT / "realtime_app/configs/current_mainline.json")
+    resolved_scene_profile = (cfg["scene_route"]["default_profile"]
+                              if cli.scene_profile == "mainline" else cli.scene_profile)
+    profiles = read(ROOT / "realtime_app/configs/stage_ground_profiles.json")["profiles"]
+    if resolved_scene_profile not in profiles:
+        raise ValueError("unknown selected scene profile")
     sel = read(cli.selection) if cli.selection else cfg["mainline_selection"]
     body = sel["body"]
     smoothing = body.get("display_smoothing", False)
@@ -58,9 +63,8 @@ def main():
     options = fit_arguments(ROOT / body["reproduction_arguments"])
     if (sel["detector"] != "pmpose" or options.body_weighting != "reference"
             or [options.body_reference_reprojection_px, options.body_reference_ray_gap_mm,
-                options.body_reference_confidence_floor] != [25.0, 80.0, 0.6]
-            or cfg["scene_route"]["default_profile"] != "baseline"):
-        raise ValueError("exporter requires selected PMPose reference25/baseline route")
+                options.body_reference_confidence_floor] != [25.0, 80.0, 0.6]):
+        raise ValueError("exporter requires selected PMPose reference25 body route")
     frames = read(ROOT / sel.get("frames_metadata", str(Path(sel["dataset"]) / "frames.json")))
     if len(frames) != sel["frames"]:
         raise ValueError("frame metadata count differs from selection")
@@ -75,10 +79,11 @@ def main():
     write(out / "protocol.json", {
         "selected_body": body, "frames": sel["frames"], "frame_ids": sel["frame_ids"],
         "source_pair_ids": [int(row["pair_id"]) for row in frames],
-        "scene_profile": "mainline -> baseline" if cli.scene_profile == "mainline" else cli.scene_profile,
+        "scene_profile": ("mainline -> " + resolved_scene_profile
+                          if cli.scene_profile == "mainline" else cli.scene_profile),
         "detector_inputs": sel["detector_inputs"],
         "implementation": "realtime_app/build_current_mainline_view.py",
-        "variable": "Visualization export of selected body; fresh strict geometry and baseline replay, no fitting changes",
+        "variable": "Visualization export of selected body; fresh strict geometry and selected scene replay, no fitting changes",
         "success": "Complete real mesh, original/rejected observations, same-frame transforms, solid walker and cameras; file and browser verification",
         "stop": "Missing assets or source/frame/geometry mismatch: preserve failure and stop; no relaxed gates or substituted frames",
         "old_dynamic_inputs_consumed": False, "body_refitted": False,
@@ -214,7 +219,7 @@ def main():
         if getattr(options, "body_observation_mode", "legacy") == "reprojection_only":
             page = page.replace("reference25 权重", "三维诊断权重（不用于二维拟合）")
             page = page.replace("原质量 → 实际拟合权重", "原质量 → 三维诊断权重")
-        if cli.scene_profile == "supported_stop_fixed_lag":
+        if resolved_scene_profile == "supported_stop_fixed_lag":
             page = page.replace("held:'保持',", "protocol_support_restored:'协议支撑闭合',"
                                 "protocol_support_window_reestimated:'过渡窗口重估',held:'保持',")
             page = page.replace("<section><h2>操作</h2>",
