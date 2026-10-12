@@ -1040,3 +1040,24 @@ D01独立完成后继续检查StateEncoder。发现原输入流程先age=where(v
 上轮三现有测试文件test_firewall.py/test_joint.py/test_regression_information.py实际41passed in7.69s、五文件Ruff通过；覆盖22/52、float32/64值/来源往返、detach、fixture/legacy拒绝、不一致split、dtype、codec和现有生成/回归/因果接口。新增infer.validate后只运行test_firewall -k inference_rejects：2passed/16deselected in3.34s，两文件Ruff通过。41项未重复；合计43相关检查分次覆盖，新增问题对应新增检查，不将其当独立真实验证。
 
 命令均使用`.\.venv-cuda\Scripts\python.exe -B -m pytest`，三文件`-q --tb=short`；新增入口检查`-k inference_rejects`。Ruff使用既有uv offline入口。没有训练、optimizer、人体解码、成本重跑、数据下载或新验收材料。D10.1完成；下一阶段在train.py把逐帧观测历史、显式标签帧绑定和缺失行保留接到现有目标计算，实际数据loader/训练循环/效能仍未完成。
+
+## 34. 2026-10-13 D10.2因果序列目标：内存路径完成，真实训练runner仍缺
+
+先在已有长期协议登记D10_causal_objective，随后扩展train.py三个数据类和sequence_objective，不建立另一个训练/审计框架。问题为原objective只有context batch，无法从该接口核对目标行与物理原帧的绑定及因果历史。新SequenceChunk每次最多32个原帧，LabelFrame显式行绑定；各帧typed观测/标签/统计、frame/time严格递增、身份/序列/rig及目标时钟对齐在编码前检查，坏最后一行不能让前面先forward后才报错。
+
+按原顺序编码全部Observation，labels不进入encoder；仅当前有观测+完整姿态/T/beta标签的行调用原单行CFM/回归。目标tensor detach，incoming及returned TemporalState detach；块内历史观测梯度保留。无观测保留时钟/age/hidden冻结；有观测无完整目标仍更新hidden。返回全部F个原槽、context、loss/NaN、supervised、逐帧原因和原观测rejection_reasons。均值以实际监督帧计数，跨chunk均值按supervised_count加权；如果任何已计算loss非有限，则该chunk aggregate=None，不能静默挑其他有限行。没有optimizer、checkpoint或真实loader；当前F0接口不能冒称已完成G1当前信息路径。
+
+人工5帧100–104、物理时刻[0,.17,.52,.73,1.1]，1号全缺观测、3号beta maskFalse；监督行0/2/4，其余两行仍保留。fixture声明analytic/engineering；另用明确标注synthetic_contract_not_real_data的train来源人工tensor仅测试统计gate，不作为实际训练数据或held-out效果。SO3/ambient、22/52、CFM/回归八对照，随机seed7、源generator17，原fixture Normalization；不解码人体或采集/检测。
+
+首次仅新sequence相关检查21passed/19deselected in4.41s，train.py/test_joint.py Ruff通过；随后补上与原encoder+逐行objective的独立连接对照、部分pose/T及train来源gate/typed chunk检查，相关八项扩充+一项新增9passed/32deselected in2.31s；其余13项未重复。22个新检查分次覆盖全部风险，没有失败或靠调整数值阈值过门。旧19项不因无关新接口默认重跑。
+
+|明确问题|实际证据|边界|
+|---|---|---|
+|目标是否正确接到原逐帧API|八组合手动encoder/原objective的context/单帧loss逐值相同；无参数更新|只说明连接，不说明真实学习|
+|分块是否改变推理值/随机抽样|3+2分块使用同generator/carry，context及loss一致；监督计数2/1加权得到原3帧均值|TBPTT梯度跨块明确截断，不声称全长梯度相同|
+|未来信息/标签是否影响过去|变最后两帧像素与目标，前三帧context/loss不变|仅这个声明的因果路径，不认证未来数据loader|
+|块内梯度与目标/carry屏障|最后回归loss反传到第0帧及无标签第3帧观测，GRU梯度非零；target/carry无grad，缺观测无输入grad；returned hidden脱图|无optimizer步骤，不称已训练|
+|缺失/失败是否隐藏|all-missing/all-partial保留5槽NaN、lossNone、零velocity；第一监督loss inf控制令整个aggregateNone，剩余有限行仍记录|前向接口失败语义，不是全系统失败率|
+|对齐能否在forward前拒绝|frame/clock/identity/rig/order/stream/split/statistics/行数/33帧上限十项坏输入均在encoder前拒绝|显式绑定声明不认证实际数据身份或标签真实来源|
+
+命令：`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_joint.py -q --tb=short -k sequence`；追加检查只`-k 'causal_sequence_objective or partial_targets'`。Ruff既有offline入口检查train.py与test_joint.py。无需新JSON/快照/验收文档，记录实际条件/失败状态/原接口对应即可。D10.2完成，下一阶段建立实际数据文件到这个接口的读取/标签与来源绑定，并保持无数据时不执行；真实data loader、划分资产真实性、optimizer/checkpoint生命周期、训练授权及独立有效性仍未满足，长期目标未完成。

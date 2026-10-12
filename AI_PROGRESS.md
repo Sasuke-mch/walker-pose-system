@@ -4491,3 +4491,9 @@ MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结�
 接续上轮已通过未提交修改，现场确认原Normalizer拟合保留grad，float64回读降为float32且mean差8.2978027e-8。按已有预登记完成fit统计detach、split/source_kind/dtype序列化、train来源声明gate；fixture与旧四字段legacy明确不能升级训练来源，数值公式与floor不变。regression/infer验证冻结统计，SO3 codec和候选记录来源。不把metadata一致认证为真实独立数据。
 
 原三文件41tests/五文件Ruff已通过，无重跑；新增infer入口验证仅补2tests通过及两文件lint，43项分次覆盖。MODEL_RESULTS第33节、架构第8/16节与协议同步。数据records仍空，无训练/optimizer/checkpoint/解码/测时或新审计材料。下一项D10.2补显式标签帧绑定、保留缺失的因果unroll和现有目标；完整loader/循环与真实效能继续未完成，长期goal保持active，旧工作区改动保留。
+
+## 2026-10-13 D10.2因果序列目标准备路径完成
+
+预登记后扩展现有train.py的LabelFrame/SequenceChunk/SequenceObjective和sequence_objective，显式原帧/时钟/身份/rig标签绑定、最多32帧、全部观测顺序编码；仅当前观测+完整标签进入原CFM/回归，其他原槽保留NaN/原因，不跳过状态推进。目标和chunk carry detach，块内观测梯度保留；均值按监督数加权，非有限已计算目标令整chunk aggregate不可用。无新增模型、optimizer/checkpoint或文件loader。
+
+5帧工程fixture、SO3/ambient×22/52×CFM/回归，21新项先通过；补原逐行API对照与partial/train-gate检查后，仅八扩充+一新增9项通过，共22新项分次覆盖/Ruff通过。context/单帧loss与原接口一致、未来隔离、2/1监督块加权、块内历史及无标签观测梯度、target/carry屏障、全缺失/部分标签/inf失败及10种前向前拒绝均检查。MODEL_RESULTS第34节、架构第17节/台账与协议同步，无额外验收/JSON。下一项实际注册文件→序列接口及来源/资产/划分核对，数据records仍空，真实训练/runner/独立效能保持未完成；长期goal继续active，现有其他改动保留。

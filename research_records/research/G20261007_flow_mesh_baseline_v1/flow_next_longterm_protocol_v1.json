@@ -40,7 +40,7 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "D10.1 frozen statistics and provenance/dtype contract passed. Next D10.2: bind each target row to explicit observation frame/clock/identity and unroll causal contexts through original missing frames into CFM/regression objectives. Preserve every slot/reason and TBPTT boundaries; no optimizer, real-data claims or checkpoint execution.",
+  "next_stage": "D10.2 in-memory causal frame-bound chunk objective completed. Next D10.3 define/read actual registered data files into this interface without fabricated labels, validate origin/asset/split/clock mappings and keep empty manifest unavailable. No optimizer/checkpoint execution; G1 info acquisition remains separate.",
   "deficiency_improvement_20261012": {
     "status": "continuous_thread_goal_active_training_closed",
     "authorization": "Analyze existing model shortcomings, improve individually, and keep detailed long-term records; no scheduled automation",
@@ -142,6 +142,30 @@
       "record": "MODEL_RESULTS.md section33 and MODEL_ARCHITECTURE.md sections8/16",
       "limits": "metadata consistency is not authentic provenance or independent label/split evidence; loader/optimizer/checkpoint lifecycle and real efficacy missing",
       "training": false
+    },
+    "D10_causal_objective": {
+      "date": "2026-10-13", "status": "preregistered_before_implementation_checks",
+      "problem": "Existing objective consumes context batches without a path binding original frame labels to causal Observation/TemporalState; no validated TBPTT sequence target interface",
+      "scope": "Existing train.py: typed LabelFrame metadata and SequenceChunk up to32 original frames; sequence_objective computes contexts and per-frame CFM/regression, no optimizer/checkpoint/file loader. F0 only; G1 needs its separate frozen-information/current-input binding later",
+      "inputs": "One identity/sequence/rig, strictly increasing original frame/time, Labels rows aligned by explicit LabelFrame binding. Train declaration uses frozen train statistics; engineering analytic fixtures use explicit fixture statistics. Actual data records remain empty",
+      "only_variable": "Connect existing sequential observation-only encoder to existing row objectives with detached target tensors and detached carry at chunk boundaries; no architecture/capacity/loss change",
+      "missing_semantics": "Encode every original frame incl no-observation/unlabelled frames. Retain all contexts/IDs/per-frame reasons; only current-observed complete targets have loss. Skipped loss NaN, aggregate None when all skipped; a nonfinite computed loss blocks chunk aggregate rather than silently cherry-picking finite rows",
+      "weighting": "Mean over actually supervised original frames, report total/supervised/skipped counts. Cross-chunk reduction must weight by supervised_count; never substitute frame count or average chunk means with unequal support",
+      "checks": ["Same existing manual sequential encoder/objective values for ambient/SO3 x CFM/regression, same generator state", "Whole-vs-chunk values/contexts/state match with correctly weighted loss; altered future observation/label does not change past context/frame loss", "Last loss has gradients through earlier observed inputs in the same chunk, while incoming carry and targets receive no gradient; no optimizer update", "No-current/incomplete labels/all-skipped/nonfinite objective retain frames/NaN/reasons; nonfinite blocks aggregate", "Label frame/order/identity/rig/clock/split/statistics mismatch rejected before forward;32frame ceiling; current test files and changed-file Ruff only"],
+      "success": "Finite matched values/active gradients, valid causal/TBPTT semantics and explicit unavailable rows with unchanged parameter counts; no claims about actual learning or independent task improvement",
+      "stop": "Do not fabricate labels, smooth gaps or enable optimization to pass. If real loader/split/covariance is needed for an effect question, leave it incomplete; do not build another audit framework.",
+      "training": false
+    },
+    "D10_causal_objective_result": {
+      "date": "2026-10-13", "status": "in_memory_causal_F0_objective_completed_not_training_runner",
+      "interface": "train.LabelFrame/SequenceChunk/SequenceObjective/sequence_objective; max32originalframes; all rows retained",
+      "checks": "21new checks passed4.41s;8expanded+1new checks passed2.31s,22unique new checks covered; changed-file Ruff passed",
+      "values": "ambient/SO3 x22/52 xCFM/regression matched manual existing APIs and chunked values; support-weighted mean and future isolation passed",
+      "gradients": "within-chunk earlier observed/unlabelled inputs affect last objective; targets and incoming/returned carry detached; no parameter update",
+      "failures": "missing/partial rows stayNaN; all-unavailable and any nonfinite computed loss block aggregate; bad bindings rejected before encoder",
+      "record": "MODEL_RESULTS.md section34 and MODEL_ARCHITECTURE.md section17",
+      "capacity_changed": false, "optimizer_steps": 0, "checkpoint_loaded": false, "training": false,
+      "remaining": "real file loader/manifest source and group/asset authenticity;G1 frozen info;optimizer/checkpoint lifecycle and independent effectiveness"
     },
     "next_after_D01": "Inspect state/conditioning limitations and identify one discriminating counterexample before any new architecture. Mean pooling, beta variation, no RGB and hand uncertainty are hypotheses/resource limits, not automatic module-addition instructions. Search mechanism overlap before committing to an architectural research direction.",
     "original_stop_rules": "Two justified revisions per mechanism; SO3 kernel allowance exhausted; fullK32 VJP promotion stopped at ratio1.7822233; frozen held-out and fair controls inherited",
@@ -262,7 +286,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-13 D10.1 statistics detach and dtype/provenance roundtrip repaired;43related checks across runs plus Ruff. Train/fixture/legacy origin declarations distinct, not certified data authenticity. No training/checkpoint/mainline change, full runner/effectiveness remains missing.",
+  "last_completed_stage": "2026-10-13 D10.2 in-memory causal F0 chunk objective completed;22new checks across runs plusRuff. Explicit frame-label binding, all unavailable rows, support weighting, within-chunk gradients and detached TBPTT carry. D10.1 retained; no real training/optimizer/checkpoint/mainline or efficacy claim.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

@@ -15,7 +15,7 @@ from ..joint_flow import JointFlow, ModelConfig, cfm_loss
 from ..schema import TemporalState, Topology
 from ..so3_flow import SO3JointFlow, geodesic_path, haar_rotations, rotation_exp
 from ..tangent import skew
-from ..train import objective
+from ..train import LabelFrame, SequenceChunk, objective, sequence_objective
 from .test_firewall import labels, observation
 
 
@@ -284,3 +284,179 @@ def test_so3_inactive_information_removal_preserves_active_computation(nodes):
     for model in (compact, original):
         with pytest.raises(ValueError, match="Lambda"):
             model.regression(context, torch.eye(normal.topology.tangent_dimensions, dtype=torch.float64))
+
+
+def sequence_fixture(nodes=52):
+    frames = [observation(100+i, time) for i, time in enumerate((0., .17, .52, .73, 1.1))]
+    frames[1] = replace(frames[1], present=torch.zeros_like(frames[1].present), xy=torch.full_like(frames[1].xy, torch.nan))
+    reference = labels(nodes)
+    reference = replace(reference, rotations=reference.rotations[:1].repeat(5, 1, 1, 1),
+                        translation=torch.arange(15).reshape(5, 3).float()/20,
+                        beta=torch.arange(10).float()[None].expand(5, -1)/10,
+                        pose_mask=torch.ones(5, nodes, dtype=torch.bool), translation_mask=torch.ones(5, dtype=torch.bool),
+                        beta_mask=torch.tensor([True, True, True, False, True]))
+    bindings = tuple(LabelFrame(obs.identity, obs.sequence, obs.frame, obs.timestamp, obs.camera_ids) for obs in frames)
+    return SequenceChunk(tuple(frames), reference, bindings)
+
+
+def chunk_slice(chunk, start, end):
+    reference = replace(chunk.labels, **{name: getattr(chunk.labels, name)[start:end] for name in
+                                        ("rotations", "translation", "beta", "pose_mask", "translation_mask", "beta_mask")})
+    return SequenceChunk(chunk.observations[start:end], reference, chunk.label_frames[start:end])
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+@pytest.mark.parametrize("geometry", ["ambient", "SO3"])
+@pytest.mark.parametrize("mode", ["CFM", "regression"])
+def test_causal_sequence_objective_chunk_values_and_future_isolation(nodes, geometry, mode):
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    normal = Normalization.fixture(Topology(nodes))
+    model = JointFlow(ModelConfig(nodes=nodes)) if geometry == "ambient" else SO3JointFlow(normal, ModelConfig(nodes=nodes))
+    model.eval()
+    chunk = sequence_fixture(nodes)
+    before = {name: value.clone() for name, value in model.state_dict().items()}
+    with torch.no_grad():
+        whole = sequence_objective(mode, model, chunk, normal, generator=torch.Generator().manual_seed(17))
+        # Independent use of the existing encoder/row objective checks the new
+        # connector against its predecessor APIs, not just against itself.
+        state, generator, expected = None, torch.Generator().manual_seed(17), []
+        for index, obs in enumerate(chunk.observations):
+            context, state, _ = model.encoder(obs, state)
+            assert torch.equal(context, whole.contexts[index])
+            if index in (0, 2, 4):
+                target = chunk_slice(chunk, index, index+1).labels
+                kwargs = {"generator": generator} if mode == "CFM" else {}
+                value, _ = objective(mode, model, context[None], target, normal, **kwargs)
+                expected.append(value)
+                assert torch.equal(value, whole.frame_losses[index])
+        assert torch.equal(whole.loss, torch.stack(expected).mean())
+        generator = torch.Generator().manual_seed(17)
+        first = sequence_objective(mode, model, chunk_slice(chunk, 0, 3), normal, generator=generator)
+        second = sequence_objective(mode, model, chunk_slice(chunk, 3, 5), normal, first.state, generator=generator)
+        assert torch.equal(whole.contexts, torch.cat((first.contexts, second.contexts)))
+        assert torch.allclose(whole.frame_losses, torch.cat((first.frame_losses, second.frame_losses)), equal_nan=True)
+        assert whole.state.to_dict() == second.state.to_dict()
+        assert first.resources["supervised_count"] == 2 and second.resources["supervised_count"] == 1
+        weighted = (2*first.loss+second.loss)/3
+        assert torch.allclose(whole.loss, weighted, atol=1e-6, rtol=1e-6)
+        # Keep original bindings/clocks; only future observed values and targets change.
+        future = chunk.observations[:3]+tuple(replace(obs, xy=obs.xy*100) for obs in chunk.observations[3:])
+        targets = chunk.labels.translation.clone()
+        targets[3:] += 10
+        altered = replace(chunk, observations=future, labels=replace(chunk.labels, translation=targets))
+        result = sequence_objective(mode, model, altered, normal, generator=torch.Generator().manual_seed(17))
+    assert torch.equal(whole.contexts[:3], result.contexts[:3])
+    assert torch.allclose(whole.frame_losses[:3], result.frame_losses[:3], equal_nan=True)
+    assert whole.supervised.tolist() == [True, False, True, False, True]
+    assert whole.resources["original_frames"] == whole.resources["encoder_frame_calls"] == 5
+    assert whole.resources["velocity_batch_calls"] == whole.resources["target_state_evaluations"] == 3
+    assert whole.resources["optimizer_steps"] == 0 and not whole.resources["checkpoint_loaded"]
+    assert whole.reasons[1]["unavailable"] == ["no_current_observation"]
+    assert whole.reasons[3]["unavailable"] == ["beta_label_unavailable"]
+    assert whole.reasons[1]["observation_rejection_reasons"] == chunk.observations[1].rejection_reasons
+    assert all(torch.equal(value, before[name]) for name, value in model.state_dict().items())
+
+
+@pytest.mark.parametrize("geometry", ["ambient", "SO3"])
+def test_sequence_gradient_uses_past_observations_not_targets_or_incoming_carry(geometry):
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    normal = Normalization.fixture(Topology())
+    model = JointFlow() if geometry == "ambient" else SO3JointFlow(normal)
+    chunk = sequence_fixture()
+    frames = tuple(replace(obs, xy=obs.xy.clone().requires_grad_()) for obs in chunk.observations)
+    targets = replace(chunk.labels, translation=chunk.labels.translation.clone().requires_grad_(),
+                      beta=chunk.labels.beta.clone().requires_grad_())
+    chunk = replace(chunk, observations=frames, labels=targets)
+    carry = TemporalState(frames[0].identity, frames[0].sequence, frames[0].camera_ids,
+                          torch.zeros(128, requires_grad=True), torch.zeros(2, 17), -.1, 99,
+                          torch.zeros(2, 17, dtype=torch.bool))
+    result = sequence_objective("regression", model, chunk, normal, carry)
+    result.frame_losses[-1].backward()  # No optimizer step.
+    assert frames[0].xy.grad is not None and frames[0].xy.grad.abs().sum() > 0
+    assert frames[3].xy.grad is not None and frames[3].xy.grad.abs().sum() > 0  # Unlabelled observation still updates memory.
+    assert frames[1].xy.grad is None or frames[1].xy.grad.count_nonzero() == 0
+    assert targets.translation.grad is None and targets.beta.grad is None and carry.hidden.grad is None
+    assert result.state.hidden.grad_fn is None and not result.state.hidden.requires_grad
+    assert model.encoder.gru.weight_hh.grad.abs().sum() > 0
+
+
+def test_sequence_all_missing_and_nonfinite_objective_keep_unavailable_slots(monkeypatch):
+    from .. import train
+
+    torch.set_num_threads(1)
+    model, normal = JointFlow().eval(), Normalization.fixture(Topology())
+    chunk = sequence_fixture()
+    absent = replace(chunk, observations=tuple(replace(obs, present=torch.zeros_like(obs.present),
+                                                       xy=torch.full_like(obs.xy, torch.nan)) for obs in chunk.observations))
+    with torch.no_grad():
+        result = sequence_objective("regression", model, absent, normal)
+    assert result.loss is None and not result.supervised.any() and result.frame_losses.isnan().all()
+    assert len(result.contexts) == len(result.label_frames) == len(result.reasons) == 5
+    assert result.resources["velocity_batch_calls"] == 0 and result.resources["skipped_count"] == 5
+    original = train.objective
+    calls = []
+    def nonfinite_first(*args, **kwargs):
+        calls.append(1)
+        return (torch.tensor(torch.inf), {}) if len(calls) == 1 else original(*args, **kwargs)
+    monkeypatch.setattr(train, "objective", nonfinite_first)
+    with torch.no_grad():
+        result = sequence_objective("regression", model, chunk, normal)
+    assert result.loss is None and result.resources["nonfinite_objective"]
+    assert result.supervised.tolist() == [False, False, True, False, True]
+    assert result.frame_losses[0].isnan() and len(calls) == 3
+    assert result.reasons[0]["unavailable"] == ["nonfinite_sequence_objective"]
+
+
+def test_sequence_partial_targets_and_train_statistics_contract():
+    torch.set_num_threads(1)
+    model, normal, chunk = JointFlow().eval(), Normalization.fixture(Topology()), sequence_fixture()
+    incomplete = replace(chunk.labels, pose_mask=torch.zeros_like(chunk.labels.pose_mask),
+                         translation_mask=torch.zeros_like(chunk.labels.translation_mask))
+    with torch.no_grad():
+        empty = sequence_objective("regression", model, replace(chunk, labels=incomplete), normal)
+    assert empty.loss is None and empty.frame_losses.isnan().all() and len(empty.contexts) == 5
+    assert all("incomplete_pose_label" in reason["unavailable"] for reason in empty.reasons)
+    assert all("translation_label_unavailable" in reason["unavailable"] for reason in empty.reasons)
+    assert empty.resources["velocity_batch_calls"] == 0
+    # Metadata is explicitly synthetic contract evidence, not acquired train data.
+    declared = replace(chunk.labels, split="train", source_kind="fitted_reference")
+    complete_for_statistics = replace(declared, beta_mask=torch.ones_like(declared.beta_mask))
+    fitted = Normalization.fit(complete_for_statistics, source_path="declared_contract_fixture_not_real_data")
+    with pytest.raises(ValueError, match="declared training statistics"):
+        sequence_objective("regression", model, replace(chunk, labels=declared), normal)
+    with torch.no_grad():
+        supported = sequence_objective("regression", model, replace(chunk, labels=declared), fitted)
+    assert supported.loss is not None and supported.supervised.tolist() == [True, False, True, False, True]
+    with pytest.raises(TypeError, match="typed SequenceChunk"):
+        sequence_objective("regression", model, {}, normal)
+
+
+@pytest.mark.parametrize("fault", ["frame", "clock", "identity", "rig", "order", "stream", "split", "statistics", "rows", "too_long"])
+def test_sequence_bindings_and_resource_contract_checked_before_forward(fault):
+    model, normal, chunk = JointFlow().eval(), Normalization.fixture(Topology()), sequence_fixture()
+    bindings = list(chunk.label_frames)
+    if fault in ("frame", "clock", "identity", "rig"):
+        field, value = {"frame": ("frame", 999), "clock": ("timestamp", 9.),
+                        "identity": ("identity", "other"), "rig": ("camera_ids", ("a", "b"))}[fault]
+        bindings[-1] = replace(bindings[-1], **{field: value})
+        chunk = replace(chunk, label_frames=tuple(bindings))
+    elif fault == "order":
+        chunk = replace(chunk, observations=chunk.observations[:-1]+(chunk.observations[0],))
+    elif fault == "stream":
+        chunk = replace(chunk, observations=chunk.observations[:-1]+(replace(chunk.observations[-1], sequence="other"),))
+    elif fault == "split":
+        chunk = replace(chunk, labels=replace(chunk.labels, split="test"))
+    elif fault == "statistics":
+        normal = replace(normal, split="legacy_unverified", source_kind="legacy_unverified")
+    elif fault == "rows":
+        chunk = replace(chunk, label_frames=chunk.label_frames[:-1])
+    else:
+        chunk = replace(chunk, observations=(chunk.observations[0],)*33)
+    calls = []
+    handle = model.encoder.register_forward_pre_hook(lambda *args: calls.append(1))
+    with pytest.raises(ValueError):
+        sequence_objective("regression", model, chunk, normal)
+    handle.remove()
+    assert not calls
