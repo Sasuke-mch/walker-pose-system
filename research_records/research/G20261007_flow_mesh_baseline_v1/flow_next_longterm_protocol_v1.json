@@ -40,7 +40,7 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "D03 sequence shape contract/mechanism analysis: distinguish static physical beta from changing causal estimates; examine current complete-candidate and H8 prefix-freeze semantics before any architectural addition. No beta EMA, old-beta/new-pose splice, future leakage or smoothness-as-efficacy claim. D10.3 reader complete; real data still unavailable and training/checkpoint closed.",
+  "next_stage": "D05 noise information availability and fair F0/G1 input contract: inspect current code and prior noise controls, distinguish fixed proxy precision from genuinely calibrated varying noise, and avoid attributing added input information to architecture. No default new precision module, calibration/efficacy claim or training/checkpoint.",
   "deficiency_improvement_20261012": {
     "status": "continuous_thread_goal_active_training_closed",
     "authorization": "Analyze existing model shortcomings, improve individually, and keep detailed long-term records; no scheduled automation",
@@ -192,6 +192,33 @@
       "capacity_changed": false, "optimizer_steps": 0, "checkpoint_loaded": false, "training": false,
       "remaining": "real resources/authenticity;G1 frozen info;optimizer/checkpoint lifecycle;training authorization;independent effectiveness"
     },
+    "D03_sequence_shape_contract": {
+      "date": "2026-10-13", "status": "preregistered_before_analytic_controls_and_cache_check",
+      "problem": "Current JointFlow/SO3 infer defines current-frame complete candidates conditioned on observation-only causal hidden state; frame-keyed base draws and no candidate beta carry do not define a shared-shape trajectory law. Per-frame estimate changes alone do not demonstrate an error",
+      "scope": "Read candidate_store.nested_noise/infer, schema.TemporalState, both joint solvers and historical PrefixSharedShape/H8. SMPL author site and cached primary HuManiFlow sections3.4-3.6; no full method rerun",
+      "competing_explanations": ["Changing causal estimates of a static physical beta are legitimate under new evidence", "Independent per-frame marginal draws need extra coupling to become one coherent sequence sample", "Freezing early beta prevents later correction and splicing it into independently generated pose/T can destroy joint dependence"],
+      "controls": ["Known scalar static beta priorN0/1 and independent unit-noise observations: posterior mean=sumy/(1+t), variance=1/(1+t). Compare prefix8 freeze versus updates through16; matched known model, not human labels", "Original PrefixSharedShape with fixed analytic1to10 head coefficient8/9 and16synthetic scalar features: first7unknown, then frozen; no learned checkpoint or optimizer", "Two exact discrete temporal couplings with identical beta marginals but mismatch probabilities0 and1/2; no probability calibration claim", "Known two-mode complete(beta,T) support satisfying beta+T=0: original mode pairs satisfy constraint; cross-mode beta splice violates it. Abstract scalar support, not real projection/mesh"],
+      "only_code_variable": "Expose current temporal sampling scope in infer provenance; no seeds, tensors, encoder, velocity, solver, candidate selection or publication changes",
+      "cache_check": "Extend existing nested frame-noise/cache test: current scope survives cache roundtrip; a legacy cache lacking it is not silently upgraded. Use temporary cache only",
+      "success": "Analytic identities and existing prefix implementation agree; no uniform freeze improvement or trajectory posterior is inferred from marginals; provenance distinguishes actual current-frame law and absent cross-frame coupling",
+      "stop": "Do not add beta EMA/prefix freezing/clamped joint velocity, reuse slot IDs as trajectories, splice old beta, or add capacity without a coherent conditional/sequence model and independent effectiveness evidence. Stop at one bounded contract stage; no new audit JSON or permanent toy dataset",
+      "remaining": "Shared-shape trajectory generator/filter and matched same-input controls require explicit sequence semantics/labels/training; current real records remain0",
+      "training": false, "checkpoint_loaded": false, "architecture_change_allowed": false
+    },
+    "D03_sequence_shape_contract_result": {
+      "date": "2026-10-13", "status": "contract_stage_completed_shared_sequence_effectiveness_incomplete",
+      "actual_scope": "current-frame joint R/T/beta induced law conditional on observation-only context; no explicit beta carry or cross-frame sample law; frame slots not trajectories",
+      "scalar_control": "Known independent Gaussian model:16exact posterior recurrence/closed-form agreements; prefix8 mean16/9 variance1/9, through16 mean16/17 variance1/17. Original PrefixSharedShape fixed analytic8/9 head gives first7NaN/count8/frozen16/9",
+      "coupling_control": "Exact beta +/-1 couplings have same1/2 marginals but mismatch probability0 versus1/2; per-frame marginal checks do not certify shared-shape trajectories",
+      "joint_support_control": "Abstract two modes(beta,T)=(-1,+1),(+1,-1) satisfy beta+T=0; oldbeta/newT splice residual2; not real projection or human error",
+      "code": "infer.provenance.temporal_sampling only; no seed/parameter/tensor/solver/selection/publication changes; legacy cache without declaration stays unrecorded",
+      "checks": "One bounded analytic process passed; extended existing cache/noise test1passed2.25s/40deselected; changed-file Ruff passed; no failed numeric controls or broad rerun",
+      "decision": "Retain current-frame joint model; stop direct H8 prefix freeze/EMA/oldbeta splice or shared seed as trajectory mechanism. Coherent conditional/sequence objective and independent evidence required before capacity or policy changes",
+      "sources": "HuManiFlow cachedP05 sections3.4/3.5eq8-10/3.6eq12; authorSMPL site. PDF403/HTML unavailable and SMPL PDF content limit retained; no full author network or global novelty claim",
+      "record": "MODEL_RESULTS.md section36; MODEL_ARCHITECTURE.md section19; LITERATURE_ANALYSIS.md; AI_PROGRESS.md",
+      "training": false, "checkpoint_loaded": false, "architecture_changed": false,
+      "remaining": "shared-shape sequence generator/filter and controls;real labels/held-out effectiveness;no calibrated posterior evidence"
+    },
     "next_after_D01": "Inspect state/conditioning limitations and identify one discriminating counterexample before any new architecture. Mean pooling, beta variation, no RGB and hand uncertainty are hypotheses/resource limits, not automatic module-addition instructions. Search mechanism overlap before committing to an architectural research direction.",
     "original_stop_rules": "Two justified revisions per mechanism; SO3 kernel allowance exhausted; fullK32 VJP promotion stopped at ratio1.7822233; frozen held-out and fair controls inherited",
     "training": false
@@ -311,7 +338,7 @@
   },
   "evidence_boundary": "numeric/engineering and fixed-sample costs only; Rodrigues improves the oldSO3 kernel in this run but remains slower thanambient. No genuine shape identifiability, accuracy, calibration or general/deployed speed advantage demonstrated.",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-13 D10.3 registered train-file reader complete;24new checks across runs andRuff. Original-row metadata/masks/label binding preserved; actual training/noise records0 and unavailable. No training/optimizer/checkpoint/mainline or efficacy claim.",
+  "last_completed_stage": "2026-10-13 D03 shape temporal contract stage completed: analytic controls reject automatic freeze/splice, current per-frame joint model retained. Infer/cache scope explicit,1extended existing test/Ruff passed. Shared-sequence model/real effectiveness remain incomplete; training/checkpoint closed.",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

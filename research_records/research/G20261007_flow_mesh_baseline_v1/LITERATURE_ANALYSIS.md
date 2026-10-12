@@ -619,3 +619,9 @@ architecture_r14_results_v1.json/v2.json数值完全一致；首次6项B023 lamb
 [On the Limitations of Representing Functions on Sets](https://proceedings.mlr.press/v97/wagstaff19a/wagstaff19a.pdf)，Wagstaff等，ICML2019：实际读第2/4/4.1节，连续标量集合通用sum表示的维数条件及其适用范围。通用表达能力、指定任务和带身份的向量槽不同，不能把其M/N条件直接换成34×15/128来证本项目必须扩容。本文也不证明随机训练或观测条件足够。没有运行作者median实验。
 
 本地D02结果见MODEL_RESULTS第32节/flow_next_encoder_dimension_v1.json：仅当前帧像素与score的固定102D输入族，实际context128在3seed局部满列秩，另有identity-routed102D表示控制；二者都不证明全局/真实ray/history信息充分。采用状态是约束错误的“池化必然失败/必须扩容”推理，保留当前架构；没有将论文机制作为新的模块或创新。
+
+### 2026-10-13 D03静态体型与序列采样的证据边界
+
+聚焦复读现有P05.txt 3.4/3.5式8–10/3.6式12：[HuManiFlow](https://arxiv.org/abs/2305.06968)先取shape，再以该shape和祖先旋转采姿态；它是单图像方法，不是共享shape的因果序列过滤，也不支持把旧beta拼进另一个完整候选。shape条件关系已为H8来源，不能再当新的创新；本轮未做全面撞题检索或作者网络复现。[SMPL作者主页](https://smpl.is.tue.mpg.de/)区分identity-dependent与pose-dependent形变；原大PDF超工具内容上限，不称全文读取。
+
+本项目当前q_t的beta估计随观测更新与物理静态beta不矛盾；当前缓存未定义跨帧joint law。已知标量Bayes及边缘相同/耦合不同的解析控制见MODEL_RESULTS第36节，不能归为真实人体后验校准或更准模型。保留逐帧联合路线，拒绝无依据冻结/拼接；任何共享序列改进须另有明确联合目标、同输入/预算对照及独立证据。本次只增加实际采样范围声明，不改变生成器。

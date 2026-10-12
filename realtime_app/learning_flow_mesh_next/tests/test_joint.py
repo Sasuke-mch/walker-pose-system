@@ -78,6 +78,14 @@ def test_nested_independent_frame_noise_and_cache(model, tmp_path):
     cached = CandidateStore.load(path)
     assert cached.ids == store.ids and torch.equal(cached.raw, store.raw)
     assert cached.provenance["rejection_reasons"] == [list(r) for r in observation().rejection_reasons]
+    contract = cached.provenance["temporal_sampling"]
+    assert contract == store.provenance["temporal_sampling"]
+    assert contract["unit"] == "current_frame_complete_candidate" and contract["cross_frame_joint_law"] == "not_defined"
+    assert not contract["explicit_beta_carry"] and not contract["slot_is_trajectory"]
+    # Old records without this declaration remain unknown, never auto-certified.
+    legacy = replace(store, provenance={key: value for key, value in store.provenance.items() if key != "temporal_sampling"})
+    legacy.save(tmp_path / "legacy_cache.npz")
+    assert "temporal_sampling" not in CandidateStore.load(tmp_path / "legacy_cache.npz").provenance
     with pytest.raises(FileExistsError):
         store.save(path)
     assert store.resources["network_calls"] == 2

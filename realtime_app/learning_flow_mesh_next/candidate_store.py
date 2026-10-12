@@ -147,6 +147,10 @@ def infer(model, normalization, observation: Observation, state=None, *, k=32, s
                   "normalization_source": normalization.source, "stream": stream,
                   "normalization_split": normalization.split,
                   "normalization_source_kind": normalization.source_kind,
+                  "temporal_sampling": {"unit": "current_frame_complete_candidate",
+                                        "cross_frame_joint_law": "not_defined",
+                                        "explicit_beta_carry": False,
+                                        "slot_is_trajectory": False},
                   "information_encoding": model.config.information_encoding}
     if hasattr(model, "rotation_representation"):
         provenance["rotation_representation"] = model.rotation_representation

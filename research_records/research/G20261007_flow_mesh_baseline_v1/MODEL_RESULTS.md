@@ -1077,3 +1077,19 @@ D01独立完成后继续检查StateEncoder。发现原输入流程先age=where(v
 现场读真实flow_next_data_manifest_v1.json：records0、training_data_ready=False、truth_status=no_independent_3d_or_scan；实际调用新读取器返回registered_training_data_unavailable。flow_next_noise_data_manifest_v1.json的独立参考records同为0，360帧现有观测不升级为训练/验证真值。真实清单未改，临时文件不成为永久假数据。
 
 D10.3解决文件连接与声明对齐，不能认证标签/资产基/人物/物理时钟真实性或统计实际只来自train；caller asset_contract也只是当前显式声明，未做真实资产认证。optimizer/checkpoint生命周期、G1冻结信息路径、真实资源、训练授权及独立效能均未完成，长期目标未完成。下一阶段D03先分析逐帧beta与序列共享shape的合同/机制：估计随新证据变化不等于真实体型变化；不自动冻结、EMA或把旧beta拼到新pose，也不以平滑作收益证据。
+
+## 36. 2026-10-13 D03体型合同判别：保留逐帧模型，停止直接嫁接冻结
+
+上轮完成注册文件读取，本轮先核对实际candidate_store.py、schema.TemporalState、ambient/SO3 solver、旧shared_shape.py/shape_features.py/beta_conditioning.py和H8协议。当前种子依frame变化，候选beta不进入下一TemporalState；采样是当前帧完整R/T/beta，历史只由观测编码。这确认缺“共享beta整段轨迹的生成合同”，不能从beta随帧变化进一步推断真实精度变差。H8则用前8个认可帧local特征均值经旧head，ready后不再消费shape特征；它与next不是同一个模型。
+
+先登记D03_sequence_shape_contract，再运行一次临时解析控制，未建立新audit JSON/脚本或永久数据。正文聚焦[HuManiFlow](https://arxiv.org/abs/2305.06968)现有sources/P05.txt 3.4、3.5式8–10、3.6式12：Gaussian shape与shape-conditioned ancestor pose因子化，先shape后pose抽样；论文点估计也不一般等于联合mode。在线PDF403、arXiv HTML v2不存在/ar5iv不可访问；已读现有正文而非声称网络获取成功。SMPL论文39.8MB超工具内容上限，改读[作者主页](https://smpl.is.tue.mpg.de/)对identity-dependent和pose-dependent形变的区分，不称SMPL全文复读。没有运行作者网络、下载模型/训练标签或做全局新颖性认证。
+
+输入/控制1：已知维数1的静态隐变量beta~N(0,1)，y_i=beta+epsilon_i，独立epsilon_i~N(0,1)。精确Fraction顺序Bayes更新与闭式mu_t=sum(y)/(t+1)、v_t=1/(t+1)在全部16时刻相同。人为y前8次2、后8次0时，t8均值16/9、方差1/9；t16均值16/17、方差1/17。复用原PrefixSharedShape，人工1→10无偏置head只第一维固定8/9、其他0，16行float64 feature、admitted全True、frame0–15、analytic_scalar_not_human序列；实际前7行beta NaN/readyFalse，count停8，第7–15行第一维维持16/9，误差<1e-12。此仅是原前缀组件控制，不是随机H8或next精度测试。该已知模型下对全部数据积分的posterior-mean平方误差为冻结1/9、更新1/17；它否定“物理beta静态所以冻结估计必然更好”，不把这个风险数值套到COCO/真实人体。
+
+控制2：beta每时刻±1各概率1/2。共享coupling表[[1/2,0],[0,1/2]]和独立表[[1/4,1/4],[1/4,1/4]]，行列边缘完全相同，时间间beta不同的概率分别0与1/2。这证明逐帧边缘/逐帧coverage或beta散度不能单独认证跨帧世界状态耦合。当前frame-specific随机数是可复核采样政策，非生理体型变化证据；复用同seed的context-dependent映射也未保证beta恒定。若前后shape边缘不同，等权固定slot的beta逐一恒定与同时匹配两边缘相矛盾；静态参数过滤需明确权重/重采样/谱系语义。
+
+控制3：抽象联合支持只有(beta,T)=(-1,+1),(+1,-1)，两完整模式均满足beta+T=0；旧beta=-1与新模式T=-1拼接得到绝对残差2，移到原联合支持以外。没有真实相机/米/mm或SMPL解码，不称重投影失败率；它说明正确的条件生成不同于输出拼接，也不保证仅将beta速度清零后原joint flow仍采样目标条件分布。
+
+唯一代码改动是infer缓存temporal_sampling声明当前帧完整候选、cross-frame law未定义、没有显式beta carry、slot不是轨迹。所有参数、随机种子、encoder/solver/损失、R/T/beta tensor和原不可用/发布路径未改。仅扩展原test_nested_independent_frame_noise_and_cache：K8/K32嵌套及跨帧noise不同、raw/IDs缓存一致、声明保存、无声明旧临时缓存不自动升级。实际1passed/40deselected in2.25s，两文件Ruff通过；无失败和全套重跑。命令`.\.venv-cuda\Scripts\python.exe -B -m pytest realtime_app/learning_flow_mesh_next/tests/test_joint.py -q --tb=short -k nested_independent_frame_noise_and_cache`；三个解析控制在一次PowerShell here-string送同Python进程执行，结果stdout，公式/输入/head/代码路径在本节可追溯，不另建流程脚本。
+
+D03合同阶段决定：保留现有逐帧联合模型，停止默认嫁接H8冻结、EMA、跨模式旧beta拼接或固定seed当共享轨迹的提案；没有独立证据时不添加shape容量。后续若提出共享序列模型，必须定义一个beta与全历史R/T的联合目标、因果在线发布政策、配套条件采样训练/原标签来源；对照为同输入/预算逐帧联合及真实实施的因果条件shape政策，完整计算额外采样/初始化/重建成本，不以平滑挑赢家。H8固定8认可帧仅是工程阈值，shape可辨识、真实优劣、序列训练与独立held-out仍缺，当前真实records0/训练关闭。下一项D05审查噪声信息的共同可用性与F0/G1输入公平合同，沿用既有noise检查，不默认接新precision模块；长期目标未完成。

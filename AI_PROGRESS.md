@@ -4505,3 +4505,11 @@ MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结�
 临时明确合成35帧22/52得到32+3原行，15类文件错误与5类注册错误拒绝，文件→原内存5帧context/state/aggregate相同、逐帧loss allclose含NaN一致。初次括号SyntaxError令22项import失败，修复后22项通过；Ruff类型提示修正后仅补Boolean nodes拒绝1项通过；另发现无符号frame差分回绕误判倒序，改相邻比较，仅补该拒绝1项通过。共24新项分次覆盖、Ruff通过。失败/输入/命令/边界记录在MODEL_RESULTS第35节，架构第18节及协议同步；不新增审计或永久假数据。
 
 真实训练manifest records0/training_data_readyFalse，新读取器明确registered_training_data_unavailable；独立噪声参考records0。声明一致不证明真实标签/clock/basis/统计来源，完整runner/G1/独立效能与训练授权仍缺。下一项D03先推导逐帧beta与共享shape机制，不能把平滑或旧beta拼接称改进；长期goal保持active，既有工作区改动保留。
+
+## 2026-10-13 D03静态体型与候选时序合同
+
+核对当前next源码与旧H8/PrefixSharedShape：next是当前帧完整R/T/beta，TemporalState仅观测history，无显式候选beta carry或跨帧joint law；frame内slot不能当轨迹。复读P05原正文shape→conditioned pose与SMPL作者主页，访问失败边界保存。先登记再做3个解析控制：已知标量16时刻Bayes更新与闭式精确一致，原prefix8固定解析head冻结16/9而新证据均值16/17；相同边缘的两个coupling时间shape不一致概率0/1/2；旧beta/新T拼接破坏抽象联合支持。数字只对应明确标量假设，无人体精度或真实后验结论。
+
+仅在infer/cache provenance声明current-frame unit、cross-frame law未定义、无显式beta carry/slot非轨迹。原cache测试扩展1passed/Ruff通过，旧无声明临时缓存不自动升级；参数/种子/求解/发布未改，无optimizer/checkpoint或新audit JSON/流程脚本。MODEL_RESULTS第36节、架构第19节/台账、论文来源范围和长期协议同步。
+
+保留逐帧联合模型，停止默认移植H8冻结/EMA/旧beta拼接/固定seed当共享轨迹。真正共享序列模型须有一致联合目标、因果发布政策、同信息/预算对照与独立数据；D03效能未完成，records0/训练关闭。下一项D05核对噪声信息共同可用性与F0/G1公平输入合同；长期goal继续active，现有其他工作区改动保留。

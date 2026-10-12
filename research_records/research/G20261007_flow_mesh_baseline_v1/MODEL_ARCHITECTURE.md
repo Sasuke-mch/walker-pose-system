@@ -241,7 +241,7 @@ CFM三块等权：固定1rad单位下每角速度坐标MSE（SO3 canonical metri
 |---|---|---|---|---|
 |D01/P0|SO3 F0拒绝所有Λ，却继承15104个info投影权重和固定probes；so3_flow.py/joint_flow.py，源码确认。|移除SO3默认常驻的不可达层/buffers，保留显式legacy分配对照；不动ambient G0/G1。保留构造RNG顺序，对比全部活跃参数、完整候选/状态、CFM/回归值及梯度。|52参数695952、22参数692112；全部活跃计算逐值相同、拒绝语义不变。若需广泛重构或隐式checkpoint迁移则停；只证明存储简化，不测时追分。|已完成存储简化；25相关测试/Ruff通过，MODEL_RESULTS第30节。|
 |D02/P1|34槽经均值池化/GRU到context128，人体tokens接共同条件；实际局部关系受损未证。第32节窄102D像素/score输入三seed局部满列秩，初始化敏感性不均。|区分输入自由度、全局非单射与训练后任务充分性；保留原结构，不从34×15原特征槽数推导必须扩容。身份路由仅为数学控制，未移植。|当前结论排除“均值池化/128维本身已经证明该输入范围丢信息”的理由；不认证全局/实际ray/history信息充分，真实对照仍需数据。|维数直接扩容停止；原结构保留，效能问题待独立训练/数据。|
-|D03/P1|next逐帧联合估计beta，没有序列静态shape状态；物理静态体型与估计随证据变化不同，源码确认，实际劣化未证。|审查联合序列状态/条件读出是否能表达共享shape；与逐帧及H8前缀冻结作因果、完整候选的公平对照，不能把旧beta拼入新pose。|不泄漏未来、不回写、不通过EMA隐藏失败；必须独立shape/姿态效能支持收益。无标签先做合同推导，不能以beta平滑认定改进。|待机制分析与数据。|
+|D03/P1|next定义当前帧联合候选，没有跨帧joint law或显式beta carry；编号不是轨迹。静态真实体型不要求各时刻后验估计相同，实际劣化未证。|已补infer/cache采样范围声明；解析对照拒绝直接嫁接H8冻结、旧beta拼接及仅复用随机种子。保留逐帧模型；共享shape须配套条件/序列生成和同信息对照。|独立shape/姿态效能才可晋升；不泄漏未来、不回写、不以平滑证明收益，当前声明不称真实后验。|合同阶段完成，第36节；共享序列模型与真实效能仍待数据/训练。|
 |D04/P1|COCO17输入、52旋转输出，但无独立手部/shape监督和验证；源码及空manifest确认。|逐项声明可观察输入与标签范围；BODY22只能作部分输出对照。额外WiLoR/RGB是信息增加，必须另登记匹配输入，不自动叠加。|取得同family/basis/手均值的真实完整标签并独立评价；不以合法手旋转或表面投影证明真实手姿。数据未获则效果项未完成。|资源限制，暂无新数据。|
 |D05/P1|F0不接收NoiseModel.precision，G1通过Λ间接接收；已有第16节noise控制，输入公平性边界确认。|固定noise时保留；变化noise时先明确共同可用信息与接口，再做噪声因素/架构因素分离对照。confidence不得当校准协方差。|信息来源、容量和完整获取成本均匹配；无独立噪声校准数据不晋升概率/置信度结论。|待输入协议与校准资源。|
 |D06/P2|默认Λ对角块丢交叉耦合，固定sketch非单射且原晋升已停；实测反例/第7节确认。|优先问任务是否需要Λ及其耦合，而非不断扩展编码；继承Flow/回归×有/无Λ对照和全部anchor/J成本。|按原held-out门证明收益，不能用sketch重建可见性代替任务效能；不恢复已停跨块扩展。|保留对照，未证明信息必要性。|
@@ -279,3 +279,15 @@ NPZ格式`flow_next_sequence_v1`仅使用numeric arrays与JSON文本，allow_pic
 按最多32个连续原行切chunk，不按可监督状态筛掉行；Observation/Labels继续使用既有validate/packed，缺失NaN和原拒绝原因仍存在。返回source/manifest路径、全部原frame IDs、组/资产声明及authenticity_verified=False等来源字段。D10.2目标函数与参数容量均未改；它的监督条件、TBPTT、失败及加权口径继续适用。
 
 检查使用pytest临时、明确synthetic_contract_fixture的35帧22/52文件及5帧连接对照，非真实数据：32+3分块保留全部行，文件与独立内存输入的contexts/状态/aggregate相同，逐帧loss按allclose含NaN一致。24个新检查分次覆盖与Ruff通过，失败与命令见MODEL_RESULTS第35节。当前真实训练及独立噪声参考清单records均0，读取真实清单返回registered_training_data_unavailable。声明匹配不认证真实subject/clock/asset basis/标签质量，也不证明统计只由实际train获得；无optimizer或checkpoint操作，完整训练runner和独立效能仍未完成。
+
+## 19. 静态体型、在线估计与跨帧候选合同（2026-10-13，D03）
+
+当前代码的输出记为$q_t(R_t,T_t,\beta\mid c_t)$，其中$c_t$由截至当前的Observation-only encoder产生，$q_t$仅是现有随机采样器诱导的分布记号，不是已认证后验。nested_noise的key含identity/sequence/frame/stream/slot；TemporalState只有观测hidden/age/seen和身份时钟，不携带任何候选beta。ambient/SO3的T与beta均在当前帧联合ODE中更新，完整候选一起选取。固定帧内K8是K32前缀；跨帧同slot并非同一个人的世界状态假设。没有定义一个共享beta的整段轨迹分布。
+
+静态物理参数不等于冻结估计。已知模型$\beta\sim N(0,1), y_i=\beta+\epsilon_i,\epsilon_i\sim N(0,1)$独立时，$\mu_t=\sum_{i=1}^t y_i/(t+1),v_t=1/(t+1)$；真实beta始终一个常量，估计和不确定性仍随新证据改变。对全部数据取期望，冻结第8次后验均值这一估计器的平方误差期望为1/9，更新到16次的估计器为1/17；此为已知标量模型的解析性质，不是人体真实误差。原PrefixSharedShape用固定解析head的检查确认前7行不可用、count8后读出冻结，说明H8确实实施这种政策，不证明该政策更好。
+
+单帧分布不足以推出跨帧耦合：beta取±1，两个时间各边缘均1/2；shared coupling的2×2表diag(1/2,1/2)与independent coupling的四项1/4具有相同边缘，而跨帧不同beta概率分别0与1/2。重新使用同seed也不构成静态shape保证，映射随context变化；若两个时刻beta分布不同，却要求等权同slot样本逐一恒定，就不可能同时保持这两个边缘。静态隐变量过滤可更新权重/粒子谱系，但当前缓存并没有这种协议。
+
+共享轨迹目标须明确为一个beta与全部$R_{1:t},T_{1:t}$的联合分布，并区分“当前时刻重建过去的轨迹”与“已发布在线动作不可回写”。可以依链式法则分解shape分布与以shape为条件的轨迹分布；该数学分解不保证当前速度网络能直接实现条件采样。[HuManiFlow](https://arxiv.org/abs/2305.06968)式8–10/3.6先采shape再以它条件化姿态，但它是单图像方法，H8也不是作者完整复现；不能照搬成next共享序列有效性证明。冻结beta速度、固定seed或把旧beta拼到新pose/T均不是条件分布推导。
+
+本轮仅在infer.provenance新增temporal_sampling：unit=current_frame_complete_candidate，cross_frame_joint_law=not_defined，explicit_beta_carry=False，slot_is_trajectory=False。缓存roundtrip保留字段；旧缓存没有字段时仍未声明，不静默认证。种子、参数、目标、求解、发布和候选选择未改，from_parameters的完整候选beta语义保留。既有cache测试扩展1passed/Ruff通过；解析支持反例、失败访问与边界见MODEL_RESULTS第36节。保留当前逐帧生成，停止无条件冻结/拼接提案；共享序列机制与真实收益保持未完成，训练/神经checkpoint关闭。
