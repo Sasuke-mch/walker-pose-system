@@ -1,0 +1,78 @@
+{
+  "device": "cpu",
+  "dtype": "float64",
+  "surface": "analytic rigid_surface, not SMPLH",
+  "camera": {
+    "f": 100,
+    "c": 128,
+    "D": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "baseline": 0.2,
+    "image_size": [
+      256,
+      256
+    ]
+  },
+  "step": 0.0001,
+  "cases": [
+    {
+      "name": "interior",
+      "position": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "anchor_uv": [
+        [
+          128.0,
+          128.0
+        ]
+      ],
+      "anchor_valid": true,
+      "plus_x_uv": [
+        [
+          128.00999999996668,
+          128.0
+        ]
+      ],
+      "plus_x_valid": true,
+      "AD_finite": true,
+      "FD_available": true,
+      "FD_reasons": []
+    },
+    {
+      "name": "near_right_edge",
+      "position": [
+        3.34134876465381,
+        0.0,
+        1.0
+      ],
+      "anchor_uv": [
+        [
+          255.99999,
+          128.0
+        ]
+      ],
+      "anchor_valid": true,
+      "plus_x_uv": [
+        [
+          256.0008120340842,
+          128.0
+        ]
+      ],
+      "plus_x_valid": false,
+      "AD_finite": true,
+      "FD_available": false,
+      "FD_reasons": [
+        "information_unavailable:ValueError:anchor_or_perturbation_projection_invalid"
+      ]
+    }
+  ],
+  "training": false,
+  "decision": "anchor-only AD is not a drop-in replacement; close this shortcut",
+  "boundary": "constructed counterexample, not population frequency or physical accuracy"
+}

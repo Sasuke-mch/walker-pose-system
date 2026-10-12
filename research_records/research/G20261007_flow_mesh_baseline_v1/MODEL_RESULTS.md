@@ -732,3 +732,12 @@ audit_operator_transfer.py调用项目实际geometry_observation.project，CPU f
 拒绝语义尚未等价：FD检查锚点及338邻域状态，raw AD仅锚点。最后一列为保守FD加AD（还计算FD J），只有单次且并非最优guard实现，不据此证明所有保留guard的AD都更慢。没有执行非法锚点/扰动边界的批量对照，不宣称已通过拒绝门。当前不替换geometry_information.local_information，也未改G0/G1、参数或候选预算。下一阶段先判断邻域拒绝合同能否用更简单且可验证的方式保留；若无法保留并获全成本收益，停止此替换方向，转回单生成器机制审查，不继续打磨数值小差异。
 
 失败保留：首次回归器路径拼错在启动期FileNotFound，见failure_v1；随后B023发现循环闭包未显式绑定，修正后v3实际复跑通过；最终离线Ruff及AST通过。未使用优化器、训练、神经checkpoint或独立真值；本阶段是局部算子工程证据，长期方法有效性尚未完成。
+
+
+## 14. 2026-10-12 邻域拒绝反例与自动微分捷径停止决定
+
+flow_next_guard_protocol_v1.json先登记，audit_guard.py调用实际project与local_information，CPU float64、52节点、fixture尺度、step1e-4。使用明确的解析rigid_surface而非SMPL-H；人工双目f100/c128、D0、256×256、基线0.2。内部点[0,0,1]和边界点[tan((256−1e-5−128)/100),0,1]分别作为唯一完整候选，其他输入固定。没有优化器或神经网络。
+
+内部点原像素[128,128]，正向平移扰动后u=128.00999999997；自动微分有限且原FD信息可用。边界点x=3.34134876465，原u=255.99999合法，自动微分仍有限，但正向扰动后u=256.00081203408越界，原local_information返回information_unavailable:ValueError:anchor_or_perturbation_projection_invalid。所有断言、Ruff、AST通过，原输出保存在flow_next_guard_audit_v1.json。此为可复现存在性反例，不代表真实人体边界失败频率；也不证明FD数值邻域门本身是最佳统计设计。
+
+决定：关闭“anchor-only AD直接替换FD并保持原拒绝语义”的捷径。精确保留现有探针语义的直接实现仍需评估原扰动；此前保守FD+AD实现未见全成本收益，但并未排除未来有证明的界限或专门优化。当前不新增近边界阈值、回退分支或检查网络来追逐这项局部速度；暂停该性能替换方向，保留原FD。下一阶段回到G0/G1简约性：审查单个生成器如何表达残差方向与算子条件，优先已有条件表示的替换/合并，先核对论文假设与现有信息接口，训练和主线仍冻结。真实方法收益尚未完成。

@@ -40,10 +40,10 @@
     "success": "recover known exact confounding, retain independent shape direction, preserve orthogonal row and nuisance permutation invariance",
     "stop": "if numerical counterexamples fail, preserve failures and repair before committing; after validated diagnostic do not claim efficacy"
   },
-  "next_stage": "Assess minimal neighborhood guard equivalence and total cost before any AD promotion; preserve rejected perturbations. If no defensible benefit, stop this replacement and resume single-generator mechanism research; do not polish already-small derivative errors. Training closed.",
+  "next_stage": "Return to G0/G1 simplification: read primary papers and official implementations on a single generator with observation residual/operator conditioning; test mechanism overlap and double-conditioning assumptions before any network changes. Local AD performance replacement paused; no new heuristic guard layers. Training remains closed.",
   "evidence_boundary": "numeric diagnostics only; no genuine shape identifiability, accuracy or speed improvement demonstrated",
   "current_reference_gate": "flow_next_noise_data_manifest_v1.json; no independent registered reference records",
-  "last_completed_stage": "2026-10-12 licensed SMPLH reverse Jacobian numerical gate passed at two artificial anchors; memory/time/guard tradeoffs recorded; replacement not promoted",
+  "last_completed_stage": "2026-10-12 actual local_information boundary counterexample: finite anchor AD but rejected FD perturbation; anchor-only replacement shortcut closed",
   "architecture_document": "MODEL_ARCHITECTURE.md",
   "detailed_results_document": "MODEL_RESULTS.md",
   "historical_scheduled_followup": {

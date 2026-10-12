@@ -1,0 +1,10 @@
+{
+  "target": "reject anchor-only AD as drop-in replacement if it changes local_information availability",
+  "only_variable": "anchor derivative validity versus existing full neighborhood rejection",
+  "inputs": "CPU float64 artificial rigid surface and actual project/local_information; analytic fisheye boundary and interior control; no licensed mesh required",
+  "fixed": "52 nodes; fixture TangentScale; step1e-4; all admitted observations; two declared artificial cameras",
+  "success": "interior FD available and AD finite; boundary anchor AD finite but original FD returns explicit perturbation invalid rejection",
+  "stop": "one bounded counterexample check; no performance claim, no new default or guard heuristics; if reproduced close anchor-only replacement direction",
+  "next": "return to single-generator architecture mechanisms; do not continue optimizing numerical agreement",
+  "training": false
+}

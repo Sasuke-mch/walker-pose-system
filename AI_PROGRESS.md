@@ -4331,3 +4331,10 @@ pilot为360帧30/30/100/D0；据C30的latent先验/二维梯度比例0.924，仅
 实际本地SMPL-H male/MANO、COCO17回归器、两个人工锚点和非零畸变测试rig，float64有限差分对标量/向量化反向微分，J/H=JᵀJ误差约1e-9，预注册1e-4数值门通过。向量反向额外显存106131456 bytes对FD31260672；v2约96–102ms对318–385ms，v3约787–791ms对1341–1395ms，跨运行耗时不稳定，不宣称稳定加速或实时。FD+AD单次保守guard实现两次均未获收益；raw AD缺邻域338状态拒绝检查，未通过拒绝等价门。默认FD和G0/G1保留，不将局部导数一致宣称真实精度。
 
 flow_next_jacobian_protocol_v1.json、audit_v2/v3.json、failure_v1.json及validation_v1.json保留原数据和错误：首次回归器文件名错误；B023闭包修复后实际复跑；历史输出误写D0但实际调用非零D测试rig，更正已记录，runner元数据已修复。离线Ruff及AST通过。详见MODEL_RESULTS第13节。下一阶段检查邻域拒绝能否简约保留且降低完整成本，无收益则停止替换并转回单生成器机制研究。训练关闭、无神经checkpoint、未动正式主线；长期目标继续。
+
+
+## 2026-10-12 JointFlow邻域拒绝反例与停止捷径
+
+预注册flow_next_guard_protocol_v1.json后，audit_guard.py在CPU float64解析刚体surface上调用实际project/local_information。内部点AD有限且FD可用；边界点原u255.99999合法、AD有限，正向1e-4平移扰动后u256.000812034越界，原FD明确返回anchor_or_perturbation_projection_invalid。Ruff/AST及两组断言通过，原数值与拒绝保存flow_next_guard_audit_v1.json，非真实人体失败频率。
+
+关闭anchor-only AD直接替换FD捷径；先前保守完整guard无收益，暂停该局部性能替换，不新增边界启发式。下一阶段回到单生成器的残差/算子条件及G0/G1必要性文献和源码审查。默认FD、训练关闭及正式主线保留，长期目标仍在进行。MODEL_RESULTS第14节及MODEL_ARCHITECTURE已同步。
