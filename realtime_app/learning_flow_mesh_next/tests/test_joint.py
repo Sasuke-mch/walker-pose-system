@@ -127,7 +127,7 @@ def test_so3_fixed_path_endpoint_and_time_derivative(nodes):
         geodesic_path(source.clone().requires_grad_(), target, time)
 
 
-@pytest.mark.parametrize("nodes,parameters", [(22, 707216), (52, 711056)])
+@pytest.mark.parametrize("nodes,parameters", [(22, 692112), (52, 695952)])
 def test_so3_group_step_and_nonuniform_output_normalization(nodes, parameters):
     normal = Normalization(torch.full((6*nodes+13,), .2), torch.linspace(.5, 2, 6*nodes+13),
                            Topology(nodes), "analytic_fixture_nonuniform")
@@ -165,7 +165,7 @@ def test_so3_objectives_and_sampler_have_active_gradients(nodes):
         for head in (model.pose_out, model.position_out, model.shape_out):
             assert torch.isfinite(head.weight.grad).all() and head.weight.grad.abs().sum() > 0
         assert model.blocks[0].linear1.weight.grad.abs().sum() > 0
-        assert model.info_pose.weight.grad is None
+        assert not hasattr(model, "info_pose")
     model.zero_grad(set_to_none=True)
     noise = torch.randn(2, 6*nodes+13, generator=torch.Generator().manual_seed(19))
     sampled = model.sample(context, noise, steps=2)
@@ -224,3 +224,63 @@ def test_so3_complete_sampler_matches_matrix_exp_kernel():
         assert torch.allclose(model.sample(context, gaussian, steps=8),
                               reference.sample(context, gaussian, steps=8), atol=3e-5, rtol=0)
         assert torch.allclose(model.regression(context[None]), reference.regression(context[None]), atol=3e-5, rtol=0)
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+def test_so3_inactive_information_removal_preserves_active_computation(nodes):
+    """Storage-only simplification must not masquerade as changed capacity/quality."""
+    torch.set_num_threads(1)
+    normal = Normalization.fixture(Topology(nodes))
+    torch.manual_seed(7)
+    compact = SO3JointFlow(normal, ModelConfig(nodes=nodes)).double().eval()
+    torch.manual_seed(7)
+    original = SO3JointFlow(normal, ModelConfig(nodes=nodes), retain_inactive_information=True).double().eval()
+    removed = {f"{name}.weight" for name in ("info_pose", "info_position", "info_shape")}
+    assert set(original.state_dict())-set(compact.state_dict()) == removed
+    assert sum(original.state_dict()[key].numel() for key in removed) == 15104
+    assert sum(p.numel() for p in original.parameters()) == (711056 if nodes == 52 else 707216)
+    assert sum(p.numel() for p in compact.parameters()) == (695952 if nodes == 52 else 692112)
+    assert all(torch.equal(value, original.state_dict()[name]) for name, value in compact.state_dict().items())
+    assert not dict(compact.named_buffers())
+    assert sum(value.numel()*value.element_size() for value in original.buffers()) == 13*normal.topology.tangent_dimensions*8
+    with pytest.raises(RuntimeError, match="Unexpected key"):
+        compact.load_state_dict(original.state_dict())  # Never silently migrate old state dictionaries.
+    obs = observation()
+    obs = replace(obs, xy=obs.xy.double(), confidence=obs.confidence.double(),
+                  origins=obs.origins.double(), directions=obs.directions.double())
+    state_pair = [None, None]
+    for frame, missing in ((0, False), (1, True), (2, False)):
+        current = replace(obs, frame=frame, timestamp=frame*.2)
+        if missing:
+            current = replace(current, present=torch.zeros_like(current.present), xy=torch.full_like(current.xy, torch.nan))
+        with torch.no_grad():
+            a, state_pair[0] = infer(compact, normal, current, state_pair[0], k=32, steps=8)
+            b, state_pair[1] = infer(original, normal, current, state_pair[1], k=32, steps=8)
+        for field in ("raw", "rotations", "translation", "beta", "numerical", "actions"):
+            assert torch.equal(getattr(a, field), getattr(b, field))
+        assert a.ids == b.ids and a.seeds == b.seeds and a.reasons == b.reasons
+        assert a.resources["network_calls"] == b.resources["network_calls"] == 8
+        assert a.resources["candidate_state_evaluations"] == b.resources["candidate_state_evaluations"] == 256
+        assert state_pair[0].to_dict() == state_pair[1].to_dict()
+        assert bool(a.actions.any()) == (not missing)
+    context = torch.randn(2, 128, dtype=torch.float64, generator=torch.Generator().manual_seed(17))
+    reference = labels(nodes)
+    reference = replace(reference, rotations=reference.rotations.double(),
+                        translation=reference.translation.double(), beta=reference.beta.double())
+    for mode in ("CFM", "regression"):
+        losses = []
+        for model in (compact, original):
+            model.zero_grad(set_to_none=True)
+            kwargs = {"generator": torch.Generator().manual_seed(19)} if mode == "CFM" else {}
+            loss, _ = objective(mode, model, context, reference, normal, **kwargs)
+            loss.backward()
+            losses.append(loss.detach())
+        assert torch.equal(*losses)
+        original_parameters = dict(original.named_parameters())
+        for name, parameter in compact.named_parameters():
+            expected = original_parameters[name].grad
+            assert (parameter.grad is None and expected is None) or torch.equal(parameter.grad, expected)
+        assert all(original_parameters[name].grad is None for name in removed)
+    for model in (compact, original):
+        with pytest.raises(ValueError, match="Lambda"):
+            model.regression(context, torch.eye(normal.topology.tangent_dimensions, dtype=torch.float64))

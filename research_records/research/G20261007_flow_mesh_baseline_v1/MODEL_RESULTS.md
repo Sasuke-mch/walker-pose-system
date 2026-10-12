@@ -974,3 +974,21 @@ geometry_observation.py 改为直接用平方残差判定二次区间；二次�
 VJP阶段自身p50为34.70410ms；完整p50比 **1.7822233**，超过先定1.25门，停止全K32晚反馈晋升。所有记录32候选数值合法，VJP均available，最终vertices有限，实际计数通过；失败原因数组完整保存于 flow_next_endpoint_vjp_cost_v1.json。该负结果属于计算可行性，不能解释为反馈准确度差；也不能因方向误差小就忽略成本。8次小样本p95与未锁负载只支持本次停止判断，不认证生产延迟或真实人体精度。
 
 测前GPU16%/1921MiB/21.33W。工具等待被用户新消息中断时进程已完成并保存结果，现场检查无相关后台进程，直接读取JSON，没有重复启动/重跑以选较好耗时。用户转向方案解释与架构图，当前停止新增实验，保留独立算子供研究；未开启第二轮修订、训练、checkpoint或默认主线晋升。数据门仍缺，长期效能目标未完成。
+
+## 30. 2026-10-12 长期不足改进D01：移除SO3不可达分配，活跃计算不变
+
+用户要求持续分析现模型不足并逐项改进。建立当前聊天continuous goal，12项按源码确认/实测失败/设计假设/资源限制分级台账见MODEL_ARCHITECTURE第16节，原held-out门、数据暂无、训练关闭、两轮机制限制和VJP成本停止决定继承。没有用台账替代改进实施，也不将暂无RGB、共享beta或局部attention自动判为效果缺陷。
+
+在现有长期协议deficiency_improvement_20261012::first_step先登记D01：SO3所有Λ输入已拒绝，其15104个info_pose/position/shape权重及fixed probes仅常驻、无活跃依赖。竞争解释分别为可无损删除、隐藏依赖和初始化RNG假差异。so3_flow构造新增显式retain_inactive_information默认False，沿原super/pose头构造顺序后删除不可达层、将probes置None；True保留原分配。profile共享初始化仅复制ambient/SO3实际共同keys，避免把已删层视作新模型参数。原JointFlow/G0/G1与信息条件回归保留。
+
+|分配模式|52节点参数|22节点参数|Lambda|活跃计算|
+|---|---:|---:|---|---|
+|默认精简SO3|695952|692112|仍显式拒绝|与同权重旧模式逐值相同|
+|显式原分配SO3|711056|707216|仍显式拒绝|原行为保留|
+|原ambient JointFlow|711443|707603|支持现有接口|未改变|
+
+减少15104个参数，约原52节点分配的2.1242%；float32权重张量减少60416bytes。fixed probes为13M元素，默认原float64下52/22为17576/8216bytes，转换dtype后另算；非持久buffers不在state_dict里。这里只证明常驻/序列化权重简化，删除前仍构造原层，未声称更低初始化峰值、运行延迟、显存allocator峰值、人体精度或新颖性；实际有效容量不变。
+
+先运行新对照测试两拓扑，2failed/17deselected是新增legacy构造参数尚未实现的TypeError，不是原模型精度失败。实现后只运行test_joint.py/test_regression_information.py：25passed in7.55s；三份改动Python Ruff通过。新22/52逐值对照检查同seed活跃参数、所有state_dict差异恰为三组信息权重、buffer大小；K32/8在观测→全缺失→恢复三帧的raw/R/T/beta/numerical/actions/IDs/seeds/reasons/网络计数与完整serialized state均一致；两目标loss及每个活跃参数梯度逐值相同，旧不可达权重gradNone；Lambda仍拒绝。严格加载原模式随机state_dict到新模式明确unexpected keys，未隐式吞旧层；这是内存随机模块的键合同检查，没有读取checkpoint、训练或optimizer运行。
+
+此前架构图与SO3成本v1/v2/VJPv1保留原711056容量并在架构文档标为历史分配；未因删参数重跑测时或覆盖结果。D01完成，下一步优先判别D02观测压缩或D08缺失时间处理是否存在新的具体问题，先排除已修复身份碰撞和“context不同就是精度改善”的错误推理。其余设计/效能不足仍未完成，长期目标保持active。

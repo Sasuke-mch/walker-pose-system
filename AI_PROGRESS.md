@@ -4463,3 +4463,11 @@ flow_next_endpoint_vjp_cost_v1.json与MODEL_RESULTS第29节、MODEL_ARCHITECTURE
 按用户要求核对当前源码/已有架构记录，补入MODEL_ARCHITECTURE第15节及figures/jointflow_so3_current_20261012的PNG、可编辑SVG、矢量PDF。白底黑线，34槽观测→因果context128→54token/4block单模型SO3→8步→完整候选/真实解码/A4；独立VJP和既有双阶段对照另列，不绘制尚未接入的反馈箭头。实际看图修正公式标签和箭头路线，无新模型实验/报告/验收体系。
 
 SBI-SIM采用状态同步为独立算子方向通过、K32成本失败、未接网络；解释beta估计非H8共享冻结、COCO17不能提供独立手部/shape约束，图形与SO3合法不证明创新或精度。只提交本次图与说明，既有18行预登记、2处空行和其他工作区改动保留；不push，不继续测时。
+
+## 2026-10-12 长期不足改进目标与D01存储简化
+
+用户授权分析现模型不足、逐项改进并详细记录，建立当前聊天continuous goal，不设定时automation。源码/实测/设计假设/资源限制分级的12项台账见MODEL_ARCHITECTURE第16节，目标保持active；训练与checkpoint、正式主线和数据门继续保留，不能把所有缺分支直接改成堆模块。
+
+先在长期协议登记D01：SO3拒绝Λ却常驻15104不可达信息权重与probes。默认删除不可达分配，retain_inactive_information=True保留原分配对照，原初始化顺序/活跃参数不变；profile只复制实际共享keys，ambient/双阶段不改。52/22参数711056/707216→695952/692112，float32权重减少60416bytes；没有测时或精度宣称。
+
+新增对照首次2failed因构造参数未实现；实现后25相关joint/信息回归测试通过、三文件Ruff通过。22/52同seed活跃参数、K32/8观测/缺失/恢复完整候选与因果状态、CFM/回归loss/梯度逐值相同，严格旧state_dict在新模式明确拒绝，不加载checkpoint。MODEL_RESULTS第30节保存条件/失败/边界；旧架构图/成本保留原容量并标历史分配，没有额外验收/快照。下一步先判别D02观测压缩或D08缺失时间问题，其他不足未解决，长期任务不标完成。

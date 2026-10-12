@@ -66,21 +66,32 @@ class SO3JointFlow(JointFlow):
 
     Internal states use physical rotation columns and standardized T/beta.
     Public outputs use the bound full Normalization so existing CandidateStore
-    decoding retains its meaning. Information layers stay allocated/inactive.
+    decoding retains its meaning. Unreachable information layers are omitted
+    by default; explicit legacy allocation is a storage-only control.
     """
 
     rotation_representation = "SO3_body_angular_velocity"
     solver_name = "LieEuler"
 
-    def __init__(self, normalization, config=None, *, rotation_kernel="rodrigues"):
+    def __init__(self, normalization, config=None, *, rotation_kernel="rodrigues",
+                 retain_inactive_information=False):
         if rotation_kernel not in ("rodrigues", "matrix_exp"):
             raise ValueError("unregistered SO3 rotation kernel")
+        if not isinstance(retain_inactive_information, bool):
+            raise TypeError("explicit boolean legacy information allocation required")
         super().__init__(config)
         if normalization.topology != self.topology:
             raise ValueError("SO3 normalization topology mismatch")
         self.normalization = normalization.validate()
         self.pose_out = nn.Linear(self.config.width, 3)
         self.rotation_kernel = rotation_kernel
+        self.retain_inactive_information = retain_inactive_information
+        if not retain_inactive_information:
+            # Preserve the original construction/RNG order and active tensors.
+            # SO3.velocity rejects Lambda before these base-class paths execute.
+            for name in ("info_pose", "info_position", "info_shape"):
+                delattr(self, name)
+            self.pose_probes = self.shape_probes = None
 
     def _rotation_exp(self, vector):
         return rotation_exp(vector) if self.rotation_kernel == "rodrigues" else torch.matrix_exp(skew(vector))

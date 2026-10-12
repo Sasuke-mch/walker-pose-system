@@ -230,7 +230,8 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda", compare_r
     ambient = JointFlow().to(device).eval()
     normal = fixture_normalization(ambient.topology, device=device)
     manifold = SO3JointFlow(normal).to(device).eval()
-    common = {key: value for key, value in ambient.state_dict().items() if not key.startswith("pose_out.")}
+    common = {key: value for key, value in ambient.state_dict().items()
+              if key in manifold.state_dict() and not key.startswith("pose_out.")}
     manifold.load_state_dict(common, strict=False)
     models = {"ambient": ambient, "SO3": manifold}
     if compare_rotation_kernels:
