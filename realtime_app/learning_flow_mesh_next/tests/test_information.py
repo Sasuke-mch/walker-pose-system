@@ -46,12 +46,18 @@ def test_two_stage_frozen_g0_and_state_chunk_roundtrip():
     pipeline = TwoStageInference(g0, g1, normal, TangentScale.fixture(g0.topology), rigid_surface, rig(), NoiseModel.proxy())
     before = {k: v.clone() for k, v in g0.state_dict().items()}
     with torch.no_grad():
-        _, _, info, state, report = pipeline(replace(observation(), xy=observation().xy.double()), k=2, anchor_k=2, steps=1)
+        first_obs = replace(observation(), xy=observation().xy.double())
+        first, _, info, state, report = pipeline(first_obs, k=2, anchor_k=2, steps=1)
+        studied, _, full_info, full_state, full_report = pipeline(first_obs, k=2, anchor_k=2, steps=1, diagnostics=True)
         restored = TwoStageState.from_dict(json.loads(json.dumps(state.to_dict())), dtype=torch.float64)
         obs = replace(observation(1, .1), xy=observation().xy.double())
         a = pipeline(obs, state, k=2, anchor_k=2, steps=1)[0]
         b = pipeline(obs, restored, k=2, anchor_k=2, steps=1)[0]
     assert torch.equal(a.raw, b.raw) and info.matrix is not None
+    assert torch.equal(first.raw, studied.raw) and first.reasons == studied.reasons
+    assert torch.equal(info.matrix, full_info.matrix) and state.to_dict() == full_state.to_dict()
+    assert report["information_diagnostics"] == "not_requested"
+    assert full_report["information_diagnostics"] == "computed"
     assert report["generators"] == 2 and report["network_calls"] == 2
     assert report["candidate_state_evaluations"] == 4
     assert not any(p.requires_grad for p in g0.parameters())
@@ -261,11 +267,62 @@ def test_svd_shape_audit_independent_direction_and_coordinate_invariance():
     assert empty.count_nonzero() == 0 and report["residual_shape_energy_fraction"] is None
 
 
-def test_no_measurement_and_bad_projection_information_failure():
+@pytest.mark.parametrize("diagnostics", [False, True])
+def test_no_measurement_and_bad_projection_information_failure(diagnostics):
     store = store_fixture()
     missing = replace(observation(), present=torch.zeros(2, 17, dtype=torch.bool))
-    info = local_information(store, missing, rig(), NoiseModel.proxy(), TangentScale.fixture(store.topology), rigid_surface)
+    info = local_information(store, missing, rig(), NoiseModel.proxy(), TangentScale.fixture(store.topology),
+                             rigid_surface, diagnostics=diagnostics)
     assert info.matrix is None and info.reasons == ["no_current_observation"]
     store.translation[:, 2] = -1
-    info = local_information(store, observation(), rig(), NoiseModel.proxy(), TangentScale.fixture(store.topology), rigid_surface)
+    info = local_information(store, observation(), rig(), NoiseModel.proxy(), TangentScale.fixture(store.topology),
+                             rigid_surface, diagnostics=diagnostics)
     assert info.matrix is None and "projection_invalid" in info.reasons[0]
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+def test_optional_diagnostics_preserve_information_without_redundant_schur(monkeypatch, nodes):
+    from .. import geometry_information as geometry
+    from ..candidate_store import from_parameters
+    from ..schema import Topology
+
+    original = store_fixture()
+    store = from_parameters(torch.cat((original.raw[:, :6*nodes], original.raw[:, -13:]), -1),
+                            Topology(nodes), ids=original.ids, seeds=original.seeds,
+                            current_observed=True, provenance={}, resources={})
+    args = (store, observation(), rig(), NoiseModel.proxy(), TangentScale.fixture(store.topology), rigid_surface)
+    calls, schur = [], geometry.schur_shape
+    def counted(matrix, *, rtol=1e-6):
+        calls.append(rtol)
+        return schur(matrix, rtol=rtol)
+    monkeypatch.setattr(geometry, "schur_shape", counted)
+    full = local_information(*args)
+    assert full.diagnostics["status"] == "computed"
+    assert calls == [1e-6, 1e-4, 1e-5, 1e-8, 1e-10]
+    assert full.diagnostics["rank_sensitivity"][2]["pinv_rtol"] == 1e-6
+    def forbidden(*args, **kwargs):
+        raise AssertionError("minimal acquisition must not run rank/shape diagnostics")
+    monkeypatch.setattr(geometry, "information_diagnostics", forbidden)
+    minimal = local_information(*args, diagnostics=False)
+    assert torch.equal(minimal.matrix, full.matrix) and torch.equal(minimal.jacobian, full.jacobian)
+    assert torch.equal(minimal.anchor_rotation, full.anchor_rotation)
+    assert minimal.anchor_id == full.anchor_id and minimal.reasons == full.reasons == []
+    assert minimal.binding == full.binding and minimal.provenance == full.provenance
+    assert minimal.diagnostics["status"] == "not_requested"
+    assert minimal.diagnostics["candidate_current_observation_binding"] == full.diagnostics["candidate_current_observation_binding"]
+    assert minimal.resources["decoder_state_evaluations"] == full.resources["decoder_state_evaluations"] == 2*(3*nodes+13)+1
+
+
+def test_diagnostic_failure_does_not_discard_valid_information(monkeypatch):
+    from .. import geometry_information as geometry
+
+    store = store_fixture()
+    args = (store, observation(), rig(), NoiseModel.proxy(), TangentScale.fixture(store.topology), rigid_surface)
+    reference = local_information(*args, diagnostics=False)
+    def failed(*args, **kwargs):
+        raise RuntimeError("diagnostic decomposition failed")
+    monkeypatch.setattr(geometry, "schur_shape", failed)
+    result = local_information(*args)
+    assert torch.equal(result.matrix, reference.matrix) and torch.equal(result.jacobian, reference.jacobian)
+    assert result.reasons == [] and result.diagnostics["status"] == "unavailable"
+    assert result.diagnostics["reason"] == "RuntimeError:diagnostic decomposition failed"

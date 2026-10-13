@@ -38,7 +38,7 @@ class TwoStageInference:
         self.cameras, self.noise = cameras, noise
 
     def __call__(self, observation, state=None, *, k=32, steps=8, anchor_k=32, jacobian_step=1e-4,
-                 regression=False):
+                 regression=False, diagnostics=False):
         # Reject invalid control budgets before paying for the shared anchor/J.
         if regression and k != 1:
             raise ValueError("regression is a single deterministic control; use k=1")
@@ -50,7 +50,7 @@ class TwoStageInference:
             g0, state0 = infer(self.g0, self.normalization, observation, state.g0,
                                k=anchor_k, steps=steps, stream="G0")
             information = local_information(g0, observation, self.cameras, self.noise,
-                                            self.scale, self.surface, step=jacobian_step)
+                                            self.scale, self.surface, step=jacobian_step, diagnostics=diagnostics)
         g1, state1 = infer(self.g1, self.normalization, observation, state.g1,
                            k=k, steps=steps, stream="G1", information=information.matrix, regression=regression)
         if observation.xy.is_cuda:
@@ -64,6 +64,7 @@ class TwoStageInference:
                   "J_decoder_calls": information.resources.get("decoder_batch_calls", 0),
                   "J_decoder_state_evaluations": information.resources.get("decoder_state_evaluations", 0),
                   "information_fallback_reasons": information.reasons,
+                  "information_diagnostics": information.diagnostics.get("status"),
                   "matched_total_sampling_G0_control_K": None if regression else anchor_k+k,
                   "matched_walltime_control": "must measure separately; sample count alone is insufficient"}
         g1.provenance["information"] = {"anchor_id": information.anchor_id, "noise_source": information.noise_source,

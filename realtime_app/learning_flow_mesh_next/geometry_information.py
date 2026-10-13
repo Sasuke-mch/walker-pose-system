@@ -194,12 +194,34 @@ def whitened_shape_audit(white, *, rtol=1e-6):
     }
 
 
-def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, chunk=16):
+def information_diagnostics(matrix, jacobian, precision):
+    """Optional rank/shape study; it does not construct or validate Lambda."""
+    _, diagnostic = schur_shape(matrix)
+    diagnostic["rank_sensitivity"] = [dict(diagnostic) if r == 1e-6 else schur_shape(matrix, rtol=r)[1]
+                                      for r in (1e-4, 1e-5, 1e-6, 1e-8, 1e-10)]
+    # Gram matrices square singular values; direct whitened-J diagnostics are
+    # retained for research, without treating a numerical rank as identifiability.
+    white = torch.linalg.cholesky(precision).T @ jacobian
+    Ju, Jb = white[:, :-10], white[:, -10:]
+    residual = Jb - Ju @ torch.linalg.pinv(Ju, rtol=1e-6) @ Jb
+    diagnostic["whitened_J_nuisance_rank_rtol1e-6"] = int(torch.linalg.matrix_rank(Ju, rtol=1e-6))
+    diagnostic["whitened_J_residual_shape_eigenvalues"] = torch.linalg.eigvalsh(residual.T@residual).cpu().tolist()
+    diagnostic["whitened_svd_sensitivity"] = [whitened_shape_audit(white, rtol=r)[1]
+                                              for r in (1e-4, 1e-5, 1e-6, 1e-8, 1e-10)]
+    diagnostic["rank_warning"] = "Gram pseudoinverse thresholds square Jacobian conditioning; apparent nonzero Schur under truncation is not shape identifiability"
+    diagnostic["jacobian_rank"] = int(torch.linalg.matrix_rank(jacobian, rtol=1e-6))
+    return diagnostic
+
+
+def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, chunk=16, diagnostics=True):
     """Central finite-difference J in train-scaled coordinates, no anchor/J gradients.
 
     Decoder evaluations and batch calls are counted explicitly. Central differences
     permit the same callable for licensed SMPL and independent analytic checks.
+    Research diagnostics are optional and cannot invalidate a finite guarded J.
     """
+    if not isinstance(diagnostics, bool):
+        raise TypeError("explicit boolean diagnostics option required")
     check_rig(obs, cameras)
     noise.validate_for(obs)
     scale.validate(store.topology)
@@ -210,7 +232,8 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
         torch.cuda.synchronize()
         start = time.perf_counter()
     resources = {"decoder_batch_calls": 0, "decoder_state_evaluations": 0,
-                 "method": "central_finite_difference", "step_standardized": step}
+                 "method": "central_finite_difference", "step_standardized": step,
+                 "diagnostics_requested": diagnostics}
     result = Information(None, None, None, None, scale.values.detach().clone(), noise.source,
                          noise.calibrated, [], resources=resources)
     result.provenance = {"identity": obs.identity, "sequence": obs.sequence, "frame": obs.frame,
@@ -220,6 +243,8 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
     candidate_binding = store.provenance.get("observation_binding")
     binding_status = "legacy_unverified" if candidate_binding is None else "verified"
     result.diagnostics["candidate_current_observation_binding"] = binding_status
+    result.diagnostics["status"] = "not_computed" if diagnostics else "not_requested"
+    result.diagnostics["coordinate_scale_source"] = scale.source
     if candidate_binding is not None and candidate_binding != result.binding["observation"]:
         result.reasons.append("candidate_anchor_observation_binding_mismatch")
         return result
@@ -268,25 +293,16 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
             if not torch.isfinite(matrix).all():
                 raise ValueError("nonfinite_information")
             result.matrix, result.jacobian = matrix.detach(), jacobian.detach()
-            _, diagnostic = schur_shape(matrix)
-            diagnostic["rank_sensitivity"] = [schur_shape(matrix, rtol=r)[1] for r in (1e-4, 1e-5, 1e-6, 1e-8, 1e-10)]
-            # Gram matrices square singular values. Inspect a whitened-J residual
-            # as an additional conditioning audit, rather than treating rank as proof.
-            white = torch.linalg.cholesky(precision).T @ jacobian
-            Ju, Jb = white[:, :-10], white[:, -10:]
-            residual = Jb - Ju @ torch.linalg.pinv(Ju, rtol=1e-6) @ Jb
-            diagnostic["whitened_J_nuisance_rank_rtol1e-6"] = int(torch.linalg.matrix_rank(Ju, rtol=1e-6))
-            diagnostic["whitened_J_residual_shape_eigenvalues"] = torch.linalg.eigvalsh(residual.T@residual).cpu().tolist()
-            diagnostic["whitened_svd_sensitivity"] = [whitened_shape_audit(white, rtol=r)[1]
-                                                      for r in (1e-4, 1e-5, 1e-6, 1e-8, 1e-10)]
-            diagnostic["rank_warning"] = "Gram pseudoinverse thresholds square Jacobian conditioning; apparent nonzero Schur under truncation is not shape identifiability"
-            diagnostic["jacobian_rank"] = int(torch.linalg.matrix_rank(jacobian, rtol=1e-6))
-            diagnostic["coordinate_scale_source"] = scale.source
-            diagnostic["candidate_current_observation_binding"] = binding_status
-            result.diagnostics = diagnostic
     except (ValueError, RuntimeError) as error:
         result.matrix, result.jacobian = None, None
         result.reasons.append(f"information_unavailable:{type(error).__name__}:{error}")
+    if diagnostics and result.matrix is not None:
+        try:
+            with torch.no_grad():
+                result.diagnostics.update(information_diagnostics(result.matrix, result.jacobian, precision))
+            result.diagnostics["status"] = "computed"
+        except (ValueError, RuntimeError) as error:
+            result.diagnostics.update(status="unavailable", reason=f"{type(error).__name__}:{error}")
     if store.raw.is_cuda:
         torch.cuda.synchronize()
     resources["total_ms"] = (time.perf_counter()-start)*1000

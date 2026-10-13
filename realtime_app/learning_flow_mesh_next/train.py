@@ -191,7 +191,7 @@ class SequenceInformation:
 
 
 def acquire_sequence_information(g0, observations, normalization, scale, surface, cameras, noise, state=None,
-                                 *, anchor_k=32, steps=8, jacobian_step=1e-4):
+                                 *, anchor_k=32, steps=8, jacobian_step=1e-4, diagnostics=False):
     """Acquire frozen information from observations only, never from target labels."""
     from .candidate_store import infer
 
@@ -228,7 +228,8 @@ def acquire_sequence_information(g0, observations, normalization, scale, surface
     with torch.no_grad():
         for obs in observations:
             anchor, state = infer(g0, normalization, obs, state, k=anchor_k, steps=steps, stream="G0")
-            frames.append(local_information(anchor, obs, cameras, noise, scale, surface, step=jacobian_step))
+            frames.append(local_information(anchor, obs, cameras, noise, scale, surface,
+                                            step=jacobian_step, diagnostics=diagnostics))
             resources.append(anchor.resources)
     result = SequenceInformation(tuple(frames), tuple(resources), tuple(cameras), noise, scale, state.detached())
     return result.validate(observations, g0.topology)
