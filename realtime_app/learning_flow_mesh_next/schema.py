@@ -1,5 +1,7 @@
 """Typed deployment inputs, with no labels or arbitrary extra fields."""
 from dataclasses import dataclass
+from math import isfinite
+from numbers import Integral
 
 import torch
 
@@ -107,6 +109,21 @@ class TemporalState:
     last_timestamp: float
     last_frame: int
     seen: torch.Tensor
+
+    def validate(self, width=None):
+        """Validate carried evidence before any consumer advances the clock."""
+        if not isfinite(self.last_timestamp):
+            raise ValueError("finite temporal-state timestamp required")
+        if (isinstance(self.last_frame, bool) or not isinstance(self.last_frame, Integral)
+                or self.last_frame < 0):
+            raise ValueError("nonnegative integer temporal-state frame ID required")
+        if (self.hidden.ndim != 1 or (width is not None and self.hidden.shape != (width,))
+                or self.age.shape != (2, 17) or self.seen.shape != (2, 17)):
+            raise ValueError("incompatible temporal-state dimensions")
+        if (self.seen.dtype != torch.bool or not torch.isfinite(self.hidden).all()
+                or not torch.isfinite(self.age).all() or (self.age < 0).any()):
+            raise ValueError("corrupt serialized temporal state")
+        return self
 
     def detached(self):
         # TBPTT retains values; this is not a reset.

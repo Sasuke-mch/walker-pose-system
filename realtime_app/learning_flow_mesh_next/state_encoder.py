@@ -26,14 +26,13 @@ class StateEncoder(nn.Module):
             seen = torch.zeros_like(obs.present)
             dt = 0.0
         else:
+            if not isinstance(state, TemporalState):
+                raise TypeError("typed causal carry required")
+            state.validate(self.width)
             if (state.identity, state.sequence, state.camera_ids) != (obs.identity, obs.sequence, obs.camera_ids):
                 raise ValueError("incompatible stream; explicit reset required")
             if obs.timestamp <= state.last_timestamp or obs.frame <= state.last_frame:
                 raise ValueError("physical timestamps and frame IDs must strictly increase")
-            if state.hidden.shape != (self.width,) or state.age.shape != (2, 17) or state.seen.shape != (2, 17):
-                raise ValueError("incompatible temporal-state dimensions")
-            if not torch.isfinite(state.hidden).all() or not torch.isfinite(state.age).all() or (state.age < 0).any():
-                raise ValueError("corrupt serialized temporal state")
             dt = obs.timestamp - state.last_timestamp
             hidden, age, seen = state.hidden, state.age + dt, state.seen
         valid = obs.admitted()

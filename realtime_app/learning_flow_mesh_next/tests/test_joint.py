@@ -378,7 +378,7 @@ def test_multi_stream_batch_carries_across_batches_without_mutating_input():
     assert {key: state.to_dict() for key, state in first.states.items()} == original
 
 
-@pytest.mark.parametrize("fault", ["later_clock", "overlap", "split", "rows", "too_many", "type", "carry"])
+@pytest.mark.parametrize("fault", ["later_clock", "overlap", "split", "rows", "too_many", "type", "carry", "carry_clock"])
 def test_multi_stream_batch_rejects_bad_later_window_before_any_encoder(monkeypatch, fault):
     from ..train import sequence_batch_objective
 
@@ -403,13 +403,38 @@ def test_multi_stream_batch_rejects_bad_later_window_before_any_encoder(monkeypa
         obs = chunks[1].observations[0]
         key = (obs.identity, obs.sequence, obs.camera_ids)
         states = {key: TemporalState(obs.identity, obs.sequence, obs.camera_ids,
-                                    torch.full((128,), torch.nan), torch.zeros(2, 17), -.1, 99,
+                                    torch.full((128,), torch.nan) if fault == "carry" else torch.zeros(128),
+                                    torch.zeros(2, 17), -.1 if fault == "carry" else float("nan"), 99,
                                     torch.zeros(2, 17, dtype=torch.bool))}
     def forbidden(*args, **kwargs):
         raise AssertionError("bad final window or carry must reject before any batch encoder")
     monkeypatch.setattr(model.encoder, "forward", forbidden)
     with pytest.raises((ValueError, TypeError)):
         sequence_batch_objective("regression", model, chunks, normal, states)
+
+
+@pytest.mark.parametrize("entry", ["sequence", "acquisition"])
+def test_corrupt_sequence_clock_rejected_before_any_encoder(monkeypatch, entry):
+    from ..geometry_observation import NoiseModel
+    from ..tangent import TangentScale
+    from ..train import acquire_sequence_information
+    from .test_aggregate import rig
+    from .test_information import rigid_surface
+
+    model = JointFlow().eval().requires_grad_(False)
+    normal, chunk = Normalization.fixture(model.topology), sequence_fixture()
+    obs = chunk.observations[0]
+    state = TemporalState(obs.identity, obs.sequence, obs.camera_ids, torch.zeros(128),
+                          torch.zeros(2, 17), float("nan"), 99, torch.zeros(2, 17, dtype=torch.bool))
+    def forbidden(*args, **kwargs):
+        raise AssertionError("corrupt carry must reject before encoding")
+    monkeypatch.setattr(model.encoder, "forward", forbidden)
+    with pytest.raises(ValueError, match="finite.*timestamp"):
+        if entry == "sequence":
+            sequence_objective("regression", model, chunk, normal, state)
+        else:
+            acquire_sequence_information(model, chunk.observations, normal, TangentScale.fixture(model.topology),
+                                         rigid_surface, rig(), NoiseModel.proxy(), state, anchor_k=1, steps=1)
 
 
 def test_multi_stream_batch_unavailable_and_nonfinite_keep_original_windows(monkeypatch):

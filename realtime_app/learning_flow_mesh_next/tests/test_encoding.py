@@ -7,6 +7,8 @@ from ..candidate_store import infer
 from ..data_firewall import Normalization
 from ..information_encoding import fixed_probes, information_features
 from ..joint_flow import JointFlow, ModelConfig, cfm_loss
+from ..schema import TemporalState
+from ..state_encoder import StateEncoder
 from .test_firewall import labels, observation
 
 
@@ -113,3 +115,36 @@ def test_same_capacity_default_identity_and_shared_loss_sample_graph(nodes, para
     loss, _ = cfm_loss(new, context.float(), target, Normalization.fixture(new.topology), information=coupled.float())
     assert torch.isfinite(loss)
     assert torch.isfinite(new.sample(context[:1].float(), state.float(), steps=2, information=coupled.float())).all()
+
+
+@pytest.mark.parametrize("restored", [False, True])
+@pytest.mark.parametrize("timestamp", [float("nan"), float("inf"), -float("inf")])
+def test_corrupt_carry_clock_rejected_before_neural_forward(timestamp, restored):
+    model = StateEncoder().eval()
+    with torch.no_grad():
+        _, state, _ = model(observation())
+    state = replace(state, last_timestamp=timestamp)
+    if restored:
+        state = TemporalState.from_dict(state.to_dict())
+    calls = []
+    hook = model.local[0].register_forward_pre_hook(lambda *_: calls.append("measurement"))
+    try:
+        with pytest.raises(ValueError, match="finite.*timestamp"):
+            model(observation(1, .2), state)
+        assert calls == []
+    finally:
+        hook.remove()
+
+
+@pytest.mark.parametrize("field, value", [
+    ("last_frame", -1), ("last_frame", .5), ("last_frame", True),
+    ("hidden", torch.full((128,), torch.nan)),
+    ("age", torch.full((2, 17), -1.)),
+    ("seen", torch.ones(2, 17)),
+])
+def test_corrupt_carry_fields_share_encoder_validation(field, value):
+    model = StateEncoder().eval()
+    with torch.no_grad():
+        _, state, _ = model(observation())
+    with pytest.raises(ValueError):
+        model(observation(2, .2), replace(state, **{field: value}))

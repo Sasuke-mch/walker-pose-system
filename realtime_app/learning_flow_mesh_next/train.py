@@ -83,6 +83,8 @@ class SequenceChunk:
             raise TypeError("typed observations and Labels required")
         if state is not None and not isinstance(state, TemporalState):
             raise TypeError("typed causal carry required")
+        if state is not None:
+            state.validate()
         if self.labels.topology != topology or normalization.topology != topology:
             raise ValueError("sequence target/normalization topology mismatch")
         _, mask = self.labels.packed(require_complete=False)
@@ -195,6 +197,8 @@ def acquire_sequence_information(g0, observations, normalization, scale, surface
 
     if state is not None and not isinstance(state, TemporalState):
         raise TypeError("typed acquisition carry required")
+    if state is not None:
+        state.validate(g0.encoder.width)
     if g0.training or any(parameter.requires_grad for parameter in g0.parameters()):
         raise ValueError("explicit frozen eval G0 required")
     if not 1 <= len(observations) <= configuration()["unroll"]:
@@ -466,11 +470,7 @@ def sequence_batch_objective(mode, model, chunks, normalization, states=None, *,
             raise TypeError("typed per-stream causal carries required")
         if key != (state.identity, state.sequence, tuple(state.camera_ids)):
             raise ValueError("batch carry key differs from its declared stream")
-        if (state.hidden.shape != (model.encoder.width,) or state.age.shape != (2, 17)
-                or state.seen.shape != (2, 17) or state.seen.dtype != torch.bool
-                or not torch.isfinite(state.hidden).all() or not torch.isfinite(state.age).all()
-                or (state.age < 0).any()):
-            raise ValueError("invalid per-stream batch carry")
+        state.validate(model.encoder.width)
     if information is not None:
         if len(information) != len(chunks) or any(not isinstance(item, SequenceInformation) for item in information):
             raise ValueError("one typed information bundle per original causal chunk required")
