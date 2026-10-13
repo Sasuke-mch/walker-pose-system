@@ -369,6 +369,148 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda", compare_r
             "boundary": "small fixed random-model timing sample; clocks/power/concurrent load uncontrolled; no accuracy or calibration conclusion"}
 
 
+def run_current(*, repeats=30, warmup=5, device="cuda"):
+    """Current publish path: choose first, decode the selected human once."""
+    from realtime_app.learning_flow_mesh.body import BodyDecoder
+    from realtime_app.pose_app.smpl_coco_observation import load_coco17_regressor
+
+    from .aggregate import decide
+    from .candidate_store import infer
+    from .geometry_information import local_information
+    from .geometry_observation import NoiseModel, project
+
+    if device != "cuda" or not torch.cuda.is_available():
+        raise ValueError("current-model benchmark requires CUDA")
+    if repeats < 2 or warmup < 0:
+        raise ValueError("at least two repeats and nonnegative warmup required")
+    torch.set_num_threads(1)
+    torch.manual_seed(7)
+    g0, g1 = JointFlow().to(device).eval(), JointFlow().to(device).eval()
+    g0.requires_grad_(False)
+    config = json.loads(Path("realtime_app/learning_flow_mesh/config.json").read_text(encoding="utf-8"))
+    surface = CountedSurface(SurfaceDecoder(BodyDecoder(**config["assets"]).to(device),
+        torch.tensor(load_coco17_regressor(Path("models/smpl/J_regressor_coco.npy")), device=device)))
+    cameras = tuple(replace(c, **{name: getattr(c, name).to(device=device, dtype=torch.float32)
+                                 for name in ("K", "D", "R", "T")}) for c in rig())
+    noise = replace(NoiseModel.proxy(), precision=NoiseModel.proxy().precision.to(device))
+    normal = fixture_normalization(g0.topology, device=device)
+    scale = replace(TangentScale.fixture(g0.topology), values=torch.ones(169, device=device))
+    fixture = observation()
+    with torch.no_grad():
+        points = surface(torch.eye(3, device=device).expand(1, 52, 3, 3),
+                         torch.tensor([[0., 0., 3.]], device=device), torch.zeros(1, 10, device=device))["coco17"][0]
+        pixels = torch.stack([project(points, camera)[0] for camera in cameras]).detach()
+    obs = replace(fixture, xy=pixels, **{name: getattr(fixture, name).to(device) for name in
+        ("confidence", "present", "quality", "geometry", "views", "origins", "directions")}).validate()
+    modes = ("F0_K32_Euler8_A4", "R0_K1_A4", "F_info_K32_Euler8_A6")
+    states = {mode: None for mode in modes}
+    anchor_state, records = None, []
+
+    def mark():
+        torch.cuda.synchronize()
+        return time.perf_counter()
+
+    with torch.no_grad():
+        for repetition in range(warmup + repeats):
+            current = replace(obs, frame=repetition, timestamp=repetition/30)
+            for mode in modes:
+                surface.calls = surface.states = 0
+                torch.cuda.reset_peak_memory_stats()
+                baseline = torch.cuda.memory_allocated()
+                start = mark()
+                info = None
+                g0_ms = j_ms = 0.
+                if mode.startswith("F_info"):
+                    anchor, anchor_state = infer(g0, normal, current, anchor_state, k=32, steps=8)
+                    after_g0 = mark()
+                    info = local_information(anchor, current, cameras, noise, scale, surface,
+                                             step=1e-3, diagnostics=False)
+                    after_j = mark()
+                    g0_ms, j_ms = (after_g0-start)*1000, (after_j-after_g0)*1000
+                generate_at = mark()
+                regression = mode.startswith("R0")
+                candidates, states[mode] = infer(g1 if info is not None else g0, normal, current, states[mode],
+                    k=1 if regression else 32, steps=1 if regression else 8, regression=regression,
+                    stream="G1" if info is not None else "G0", information=info.matrix if info is not None else None)
+                generated_at = mark()
+                if info is None:
+                    decision = decide(candidates, "A4", scale)
+                else:
+                    decision, _ = decide_information(candidates, info, scale, RiskPolicy(lambda_g=.1),
+                        observation=current, cameras=cameras, noise=noise, surface=surface)
+                decided_at = mark()
+                finite_mesh = False
+                if decision.selected_index is not None:
+                    index = decision.selected_index
+                    mesh = surface(candidates.rotations[index:index+1], candidates.translation[index:index+1],
+                                   candidates.beta[index:index+1])
+                    finite_mesh = bool(torch.isfinite(mesh["vertices"]).all())
+                finished = mark()
+                if repetition >= warmup:
+                    records.append({"mode": mode, "frame": repetition,
+                        "G0_ms": g0_ms, "J_ms": j_ms,
+                        "generation_ms": (generated_at-generate_at)*1000,
+                        "encoder_ms": candidates.resources["encoder_ms"],
+                        "sample_and_denormalize_ms": candidates.resources["total_ms"]-candidates.resources["encoder_ms"],
+                        "candidate_pack_binding_overhead_ms": (generated_at-generate_at)*1000-candidates.resources["total_ms"],
+                        "selection_ms": (decided_at-generated_at)*1000,
+                        "selected_mesh_ms": (finished-decided_at)*1000, "full_ms": (finished-start)*1000,
+                        "network_calls_final_model": candidates.resources["network_calls"],
+                        "candidate_state_evaluations_final_model": candidates.resources["candidate_state_evaluations"],
+                        "decoder_calls": surface.calls, "decoder_states": surface.states,
+                        "numeric_candidates": int(candidates.numerical.sum()), "selected_id": decision.selected_id,
+                        "finite_selected_mesh": finite_mesh, "reasons": decision.reasons,
+                        "fallback": decision.diagnostic.get("fallback", False),
+                        "information_available": info.matrix is not None if info is not None else None,
+                        "peak_cuda_allocated_bytes": torch.cuda.max_memory_allocated(),
+                        "peak_cuda_increment_bytes": torch.cuda.max_memory_allocated()-baseline})
+
+        # A single velocity call uses already resident inputs; no encoder or LBS.
+        context = g0.encoder(obs)[0][None].expand(32, -1)
+        initial = torch.randn(32, 325, device=device)
+        flow_time = torch.full((32,), .5, device=device)
+        core_records = []
+        begin, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+        for repetition in range(warmup + repeats):
+            start = mark()
+            begin.record()
+            velocity = g0.velocity(initial, flow_time, context)
+            end.record()
+            finished = mark()
+            if repetition >= warmup:
+                core_records.append({"wall_ms": (finished-start)*1000, "cuda_event_ms": begin.elapsed_time(end)})
+        core_finite = bool(torch.isfinite(velocity).all())
+
+    def quantiles(values):
+        return {label: float(np.quantile(values, q)) for label, q in (("p50", .5), ("p95", .95))}
+
+    keys = ("G0_ms", "J_ms", "generation_ms", "encoder_ms", "sample_and_denormalize_ms",
+            "candidate_pack_binding_overhead_ms", "selection_ms", "selected_mesh_ms", "full_ms")
+    summary = {}
+    for mode in modes:
+        rows = [row for row in records if row["mode"] == mode]
+        summary[mode] = {key: quantiles([row[key] for row in rows]) for key in keys}
+        summary[mode].update(fallback_count=sum(row["fallback"] for row in rows),
+            published_finite_count=sum(row["finite_selected_mesh"] for row in rows),
+            decoder_states=sorted({row["decoder_states"] for row in rows}),
+            peak_cuda_allocated_bytes=max(row["peak_cuda_allocated_bytes"] for row in rows),
+            peak_cuda_increment_bytes=max(row["peak_cuda_increment_bytes"] for row in rows))
+    return {"scope": "current FP32 GPU publish paths; resident analytic pixels; random neural weights",
+        "hardware": torch.cuda.get_device_name(), "torch": torch.__version__, "cuda": torch.version.cuda,
+        "seed": 7, "warmup": warmup, "repeats": repeats, "cpu_threads": 1, "dtype": "float32",
+        "parameters_per_JointFlow": sum(p.numel() for p in g0.parameters()),
+        "timing": "synchronized perf_counter wall time; core additionally CUDA events, including stream gaps",
+        "state": "independent carried history per mode; fixed pixels with frame/clock advancing 1/30 second",
+        "assets": config["assets"], "normalization": normal.source, "noise": noise.source,
+        "jacobian": "central difference 1e-3; diagnostics=False; no derivative accuracy experiment",
+        "capture_detector_transfer_load_included": False, "training": False, "neural_checkpoint_loaded": False,
+        "summary": summary, "records": records,
+        "single_velocity_K32": {key: quantiles([row[key] for row in core_records])
+                                for key in ("wall_ms", "cuda_event_ms")},
+        "single_velocity_records": core_records, "single_velocity_finite": core_finite,
+        "boundary": "finite-repeat sample p95, desktop GPU load/power uncontrolled; no accuracy or production FPS claim"}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
@@ -376,6 +518,8 @@ def main():
     parser.add_argument("--warmup", type=int, default=1)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--matched-controls", action="store_true")
+    parser.add_argument("--current-model", action="store_true",
+                        help="current FP32 GPU F0/R0/information publish paths, no SO3 optimization")
     parser.add_argument("--representation-controls", action="store_true")
     parser.add_argument("--compare-rotation-kernels", action="store_true")
     parser.add_argument("--endpoint-feedback-controls", action="store_true",
@@ -385,7 +529,12 @@ def main():
         parser.error("rotation kernel comparison requires representation controls")
     if args.endpoint_feedback_controls and (args.representation_controls or args.matched_controls or args.compare_rotation_kernels):
         parser.error("endpoint feedback and other controls are separate experiments")
-    if args.representation_controls or args.endpoint_feedback_controls:
+    if args.current_model:
+        if any((args.matched_controls, args.representation_controls, args.endpoint_feedback_controls,
+                args.compare_rotation_kernels)):
+            parser.error("current-model timing is separate from historical comparison controls")
+        report = run_current(repeats=args.repeats, warmup=args.warmup, device=args.device)
+    elif args.representation_controls or args.endpoint_feedback_controls:
         if args.matched_controls:
             parser.error("representation and two-stage matched controls are separate experiments")
         report = run_representation_controls(repeats=args.repeats, warmup=args.warmup, device=args.device,

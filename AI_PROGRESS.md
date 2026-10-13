@@ -4665,3 +4665,11 @@ SMPL-H结构检查发现旧current_mainline.json/frozen_scalar_options比现行p
 按用户要求制作当前模型的一页结构图，输出至`research_records/research/G20261007_flow_mesh_baseline_v1/figures/jointflow_architecture_20261013.{png,svg,pdf}`；PNG4400×2740，SVG可编辑结构和文字，PDF用于报告。上方完整主链、左下速度网络展开、右下可选几何分支：明确325D、54×128 tokens、4层4头、K32/Euler8，完整候选选择后人体解码，几何成本按需计算；G0/J/Λ/G1为研究路径，SO3为独立对照。网格小图复用已有neutral示意，不冒充新结果。
 
 绘图源码为`realtime_app/learning_flow_mesh_next/draw_architecture.py`；已有MODEL_ARCHITECTURE第28节补入口、重建方式和图意。仅进行源码维度/箭头核对、运行绘图和实际版式检查，修复缺字及重叠后最终无缺字警告，Ruff通过。没有模型/训练/数据/主线改动或额外审计材料；本轮图和源码及记录增量本地提交，保留工作区已有改动，不推送。
+
+## 2026-10-13 当前Flow GPU测速与模块原理说明
+
+用户明确要求显卡测速，并切实解释速度网络、Transformer及因果条件编码。本轮扩展现有profile.py的--current-model模式，GPU真实运行FP32/eval/no_grad、seed7、预热5次/测量30次，三个路径交错，各自因果记忆推进；输入为解析fixture像素及工程条件，真实许可SMPL-H解码，网络未训练。计时同步CUDA并保留候选打包/检查/选择及最终网格，单模型A4不再额外解码未选择人体；采集、二维检测、外部传输和首载不计入。不是训练或核优化任务。
+
+RTX5070Ti Laptop12GB、torch2.11.0+cu128：F0的K32/Euler8+A4+网格中位34.116ms/P9537.043ms；同型K1单次回归13.685/15.756ms；G0/J/G1+A6+网格331.005/350.473ms。单次K32速度网络1.652ms，几何信息J243.163ms，占双阶段主要成本；不能把整个模型慢都归因于Transformer。F0/R0各解码1人体，信息路径372状态=339有限差分+32候选评分+1最终人体。各路径30/30有限网格、无fallback；这只证明工程可跑，不证明生成精度。单模型上述局部路径P95已超过33.3ms，不能称完整系统30fps。
+
+原始结果与全部逐次计时在flow_next_gpu_runtime_20261013.json，运行命令、显存范围及环境/小样本边界写入MODEL_RESULTS第44节；MODEL_ARCHITECTURE第29节用标量例、公式和具体身体歧义解释生成进度与视频时间的区别、54参数块如何交换信息、GRU如何保留过去测量，以及Transformer/容量/多候选尚未证明最优。计时入口Ruff通过及实际GPU运行完成，不新增冗余测试/快照/验收脚本，不改变模型或正式主线。任务增量本地提交，保留其余未提交改动，不推送。
