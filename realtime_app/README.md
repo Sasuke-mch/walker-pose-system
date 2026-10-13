@@ -1,5 +1,13 @@
 # realtime_app
 
+## 2026-10-13 新拟合采用可靠程度权重
+
+body.fit_smplh_wilor_sequence默认--fit-policy reliability；tools/run_smplh_reprojection_experiment.py也默认新策略。身体3D使用双目较低分数及独立几何衰减，2D/3D/MANO损失按原始帧/视图/点的固定总数归约；零分和缺失不获得正权重或被重新归一化成满强度。踝倍率与检测分数分开。根锚使用旋转空间距离及肩髋可靠程度，接触D2/D3继续保留身体数据约束。
+
+新方法尚未经验标定为概率/协方差，固定分母改变了观测相对先验的尺度，旧lambda未重新调优。当前已保存主线网格仍来自legacy；冻结cold profiles与历史命令读取器明确保留旧策略。直接使用旧argv需补--fit-policy legacy；使用新方法则保留body-weighting默认quality（实际解析为新可靠程度公式），不能携带旧reference/uniform/no_*配方。新策略要求身体3D或2D数据项恰有一项为正，避免对同一像素重复计证。
+
+公式、输入拒绝原因和接触证据边界见../docs/CURRENT_SMPLH_ALGORITHM_20261002.md第28节。本轮只做方法和单元检查，未重拟合已保存的360/448序列。下方2026-10-05段落保留旧身体结果语义，场景mainline当前解析为supported_stop_fixed_lag。
+
 ## 当前360帧身体工程主线（2026-10-05）
 
 选择来源为configs/current_mainline.json/mainline_selection.body；当前为reference25完整冷启动结果。身体权重采用reference，25px回投影平台、80mm射线间距平台、0.6置信度参考下限；body_quality与body_fit_weights分存。各关节权重/置信度规则登记为后续重点，详细取舍见../docs/CURRENT_SMPLH_ALGORITHM_20261002.md第25节。Stage/地面仍为baseline，448帧冻结profile保持quality。通用求解器省略参数的兼容默认不能冒充此主线。
@@ -9,6 +17,7 @@
 ```powershell
 $selectedBody = (Get-Content realtime_app/configs/current_mainline.json -Raw | ConvertFrom-Json).mainline_selection.body
 $fitArgs = [string[]](Get-Content $selectedBody.reproduction_arguments -Raw | ConvertFrom-Json)
+$fitArgs += @('--fit-policy', 'legacy')
 $fitArgs[[Array]::IndexOf($fitArgs, '--output-dir') + 1] = 'research_records/engineering_validation/reference25_new_run/fit'
 & ./.venv-cuda/Scripts/python.exe -B realtime_app/run_tool.py body.fit_smplh_wilor_sequence @fitArgs
 ```

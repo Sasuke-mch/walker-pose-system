@@ -4592,6 +4592,30 @@ SMPL-H结构检查发现旧current_mainline.json/frozen_scalar_options比现行p
 
 详细方法/公式/检查写入docs/CURRENT_SMPLH_ALGORITHM_20261002.md第27节，并更新其顶部场景时效信息和旧每步前向描述；docs/PROJECT_STATUS.md更新当前方法与路线导航；current_mainline.json/body/solver_maintenance明确仅维护源码、旧选择结果不重算；本文保留阶段进展和停止界限。既有未提交文件及另一聊天Flow变更保留，只提交本任务代码和文档增量，不推送。
 
+## 2026-10-13 SMPL-H置信度目标、旋转锚与接触身体保持项修正
+
+用户明确要求把上轮第27节列出的可实现问题解决，重点是置信度逻辑，并继续限定不跑真实序列结果比较。本轮针对实际通用求解入口实施fit-policy=reliability（默认），legacy显式保留旧方法。不是只补说明，也未把旧结果升级为新方法结果。
+
+旧reference25的(0.6+0.4c)保留零分权重，3D/MANO的sum(w*r)/sum(w)抵消整体分数强弱，二维各相机先归一化再平均会抹平跨相机可靠程度。新3D为有效双目min(cL,cR)乘几何衰减，severity=max(eL/25,eR/25,gap/80)，四次尾无正下限；2D每视图直接score乘Huber、踝倍率另作任务系数。3D/2D/MANO按原始frame/view/joint位置总数固定归约。权重由观测预先计算、脱离优化图，不通过当前拟合残差自我认证。
+
+非法/零分、缺失、像素越界保留原点与原因，body_fit_support独立于原body_accepted及严格场景掩码。手二维缺失或非法box score不再当中性满权重；无权重手诊断为null。body_m/手像素RMS只作条件加权诊断，body_objective_m2单独记录实际数据项。reliability禁止同源2D与三角化3D双正目标，防止相关证据重复计入。
+
+根锚改为sum(a_t*||R-Rinit||²/6)/N，a_t取初始化肩髋四点最小拟合可靠程度；sinc Rodrigues覆盖等价轴角与近零/近pi导数，chordal在pi仍有驻点，不称全局保证。初始化锚是同源正则，不是独立观测。接触D2/D3释放身体变量时保留所选身体观测及已启用腕/身体时序项；普通无接触路径仍冻结身体。输出physical_evidence明确共享局部手指姿态不能证明固定抓握、COCO踝不能证明足底接触，缺失物理测量不靠新硬约束填补。
+
+兼容与记录：cold_smplh两profile及冻结标量固定legacy；历史argv读取器run_smplh_ablations、check_mainline_regression及cold runner对未标策略的旧命令补legacy。直接重放旧mainline_fit_args需加--fit-policy legacy，README示例已同步；二维实验入口默认reliability并去掉旧reference配方。current_mainline.json记录selected_result_fit_policy=legacy、新入口默认reliability、未重算/未标定/无新精度结论。算法第28节详细记公式/尺度/范围，PROJECT_STATUS、主线Stage文档、根README/CLAUDE与realtime_app/README补入口区别，没有新Markdown报告。
+
+检查针对具体目标：142项相关单元用例首轮通过；随后补根锚可信度及历史argv策略，受影响33项通过（2项新增）。16个改动Python文件Ruff E9/F通过，15个相关Python AST解析、3个配置JSON解析通过；3条旧NumPy FutureWarning保留。未做360/448拟合、渲染或效果/性能比较。固定分母改变观测与先验尺度，旧lambda未重新调优；25px/80mm/min规则仍是工程可靠程度，不是经验校准的协方差，小视差各向异性也未完整建模。详细统计校准前提和原始文献链接写入算法第28节。
+
+用户随后要求整体再改进，正在以单独下一阶段复查共享手初始化与接触项内部归约；本节只记录已完成的上述改动，不提前把后续修正记为完成。保留Flow及用户原有未提交文件；只提交本轮代码与文档增量，不推送。
+
+## 2026-10-13 SMPL-H整体求解复查与修正
+
+用户继续要求“除了上述问题，对整体再次改进”。在第28节置信度修正基础上，只读复查实际依赖发现并修复6项：共享手PCA平均可能在+179/-179度分支相消，新策略以最高有效box score的完整假设初始化；初始化硬门使用拟合可靠程度的条件加权RMS并另存原无权RMS；native/像素两条手关联均拒绝非法身体腕分数；身体时间项按关节三帧与双髋支持、固定原始位置数归约；接触手/足及全片手表面先验按[0,1]标签保留绝对强度；零状态模板从N份重复前向缩为1帧，再保留原N帧旋转模板前向。legacy行为显式保留，新策略未引入额外网络/求解轮次或默认启用时序/接触。
+
+实现位于smplh_fitting/initialization.py、losses.py、contact.py、pipeline.py及wilor_mano_prior.py、smplh_hand_observation.py。新增算法第29节逐项说明反例、公式、输入支持和限制；配置method_revision、PROJECT_STATUS与相关入口导航同步。当前身体360/448旧网格不重算，场景与Flow不受修改，最高box分数不是真实手姿、接触标签不成为物理真值。
+
+检查仅针对新增问题：test_smplh_fitting_components.py与test_wilor_mano_prior.py共63项通过（6新增），验证pi分支、手关联、初始化加权门和模板batch、时间梯度及接触分数缩放。与前一阶段142/33项分开记录，不累加重复用例；旧3条NumPy FutureWarning保留。最终18个改动Python文件Ruff E9/F及AST、3个配置JSON解析通过，未进行新的真实拟合或结果/性能比较。无新增Markdown报告、哈希清单、快照或流程脚本。只提交本次代码与既有文档增量，保留工作区其他未提交改动，不推送。
+
 ## 2026-10-13 Flow Matching当前模型完整Word说明
 
 按用户要求，对当前learning_flow_mesh_next从输入到输出作完整教学说明，交付`资料/实验报告/FlowMatching_当前模型完整说明_20261013.docx`。25页，6幅黑白结构图、52个Word原生公式、14张白底黑线表格；覆盖观测/掩码/坐标、GRU历史、325维状态与169维局部空间、54个token及attention、CFM目标/Euler采样、SMPL-H解码、J/Λ、四法与双阶段、A0–A7候选选择、序列训练准备、评价边界、SO3候选和逐帧示例。源码按当前实现核对，原论文只支持方法背景；明确尚未训练、无真实精度/实时结论，示例与图不冒充实验。

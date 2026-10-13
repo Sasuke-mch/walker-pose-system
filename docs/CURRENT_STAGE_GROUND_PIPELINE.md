@@ -1,5 +1,9 @@
 # 当前两阶段与动态地面主线
 
+## 2026-10-13 身体拟合方法更新的边界
+
+新身体求解默认fit-policy=reliability，修正置信度归约、旋转锚与接触保持项，详见CURRENT_SMPLH_ALGORITHM_20261002.md第28节。已保存360 reference25身体及其场景页面未重算；本页旧复现argv需补--fit-policy legacy。场景主线仍为supported_stop_fixed_lag，本次身体方法修改不改变其停止支撑假设、标定或阶段门。新策略没有建立固定抓握或足底接触真值。
+
 ## 2026-10-12 连续过渡逻辑进入工程主线
 
 按用户明确选择，场景默认入口和`--scene-profile mainline`现在解析为`supported_stop_fixed_lag`；旧算法通过`--scene-profile baseline`显式保留。当前唯一变量是Stage/地面路由及导出兼容性，原Stage动作标签、严格脚点/旋转门、身体拟合选择和历史结果保留。下方2026-10-05及此前的baseline主线说明是历史决定。

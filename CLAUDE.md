@@ -1,5 +1,9 @@
 # Walker Pose System - Claude 工作指南
 
+## 2026-10-13 SMPL-H拟合方法更新
+
+通用拟合与二维实验入口默认使用--fit-policy reliability，修正置信度归约、SO(3)根锚及接触阶段身体观测保持项。已保存360 reference25和448结果仍来自legacy，未重算；冻结profile保留legacy，直接重放历史argv须显式补--fit-policy legacy。公式、输入支持、统计校准及物理证据边界见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第28节，进度见AI_PROGRESS.md；下方历史分数下限0.6不代表新方法。
+
 ## 2026-10-12 场景主线更新
 
 用户已将448帧验收的Stage1/2连续过渡逻辑选为场景主线：默认场景入口及`--scene-profile mainline`解析为`supported_stop_fixed_lag`。停止时四脚已落在同一平地是必要采集前提；采用0.5秒固定延迟发布，实时采集入口接入仍待验证。旧baseline显式保留，身体选择不随本次场景提升改变。下方2026-10-05的baseline主线决定为历史记录；当前配置、边界和验证见`AI_PROGRESS.md`与`docs/CURRENT_STAGE_GROUND_PIPELINE.md`。
