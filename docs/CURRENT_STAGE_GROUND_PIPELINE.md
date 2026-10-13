@@ -336,3 +336,84 @@ stage_landing_recovery_v1的最终lag_lowerbody在98/147/219/300确认恢复，f
 固定延迟15名义帧（30FPS约0.5s），只调整尚未发布缓冲：停止前最多0.3s区间以显式SE3支撑修正完成高度/roll/pitch闭合，保留XY/yaw；不是网页时间插值。记录原位姿、原失败与post-support旧ankle anchor残差，>150mm/8°拒绝。原始静态安装与平地支撑协议是先验，不是自动识别的物理触地。旧448无曝光/host时间，新模式仅名义时间离线验证；此前候选host时间要求不被通用取消。
 
 G20261012_supported_stop448_v1/view_v4完整448验证：11原Stage1边界高度步长全零，所有Stage1四脚参考地面Z数值为零；最大帧高度步长69.52→13.61mm、旋转5.84→1.89°、任一助步器节点步长96.65→49.45mm。XY最大步长30.51→33.24mm，旧anchor残差99.58mm保留，不能说所有运动指标提升。view_v2/v3仍63.8mm支撑误差及回归反例均保留。33测试、22来源检查和浏览器实测通过。默认baseline与正式360选择不变；新候选需显式--scene-profile supported_stop_fixed_lag，完整协议/对照/失败见该研究目录。
+
+## 2026-10-14 独立视觉世界位姿路线调研与设计决定
+
+**状态：文献与现有实现核对后的设计建议，尚未实现新后端、安装模型或运行新场景实验。** 本节不更改 `mainline -> supported_stop_fixed_lag` 的选择，不替换正式360帧或新448帧身体。检索截止2026-10-14；以下排序针对本项目双鱼眼、动态人体、相机安装在助步器及本机12 GB显存条件，不是跨任务的SOTA排名。
+
+### 1. 这次要解决的具体问题
+
+现有场景入口的完整平移仍由 Stage 2 脚锚计算 `t=a-Rp`，背景前端主要提供旋转。这样做把“脚在世界中暂时不动”的动作协议当成了相机平移观测；一旦脚点缺失、两脚不一致或动作标签误判，人体、助步器和相机就会一起产生错误的世界位姿。Stage 1 的保持位姿和 `supported_stop_fixed_lag` 的平地修正可以减少跳变，但它们不能替代静态背景的独立运动估计。
+
+已有诊断不能写成“背景 VO 全部失败”：`research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_transition_diagnosis_v1/comparison.json` 中 `stage_predict` 为 76/360 帧 accepted，`background_wide` 为 106/360 帧 accepted。不过两条分支均为 `pose_injected=false`。`background_wide` 的中位处理时间约 707.8 ms，最大链接数 37；主要失败原因为少于 6 条链接（241/360）。`causal_stereo_background_pose.py` 仍明确输出 `mask_certified=false`、`metric_pose_usable=false`：仅有人体mask，助步器/背景静态归属未经确认；`continuous_stage_ground.py` 要求可用标记为真才消费视觉平移。因此缺口是可靠、持续、低成本的静态背景米制位姿，不是完全没有 PnP 代码，也不能靠直接翻转可用标记解决。
+
+### 2. 调研后的候选排序
+
+| 候选 | 已核对事实 | 在本项目中的角色 | 主要风险 |
+|---|---|---|---|
+| **ORB-SLAM3 Stereo/Fisheye** | 官方支持 stereo、fisheye、原始鱼眼图像和 TUM-VI fisheye stereo；鱼眼模式不要求先做图像整流。 | 首个可解释的独立几何基线；直接输出带双目尺度的相机轨迹，适合先验证背景静态点和回环。 | 原生实现是 Linux/C++，Windows 集成成本高；动态人体和相机附着助步器必须显式屏蔽；仍会在低纹理背景中丢跟踪。 |
+| **cuVSLAM** | 官方支持 stereo/multicamera、刚性 `rig_from_camera`、动态 mask 和 `world_from_rig`；论文报告 768×480 单 stereo track call 在 RTX 4090 为 0.4 ms、Jetson AGX Orin 为 1.8 ms，明确只计 tracking 调用。 | 速度优先的独立视觉轨迹后端；本机GPU部署候选，WSL2可行性未实测。 | 官方 wheel 面向 Ubuntu 22/24 或 Jetson，无原生 Windows wheel；文档鱼眼模型有 FOV<180°限制；还需核对同步和畸变语义。论文调用时间不是整链路 FPS。 |
+| **Pi3X（π³项目）小窗口** | 官方更新支持 rays、intrinsics、poses、连续 confidence 和 approximate metric scale；A800 80 GB/BF16、504×504、512张图的官方记录约39 GB/203.68 s（multimodal=false）。这不支持将448双目对即896张图整批塞入12 GB的方案。 | 独立学习几何候选，也可给几何后端提供候选深度和重定位初始化；先试8–16张图是拟议起点，尚无本机容量/速度结论。 | 条件输入不是硬几何约束；源码将射线化为xy/z并归一化位姿尺度，不能仅凭输入基线宣称米制。需要有效鱼眼射线适配、外部双目尺度约束；较低分辨率或更小窗口另行测量。 |
+| **RayMap3R** | 2026 论文提出无训练的双分支动态抑制；RTX A6000 48 GB 上 50/1000 views 均约 9.2/9.4 GB、13.8 FPS，使用隐状态保持常量内存；相机 ATE 从基础 0.114 到完整 0.081，其中 state-aware smoothing 贡献明显。 | 动态人体干扰诊断和候选静态性先验；可作为视觉后端的第二意见，不直接写入主线世界位姿。 | RayMap 公式是针孔射线；尺度对齐和轨迹平滑会改善数值但不等于新观测；12 GB、鱼眼和本项目场景均未实测。 |
+| **MASt3R-SLAM / Fast3R / BLASt3R** | MASt3R-SLAM（CVPR2025）约15 FPS/RTX4090，支持跟踪、重定位和回环，使用Sim(3)；Fast3R（CVPR2025）在A100/512×384时8图6.33 GiB、32图13.25 GiB；BLASt3R为2026-09预印本，公开实验主要使用80 GB卡。 | 完整学习SLAM备选、关键帧重建及离线对照；BLASt3R纳入近期方法观察。 | 未选作首个部署候选，不代表已证明不能在12 GB运行。仍需解决动态前景、双鱼眼、尺度与连续延迟；批量吞吐不能当逐帧时延。 |
+
+RayMap3R相机评估包含Sim(3)对齐，不能把ATE当本项目米制漂移保证；其代码 `infer.py` 默认 `model_update_type=cut3r`，完整RayMap门需要显式 `xattn`，不能将默认命令等同论文完整方案。StreamVGGT、CUT3R等流式结构也不能只凭“streaming”名称认定运行显存恒定，要核对KV缓存或整片预编码。
+
+人体世界估计方面，OnlineHMR（CVPR2026）已有“相机系人体 + 增量SLAM + 尺度恢复”的分离结构，完整流程报告3.3 FPS/RTX6000 Ada；JOSH（ICLR2026）联合人体、场景和接触，官方测试环境24 GB。它们支持借鉴坐标分离与人体mask的设计，但不证明可直接用于本机双鱼眼，也不能把这项系统分解本身包装成新颖贡献。当前SMPL-H已提供人体形状和姿态，优先补世界轨迹可减少重复网络。
+
+### 3. 建议的系统结构与传感器适配
+
+拟新增独立的 `visual_rig_pose` 分支，输入原始左/右鱼眼帧、正式鱼眼内参、双目外参和帧时间，输出每帧 `world_from_rig`、相邻增量及后端实际可提供的质量信息：重投影残差、内点空间覆盖、动态/遮挡比例、退化方向、地图/重定位状态和 `pose_reliability`。缺失字段不能伪填已测。该分支不读取 Stage 1/2 标签，不从脚踝估计平移；稀疏静态地图已能支持这项任务，稠密房间表面或3DGS不是第一阶段必需项。
+
+第一后端优先验证 ORB-SLAM3 鱼眼 stereo；如果部署环境允许，第二后端验证 cuVSLAM stereo。两者都必须把人和相机附着助步器从静态背景证据中排除。人体 mask 只能排除人体，不能自动证明助步器是静态世界物体；助步器应使用保守的相机附着 ROI/投影 mask，并把该 mask 标记为工程先验。不得把助步器自身的杆件特征混入世界静态地图。
+
+后端适配成本不同：ORB-SLAM3官方 `System::TrackStereo` 无mask参数，须在特征提取/匹配处接入排除逻辑，不能以涂黑图像就假定边界伪特征已被排除；cuVSLAM已有输入mask接口。前者作为可解释对照，后者作为速度候选，并不预先认定前者部署更省事。
+
+在相机和助步器刚性安装有效的条件下，助步器不需要每帧由大模型重新估计几何和独立轨迹。以左相机C、助步器A、世界W表示坐标，`T_W<-A(t) = T_W<-C(t) T_C<-A`，人体网格 `V_W(t) = T_W<-C(t) V_C(t)`；若后端rig原点不是左光心，先乘固定 `T_rig<-C`。SMPL-H继续拟合相机系人体，三个对象使用同一变换来源。
+
+现有粗助步器模型 `G20260918_offline_walker_frame_evidence_v1/coarse_complete_model_v2_camera_rail/coarse_walker_model.json` 提供相机—助步器参考变换，但换机位安装正确性未认证。`G20261003_repositioned360_manual_v1/camera_coordinate_reference.json` 是coordinate-only、`physical_walker_estimated=false`的身份坐标参考，并不是该粗模型；该目录 `protocol.json` 的 `walker_mount_camera_discrepancy_mm=26.4915` 是历史参考差异，不能解释为当前安装标定误差、协方差或物理精度。安装关系松动或改变时须重新确定该刚体变换。
+
+双目标定能提供尺度来源，不提供绝对世界原点和方向。无地面/重力/已知标志锚时，SLAM地图的整体旋转和平移仍是任意坐标规约；IMU重力可约束倾斜，却不能单独固定全局yaw/位置。采集关系有效的初始ChArUco变换可将视觉地图锚定到初始地面：后续每帧通过视觉轨迹传播，**不能在相机移动后仍原封不动地使用初始相机到地面的变换**。
+
+现有 `realtime_app/calibration/results/cam0_fisheye.json`、`cam1_fisheye.json` 为1920×1080 OpenCV fisheye；中心线HFOV约152.961°/153.429°、VFOV约82.773°/82.360°，这些数值不能证明对角/边角全部射线满足候选模型限制。正式 `stereo_fisheye.json` 约定 `X_cam1=R_cam0_to_cam1*X_cam0+T_cam0_to_cam1`，平移单位mm，适配器须显式转换单位和方向。针孔学习模型可使用由该标定生成的有效虚拟视图，但须保存其回到原始鱼眼射线的映射，不能拿针孔K直接投影原鱼眼像素。cuVSLAM文档明确等距四参数与OpenCV fisheye兼容，但有效视野限制仍需核对；不同后端的投影/反投影定义也不能仅凭同名系数直接互抄。
+
+cuVSLAM API建议相机时间差约1 ms以内；当前旧448对只有名义帧序/时间，没有曝光同步证明。这是数据兼容性缺口：可以做离线候选比较，但不能据此认证动态米制精度。新采集需记录可解释的配对时间，不能以同一帧号代替同步证据。DA3的既有用途限制保持，不将其升级为米制深度或标定输入。
+
+### 4. Stage 1/2 的新角色
+
+拟将Stage 1/2从主要位姿生成机制降为可关闭的软先验。第一实现宜使用后端的相对位姿观测建立小型SE(3)位姿图，后端自己处理背景特征与双目几何。`T_t`表示rig到世界的位姿，`delta_vis_t`表示前一rig系中的当前rig位姿，`Log`将刚体变换残差转为旋转/平移向量：
+
+```text
+min  E_visual(T) + lambda_stage E_stage(T) + lambda_support E_support(T)
+E_visual = sum_t w_t rho(||D^-1 Log(delta_vis_t^-1 T_(t-1)^-1 T_t)||^2)
+```
+
+其中rho为抑制离群的鲁棒损失；D是预先声明的旋转/平移尺度（弧度/米），w是工程可靠度，不是已校准的逆方差。若后端提供有效的信息矩阵，可表达不同方向的约束强弱，但仍需注明其近似假设。后端回环修正后要区分连续里程计坐标与修正地图坐标，避免把地图整体更新误作人体瞬移；重定位断段及修正量显式保留。
+
+置信度逻辑必须同时处理以下问题，不能给各模块一个分数后直接相乘就称概率融合：
+
+- 分开记录静态归属证据、匹配可靠度、双目几何和位姿可观测方向；网络confidence、检测分数、内点比例都不自动等于正确概率或逆协方差。低视差/单一区域纹理可能有很低回投影误差却不能约束全部平移。
+- 弱证据不得除以自身权重和而恢复为满强度；缺失、陈旧、遮挡或几何退化应降低绝对观测强度。权重标度在匹配对照中固定，不能按结果临时调高Stage项。
+- **同源证据只计一次。** 消费VO相对位姿时，不再把产生它的原特征作为另一套独立观测；如果以后改为统一特征BA，则用原左右像素和已知rig外参，不无条件叠加由同批像素算出的双目深度项。同理，后端已用的回环不在外层重复添加独立回环因子。
+- Stage1的背景停止证据与VO可能共享特征，不能假设独立后再累加信息；初版优先让它控制先验是否启用，而不把相同背景结果重复当测量。Stage2踝点高分只说明踝点观测较可靠，**不证明足底接触或世界静止**；脚静止约束要有明确协议/额外证据，缺失时关闭。
+- 视觉失效时可输出显式 `predicted` 或 `stage_only` 降级，但不能将其标成视觉测量成功；不用提高先验权重掩盖失效。视觉与Stage冲突时保留残差及拒绝理由。`supported_stop_fixed_lag`的四脚同平地条件仍是用户确认的采集先验，不能记录成自动触地检测。
+
+未来概率/方差校准需要独立留出参考误差；当前无独立世界轨迹真值，只能做工程可靠度分层和留出重投影检查，不能宣布概率校准完成。输出保留 `visual_only`、`stage_only`、`fused_soft` 的估计来源，以及独立的 `tracked/lost/relocalized/predicted` 状态和 `world_pose_certified=false`。
+
+### 5. 实施顺序与停止门
+
+1. 第一个可检查阶段只打通独立视觉后端适配与同源重放导出：原鱼眼、正式标定、完整帧序/失败状态进入，输出 `visual_rig_pose.jsonl`。不先改SMPL-H或叠加新的大人体网络；`static_background_stereo_frontend.py`、`static_background_vo.py`及既有scene replay可复用输入和诊断，不用另建一套场景系统。
+2. 优先ORB-SLAM3 fisheye stereo建立基线，cuVSLAM作为GPU速度替代；后者先解决Ubuntu/WSL2依赖、有效视野、同步问题，再计时。Pi3X小窗口或RayMap3R可独立作为替代后端/前端评估，**不要求经典SLAM先通过**；不同候选同样遵守尺度/观测/失败门。
+3. 初次场景比较固定 `G20261013_reliability448_view_v1` 的人体拟合及其 `plan.json` 中原始448双目对，0..447全保留；360序列可另作迁移检查，不能混为同一次对照。比较当前Stage路线、视觉路线关闭Stage、同一视觉路线加Stage软约束。第二、三组只改变Stage因子启用与否，第一、二组只比较场景位姿来源；无须重新拟合身体。
+4. 在运行前固定mask/几何门和误差/覆盖/预算阈值；以原始图像中静态支持、留出背景重投影、双目rig一致性、连续覆盖和丢失/重定位分段为工程检查。刚体复合恒等式只检查坐标实现，轨迹更平滑只反映平滑性；均不能作为真实精度证据。不能宣称“双目就不会漂移”。本次尚未设定或通过数值升级门，所有候选默认不可注入正式scene writer；未来通过预先声明的工程门后才讨论 `metric_pose_usable=true`，物理认证仍为false。
+5. 成功标准首先是Stage关闭后仍有来自静态背景的米制运动观测，且在相同数据上改善事先约定的可用性/留出残差并满足处理预算；不是全片都有非空位姿。没有独立相机/rig轨迹，只能给工程一致性结论。若因纹理、遮挡、同步或安装关系持续失败，停止增大模型，先处理对应观测缺口；保留失败片段，不通过插值、Stage硬填补或显示平滑冒充视觉成功。
+
+### 6. 调研依据
+
+- ORB-SLAM3 官方说明与鱼眼 stereo 示例：https://github.com/UZ-SLAMLab/ORB_SLAM3
+- NVIDIA cuVSLAM 论文、性能表和 PyCuVSLAM 文档：https://arxiv.org/html/2506.04359v3 、https://nvidia-isaac.github.io/cuVSLAM/python/api.html
+- Pi3/Pi3X 官方代码与容量记录：https://github.com/yyfz/Pi3 、https://raw.githubusercontent.com/yyfz/Pi3/main/benchmark_pi3x.json
+- RayMap3R 论文与代码：https://arxiv.org/html/2603.20588v1 、https://github.com/Brack-Wang/raymap3r
+- MASt3R-SLAM、Fast3R 和 BLASt3R：https://arxiv.org/html/2412.12392v1 、https://github.com/facebookresearch/fast3r 、https://github.com/naver/blast3r
+- OnlineHMR论文与实现：https://arxiv.org/html/2603.17355v1 、https://github.com/Tsukasane/Video-OnlineHMR
+- JOSH论文/项目与实现：https://vail.cs.ucla.edu/JOSH/ 、https://github.com/genforce/JOSH

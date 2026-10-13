@@ -1,5 +1,17 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-14 独立视觉场景位姿调研与设计
+
+用户希望相机/助步器/人体世界估计不再以Stage1/2规则为主要来源。本轮完成现有场景链与官方论文/仓库/API的针对性核对；研究结论和适配细节记在[现有场景说明](docs/CURRENT_STAGE_GROUND_PIPELINE.md#2026-10-14-独立视觉世界位姿路线调研与设计决定)。没有安装/下载新模型、修改求解代码或运行新的场景实验，以下均为待实施设计，不改变mainline=supported_stop_fixed_lag、正式360身体或当前448可视化。
+
+当前主要平移依赖Stage2脚锚；已有背景stereo VO是诊断分支，并非从未成功：换机位360的stage_predict/background_wide分别76/106帧accepted，均pose_injected=false。后者中位707.8ms、241帧少于6链接；当前causal_stereo_background_pose明确因仅有人体mask、助步器静态归属未确认而输出metric_pose_usable=false。不能直接取消该门。相机附着助步器与人体都应从世界静态特征中排除。
+
+建议先建立独立visual_rig_pose：ORB-SLAM3原生fisheye stereo作几何基线，cuVSLAM作GPU速度候选，Pi3X小窗口作学习替代/增强；RayMap3R作为动态场景备选，MASt3R-SLAM/Fast3R/BLASt3R保留对照。已核对官方时间/显存的硬件、分辨率、views与pairs和tracking调用范围；均无本机运行结论。cuVSLAM官方Ubuntu wheel/鱼眼有效视野/约1ms同步要求尚需适配，旧448名义时间不证明曝光同步；Pi3X条件输入也不等于硬基线或精确米制输出。OnlineHMR与JOSH已有相关人体/场景分解或联合结构，不将系统分解本身称新颖贡献。
+
+相机轨迹与有效刚体安装变换共同决定助步器轨迹，相机系SMPL-H通过同一逐帧变换进入世界。初始ChArUco只锚定初始世界，不能随相机移动仍沿用固定camera-to-ground。Stage拟改为可关闭软先验：显式分离静态性/匹配/几何/可观测方向，未校准分数不称概率或逆方差；弱证据不重新归一化成满强度，VO位姿与原始特征、同源Stage背景停止结果不重复计数。脚踝高分不证明足底接触；失效/预测/Stage降级分别保留。
+
+下一可检查阶段为独立后端同源离线导出。拟固定G20261013_reliability448_view_v1人体及其plan.json的0..447原始双目对，比当前Stage、视觉关闭Stage、同一视觉加Stage三路；不重拟合身体。候选可独立评估，无需等待经典SLAM先通过，但注入正式writer前须预定并通过观测/尺度/覆盖/时延工程门。当前尚无数值门通过，更无独立世界精度结论。本轮仅检查文档差异与空白错误，未重跑模型；保留工作区和Flow既有改动。
+
 ## 2026-10-13 本机CUDA SMPL-H运行速度测量
 
 用户要求用本机显卡测算现有模型速度。本轮只测当前G20261013_reliability448_view_v1的448帧/560步SMPL-H配置，source argv除输出目录外完全不变；seed0、float32，原二维0.004/25px、踝倍率2/native共享PCA12与阶段预算保持。输出research_records/engineering_validation/G20261013_smplh_runtime448_v1；计时数据runtime.json、实际fit_args.json和fit.log保存。输入资产及详细参数继续从该source argv与原448 plan读取，没有重新测PMPose/WiLoR检测、Stage/地面或浏览器渲染。
