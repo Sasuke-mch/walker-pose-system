@@ -20,13 +20,22 @@ from .tests.test_firewall import observation
 
 
 class CountedSurface:
-    def __init__(self, surface):
+    def __init__(self, surface, *, observation_only=True):
         self.surface, self.calls, self.states = surface, 0, 0
+        self.mesh_states = 0
+        if observation_only and hasattr(surface, "coco17"):
+            self.coco17 = self._coco17
 
     def __call__(self, rotations, translation, beta):
         self.calls += 1
         self.states += len(beta)
+        self.mesh_states += len(beta)
         return self.surface(rotations, translation, beta)
+
+    def _coco17(self, rotations, translation, beta):
+        self.calls += 1
+        self.states += len(beta)
+        return self.surface.coco17(rotations, translation, beta)
 
 
 def sync(device):
@@ -369,7 +378,7 @@ def run_representation_controls(*, repeats=8, warmup=2, device="cuda", compare_r
             "boundary": "small fixed random-model timing sample; clocks/power/concurrent load uncontrolled; no accuracy or calibration conclusion"}
 
 
-def run_current(*, repeats=30, warmup=5, device="cuda"):
+def run_current(*, repeats=30, warmup=5, device="cuda", geometry_controls=False):
     """Current publish path: choose first, decode the selected human once."""
     from realtime_app.learning_flow_mesh.body import BodyDecoder
     from realtime_app.pose_app.smpl_coco_observation import load_coco17_regressor
@@ -390,6 +399,8 @@ def run_current(*, repeats=30, warmup=5, device="cuda"):
     config = json.loads(Path("realtime_app/learning_flow_mesh/config.json").read_text(encoding="utf-8"))
     surface = CountedSurface(SurfaceDecoder(BodyDecoder(**config["assets"]).to(device),
         torch.tensor(load_coco17_regressor(Path("models/smpl/J_regressor_coco.npy")), device=device)))
+    optimized_surface = surface
+    reference_surface = CountedSurface(surface.surface, observation_only=False)
     cameras = tuple(replace(c, **{name: getattr(c, name).to(device=device, dtype=torch.float32)
                                  for name in ("K", "D", "R", "T")}) for c in rig())
     noise = replace(NoiseModel.proxy(), precision=NoiseModel.proxy().precision.to(device))
@@ -403,8 +414,10 @@ def run_current(*, repeats=30, warmup=5, device="cuda"):
     obs = replace(fixture, xy=pixels, **{name: getattr(fixture, name).to(device) for name in
         ("confidence", "present", "quality", "geometry", "views", "origins", "directions")}).validate()
     modes = ("F0_K32_Euler8_A4", "R0_K1_A4", "F_info_K32_Euler8_A6")
+    if geometry_controls:
+        modes = (*modes[:2], "F_info_full_mesh_FD16_A6", "F_info_observation_FD16_A6", modes[-1])
     states = {mode: None for mode in modes}
-    anchor_state, records = None, []
+    anchor_states, records = {mode: None for mode in modes}, []
 
     def mark():
         torch.cuda.synchronize()
@@ -413,18 +426,21 @@ def run_current(*, repeats=30, warmup=5, device="cuda"):
     with torch.no_grad():
         for repetition in range(warmup + repeats):
             current = replace(obs, frame=repetition, timestamp=repetition/30)
+            reference_info = reference_candidates = reference_decision = None
             for mode in modes:
-                surface.calls = surface.states = 0
+                surface = reference_surface if mode == "F_info_full_mesh_FD16_A6" else optimized_surface
+                surface.calls = surface.states = surface.mesh_states = 0
                 torch.cuda.reset_peak_memory_stats()
                 baseline = torch.cuda.memory_allocated()
                 start = mark()
                 info = None
                 g0_ms = j_ms = 0.
                 if mode.startswith("F_info"):
-                    anchor, anchor_state = infer(g0, normal, current, anchor_state, k=32, steps=8)
+                    anchor, anchor_states[mode] = infer(g0, normal, current, anchor_states[mode], k=32, steps=8)
                     after_g0 = mark()
                     info = local_information(anchor, current, cameras, noise, scale, surface,
-                                             step=1e-3, diagnostics=False)
+                                             step=1e-3, diagnostics=False,
+                                             chunk=16 if "FD16" in mode else None)
                     after_j = mark()
                     g0_ms, j_ms = (after_g0-start)*1000, (after_j-after_g0)*1000
                 generate_at = mark()
@@ -446,6 +462,17 @@ def run_current(*, repeats=30, warmup=5, device="cuda"):
                                    candidates.beta[index:index+1])
                     finite_mesh = bool(torch.isfinite(mesh["vertices"]).all())
                 finished = mark()
+                comparison = {}
+                if mode == "F_info_full_mesh_FD16_A6":
+                    reference_info, reference_candidates, reference_decision = info, candidates, decision
+                elif reference_info is not None and info is not None:
+                    comparison["selected_id_matches_full_mesh"] = decision.selected_id == reference_decision.selected_id
+                    comparison["candidate_max_abs_difference"] = float((candidates.raw-reference_candidates.raw).abs().max())
+                    if info.matrix is not None and reference_info.matrix is not None:
+                        comparison["jacobian_relative_difference"] = float(
+                            (info.jacobian-reference_info.jacobian).norm()/reference_info.jacobian.norm())
+                        comparison["information_relative_difference"] = float(
+                            (info.matrix-reference_info.matrix).norm()/reference_info.matrix.norm())
                 if repetition >= warmup:
                     records.append({"mode": mode, "frame": repetition,
                         "G0_ms": g0_ms, "J_ms": j_ms,
@@ -458,6 +485,10 @@ def run_current(*, repeats=30, warmup=5, device="cuda"):
                         "network_calls_final_model": candidates.resources["network_calls"],
                         "candidate_state_evaluations_final_model": candidates.resources["candidate_state_evaluations"],
                         "decoder_calls": surface.calls, "decoder_states": surface.states,
+                        "full_mesh_states": surface.mesh_states,
+                        "information_decoder_calls": info.resources["decoder_batch_calls"] if info is not None else 0,
+                        "information_chunk": info.resources["chunk"] if info is not None else None,
+                        "paired_geometry_comparison": comparison,
                         "numeric_candidates": int(candidates.numerical.sum()), "selected_id": decision.selected_id,
                         "finite_selected_mesh": finite_mesh, "reasons": decision.reasons,
                         "fallback": decision.diagnostic.get("fallback", False),
@@ -493,6 +524,8 @@ def run_current(*, repeats=30, warmup=5, device="cuda"):
         summary[mode].update(fallback_count=sum(row["fallback"] for row in rows),
             published_finite_count=sum(row["finite_selected_mesh"] for row in rows),
             decoder_states=sorted({row["decoder_states"] for row in rows}),
+            full_mesh_states=sorted({row["full_mesh_states"] for row in rows}),
+            information_decoder_calls=sorted({row["information_decoder_calls"] for row in rows}),
             peak_cuda_allocated_bytes=max(row["peak_cuda_allocated_bytes"] for row in rows),
             peak_cuda_increment_bytes=max(row["peak_cuda_increment_bytes"] for row in rows))
     return {"scope": "current FP32 GPU publish paths; resident analytic pixels; random neural weights",
@@ -502,6 +535,9 @@ def run_current(*, repeats=30, warmup=5, device="cuda"):
         "timing": "synchronized perf_counter wall time; core additionally CUDA events, including stream gaps",
         "state": "independent carried history per mode; fixed pixels with frame/clock advancing 1/30 second",
         "assets": config["assets"], "normalization": normal.source, "noise": noise.source,
+        "geometry_controls": geometry_controls,
+        "observation_vertex_count": len(optimized_surface.surface.observation_vertices),
+        "geometry_control_boundary": "same frozen models/K32/Euler8/FP32/observations; current batched candidate bookkeeping in every mode",
         "jacobian": "central difference 1e-3; diagnostics=False; no derivative accuracy experiment",
         "capture_detector_transfer_load_included": False, "training": False, "neural_checkpoint_loaded": False,
         "summary": summary, "records": records,
@@ -520,11 +556,15 @@ def main():
     parser.add_argument("--matched-controls", action="store_true")
     parser.add_argument("--current-model", action="store_true",
                         help="current FP32 GPU F0/R0/information publish paths, no SO3 optimization")
+    parser.add_argument("--geometry-controls", action="store_true",
+                        help="with --current-model, compare full mesh FD16 / observation-only FD16 / batched FD")
     parser.add_argument("--representation-controls", action="store_true")
     parser.add_argument("--compare-rotation-kernels", action="store_true")
     parser.add_argument("--endpoint-feedback-controls", action="store_true",
                         help="one real direction check then fixed K32/8 SO3 endpoint VJP overhead; no correction applied")
     args = parser.parse_args()
+    if args.geometry_controls and not args.current_model:
+        parser.error("geometry controls require current-model timing")
     if args.compare_rotation_kernels and not args.representation_controls:
         parser.error("rotation kernel comparison requires representation controls")
     if args.endpoint_feedback_controls and (args.representation_controls or args.matched_controls or args.compare_rotation_kernels):
@@ -533,7 +573,8 @@ def main():
         if any((args.matched_controls, args.representation_controls, args.endpoint_feedback_controls,
                 args.compare_rotation_kernels)):
             parser.error("current-model timing is separate from historical comparison controls")
-        report = run_current(repeats=args.repeats, warmup=args.warmup, device=args.device)
+        report = run_current(repeats=args.repeats, warmup=args.warmup, device=args.device,
+                             geometry_controls=args.geometry_controls)
     elif args.representation_controls or args.endpoint_feedback_controls:
         if args.matched_controls:
             parser.error("representation and two-stage matched controls are separate experiments")

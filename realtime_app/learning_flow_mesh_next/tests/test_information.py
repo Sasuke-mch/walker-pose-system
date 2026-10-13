@@ -95,6 +95,97 @@ def rigid_surface(rotations, translation, beta):
     return {"coco17": points}
 
 
+@pytest.mark.parametrize("device,dtype,step", [("cpu", torch.float64, 1e-4),
+                                              ("cuda", torch.float32, 1e-3),
+                                              ("cuda", torch.float32, 1e-4)])
+def test_observation_only_licensed_surface_values_gradients_and_information(device, dtype, step):
+    """Cropping LBS must retain the surface operator, not use skeletal joints."""
+    import json
+    from pathlib import Path
+
+    from realtime_app.learning_flow_mesh.body import BodyDecoder
+    from realtime_app.learning_flow_mesh.rotations import matrix_to_six
+    from realtime_app.pose_app.smpl_coco_observation import load_coco17_regressor
+
+    from ..body import SurfaceDecoder
+    from ..candidate_store import from_parameters
+    from ..schema import Topology
+    from ..tangent import skew
+
+    if device == "cuda" and not torch.cuda.is_available():
+        pytest.skip("CUDA unavailable")
+    config = json.loads(Path("realtime_app/learning_flow_mesh/config.json").read_text(encoding="utf-8"))
+    if not all(Path(path).is_file() for path in config["assets"].values()):
+        pytest.skip("licensed SMPL-H/MANO assets unavailable")
+    torch.set_num_threads(1)
+    torch.manual_seed(83)
+    decoder = BodyDecoder(**config["assets"]).to(device=device, dtype=dtype)
+    regressor = torch.tensor(load_coco17_regressor("models/smpl/J_regressor_coco.npy"), device=device, dtype=dtype)
+    surface = SurfaceDecoder(decoder, regressor)
+    rotation = torch.matrix_exp(skew(torch.randn(3, 52, 3, device=device, dtype=dtype)*.2)).requires_grad_()
+    translation = torch.tensor([[0., 0., 3.], [.1, -.1, 3.2], [-.1, .1, 2.8]], device=device, dtype=dtype).requires_grad_()
+    beta = (torch.randn(3, 10, device=device, dtype=dtype)*.2).requires_grad_()
+    full = surface(rotation, translation, beta)["coco17"]
+    fast = surface.coco17(rotation, translation, beta)
+    atol = 1e-10 if dtype == torch.float64 else 2e-6
+    torch.testing.assert_close(fast, full, atol=atol, rtol=atol)
+    weight = torch.randn_like(full)
+    expected = torch.autograd.grad((full*weight).sum(), (rotation, translation, beta))
+    actual = torch.autograd.grad((fast*weight).sum(), (rotation, translation, beta))
+    for a, b in zip(actual, expected):
+        torch.testing.assert_close(a, b, atol=atol*10, rtol=atol*10)
+    assert len(surface.observation_vertices) == int(regressor.ne(0).any(0).sum())
+    cameras = tuple(replace(c, **{name: getattr(c, name).to(device=device, dtype=dtype)
+                                  for name in ("K", "D", "R", "T")}) for c in rig())
+    fixture = observation()
+    obs = replace(fixture, **{name: getattr(fixture, name).to(device) for name in
+        ("confidence", "present", "quality", "geometry", "views", "origins", "directions")},
+        xy=torch.stack([project(full.detach()[0], camera)[0] for camera in cameras]))
+    raw = torch.cat((matrix_to_six(rotation.detach()).flatten(1), translation.detach(), beta.detach()), -1)
+    store = from_parameters(raw, Topology(), ids=["a", "b", "c"], seeds=[0, 1, 2],
+                            current_observed=True, provenance={}, resources={})
+    scale = TangentScale.fixture(store.topology)
+    args = (store, obs, cameras, NoiseModel.proxy(), scale)
+    # A callable without coco17 is the original full-mesh/chunk16 reference.
+    reference = local_information(*args, lambda r, t, b: surface(r, t, b), step=step, diagnostics=False)
+    result = local_information(*args, surface, step=step, diagnostics=False)
+    assert result.matrix is not None and reference.matrix is not None
+    relative_j = float((result.jacobian-reference.jacobian).norm()/reference.jacobian.norm())
+    relative_matrix = float((result.matrix-reference.matrix).norm()/reference.matrix.norm())
+    tolerance = 1e-8 if dtype == torch.float64 else (2e-3 if step == 1e-3 else 2e-2)
+    assert relative_j < tolerance and relative_matrix < tolerance
+    assert result.anchor_id == reference.anchor_id and result.reasons == reference.reasons == []
+    assert result.resources["decoder_state_evaluations"] == reference.resources["decoder_state_evaluations"] == 339
+    assert result.resources["decoder_batch_calls"] == 2 and reference.resources["decoder_batch_calls"] == 23
+    print(f"{device}/{dtype}/step={step}: surface_max={float((fast-full).detach().abs().max()):.3g}, "
+          f"J_relative={relative_j:.3g}, Lambda_relative={relative_matrix:.3g}")
+    bad_translation = translation.detach().clone()
+    bad_translation[0, 0] = torch.nan
+    for decode in (surface, surface.coco17):
+        with pytest.raises(ValueError, match="nonfinite shape/translation"):
+            decode(rotation.detach(), bad_translation, beta.detach())
+    # Both reject a valid current anchor whose original -Tz probe goes behind
+    # the cameras. No removed +/- probe may turn this into usable information.
+    extreme = replace(scale, values=scale.values.clone())
+    extreme.values[158] = 1e5
+    old_failure = local_information(store, obs, cameras, NoiseModel.proxy(), extreme,
+                                    lambda r, t, b: surface(r, t, b), step=step, diagnostics=False)
+    new_failure = local_information(store, obs, cameras, NoiseModel.proxy(), extreme,
+                                    surface, step=step, diagnostics=False)
+    assert old_failure.matrix is None and new_failure.matrix is None
+    assert old_failure.reasons == new_failure.reasons
+    if device == "cpu":
+        state = surface.state_dict()
+        state["regressor"] = state["regressor"].roll(7, 1)
+        state["decoder.layer.v_template"] = state["decoder.layer.v_template"] + .02
+        surface.load_state_dict(state)
+        surface.float().double()
+        with torch.no_grad():
+            rebuilt = surface.coco17(rotation, translation, beta)
+            updated_full = surface(rotation, translation, beta)["coco17"]
+        torch.testing.assert_close(rebuilt, updated_full, atol=1e-10, rtol=1e-10)
+
+
 def endpoint_fixture():
     from ..candidate_store import from_parameters
 

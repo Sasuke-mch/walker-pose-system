@@ -5,6 +5,7 @@ from dataclasses import dataclass, field, replace
 import torch
 
 from .aggregate import decide
+from .body import observation_points
 from .geometry_observation import check_rig, observation_errors, project
 from .input_binding import information_snapshot
 from .tangent import skew
@@ -121,7 +122,7 @@ def endpoint_cost_vjp(store, obs, cameras, noise, scale, surface, *, huber=3.0):
             shape = beta[rows] + physical[:, -10:]
             result.resources["decoder_batch_calls"] += 1
             result.resources["decoder_state_evaluations"] += len(rows)
-            points = surface(perturbed, position, shape)["coco17"]
+            points = observation_points(surface, perturbed, position, shape)
             costs, _, uv, valid = observation_errors(points, obs, cameras, noise, huber=huber)
             projected = (valid[:, obs.admitted()].all(-1)
                          & torch.isfinite(uv[:, obs.admitted()]).flatten(1).all(-1))
@@ -213,7 +214,7 @@ def information_diagnostics(matrix, jacobian, precision):
     return diagnostic
 
 
-def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, chunk=16, diagnostics=True):
+def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, chunk=None, diagnostics=True):
     """Central finite-difference J in train-scaled coordinates, no anchor/J gradients.
 
     Decoder evaluations and batch calls are counted explicitly. Central differences
@@ -225,6 +226,10 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
     check_rig(obs, cameras)
     noise.validate_for(obs)
     scale.validate(store.topology)
+    if chunk is None:
+        # Observation-only LBS has bounded vertex work; batch every original
+        # +/- probe. Generic/full-mesh callables retain the old memory bound.
+        chunk = 2*store.topology.tangent_dimensions if hasattr(surface, "coco17") else 16
     if step <= 0 or chunk < 1:
         raise ValueError("positive numerical Jacobian step/chunk required")
     start = time.perf_counter()
@@ -233,6 +238,7 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
         start = time.perf_counter()
     resources = {"decoder_batch_calls": 0, "decoder_state_evaluations": 0,
                  "method": "central_finite_difference", "step_standardized": step,
+                 "chunk": chunk,
                  "diagnostics_requested": diagnostics}
     result = Information(None, None, None, None, scale.values.detach().clone(), noise.source,
                          noise.calibrated, [], resources=resources)
@@ -270,7 +276,7 @@ def local_information(store, obs, cameras, noise, scale, surface, *, step=1e-4, 
     m = store.topology.tangent_dimensions
     def pixels(displacement):
         rotations, position, beta = local_parameters(anchor, displacement, scale.values)
-        points = surface(rotations, position, beta)["coco17"]
+        points = observation_points(surface, rotations, position, beta)
         resources["decoder_batch_calls"] += 1
         resources["decoder_state_evaluations"] += len(displacement)
         views = [project(points, camera) for camera in cameras]

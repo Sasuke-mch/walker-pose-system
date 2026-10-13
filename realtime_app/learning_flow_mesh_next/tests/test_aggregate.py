@@ -8,7 +8,7 @@ import torch
 from realtime_app.learning_flow_mesh.rotations import matrix_to_six
 
 from .. import aggregate
-from ..aggregate import decide, diagnostic_joint_controls
+from ..aggregate import decide, diagnostic_joint_controls, stable_min
 from ..candidate_store import from_parameters
 from ..geometry_observation import Camera, NoiseModel, observation_errors, project
 from ..schema import Topology
@@ -83,6 +83,36 @@ def test_masks_failures_never_resampled():
     assert failed.reasons[2] == ["nonfinite_joint_state"]
     with pytest.raises(ValueError):
         failed.select(1)
+
+
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+def test_stable_min_retains_nonfinite_rejection_and_id_tie_break(dtype):
+    costs = torch.tensor([torch.nan, 2., torch.inf, 2., -torch.inf, 1.], dtype=dtype)
+    ids = ["nan", "z", "positive_inf", "a", "negative_inf", "not_an_action"]
+    actions = torch.tensor([4, 3, 2, 1, 0])
+    assert stable_min(costs, actions, ids) == 3
+    assert stable_min(costs, actions.flip(0), ids) == 3
+    assert stable_min(costs, torch.tensor([0, 2, 4]), ids) is None
+    assert stable_min(costs, torch.empty(0, dtype=torch.long), ids) is None
+
+
+def test_all_rejection_reasons_keep_order_with_no_current_observation():
+    store = store_fixture()
+    raw = store.raw.clone()
+    raw[1, :6] = 0
+    raw[2, -1] = torch.inf
+    raw[3, 0] = torch.nan
+    failed = from_parameters(raw, store.topology, ids=store.ids, seeds=store.seeds,
+                             current_observed=False, provenance={}, resources={})
+    assert failed.reasons == [
+        ["no_current_observation"],
+        ["invalid_rotation", "no_current_observation"],
+        ["nonfinite_joint_state", "no_current_observation"],
+        ["invalid_rotation", "nonfinite_joint_state", "no_current_observation"],
+        ["no_current_observation"],
+    ]
+    assert failed.numerical.tolist() == [True, False, False, False, True]
+    assert not failed.actions.any() and len(failed.raw) == 5
 
 
 def test_coordinate_mean_only_decodes_surface(monkeypatch):

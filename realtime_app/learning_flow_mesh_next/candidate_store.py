@@ -88,13 +88,17 @@ def from_parameters(raw, topology, *, ids, seeds, current_observed, provenance, 
         raise ValueError("unique candidate IDs and all seeds required")
     rotations, valid = six_to_matrix(raw[:, :n*6].reshape(k, n, 6))
     translation, beta = raw[:, n*6:n*6+3], raw[:, -10:]
-    numerical = valid.all(-1) & torch.isfinite(translation).all(-1) & torch.isfinite(beta).all(-1)
+    rotation_valid = valid.all(-1)
+    numerical = rotation_valid & torch.isfinite(translation).all(-1) & torch.isfinite(beta).all(-1)
+    # Transfer the two reporting flags together, instead of synchronizing CUDA
+    # for each candidate's Python branch. Keep every original rejection reason.
+    reporting_flags = torch.stack((rotation_valid, torch.isfinite(raw).all(-1)), -1).cpu().tolist()
     reasons = []
-    for i in range(k):
+    for valid_rotation, finite_state in reporting_flags:
         rejected = []
-        if not valid[i].all():
+        if not valid_rotation:
             rejected.append("invalid_rotation")
-        if not torch.isfinite(raw[i]).all():
+        if not finite_state:
             rejected.append("nonfinite_joint_state")
         if not current_observed:
             rejected.append("no_current_observation")

@@ -1,9 +1,11 @@
 """Whole-candidate actions and separate joint-only diagnostic controls."""
+import math
 import re
 from dataclasses import dataclass, field
 
 import torch
 
+from .body import observation_points
 from .geometry_observation import observation_errors
 from .tangent import complete_distances
 
@@ -26,8 +28,12 @@ class Decision:
 def stable_min(costs, indices, ids):
     if len(indices) == 0:
         return None
-    finite = [int(i) for i in indices if torch.isfinite(costs[i])]
-    return min(finite, key=lambda i: (float(costs[i]), ids[i])) if finite else None
+    # Selection is discrete already. Read each tensor once instead of forcing
+    # a GPU-to-host scalar synchronization for every candidate and sort key.
+    host_costs = costs.detach().cpu().tolist()
+    host_indices = indices.detach().cpu().tolist()
+    finite = [i for i in host_indices if math.isfinite(host_costs[i])]
+    return min(finite, key=lambda i: (host_costs[i], ids[i])) if finite else None
 
 
 def diagnostic_joint_controls(points, per_joint_errors, mask, *, ids, topk=3, temperature=1.0):
@@ -80,7 +86,7 @@ def decide(store, method, scale, *, observation=None, cameras=None, noise=None, 
         if surface is None:
             raise ValueError("surface operator required for joint coordinate diagnostic")
         points = store.raw.new_full((len(store.raw), 17, 3), torch.nan)
-        points[legal] = surface(store.rotations[legal], store.translation[legal], store.beta[legal])["coco17"]
+        points[legal] = observation_points(surface, store.rotations[legal], store.translation[legal], store.beta[legal])
     if needs_geometry:
         errors, per_joint, _, _ = observation_errors(points, observation, cameras, noise)
         if method == "A3":

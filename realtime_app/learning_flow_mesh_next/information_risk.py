@@ -6,6 +6,7 @@ import torch
 from realtime_app.learning_flow_mesh.rotations import validate_rotation_matrices
 
 from .aggregate import Decision, decide, stable_min
+from .body import observation_points
 from .geometry_observation import observation_errors
 from .input_binding import require_information_binding
 from .tangent import angles, pairwise_tangent
@@ -106,7 +107,7 @@ def decide_information(store, information, scale, policy, *, method="A6", observ
             if any(value is None for value in (cameras, noise, surface)):
                 raise ValueError("geometry_resources_unavailable")
             points = store.raw.new_full((len(store.raw), 17, 3), torch.nan)
-            points[legal] = surface(store.rotations[legal], store.translation[legal], store.beta[legal])["coco17"]
+            points[legal] = observation_points(surface, store.rotations[legal], store.translation[legal], store.beta[legal])
             errors = observation_errors(points, observation, cameras, noise)[0]
             costs[legal] += policy.lambda_g*errors[legal]
     except (ValueError, RuntimeError) as error:
