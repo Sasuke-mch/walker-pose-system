@@ -4591,3 +4591,9 @@ SMPL-H结构检查发现旧current_mainline.json/frozen_scalar_options比现行p
 范围收紧前已执行360原输入A2/B2/C3/D100/D100前后内核一致性检查（tmp/smplh_architecture_t03gihip）；只对应共享旋转压缩前版本。448完整比较在资源准备时被会话中断（tmp/smplh_architecture_448_q7yv3gbl/before仅部分记录），未完成、不继续、不作为失败性能或通过证据。最终实现未做新的完整拟合/精度/性能评价，不以早期部分检查冒称最终全量通过。
 
 详细方法/公式/检查写入docs/CURRENT_SMPLH_ALGORITHM_20261002.md第27节，并更新其顶部场景时效信息和旧每步前向描述；docs/PROJECT_STATUS.md更新当前方法与路线导航；current_mainline.json/body/solver_maintenance明确仅维护源码、旧选择结果不重算；本文保留阶段进展和停止界限。既有未提交文件及另一聊天Flow变更保留，只提交本任务代码和文档增量，不推送。
+
+## 2026-10-13 Flow Matching当前模型完整Word说明
+
+按用户要求，对当前learning_flow_mesh_next从输入到输出作完整教学说明，交付`资料/实验报告/FlowMatching_当前模型完整说明_20261013.docx`。25页，6幅黑白结构图、52个Word原生公式、14张白底黑线表格；覆盖观测/掩码/坐标、GRU历史、325维状态与169维局部空间、54个token及attention、CFM目标/Euler采样、SMPL-H解码、J/Λ、四法与双阶段、A0–A7候选选择、序列训练准备、评价边界、SO3候选和逐帧示例。源码按当前实现核对，原论文只支持方法背景；明确尚未训练、无真实精度/实时结论，示例与图不冒充实验。
+
+仅制作文档，模型/训练/正式主线不改。OOXML结构检查通过；Microsoft Word实际渲染25页，逐页浏览分页并抽看公式/图表细节，修复图中字形缺失和封面继承色线。PDF与渲染图仅在tmp用于版式检查，无新增模型测试/审计材料。架构记录增加同文档入口；保留既有未提交改动，按本次增量本地提交，不推送。
