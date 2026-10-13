@@ -4559,3 +4559,7 @@ MODEL_RESULTS第32节、架构台账、论文范围与长期协议同步。结�
 MODEL_RESULTS第41节记录输入、复现方式和边界；MODEL_ARCHITECTURE第24节登记D13–15与后续优先级。补充单帧17点几何J精确局部秩≤51/169维至少118维零空间、同观测派生Λ的作用、SO3与ambient G1分支范围、完整标签门/BODY22解码边界、在线诊断分解与候选任务权重/序列联合模型问题。先修已证代码错误，再落实可获得的监督与公平对照；数据/授权到位后补训练生命周期，以效果决定架构扩展。
 
 本轮仅分析和更新已有记录，未修Python、未训练/加载权重/追加模型或重跑旧测试与成本，D13–15明确待修。长期真实效能仍受资源条件约束，整体目标未完成；原工作区改动保留。
+
+## 2026-10-13 SMPL-H冻结配置缺省字段修复
+
+SMPL-H结构检查发现旧current_mainline.json/frozen_scalar_options比现行parser少5项：body_observation_mode=legacy、body_ankle_reprojection_multiplier=1、reference阈值25px/80mm及confidence_floor=0.6。仅补录原有默认值，未改变冻结448配置的quality权重、360 reference25选择、拟合输入/预算或场景路由。原test_current_route_scalar_snapshot_matches_the_same_parser因此失败，修复后test_cold_start_profiles.py全部14项通过；这属于配置记录修复，不是新实验或主线结果晋升。
