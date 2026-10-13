@@ -1,5 +1,9 @@
 # Project status
 
+## 2026-10-14 Flow相关新算法适配
+
+六篇少步生成/人体恢复加速的来源与取舍见[LITERATURE_ANALYSIS](../research_records/research/G20261007_flow_mesh_baseline_v1/LITERATURE_ANALYSIS.md)的2026-10-14专题；拟议接口与停止条件见MODEL_ARCHITECTURE第32节，阅读边界见MODEL_RESULTS第47节。优先研究无辅助头iMF训练目标，当前不接入硬冻结、token合并或删几何；本轮仅文献与设计，模型未训练、无新测速。进度以AI_PROGRESS本日对应条目为准。
+
 ## 2026-10-14 场景重建：独立视觉世界轨迹路线
 
 已完成面向双鱼眼、相机附着助步器及12GB显存的官方方法核对。建议新增独立visual_rig_pose：ORB-SLAM3 fisheye stereo作基线、cuVSLAM作速度候选、Pi3X小窗口作学习候选；统一相机/助步器/SMPL-H世界变换，将Stage1/2降为可关闭软先验。人体和助步器须同时排除出静态背景；同源视觉/Stage证据不能重复计权，检测或网络分数不自动成为概率/逆协方差。
