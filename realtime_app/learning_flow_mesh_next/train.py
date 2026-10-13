@@ -48,6 +48,17 @@ def objective(mode, model, context, labels, normalization, **kwargs):
     raise ValueError("unregistered objective")
 
 
+def _reduce_objectives(losses, counts=None):
+    """Preserve differentiable means without overflowing a finite loss dtype."""
+    if not len(losses):
+        return None, False
+    values = losses.to(torch.float64)
+    weights = torch.ones_like(values) if counts is None else values.new_tensor(counts)
+    aggregate = (values*(weights/weights.sum())).sum().to(losses.dtype)
+    nonfinite = not bool(torch.isfinite(aggregate))
+    return None if nonfinite else aggregate, nonfinite
+
+
 @dataclass(frozen=True)
 class LabelFrame:
     """Explicit target-row binding; a declaration, not certified ground truth."""
@@ -280,11 +291,13 @@ def sequence_objective(mode, model, chunk, normalization, state=None, *, generat
         reasons.append(row)
     frame_losses = torch.stack(losses)
     supervised = torch.tensor(supported, dtype=torch.bool, device=frame_losses.device)
-    aggregate = frame_losses[supervised].mean() if supervised.any() and not nonfinite else None
+    aggregate, nonfinite_aggregation = (None, False) if nonfinite else _reduce_objectives(frame_losses[supervised])
+    nonfinite = nonfinite or nonfinite_aggregation
     resources = {"original_frames": len(losses), "supervised_count": int(supervised.sum()),
                  "skipped_count": int((~supervised).sum()), "encoder_frame_calls": len(losses),
                  "velocity_batch_calls": computed_count, "target_state_evaluations": computed_count,
-                 "nonfinite_objective": nonfinite, "optimizer_steps": 0,
+                 "nonfinite_objective": nonfinite, "nonfinite_aggregation": nonfinite_aggregation,
+                 "optimizer_steps": 0,
                  "checkpoint_loaded": False, "scope": "in-memory causal F0 objective; no dataset authenticity certification"}
     if information is not None:
         resources.update(information_acquisition=information.counts(),
@@ -490,23 +503,19 @@ def sequence_batch_objective(mode, model, chunks, normalization, states=None, *,
                                     information=None if information is None else information[index])
         states[key] = result.state
         results.append(result)
-    count = sum(result.resources["supervised_count"] for result in results)
     nonfinite = any(result.resources["nonfinite_objective"] for result in results)
-    aggregate = None
-    if count and not nonfinite:
-        # Normalize support first: loss*large_count may overflow even when the
-        # final nonnegative weighted mean is representable in the loss dtype.
-        weighted = [result.loss*(result.resources["supervised_count"]/count)
-                    for result in results if result.loss is not None]
-        aggregate = torch.stack(weighted).sum()
-    nonfinite_aggregation = aggregate is not None and not torch.isfinite(aggregate)
-    if nonfinite_aggregation:
-        aggregate, nonfinite = None, True
+    aggregate, nonfinite_aggregation = None, False
+    supported = [result for result in results if result.loss is not None]
+    if supported and not nonfinite:
+        aggregate, nonfinite_aggregation = _reduce_objectives(
+            torch.stack([result.loss for result in supported]),
+            [result.resources["supervised_count"] for result in supported])
+    nonfinite = nonfinite or nonfinite_aggregation
     summed = ("original_frames", "supervised_count", "skipped_count", "encoder_frame_calls",
               "velocity_batch_calls", "target_state_evaluations")
     resources = {key: sum(result.resources[key] for result in results) for key in summed}
     resources.update(streams=len(set(keys)), chunks=len(chunks), nonfinite_objective=nonfinite,
-                     nonfinite_aggregation=bool(nonfinite_aggregation),
+                     nonfinite_aggregation=nonfinite_aggregation,
                      aggregation="supervised_original_frame_weighted", optimizer_steps=0, checkpoint_loaded=False,
                      scope="bounded causal batch targets; not a trained runner or source authenticity certificate")
     if information is not None:

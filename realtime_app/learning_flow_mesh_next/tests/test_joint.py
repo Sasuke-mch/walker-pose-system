@@ -440,23 +440,33 @@ def test_multi_stream_batch_unavailable_and_nonfinite_keep_original_windows(monk
     assert failed.resources["original_frames"] == 10 and failed.resources["velocity_batch_calls"] == 6
 
 
-def test_multi_stream_batch_avoids_weighted_numerator_overflow(monkeypatch):
+@pytest.mark.parametrize("scope", ["sequence", "batch"])
+def test_objective_reduction_preserves_large_finite_mean_and_gradient(monkeypatch, scope):
     from .. import train
 
+    torch.set_num_threads(1)
     model, normal = JointFlow().eval(), Normalization.fixture(Topology())
-    real_objective = train.sequence_objective
+    value = torch.tensor(3e38, requires_grad=True)
     def large_finite_target(*args, **kwargs):
-        result = real_objective(*args, **kwargs)
-        # The true weighted mean is 3e38, representable in float32. Multiplying
-        # by support before dividing must not destroy that valid mean.
-        result.loss = torch.tensor(3e38)
-        return result
-    monkeypatch.setattr(train, "sequence_objective", large_finite_target)
-    with torch.no_grad():
+        return value, {}
+    monkeypatch.setattr(train, "objective", large_finite_target)
+    if scope == "sequence":
+        result = train.sequence_objective("regression", model, sequence_fixture(), normal)
+        chunks = [result]
+        assert result.resources["supervised_count"] == 3
+    else:
         result = train.sequence_batch_objective("regression", model, multi_stream_chunks(), normal)
-    assert all(torch.isfinite(chunk.loss) for chunk in result.chunks)
-    assert result.loss is not None and not result.resources["nonfinite_aggregation"]
+        chunks = result.chunks
+        assert [chunk.resources["supervised_count"] for chunk in chunks] == [2, 3, 1]
+    # A mean of 3e38 is representable in float32, unlike its unscaled sum.
+    assert result.loss is not None and torch.isfinite(result.loss)
+    assert not result.resources["nonfinite_objective"] and not result.resources["nonfinite_aggregation"]
     torch.testing.assert_close(result.loss, torch.tensor(3e38))
+    for chunk in chunks:
+        assert torch.isfinite(chunk.frame_losses[chunk.supervised]).all()
+        assert len(chunk.frame_losses) == len(chunk.label_frames) == len(chunk.reasons)
+    result.loss.backward()
+    torch.testing.assert_close(value.grad, torch.tensor(1.))
 
 
 @pytest.mark.parametrize("nodes", [22, 52])
@@ -484,7 +494,7 @@ def test_causal_sequence_objective_chunk_values_and_future_isolation(nodes, geom
                 value, _ = objective(mode, model, context[None], target, normal, **kwargs)
                 expected.append(value)
                 assert torch.equal(value, whole.frame_losses[index])
-        assert torch.equal(whole.loss, torch.stack(expected).mean())
+        torch.testing.assert_close(whole.loss, torch.stack(expected).mean())
         generator = torch.Generator().manual_seed(17)
         first = sequence_objective(mode, model, chunk_slice(chunk, 0, 3), normal, generator=generator)
         second = sequence_objective(mode, model, chunk_slice(chunk, 3, 5), normal, first.state, generator=generator)
