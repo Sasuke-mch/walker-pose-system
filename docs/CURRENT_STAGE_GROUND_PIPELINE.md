@@ -2,6 +2,8 @@
 
 ## 2026-10-13 身体拟合方法更新的边界
 
+完整的身体求解实现见[SMPL-H算法第30节](CURRENT_SMPLH_ALGORITHM_20261002.md#implementation-guide)，包括原始鱼眼与cam0米制、身体软权候选与严格场景掩码的区别，以及可选接触如何消费同源地面变换。该说明不改变Stage/动态地面选择，不把当前reliability代码误登记为已经重算的主线网格。
+
 新身体求解默认fit-policy=reliability，修正置信度归约、旋转锚与接触保持项，详见CURRENT_SMPLH_ALGORITHM_20261002.md第28节。已保存360 reference25身体及其场景页面未重算；本页旧复现argv需补--fit-policy legacy。场景主线仍为supported_stop_fixed_lag，本次身体方法修改不改变其停止支撑假设、标定或阶段门。新策略没有建立固定抓握或足底接触真值。
 
 ## 2026-10-12 连续过渡逻辑进入工程主线

@@ -2,6 +2,8 @@
 
 ## 本文范围与当前选择（2026-10-13）
 
+**从头理解或接手当前代码，请先读[第30节：现有方法完整实现说明](#implementation-guide)。** 该节按输入、参数、目标、初始化、阶段更新、输出和使用顺序组织；第27—29节保留修改原因与检查历史。第1—24节主要描述历史448帧配置，不能把其中的人工腕参考、共享手姿或接触参数当成新入口默认值。
+
 本轮置信度、旋转锚与接触保持项已实际修正，详见第28节；整体复查后的初始化、关联、时间项和接触内部归约修正见第29节。通用拟合入口默认reliability；本页较早reference25和448结果仍来自legacy，重放旧命令必须明确--fit-policy legacy。第27节“未解决”的实现问题以第28/29节更新为准，物理证据和统计校准缺口仍明确保留。
 
 当前360帧身体工程主线为PMPose同源SMPL-H冷启动reference25，结果G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz；实际命令参数见同实验runs/reference25/fit_args.json，显式冻结的复现参数见mainline_fit_args.json。普通偏差保留有效权重，仅严重几何异常连续降权，body_quality与body_fit_weights分开保存。未启用人工腕参考、身体时序或接触目标。场景默认已于2026-10-12升级为supported_stop_fixed_lag，旧360帧baseline场景产物仍为历史参考；各关节权重与置信度规则见第25节。
@@ -10,7 +12,7 @@
 
 更新时间：2026-10-13。早期448帧主体保留其历史范围；近期448帧二维拟合及踝权重版本见第26节，2026-10-13方法结构精简、公式及未解决问题见第27节。本次仅更新求解实现，不替换已选择的身体结果。仓库根目录：`D:\my_works\walker_pose_system`。
 
-本文记录当前 448 帧冷启动身体与手部拟合的实际计算，不按二维检测器品牌组织，也不把历史固定抓握精修误写成当前步骤。依据为实际入口、拟合源码、保存的运行命令、结果及审计文件。它是当前实验的实现说明；长期规则仍以 AGENTS.md、AI_PROGRESS.md 和 VISUALIZATION_PIPELINE.md 为准。
+本文保留历史448帧冷启动身体与手部拟合的计算记录，并在后续章节记录360帧主线及当前求解实现；不同日期和配置的结论不能混用。依据为实际入口、拟合源码、保存的运行命令、结果及已有检查文件。长期规则仍以 AGENTS.md、AI_PROGRESS.md 和 VISUALIZATION_PIPELINE.md 为准。
 
 ## 1. 当前究竟在解决什么问题
 
@@ -1086,3 +1088,332 @@ reliability的D2/D3在有外部接触输入、释放root/transl/latent时继续�
 新元数据记录shared_initialization、初始化门归约、body_temporal支持、contact归约及global_hand_prior_support；原gradient_audit明确标成A/C部分身体项，避免把它误称为完整目标分解。本轮没有声称源接触NPZ只凭帧数即可认证同源性；调用者仍须遵守当前接触协议和输入来源约束，接触分支不因此获得主线资格。
 
 针对以上修改，只重跑受影响的SMPL-H组件与MANO两个测试文件，63项通过（含6新增）：pi分支完整初始化、无效身体腕关联拒绝、低权点的初始化门/单模板batch契约、逐关节时间梯度、接触整体分数同比梯度及[0,1]范围。与第28节的142项初轮和33项受影响检查分开记录，不将重复执行相加当测试覆盖数。随后只做改动文件静态检查和提交差异检查，没有新整片拟合、训练、渲染、结果报告或性能评价。
+
+<a id="implementation-guide"></a>
+
+## 30. 现有方法完整实现说明（2026-10-13）
+
+本节依据当前源码记录**离线整段SMPL-H参数拟合器**。`fit-policy=reliability`是通用CLI的新默认；第25节已保存的360帧reference25网格仍来自`legacy`。本节没有重新拟合这些网格，也不把源码修正当作新的实验结果。文中路径相对仓库根目录，代码模块默认位于`realtime_app/`。
+
+### 30.1 方法在做什么，哪些部分保持固定
+
+给定同步双鱼眼人体观测、固定相机标定和WiLoR手部结果，求解一段视频的共享体型、逐帧身体状态及双手局部姿态。优化变量经过固定的VPoser与SMPL-H解码器生成网格；再将模型关节点或投影与有效观测比较，使用Adam分阶段更新变量。这里没有训练新的神经网络，也没有Flow Matching的噪声、速度场或候选采样。
+
+```text
+左右人体JSON ──转回原始鱼眼像素── 每视图坐标、分数、有效状态
+                     │                      │
+                     ├──固定标定三角化───────┤
+                     │  3D、回投误差、射线间距、拒绝原因
+                     │                      │
+                     └──肩髋刚体初始化       └──固定观测权重
+                              │
+共享 beta、逐帧 root / transl / VPoser latent、双手 MANO PCA
+                              │
+                  固定解码器 → 网格与关节点
+                              │
+             身体3D或身体2D + 手部信息 + 参数先验
+                              │
+               A → B → C → D1 → D2 → 可选D3
+                              │
+                   最终参数、网格、权重和状态
+
+WiLoR JSONL → 人体腕关联 → 每相机的左/右手候选 → 局部旋转或辅助像素
+外部接触资源（可选）→ 当前地面中的手掌/足底表面目标 → 接触D2/D3
+```
+
+相机内外参、COCO回归器、SMPL-H形状/姿态基与蒙皮权重、VPoser网络、MANO均值和PCA基均不随拟合更新。相机身份沿用标定的`cam0=LEFT`、`cam1=RIGHT`，不能用临时OpenCV设备索引替换。场景Stage/地面是独立链路；通常身体拟合只在cam0坐标中进行，只有显式接触分支使用场景变换。
+
+### 30.2 入口和模块职责
+
+| 文件或函数 | 实际职责 |
+|---|---|
+| `run_tool.py body.fit_smplh_wilor_sequence` | 统一命令分发，不改参数与工作目录 |
+| `walker_tools/body/fit_smplh_wilor_sequence.py::build_parser/main` | 参数默认值、解析，调用`run_fit` |
+| `tools/fit_smplh_wilor_sequence.py` | 历史入口兼容转发，不是第二套算法 |
+| `pose_app/smplh_fitting/pipeline.py::run_fit` | 读取、初始化、组装损失、优化循环和输出 |
+| `pose_app/smplh_fitting/stages.py` | 参数合法性、每阶段预算、变量冻结、局部手计算路径 |
+| `pose_app/smplh_fitting/losses.py` | 有效像素、身体权重、旋转锚、观测归约和时序项 |
+| `pose_app/smplh_fitting/initialization.py` | 单模板、肩髋方向、同模板平移和初始化门 |
+| `pose_app/body_observations.py` | 身体JSON读取、逆转正、软权候选三角化 |
+| `pose_app/fisheye_camera.py`、`pose_app/smpl_coco_observation.py` | 标定投影与posed vertices到COCO17回归 |
+| `pose_app/smplh_hand_observation.py` | 双相机×双解剖手关联、21点顺序、像素辅助观测 |
+| `pose_app/wilor_mano_prior.py` | 资产/参数约定、局部旋转转换、PCA编码、完整初值选择和旋转损失 |
+| `pose_app/smplh_fitting/contact.py`、`pose_app/smpl_surface_contact.py` | 可选接触输入检查、坐标变换与表面损失 |
+
+修改数值公式应定位到对应组件；阶段何时启用该项则要同时看`pipeline.py`。只阅读CLI帮助或单个损失函数，无法确定最后参与反向传播的完整目标。
+
+### 30.3 输入数据、帧顺序、坐标和单位
+
+记序列长度为`N`，身体关节数`J=17`，相机数`V=2`。
+
+| 输入 | 内容与契约 |
+|---|---|
+| `--left-raw / --right-raw` | JSON的`images`记录；每项使用`keypoints[0]`，接受17×3或23×3，23通道只取前17个COCO点；三列为u、v、score |
+| 帧编号 | 优先`image_id`，其次`frame_index`；左右帧集合必须相同，并且排序后为0..N−1；不会取交集静默删帧 |
+| `--wilor-left / --wilor-right` | 分别表示左/右**相机**的JSONL；每个文件都可能含解剖学左手与右手，不能按文件名只读一只手 |
+| `--calibration-dir` | 双鱼眼K、D、cam0到cam1的R与毫米制T及图像尺寸；拟合不优化标定 |
+| `--regressor` | 从6890个posed vertices回归COCO17的固定矩阵 |
+| `--smplh-model` | 真实SMPL-H模型资产，检查6890顶点及手关节/均值契约 |
+| `--vposer-dir` | CLI解析层允许省略，但`run_fit`运行时必需；不会默默切换为自由63维身体轴角 |
+| `--mano-left / --mano-right` | 对应手的均值与PCA基；native路径还核对canonical right MANO资产 |
+
+人体检测是在转正后的图像上产生的。当前读取器沿用1920×1080原图约定：左侧`(x,y)=(1919−v,u)`，右侧`(x,y)=(v,1079−u)`；先逆转正，再做关联与鱼眼几何。这里的1920/1080是实现中的固定约定，不是自动适配任意分辨率；更换分辨率/旋转方式必须修改并核对读取约定，不能仅更换标定文件。
+
+左右鱼眼点先去畸变到归一化成像平面，以`P0=[I|0]`、`P1=[R01|T01]`三角化。`X_cam1=R01 X_cam0+T01`。原始三角化、射线距离及标定平移使用**mm**；进入SMPL-H拟合后统一换为**m**，像素残差为**px**，轴角为**rad**。地面变换的平移也必须从mm换成m后与网格运算。
+
+身体输入数组是`N×17×3`，三角化目标同形。三角化还返回左右回投误差、射线最近距离、深度、accepted和逐点原因。此读取器是身体软权候选路径，**不是严格场景三角化门**；`body_accepted`、`body_fit_support`与Stage/地面使用的严格掩码是不同变量，不能互相替换。二维模式仍使用三角化进行初始化和诊断，并非完全取消双目几何依赖。
+
+### 30.4 参数、张量维度与解码
+
+令`K`为每只手的PCA维度（默认12），`S=1`表示全片共享手姿，否则`S=N`。
+
+| 代码变量 | 优化形状 | 含义 |
+|---|---|---|
+| `beta` | `1×10` | 全序列同一个人的体型，调用模型时展开到N帧 |
+| `root` | `N×3` | 根全局旋转的轴角表示 |
+| `transl` | `N×3` | cam0坐标中的全局平移，m |
+| `latent` | `N×32` | 当前VPoser资产的身体潜变量，解码为`N×63`身体轴角 |
+| `lhand / rhand` | 各`S×K` | 两只解剖手的局部PCA系数 |
+
+32维对应当前VPoser资产；实现会检查解码的batch和身体维度。按此维度计算，总未知量为`38N+10+2SK`。共享12维双手时为`38N+34`，逐帧12维双手时为`62N+10`。这只是参数数量，不是每阶段都一起更新。
+
+每只手独立使用均值`μ∈R^45`、PCA行基`C∈R^(K×45)`及行范数`s∈R^K`：
+
+\[
+\theta^{hand}=\mu+(c\oslash s)C.
+\]
+
+`s`用于基向量尺度归一，不是由当前视频估计的误差标准差。`c=0`得到MANO平均手姿，而不是45个零轴角。共享模式先解码一组局部手姿，再展开到N帧；它只固定手指相对父关节的旋转，不固定手腕位置、手腕朝向或手相对扶手的刚体变换。
+
+VPoser将latent解码为21个身体关节的轴角；SMPL-H结合共享beta、身体与手姿，经固定形状/姿态修正、运动学与线性混合蒙皮得到`N×6890×3`网格。身体观测点使用`COCO17=regressor @ posed_vertices`，不是直接抽取内部骨架的17个关节。手21点来自内部腕/手指关节和5个指尖表面顶点，并重新排列到WiLoR/OpenPose顺序。输出内部`smplh_joints`可能含库附加点，不能仅凭SMPL-H运动学52关节就假定输出恰好52行。
+
+### 30.5 身体可靠程度：从原始score到最终权重
+
+新策略把三个概念分开：**是否可用**由mask决定，**该观测有多可信**由score与几何衰减决定，**任务强调程度**由外部λ或踝倍率决定。mask不是分数，λ也不是概率。
+
+每视图二维支持要求坐标与分数有限、在原始图像范围内且`0<score≤1`。非法或缺失观测保留原始数据和原因；不把负数、超过1的数或NaN裁成有效高分。
+
+三维支持`M_tj`还要求双目几何accepted、三角化有限、左右二维均有效，以及回投误差/射线间距有限非负。对支持点定义：
+
+\[
+c_{tj}=\min(c^L_{tj},c^R_{tj}),\qquad
+q_{tj}=\max\left(\frac{e^L_{tj}}{25\,px},\frac{e^R_{tj}}{25\,px},\frac{g_{tj}}{80\,mm}\right),
+\]
+\[
+a_{tj}=\frac{1}{1+\max(q_{tj}-1,0)^4},\qquad
+w_{tj}=M_{tj}\,c_{tj}\,a_{tj}.
+\]
+
+25px/80mm分别由`body_reference_reprojection_px`和`body_reference_ray_gap_mm`配置。取较低视图分数，是因为三角化需要两侧共同支持；几何仅作进一步衰减。平台内不额外降权，超出后连续衰减，无正的置信度或尾权下限。实现采用稳定的倒数形式，避免极大severity直接四次方溢出。
+
+这些权重在优化前从输入观测算好，进入损失时detach；不会根据当前模型拟合得好不好反过来提升观测分数。原`body_quality`仍保存历史几何质量作诊断，新策略实际用`body_fit_weights`。同一个几何问题也不再被多个指数因子连续相乘重复抑制。
+
+**这是一套保留可靠程度的加权逻辑，还不是概率/逆协方差模型。** 检测score没有独立误差标签的经验校准；min规则、25px/80mm及四次尾属于明确的工程选择。小视差导致的三维方向性不确定度并未用完整协方差表示。不能将“分数0.8”解释为“80%概率误差小于某毫米阈值”。
+
+### 30.6 身体数据项、归约与梯度含义
+
+记模型COCO点为`X_tj(Θ)`，三角化目标为`Y_tj`。三维数据项为：
+
+\[
+L_{3D}=\frac{1}{NJ}\sum_{t,j}w_{tj}\|X_{tj}(\Theta)-Y_{tj}\|_2^2.
+\]
+
+单位为m²，分母固定为原始`N×17`位置数，不是有效点数或权重之和。无效槽不参与算术；实现先选择/隔离支持点，避免`NaN×0`污染梯度。零占位只用于内部安全计算，原始缺失观测和拒绝原因仍保存。
+
+二维数据项直接比较原始鱼眼像素。设`π_v`为固定相机投影、`u_vtj`为观测、`σ_px`为像素尺度：
+
+\[
+H(x)=\begin{cases}\tfrac12x^2,&x\le1,\\x-\tfrac12,&x>1,\end{cases}\qquad
+L_{2D}=\frac{1}{2NJ}\sum_{v,t,j}m_{vtj}c_{vtj}p_j
+H\!\left(\frac{\|\pi_v(X_{tj})-u_{vtj}\|_2}{\sigma_{px}}\right).
+\]
+
+`p_j=1`，仅在指定踝倍率时COCO15/16改为该倍率；该参数必须配合`reprojection_only`，明确属于任务优先级。默认`σ_px=100`；历史448二维配方的25px不是通用默认。两个相机共同除以`2N17`，不会各自归一化后再等权平均。模型在有支持的相机点后方时直接失败，不以安全占位掩盖这些点。
+
+相同残差与雅可比下，权重1和0.1对数据梯度的贡献比为10:1。若整段分数都乘0.1，数据梯度也乘0.1，先验强度不变；这正是低质量整段数据应减少对先验覆盖的逻辑。原来的`Σwr/Σw`会抵消这种整体下降。另一方面，固定分母使缺失更多时数据总强度下降，这是设计结果，不是将缺失点恢复成低误差。
+
+新策略要求`body_3d_weight`与`body_reprojection_weight`**恰有一项为正**。同一双目像素及其三角化结果不是两份独立证据，因此不同时作为双正身体目标。`body_observation_mode=legacy`只是旧命名的普通数据模式，不等于`fit_policy=legacy`；前者与新的可靠程度策略可以同时存在。
+
+`body_m`仍是`√(Σw‖X−Y‖²/Σw)`的条件加权诊断；`body_objective_m2`才是上述固定分母三维项。`body_2d_px`是按检测分数加权的原始像素距离均值，不含Huber和踝优先级。诊断数值不能直接相加还原总loss，更不能解释成独立三维精度。
+
+### 30.7 冷启动和初始化拒绝门
+
+1. beta、latent和双手PCA系数从零开始，不加载历史拟合参数或Adam状态。先用一帧零beta/零root/零transl、零latent解码出的身体姿态生成模板；初始化模板明确使用零45维手轴角，与后续PCA零系数对应的平均手姿不同。
+2. 用模板及每帧三角化的肩5/6、髋11/12构造身体正交基：左向量来自左右肩差，上方向来自肩中点减髋中点，正交化后取叉积补第三轴。根旋转为`R_init=B_observed B_template^T`，再转轴角。
+3. 将同一模板身体姿态展开到N帧，按各帧初始根旋转重新调用SMPL-H。平移为观测髋中点减去**这个旋转后模板**的髋中点，避免方向和平移引用不同模板状态。
+4. 所有帧必须满足现有肩髋方向与支持门。函数虽保留单髋平移回退的来源记录，但不能据此声称缺失肩髋的序列已获准绕过总体初始化门。
+5. 新策略以`√(Σw‖X_init−Y‖²/Σw)×1000`检查初始化几何尺度，默认阈值300mm；同时记录原无权RMS。非有限、无有效支持或超过门值则停止，不自动扩大阈值、插值或换旧结果。
+
+初始化门检验的是有支持点上的几何误差，所以使用条件加权均值；如果也除原始位置数，整段极低分反而可能把错误初始化压到门下。它的目的与混合先验的拟合目标不同，不能机械统一分母。冷启动仍依赖观测、标定、预训练资产和初始身体方向，不等于不使用先验。
+
+### 30.8 手部观测、旋转约定与初值
+
+WiLoR的原生MANO路径使用15个局部手指旋转，忽略其全局root、translation和betas，不将WiLoR相机尺度或手部形状当作人体真值。读取器核对参数约定、父相对旋转和关节顺序；左手转换为`M R M`的双侧基变换，不能只做`M R`。候选需与对应人体腕关联，新策略要求关联腕有限、在边界内且分数0.25..1；异常身体腕不能绕到手分支继续使用。
+
+同一相机可保留左右两只解剖手，两相机给每只手至多两份局部旋转假设。native权重`b_tvs`来自有效`detector_confidence`，缺失/非法分数不给正权重。没有有效native覆盖的手会被拒绝，具体候选选择及拒绝原因写入既有参数检查文件。
+
+将旋转转为45维轴角后，以`(θ−μ) pinv(C) ⊙ s`编码PCA。共享模式选择所有有效帧/视图中box score最高的**完整假设**，分数相同取最先出现者；逐帧模式选择该帧最佳视图，缺失帧初值为零。这样避免对+179°/−179°主值轴角直接平均后相消；不意味着最高分候选就是真实手姿，也不消除非凸问题。
+
+native初值直到进入D1才复制到手参数，A/B/C不受其改变；即使D1预算为0，这个阶段入口赋值仍发生，后续D2可使用该初值。所有有效假设继续参与手损失，不只拟合被选为初值的一帧。
+
+对一只手，局部旋转项为：
+
+\[
+L_{MANO}^{s}=\frac{1}{2N}\sum_{t,v}b_{tvs}\frac{1}{15}
+\sum_{k=1}^{15}\frac{\|R_{tsk}(\Theta)-\widehat R_{tvsk}\|_F^2}{4},
+\quad L_{MANO}=\tfrac12(L_{MANO}^{left}+L_{MANO}^{right}).
+\]
+
+单关节`‖R−R̂‖²/4=1−cos(角差)`，是有界旋转弦距离，不是角度平方的精确测地距离。共享手仅计算一次预测旋转，然后广播给所有N×2观测；不会复制独立手参数。`b`是候选框分数，不是逐手指测量精度。
+
+可选WiLoR二维项使用其模型投影21点，是辅助信息。每相机、每手权重为box score×边界因子×关节优先级：边界内1、外部保留点0.1，腕1，五指各沿近端到指尖为0.95/0.82/0.68/0.48；缺失或非法box score为0。这条辅助路径的边界处理不同于身体二维硬支持，不能统一描述为所有越界手点已删除。每个相机×手项除以`N×21`，**四项相加**，没有再除4；单位px²，不使用身体二维的Huber尺度。关闭`hand_2d_weight`后不计算其投影损失，不能把WiLoR投影称独立人工2D真值。
+
+### 30.9 先验、时序项与总目标
+
+参数正则为：
+
+\[
+L_\beta=\operatorname{mean}(\beta^2),\quad
+L_z=\operatorname{mean}(z^2),\quad
+L_{PCA}=\operatorname{mean}(c_L^2)+\operatorname{mean}(c_R^2).
+\]
+
+根锚使用同源初始化作为软正则。令`a_t`为该帧两肩两髋四个`body_fit_weights`的最小值：
+
+\[
+L_{root}=\frac1N\sum_t a_t\frac{\|R(r_t)-R(r_t^{init})\|_F^2}{6}.
+\]
+
+这是旋转空间弦距离；局部小角度下约为角差平方/3。sinc形式Rodrigues避免直接`acos`端点问题，但180°仍可能出现驻点。该项是同源方向保持，不是新增独立观测，不能证明根朝向已准确。
+
+可选身体时间项对模型COCO相对髋中点的位置作二阶差分，以0.03m为Huber阈值。新策略要求对应关节连续三帧有`body_fit_support`，并要求三帧左右髋均支持；除以原始`(N−2)×17`槽数，不跨缺口。即使是二维数据目标，这一时间支持仍依赖三角化支持。该项默认关闭。
+
+逐帧手模式的时间项对PCA系数作二阶差分，先在K维取平方均值，再对**有效三帧组**求均值，最后左右手平均；支持来自有效手像素或native假设。它目前只使用是否有效，不按连续box分数缩放，归约也不是固定全序列分母。共享手模式该项为零。身体/手部二阶差分均未除采样时间平方，不能直接当成m/s²或角加速度；换帧率时不能无条件复用同一λ。
+
+骨长项比较当前内部骨架的10组长度与零beta模板长度，默认关闭，因为启用会把共享体型拉向模板。独立人工腕参考也是显式可选项，参考路径与正权重必须一起提供；当前360主线未启用。没有这些输入就没有相应信息来源。
+
+每阶段总目标可写为：
+
+\[
+L=\lambda_{3D}L_{3D}+\lambda_{2D}L_{2D}
++\lambda_{MANO}L_{MANO}+\lambda_{hand2D}L_{hand2D}
++\lambda_\beta L_\beta+\lambda_z L_z+\lambda_{PCA}L_{PCA}
++\lambda_{root}L_{root}+\lambda_{timeB}L_{timeB}
++\lambda_{timeH}L_{timeH}+\lambda_{bone}L_{bone}
++\lambda_{wrist}L_{wrist}+L_{contact}.
+\]
+
+这个式子列出可用项，不代表每阶段全部激活；实际开关见下一节。各项量纲不同，λ同时承担数值尺度与偏好，不能只按λ大小比较约束强弱。改为固定分母后，旧λ尚未重新调优，不应标成统计最优配置。
+
+### 30.10 分阶段优化：更新变量与实际开关
+
+| 阶段 | 更新变量 | 默认lr倍率（基础0.02） | 观测与特殊项 |
+|---|---|---|---|
+| A `A_body_vposer` | transl、latent | 1（0.02） | 身体数据；可选身体时序、骨长、腕参考 |
+| B `B_shared_beta` | beta | 0.1（0.002） | 身体数据；可选腕参考；不启用身体时序/骨长 |
+| C `C_body_vposer_refine` | beta、root、transl、latent | 0.25（0.005） | 身体数据、根锚；可选身体时序、骨长、腕参考 |
+| D1 `D1_hand_proximal` | lhand、rhand | 0.5（0.01） | native与/或手二维、手时序；身体冻结 |
+| D2 无接触 | lhand、rhand | 0.25（0.005） | 同D1，继续手部细化 |
+| D2 有接触 | lhand、rhand、root、transl、latent | 0.25（0.005） | 手项、表面接触、根锚，并保留身体数据及已启用腕/身体时序 |
+| D3 有接触 | 同接触D2 | 0.1（0.002） | 继续接触细化，保留相同身体约束 |
+
+`beta_policy=freeze_after_b`仅从C的更新列表移除beta；D阶段始终冻结beta。无接触时D3强制0步，不能让WiLoR模型投影单独推动全身。参数正则在总式中一直存在，但冻结变量对应的常数不会产生参数更新；“计算过某项”不等于“它在该阶段有效优化身体”。
+
+每阶段新建Adam，动量不跨阶段继承。每步依次清梯度、解码、构造启用项、检查总loss有限、反传、检查活动梯度、更新、检查活动参数。没有学习率调度器、自动早停、梯度裁剪或失败后回滚重试；不能在实现说明中暗示这些机制存在。
+
+六个预算分别来自`base/beta/joint/hand/contact/contact-refine-steps`。省略的预算各取`max(1, steps//6)`，显式0可跳过优化循环。**`steps`不是总迭代硬上限**：默认180且无接触时实际为30+30+30+30+30+0=150；要完全跳过各阶段循环，需显式设置各阶段预算为0，而不能仅设`steps=0`。冻结360历史配方为30/30/300/100/100/0，与默认不同。
+
+### 30.11 可选接触分支的具体计算和边界
+
+启用必须同时给出`contact_labels`、`scene_transforms`、`contact_vertex_sets`、`walker_topology`，且手/足表面总λ至少一项为正。读取器检查有限值、数组形状、旋转与顶点索引等；reliability下手/足标签在[0,1]，标签全零失败。几何形状检查不等于对采集同源性或物理标签真实性的独立认证，调用者仍须遵守当前实验协议。
+
+cam0网格变到每帧地面：`V_G=R_GC V_C+t_GC`。手掌顶点计算到扶手线段胶囊表面的有符号残差`d=distance_to_segment−0.016m`；足底顶点使用`d=z_G`。它们都使用真实模型表面，不能用COCO腕/踝替代。
+
+对K个候选表面点，中心化softmin和pseudo-Huber为：
+
+\[
+\operatorname{csoftmin}_\tau(d)=-\tau\log\left(\frac1K\sum_i e^{-d_i/\tau}\right),\quad
+\rho_\delta(x)=\delta^2\left(\sqrt{1+(x/\delta)^2}-1\right),
+\]
+\[
+\ell(d)=\rho_\delta(\operatorname{csoftmin}_\tau(d))
++\frac1K\sum_i\max(-d_i,0)^2.
+\]
+
+当前`τ=0.005m`，手`δ=0.015m`、足`δ=0.010m`，穿透项系数1。softmin减去了点数造成的偏移，是平滑的表面距离代理；不是要求所有候选顶点同时贴在平面，也不是精确的最小距离。
+
+手、足分别按`Σ_(t,s) label_ts × ℓ_ts/(2N)`归约，再乘各自λ。显式全片手表面先验在固定相机—助步器变换下比较对应掌顶点，距离除0.03m后作Huber，顶点均值乘该帧手标签，再按帧和左右手平均；零标签帧不再接受满强度先验。
+
+接触D2/D3释放身体变量，所以新策略同时保留原来选择的身体数据项，避免全身只为满足接触而漂移。接触标签、扶手尺寸和地面仍是外部输入/假设；共享手PCA不证明固定抓握，只有踝观测也不证明足底接触。未提供独立物理信息时，输出的`physical_evidence`明确保留未建立状态，不从拟合残差自动生成“真实接触”。
+
+### 30.12 减少冗余计算的实际路径
+
+当阶段≥D1、训练变量恰为双手PCA、`hand_2d_weight=0`且该阶段无接触目标时，native局部旋转、PCA先验和手时序已经能完整计算活动梯度。此时采用`local_hand`路径：普通优化步不调用全身SMPL-H，日志步才在`no_grad`下重算完整模型诊断。若手二维或接触依赖空间位置，则仍走完整网格路径，不近似替代蒙皮。
+
+日志按全局步`step%10==0`或最后一个优化步记录。共享手的15组预测旋转只转换一次，观测仍保留全部帧/视图；固定手映射、置信度和关节优先级移到循环外。初始化的首个零状态模板只前向1帧；带各帧root的第二次模板前向仍为N帧。最终输出也始终用最终参数重新解码完整网格。
+
+手指蒙皮可能改变表面回归的COCO腕，所以“身体参数冻结”不能推出所有COCO点完全不变；日志与最终输出重新计算这些点。`stage_schedule.model_evaluations`只计阶段循环中的模型调用，不包含初始化、最终解码或外部observer，不能直接当作整次运行总调用数/性能测试。
+
+### 30.13 默认参数、历史复现和新方法的调用边界
+
+| 参数 | 通用CLI当前默认 | 使用时需区分 |
+|---|---|---|
+| fit_policy | reliability | 历史未带策略的内部Namespace可能按legacy兼容；直接调用者应显式设置 |
+| body_weighting | quality | 新策略在此名称下使用第30.5节公式；reference/uniform/no_*仅允许legacy |
+| body_3d_weight / body_reprojection_weight | 1 / 0 | 新策略恰有一项为正 |
+| body_observation_mode | legacy | 是普通模式的旧名称，不决定fit_policy |
+| body_reprojection_scale_px / ankle倍率 | 100 / 1 | 踝倍率≠1须用reprojection_only |
+| beta_policy / beta_prior_weight | joint / 0.001 | 始终共享beta；C是否继续优化可显式选择 |
+| vposer_prior_weight / root_anchor_weight | 0.02 / 0.01 | 不是已重新调优的最优值 |
+| hand_pca_comps / hand_pca_prior_weight | 12 / 0.001 | profile标签pca12/pca24/full45需与维度一致 |
+| mano_pose_weight / mano_pose_init | 0 / 关闭 | 通用默认并没有自动启用native手姿 |
+| shared_hand_pose | 关闭 | 开启通常还必须native初始化且native权重>0；先验消融需显式许可开关 |
+| hand_2d_weight / hand_temporal_weight | 1e−7 / 0.02 | 共享模式手时序恒为0；native-only需显式把手二维设0 |
+| body_temporal / bone / wrist / contact权重 | 全部0 | 没有默认接触、人工腕或身体平滑 |
+| lr / device / max_init_body_rms_mm | 0.02 / cuda / 300 | CUDA不可用就失败，不自动转CPU |
+
+`body_reference_confidence_floor`解析默认仍为0.6，只供legacy reference使用。新策略实际floor恒为0，并拒绝修改这个历史专用参数；不能因帮助里看见0.6就断言新策略仍保留0.6下限，也不要用`--body-reference-confidence-floor 0`试图开启新策略。
+
+从仓库根查看实际入口参数（只显示帮助，不运行拟合）：
+
+```powershell
+& ./.venv-cuda/Scripts/python.exe -B realtime_app/run_tool.py body.fit_smplh_wilor_sequence --help
+```
+
+实际运行须补齐本节30.3的输入和独立空输出目录。使用已保存360参数时，由`configs/current_mainline.json/mainline_selection.body.reproduction_arguments`定位参数数组，不能把新CLI默认偷偷套到旧结果上：
+
+| 目的 | 应明确设置的策略/变化 |
+|---|---|
+| 重放已保存reference25 | 原完整参数数组+`--fit-policy legacy`，仅换新输出；见`realtime_app/README.md`现有示例 |
+| 在同样输入/预算上使用新3D方法 | 明确reliability、body-weighting=quality、body-3d-weight>0、body-reprojection-weight=0；移除旧reference消融选项；原有native/shared手设置需明确保留 |
+| 使用新二维身体目标 | reliability、body-observation-mode=reprojection_only、body-3d-weight=0、body-reprojection-weight>0；明确像素尺度；不允许人工3D腕或接触目标 |
+| 仅使用native手部信息 | mano-pose-init、mano-pose-weight>0、hand-2d-weight=0；是否shared是独立建模选择 |
+
+更换策略并不自动获得同等λ尺度，也不自动成为新主线。通用入口没有自动为实验固定所有随机种子；实验包装器与所保存参数/协议的设置需另外保留，不宣称跨设备逐位复现。以上只是实施说明，本轮没有执行任何拟合命令。
+
+### 30.14 输出、失败处理与阅读结果的方法
+
+| 文件/字段 | 记录内容 |
+|---|---|
+| `cold_initialization.npz` | 优化前beta、root、transl、VPoser latent、pair_id；不是完整优化器检查点 |
+| `initialization_audit.json` | 初始化来源、门值、加权及原无权RMS等；不能只读通过/失败而忽略支持条件 |
+| `wilor_association_audit.json` | 手候选关联与拒绝信息 |
+| `wilor_mano_parameter_audit.json` | 启用native时的资产、参数约定、覆盖与编码情况 |
+| `wilor_hand_geometry_audit.jsonl`及summary | 启用相关诊断时的跨视图手几何信息；不作为手3D拟合目标；禁用时看summary状态 |
+| `wrist_reference_audit.json` | 仅在启用外部腕参考时记录来源与使用范围 |
+| `result.npz` | 最终参数、真实网格faces/vertices、模型COCO/内部关节/手21点、原始观测、权重、有效状态和可选接触诊断 |
+| `fit_summary.json` | 策略、输入资产路径、参数语义、阶段预算/变量/lr、历史loss、初始化门、证据边界 |
+
+`result.npz`中的`vertices/predicted_coco/transl`为cam0米制；`raw_triangulated_points`保留毫米，不能直接与前者相减。输出`left/right_hand_pca`展开为N行，即使真实训练参数只有1×K；需要结合`shared_hand_pose`与`hand_pose_parameter_frames`判断自由度。`body_left/right_confidence`、二维valid/reasons、`body_accepted`、`body_fit_support`、`body_fit_weights`和新增权重分解同时保留，不能只读最终网格丢弃失败状态。
+
+history的loss/诊断来自该步**更新前**前向，虽然日志在`optim.step()`后写出；`result.npz`是最后更新后重新解码。因此最后一行history不等于最终网格误差的重新计算。`weighted_terms`只记录若干选定项，未覆盖手二维、全部时序、腕和接触等；不能把其求和当作完整总目标。`reprojection_only`的局部梯度采样实际覆盖阶段索引0..2（A/B/C）中存在的local_step 0/30，元数据中的旧`A_C`文字不精确；第29节所述范围以这里的源码条件为准，它也不是完整目标的梯度分解。
+
+拟合拒绝非空输出目录；预算/权重/尺度先校验，但建目录后仍可能在资产、帧、初始化或优化阶段失败，所以失败目录可能已有输入检查记录，不能把“目录存在”当作完成。总loss、活动梯度、更新后参数和最终张量有有限值检查；失败立即抛出，不自动换旧网格、补帧或隐藏拒绝点。日志不包含可恢复Adam状态，也没有自动断点续跑。
+
+### 30.15 当前完成范围与仍不能宣称的内容
+
+当前已经实现：保留绝对可靠程度的身体/原生手/接触观测归约；身体3D/2D互斥；SO(3)根锚；接触释放身体时保留身体数据；完整共享手初值；按关节的身体时间支持；局部手计算和单模板精简。第28/29节保留对应方法检查记录。
+
+当前没有完成：检测score到误差概率或协方差的经验标定、三角化完整各向异性不确定度建模、新λ的真实数据调优、新策略360/448完整拟合或独立三维精度评价。固定抓握和足底触地仍需要独立测量/可审查的外部协议，不能由参数共享、平滑或接触代理反推出事实。手时间先验及某些外部参考也不应被概括成“所有信息均已概率化”。
+
+本轮仅按源码补全实现记录，检查文档引用、默认值/公式与实际分支及改动差异；不重复此前已通过的模型单元测试，不新增训练、拟合、渲染或结果验证。主线选择与历史结果的状态仍由`AI_PROGRESS.md`和`current_mainline.json`约束。

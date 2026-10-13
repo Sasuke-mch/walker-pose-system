@@ -1,5 +1,9 @@
 # realtime_app
 
+## SMPL-H实现说明（2026-10-13）
+
+从输入到输出的完整说明见[现有算法第30节](../docs/CURRENT_SMPLH_ALGORITHM_20261002.md#implementation-guide)：包含模块调用链、坐标/单位、参数维度、置信度及各损失公式、初始化、A/B/C/D阶段变量和预算、接触分支、局部手计算、参数迁移与输出读取。该节依据当前reliability源码；下方reference25复现例属于legacy历史结果。特别注意steps并非总步数硬上限、通用默认未自动启用native/shared手，以及history和最终网格对应不同的更新时刻。
+
 ## 2026-10-13 新拟合采用可靠程度权重
 
 body.fit_smplh_wilor_sequence默认--fit-policy reliability；tools/run_smplh_reprojection_experiment.py也默认新策略。身体3D使用双目较低分数及独立几何衰减，2D/3D/MANO损失按原始帧/视图/点的固定总数归约；零分和缺失不获得正权重或被重新归一化成满强度。踝倍率与检测分数分开。根锚使用旋转空间距离及肩髋可靠程度，接触D2/D3继续保留身体数据约束。

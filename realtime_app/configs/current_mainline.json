@@ -162,6 +162,7 @@
       },
       "method_revision": {
         "date": "2026-10-13",
+        "implementation_guide": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#implementation-guide",
         "record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#28-置信度加权旋转锚与接触保持项的实际修正2026-10-13",
         "selected_result_fit_policy": "legacy",
         "new_general_fitter_default": "reliability",
