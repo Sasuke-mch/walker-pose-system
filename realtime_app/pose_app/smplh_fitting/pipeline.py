@@ -52,7 +52,11 @@ from .stages import (
 )
 
 
-def run_fit(args, observer=None) -> int:
+def run_fit(args, observer=None, runtime_observer=None) -> int:
+    # Optional boundary callbacks let benchmarks synchronize CUDA and time
+    # real stages without altering losses, budgets or per-step execution.
+    if runtime_observer is not None:
+        runtime_observer("fit_start", {})
     validate_optimization_options(args)
     reliability = getattr(args, "fit_policy", "legacy") == "reliability"
     retain_contact_body = reliability and args.contact_labels is not None
@@ -413,6 +417,8 @@ def run_fit(args, observer=None) -> int:
                         betas=beta.detach().cpu().numpy(), global_orient=root.detach().cpu().numpy(),
                         transl=transl.detach().cpu().numpy(), vposer_latent=latent.detach().cpu().numpy(),
                         pair_id=np.asarray(ids, dtype=np.int64))
+    if runtime_observer is not None:
+        runtime_observer("optimization_start", {"frames": n})
     global_step = 0
     for stage_index, (stage_name, train_names, n_stage) in enumerate(zip(stage_names, stage_train, stage_steps)):
         # Do not let MANO initialization alter A/B/C body or shared-beta fits.
@@ -429,6 +435,9 @@ def run_fit(args, observer=None) -> int:
             hand_2d_weight=args.hand_2d_weight, contact_enabled=contact_enabled)
         body_active = body_observation_stage(stage_index, retain_contact_body=retain_contact_body)
         model_evaluations = 0
+        if runtime_observer is not None:
+            runtime_observer("stage_start", {"stage": stage_name, "steps": n_stage,
+                                             "execution": "local_hand" if local_hand_only else "full_model"})
         for local_step in range(n_stage):
             step = global_step
             global_step += 1
@@ -635,6 +644,9 @@ def run_fit(args, observer=None) -> int:
                 if reprojection_only or reliability:
                     row["weighted_terms"] = {k: float(v.detach()) for k, v in weighted_terms.items()}
                 print(json.dumps(row), flush=True)
+        if runtime_observer is not None:
+            runtime_observer("stage_end", {"stage": stage_name, "steps": n_stage,
+                                           "model_evaluations": model_evaluations})
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
                               "objective_execution": "local_hand" if local_hand_only else "full_model",
                               "model_evaluations": model_evaluations,
@@ -657,6 +669,8 @@ def run_fit(args, observer=None) -> int:
                     "smplh_joints": observed.joints.detach().cpu().numpy(),
                     "predicted_coco": regress_coco17_torch(observed.vertices, reg).cpu().numpy()})
 
+    if runtime_observer is not None:
+        runtime_observer("optimization_end", {})
     with torch.no_grad():
         body_pose = decode_body_pose(latent)
         lhand_pose = decode_hand_pose(lhand, mano_l_components, mano_l_mean, mano_l_scale)
@@ -671,6 +685,8 @@ def run_fit(args, observer=None) -> int:
                                "joints": final.joints, "predicted_coco": final_coco,
                                "left_hand_pose": lhand_pose, "right_hand_pose": rhand_pose},
                               "final output")
+        if runtime_observer is not None:
+            runtime_observer("final_decode_end", {})
         contact_diag = {}
         if mano_enabled:
             for side in ("left", "right"):
@@ -836,4 +852,6 @@ def run_fit(args, observer=None) -> int:
             "root_anchor_is_independent_evidence": False,
         },
     }, ensure_ascii=False, indent=2), encoding="utf-8")
+    if runtime_observer is not None:
+        runtime_observer("fit_end", {})
     return 0

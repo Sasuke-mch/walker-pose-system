@@ -1,5 +1,17 @@
 # realtime_app
 
+## 当前SMPL-H速度测量（2026-10-13）
+
+本机RTX5070Ti Laptop对当前448帧/560步方法实测：完整solver 42.0031s（10.6659帧/s离线吞吐）；已有参数单帧解码中位14.3135ms，批448解码29.7663ms。数据和详细计时边界见`G20261013_smplh_runtime448_v1/runtime.json`与算法第32节；解码速度不等于从观测求参数的完整拟合速度。
+
+速度入口从仓库根执行，每次用新输出目录：
+
+```powershell
+& ./.venv-cuda/Scripts/python.exe -X utf8 -B realtime_app/tools/benchmark_smplh_runtime.py --source-args research_records/engineering_validation/G20261013_reliability448_view_v1/fit/fit_args.json --output research_records/engineering_validation/G20261013_smplh_runtime448_repeat_v1 --warmup 10 --samples 50
+```
+
+该入口只替换source argv的output-dir，在CUDA完成一次完整拟合并保存独立输出；然后测已拟合参数的float32/no_grad解码。阶段计时通过可选runtime_observer回调在边界同步CUDA；普通拟合不传回调时无额外同步。PMPose/WiLoR二维检测、场景重放和页面渲染不在此速度范围内。
+
 ## 当前方法新448帧页面（2026-10-13）
 
 新reliability拟合及页面在`research_records/engineering_validation/G20261013_reliability448_view_v1`：完整离线入口`view/body.html`；运行预览服务后访问`view/body_browser.html`（需同目录`body_data.json.gz`）。此版本沿用最近448的二维身体目标/踝倍率2和native共享手姿，完整冷启动560步，fresh strict/Stage/地面，未使用显示平滑。当前导出入口支持显式reliability选择，并检查保存结果与复现argv的策略；旧reference25导出仍可复现。输入/参数/命令见该目录plan.json、fit/fit_args.json、selection.json；现有正式360选择不自动替换。

@@ -1,5 +1,17 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-13 本机CUDA SMPL-H运行速度测量
+
+用户要求用本机显卡测算现有模型速度。本轮只测当前G20261013_reliability448_view_v1的448帧/560步SMPL-H配置，source argv除输出目录外完全不变；seed0、float32，原二维0.004/25px、踝倍率2/native共享PCA12与阶段预算保持。输出research_records/engineering_validation/G20261013_smplh_runtime448_v1；计时数据runtime.json、实际fit_args.json和fit.log保存。输入资产及详细参数继续从该source argv与原448 plan读取，没有重新测PMPose/WiLoR检测、Stage/地面或浏览器渲染。
+
+本机RTX5070Ti Laptop GPU，12226.56MiB，驱动573.29，PyTorch2.11.0+cu128/CUDA12.8、Python3.12.12，torch CPU线程20。一次完整参数冷启动求解（CUDA上下文已初始化）耗时42.0031s：准备3.5750s、优化36.7760s、最终解码/有限值检查0.0282s、回传与输出1.6239s。448/42.0031=10.6659帧/s，摊销93.7569ms/帧；是整段离线吞吐，不是逐帧因果延迟。PyTorch峰值已分配645.12MiB、保留738MiB，不含显示/CUDA上下文等外部占用。系统桌面仍有GPU占用，未改变功耗/频率或强制关闭其他应用。
+
+各阶段实测A30 3.1239s（104.13ms/整段优化步）、B30 2.1716s（72.39ms）、C300 25.6870s（85.62ms）、D1 100 2.3955s（23.96ms）、D2 100 2.4275s（24.28ms）、D3零步。C约占全流程61.15%；D1/D2均local_hand，只在10/11个日志步重算网格。这些阶段内包含本来就存在的loss/反传/Adam/诊断/日志与部分梯度采样，不误称纯GPU kernel时间。
+
+已有参数解码另预热10次、同步计时50次，每次包括VPoser、共享MANO PCA、真实SMPL-H、COCO17及双手21点，不含优化/文件写入。B1 GPU输出wall中位14.3135ms/P95 22.9080ms（约69.86次/s）；B448 GPU输出29.7663ms/P95 33.9673ms（摊销0.06644ms/帧）；B448再把网格/COCO/手点回CPU为36.6252ms/P95 42.8695ms。批量并行摊销不能当作单帧求解延迟或实时姿态恢复速度。完整拟合只有一次样本，未给它编造P95。完整计时不含解释器/模块导入、CUDA上下文首次启动；包含资产/观测/三角化/初始化/560步/日志/NPZ压缩保存。
+
+实施增加可选run_fit(runtime_observer=...)阶段边界回调，默认None不触发任何同步，不改优化目标或预算；新增tools/benchmark_smplh_runtime.py用于这项速度测量，不另建验证脚本或Markdown报告。两文件AST与Ruff E9/F通过；实际完整CUDA运行验证回调路径；数据一致检查确认只换输出、四段时间精确覆盖总时间、阶段预算/调用数吻合、每个decoder有50样本。旧NumPy及模型资产SciPy兼容提示保留。未重复无关测试或进行精度/旧模型结果比较。算法第32节、应用README与PROJECT_STATUS同步速度口径；只提交本轮源码、既有文档增量及小计时/参数JSON，不提交大型拟合输出，保留Flow及工作区其他未提交改动，不推送。
+
 ## 2026-10-13 当前reliability方法新448帧人体可视化
 
 用户明确要求根据现有逻辑生成新的448帧人体，并执行根目录可视化规范。本轮使用原people_1/input_448pairs的0..447全448帧，以及同源c3_predictions左右PMPose、G20261001_fixed_mano_pca448_v1左右原生WiLoR、原采集标定realtime_app/calibration/results、VPoser与male SMPL-H资产。输出research_records/engineering_validation/G20261013_reliability448_view_v1；plan.json、fit_run_command.json、fit/fit_args.json和resolved_options.json保留输入、参数、代码入口与输出。没有截帧、换采集、加载旧人体参数或继续早期被中断的对照。
