@@ -1,5 +1,11 @@
 # Project status
 
+## 2026-10-13 Flow借鉴SMPL-H问题处理的定向修正
+
+隔离next模型已分离H2原始二维支持与strict几何门，避免双目拒绝连带删除有效像素；A1及关闭几何的A5删除无用投影/解码依赖；缺失点在非线性投影前隔离，修复NaN/Inf梯度污染。未增加网络或参数，原完整候选和失败语义保留。相关23项检查及六个Python的Ruff通过，没有真实序列重跑、训练或性能/精度声明；旧H2回放数值按旧掩码解释。正式场景/身体选择不改。
+
+共享整片体型、置信度经验公式、固定位置归约、共享手姿与接触没有机械移植。具体理由、接口变化及Word时效见[MODEL_ARCHITECTURE第27节](../research_records/research/G20261007_flow_mesh_baseline_v1/MODEL_ARCHITECTURE.md#27-对照smpl-h主线的定向借鉴2026-10-13)，反例与必要检查见[MODEL_RESULTS第43节](../research_records/research/G20261007_flow_mesh_baseline_v1/MODEL_RESULTS.md#43-2026-10-13对照smpl-h主线的定向迁移)及AI_PROGRESS。
+
 ## 2026-10-13 当前reliability新448帧人体页面
 
 完整新冷启动拟合及交互页面位于`research_records/engineering_validation/G20261013_reliability448_view_v1`，入口`view/body.html`，浏览器轻量入口`view/body_browser.html`。沿用最近448二维/踝倍率2/native共享手配置，显式新reliability目标；560步完成，当前strict/Stage/地面重放，无显示平滑。19项来源/坐标及浏览器控件检查通过，13项导出策略/帧映射测试通过。实施记录见算法第31节与AI_PROGRESS；它是当前方法的工程输出，正式360主线和历史448选择不自动提升。
