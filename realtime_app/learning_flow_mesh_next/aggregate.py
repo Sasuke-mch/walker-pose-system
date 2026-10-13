@@ -73,19 +73,23 @@ def decide(store, method, scale, *, observation=None, cameras=None, noise=None, 
     if len(legal) == 0 or len(actions) == 0:
         return Decision(method, None, None, costs, True, None, ["empty_action_set"])
     diagnostic = {}
-    if method in ("A1", "A2", "A3", "A5"):
-        if any(v is None for v in (observation, cameras, noise, surface)):
-            raise ValueError("fixed original observations, rig, noise and surface operator required")
+    needs_geometry = method in ("A2", "A3") or (method == "A5" and lambda_g > 0)
+    if needs_geometry and any(v is None for v in (observation, cameras, noise, surface)):
+        raise ValueError("fixed original observations, rig, noise and surface operator required")
+    if method == "A1" or needs_geometry:
+        if surface is None:
+            raise ValueError("surface operator required for joint coordinate diagnostic")
         points = store.raw.new_full((len(store.raw), 17, 3), torch.nan)
         points[legal] = surface(store.rotations[legal], store.translation[legal], store.beta[legal])["coco17"]
+    if needs_geometry:
         errors, per_joint, _, _ = observation_errors(points, observation, cameras, noise)
-        if method == "A1":
-            diagnostic = {"coordinate_mean_coco17_absolute": points[legal].mean(0),
-                          "scope": "diagnostic_only_no_human_publication"}
-        elif method == "A3":
+        if method == "A3":
             diagnostic = diagnostic_joint_controls(points, per_joint, store.actions, ids=store.ids)
         elif method == "A2":
             costs[actions] = errors[actions]
+    if method == "A1":
+        diagnostic = {"coordinate_mean_coco17_absolute": points[legal].mean(0),
+                      "scope": "diagnostic_only_no_human_publication"}
     if method in ("A1", "A3"):
         return Decision(method, None, None, costs, True, None, ["joint_only_diagnostic"], diagnostic)
     if method == "A0":
