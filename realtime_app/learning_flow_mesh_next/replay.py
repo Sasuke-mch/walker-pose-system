@@ -54,9 +54,12 @@ def load_saved_observations(source=BASE / "architecture_h2_results_v3.npz", mapp
                                          "strict": strict[j], "quality_flags": json.loads(str(arrays["quality_flags_json"][i, j]))})
                               for j in range(17)) for v in range(2))
         view_times = tuple(int(frame[f"{side}_host_return_timestamp_ns"])/1e9 for side in ("left", "right"))
+        # H2 observation_mask is per-view finite, in-bounds pixel support.
+        # Its strict stereo gate belongs only to geometry; failing triangulation
+        # must not erase usable 2D evidence in either associated view.
         obs = Observation(tensor(arrays["raw_xy"][i]), tensor(arrays["confidence"][i]),
                           tensor(arrays["observation_mask"][i]),
-                          tensor(np.broadcast_to(arrays["strict_gate"][i], (2, 17)).copy()),
+                          tensor(arrays["observation_mask"][i].copy()),
                           tensor(arrays["geometry_mask"][i]),
                           torch.tensor(arrays["selected_people"][i] >= 0, device=device, dtype=torch.bool),
                           tensor(arrays["ray_origins_m"][i]), tensor(arrays["ray_directions_cam0"][i]),

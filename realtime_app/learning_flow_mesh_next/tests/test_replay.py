@@ -24,19 +24,31 @@ def test_saved_relative_calibration_and_utf8_bom(tmp_path):
     assert cameras[1].T.equal(torch.tensor([-.2, 0., 0.], dtype=torch.float64))
 
 
-def test_real_clock_adapter_never_reads_xyz_labels(tmp_path):
+@pytest.mark.parametrize("support", ["stereo", "left_only", "geometry_rejected"])
+def test_real_clock_adapter_preserves_2d_support_and_never_reads_xyz_labels(tmp_path, support):
     frames = [{"index": i, "pair_id": 1157+i,
                "left_host_return_timestamp_ns": 1000000000+i*100000000,
                "right_host_return_timestamp_ns": 1020000000+i*100000000} for i in range(2)]
     shape = (2, 2, 17)
     mask = np.ones(shape, bool)
     mask[1] = False
+    if support == "left_only":
+        mask[0, 1] = False
+    strict = np.zeros((2, 17), bool)
+    strict[0] = support == "stereo"
+    geometry = np.broadcast_to(strict[:, None], shape).copy()
+    xy = np.ones((*shape, 2))
+    xy[~mask] = np.nan
+    confidence = np.ones(shape)
+    confidence[~mask] = np.nan
+    confidence[0, 0, 0] = 0  # Retain detector score as a feature, not a covariance or new gate.
+    strict_reason = "" if support == "stereo" else "source_stereo_rejected"
     reasons = np.array([json.dumps([[""]*17]*2)]*2)
     source = tmp_path / "inputs.npz"
     np.savez(source, frame_ids=np.arange(2), original_pair_ids=np.arange(1157, 1159),
-             raw_xy=np.ones((*shape, 2)), confidence=np.ones(shape), observation_mask=mask,
-             geometry_mask=mask, strict_gate=mask[:, 0], selected_people=np.array([[0, 0], [-1, -1]]),
-             strict_reasons_json=np.array([json.dumps([""]*17)]*2),
+             raw_xy=xy, confidence=confidence, observation_mask=mask,
+             geometry_mask=geometry, strict_gate=strict, selected_people=np.array([[0, 0], [-1, -1]]),
+             strict_reasons_json=np.array([json.dumps([strict_reason]*17)]*2),
              quality_flags_json=np.full((2, 17), "[]"), point_reasons_json=reasons, ray_reasons_json=reasons,
              ray_origins_m=np.zeros((*shape, 3)), ray_directions_cam0=np.tile([0., 0., 1.], (*shape, 1)),
              strict_xyz_m_diagnostic=np.array([None], dtype=object))
@@ -50,7 +62,15 @@ def test_real_clock_adapter_never_reads_xyz_labels(tmp_path):
     assert observations[0].timestamp == pytest.approx(1.01)
     assert observations[1].timestamp-observations[0].timestamp == pytest.approx(.1)
     assert observations[0].view_timestamps == (1., 1.02)
-    assert not observations[1].admitted().any() and provenance["strict_points"] == 17
+    assert np.array_equal(observations[0].admitted().numpy(), mask[0])
+    assert np.array_equal(observations[0].quality.numpy(), mask[0])
+    assert np.array_equal(observations[0].geometry.numpy(), geometry[0])
+    assert observations[0].confidence[0, 0] == 0
+    np.testing.assert_equal(observations[0].xy.numpy(), xy[0])
+    assert json.loads(observations[0].rejection_reasons[0][0]) == {
+        "point": "", "ray": "", "strict": strict_reason, "quality_flags": []}
+    assert not observations[1].views.any() and not observations[1].admitted().any()
+    assert provenance["strict_points"] == int(strict.sum())
     assert "strict_xyz_m_diagnostic" not in vars(observations[0])
 
 
