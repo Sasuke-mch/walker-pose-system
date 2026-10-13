@@ -97,14 +97,19 @@ def check_rig(obs, cameras):
 
 
 def observation_errors(points, obs, cameras, noise, *, huber=3.0):
-    """K absolute candidate surface points; admitted observation set stays fixed."""
+    """Fixed admitted observations; unrequested projections return NaN/False."""
     check_rig(obs, cameras)
     noise.validate_for(obs)
     if points.ndim != 3 or points.shape[1:] != (17, 3) or huber <= 0:
         raise ValueError("COCO17 surface points and positive Huber threshold required")
-    predictions, valid = zip(*(project(points, camera) for camera in cameras))
-    uv, projection_valid = torch.stack(predictions, 1), torch.stack(valid, 1)
     admitted = obs.admitted()
+    uv = points.new_full((len(points), 2, 17, 2), torch.nan)
+    projection_valid = torch.zeros((len(points), 2, 17), dtype=torch.bool, device=points.device)
+    # Select before nonlinear projection: masking its result cannot prevent
+    # an unobserved NaN/Inf coordinate from producing 0*NaN in backward.
+    for view, camera in enumerate(cameras):
+        mask = admitted[view]
+        uv[:, view, mask], projection_valid[:, view, mask] = project(points[:, mask], camera)
     clean_obs = torch.where(admitted[..., None], obs.xy.to(points), 0)
     difference = torch.where(admitted[None, ..., None], uv - clean_obs, 0)
     square = torch.einsum("kvji,vjil,kvjl->kvj", difference, noise.precision.to(points), difference)

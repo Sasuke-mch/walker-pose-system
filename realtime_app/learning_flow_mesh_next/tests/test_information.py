@@ -28,6 +28,32 @@ def test_exact_observation_cost_has_zero_finite_derivative():
     assert torch.equal(derivative, torch.zeros_like(derivative))
 
 
+@pytest.mark.parametrize("missing_value", [torch.nan, torch.inf])
+def test_unobserved_surface_values_do_not_enter_projection_backward(missing_value):
+    cameras = rig()
+    present = observation().present.clone()
+    present[:, 0], present[1, 1] = False, False
+    xy = torch.tensor([320., 240.], dtype=torch.float64).expand(2, 17, 2).clone()
+    xy[~present] = torch.nan
+    obs = replace(observation(), xy=xy, present=present)
+    reference = torch.tensor([.1, -.05, 3.], dtype=torch.float64).expand(1, 17, 3).clone().requires_grad_()
+    expected = observation_errors(reference, obs, cameras, NoiseModel.proxy())[0]
+    expected_gradient = torch.autograd.grad(expected.sum(), reference)[0]
+    points = reference.detach().clone()
+    points[:, 0] = missing_value
+    points.requires_grad_()
+    costs, per_joint, uv, valid = observation_errors(points, obs, cameras, NoiseModel.proxy())
+    gradient = torch.autograd.grad(costs.sum(), points)[0]
+    assert torch.isfinite(gradient).all()
+    assert torch.equal(costs, expected) and torch.equal(gradient, expected_gradient)
+    assert gradient[:, 0].count_nonzero() == 0 and torch.isinf(per_joint[:, 0]).all()
+    assert torch.isnan(uv[:, ~obs.admitted()]).all() and not valid[:, ~obs.admitted()].any()
+    # The same corrupt value remains a failure if its observation is admitted.
+    admitted = replace(obs, xy=torch.nan_to_num(xy), present=torch.ones_like(present))
+    failed_cost, _, _, failed_valid = observation_errors(points, admitted, cameras, NoiseModel.proxy())
+    assert torch.isinf(failed_cost).all() and not failed_valid[:, :, 0].any()
+
+
 def test_two_stage_frozen_g0_and_state_chunk_roundtrip():
     import json
 
