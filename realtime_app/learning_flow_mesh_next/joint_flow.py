@@ -53,8 +53,15 @@ class JointFlow(nn.Module):
         self.pose_out, self.position_out, self.shape_out = nn.Linear(w, 6), nn.Linear(w, 3), nn.Linear(w, 10)
 
     def velocity(self, state, flow_time, context, information=None):
+        self._validate_state_context(state, context)
+        if flow_time.shape != (len(state),) or not torch.isfinite(flow_time).all() or ((flow_time < 0) | (flow_time > 1)).any():
+            raise ValueError("one shared CFM time per joint sample")
         residual = self._information_tokens(information, state) if information is not None else None
         return self._velocity_from_tokens(state, flow_time, context, residual)
+
+    def _validate_state_context(self, state, context):
+        if state.ndim != 2 or state.shape[1] != self.topology.dimensions or context.shape != (len(state), self.config.width):
+            raise ValueError("joint velocity state/context mismatch")
 
     def _information_tokens(self, information, state):
         """Frame-constant condition; only Lambda is detached, not its projections."""
@@ -67,12 +74,9 @@ class JointFlow(nn.Module):
                           self.info_shape(shape_information)[None]), 0)
 
     def _velocity_from_tokens(self, state, flow_time, context, information_tokens):
-        batch, d = state.shape
+        """Tensor step; callers validate external inputs or construct Euler times."""
+        batch = len(state)
         n = self.config.nodes
-        if d != self.topology.dimensions or context.shape != (batch, self.config.width):
-            raise ValueError("joint velocity state/context mismatch")
-        if flow_time.shape != (batch,) or not torch.isfinite(flow_time).all() or ((flow_time < 0) | (flow_time > 1)).any():
-            raise ValueError("one shared CFM time per joint sample")
         pose, position, shape = state[:, :6*n].reshape(batch, n, 6), state[:, 6*n:6*n+3], state[:, -10:]
         tokens = torch.cat((self.pose_in(pose), self.position_in(position)[:, None], self.shape_in(shape)[:, None]), 1)
         time = torch.stack((flow_time, (2*torch.pi*flow_time).sin(), (2*torch.pi*flow_time).cos()), -1)
@@ -94,10 +98,15 @@ class JointFlow(nn.Module):
             raise ValueError("positive Euler steps and finite initial noise required")
         state = initial
         expanded = context.expand(len(initial), -1)
+        self._validate_state_context(state, expanded)
         # Call-local reuse avoids stale information or autograd graphs across frames.
         residual = self._information_tokens(information, initial) if information is not None else None
+        # Same rounded step/steps values as new_full at each step. Only this
+        # internal schedule bypasses external-time checks, avoiding CUDA scalar
+        # waits in the loop; velocity() still checks every caller-supplied time.
+        times = initial.new_tensor([step / steps for step in range(steps)])
         for step in range(steps):
-            state = state + self._velocity_from_tokens(state, state.new_full((len(state),), step / steps),
+            state = state + self._velocity_from_tokens(state, times[step].expand(len(state)),
                                                        expanded, residual) / steps
         return state
 

@@ -117,6 +117,42 @@ def test_g1_detaches_information_and_reuses_graph(model):
     assert info.grad is None and model.info_shape.weight.grad.abs().sum() > 0
 
 
+@pytest.mark.parametrize("nodes,steps", [(22, 3), (52, 8)])
+@pytest.mark.parametrize("device", ["cpu", pytest.param("cuda", marks=pytest.mark.skipif(
+    not torch.cuda.is_available(), reason="CUDA unavailable"))])
+def test_ambient_internal_schedule_matches_checked_euler(nodes, steps, device):
+    torch.set_num_threads(1)
+    torch.manual_seed(31)
+    model = JointFlow(ModelConfig(nodes=nodes)).to(device).eval()
+    initial = torch.randn(3, model.topology.dimensions, device=device)
+    context = torch.randn(128, device=device)
+    with torch.no_grad():
+        expected = initial
+        for step in range(steps):
+            expected = expected + model.velocity(
+                expected, initial.new_full((len(initial),), step/steps),
+                context.expand(len(initial), -1))/steps
+        actual = model.sample(context, initial, steps=steps)
+    assert torch.equal(actual, expected)
+
+
+def test_ambient_public_time_and_sampler_inputs_still_reject(model):
+    state, context = torch.zeros(2, 325), torch.zeros(2, 128)
+    for time in (torch.tensor([-.01, .5]), torch.tensor([.5, 1.01]),
+                 torch.tensor([torch.nan, .5]), torch.tensor([.5, torch.inf]),
+                 torch.zeros(2, 1)):
+        with pytest.raises(ValueError, match="one shared CFM time"):
+            model.velocity(state, time, context)
+    for steps in (0, -1, 1.5):
+        with pytest.raises(ValueError, match="positive Euler steps"):
+            model.sample(context, state, steps=steps)
+    with pytest.raises(ValueError, match="finite initial noise"):
+        model.sample(context, torch.full_like(state, torch.nan))
+    for initial, condition in ((torch.zeros(2, 324), context), (state, torch.zeros(2, 127))):
+        with pytest.raises(ValueError, match="state/context mismatch"):
+            model.sample(condition, initial)
+
+
 @pytest.mark.parametrize("nodes", [22, 52])
 def test_so3_fixed_path_endpoint_and_time_derivative(nodes):
     axis = torch.tensor([-1., 2., -3.], dtype=torch.float64)

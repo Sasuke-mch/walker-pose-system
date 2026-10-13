@@ -1,5 +1,9 @@
 # Project status
 
+## 2026-10-14 Flow采样去除内部重复同步
+
+公开输入校验保留，内部已知合法的Euler时间一次构造，避免每步GPU标量等待；八步F0标量读取17→1，局部采样中位14.77→12.83ms，约减少13.1%。整链交错对照尚不支持稳定提速：几何149.81→146.24ms，F0为40.15→41.69ms；详细不利结果与波动也保留。网络/完整几何/输入绑定不变，相关值/梯度及拒绝检查通过。实现、测量及边界见MODEL_ARCHITECTURE第33节、MODEL_RESULTS第48节和AI_PROGRESS；iMF训练目标仍未接入。
+
 ## 2026-10-14 Flow相关新算法适配
 
 六篇少步生成/人体恢复加速的来源与取舍见[LITERATURE_ANALYSIS](../research_records/research/G20261007_flow_mesh_baseline_v1/LITERATURE_ANALYSIS.md)的2026-10-14专题；拟议接口与停止条件见MODEL_ARCHITECTURE第32节，阅读边界见MODEL_RESULTS第47节。优先研究无辅助头iMF训练目标，当前不接入硬冻结、token合并或删几何；本轮仅文献与设计，模型未训练、无新测速。进度以AI_PROGRESS本日对应条目为准。
