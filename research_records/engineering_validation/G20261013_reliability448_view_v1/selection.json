@@ -1,0 +1,29 @@
+{
+  "dataset": "research_records\\engineering_validation\\G20261013_reliability448_view_v1",
+  "frames": 448,
+  "frame_ids": "0..447",
+  "source_pair_ids": "0..447",
+  "frames_metadata": "research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\frames.json",
+  "scene_reproduction_command": "research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\scene_template_command.json",
+  "visualization_title": "SMPL-H · 448帧 · 可靠程度加权",
+  "detector": "pmpose",
+  "detector_inputs": {
+    "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "images": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs"
+  },
+  "body": {
+    "result": "research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\result.npz",
+    "reproduction_arguments": "research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\fit_args.json",
+    "resolved_options": "research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\resolved_options.json",
+    "body_weighting": "quality",
+    "fit_policy": "reliability",
+    "wrist_reference_enabled": false,
+    "accepted_for_main_fit": false,
+    "fresh_cold_fit": true,
+    "display_smoothing": false
+  },
+  "frame_count_resolution": "full original 448 pairs, 0..447",
+  "minimal_visualization_title": "SMPL-H · 新448帧人体",
+  "user_selection": "Fresh current reliability fit with latest 448 2D/ankle settings, no display smoothing"
+}

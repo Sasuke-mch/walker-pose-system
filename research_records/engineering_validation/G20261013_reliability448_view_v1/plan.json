@@ -1,0 +1,52 @@
+{
+  "status": "completed",
+  "requested_output": "fresh full448 SMPL-H visualization",
+  "frames": 448,
+  "frame_ids": "0..447",
+  "inputs": {
+    "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "images": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs"
+  },
+  "source_fit_arguments": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\source_fit_args.json",
+  "reference_configuration": "research_records\\engineering_validation\\G20261012_ankle_weight448_v1\\viewer_fit_args.json",
+  "variable": "reliability method revision with latest 448 2D/ankle settings retained; fresh cold initialization and fresh current scene replay",
+  "body_objective": {
+    "3d_weight": 0,
+    "2d_weight": 0.004,
+    "scale_px": 25,
+    "ankle_multiplier": 2
+  },
+  "schedule": [
+    30,
+    30,
+    300,
+    100,
+    100,
+    0
+  ],
+  "seed": 0,
+  "mano": "native weight0.1, init, shared PCA12; hand2D=0",
+  "display_smoothing": false,
+  "scene_profile": "mainline -> supported_stop_fixed_lag",
+  "success": "448 finite real meshes; same-source fresh strict/Stage/ground; complete raw/rejected skeleton, cameras and solid walker; working browser playback",
+  "stop": "invalid source, missing asset, initialization or finite-value failure: retain logs and reject; no relaxed gates, mixed results or filled frames",
+  "limits": "Engineering visualization; no independent 3D/contact accuracy claim; existing lambda retained without new calibration",
+  "outputs": {
+    "fit": "fit/result.npz",
+    "viewer": "view/body.html",
+    "browser_viewer": "view/body_browser.html",
+    "browser_data": "view/body_data.json.gz",
+    "preview": "view/preview.jpg"
+  },
+  "completed_steps": 560,
+  "source_checks": 19,
+  "stage_counts": {
+    "warming_up": 5,
+    "transition": 114,
+    "stage2_feet_static_walker_moving": 115,
+    "stage1_walker_static_human_moving": 214
+  },
+  "strict_accepted_points": 5286,
+  "selected_mainline_changed": false
+}

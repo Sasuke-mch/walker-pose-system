@@ -1,0 +1,14 @@
+[
+  "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+  "-X",
+  "utf8",
+  "-B",
+  "realtime_app/build_current_mainline_view.py",
+  "--selection",
+  "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\selection.json",
+  "--output",
+  "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\view",
+  "--scene-profile",
+  "mainline",
+  "--minimal-text"
+]

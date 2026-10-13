@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "url": "http://127.0.0.1:8768/body_browser.html",
+  "browser": "Codex in-app browser",
+  "observed_frames": [
+    0,
+    22,
+    380,
+    391,
+    447
+  ],
+  "controls_checked": [
+    "frame slider",
+    "play/pause with visible frame advancement",
+    "rate selector 1x/2x",
+    "left drag rotation",
+    "mesh visibility toggle",
+    "reset view",
+    "quality/rejection details"
+  ],
+  "real_mesh_visible": true,
+  "ground_dark_plane_light_background": true,
+  "black_raw_observation_bones_visible": true,
+  "solid_walker_visible": true,
+  "stage_and_ground_status_visible": true,
+  "no_display_smoothing": true,
+  "console_warnings_errors": [],
+  "screenshot": "preview.jpg",
+  "automation_note": "DOM button role lookup for details found no match; fresh AX state identified the summary and AX click succeeded; no application error",
+  "limits": "Browser interaction and visual/source consistency; no independent accuracy or physical contact conclusion"
+}

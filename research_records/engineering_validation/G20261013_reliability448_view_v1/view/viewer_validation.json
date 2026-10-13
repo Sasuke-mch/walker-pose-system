@@ -1,0 +1,175 @@
+{
+  "status": "file_checks_passed_browser_pending",
+  "vertices": 6890,
+  "faces": 13776,
+  "index_entries": 41328,
+  "frames": 448,
+  "joints": {
+    "0": {
+      "finite": 448,
+      "strict_accepted": 256,
+      "finite_rejected": 192,
+      "rejection_reasons": {
+        "high_reprojection_error": 191,
+        "association_failed": 1
+      }
+    },
+    "1": {
+      "finite": 433,
+      "strict_accepted": 244,
+      "finite_rejected": 189,
+      "rejection_reasons": {
+        "high_reprojection_error": 186,
+        "out_of_raw_image_bounds": 17,
+        "association_failed": 1
+      }
+    },
+    "2": {
+      "finite": 439,
+      "strict_accepted": 234,
+      "finite_rejected": 205,
+      "rejection_reasons": {
+        "high_reprojection_error": 204,
+        "out_of_raw_image_bounds": 9,
+        "association_failed": 1
+      }
+    },
+    "3": {
+      "finite": 390,
+      "strict_accepted": 295,
+      "finite_rejected": 95,
+      "rejection_reasons": {
+        "high_reprojection_error": 95,
+        "out_of_raw_image_bounds": 57,
+        "association_failed": 1
+      }
+    },
+    "4": {
+      "finite": 448,
+      "strict_accepted": 356,
+      "finite_rejected": 92,
+      "rejection_reasons": {
+        "high_reprojection_error": 91,
+        "association_failed": 1
+      }
+    },
+    "5": {
+      "finite": 448,
+      "strict_accepted": 300,
+      "finite_rejected": 148,
+      "rejection_reasons": {
+        "high_reprojection_error": 147,
+        "association_failed": 1
+      }
+    },
+    "6": {
+      "finite": 448,
+      "strict_accepted": 414,
+      "finite_rejected": 34,
+      "rejection_reasons": {
+        "high_reprojection_error": 33,
+        "association_failed": 1
+      }
+    },
+    "7": {
+      "finite": 448,
+      "strict_accepted": 265,
+      "finite_rejected": 183,
+      "rejection_reasons": {
+        "high_reprojection_error": 182,
+        "association_failed": 1
+      }
+    },
+    "8": {
+      "finite": 448,
+      "strict_accepted": 377,
+      "finite_rejected": 71,
+      "rejection_reasons": {
+        "high_reprojection_error": 70,
+        "association_failed": 1
+      }
+    },
+    "9": {
+      "finite": 448,
+      "strict_accepted": 278,
+      "finite_rejected": 170,
+      "rejection_reasons": {
+        "high_reprojection_error": 167,
+        "association_failed": 1,
+        "low_2d_score": 2
+      }
+    },
+    "10": {
+      "finite": 448,
+      "strict_accepted": 430,
+      "finite_rejected": 18,
+      "rejection_reasons": {
+        "high_reprojection_error": 17,
+        "association_failed": 1
+      }
+    },
+    "11": {
+      "finite": 448,
+      "strict_accepted": 326,
+      "finite_rejected": 122,
+      "rejection_reasons": {
+        "high_reprojection_error": 121,
+        "association_failed": 1
+      }
+    },
+    "12": {
+      "finite": 448,
+      "strict_accepted": 325,
+      "finite_rejected": 123,
+      "rejection_reasons": {
+        "high_reprojection_error": 122,
+        "association_failed": 1
+      }
+    },
+    "13": {
+      "finite": 448,
+      "strict_accepted": 356,
+      "finite_rejected": 92,
+      "rejection_reasons": {
+        "high_reprojection_error": 91,
+        "association_failed": 1
+      }
+    },
+    "14": {
+      "finite": 448,
+      "strict_accepted": 84,
+      "finite_rejected": 364,
+      "rejection_reasons": {
+        "high_reprojection_error": 363,
+        "association_failed": 1
+      }
+    },
+    "15": {
+      "finite": 448,
+      "strict_accepted": 317,
+      "finite_rejected": 131,
+      "rejection_reasons": {
+        "high_reprojection_error": 130,
+        "association_failed": 1
+      }
+    },
+    "16": {
+      "finite": 448,
+      "strict_accepted": 429,
+      "finite_rejected": 19,
+      "rejection_reasons": {
+        "high_reprojection_error": 18,
+        "association_failed": 1
+      }
+    }
+  },
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\view\\result.npz",
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\view\\scene",
+  "stage_counts": {
+    "transition": 114,
+    "stage2_feet_static_walker_moving": 115,
+    "stage1_walker_static_human_moving": 214,
+    "warming_up": 5
+  },
+  "no_display_smoothing": true
+}

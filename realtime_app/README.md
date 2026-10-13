@@ -1,5 +1,9 @@
 # realtime_app
 
+## 当前方法新448帧页面（2026-10-13）
+
+新reliability拟合及页面在`research_records/engineering_validation/G20261013_reliability448_view_v1`：完整离线入口`view/body.html`；运行预览服务后访问`view/body_browser.html`（需同目录`body_data.json.gz`）。此版本沿用最近448的二维身体目标/踝倍率2和native共享手姿，完整冷启动560步，fresh strict/Stage/地面，未使用显示平滑。当前导出入口支持显式reliability选择，并检查保存结果与复现argv的策略；旧reference25导出仍可复现。输入/参数/命令见该目录plan.json、fit/fit_args.json、selection.json；现有正式360选择不自动替换。
+
 ## SMPL-H实现说明（2026-10-13）
 
 从输入到输出的完整说明见[现有算法第30节](../docs/CURRENT_SMPLH_ALGORITHM_20261002.md#implementation-guide)：包含模块调用链、坐标/单位、参数维度、置信度及各损失公式、初始化、A/B/C/D阶段变量和预算、接触分支、局部手计算、参数迁移与输出读取。该节依据当前reliability源码；下方reference25复现例属于legacy历史结果。特别注意steps并非总步数硬上限、通用默认未自动启用native/shared手，以及history和最终网格对应不同的更新时刻。

@@ -1,5 +1,17 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-13 当前reliability方法新448帧人体可视化
+
+用户明确要求根据现有逻辑生成新的448帧人体，并执行根目录可视化规范。本轮使用原people_1/input_448pairs的0..447全448帧，以及同源c3_predictions左右PMPose、G20261001_fixed_mano_pca448_v1左右原生WiLoR、原采集标定realtime_app/calibration/results、VPoser与male SMPL-H资产。输出research_records/engineering_validation/G20261013_reliability448_view_v1；plan.json、fit_run_command.json、fit/fit_args.json和resolved_options.json保留输入、参数、代码入口与输出。没有截帧、换采集、加载旧人体参数或继续早期被中断的对照。
+
+沿用最近448配置的纯二维身体目标：body3D=0、2D=0.004/25px、踝倍率2、VPoser0.01、beta0.001、root0.01、native MANO0.1、共享PCA12/初始化、手2D=0，预算A30/B30/C300/D100/D100/D3zero、seed0。方法策略改为reliability/body-weighting=quality，实际采用新固定位置归约与旋转锚、完整手初值等实现。全部560步完成，448帧肩髋初值有效，初始化条件加权RMS127.15mm（门300mm）；最终448×6890真实网格和13776面及模型参数有限。这是一次当前方法的工程输出，保留原lambda，没有重新校准或声称优于旧结果。
+
+build_current_mainline_view.py原来硬限legacy reference25，现新增明确的reliability策略检查及结果/argv策略一致门，保持同源PMPose限制、旧reference25复现和全部来源门。普通未平滑结果也导出body_browser.html+body_data.json.gz，同时保留完整离线body.html。相关既有测试文件补7个策略用例，合计13项通过；两个改动Python AST与Ruff E9/F通过，未执行无关全量测试。
+
+新view从原有序图像重新三角化并重放mainline→supported_stop_fixed_lag，未消费旧Stage/地面/逐帧助步器或旧网页顶点。19项来源/坐标检查通过，严格accepted5286点；Stage warming_up5、transition114、Stage2 115、Stage1 214。使用统一[X,-Y,Z]、真实三角面、黑色原始观测骨架、拒绝标记、深色XY地面/浅色背景、拓扑实体助步器、两个相机和轨迹。本轮没有显示平滑/插值；旧技能摘录的右膝永久排除条款由根目录现规覆盖，17点按当前逐帧质量门处理。逐关节有限/accepted/rejected及原因见view/viewer_validation.json。
+
+浏览器实看0/22/380/391/447、时间轴、播放推进、1x/2x选择、旋转、人体开关及复位正常；console无warn/error。详情用DOM button角色定位没有匹配，重新读AX后直接操作summary成功，无页面故障。view/browser_validation.json与preview.jpg记录；预览http://127.0.0.1:8768/body_browser.html，服务仅绑定127.0.0.1，离线入口view/body.html。页面已在当前聊天打开。正式360主线/历史448选择不提升，脚底低于地面、观测拒绝和协议恢复状态保留，不把视觉或回投一致性升级为独立三维/触地/固定抓握证据。只提交本次源码、既有文档增量与小参数记录，大型网格/HTML/GZ/原图不入Git，其他已有改动保留，不推送。
+
 ## 2026-10-13 SMPL-H现有方法完整实现说明
 
 按用户要求，在既有docs/CURRENT_SMPLH_ALGORITHM_20261002.md新增第30节完整实现说明（锚点implementation-guide），并在顶部区分当前源码、360 reference25旧结果和早期448记录。说明覆盖调用链/模块职责、JSON与双相机双手语义、逆转正和毫米/米转换、参数形状与解码、身体有效性/分数/几何衰减、固定分母及梯度意义、初始化门、native MANO与辅助像素、先验和时序、阶段变量/预算/lr、表面接触、局部手计算、默认参数迁移、输出及失败处理。

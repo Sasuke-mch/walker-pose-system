@@ -34,6 +34,23 @@ def execute(out, name, command):
     print("completed", name, flush=True)
 
 
+def require_exportable_body(detector, options):
+    """Keep historical reference25 replay and allow the current reliability fitter."""
+    if detector != "pmpose":
+        raise ValueError("exporter requires same-source PMPose body observations")
+    policy = getattr(options, "fit_policy", "legacy")
+    if policy == "reliability":
+        from pose_app.smplh_fitting.stages import validate_optimization_options
+
+        validate_optimization_options(options)
+        return
+    if (policy == "legacy" and options.body_weighting == "reference"
+            and [options.body_reference_reprojection_px, options.body_reference_ray_gap_mm,
+                 options.body_reference_confidence_floor] == [25.0, 80.0, 0.6]):
+        return
+    raise ValueError("exporter requires legacy reference25 or a valid reliability body route")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
@@ -61,10 +78,11 @@ def main():
     if smoothing and not cli.selection:
         raise ValueError("display smoothing requires an explicit isolated selection")
     options = fit_arguments(ROOT / body["reproduction_arguments"])
-    if (sel["detector"] != "pmpose" or options.body_weighting != "reference"
-            or [options.body_reference_reprojection_px, options.body_reference_ray_gap_mm,
-                options.body_reference_confidence_floor] != [25.0, 80.0, 0.6]):
-        raise ValueError("exporter requires selected PMPose reference25 body route")
+    require_exportable_body(sel["detector"], options)
+    if options.fit_policy == "reliability":
+        fitted_summary = read((ROOT / body["result"]).parent / "fit_summary.json")
+        if fitted_summary.get("fit_policy") != options.fit_policy:
+            raise ValueError("selected fitted result policy differs from its reproduction arguments")
     frames = read(ROOT / sel.get("frames_metadata", str(Path(sel["dataset"]) / "frames.json")))
     if len(frames) != sel["frames"]:
         raise ValueError("frame metadata count differs from selection")
@@ -87,6 +105,8 @@ def main():
         "success": "Complete real mesh, original/rejected observations, same-frame transforms, solid walker and cameras; file and browser verification",
         "stop": "Missing assets or source/frame/geometry mismatch: preserve failure and stop; no relaxed gates or substituted frames",
         "old_dynamic_inputs_consumed": False, "body_refitted": False,
+        "body_fit_policy": options.fit_policy,
+        "body_observation_mode": options.body_observation_mode,
         "display_smoothing": smoothing, "interpolation": False,
         "limits": "Engineering display; static installation is an assumption, no independent contact or 3D truth"})
     try:
@@ -219,6 +239,8 @@ def main():
         if getattr(options, "body_observation_mode", "legacy") == "reprojection_only":
             page = page.replace("reference25 权重", "三维诊断权重（不用于二维拟合）")
             page = page.replace("原质量 → 实际拟合权重", "原质量 → 三维诊断权重")
+        elif options.fit_policy == "reliability":
+            page = page.replace("reference25 权重", "可靠程度权重")
         if resolved_scene_profile == "supported_stop_fixed_lag":
             page = page.replace("held:'保持',", "protocol_support_restored:'协议支撑闭合',"
                                 "protocol_support_window_reestimated:'过渡窗口重估',held:'保持',")
@@ -241,21 +263,20 @@ def main():
             from walker_tools.visualization.minimal_viewer_text import minimal_viewer_text
             page = minimal_viewer_text(page, sel.get("minimal_visualization_title", "人体与助步器"))
         page_path.write_text(page, encoding="utf-8")
-        if smoothing:
-            # Keep the standalone page, but avoid embedding ~100MB of JSON
-            # in the app browser's DOM/inspection transport.
-            import gzip
-            packed = re.search(r'<script id="data" type="application/json">(.*?)</script>', page, re.DOTALL)
-            (out / "body_data.json.gz").write_bytes(gzip.compress(packed[1].encode("utf-8"), compresslevel=1))
-            browser_page = page[:packed.start()] + page[packed.end():]
-            browser_page = browser_page.replace(
-                "const d=JSON.parse(document.getElementById('data').textContent),canvas=",
-                "function startViewer(d){const canvas=", 1)
-            browser_page = browser_page.replace("</script></html>",
-                "}fetch('body_data.json.gz').then(async response=>{if(!response.ok)throw Error('viewer data '+response.status);"
-                "return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();})"
-                ".then(startViewer).catch(error=>{document.getElementById('qa').textContent='加载失败：'+error;});</script></html>")
-            (out / "body_browser.html").write_text(browser_page, encoding="utf-8")
+        # Keep the standalone page and a compact browser entry for every
+        # fit, including unsmoothed meshes with a large numeric payload.
+        import gzip
+        packed = re.search(r'<script id="data" type="application/json">(.*?)</script>', page, re.DOTALL)
+        (out / "body_data.json.gz").write_bytes(gzip.compress(packed[1].encode("utf-8"), compresslevel=1))
+        browser_page = page[:packed.start()] + page[packed.end():]
+        browser_page = browser_page.replace(
+            "const d=JSON.parse(document.getElementById('data').textContent),canvas=",
+            "function startViewer(d){const canvas=", 1)
+        browser_page = browser_page.replace("</script></html>",
+            "}fetch('body_data.json.gz').then(async response=>{if(!response.ok)throw Error('viewer data '+response.status);"
+            "return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();})"
+            ".then(startViewer).catch(error=>{document.getElementById('qa').textContent='加载失败：'+error;});</script></html>")
+        (out / "body_browser.html").write_text(browser_page, encoding="utf-8")
         if smoothing:
             validation_path = out / "viewer_validation.json"
             validation = read(validation_path)

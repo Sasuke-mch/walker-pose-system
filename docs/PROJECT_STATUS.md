@@ -1,5 +1,9 @@
 # Project status
 
+## 2026-10-13 当前reliability新448帧人体页面
+
+完整新冷启动拟合及交互页面位于`research_records/engineering_validation/G20261013_reliability448_view_v1`，入口`view/body.html`，浏览器轻量入口`view/body_browser.html`。沿用最近448二维/踝倍率2/native共享手配置，显式新reliability目标；560步完成，当前strict/Stage/地面重放，无显示平滑。19项来源/坐标及浏览器控件检查通过，13项导出策略/帧映射测试通过。实施记录见算法第31节与AI_PROGRESS；它是当前方法的工程输出，正式360主线和历史448选择不自动提升。
+
 ## 2026-10-13 SMPL-H完整实现说明入口
 
 [算法第30节](CURRENT_SMPLH_ALGORITHM_20261002.md#implementation-guide)按实际源码串起输入与坐标、参数形状、置信度/损失、初始化、分阶段更新、接触、计算精简、默认值、输出和失败处理。明确通用reliability实现与已保存legacy网格的区别，并说明手时序归约、steps预算和诊断字段的实际限制。本轮仅补记录，未运行新拟合或改变主线选择；第27—29节仍保存修改原因及已有检查历史。
