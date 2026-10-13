@@ -152,11 +152,13 @@ def validate_smplh(model):
             if int(torch.argmin(all_distances)) != finger:
                 raise ValueError(f"SMPL-H {side} fingertip order check failed at finger {finger}")
 
-def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera: str):
+def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera: str,
+              *, require_confidence: bool = False):
     """Keep all candidates; select by same-side PMPose wrist proximity.
 
-    Missing historical detector confidence is a labelled neutral weight (1),
-    never a claimed model confidence. Bounds are diagnostic, not a deletion gate.
+    Legacy missing confidence has a labelled neutral weight (1). With
+    require_confidence, missing/invalid scores retain points but carry zero weight.
+    Bounds are a separate soft attenuation, not a deletion gate.
     A 150px wrist gate and 25px ambiguity margin are engineering association rules.
     """
     n = len(body)
@@ -173,6 +175,9 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
             raise ValueError(f"image/pair_id mismatch: {row['image']}")
         for h, side in enumerate(("left", "right")):
             wrist = body[i, 9+h]
+            wrist_ok = np.isfinite(wrist).all() and wrist[2] >= .25
+            if require_confidence:
+                wrist_ok = wrist_ok and wrist[2] <= 1 and 0 <= wrist[0] < width and 0 <= wrist[1] < height
             entries = []
             for ordinal, candidate in enumerate(row["records"]):
                 if candidate.get("side") != side: continue
@@ -180,7 +185,7 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
                     raise ValueError("hand observation must be in raw fisheye pixels")
                 p = np.asarray(candidate["keypoints_2d_raw_fisheye"], np.float32)
                 if p.shape != (21, 2): raise ValueError("hand point shape is not 21x2")
-                distance = float(np.linalg.norm(p[0]-wrist[:2])) if np.isfinite(wrist).all() and wrist[2] >= .25 and np.isfinite(p[0]).all() else None
+                distance = float(np.linalg.norm(p[0]-wrist[:2])) if wrist_ok and np.isfinite(p[0]).all() else None
                 entries.append((distance, ordinal, candidate, p))
             ranked = sorted(entries, key=lambda x: x[0] if x[0] is not None else float("inf"))
             selected = None
@@ -195,9 +200,15 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
                         selected = ranked[0][1]; reason = "selected"
                         c, p = ranked[0][2:]
                         conf = c.get("detector_confidence")
-                        if conf is not None and not np.isfinite(conf):
+                        if not require_confidence and conf is not None and not np.isfinite(conf):
                             raise ValueError(f"nonfinite detector confidence: {camera} frame {i} hand {side}")
-                        weight = 1.0 if conf is None else float(np.clip(conf, 0, 1))
+                        if require_confidence:
+                            score_valid = conf is not None and np.isfinite(conf) and 0 < conf <= 1
+                            weight = float(conf) if score_valid else 0.0
+                            if not score_valid:
+                                reason = "selected_but_confidence_unavailable"
+                        else:
+                            weight = 1.0 if conf is None else float(np.clip(conf, 0, 1))
                         points[i,h] = p
                         finite = np.isfinite(p).all(-1)
                         bounds = finite & (p[:, 0] >= 0) & (p[:, 0] < width) & (p[:, 1] >= 0) & (p[:, 1] < height)
@@ -209,7 +220,7 @@ def read_view(path: Path, body: np.ndarray, image_size: tuple[int, int], camera:
                     "record_index":ordinal,"candidate_index":c.get("candidate_index"),
                     "selected":ordinal==selected,"reason":reason if ordinal==selected or selected is None else "farther_same_side_candidate",
                     "wrist_distance_px":dist,"detector_confidence":c.get("detector_confidence"),
-                    "confidence_source":"missing_neutral_weight" if c.get("detector_confidence") is None else "detector_box",
+                    "confidence_source":("missing_zero_weight" if require_confidence else "missing_neutral_weight") if c.get("detector_confidence") is None else "detector_box",
                     "finite":finite.tolist(),"in_bounds":bounds.tolist(),"points":p.tolist(),
                     "source":"wilor_model_projection"})
             if not entries:
@@ -224,7 +235,8 @@ def finite_pixel_values(points: np.ndarray) -> np.ndarray:
 
 
 def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
-               image_size: tuple[int, int], camera: str, consume_pixels: bool = True) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict]]:
+               image_size: tuple[int, int], camera: str, consume_pixels: bool = True,
+               *, require_confidence: bool = False) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[dict]]:
     """Use the single audited WiLoR association implementation.
 
     The shared reader validates frame/image identity, duplicate frames and
@@ -242,7 +254,8 @@ def read_wilor(path: Path, n: int, side: str, body_points: np.ndarray,
                 [{"source": str(path), "camera": camera, "hand": side,
                   "reason": "hand_2d_disabled_not_consumed", "selected": False}])
 
-    points, weights, audit = read_view(path, body_points, image_size, camera)
+    points, weights, audit = read_view(path, body_points, image_size, camera,
+                                      require_confidence=require_confidence)
     hand_index = 0 if side == "left" else 1
     obs = points[:, hand_index]
     valid = np.isfinite(obs).all(axis=-1)

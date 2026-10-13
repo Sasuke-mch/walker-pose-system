@@ -1,4 +1,6 @@
 [
+  "--fit-policy",
+  "legacy",
   "--left-raw",
   "SET_BY_COLD_RUNNER",
   "--right-raw",

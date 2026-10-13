@@ -489,3 +489,77 @@ def test_selected_hand_confidence_cannot_poison_weights(tmp_path):
         ValueError, match="nonfinite detector confidence.*frame 0 hand left"
     ):
         read_view(path, body, (1920, 1080), "left")
+
+
+def test_reliability_temporal_support_is_per_joint_and_requires_pelvis():
+    coco = torch.zeros(3, 17, 3, requires_grad=True)
+    with torch.no_grad():
+        coco[1, 13, 0] = .1
+    mask = torch.ones(3, 17, dtype=torch.bool)
+    mask[1, 0] = False  # a missing nose must not disable a supported knee
+    kwargs = dict(args=options(fit_policy="reliability"), n=3, stage_index=2,
+                  body_loss=torch.tensor(0.), coco=coco, mask_body=mask)
+    loss = body_temporal_loss(**kwargs)
+    gradient = torch.autograd.grad(loss, coco)[0]
+    assert loss > 0 and gradient[:, 13].abs().sum() > 0
+    assert gradient[:, 0].abs().sum() == 0
+    mask[1, 13] = False
+    assert body_temporal_loss(**kwargs) == 0
+    mask[1, 13] = True
+    mask[1, 11] = False
+    assert body_temporal_loss(**kwargs) == 0
+
+
+def test_reliability_contact_weights_preserve_absolute_strength(surface_input_files):
+    from dataclasses import replace
+    args, _, _, _ = surface_input_files
+    args.fit_policy = "reliability"
+    target = load_surface_targets(args, 2, "cpu")
+    vertices = torch.full((2, 6890, 3), .05, requires_grad=True)
+    target = replace(target, global_hand_offset=torch.zeros(2, 3),
+                     global_hand_surface={side: torch.zeros(2, 3) for side in ("left", "right")},
+                     camera_rotation=torch.eye(3), camera_translation=torch.zeros(3))
+    kwargs = dict(left_in_cam0=None, contact_enabled=True, stage_index=4, vertices=vertices, fixed_slots=True)
+    strong = surface_contact_losses(**kwargs, contact=target)
+    weak = surface_contact_losses(**kwargs, contact=replace(target, hand_weight=target.hand_weight * .1,
+                                                            foot_weight=target.foot_weight * .1))
+    for a, b in zip(strong, weak):
+        torch.testing.assert_close(b, .1 * a)
+    torch.testing.assert_close(torch.autograd.grad(sum(weak), vertices, retain_graph=True)[0],
+                               .1 * torch.autograd.grad(sum(strong), vertices)[0])
+
+
+def test_contact_confidence_and_task_lambda_cannot_be_confused(surface_input_files):
+    args, labels, _, _ = surface_input_files
+    args.fit_policy = "reliability"
+    labels["hand_contact_weight"][0, 0] = 2.
+    np.savez(args.contact_labels, **labels)
+    with pytest.raises(ValueError, match="task priority"):
+        load_surface_targets(args, 2, "cpu")
+
+
+def test_initialization_uses_one_template_and_reliability_gate(monkeypatch):
+    from pose_app.smplh_fitting import initialization as module
+    points = torch.zeros(17, 3)
+    points[:, 2] = 2.
+    points[5, :2] = torch.tensor([-.2, .5]); points[6, :2] = torch.tensor([.2, .5])
+    points[11, 0] = -.1; points[12, 0] = .1
+    batches = []
+    def model(**kwargs):
+        size = len(kwargs["betas"]); batches.append(size)
+        assert len(kwargs["body_pose"]) == size
+        return SimpleNamespace(vertices=points[None].expand(size, -1, -1), joints=torch.zeros(size, 22, 3))
+    monkeypatch.setattr(module, "regress_coco17_torch", lambda vertices, reg: vertices)
+    tri = points[None].expand(2, -1, -1).numpy().copy()
+    tri[:, 0, 0] = 100.  # extreme but almost unsupported nose
+    weights = np.ones((2, 17)); weights[:, 0] = 1.e-12
+    decoded = []
+    def decode(z):
+        decoded.append(len(z)); return torch.zeros(len(z), 63)
+    result = module.initialize_rigid_body(
+        model=model, reg=None, decode_body_pose=decode, n=2, latent_dim=32, device="cpu", tri_m=tri,
+        body_mask=np.ones((2, 17), bool), root=torch.zeros(2, 3), transl=torch.zeros(2, 3),
+        body_weights=weights, single_template=True)
+    assert batches == [1, 2] and decoded == [1]
+    assert result.init_body_rms_mm < 1. and result.init_body_unweighted_rms_mm > 1000.
+    assert (result.root_init_source == "shoulder_hip_rigid_basis").all()

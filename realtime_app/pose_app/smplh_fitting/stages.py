@@ -69,6 +69,18 @@ def validate_optimization_options(args):
             raise ValueError(
                 f"--{name.replace('_', '-')} must be finite and non-negative"
             )
+    policy = getattr(args, "fit_policy", "legacy")
+    if policy not in ("reliability", "legacy"):
+        raise ValueError("unknown fit policy")
+    if policy == "reliability":
+        if args.body_3d_weight > 0 and args.body_reprojection_weight > 0:
+            raise ValueError("reliability policy requires one body data term: 3D and its source 2D are correlated")
+        if args.body_3d_weight == 0 and args.body_reprojection_weight == 0:
+            raise ValueError("reliability policy requires a positive body observation weight")
+        if getattr(args, "body_weighting", "quality") != "quality":
+            raise ValueError("historical body-weighting recipes require --fit-policy legacy")
+        if getattr(args, "body_reference_confidence_floor", .6) != .6:
+            raise ValueError("confidence-floor is legacy-only; reliability always uses zero floor")
 
 
 def build_stage_schedule(args, contact_enabled: bool):

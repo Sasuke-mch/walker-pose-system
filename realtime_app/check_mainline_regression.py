@@ -25,7 +25,9 @@ def fit_arguments(path):
     if "--left-raw" not in values:
         raise ValueError("command has no --left-raw")
     # Accept both historical fit_command.json and an options-only argv list.
-    values = values[values.index("--left-raw"):]
+    values = values[next(i for i, value in enumerate(values) if value.startswith("--")):]
+    if "--fit-policy" not in values:
+        values.extend(["--fit-policy", "legacy"])
     if any(value.startswith("--") and values.count(value) != 1 for value in values):
         raise ValueError("duplicate options in command")
     try:

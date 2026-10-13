@@ -93,7 +93,7 @@ def convert_record(record: dict) -> np.ndarray:
     return MIRROR @ r @ MIRROR if record["side"] == "left" else r
 
 
-def read_parameter_view(path: Path, body: np.ndarray, image_size: tuple[int, int]):
+def read_parameter_view(path: Path, body: np.ndarray, image_size: tuple[int, int], *, bounded_body_score=False):
     """N x 2 x 15 rotations; rejected candidates remain in the audit.
 
     Association is independent of WiLoR's pinhole-projected 21 keypoints.
@@ -117,6 +117,8 @@ def read_parameter_view(path: Path, body: np.ndarray, image_size: tuple[int, int
                 wrist = np.asarray(body[frame, 9 + h])
                 wrist_ok = (np.isfinite(wrist).all() and wrist[2] >= .25
                             and 0 <= wrist[0] < width and 0 <= wrist[1] < height)
+                if bounded_body_score:
+                    wrist_ok = wrist_ok and wrist[2] <= 1
                 entries = []
                 for ordinal, c in enumerate(row["records"]):
                     if c.get("side") != side:
@@ -190,7 +192,31 @@ def encode_pca(rotations, components, mean, scale):
     return coeff, angles
 
 
-def rotation_pose_loss(axis_angles, targets, weights):
+def initial_pca_hypothesis(coefficients, weights, *, shared, select_complete=False):
+    """Choose supported complete hypotheses; legacy shared initialization averages PCA.
+
+    Averaging principal rotvec/PCA coordinates can cancel nearly identical
+    rotations across the pi branch cut. Selection is only a starting point;
+    all accepted views still enter the rotation objective.
+    """
+    coeff, weights = np.asarray(coefficients), np.asarray(weights)
+    if coeff.shape[:2] != weights.shape or not np.isfinite(weights).all() or (weights < 0).any():
+        raise ValueError("invalid PCA initialization weights/shape")
+    if not (weights > 0).any():
+        raise ValueError("no supported PCA hypothesis")
+    if not np.isfinite(coeff[weights > 0]).all():
+        raise ValueError("nonfinite supported PCA hypothesis")
+    if shared:
+        if select_complete:
+            frame, view = np.unravel_index(np.argmax(weights), weights.shape)
+            return coeff[frame, view][None, :].copy()
+        return ((coeff * weights[..., None]).sum(axis=(0, 1)) / weights.sum())[None, :]
+    initial = coeff[np.arange(len(weights)), np.argmax(weights, axis=1)].copy()
+    initial[weights.max(axis=1) <= 0] = 0
+    return initial
+
+
+def rotation_pose_loss(axis_angles, targets, weights, *, fixed_slots=False):
     """Chordal SO(3) loss = 1-cos(angle), bounded, no acos endpoint gradient.
 
     axis_angles: N x 45, or 1 x 45 for shared local articulation.
@@ -199,6 +225,16 @@ def rotation_pose_loss(axis_angles, targets, weights):
     """
     from smplx.lbs import batch_rodrigues
     r = batch_rodrigues(axis_angles.reshape(-1, 3)).reshape(-1, 15, 3, 3)
+    if fixed_slots:
+        if not weights.isfinite().all() or ((weights < 0) | (weights > 1)).any():
+            raise ValueError("MANO box reliability must be in [0,1]")
+        active = weights > 0
+        # Select before subtracting: an absent view may have undefined targets.
+        predicted = r[:, None].expand_as(targets)[active]
+        residual = (predicted - targets[active]).square().sum((-1, -2)).mean(-1) / 4.
+        if not residual.isfinite().all():
+            raise ValueError("nonfinite supported MANO rotation")
+        return (residual * weights[active].detach()).sum() / max(weights.numel(), 1)
     per_joint = (r[:, None] - targets).square().sum(dim=(-1, -2)) / 4.
     numerator = (per_joint.mean(-1) * weights).sum()
     return numerator / weights.sum().clamp_min(1e-8)

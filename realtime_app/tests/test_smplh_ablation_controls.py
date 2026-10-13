@@ -43,3 +43,13 @@ def test_quality_component_ablation_keeps_mask_and_original_quality(mode, expect
     np.testing.assert_allclose(weights, [[expected, 0.]])
     np.testing.assert_array_equal(accepted, [[True, False]])
     np.testing.assert_array_equal(quality, [[.01, 0.]])
+
+
+def test_new_entry_uses_reliability_and_legacy_recipes_require_explicit_policy():
+    assert options().fit_policy == "reliability"
+    with pytest.raises(ValueError, match="historical"):
+        validate_optimization_options(options("--body-weighting", "reference"))
+    validate_optimization_options(options("--fit-policy", "legacy", "--body-weighting", "reference"))
+    with pytest.raises(ValueError, match="correlated"):
+        validate_optimization_options(options("--body-reprojection-weight", ".004"))
+    validate_optimization_options(options("--body-3d-weight", "0", "--body-reprojection-weight", ".004"))

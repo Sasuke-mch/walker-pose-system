@@ -71,3 +71,41 @@ class ReferenceWeightTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# Reliability is an explicitly new objective; tests above freeze historical recipes.
+def test_stereo_reliability_has_no_floor_and_requires_both_valid_views():
+    from pose_app.smplh_fitting.losses import reliability_body_weights
+    left = np.tile([10., 10., 1.], (1, 6, 1))
+    right = left.copy()
+    right[0, :, 2] = [.2, 0., -1., np.nan, 1.1, .8]
+    accepted = np.ones((1, 6), bool)
+    accepted[0, -1] = False
+    weights, scores, geometry, support = reliability_body_weights(
+        left, right, (100, 100), accepted, np.zeros((1, 6)), np.zeros((1, 6)), np.zeros((1, 6)))
+    np.testing.assert_allclose(weights, [[.2, 0, 0, 0, 0, 0]])
+    assert support.tolist() == [[True, False, False, False, False, False]]
+    np.testing.assert_allclose(weights, scores * geometry)
+
+
+def test_worst_view_geometry_attenuates_without_positive_tail_floor():
+    from pose_app.smplh_fitting.losses import reliability_body_weights
+    raw = np.tile([10., 10., .8], (1, 4, 1))
+    weights, _, geometry, _ = reliability_body_weights(
+        raw, raw, (100, 100), np.ones((1, 4), bool), np.zeros((1, 4)),
+        np.array([[0., 25., 100., 1.e6]]), np.zeros((1, 4)))
+    np.testing.assert_allclose(weights[0, :3], [.8, .8, .8/82])
+    assert weights[0, -1] < 1.e-12 and np.all(np.diff(geometry) <= 0)
+
+
+def test_fixed_slots_preserve_absolute_confidence_and_missing_support_strength():
+    import torch
+    from pose_app.smplh_fitting.losses import weighted_observation_mean
+    x = torch.tensor([2., 4.], requires_grad=True)
+    mask = torch.tensor([True, True])
+    full = weighted_observation_mean(x.square(), torch.ones(2), mask, fixed_slots=True)
+    weak = weighted_observation_mean(x.square(), torch.full((2,), .1), mask, fixed_slots=True)
+    torch.testing.assert_close(torch.autograd.grad(weak, x, retain_graph=True)[0],
+                               .1 * torch.autograd.grad(full, x)[0])
+    partial = weighted_observation_mean(x.square(), torch.ones(2), torch.tensor([True, False]), fixed_slots=True)
+    assert partial == 2.  # one retained slot / two original slots

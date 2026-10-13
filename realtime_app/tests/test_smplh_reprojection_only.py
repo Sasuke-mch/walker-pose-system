@@ -127,3 +127,74 @@ def test_nondefault_ankle_multiplier_rejects_legacy_mode():
     from pose_app.smplh_fitting.stages import validate_optimization_options
     with pytest.raises(ValueError, match="requires reprojection_only"):
         validate_optimization_options(SimpleNamespace(body_ankle_reprojection_multiplier=2., body_observation_mode="legacy"))
+
+
+@pytest.mark.parametrize("scale", [1., .1])
+def test_reliability_camera_influence_and_absolute_score_gradients(scale):
+    projection = torch.tensor([[[25., 0.]]], requires_grad=True)
+    other = torch.tensor([[[0., 25.]]], requires_grad=True)
+    args = SimpleNamespace(fit_policy="reliability", body_reprojection_weight=1., body_reprojection_scale_px=25.)
+    loss, _ = body_reprojection_loss(
+        args=args, stage_index=0, body_loss=torch.tensor(0.), proj_cam0=projection, proj_cam1=other,
+        raw_left_2d=torch.zeros_like(projection), raw_right_2d=torch.zeros_like(other),
+        raw_left_conf=torch.tensor([[scale]]), raw_right_conf=torch.tensor([[.1 * scale]]),
+        raw_left_valid=torch.ones(1, 1, dtype=torch.bool), raw_right_valid=torch.ones(1, 1, dtype=torch.bool))
+    left, right = torch.autograd.grad(loss, (projection, other))
+    torch.testing.assert_close(left.norm(), torch.tensor(scale / 50.))
+    torch.testing.assert_close(right.norm(), left.norm() * .1)
+
+
+def test_reliability_ankle_priority_is_not_normalized_into_confidence():
+    args = SimpleNamespace(fit_policy="reliability", body_reprojection_weight=1., body_reprojection_scale_px=25.,
+                           body_ankle_reprojection_multiplier=1.)
+    projection = torch.full((1, 17, 2), 25., requires_grad=True)
+    mask = torch.zeros(1, 17, dtype=torch.bool)
+    mask[:, 15] = True
+    kwargs = dict(args=args, stage_index=0, body_loss=torch.tensor(0.), proj_cam0=projection, proj_cam1=projection,
+                  raw_left_2d=torch.zeros_like(projection), raw_right_2d=torch.zeros_like(projection),
+                  raw_left_conf=torch.ones(1, 17), raw_right_conf=torch.ones(1, 17),
+                  raw_left_valid=mask, raw_right_valid=torch.zeros_like(mask))
+    unit, _ = body_reprojection_loss(**kwargs)
+    args.body_ankle_reprojection_multiplier = 2.
+    doubled, _ = body_reprojection_loss(**kwargs)
+    torch.testing.assert_close(doubled, 2 * unit)
+
+
+@pytest.mark.parametrize("stage", [4, 5])
+def test_contact_body_release_retains_observation_gradients(stage):
+    from pose_app.smplh_fitting.losses import body_observation_stage
+    x = torch.tensor(2., requires_grad=True)
+    term = enabled_body_observation(x.square(), 3., stage, retain_contact_body=True)
+    assert torch.autograd.grad(term, x)[0] == 12.
+    assert body_observation_stage(stage, retain_contact_body=True)
+    assert not body_observation_stage(3, retain_contact_body=True)
+    args = SimpleNamespace(fit_policy="reliability", contact_labels="external", body_reprojection_weight=1.,
+                           body_reprojection_scale_px=25.)
+    projection = x.expand(1, 1, 2)
+    term, _ = body_reprojection_loss(
+        args=args, stage_index=stage, body_loss=x.new_zeros(()), proj_cam0=projection, proj_cam1=projection,
+        raw_left_2d=torch.zeros_like(projection), raw_right_2d=torch.zeros_like(projection),
+        raw_left_conf=torch.ones(1, 1), raw_right_conf=torch.ones(1, 1),
+        raw_left_valid=torch.ones(1, 1, dtype=torch.bool), raw_right_valid=torch.ones(1, 1, dtype=torch.bool))
+    assert torch.autograd.grad(term, x)[0] > 0
+
+
+@pytest.mark.parametrize("angle", [0., .3, 3.141592653589793])
+def test_rotation_anchor_is_finite_with_geometrically_equivalent_rotvecs(angle):
+    from pose_app.smplh_fitting.losses import root_rotation_anchor
+    root = torch.tensor([[0., 0., angle]], dtype=torch.float64, requires_grad=True)
+    equivalent = torch.tensor([[0., 0., angle + 2 * np.pi]], dtype=torch.float64)
+    value = root_rotation_anchor(root, equivalent, rotation_space=True)
+    assert value < 1.e-25
+    assert torch.isfinite(torch.autograd.grad(value, root)[0]).all()
+    torch.autograd.gradcheck(lambda v: root_rotation_anchor(v, torch.zeros_like(v), rotation_space=True), (root,))
+
+
+def test_root_initialization_anchor_does_not_restore_full_trust_to_weak_body_data():
+    from pose_app.smplh_fitting.losses import root_rotation_anchor
+    root = torch.tensor([[0., .3, 0.]], requires_grad=True)
+    target = torch.zeros_like(root)
+    full = root_rotation_anchor(root, target, rotation_space=True, weights=torch.ones(1))
+    weak = root_rotation_anchor(root, target, rotation_space=True, weights=torch.tensor([.1]))
+    torch.testing.assert_close(torch.autograd.grad(weak, root, retain_graph=True)[0],
+                               .1 * torch.autograd.grad(full, root)[0])

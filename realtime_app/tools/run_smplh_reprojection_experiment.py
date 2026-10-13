@@ -10,11 +10,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from pose_app.smplh_fitting.pipeline import run_fit
 from walker_tools.body.fit_smplh_wilor_sequence import build_parser
+from run_smplh_ablations import modified_options
 
 
 def main():
     cli = argparse.ArgumentParser()
     cli.add_argument("--output", type=Path, required=True)
+    cli.add_argument("--fit-policy", choices=("reliability", "legacy"), default="reliability",
+                     help="use legacy only to reproduce pre-policy 2D objectives")
     cli.add_argument("--reprojection-weight", type=float, default=.002)
     cli.add_argument("--vposer-weight", type=float, default=.02)
     cli.add_argument("--beta-weight", type=float, default=.001)
@@ -36,6 +39,10 @@ def main():
              "--body-reprojection-scale-px", "25", "--vposer-prior-weight", str(opts.vposer_weight),
              "--beta-prior-weight", str(opts.beta_weight), "--root-anchor-weight", str(opts.root_weight),
              "--body-ankle-reprojection-multiplier", str(opts.ankle_multiplier)]
+    changes = {"fit_policy": opts.fit_policy}
+    if opts.fit_policy == "reliability":
+        changes["body_weighting"] = "quality"  # resolved reliability recipe, not legacy reference25
+    argv = modified_options(argv, changes, opts.output)
     args = build_parser().parse_args(argv)
     if opts.output.exists():
         raise RuntimeError("refuse existing experiment output")

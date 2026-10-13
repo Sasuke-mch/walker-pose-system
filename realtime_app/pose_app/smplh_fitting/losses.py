@@ -7,7 +7,7 @@ import numpy as np
 import torch
 
 
-def raw_pixel_support(raw, image_size):
+def raw_pixel_support(raw, image_size, *, bounded_confidence=False):
     """Per-view support independent of triangulation; retain reasons for all slots."""
     raw = np.asarray(raw)
     finite = np.isfinite(raw).all(axis=-1)
@@ -19,14 +19,88 @@ def raw_pixel_support(raw, image_size):
     reasons[~positive] = "nonpositive_confidence"
     reasons[~bounds] = "out_of_raw_image_bounds"
     reasons[~finite] = "nonfinite_source"
+    if bounded_confidence:
+        bad_score = finite & ((raw[..., 2] < 0) | (raw[..., 2] > 1))
+        valid[bad_score] = False
+        reasons[bad_score] = "confidence_out_of_range"
     return valid, reasons
 
 
-def enabled_body_observation(body_loss, weight, stage_index):
+def reliability_body_weights(left, right, image_size, accepted, errors_left, errors_right,
+                             ray_gap_mm, *, reprojection_px=25., ray_scale_mm=80.):
+    """Conservative stereo reliability, not a calibrated inverse covariance.
+
+    A stereo position needs both views: its score cannot exceed either view.
+    Geometry only attenuates it; no confidence floor or duplicate ray/pixel product.
+    """
+    if not np.isfinite([reprojection_px, ray_scale_mm]).all() or min(reprojection_px, ray_scale_mm) <= 0:
+        raise ValueError("invalid reliability geometry scales")
+    ml, _ = raw_pixel_support(left, image_size, bounded_confidence=True)
+    mr, _ = raw_pixel_support(right, image_size, bounded_confidence=True)
+    el, er, gap = (np.asarray(v) for v in (errors_left, errors_right, ray_gap_mm))
+    support = np.asarray(accepted, bool) & ml & mr
+    support &= np.isfinite(el) & np.isfinite(er) & np.isfinite(gap) & (el >= 0) & (er >= 0) & (gap >= 0)
+    confidence = np.zeros_like(el, dtype=float)
+    geometry = np.zeros_like(el, dtype=float)
+    confidence[support] = np.minimum(left[..., 2][support], right[..., 2][support])
+    severity = np.maximum(np.maximum(el[support], er[support]) / reprojection_px,
+                          gap[support] / ray_scale_mm)
+    # Stable form of 1/(1+max(severity-1,0)^4), without a positive tail floor.
+    excess = np.maximum(severity - 1., 0.)
+    inv = 1. / np.maximum(excess, 1.)
+    geometry[support] = np.where(excess <= 1., 1. / (1. + np.minimum(excess, 1.)**4),
+                                 inv**4 / (1. + inv**4))
+    return confidence * geometry, confidence, geometry, support
+
+
+def weighted_observation_mean(residual, weights, mask, *, fixed_slots=False):
+    """Select before multiplying; reliability keeps absolute score/support strength."""
+    if not torch.isfinite(weights[mask]).all() or (weights[mask] < 0).any():
+        raise ValueError("observation weights must be finite and nonnegative")
+    active = mask & (weights > 0)
+    selected_weights = weights[active].detach()
+    selected_residual = residual[active]
+    if not torch.isfinite(selected_weights).all() or not torch.isfinite(selected_residual).all():
+        raise RuntimeError("nonfinite supported observation residual or weight")
+    numerator = (selected_residual * selected_weights).sum()
+    denominator = max(mask.numel(), 1) if fixed_slots else selected_weights.sum().clamp_min(1e-6)
+    return numerator / denominator
+
+
+def body_observation_stage(stage_index, *, retain_contact_body=False):
+    """Whenever contact releases body variables, keep their data attachment."""
+    return stage_index <= 2 or (retain_contact_body and stage_index >= 4)
+
+
+def enabled_body_observation(body_loss, weight, stage_index, *, retain_contact_body=False):
     """Disabled 3D term has no autograd edge, including NaN diagnostics."""
-    if weight == 0 or stage_index >= 3:
+    if weight == 0 or not body_observation_stage(stage_index, retain_contact_body=retain_contact_body):
         return body_loss.detach().new_zeros(())
     return weight * body_loss
+
+
+def root_rotation_anchor(root, target, *, rotation_space=False, weights=None):
+    """SO(3) chordal anchor /6, matching mean rotvec-square near identity.
+
+    Unlike subtracting axis angles, equivalent rotations have zero cost.
+    The bounded chordal cost has no acos singularity at zero or pi.
+    """
+    if not rotation_space:
+        return (root - target).square().mean()
+
+    def matrix(v):
+        x, y, z = v.unbind(-1)
+        zero = torch.zeros_like(x)
+        skew = torch.stack((zero, -z, y, z, zero, -x, -y, x, zero), -1).reshape(*v.shape[:-1], 3, 3)
+        angle = torch.linalg.vector_norm(v, dim=-1)[..., None, None]
+        return (torch.eye(3, dtype=v.dtype, device=v.device)
+                + torch.sinc(angle / torch.pi) * skew
+                + .5 * torch.sinc(angle / (2 * torch.pi)).square() * (skew @ skew))
+
+    residual = (matrix(root) - matrix(target.detach())).square().sum((-1, -2)) / 6.
+    if weights is None:
+        return residual.mean()
+    return weighted_observation_mean(residual, weights, torch.ones_like(weights, dtype=torch.bool), fixed_slots=True)
 
 
 def supported_camera_points(points, valid):
@@ -91,7 +165,41 @@ def body_reprojection_loss(
     """Dual raw-fisheye Huber loss and diagnostic pixel residual."""
     body_2d_loss = body_loss.new_zeros(())
     body_2d_px = body_loss.new_zeros(())
-    if args.body_reprojection_weight > 0 and stage_index in (0, 1, 2):
+    retain_contact = (getattr(args, "fit_policy", "legacy") == "reliability"
+                      and getattr(args, "contact_labels", None) is not None)
+    if args.body_reprojection_weight > 0 and body_observation_stage(stage_index, retain_contact_body=retain_contact):
+        if getattr(args, "fit_policy", "legacy") == "reliability":
+            numerator = body_loss.new_zeros(())
+            pixel_numerator = body_loss.new_zeros(())
+            score_sum = body_loss.new_zeros(())
+            slots = raw_left_valid.numel() + raw_right_valid.numel()
+            for prediction, target, score, mask in (
+                (proj_cam0, raw_left_2d, raw_left_conf, raw_left_valid),
+                (proj_cam1, raw_right_2d, raw_right_conf, raw_right_valid),
+            ):
+                if not mask.any():
+                    continue
+                weights = score[mask].detach()
+                if not torch.isfinite(weights).all() or ((weights <= 0) | (weights > 1)).any():
+                    raise RuntimeError("invalid supported detector score")
+                residual = torch.linalg.vector_norm(prediction[mask] - target[mask], dim=-1)
+                if not torch.isfinite(residual).all():
+                    raise RuntimeError("nonfinite supported body reprojection")
+                scaled = residual / args.body_reprojection_scale_px
+                robust = torch.where(scaled <= 1., .5 * scaled.square(), scaled - .5)
+                task = torch.ones_like(score)
+                multiplier = getattr(args, "body_ankle_reprojection_multiplier", 1.)
+                if multiplier != 1:
+                    if mask.shape[-1] != 17:
+                        raise ValueError("ankle multiplier requires COCO17 order")
+                    task[..., 15:17] = multiplier
+                numerator = numerator + (robust * weights * task[mask]).sum()
+                pixel_numerator = pixel_numerator + (residual * weights).sum()
+                score_sum = score_sum + weights.sum()
+            if not bool(score_sum > 0):
+                raise RuntimeError("no supported raw body pixels")
+            # Diagnostic pixels remain a weighted mean; objective uses fixed slots.
+            return numerator / max(slots, 1), pixel_numerator / score_sum
         if getattr(args, "body_observation_mode", "legacy") == "reprojection_only":
             losses, pixels = [], []
             for projection, target, confidence, valid in (
@@ -185,12 +293,21 @@ def hand_temporal_loss(
 def body_temporal_loss(*, args, n, stage_index, body_loss, coco, mask_body):
     """Pelvis-relative Huber acceleration on fully supported frame triplets."""
     body_temporal = body_loss.new_zeros(())
-    if args.body_temporal_weight > 0 and n >= 3 and stage_index in (0, 2):
+    retain_contact = (getattr(args, "fit_policy", "legacy") == "reliability"
+                      and getattr(args, "contact_labels", None) is not None and stage_index >= 4)
+    if args.body_temporal_weight > 0 and n >= 3 and (stage_index in (0, 2) or retain_contact):
         pelvis = 0.5 * (coco[:, 11] + coco[:, 12])
         rel = coco - pelvis[:, None, :]
         acc = rel[2:] - 2.0 * rel[1:-1] + rel[:-2]
-        body_valid_frame = mask_body.all(dim=1)
-        edge = body_valid_frame[2:] & body_valid_frame[1:-1] & body_valid_frame[:-2]
+        reliability = getattr(args, "fit_policy", "legacy") == "reliability"
+        if reliability:
+            pelvis_valid = mask_body[:, 11] & mask_body[:, 12]
+            pelvis_edge = pelvis_valid[2:] & pelvis_valid[1:-1] & pelvis_valid[:-2]
+            edge = mask_body[2:] & mask_body[1:-1] & mask_body[:-2] & pelvis_edge[:, None]
+            acc = torch.where(edge[..., None], acc, 0.)
+        else:
+            body_valid_frame = mask_body.all(dim=1)
+            edge = body_valid_frame[2:] & body_valid_frame[1:-1] & body_valid_frame[:-2]
         acc_norm = torch.linalg.vector_norm(acc, dim=-1)
         # Huber in metres: preserve genuine motion while suppressing
         # one-frame detector spikes. Delta is fixed and recorded.
@@ -198,9 +315,14 @@ def body_temporal_loss(*, args, n, stage_index, body_loss, coco, mask_body):
         robust = torch.where(
             acc_norm <= delta, 0.5 * acc_norm.pow(2), delta * (acc_norm - 0.5 * delta)
         )
-        body_temporal = robust[edge].mean() if edge.any() else robust.mean() * 0.0
+        if reliability:
+            body_temporal = robust[edge].sum() / max(edge.numel(), 1)
+        else:
+            body_temporal = robust[edge].mean() if edge.any() else robust.mean() * 0.0
     return body_temporal
 
 
-def weighted_hand_residual(res, w, mask):
+def weighted_hand_residual(res, w, mask, *, fixed_slots=False):
+    if fixed_slots:
+        return weighted_observation_mean(res, w, mask, fixed_slots=True)
     return (res * w).sum() / w.sum().clamp_min(1e-6) if mask.any() else res.sum() * 0.0

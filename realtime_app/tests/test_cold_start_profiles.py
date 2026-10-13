@@ -22,6 +22,7 @@ def test_profile_preserves_cold_parameterization_and_stage_trainability(profile,
     assert values.count('--allow-diagnostic-wrist-reference') == 1
     assert options.left_raw == Path('left.json')
     assert options.output_dir == Path('new_output/fit')
+    assert options.fit_policy == "legacy"
     assert options.mano_pose_init and options.shared_hand_pose
     assert options.hand_pca_comps == 12
     assert options.wrist_reference_weight == 1

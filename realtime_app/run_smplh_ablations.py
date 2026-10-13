@@ -21,7 +21,10 @@ def write(path, data):
 
 
 def modified_options(values, changes, output):
-    values = list(values[values.index("--left-raw"):])
+    values = list(values[next(i for i, value in enumerate(values) if value.startswith("--")):])
+    # Saved pre-policy commands must not silently acquire new objectives.
+    if "--fit-policy" not in values:
+        values.extend(["--fit-policy", "legacy"])
     changes = {**changes, "output_dir": str(output)}
     for name, value in changes.items():
         flag = "--" + name.replace("_", "-")

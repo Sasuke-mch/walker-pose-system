@@ -35,6 +35,8 @@ def fit_command(settings, body_paths, output, wrist_path, joint_steps=None):
     flags = [value for value in values if value.startswith('--')]
     if len(flags) != len(set(flags)):
         raise ValueError('duplicate options in cold settings')
+    if '--fit-policy' not in values:
+        values.extend(['--fit-policy', 'legacy'])
     command = [sys.executable, '-u', 'realtime_app/tools/fit_smplh_wilor_sequence.py', *values]
     for flag, value in {'--left-raw': body_paths['left'], '--right-raw': body_paths['right'],
                         '--output-dir': output / 'fit'}.items():
@@ -61,7 +63,7 @@ def fit_command(settings, body_paths, output, wrist_path, joint_steps=None):
         raise ValueError('cold runner does not support contact inputs; use the general fitter')
     if not options.mano_pose_init or not options.shared_hand_pose:
         raise ValueError('cold runner requires native MANO initialization and shared hands')
-    expected = {'beta_policy': 'joint', 'beta_prior_weight': .001,
+    expected = {'fit_policy': 'legacy', 'beta_policy': 'joint', 'beta_prior_weight': .001,
                 'body_3d_weight': 1., 'body_weighting': 'quality',
                 'allow_hand_prior_ablation': False}
     if any(getattr(options, name) != value for name, value in expected.items()):

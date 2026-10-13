@@ -116,3 +116,57 @@ class NativeManoTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_reliability_mano_loss_scales_with_score_and_preserves_missing_slots():
+    import torch
+    pose = torch.full((1, 45), .3, requires_grad=True)
+    target = torch.eye(3).expand(2, 2, 15, 3, 3).clone()
+    target[:, 1] = float("nan")
+    weights = torch.tensor([[1., 0.], [1., 0.]])
+    full = rotation_pose_loss(pose, target, weights, fixed_slots=True)
+    weak = rotation_pose_loss(pose, target, weights * .1, fixed_slots=True)
+    torch.testing.assert_close(torch.autograd.grad(weak, pose, retain_graph=True)[0],
+                               torch.autograd.grad(full, pose)[0] * .1)
+    absent = rotation_pose_loss(pose, target, weights * 0, fixed_slots=True)
+    assert absent == 0 and torch.autograd.grad(absent, pose)[0].abs().sum() == 0
+
+
+def test_hand_reader_missing_confidence_is_not_a_perfect_observation(tmp_path):
+    from pose_app.smplh_hand_observation import read_view
+    body = np.zeros((1, 17, 3)); body[:, 9:11] = [100, 100, .9]
+    candidate = {"side": "left", "pixel_frame": "raw_fisheye",
+                 "keypoints_2d_raw_fisheye": [[100, 100]] * 21}
+    path = tmp_path / "hand.jsonl"
+    path.write_text(json.dumps({"frame_index": 0, "image": "pair_0000.png", "records": [candidate]}) + "\n")
+    points, weights, audit = read_view(path, body, (1920, 1080), "left", require_confidence=True)
+    assert np.isfinite(points[0, 0]).all() and weights.sum() == 0
+    assert audit[0]["reason"] == "selected_but_confidence_unavailable"
+    assert audit[0]["confidence_source"] == "missing_zero_weight"
+
+
+def test_shared_initialization_retains_complete_hypothesis_across_pi_branch():
+    from pose_app.wilor_mano_prior import initial_pca_hypothesis
+    angles = np.zeros((1, 2, 45)); angles[0, :, 0] = np.deg2rad([179., -179.])
+    rotations = Rotation.from_rotvec(angles.reshape(-1, 3)).as_matrix().reshape(1, 2, 15, 3, 3)
+    coeff, _ = encode_pca(rotations, np.eye(45), np.zeros(45), np.ones(45))
+    legacy = initial_pca_hypothesis(coeff, np.ones((1, 2)), shared=True)
+    selected = initial_pca_hypothesis(coeff, np.ones((1, 2)), shared=True, select_complete=True)
+    assert abs(legacy[0, 0]) < 1.e-12
+    np.testing.assert_allclose(selected, coeff[0, 0][None])
+    assert abs(selected[0, 0]) > 3.
+    weights = np.array([[0., .8]])
+    np.testing.assert_allclose(initial_pca_hypothesis(coeff, weights, shared=True, select_complete=True), coeff[0, 1][None])
+
+
+def test_hand_association_does_not_reuse_rejected_body_score(tmp_path):
+    from pose_app.smplh_hand_observation import read_view
+    body = np.zeros((1, 17, 3)); body[:, 9:11] = [100, 100, 1.1]
+    candidate = record("left")
+    candidate["keypoints_2d_raw_fisheye"] = [[100, 100]] * 21
+    path = tmp_path / "hand.jsonl"
+    path.write_text(json.dumps({"frame_index": 0, "image": "pair_0000.png", "records": [candidate]}) + "\n")
+    _, weights, audit = read_view(path, body, (1920, 1080), "left", require_confidence=True)
+    assert weights.sum() == 0 and audit[0]["reason"] == "body_wrist_unavailable"
+    _, weights, audit = read_parameter_view(path, body, (1920, 1080), bounded_body_score=True)
+    assert weights.sum() == 0 and audit[0]["reason"] == "body_wrist_unavailable"

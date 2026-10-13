@@ -17,6 +17,7 @@ class RigidInitialization:
     ref_bone_lengths: np.ndarray
     root_anchor_target: torch.Tensor
     init_body_rms_mm: float
+    init_body_unweighted_rms_mm: float
 
 
 def make_body_basis(points: np.ndarray) -> np.ndarray | None:
@@ -58,20 +59,23 @@ def initialize_rigid_body(
     body_mask,
     root,
     transl,
+    body_weights=None,
+    single_template=False,
 ):
     """Initialize root/translation in place and return the unchanged gate diagnostics."""
     # Decode the VPoser mean and use it for the template basis.  A zero axis
     # angle is not treated as an observation-based body orientation.
     with torch.no_grad():
-        template_latent = torch.zeros(n, latent_dim, device=device)
+        template_frames = 1 if single_template else n
+        template_latent = torch.zeros(template_frames, latent_dim, device=device)
         template_body_pose = decode_body_pose(template_latent)
         template = model(
-            betas=torch.zeros(n, 10, device=device),
-            global_orient=torch.zeros(n, 3, device=device),
+            betas=torch.zeros(template_frames, 10, device=device),
+            global_orient=torch.zeros(template_frames, 3, device=device),
             body_pose=template_body_pose,
-            left_hand_pose=torch.zeros(n, 45, device=device),
-            right_hand_pose=torch.zeros(n, 45, device=device),
-            transl=torch.zeros(n, 3, device=device),
+            left_hand_pose=torch.zeros(template_frames, 45, device=device),
+            right_hand_pose=torch.zeros(template_frames, 45, device=device),
+            transl=torch.zeros(template_frames, 3, device=device),
             return_verts=True,
         )
         template_coco = (
@@ -113,7 +117,7 @@ def initialize_rigid_body(
         rotated_template = model(
             betas=torch.zeros(n, 10, device=device),
             global_orient=root_init_t,
-            body_pose=template_body_pose,
+            body_pose=template_body_pose.expand(n, -1),
             left_hand_pose=torch.zeros(n, 45, device=device),
             right_hand_pose=torch.zeros(n, 45, device=device),
             transl=torch.zeros(n, 3, device=device),
@@ -177,11 +181,20 @@ def initialize_rigid_body(
     init_coco_after_translation = rotated_template_np + t0[:, None, :]
     init_res = init_coco_after_translation - tri_m
     init_valid = body_mask & np.isfinite(init_res).all(axis=-1)
-    init_body_rms_mm = (
+    init_body_unweighted_rms_mm = (
         float(np.sqrt(np.mean(np.sum(init_res[init_valid] ** 2, axis=-1))) * 1000.0)
         if init_valid.any()
         else float("nan")
     )
+    init_body_rms_mm = init_body_unweighted_rms_mm
+    if body_weights is not None:
+        weights = np.asarray(body_weights)
+        if weights.shape != body_mask.shape or not np.isfinite(weights).all() or (weights < 0).any():
+            raise ValueError("invalid initialization reliability")
+        selected = init_valid & (weights > 0)
+        init_body_rms_mm = (float(np.sqrt(np.sum(weights[selected] * np.sum(init_res[selected]**2, axis=-1))
+                                                / weights[selected].sum())) * 1000.
+                            if selected.any() else float("nan"))
     return RigidInitialization(
         root_init_np,
         root_init_source,
@@ -190,4 +203,5 @@ def initialize_rigid_body(
         ref_bone_lengths,
         root_anchor_target,
         init_body_rms_mm,
+        init_body_unweighted_rms_mm,
     )

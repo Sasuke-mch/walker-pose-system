@@ -16,6 +16,7 @@
   "legacy_profile": "realtime_app/configs/cold_smplh_legacy30.json",
   "run_root": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2",
   "frozen_scalar_options": {
+    "fit_policy": "legacy",
     "steps": 180,
     "base_steps": 30,
     "beta_steps": 30,
@@ -158,6 +159,19 @@
         "scope": "Source-only simplification: local-hand objective execution, inactive geometry branches skipped, shared hand rotations decoded once; original objective, budgets and Adam resets retained.",
         "selected_result_recomputed": false,
         "new_accuracy_or_performance_claim": false
+      },
+      "method_revision": {
+        "date": "2026-10-13",
+        "record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#28-置信度加权旋转锚与接触保持项的实际修正2026-10-13",
+        "selected_result_fit_policy": "legacy",
+        "new_general_fitter_default": "reliability",
+        "historical_replay_requires": "--fit-policy legacy",
+        "changes": "Zero-floor reliability, fixed-slot data losses, SO3 root anchor weighted by source shoulders/hips, body observations retained during contact refinement.",
+        "empirical_confidence_calibration": false,
+        "overall_refinement_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#29-整体求解一致性与初始化精简2026-10-13",
+        "overall_refinements": "Complete shared-hand initialization hypothesis; reliability-weighted initialization gate; bounded wrist association; per-joint temporal support; fixed contact reduction; single template forward.",
+        "selected_result_recomputed": false,
+        "new_accuracy_claim": false
       }
     },
     "live": {

@@ -35,6 +35,8 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--regressor", type=Path, required=True)
     ap.add_argument("--smplh-model", type=Path, required=True)
     ap.add_argument("--output-dir", type=Path, required=True)
+    ap.add_argument("--fit-policy", choices=("reliability", "legacy"), default="reliability",
+                    help="reliability: zero-floor scores and fixed-slot loss reduction; legacy: historical objectives")
     ap.add_argument("--steps", type=int, default=180)
     ap.add_argument("--base-steps", type=int, default=None,
                     help="Stage A body/VPoser steps; defaults to steps//6")
@@ -47,13 +49,13 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--body-observation-mode", choices=("legacy", "reprojection_only"), default="legacy",
                     help="2D-only data objective; triangulation remains initialization/diagnostic only")
     ap.add_argument("--body-weighting", choices=("quality", "uniform", "no_confidence", "no_ray", "no_reprojection", "reference"), default="quality",
-                    help="same accepted mask; uniform removes only soft quality weights")
+                    help="legacy-only recipes; reliability resolves quality to stereo minimum-score times geometry attenuation")
     ap.add_argument("--body-reference-reprojection-px", type=float, default=25.0,
-                    help="reference mode plateau for mean two-view reprojection error")
+                    help="geometry plateau: worst-view error for reliability, mean-view error for legacy reference")
     ap.add_argument("--body-reference-ray-gap-mm", type=float, default=80.0,
-                    help="reference mode plateau for calibrated ray gap")
+                    help="geometry plateau for ray gap in mm; heuristic, not empirical uncertainty calibration")
     ap.add_argument("--body-reference-confidence-floor", type=float, default=0.6,
-                    help="reference mode: confidence contribution floor, before extreme-geometry tail")
+                    help="legacy reference only: confidence floor; reliability always uses zero floor")
     ap.add_argument("--joint-steps", type=int, default=None,
                     help="Stage C VPoser/body refinement steps; defaults to steps//6")
     ap.add_argument("--hand-steps", type=int, default=None,

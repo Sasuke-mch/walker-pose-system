@@ -86,6 +86,10 @@ def load_surface_targets(args, n: int, device) -> SurfaceTargets:
             labels["foot_contact_weight"] < 0
         ):
             raise ValueError("foot_contact_weight must be finite and non-negative")
+        if getattr(args, "fit_policy", "legacy") == "reliability" and any(
+            np.any(labels[key] > 1) for key in ("hand_contact_weight", "foot_contact_weight")
+        ):
+            raise ValueError("contact reliability must be in [0,1]; use objective lambdas for task priority")
         if not np.isfinite(labels["handle_ends_ground_m"]).all():
             raise ValueError("handle_ends_ground_m contains non-finite values")
         _finite_array(
@@ -226,7 +230,7 @@ def load_surface_targets(args, n: int, device) -> SurfaceTargets:
 
 
 def surface_contact_losses(
-    *, left_in_cam0, contact_enabled, stage_index, vertices, contact
+    *, left_in_cam0, contact_enabled, stage_index, vertices, contact, fixed_slots=False
 ):
     """Surface hand, foot and optional walker-relative hand objectives."""
     # Contact geometry is computed from finite model vertices, not projected
@@ -259,13 +263,13 @@ def surface_contact_losses(
             foot_terms.append(
                 surface_contact.foot_surface_loss(sole_z) * contact.foot_weight[:, j]
             )
-        hand_den = contact.hand_weight.sum().clamp_min(1e-6)
-        foot_den = contact.foot_weight.sum().clamp_min(1e-6)
+        hand_den = max(contact.hand_weight.numel(), 1) if fixed_slots else contact.hand_weight.sum().clamp_min(1e-6)
+        foot_den = max(contact.foot_weight.numel(), 1) if fixed_slots else contact.foot_weight.sum().clamp_min(1e-6)
         contact_hand_loss = torch.stack(hand_terms, dim=1).sum() / hand_den
         contact_foot_loss = torch.stack(foot_terms, dim=1).sum() / foot_den
         if contact.global_hand_offset is not None:
             terms = []
-            for side in ("left", "right"):
+            for j, side in enumerate(("left", "right")):
                 pc = vertices[:, contact.palm_indices[side], :]
                 pw = torch.einsum(
                     "ij,nvj->nvi",
@@ -278,6 +282,7 @@ def surface_contact_losses(
                     )
                     / 0.03
                 )
-                terms.append(torch.where(err <= 1, 0.5 * err.pow(2), err - 0.5).mean())
+                robust = torch.where(err <= 1, 0.5 * err.pow(2), err - 0.5)
+                terms.append((robust.mean(dim=1) * contact.hand_weight[:, j]).mean() if fixed_slots else robust.mean())
             global_hand_loss = torch.stack(terms).mean()
     return contact_hand_loss, contact_foot_loss, global_hand_loss

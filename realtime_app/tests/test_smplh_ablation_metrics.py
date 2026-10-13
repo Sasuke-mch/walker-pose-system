@@ -72,3 +72,16 @@ def test_bad_protocol_is_rejected_before_models(fault):
         row["detector"] = "missing"
     with pytest.raises(ValueError):
         validate_plan(plan)
+
+
+def test_saved_command_policy_is_explicit_and_survives_before_left_raw(tmp_path):
+    import json
+    from check_mainline_regression import fit_arguments
+    required = ["--left-raw", "l", "--right-raw", "r", "--wilor-left", "wl", "--wilor-right", "wr",
+                "--calibration-dir", "cal", "--regressor", "reg", "--smplh-model", "model", "--output-dir", "out"]
+    path = tmp_path / "command.json"
+    for prefix, expected in [([], "legacy"), (["--fit-policy", "reliability"], "reliability")]:
+        path.write_text(json.dumps(["python", "script", *prefix, *required]))
+        assert fit_arguments(path).fit_policy == expected
+        values = modified_options(["python", "script", *prefix, *required], {}, "new")
+        assert values[values.index("--fit-policy") + 1] == expected
