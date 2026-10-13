@@ -148,3 +148,40 @@ def test_corrupt_carry_fields_share_encoder_validation(field, value):
         _, state, _ = model(observation())
     with pytest.raises(ValueError):
         model(observation(2, .2), replace(state, **{field: value}))
+
+
+@pytest.mark.parametrize("nodes", [22, 52])
+@pytest.mark.parametrize("mode", ["diagonal_blocks", "cross_block_sketch"])
+def test_sampler_reuses_only_call_local_information_with_equal_values_and_gradients(nodes, mode):
+    torch.set_num_threads(1)
+    torch.manual_seed(31)
+    model = JointFlow(ModelConfig(nodes=nodes, information_encoding=mode)).double().eval()
+    initial = torch.randn(2, model.topology.dimensions, dtype=torch.float64, requires_grad=True)
+    context = torch.randn(1, 128, dtype=torch.float64, requires_grad=True)
+    info = collision_matrices(nodes)[1].requires_grad_()
+    steps, calls = 8, []
+    targets = (initial, context, model.info_pose.weight, model.info_position.weight,
+               model.info_shape.weight, model.blocks[0].linear1.weight, model.pose_out.weight, info)
+    def original_euler(information):
+        state = initial
+        for step in range(steps):
+            state = state + model.velocity(state, state.new_full((len(state),), step/steps),
+                                            context.expand(len(state), -1), information)/steps
+        return state
+    hook = model.info_shape.register_forward_hook(lambda *_: calls.append(1))
+    try:
+        expected = original_euler(info)
+        assert len(calls) == steps
+        expected_grad = torch.autograd.grad(expected.square().mean(), targets, allow_unused=True)
+        calls.clear()
+        actual = model.sample(context, initial, steps=steps, information=info)
+        assert len(calls) == 1 and torch.equal(actual, expected)
+        actual_grad = torch.autograd.grad(actual.square().mean(), targets, allow_unused=True)
+        assert actual_grad[-1] is expected_grad[-1] is None
+        for a, b in zip(actual_grad[:-1], expected_grad[:-1]):
+            torch.testing.assert_close(a, b, atol=1e-12, rtol=1e-10)
+        with torch.no_grad():
+            changed = model.sample(context, initial, steps=steps, information=info*2)
+            assert not torch.equal(changed, actual) and torch.equal(changed, original_euler(info*2))
+    finally:
+        hook.remove()

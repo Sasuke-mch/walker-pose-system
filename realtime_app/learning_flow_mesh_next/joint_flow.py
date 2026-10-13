@@ -53,6 +53,20 @@ class JointFlow(nn.Module):
         self.pose_out, self.position_out, self.shape_out = nn.Linear(w, 6), nn.Linear(w, 3), nn.Linear(w, 10)
 
     def velocity(self, state, flow_time, context, information=None):
+        residual = self._information_tokens(information, state) if information is not None else None
+        return self._velocity_from_tokens(state, flow_time, context, residual)
+
+    def _information_tokens(self, information, state):
+        """Frame-constant condition; only Lambda is detached, not its projections."""
+        n = self.config.nodes
+        blocks, shape_information = information_features(
+            information.to(state), n, mode=self.config.information_encoding,
+            pose_probes=self.pose_probes, shape_probes=self.shape_probes)
+        return torch.cat((self.info_pose(blocks[:n]),
+                          self.info_position(blocks[n])[None],
+                          self.info_shape(shape_information)[None]), 0)
+
+    def _velocity_from_tokens(self, state, flow_time, context, information_tokens):
         batch, d = state.shape
         n = self.config.nodes
         if d != self.topology.dimensions or context.shape != (batch, self.config.width):
@@ -63,14 +77,8 @@ class JointFlow(nn.Module):
         tokens = torch.cat((self.pose_in(pose), self.position_in(position)[:, None], self.shape_in(shape)[:, None]), 1)
         time = torch.stack((flow_time, (2*torch.pi*flow_time).sin(), (2*torch.pi*flow_time).cos()), -1)
         tokens = tokens + self.token_ids + context[:, None] + self.flow_time(time)[:, None]
-        if information is not None:
-            blocks, shape_information = information_features(
-                information.to(state), n, mode=self.config.information_encoding,
-                pose_probes=self.pose_probes, shape_probes=self.shape_probes)
-            residual = torch.cat((self.info_pose(blocks[:n]),
-                                  self.info_position(blocks[n])[None],
-                                  self.info_shape(shape_information)[None]), 0)
-            tokens = tokens + residual[None]
+        if information_tokens is not None:
+            tokens = tokens + information_tokens[None]
         for block in self.blocks:
             tokens = block(tokens)
         return torch.cat((self.pose_out(tokens[:, :n]).flatten(1),
@@ -86,9 +94,11 @@ class JointFlow(nn.Module):
             raise ValueError("positive Euler steps and finite initial noise required")
         state = initial
         expanded = context.expand(len(initial), -1)
+        # Call-local reuse avoids stale information or autograd graphs across frames.
+        residual = self._information_tokens(information, initial) if information is not None else None
         for step in range(steps):
-            state = state + self.velocity(state, state.new_full((len(state),), step / steps),
-                                          expanded, information) / steps
+            state = state + self._velocity_from_tokens(state, state.new_full((len(state),), step / steps),
+                                                       expanded, residual) / steps
         return state
 
 
