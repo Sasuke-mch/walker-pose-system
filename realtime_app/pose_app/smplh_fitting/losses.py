@@ -89,8 +89,8 @@ def body_reprojection_loss(
     raw_right_valid,
 ):
     """Dual raw-fisheye Huber loss and diagnostic pixel residual."""
-    body_2d_loss = body_loss.detach() * 0.0
-    body_2d_px = body_loss.detach() * 0.0
+    body_2d_loss = body_loss.new_zeros(())
+    body_2d_px = body_loss.new_zeros(())
     if args.body_reprojection_weight > 0 and stage_index in (0, 1, 2):
         if getattr(args, "body_observation_mode", "legacy") == "reprojection_only":
             losses, pixels = [], []
@@ -184,7 +184,7 @@ def hand_temporal_loss(
 
 def body_temporal_loss(*, args, n, stage_index, body_loss, coco, mask_body):
     """Pelvis-relative Huber acceleration on fully supported frame triplets."""
-    body_temporal = body_loss.detach() * 0.0
+    body_temporal = body_loss.new_zeros(())
     if args.body_temporal_weight > 0 and n >= 3 and stage_index in (0, 2):
         pelvis = 0.5 * (coco[:, 11] + coco[:, 12])
         rel = coco - pelvis[:, None, :]

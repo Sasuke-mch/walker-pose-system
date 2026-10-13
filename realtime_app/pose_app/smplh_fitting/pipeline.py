@@ -43,6 +43,7 @@ from .stages import (
     build_stage_schedule,
     require_finite_tensors,
     set_trainable_parameters,
+    uses_local_hand_objective,
     validate_optimization_options,
 )
 
@@ -221,9 +222,9 @@ def run_fit(args, observer=None) -> int:
     mano_r_components = torch.tensor(model_data["hands_componentsr"][:hand_pca_dim], dtype=torch.float32, device=device)
     mano_l_mean = torch.tensor(model_data["hands_meanl"], dtype=torch.float32, device=device)
     mano_r_mean = torch.tensor(model_data["hands_meanr"], dtype=torch.float32, device=device)
-    # Normalize coefficients by the empirical MANO coefficient scales. This
-    # keeps the prior dimensionless and prevents the first PCA directions from
-    # dominating solely because their raw units are larger.
+    # Divide by component row norms to normalize the basis directions. These
+    # norms are not empirical coefficient standard deviations; the quadratic
+    # coefficient penalty is an engineering regularizer, not a whitened prior.
     mano_l_scale = torch.linalg.vector_norm(mano_l_components, dim=1).clamp_min(1e-6)
     mano_r_scale = torch.linalg.vector_norm(mano_r_components, dim=1).clamp_min(1e-6)
     hand_parameter_frames = 1 if args.shared_hand_pose else n
@@ -356,6 +357,8 @@ def run_fit(args, observer=None) -> int:
     obs_rl = torch.tensor(finite_pixel_values(hand_rl), device=device)
     obs_rr = torch.tensor(finite_pixel_values(hand_rr), device=device)
     mask_body = torch.tensor(body_mask, device=device)
+    body_w = torch.tensor(np.asarray(fit_quality, np.float32), device=device).clamp_min(0.0)
+    ref_bones_t = torch.tensor(ref_bone_lengths, dtype=torch.float32, device=device)[None, :]
     mask_ll = torch.tensor(hand_ll_valid, device=device); mask_lr = torch.tensor(hand_lr_valid, device=device)
     mask_rl = torch.tensor(hand_rl_valid, device=device); mask_rr = torch.tensor(hand_rr_valid, device=device)
     weight_ll = torch.tensor(hand_ll_weights, device=device)
@@ -408,61 +411,81 @@ def run_fit(args, observer=None) -> int:
         lr_scale = {0: 1.0, 1: 0.10, 2: 0.25, 3: 0.50, 4: 0.25, 5: 0.10}[stage_index]
         stage_params = [param_map[k] for k in train_names]
         optim = torch.optim.Adam(stage_params, lr=args.lr * lr_scale)
+        local_hand_only = uses_local_hand_objective(
+            stage_index=stage_index, train_names=train_names,
+            hand_2d_weight=args.hand_2d_weight, contact_enabled=contact_enabled)
+        model_evaluations = 0
         for local_step in range(n_stage):
             step = global_step
             global_step += 1
+            record_step = step % 10 == 0 or step == sum(stage_steps) - 1
             optim.zero_grad(set_to_none=True)
-            body_pose = decode_body_pose(latent)
             lhand_pose = decode_hand_pose(lhand, mano_l_components, mano_l_mean, mano_l_scale)
             rhand_pose = decode_hand_pose(rhand, mano_r_components, mano_r_mean, mano_r_scale)
-            out = model(betas=beta.expand(n, -1), global_orient=root,
-                        body_pose=body_pose, left_hand_pose=lhand_pose,
-                        right_hand_pose=rhand_pose, transl=transl, return_verts=True)
-            coco = regress_coco17_torch(out.vertices, reg)
+            zero = beta.new_zeros(())
+            body_loss = bone_loss = wrist_loss = zero
+            out = coco = None
+            # The native hand objective depends on local rotations/PCA only.
+            # Recompute mesh-dependent diagnostics at their original log steps:
+            # hand articulation can still change COCO surface-regressed wrists.
+            if not local_hand_only or record_step:
+                with torch.set_grad_enabled(not local_hand_only):
+                    body_pose = decode_body_pose(latent)
+                    out = model(betas=beta.expand(n, -1), global_orient=root,
+                                body_pose=body_pose, left_hand_pose=lhand_pose,
+                                right_hand_pose=rhand_pose, transl=transl, return_verts=True)
+                    model_evaluations += 1
+                    coco = regress_coco17_torch(out.vertices, reg)
+                    body_res = (coco - target).pow(2).sum(-1)
+                    body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
+                    if record_step or (args.bone_weight > 0 and stage_index in (0, 2)):
+                        current_bone_lengths = torch.stack([
+                            torch.linalg.vector_norm(out.joints[:, a] - out.joints[:, b], dim=-1)
+                            for a, b in body_bones], dim=1)
+                        bone_loss = (current_bone_lengths - ref_bones_t).pow(2).mean()
+                    if wrist_target is not None and (stage_index <= 2 or record_step):
+                        wrist_loss = wrist_position_loss(out.joints, wrist_target)
             if observer is not None and stage_index == 2 and local_step in (0, 30, 100):
                 observer(stage_name, local_step, {
                     "pair_id": np.asarray(ids, dtype=np.int64),
                     "betas": beta.detach().cpu().numpy().copy(),
                     "smplh_joints": out.joints.detach().cpu().numpy(),
                     "predicted_coco": coco.detach().cpu().numpy()})
-            body_res = (coco - target).pow(2).sum(-1)
-            body_w = torch.tensor(np.asarray(fit_quality, np.float32), device=device).clamp_min(0.0)
-            body_loss = (body_res * body_w)[mask_body].sum() / body_w[mask_body].sum().clamp_min(1e-6) if mask_body.any() else body_res.mean() * 0.0
-            model_cam1 = (R01 @ coco.transpose(1, 2)).transpose(1, 2) + T01
-            if (reprojection_only and stage_index <= 2
-                    and ((coco[..., 2][raw_left_valid] <= 0).any()
-                         or (model_cam1[..., 2][raw_right_valid] <= 0).any())):
-                raise RuntimeError(f"supported body point behind camera at {stage_name}:{local_step}")
-            proj_cam0 = fisheye_project_torch(
-                supported_camera_points(coco, raw_left_valid) if reprojection_only else coco, K0, D0)
-            proj_cam1 = fisheye_project_torch(
-                supported_camera_points(model_cam1, raw_right_valid) if reprojection_only else model_cam1, K1, D1)
+            proj_cam0 = proj_cam1 = None
+            if args.body_reprojection_weight > 0 and stage_index <= 2:
+                model_cam1 = (R01 @ coco.transpose(1, 2)).transpose(1, 2) + T01
+                if (reprojection_only
+                        and ((coco[..., 2][raw_left_valid] <= 0).any()
+                             or (model_cam1[..., 2][raw_right_valid] <= 0).any())):
+                    raise RuntimeError(f"supported body point behind camera at {stage_name}:{local_step}")
+                proj_cam0 = fisheye_project_torch(
+                    supported_camera_points(coco, raw_left_valid) if reprojection_only else coco, K0, D0)
+                proj_cam1 = fisheye_project_torch(
+                    supported_camera_points(model_cam1, raw_right_valid) if reprojection_only else model_cam1, K1, D1)
             body_2d_loss, body_2d_px = body_reprojection_loss(
                 args=args, stage_index=stage_index, body_loss=body_loss,
                 proj_cam0=proj_cam0, proj_cam1=proj_cam1,
                 raw_left_2d=raw_left_2d, raw_right_2d=raw_right_2d,
                 raw_left_conf=raw_left_conf, raw_right_conf=raw_right_conf,
                 raw_left_valid=raw_left_valid, raw_right_valid=raw_right_valid)
-            joints = out.joints
-            current_bone_lengths = torch.stack([
-                torch.linalg.vector_norm(joints[:, a] - joints[:, b], dim=-1)
-                for a, b in body_bones], dim=1)
-            ref_bones_t = torch.tensor(ref_bone_lengths, dtype=torch.float32, device=device)[None, :]
-            bone_loss = (current_bone_lengths - ref_bones_t).pow(2).mean()
             root_anchor = (root - root_anchor_target).pow(2).mean()
-            jl = hand21(joints, out.vertices, "left")
-            jr = hand21(joints, out.vertices, "right")
-            left_in_cam0 = fisheye_project_torch(jl, K0, D0)
-            right_in_cam0 = fisheye_project_torch(jr, K0, D0)
-            left_in_cam1 = fisheye_project_torch((R01 @ jl.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
-            right_in_cam1 = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
-            # The two axes are camera identity and anatomical hand side.
-            hand_ll_res = (left_in_cam0 - obs_ll).pow(2).sum(-1)
-            hand_rl_res = (left_in_cam1 - obs_rl).pow(2).sum(-1)
-            hand_lr_res = (right_in_cam0 - obs_lr).pow(2).sum(-1)
-            hand_rr_res = (right_in_cam1 - obs_rr).pow(2).sum(-1)
-            hand_l_loss = weighted_hand_residual(hand_ll_res, weight_ll, mask_ll) + weighted_hand_residual(hand_rl_res, weight_rl, mask_rl)
-            hand_r_loss = weighted_hand_residual(hand_lr_res, weight_lr, mask_lr) + weighted_hand_residual(hand_rr_res, weight_rr, mask_rr)
+            left_in_cam0 = None
+            hand_l_loss = hand_r_loss = zero
+            if args.hand_2d_weight > 0 and (stage_index >= 3 or record_step):
+                with torch.set_grad_enabled(stage_index >= 3):
+                    jl = hand21(out.joints, out.vertices, "left")
+                    jr = hand21(out.joints, out.vertices, "right")
+                    left_in_cam0 = fisheye_project_torch(jl, K0, D0)
+                    right_in_cam0 = fisheye_project_torch(jr, K0, D0)
+                    left_in_cam1 = fisheye_project_torch((R01 @ jl.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
+                    right_in_cam1 = fisheye_project_torch((R01 @ jr.transpose(1, 2)).transpose(1, 2) + T01, K1, D1)
+                    # The two axes are camera identity and anatomical hand side.
+                    hand_ll_res = (left_in_cam0 - obs_ll).pow(2).sum(-1)
+                    hand_rl_res = (left_in_cam1 - obs_rl).pow(2).sum(-1)
+                    hand_lr_res = (right_in_cam0 - obs_lr).pow(2).sum(-1)
+                    hand_rr_res = (right_in_cam1 - obs_rr).pow(2).sum(-1)
+                    hand_l_loss = weighted_hand_residual(hand_ll_res, weight_ll, mask_ll) + weighted_hand_residual(hand_rl_res, weight_rl, mask_rl)
+                    hand_r_loss = weighted_hand_residual(hand_lr_res, weight_lr, mask_lr) + weighted_hand_residual(hand_rr_res, weight_rr, mask_rr)
             pose_reg = (args.vposer_prior_weight * latent.pow(2).mean()
                         + args.hand_pca_prior_weight * (lhand.pow(2).mean() + rhand.pow(2).mean()))
             hand_temporal = hand_temporal_loss(
@@ -472,12 +495,6 @@ def run_fit(args, observer=None) -> int:
             body_temporal = body_temporal_loss(
                 args=args, n=n, stage_index=stage_index, body_loss=body_loss,
                 coco=coco, mask_body=mask_body)
-            if stage_index in (3, 4):
-                body_term = body_loss.detach() * 0.0
-            elif stage_index == 5:
-                body_term = body_loss.detach() * 0.0
-            else:
-                body_term = body_loss
             # Pixel residuals are numerically much larger than metre-scale
             # body residuals. Keep hand fitting auxiliary and prevent it from
             # moving the body/root to explain WiLoR's model-derived pixels.
@@ -489,19 +506,22 @@ def run_fit(args, observer=None) -> int:
             mano_pose_loss = (lhand_pose.sum() + rhand_pose.sum()) * 0.0
             if mano_enabled and stage_index >= 3:
                 from pose_app.wilor_mano_prior import rotation_pose_loss
+                # Shared articulation has one set of rotations, even though the
+                # likelihood retains every frame/view hypothesis and its weight.
                 mano_pose_loss = 0.5 * (
-                    rotation_pose_loss(lhand_pose, mano_targets["left"], mano_weights["left"]) +
-                    rotation_pose_loss(rhand_pose, mano_targets["right"], mano_weights["right"]))
-            structure_term = (args.bone_weight * bone_loss if stage_index in (0, 2)
-                              else bone_loss.detach() * 0.0)
+                    rotation_pose_loss(lhand_pose[:hand_parameter_frames], mano_targets["left"], mano_weights["left"]) +
+                    rotation_pose_loss(rhand_pose[:hand_parameter_frames], mano_targets["right"], mano_weights["right"]))
+            structure_term = (args.bone_weight * bone_loss
+                              if args.bone_weight > 0 and stage_index in (0, 2) else zero)
             temporal_term = (args.hand_temporal_weight * hand_temporal
                              if stage_index >= 3 else hand_temporal.detach() * 0.0)
             root_term = (args.root_anchor_weight * root_anchor if stage_index == 2
                          else root_anchor.detach() * 0.0)
-            contact_hand_loss, contact_foot_loss, global_hand_loss = surface_contact_losses(
-                left_in_cam0=left_in_cam0, contact_enabled=contact_enabled,
-                stage_index=stage_index, vertices=out.vertices,
-                contact=contact)
+            contact_hand_loss = contact_foot_loss = global_hand_loss = zero
+            if contact_enabled and stage_index >= 4:
+                contact_hand_loss, contact_foot_loss, global_hand_loss = surface_contact_losses(
+                    left_in_cam0=left_in_cam0, contact_enabled=contact_enabled,
+                    stage_index=stage_index, vertices=out.vertices, contact=contact)
             reproj_term = (args.body_reprojection_weight * body_2d_loss
                            if stage_index in (0, 1, 2) else body_2d_loss.detach() * 0.0)
             contact_total = (args.surface_hand_contact_weight * contact_hand_loss
@@ -510,16 +530,14 @@ def run_fit(args, observer=None) -> int:
                 contact_total = contact_total + args.global_hand_handle_weight * global_hand_loss
             contact_anchor = (args.root_anchor_weight * root_anchor
                               if contact_enabled and stage_index >= 4 else root_anchor.detach() * 0.0)
-            wrist_loss = (wrist_position_loss(out.joints, wrist_target)
-                          if wrist_target is not None else body_loss.detach() * 0.0)
             wrist_term = (args.wrist_reference_weight * wrist_loss
-                          if stage_index in (0, 1, 2) else wrist_loss.detach() * 0.0)
-            observation_3d = enabled_body_observation(body_term, getattr(args, "body_3d_weight", 1.0), stage_index)
+                          if stage_index in (0, 1, 2) else zero)
+            observation_3d = enabled_body_observation(body_loss, getattr(args, "body_3d_weight", 1.0), stage_index)
             loss = observation_3d + reproj_term + structure_term + root_term + contact_anchor + temporal_term + \
                    args.body_temporal_weight * body_temporal + hand_term + args.mano_pose_weight * mano_pose_loss + pose_reg + getattr(args, "beta_prior_weight", 1e-3) * beta.pow(2).mean() + \
                    (contact_total if stage_index >= 4 else contact_total.detach() * 0.0) + wrist_term
             if not torch.isfinite(loss):
-                terms = {"body": body_term, "hand_2d": hand_term, "pose_reg": pose_reg,
+                terms = {"body": observation_3d, "hand_2d": hand_term, "pose_reg": pose_reg,
                          "contact": contact_total, "wrist": wrist_term,
                          "root": root_term, "temporal": temporal_term,
                          "body_reprojection": reproj_term, "bone": structure_term}
@@ -547,7 +565,7 @@ def run_fit(args, observer=None) -> int:
             optim.step()
             require_finite_tensors({name: param_map[name] for name in train_names},
                                    f"parameters after {stage_name}:{local_step}")
-            if step % 10 == 0 or step == sum(stage_steps) - 1:
+            if record_step:
                 row = {"stage": stage_name, "stage_step": local_step, "step": step, "loss": float(loss.detach()),
                             "body_m": float(torch.sqrt(body_loss.detach())),
                             "body_2d_px": float(body_2d_px.detach()),
@@ -570,6 +588,8 @@ def run_fit(args, observer=None) -> int:
                     row["weighted_terms"] = {k: float(v.detach()) for k, v in weighted_terms.items()}
                 print(json.dumps(row), flush=True)
         stage_history.append({"stage": stage_name, "steps": n_stage, "trainable": train_names,
+                              "objective_execution": "local_hand" if local_hand_only else "full_model",
+                              "model_evaluations": model_evaluations,
                               "hand_3d_term": False,
                               "mano_local_pose_term": bool(args.mano_pose_weight > 0 and stage_index >= 3),
                               "learning_rate": float(args.lr * lr_scale),

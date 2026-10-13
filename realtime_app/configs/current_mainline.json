@@ -151,7 +151,14 @@
       "original_quality_field": "body_quality",
       "effective_fit_weight_field": "body_fit_weights",
       "acceptance_scope": "accepted_for_main_fit=false retains the unpassed physical/contact gate; selection as engineering mainline is explicit",
-      "selection_validation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_selection_validation.json"
+      "selection_validation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_selection_validation.json",
+      "solver_maintenance": {
+        "date": "2026-10-13",
+        "record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#27-smpl-h基线的方法结构分析与精简2026-10-13",
+        "scope": "Source-only simplification: local-hand objective execution, inactive geometry branches skipped, shared hand rotations decoded once; original objective, budgets and Adam resets retained.",
+        "selected_result_recomputed": false,
+        "new_accuracy_or_performance_claim": false
+      }
     },
     "live": {
       "entry": "realtime_app/run_stereo.py",

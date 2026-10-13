@@ -3,7 +3,11 @@ from types import SimpleNamespace
 import pytest
 import torch
 
-from pose_app.smplh_fitting.losses import hand_observation_term
+from pose_app.smplh_fitting.losses import (
+    body_reprojection_loss,
+    body_temporal_loss,
+    hand_observation_term,
+)
 from pose_app.smplh_fitting.contact import surface_contact_losses
 
 
@@ -19,6 +23,19 @@ def test_active_hand_projection_nan_is_not_silently_sanitized():
     value = hand_observation_term(weight=.1, stage_index=3, left_loss=torch.tensor(float("nan")),
                                   right_loss=torch.tensor(1.), body_loss=torch.tensor(1.))
     assert not torch.isfinite(value)
+
+
+@pytest.mark.parametrize("stage,weight", [(0, 0), (3, 1), (4, 1)])
+def test_inactive_body_terms_need_neither_geometry_nor_finite_diagnostics(stage, weight):
+    args = SimpleNamespace(body_reprojection_weight=weight, body_temporal_weight=weight)
+    diagnostic = torch.tensor(float("nan"), requires_grad=True)
+    values = body_reprojection_loss(
+        args=args, stage_index=stage, body_loss=diagnostic,
+        proj_cam0=None, proj_cam1=None, raw_left_2d=None, raw_right_2d=None,
+        raw_left_conf=None, raw_right_conf=None, raw_left_valid=None, raw_right_valid=None)
+    temporal = body_temporal_loss(
+        args=args, n=4, stage_index=stage, body_loss=diagnostic, coco=None, mask_body=None)
+    assert all(v.item() == 0 and not v.requires_grad for v in (*values, temporal))
 
 
 def test_disabled_surface_contact_uses_finite_geometry_not_projection():

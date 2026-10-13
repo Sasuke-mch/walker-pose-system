@@ -13,7 +13,11 @@ from pose_app.smplh_fitting.losses import (
     body_reprojection_loss,
 )
 from pose_app.smplh_fitting.contact import load_surface_targets, surface_contact_losses
-from pose_app.smplh_fitting.stages import build_stage_schedule, set_trainable_parameters
+from pose_app.smplh_fitting.stages import (
+    build_stage_schedule,
+    set_trainable_parameters,
+    uses_local_hand_objective,
+)
 from walker_tools.body.fit_smplh_wilor_sequence import build_parser, read_wilor
 
 
@@ -66,6 +70,48 @@ def test_stage_budget_and_freezing_preserve_one_shared_beta(contact):
 def test_explicit_zero_budget_is_not_replaced_by_default():
     _, _, steps = build_stage_schedule(options(base_steps=0, joint_steps=300), False)
     assert steps == [0, 30, 300, 30, 30, 0]
+
+
+@pytest.mark.parametrize("contact,pixel_weight", [(False, 0), (True, 0), (False, 1e-7)])
+def test_spatial_objectives_and_body_updates_cannot_skip_model(contact, pixel_weight):
+    _, train, _ = build_stage_schedule(options(), contact)
+    local = [uses_local_hand_objective(
+        stage_index=i, train_names=names, hand_2d_weight=pixel_weight,
+        contact_enabled=contact) for i, names in enumerate(train)]
+    expected = ([False, False, False, True, False, False] if contact
+                else [False, False, False, True, True, True])
+    assert local == (expected if pixel_weight == 0 else [False] * 6)
+    # Even a future hand-stage schedule change must not freeze a body update.
+    assert not uses_local_hand_objective(
+        stage_index=3, train_names=["lhand", "rhand", "latent"],
+        hand_2d_weight=0, contact_enabled=False)
+
+
+def test_shared_hand_rotation_loss_matches_expansion_without_repeated_rodrigues(monkeypatch):
+    from smplx import lbs
+    from pose_app.wilor_mano_prior import rotation_pose_loss
+
+    generator = torch.Generator().manual_seed(41)
+    pose = (torch.randn(1, 45, generator=generator, dtype=torch.float64) * .2).requires_grad_()
+    targets = lbs.batch_rodrigues(torch.randn(7 * 2 * 15, 3, generator=generator,
+                                           dtype=torch.float64)).reshape(7, 2, 15, 3, 3)
+    weights = torch.rand(7, 2, generator=generator, dtype=torch.float64)
+    weights[2] = 0  # Missing frames remain absent from the objective.
+    expanded_loss = rotation_pose_loss(pose.expand(7, -1), targets, weights)
+    expanded_gradient = torch.autograd.grad(expanded_loss, pose)[0]
+    sizes = []
+    original = lbs.batch_rodrigues
+
+    def counted(values, *args, **kwargs):
+        sizes.append(len(values))
+        return original(values, *args, **kwargs)
+
+    monkeypatch.setattr(lbs, "batch_rodrigues", counted)
+    compact_loss = rotation_pose_loss(pose, targets, weights)
+    compact_gradient = torch.autograd.grad(compact_loss, pose)[0]
+    assert sizes == [15]
+    torch.testing.assert_close(compact_loss, expanded_loss, atol=1e-12, rtol=1e-12)
+    torch.testing.assert_close(compact_gradient, expanded_gradient, atol=1e-12, rtol=1e-12)
 
 
 def test_body_basis_is_rigid_equivariant_and_rejects_degenerate_input():

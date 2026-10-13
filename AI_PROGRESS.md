@@ -4563,3 +4563,21 @@ MODEL_RESULTS第41节记录输入、复现方式和边界；MODEL_ARCHITECTURE�
 ## 2026-10-13 SMPL-H冻结配置缺省字段修复
 
 SMPL-H结构检查发现旧current_mainline.json/frozen_scalar_options比现行parser少5项：body_observation_mode=legacy、body_ankle_reprojection_multiplier=1、reference阈值25px/80mm及confidence_floor=0.6。仅补录原有默认值，未改变冻结448配置的quality权重、360 reference25选择、拟合输入/预算或场景路由。原test_current_route_scalar_snapshot_matches_the_same_parser因此失败，修复后test_cold_start_profiles.py全部14项通过；这属于配置记录修复，不是新实验或主线结果晋升。
+
+## 2026-10-13 SMPL-H基线方法分析与冗余计算精简
+
+用户要求深入优化SMPL-H基线、减少冗余，并明确Flow Matching由另一聊天处理；随后要求“不用核对运行结果，仅执行方法优化，详细写入已有相关文件”。据此完成源码阶段后停止，不恢复被中断的448对照、不新增拟合/训练/渲染或独立报告。当前身体仍为360 reference25，近期448踝倍率2及支持停止场景输出保持原选择身份。
+
+方法判断：核心是一个固定SMPL-H解码器、每帧32维VPoser/根/平移、10维共享beta和两手各12维共享PCA，总自由度38N+34。阶段A/B/C是同一组参数的分块优化，D1/D2是相同局部手目标的两段Adam；不能把阶段名误解为多网络，也不能为简洁直接合并会重置动量的D1/D2。主要可证明冗余为局部手目标每步仍执行完整人体及关闭的投影分支。
+
+实现：pose_app/smplh_fitting/stages.py按train_names恰为lhand/rhand、手2D关闭、当前接触未激活选择local_hand；pipeline.py跳过其非日志步网格/VPoser/COCO前向，原日志采样时刻用当前手姿无梯度重算，最终完整SMPL-H解码。手姿可能影响表面COCO腕点，因此不把旧身体诊断缓存为当前值。手2D或接触D2/D3/身体变量激活时保留空间模型。body_fit_weights/参考骨张量移出循环，身体双目投影只在有效二维目标阶段执行，手四投影/骨长/腕/接触按有效目标及原日志需要执行。
+
+共享手旋转由N套相同Rodrigues改为每手一套15旋转，然后广播与全部原帧/视角目标比较；保留权重、缺失、目标及残差归约，不平均原旋转、不增加状态或参数。两手变换数按公式30N→30，不据此宣称实测吞吐。PCA分量行范数仅归一化基底，修正原“经验尺度”注释，明确不是经验标准差或概率白化。losses.py关闭的身体二维/时间项使用独立零标量，避免NaN诊断通过乘0污染无效目标。
+
+原目标权重、学习率、预算、Adam重置、初始化门、掩码/失败状态和输出字段保留；stage_schedule仅新增objective_execution/model_evaluations（优化循环内计数）。没有增加网络/先验/配置路线。方法风险和后续顺序详记现有算法第27节：同像素2D/3D相关、未校准confidence/reference权重、姿态与体型可辨识性、轴角根锚不具表示不变性、共享手姿不等于抓握、表面腕点耦合、仅踝观测不能认证足接触、接触D阶段当前没有身体数据保持项、初始化仍要求完整肩髋、固定预算不等于收敛。未借本轮启用未经验证的接触、增大体型自由度或替换根锚。
+
+必要检查：SMPL-H组件/关闭分支/二维目标/reference权重/原生MANO共87项通过，包含共享旋转损失和系数梯度对展开公式的float64对照、只调用15个Rodrigues及缺失权重保留；profile配置另14项通过。6个改动Python的Ruff E9/F通过；初轮MANO未使用torch导入已清除。3条旧NumPy FutureWarning保留。不是全仓库测试，也不是人体真实结果验证。
+
+范围收紧前已执行360原输入A2/B2/C3/D100/D100前后内核一致性检查（tmp/smplh_architecture_t03gihip）；只对应共享旋转压缩前版本。448完整比较在资源准备时被会话中断（tmp/smplh_architecture_448_q7yv3gbl/before仅部分记录），未完成、不继续、不作为失败性能或通过证据。最终实现未做新的完整拟合/精度/性能评价，不以早期部分检查冒称最终全量通过。
+
+详细方法/公式/检查写入docs/CURRENT_SMPLH_ALGORITHM_20261002.md第27节，并更新其顶部场景时效信息和旧每步前向描述；docs/PROJECT_STATUS.md更新当前方法与路线导航；current_mainline.json/body/solver_maintenance明确仅维护源码、旧选择结果不重算；本文保留阶段进展和停止界限。既有未提交文件及另一聊天Flow变更保留，只提交本任务代码和文档增量，不推送。

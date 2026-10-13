@@ -193,9 +193,10 @@ def encode_pca(rotations, components, mean, scale):
 def rotation_pose_loss(axis_angles, targets, weights):
     """Chordal SO(3) loss = 1-cos(angle), bounded, no acos endpoint gradient.
 
+    axis_angles: N x 45, or 1 x 45 for shared local articulation.
     weights: N x views; targets: N x views x 15 x 3 x 3.
+    The shared case broadcasts after Rodrigues, retaining all observations.
     """
-    import torch
     from smplx.lbs import batch_rodrigues
     r = batch_rodrigues(axis_angles.reshape(-1, 3)).reshape(-1, 15, 3, 3)
     per_joint = (r[:, None] - targets).square().sum(dim=(-1, -2)) / 4.

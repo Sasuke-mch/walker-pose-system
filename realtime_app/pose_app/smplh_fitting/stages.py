@@ -126,6 +126,16 @@ def set_trainable_parameters(param_map, train):
         param_map[k].requires_grad_(True)
 
 
+def uses_local_hand_objective(*, stage_index, train_names, hand_2d_weight, contact_enabled):
+    """Local rotations/PCA need no body mesh when no spatial hand term is active."""
+    return (
+        stage_index >= 3
+        and set(train_names) == {"lhand", "rhand"}
+        and hand_2d_weight == 0
+        and not (contact_enabled and stage_index >= 4)
+    )
+
+
 def require_finite_tensors(tensors, context: str):
     """Stop before an invalid gradient/update or final result can be used."""
     import torch
