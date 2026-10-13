@@ -142,3 +142,8 @@ Build and evaluate a foot-inclusive upright person-box rule using only current-f
 The public repository contains source code, test code, portable configuration templates, compact experiment registry metadata, and small qualitative examples. It deliberately excludes model weights, third-party source trees, raw captures, videos, JSONL outputs, and local device bindings. See [`third_party/README.md`](../third_party/README.md) and [`realtime_app/docs/CAMERA_REGISTRY.md`](../realtime_app/docs/CAMERA_REGISTRY.md).
 
 评价入口已支持--sapiens-fit-dir和--pmpose-fit-dir，不指定时保持原冻结目录；新目录必须与--run的场景同源，原控制检查继续保留。冷启动配置拒绝与记录冲突的接触输入、重复参数、零联合预算及非共享/非原生初始化手姿。
+
+
+## 2026-10-14 Flow信息编码后续提速
+
+当前next将信息矩阵的旋转/平移块统一批处理；几何、完整候选、PSD和发布网格不变。GPU默认编码中位3.21→0.25ms，同次顺序组完整路径106.50→100.55ms；P95未改善，不升级为稳定实时。39项相关逻辑/梯度测试及Ruff通过，当前仍未训练。最新实现/测量边界见MODEL_ARCHITECTURE第31节、MODEL_RESULTS第46节和AI_PROGRESS；第30/45节保留前轮结果，正式SMPL-H主线不受影响。

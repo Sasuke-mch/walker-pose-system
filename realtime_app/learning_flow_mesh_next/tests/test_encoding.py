@@ -18,6 +18,40 @@ def features(matrix, nodes, mode):
                                 shape_probes=fixed_probes(len(matrix), 10))
 
 
+@pytest.mark.parametrize('nodes', [22, 52])
+@pytest.mark.parametrize('mode', ['diagonal_blocks', 'cross_block_sketch'])
+@pytest.mark.parametrize('dtype', [torch.float32, torch.float64])
+@pytest.mark.parametrize('device', ['cpu', pytest.param('cuda', marks=pytest.mark.skipif(
+    not torch.cuda.is_available(), reason='CUDA unavailable'))])
+def test_batched_blocks_match_original_loop_without_mutating_input(nodes, mode, dtype, device):
+    dimensions = 3*nodes+13
+    generator = torch.Generator().manual_seed(72)
+    # Noncontiguous and nonsymmetric to expose row/column or flatten-order errors.
+    matrix = torch.randn(dimensions, dimensions, generator=generator, dtype=dtype).to(device).T
+    matrix.requires_grad_()
+    before = matrix.detach().clone()
+    slices = [slice(3*i, 3*i+3) for i in range(nodes+1)] + [slice(-10, None)]
+    info = matrix.detach()
+    def compress(value):
+        return value.sign()*torch.log1p(value.abs())
+    diagonal = [compress(info[part, part]).flatten() for part in slices]
+    if mode == 'cross_block_sketch':
+        cross = info.clone()
+        for part in slices:
+            cross[part, part] = 0
+        projected = cross @ fixed_probes(dimensions, 3).to(info)
+        shape_projected = cross[-10:] @ fixed_probes(dimensions, 10).to(info)
+        expected = (torch.stack([old+compress(projected[part]).flatten()
+                                for old, part in zip(diagonal[:-1], slices[:-1])]),
+                    diagonal[-1]+compress(shape_projected).flatten())
+    else:
+        expected = torch.stack(diagonal[:-1]), diagonal[-1]
+    actual = features(matrix, nodes, mode)
+    assert all(torch.equal(a, b) for a, b in zip(actual, expected))
+    assert torch.equal(matrix, before)
+    assert not any(value.requires_grad for value in actual)
+
+
 def collision_matrices(nodes):
     m = 3*nodes+13
     independent = torch.eye(m, dtype=torch.float64)
