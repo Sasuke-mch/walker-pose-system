@@ -4659,3 +4659,9 @@ SMPL-H结构检查发现旧current_mainline.json/frozen_scalar_options比现行p
 必要验证：test_replay.py 5项、test_aggregate.py 9项、test_information的投影/端点相关9项通过；六个修改Python的Ruff通过。NaN/Inf两例修复前均明确失败，修复后有效成本/梯度与有限缺失槽对照相同，缺失梯度为零且准入坏投影仍拒绝。聚合调用计数及解析均方风险覆盖去冗余和完整候选合同。无全套重测、训练、神经checkpoint、真实360/448运行或性能/精度比较。
 
 新H2映射会改变部分历史context及候选绑定，旧随机回放的准入/缺失/候选数值不作为本版本结果。先前Word保留为第25节后、这次修正前的说明，涉及上述三处以架构第27节和当前源码为准。本次只修改既有记录，不新建报告/审计/快照；任务增量本地提交，保留用户及其他聊天未提交内容，不推送。当前针对性改进完成；尚未训练、真实监督与噪声参考缺口及独立效果限制仍在。
+
+## 2026-10-13 Flow模型精细架构图
+
+按用户要求制作当前模型的一页结构图，输出至`research_records/research/G20261007_flow_mesh_baseline_v1/figures/jointflow_architecture_20261013.{png,svg,pdf}`；PNG4400×2740，SVG可编辑结构和文字，PDF用于报告。上方完整主链、左下速度网络展开、右下可选几何分支：明确325D、54×128 tokens、4层4头、K32/Euler8，完整候选选择后人体解码，几何成本按需计算；G0/J/Λ/G1为研究路径，SO3为独立对照。网格小图复用已有neutral示意，不冒充新结果。
+
+绘图源码为`realtime_app/learning_flow_mesh_next/draw_architecture.py`；已有MODEL_ARCHITECTURE第28节补入口、重建方式和图意。仅进行源码维度/箭头核对、运行绘图和实际版式检查，修复缺字及重叠后最终无缺字警告，Ruff通过。没有模型/训练/数据/主线改动或额外审计材料；本轮图和源码及记录增量本地提交，保留工作区已有改动，不推送。

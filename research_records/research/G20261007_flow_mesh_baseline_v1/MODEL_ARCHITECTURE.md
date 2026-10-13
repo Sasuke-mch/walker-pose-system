@@ -483,3 +483,11 @@ flow_next_config_v1.json原performance_revisions_used=0仍是2026-10-11状态，
 特别区分三种“均值”：SMPL-H可靠程度损失的固定位置归约、next观测条件误差均值、候选分布上的Monte Carlo风险期望，各自回答不同问题。候选风险mean_l、训练样本均值及编码池化均值不能一律改成固定34分母；通过所有局部检查也不能证明这一统计取舍已经最优。
 
 本轮结论是三项有依据的职责与数值修正已完成，未解决真实精度、序列共享体型或生成分布校准。必要反例与检查见MODEL_RESULTS第43节。第26节Word保留为本次修正前的说明，涉及H2映射、聚合依赖和投影返回槽时以本节及源码为准；没有为小改动新建另一份报告。
+
+## 28. 当前模型架构图（2026-10-13）
+
+本轮按用户要求绘制一页精细架构图：[高清PNG](figures/jointflow_architecture_20261013.png)、[可编辑SVG](figures/jointflow_architecture_20261013.svg)、[PDF](figures/jointflow_architecture_20261013.pdf)。绘图源码为`realtime_app/learning_flow_mesh_next/draw_architecture.py`，从项目根目录执行`.venv-cuda/Scripts/python.exe -B realtime_app/learning_flow_mesh_next/draw_architecture.py`即可生成三种格式。
+
+图上方为二维观测→因果编码→联合Flow→整候选决策→SMPL-H解码，左下展开325维状态、54×128 tokens、4层4头Transformer和Euler更新；右下单列按需几何评分与G0/J/Λ/G1研究路径，避免把投影或双网络画成所有路径必经。SO3只标为独立表示对照；二维支持与严格几何支持分离、单次信息编码、完整候选和缺失不发布语义与第27节一致。
+
+白底青绿主线、暖色虚线研究分支，无表格或虚构实验数据。人体小图复用已有`architecture_figure_v4_cn/smplh_neutral_pose.png`作为真实网格示意，不是新推理结果；其他结构与文字为矢量，SVG使用可编辑文本，PDF嵌入字体。画布22×13.7英寸，PNG为4400×2740（200dpi）。通过实际渲染检查修正字体缺字、标题及条件标签重叠；最终渲染无缺字警告，绘图代码Ruff通过。只检查图的内容、可读性和运行，不重跑模型或新增审计流程，当前未训练及无真实精度结论的边界保留。
