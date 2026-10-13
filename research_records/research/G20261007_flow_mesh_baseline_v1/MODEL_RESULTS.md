@@ -1145,3 +1145,25 @@ G1批控制复用D10.4五帧52节点工程fixture，A前3/B全5/A后2及各自�
 命令使用`.\.venv-cuda\Scripts\python.exe -X utf8 -B -m pytest`：test_joint.py初`-k multi_stream_batch_matches`，补`-k 'multi_stream_batch and not matches'`，数值red仅`-k avoids_weighted_numerator_overflow`，修复仅`-k 'multi_stream_batch_matches or avoids_weighted_numerator_overflow'`；两现有文件test_firewall.py/test_regression_information.py仅`-k 'registered_files_connect or G1_multi_stream_batch'`。21个新检查分次覆盖，旧其他检查未全套重跑；失败、未改变接口和原数据范围在本节记录，无新脚本/验收报告/快照。
 
 D10.5多stream准备目标完成，训练/神经checkpoint继续关闭；没有参数更新或正式主线改动。实际flow_next_data_manifest_v1.json与flow_next_noise_data_manifest_v1.json现场records均0。完整训练生命周期、epoch与stream政策、四法配对runner、模型/统计/组来源真实性及独立效果仍未完成；窗口16只是准备接口上限，不能据此称优化器effective_batch已实现。下一阶段复核这些剩余要求与训练禁令/资源，选择有实际证据价值且可执行的后续工作；不以新增准备层替代真实训练与held-out验证，长期目标未完成。
+
+## 40. 2026-10-13阶段收敛：修订额度记录更正，效能尚不具备完成证据
+
+上一轮D10.5是实质进展，本轮按原目标/停止条件复核最新源码、既有实测文件与资源，而非再加一个准备层。读取README/CLAUDE/AI_PROGRESS及实验规则/原协议、MODEL_ARCHITECTURE D01–12台账、当前train.py、四法计划的受控比较/原接受门、evaluation_contract/acceptance源码范围及flow_next_config。没有模型前向、optimizer、checkpoint、测试或测时重跑，也未新建完成审计/验收文件。
+
+现场事实：注册训练manifest records0、source_path=not_acquired、license_status=missing、label_scope=no_training_labels_acquired、truth_status=no_independent_3d_or_scan；独立噪声reference records0。当前配置training_enabledFalse/checkpoint_loading_enabledFalse，长期协议禁止训练/加载/主线变更；四法current_run_results=None、independent_efficacy_establishedFalse，之前用户答复暂无新数据保持。这里只证明无已登记可用来源，不宣称已经搜遍用户磁盘或不存在未登记资源。未扫描全部原始数据、也未用拟合结果造truth。
+
+对train.py作一次临时AST实际定义/调用检查：configuration/prepare/objective、typed frame/chunk、原注册NPZ读取、冻结G0获取、序列F0/G1、多stream批目标存在；torch.optim.AdamW/torch.save/torch.load调用均0，没有.step调用。main只打印prepare。因而optimizer、epoch/stream执行政策、checkpoint生命周期、完整四法配对runner是实现缺口，不仅是“已经写好但没运行”。本轮不在无数据、训练禁令下编造成功的循环/权重生命周期，保留其未完成状态。
+
+|台账范围|可确认的当前决定/证据|未完成要求|
+|---|---|---|
+|D01、D08、D10准备接口|源代码与MODEL_RESULTS30/31/33–39证实存储简化、失效特征修复和原帧目标/状态/成本连接；提交已保存|真实pose/shape/缺失精度；训练执行与数据/来源真实性|
+|D02、D03|读取flow_next_encoder_dimension_v1.json，3seed的128×102局部rank均102；原36节静态参数解析控制支持保留当前模型，停止仅凭维数扩容/冻结拼接|所有ray/history域信息充分性、共享序列条件生成与独立shape效能|
+|D04、D05、D06|完整手/shape监督未登记；同信息回归/G1接口已接，但F0外部precision差异与Λ表示的局限仍明确；不默认叠加更多输入/耦合|可信标签/校准、同条件训练，按原4法证明信息与架构收益|
+|D07、D11、D12|完整候选/原拒绝与判决范围保留；acceptance只检查声明数据，原统计门不自动创造效能证据|独立参与者/原分割/3seed配对energy及选择误差、coverage-width/失败与全链部署成本|
+|D09|读取flow_next_so3_cost_v2.json、flow_next_endpoint_vjp_cost_v1.json与长期协议：SO3第二轮核优化已关闭；VJP fullK32比1.7822233>1.25停止晋升|无已证训练精度/校准或实时部署，不用新小样本测时重置机制额度|
+
+本轮发现具体记录冲突：flow_next_config_v1.json仍performance_revisions_used0/max2，而较新so3_kernel_revision2_20261012明确revision2及kernel_optimization_closedTrue。搜索这些字段只定位当前config和旧readiness文件；在当前配置改2/2并注明SO3表示/旋转核机制scope，避免将所有研究问题混用或给已停止机制另开额度。旧readiness和原成本/失败记录保持历史，VJP独立revision1/失败停止不被改写。新增preparation_status明确哪些接口已检查、哪些循环/权重/配对runner仍未实现，remaining由泛泛“未执行”改为真实代码/资源缺口。
+
+验证只针对本次JSON/记录修改：配置与协议能解析、训练/加载/主线flags仍False、SO3机制revision2/closedTrue且config2/2、当前真实记录数与4法结果空态一致；任务diff/暂存边界检查，不为文字修改重跑旧测试或成本。本轮不改变Python/模型、参数预算、统计接受门或已有失败。所有实际证据可由上述文件/函数/字段复核，无新脚本、报告、哈希/快照。
+
+最终阶段判断：整体目标不成立完成结论。准备接口到此先收敛；继续追求真实姿态/shape/生成/选择/校准改善需要实质资源及训练授权，之后还要补执行生命周期并按原协议评估。>=5%改善、参与者95%CI、强几何非劣、90%coverage/width、无效/保留与全链p95/三seed门保持原值，不能把工程通过数量降格为替代成功标准。资源阻碍首次集中确认，不在首次标blocked；目标仍active且完整。下轮只核对真实资源/指令是否变化及是否出现新的已证实可修缺陷；同一阻碍连续满足规定次数且无独立有效工作时才更新blocked，不重复生成材料、问已答过的暂无或创建定时自动化。

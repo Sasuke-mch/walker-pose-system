@@ -325,3 +325,15 @@ resources.information_acquisition汇总该块G0网络调用/候选状态求值�
 可选每窗口信息包仍在外部用冻结G0获取；批入口验证并汇总原G0/J计数，computed_in_this_objective=False，不重新获取，不把缓存计为部署免费。G0获取carry与这里的G1目标carry仍独立。模型容量/CFM/回归/solver/噪声来源均不改，generator按调用窗口顺序消费，改变顺序会改变CFM抽样；未新增shuffle/optimizer/checkpoint执行。
 
 21个新检查分次覆盖：8种ambient/SO3×22/52×CFM/回归对照，A/B独立重启/延续与原逐chunk调用一致、监督2/3/1正确加权；跨batch不修改incomingcarry、坏后窗口前置拒绝、全无监督及真实非有限velocity失败保留；float32 3e38均值控制发现并修复权重中间溢出。临时注册35+5文件22/52连接保留40行/36监督，G1批成本/错信息检查通过；详见MODEL_RESULTS第39节。真实注册records仍0，组/标签/资产真实性、训练授权、完整执行生命周期与四法独立效能继续未完成。
+
+## 23. 当前阶段完成边界与资源门（2026-10-13）
+
+D01常驻不可达权重简化、D08局部age/seen特征修复、D10.1–5统计/原帧/信息/多序列准备路径均有工程证据；它们不代表真实姿态、shape或概率分布改善。D02不能凭窄输入局部秩或仅有128维就新增容量；D03不能默认冻结beta/拼接候选；D09原SO3核两轮关闭、全K32端点VJP因成本失败停止晋升。其余D04/05/06/07/11/12及D02/03/08的真实效能还需相应来源/标签/训练/独立评价，不能用更多工程通过替代。
+
+当前train.py实际只配置/准备/计算目标：有原注册文件读取、因果F0/G1与多stream批目标；没有AdamW构造、optimizer step、epoch执行、权重保存/加载或四法配对训练runner。配置中的AdamW/50k/16窗口均是预置计划。实现缺口与“尚未执行”不同；当前数据来源、许可、family/basis/手均值、参考质量和训练授权尚不满足，执行生命周期待恢复相应环节后实现与验证，不把未运行的循环当已完成功能。
+
+flow_next_config_v1.json原performance_revisions_used=0仍是2026-10-11状态，和较新协议SO3第二轮关闭冲突；本轮改为2/2并明示scope=SO3表示/旋转核成本机制。不是所有研究问题共用两次，而是该已关闭机制不能重置；VJP另按原记录revision1/成本失败停止。旧flow_next_readiness_audit_v1.json和各成本文件保存历史，不覆盖。新增preparation_status把已检查准备接口与未实现生命周期、真实records0/独立效能False分开。
+
+当前资源门：flow_next_data_manifest_v1.json records0/license missing/no_training_labels_acquired；flow_next_noise_data_manifest_v1.json独立reference records0；current task明确training/checkpoint loading禁止，四法计划current_run_results=None/independent_efficacy_establishedFalse。后续保留>=5%能量/选择改善、参与者配对95%CI、强几何非劣、coverage-width/无效/成本与三seed等原门，不降低到内部一致性。现有360帧拟合/原观测不能补独立truth。全链p95<=33.3ms仍未证实，历史小预算/随机模型成本不能称部署30fps。
+
+阶段决策：保持当前隔离候选与正式主线边界，工程准备阶段先到此收敛；实质数据与授权未改变时，停止无效的效能尝试或继续加准备框架。长期目标仍完整且未完成，资源阻碍首次集中确认；目标状态暂保持active，不能在此标complete或首次标blocked。资源变化后先落实登记与来源，补实际执行/验证选点与测试锁生命周期，再运行原配对协议；不能凭现配置称模型更准确、共享序列shape有效或G1必要。

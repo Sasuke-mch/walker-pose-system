@@ -120,7 +120,20 @@
   "data_manifest": "flow_next_data_manifest_v1.json",
   "truth": "no independent 3D/shape truth",
   "research_plan": "flow_research_plan_v1.json",
-  "performance_revisions_used": 0,
+  "performance_revisions_used": 2,
   "performance_revisions_max": 2,
-  "remaining": "training, independent noise calibration, subject/rig holdouts and efficacy are not executed"
+  "performance_revision_scope": "SO3 representation/rotation-kernel cost mechanism; revision2 closed in longterm protocol; do not reset from historical readiness files",
+  "last_reviewed": "2026-10-13",
+  "preparation_status": {
+    "normalization_original_row_reader_causal_F0_G1_and_multistream_targets": "implemented_engineering_checked_not_trained",
+    "optimizer_loop_implemented": false,
+    "epoch_stream_execution_policy_implemented": false,
+    "checkpoint_lifecycle_implemented": false,
+    "four_method_paired_training_runner_implemented": false,
+    "training_records": 0,
+    "independent_noise_reference_records": 0,
+    "independent_efficacy_established": false,
+    "decision": "resource_gate_for_empirical_improvement; preserve full incomplete objective"
+  },
+  "remaining": "optimizer/epoch-stream/checkpoint lifecycle and complete four-method paired training runner are not implemented; authentic matched data, training authorization, independent calibration/holdouts and efficacy gates are not satisfied"
 }
