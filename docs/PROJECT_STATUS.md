@@ -1,5 +1,11 @@
 # Project status
 
+## 2026-10-13 当前主线与Flow研究架构
+
+正式场景入口按2026-10-12决定使用`supported_stop_fixed_lag`；身体仍为360帧PMPose/reference25 SMPL-H及WiLoR。下方较早的baseline说明保留历史范围；选择以`current_mainline.json`及`AI_PROGRESS.md`为准。本次没有将学习模型接入正式主线。
+
+隔离的`learning_flow_mesh_next`已完成固定信息条件一次编码、推理/研究诊断解耦，以及共享状态校验、共享损失归约和评价分组门修复。参数量不变，尚未训练；双生成器、完整手姿/体型和序列共享shape仍无独立效果结论。架构取舍及接口见[MODEL_ARCHITECTURE第25节](../research_records/research/G20261007_flow_mesh_baseline_v1/MODEL_ARCHITECTURE.md#25-2026-10-13架构收敛固定条件一次编码推理与诊断解耦)，具体改动、必要验证与失败见[MODEL_RESULTS第42节](../research_records/research/G20261007_flow_mesh_baseline_v1/MODEL_RESULTS.md#42-2026-10-13架构收敛与纠错)。后续以匹配数据和四法实证决定是否保留G0/J/G1复杂度，不继续堆模型或检查框架。
+
 ## 2026-10-13 SMPL-H基线方法结构维护
 
 当前身体选择仍为360帧PMPose/reference25；近期448帧二维拟合/踝倍率2是独立保留的展示结果。场景mainline自2026-10-12解析为supported_stop_fixed_lag，旧360帧baseline场景未重算。下方较早日期的主线段落保留历史范围，不能覆盖本节、AI_PROGRESS与current_mainline.json的当前选择。

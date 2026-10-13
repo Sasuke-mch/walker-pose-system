@@ -4560,6 +4560,16 @@ MODEL_RESULTS第41节记录输入、复现方式和边界；MODEL_ARCHITECTURE�
 
 本轮仅分析和更新已有记录，未修Python、未训练/加载权重/追加模型或重跑旧测试与成本，D13–15明确待修。长期真实效能仍受资源条件约束，整体目标未完成；原工作区改动保留。
 
+## 2026-10-13 Flow模型架构收敛与D13–15修复完成
+
+用户明确以learning_flow_mesh_next为重点，要求减少冗余、主要推进架构，验证只覆盖逻辑正确与可运行性。已将JointFlow固定Λ编码与动态速度主干分离：每次Euler8采样的信息特征/三投影组8→1，函数局部复用，无跨帧缓存或新参数，完整候选及梯度与原逐步调用对照一致。几何信息获取与Schur/秩/SVD研究诊断解耦，TwoStageInference和序列获取默认关闭诊断，低层研究调用仍默认开启；原339/159个FD解码状态、投影/绑定/失败门保持。完整诊断复用默认阈值Schur，6→5次；诊断失败单独保留原因，不再抹去有效matrix/J。调用减少不等于已测整链加速。
+
+D13序列/批次归约合并为稳定float64加权累积，返回原dtype，3e38反例及梯度正确且最终非有限明确不可用。D14把时钟/帧号/hidden/age/seen校验集中到TemporalState.validate，编码、序列、信息获取和整批前置流程共用，坏历史状态提前拒绝。D15收益/CI门绑定较新F0/F_info或同缓存选择对照的分组/方法/预算/test语义，强几何和错误方法不再触发歧义改善；元数据匹配仍不认证实测资源或独立真值。
+
+仅相关目标测试和Ruff通过：诊断模式输出/失败一致、实际two-stage可运行、条件复用输出/梯度一致、坏carry前置拒绝和评价语义正确。中途两处旧float64均值逐位断言因归约顺序失败，改严格数值容差后受影响项通过；新增split人工fixture漏许可声明先失败，补测试声明后通过，真实注册数据未改。完整命令范围/失败/边界记于MODEL_RESULTS第42节，不宣称全项目无bug或训练效果。按用户要求到此停止追加测试/性能测量，无新检查基础设施。
+
+MODEL_ARCHITECTURE第25节记录当前最小计算图、公式、接口及保留/删除依据；模型config同步执行默认值，原研究计划同步门的机器语义，docs/PROJECT_STATUS同步主线与隔离模型身份。四层width128、联合R/T/β、观测GRU、原SO3候选及G0/J/G1研究对照保留；不能凭随机模型断定删层/缩维有效。真实training records仍0、训练/checkpoint仍关闭，下一实质阶段是取得匹配监督后完成原四法训练与独立评价。正式场景supported_stop_fixed_lag及身体reference25选择不变；用户/其他任务原未提交改动保留，代码改进分目的本地提交，未推送。
+
 ## 2026-10-13 SMPL-H冻结配置缺省字段修复
 
 SMPL-H结构检查发现旧current_mainline.json/frozen_scalar_options比现行parser少5项：body_observation_mode=legacy、body_ankle_reprojection_multiplier=1、reference阈值25px/80mm及confidence_floor=0.6。仅补录原有默认值，未改变冻结448配置的quality权重、360 reference25选择、拟合输入/预算或场景路由。原test_current_route_scalar_snapshot_matches_the_same_parser因此失败，修复后test_cold_start_profiles.py全部14项通过；这属于配置记录修复，不是新实验或主线结果晋升。

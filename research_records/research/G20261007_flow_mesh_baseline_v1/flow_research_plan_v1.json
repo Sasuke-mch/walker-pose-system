@@ -212,6 +212,13 @@
       "walltime": "measure actual encoder/G0/J/final decoding/selection and device memory; no matched-walltime claim without measurement"
     },
     "decision": "retain G1 route only with >=5percent ambiguity-stratum energy improvement and paired95percentCI versus fresh F0 plus applicable non-degradation/retention/legality guards; system simplification decided from practical cost-quality curve. Negative evidence after at most2 meaningful revisions closes route; an unrun gate supports neither retain nor remove for efficacy.",
+    "acceptance_semantics_20261013": {
+      "generation": {"metric": "standardized_joint_energy", "stratum": "preregistered_ambiguity", "baseline_method": "F0", "proposed_method": "F_info", "budget_scope": "declared_fixed_K32_shared_acquisition"},
+      "aggregation": {"metric": "selected_error", "stratum": "preregistered_evaluation", "baseline_method": "strongest_deployable_baseline", "proposed_method": "proposed_whole_candidate_risk", "budget_scope": "declared_same_candidate_cache"},
+      "split": "test for real-source declarations; engineering_fixture for analytic checks only",
+      "mismatch": "preserve_numeric_report_but_gate_not_evaluated",
+      "boundary": "semantic declarations only; no authentication of real resources, compute, strongest baseline or external test lock"
+    },
     "inheritance": "flow_research_plan_v1 acceptance and flow_next_config_v1 criteria retained: strong-geometry degradation<=2percent, illegal-rate increase<=.005, same-cache selector stage separate, coverage/width and independent-truth gates; real-time requires full pipelinep95<=33.3ms",
     "unresolved_before_effect_run": [
       "legal complete matched-family/basis target data and independent calibration records",

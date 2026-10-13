@@ -124,6 +124,18 @@
   "performance_revisions_max": 2,
   "performance_revision_scope": "SO3 representation/rotation-kernel cost mechanism; revision2 closed in longterm protocol; do not reset from historical readiness files",
   "last_reviewed": "2026-10-13",
+  "execution_structure": {
+    "information_tokens": "once_per_sample_call; no_cross_frame_cache",
+    "two_stage_diagnostics_default": false,
+    "sequence_acquisition_diagnostics_default": false,
+    "local_information_diagnostics_default": true,
+    "diagnostic_failure": "retain_valid_information_and_report_diagnostic_unavailable",
+    "state_validation": "shared_TemporalState.validate",
+    "objective_reduction": "shared_float64_supervision_weighted_accumulation_return_original_dtype",
+    "architecture_record": "MODEL_ARCHITECTURE.md section25; MODEL_RESULTS.md section42",
+    "parameter_count_changed": false,
+    "end_to_end_speedup_measured": false
+  },
   "preparation_status": {
     "normalization_original_row_reader_causal_F0_G1_and_multistream_targets": "implemented_engineering_checked_not_trained",
     "optimizer_loop_implemented": false,

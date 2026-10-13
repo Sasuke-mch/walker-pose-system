@@ -1184,3 +1184,25 @@ D10.5多stream准备目标完成，训练/神经checkpoint继续关闭；没有�
 其余结论由源码和解析推导形成，没有新增人体实验：单帧q→17×3表面点→双目像素的精确局部J秩≤51，所以169维全人体至少118维局部零空间；在相同观测/相机/噪声条件下，观测派生Λ没有增加独立测量；SO3 F0仍拒绝Λ，而原有/无信息四法在ambient分支；全帧标签准入、BODY22不能直接经现SurfaceDecoder输出真实全网格、多组在线诊断分解、逐帧CPU旋转log、决策距离权重和跨帧joint law均有明确后续问题。完整推理范围与修正顺序见MODEL_ARCHITECTURE第24节。局部秩上界不等同于有先验/历史模型必然失败，手部权重风险也未证实实际劣化。
 
 本轮交付是带证据的纠错分析和优先级，D13–15未修复；没有优化器、神经checkpoint、数据登记变更、全套测试或成本重测。训练/独立效能资源阻碍仍在，整体目标未完成；这些新代码缺陷本身可在现有工程条件下另行修正。正式主线及已有未提交改动保留。
+
+## 42. 2026-10-13架构收敛与纠错
+
+用户授权深入改进next模型并减少冗余。本轮先修第41节D13–15，另将local_information的推理必需量与研究诊断解耦。输入沿用现有tests人工fixture、22/52节点与固定随机模型，不训练、不加载神经checkpoint、不改变正式主线。
+
+诊断拆分的唯一变量为是否执行Schur/白化SVD阈值扫描；原anchor、中心差分邻域检查、J、precision、信息矩阵、观测绑定与拒绝规则不变。低层默认保留完整诊断以兼容现有研究调用，TwoStageInference显式选择最小信息获取，调用方可开启诊断。成功条件是两模式的矩阵/J/anchor/绑定/拒绝和最终候选一致、关闭模式不调用诊断函数；诊断本身失败须明确记录而不抹去有效测量信息。只复用一次默认阈值Schur结果，不更换FD算法或减少解码邻域。若核心数值/失败语义不一致则停止修正，不宣称实时或精度改进。
+
+另一项限定改进是JointFlow条件编码与速度主干分离：同一sample调用中的冻结Λ不随Euler步变化，当前却逐步重复signed-log/块提取及三个信息投影。将其在采样入口计算一次，并在本次调用的各步复用；不跨帧缓存，不改变参数、噪声、步数、每步算子加法次序或训练单步入口。仅核对原逐步调用对照的输出/活动梯度、Λ不反传、两种信息模式和22/52节点、下一调用的新Λ不沿用旧值；验证后停止，不扩展性能测试。该改变减少确定的重复运算，不代表已测得整链加速或精度增益。
+
+实际完成的结构修改：
+
+1. `joint_flow.py`把固定信息条件编码与动态速度主干拆清，sample每次只计算一次信息tokens。原逐步velocity调用作为对照，seed31/CPUfloat64/K2/Euler8、22/52节点、diagonal_blocks/cross_block_sketch四种组合输出逐值相同；初始状态/context/三投影/主干及pose头梯度在1e-12绝对、1e-10相对容差内一致，Λ不反传。forward hook确认信息投影组8→1，下一次调用改变Λ会重新计算。无新学习参数或持久缓存。
+2. `geometry_information.py`将研究诊断拆为可选函数，`pipeline.py`及`train.acquire_sequence_information`默认diagnostics=False，低层local_information默认True兼容原研究使用。22/52节点人工rigid_surface（只有T作用）对照中matrix/J/anchor/绑定/理由相同；原完整FD状态数159/339不变；最小路径不调用诊断，完整模式Schur6→5且五阈值报告保留。two-stage随机G0/G1双精度K2/steps1的默认与完整诊断产生相同候选及carry。主动让Schur失败后matrix/J保留、diagnostics=unavailable并带原错误；无观测/坏投影在两模式继续拒绝。没有重跑真实SMPL/视频或成本实验。
+3. D13：sequence与batch共享`_reduce_objectives`，float64加权累积后回到原dtype并检查最终finite。第41节三个有限float32 3e38控制返回有限3e38；不同监督计数的多stream同样正确，标量梯度为1，缺失/失败原行保留。重构不承诺浮点求和顺序逐位一致。
+4. D14：`schema.TemporalState.validate`由单帧编码、SequenceChunk、获取器与整批前置流程共用；删除两处旧复制逻辑。NaN/±Inf原/恢复时钟、坏帧号和张量在消费前拒绝；即使是后stream的坏carry，也不会先运行其他stream编码。正常分块、历史梯度及缺失语义保持。
+5. D15：acceptance的配对收益与CI先检查当前协议的分组/方法/预算/split语义，错误证据仍保留数值报告但门为not_evaluated，并给出不匹配字段。完整自洽strong_geometry_only不再触发歧义门；两种metric错误方法/预算也不能触发。duplicate metric显式拒绝避免按顺序覆盖。真实声明只有test可进入最终数值门，人工fixture一直blocked；方法标识采用较新F0/F_info协议，详见架构第25节。不能将字符串登记当真实预算或独立真值认证。
+
+必要验证使用PowerShell7.6.6和`.venv-cuda/Scripts/python.exe -B -m pytest`，只针对修改问题：`test_joint.py`中归约/序列相关12项；`test_encoding.py`和`test_joint.py`中carry/分块/前置拒绝相关27项；评价contract/population/blocks及replay相关51项加新增split2项；information/binding/regression_information/risk相关首次73通过、2处旧均值逐位断言失败。两处为正常float64归约舍入差，保留每帧逐值相同检查，仅将总均值改为rtol1e-14，受影响CFM/回归×22/52四项随后通过。模型条件复用与已有shared-core/SO3目标相关9项通过；最后只补一次two-stage衔接检查，验证后续主干拆分未破坏前述诊断接口。以上分次记录不累加成不重复总覆盖或全项目验收。
+
+中途新增split测试因人工manifest遗漏许可声明被正确拒绝2项；只补测试声明后2项通过，没有变更真实资源登记。`.venv-cuda`无ruff模块，使用现有`uv tool run ruff`；初acceptance import间距问题修复，所有修改Python的相应Ruff检查通过。无全项目重测、性能追分、训练或checkpoint加载，无新审计脚本/快照/报告。测试是逻辑与有限输入可运行性证据，不能证明所有可能输入无bug。
+
+架构结论：联合R/T/β、四层width128、观测GRU与当前帧完整候选保持；本轮削减明确重复计算与重复校验，不凭随机模型削减表达能力。G0/J/G1仍是应接受四法对照检验的可疑成本，未获得实证前不宣布优于单模型；52节点中的手部与体型弱可观测、静态β/序列联合律和真实标签缺口仍未解决。完整取舍及公式见MODEL_ARCHITECTURE第25节；正式工程场景/身体选择不变。本轮改进完成后按用户要求停止追加检查，后续效果研究需要匹配数据和适用执行授权。
