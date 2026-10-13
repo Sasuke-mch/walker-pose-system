@@ -337,3 +337,5 @@ flow_next_config_v1.json原performance_revisions_used=0仍是2026-10-11状态，
 当前资源门：flow_next_data_manifest_v1.json records0/license missing/no_training_labels_acquired；flow_next_noise_data_manifest_v1.json独立reference records0；current task明确training/checkpoint loading禁止，四法计划current_run_results=None/independent_efficacy_establishedFalse。后续保留>=5%能量/选择改善、参与者配对95%CI、强几何非劣、coverage-width/无效/成本与三seed等原门，不降低到内部一致性。现有360帧拟合/原观测不能补独立truth。全链p95<=33.3ms仍未证实，历史小预算/随机模型成本不能称部署30fps。
 
 阶段决策：保持当前隔离候选与正式主线边界，工程准备阶段先到此收敛；实质数据与授权未改变时，停止无效的效能尝试或继续加准备框架。长期目标仍完整且未完成，资源阻碍首次集中确认；目标状态暂保持active，不能在此标complete或首次标blocked。资源变化后先落实登记与来源，补实际执行/验证选点与测试锁生命周期，再运行原配对协议；不能凭现配置称模型更准确、共享序列shape有效或G1必要。
+
+连续三轮确认后的当前状态（2026-10-13）：注册数据/独立noise-reference与训练授权未改变，goal工具已返回blocked；前文首次确认时active为当时状态。隔离候选、工程修复、正式主线边界和完整未完成目标均保留，未声明真实精度或全部不足已解决。执行生命周期/配对runner和独立验证仍须在可信资源/适用授权后完成；本轮只同步记录，不继续追加模块或流程材料。
