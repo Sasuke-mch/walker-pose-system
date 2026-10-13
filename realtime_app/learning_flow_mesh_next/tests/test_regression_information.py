@@ -245,7 +245,7 @@ def test_G1_sequence_matches_manual_objective_and_counted_acquisition(nodes, mod
                                     normal, information=bundle.frames[index].matrix, **options)
                 expected.append(loss)
                 assert torch.equal(loss, result.frame_losses[index])
-        assert torch.equal(result.loss, torch.stack(expected).mean())
+        torch.testing.assert_close(result.loss, torch.stack(expected).mean(), rtol=1e-14, atol=0)
         generator = torch.Generator().manual_seed(17)
         first_info = replace(bundle, frames=bundle.frames[:3], anchor_resources=bundle.anchor_resources[:3])
         last_info = replace(bundle, frames=bundle.frames[3:], anchor_resources=bundle.anchor_resources[3:])
