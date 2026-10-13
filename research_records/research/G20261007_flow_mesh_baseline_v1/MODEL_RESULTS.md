@@ -1169,3 +1169,18 @@ D10.5多stream准备目标完成，训练/神经checkpoint继续关闭；没有�
 最终阶段判断：整体目标不成立完成结论。准备接口到此先收敛；继续追求真实姿态/shape/生成/选择/校准改善需要实质资源及训练授权，之后还要补执行生命周期并按原协议评估。>=5%改善、参与者95%CI、强几何非劣、90%coverage/width、无效/保留与全链p95/三seed门保持原值，不能把工程通过数量降格为替代成功标准。资源阻碍首次集中确认，不在首次标blocked；目标仍active且完整。下轮只核对真实资源/指令是否变化及是否出现新的已证实可修缺陷；同一阻碍连续满足规定次数且无独立有效工作时才更新blocked，不重复生成材料、问已答过的暂无或创建定时自动化。
 
 三轮连续阻碍确认后的最终目标状态（2026-10-13）：第40节首次复核和随后两轮续任务的现有清单/配置/协议均未发生资源或授权变化；train/noise-reference records仍0，训练与checkpoint加载仍禁止，真实配对resultsNone/独立效能False，相关模型源码无新改动。没有新的可独立执行效能工作，已按连续阈值由goal工具确认status=blocked，整体objective未标complete。本轮仅同步现有记录/协议，JSON/任务diff检查；没有模型/测试/成本运行或新验收文件。所有工程成果/未完成项及原5%/CI/coverage/失败/成本门保留。恢复条件为可信匹配来源与适用训练/执行授权，之后仍须补完整生命周期并做原独立配对评价；已有工程检查或仅放开训练都不足以解除数据/证据缺口。
+
+## 41. 2026-10-13用户要求的剩余问题分析：三处新复现缺陷
+
+本轮范围为当前next源码、既有协议/不足台账和限定人工反例。目标分别检查：有限损失归约能否产生未上报的inf；损坏历史时钟能否进入前向；错误分组能否触发歧义门；边缘coverage是否足以代表整向量覆盖。停止条件是对每个问题取得一个直接反例或排除证据，不扩展训练/性能实验。本轮未修改Python，所有下列问题登记为待修复，原工程检查不撤销也不扩充成无缺陷保证。
+
+运行方式为PowerShell here-string经stdin送入`./.venv-cuda/Scripts/python.exe -B -`；仅使用已安装torch和既有tests中的人工fixture。输入、函数和输出如下，不新增永久假数据、检查脚本或审计文件。
+
+- D13：JointFlow().eval()、Normalization.fixture(Topology())和test_joint.sequence_fixture()，CPU float32、torch seed7/单线程/no_grad。只用unittest.mock.patch将train.objective返回固定有限torch.tensor(3e38)，其他序列编码、掩码、原帧目标归约不变。原5帧中3帧可监督，三者均有限；sequence_objective返回loss=inf、nonfinite_objective=False。真实算术平均应为3e38，仍在float32范围内。证明归约和错误状态缺陷，不证明实际训练已经产生此量级；外层sequence_batch_objective的非有限汇总检查仍存在，但会把可表示的结果丢为不可用。最小修正需同时处理稳定归约和最终非有限状态。
+- D14：同模型，test_firewall.observation(1,0.0)先生成正常TemporalState；只用dataclasses.replace将last_timestamp改为NaN，再输入observation(2,1.0)。encoder没有拒绝，context_finite=False。当前hidden/age有限检查没有涵盖历史clock；NaN比较为False，dt再污染特征。需要在使用carry前统一检查历史时钟及帧ID，不能靠自动reset隐藏损坏。
+- D15：复用test_evaluation_population.bound()完整人工登记，保持两参与者、原块/帧、三个seed和train统计绑定。只将PairedEvidence.stratum、registry.comparisons相应stratum及全部registered block.stratum一致改为strong_geometry_only，调用preregistered_gates({},paired_evidence=(ev,))。结果population=registered_metadata_verified，ambiguity_energy_relative_improvement=pass、energy_paired_ci_supports_improvement=pass；机制声明仍为blocked_analytic_fixture。证明指标到门的语义路由缺口，不证明真实效能被发布或原人口绑定检查失效。修正应绑定门需要的分组/对照，不能只核验“证据与自带登记一致”。
+- 概率解释反例：float64 linspace(-1,1,32)复制到51个坐标，末5列加2，target=zeros(51)。distribution返回coverage90=0.9019607901573181，现preregistered_gates coverage90=pass；5列区间始终不含0，整向量不在盒内。这是对正确声明为marginal_coordinate_intervals的指标的边界演示，不能改写为该函数算错。宽度、关节/遮挡分组、失败样本与联合目标需要分别报告/定义。Gneiting与Raftery原文明确区分校准与集中程度，并讨论同时考虑宽度和覆盖的区间评分：https://sites.stat.washington.edu/people/raftery/Research/PDF/Gneiting2007jasa.pdf 。本轮据此不替换既有预注册ES或coverage阈值。
+
+其余结论由源码和解析推导形成，没有新增人体实验：单帧q→17×3表面点→双目像素的精确局部J秩≤51，所以169维全人体至少118维局部零空间；在相同观测/相机/噪声条件下，观测派生Λ没有增加独立测量；SO3 F0仍拒绝Λ，而原有/无信息四法在ambient分支；全帧标签准入、BODY22不能直接经现SurfaceDecoder输出真实全网格、多组在线诊断分解、逐帧CPU旋转log、决策距离权重和跨帧joint law均有明确后续问题。完整推理范围与修正顺序见MODEL_ARCHITECTURE第24节。局部秩上界不等同于有先验/历史模型必然失败，手部权重风险也未证实实际劣化。
+
+本轮交付是带证据的纠错分析和优先级，D13–15未修复；没有优化器、神经checkpoint、数据登记变更、全套测试或成本重测。训练/独立效能资源阻碍仍在，整体目标未完成；这些新代码缺陷本身可在现有工程条件下另行修正。正式主线及已有未提交改动保留。
