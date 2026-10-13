@@ -8,6 +8,17 @@ from .evaluate import paired_bootstrap
 from .evaluation_population import validate_paired_population
 from .information_risk import RiskPolicy
 
+# Semantic declarations from flow_research_plan_v1 (including the later
+# four-learner contrast). Matching these does not certify actual compute or truth.
+_PAIRED_GATE_CONTRACTS = {
+    'standardized_joint_energy': {
+        'stratum': 'preregistered_ambiguity', 'baseline_method': 'F0', 'proposed_method': 'F_info',
+        'budget_scope': 'declared_fixed_K32_shared_acquisition'},
+    'selected_error': {
+        'stratum': 'preregistered_evaluation', 'baseline_method': 'strongest_deployable_baseline',
+        'proposed_method': 'proposed_whole_candidate_risk', 'budget_scope': 'declared_same_candidate_cache'},
+}
+
 
 @dataclass(frozen=True)
 class PairedEvidence:
@@ -85,8 +96,16 @@ def preregistered_gates(metrics, *, paired_evidence=()):
             ('standardized_joint_energy', 'ambiguity_energy_relative_improvement', 'energy_paired_ci_supports_improvement'),
             ('selected_error', 'aggregation_relative_improvement', 'aggregation_paired_ci_supports_improvement')):
         report = paired.get(metric)
-        metrics[improvement] = report['relative_improvement'] if report else None
-        metrics[ci_key] = report['ci_supports_improvement'] if report else None
+        if report is not None:
+            mismatches = [key for key, expected in _PAIRED_GATE_CONTRACTS[metric].items()
+                          if report[key] != expected]
+            expected_split = 'engineering_fixture' if report['source_kind'] == 'analytic_fixture' else 'test'
+            if report['split'] != expected_split:
+                mismatches.append('split')
+            report['gate_contract_mismatches'] = mismatches
+        eligible = report is not None and not report['gate_contract_mismatches']
+        metrics[improvement] = report['relative_improvement'] if eligible else None
+        metrics[ci_key] = report['ci_supports_improvement'] if eligible else None
     requirements = {"ambiguity_energy_relative_improvement": (lambda x: x >= .05),
                     "energy_paired_ci_supports_improvement": bool,
                     "strong_geometry_relative_degradation": (lambda x: x <= .02),

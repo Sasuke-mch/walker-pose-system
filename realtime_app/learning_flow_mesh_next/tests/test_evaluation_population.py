@@ -4,6 +4,7 @@ from dataclasses import replace
 import pytest
 import torch
 
+from ..acceptance import preregistered_gates
 from ..evaluation_population import fit_registered_statistics, registry_records
 from .test_evaluation_contract import evidence
 from .test_firewall import manifest
@@ -16,7 +17,7 @@ def bound():
     for key, split in (('train', 'train'), ('a', 'engineering_replay'), ('b', 'engineering_replay')):
         rows.append({'record_id': key, 'subject': key, 'original_action': key, 'sequence': key,
                      'rig': 'rig_fixture', 'source_path': f'known_fixture:{key}', 'split': split,
-                     'frames': [0, 1], 'blocks': [{'id': n, 'frames': [n], 'stratum': 'registered_fixture_stratum'} for n in (0, 1)]})
+                     'frames': [0, 1], 'blocks': [{'id': n, 'frames': [n], 'stratum': 'preregistered_ambiguity'} for n in (0, 1)]})
     m['records'] = rows
     ev = evidence()
     registry = {'manifest': m, 'source_kind': 'analytic_fixture', 'comparisons': {
@@ -49,9 +50,48 @@ def test_registered_fixture_population_and_statistics_alias_safety():
     assert stats.population[0]['frame'] == 0
 
 
+def test_registered_strong_geometry_cannot_satisfy_ambiguity_gates():
+    ev = bound()
+    registry = copy.deepcopy(ev.registry)
+    registry['comparisons'][ev.metric]['stratum'] = 'strong_geometry_only'
+    for record in registry['manifest']['records']:
+        for block in record['blocks']:
+            block['stratum'] = 'strong_geometry_only'
+    ev = replace(ev, stratum='strong_geometry_only', registry=registry)
+
+    result = preregistered_gates({}, paired_evidence=(ev,))
+
+    # Original rows, seeds and registration still agree; they answer another question.
+    report = result['paired_evidence'][ev.metric]
+    assert report['population']['status'] == 'registered_metadata_verified'
+    assert report['relative_improvement'] == .5
+    assert result['ambiguity_energy_relative_improvement'] == 'not_evaluated'
+    assert result['energy_paired_ci_supports_improvement'] == 'not_evaluated'
+    assert result['mechanism_efficacy_claim'] == 'blocked_analytic_fixture'
+
+
 def test_nonfixture_unregistered_evidence_rejected():
     with pytest.raises(ValueError, match='registered population required'):
         replace(evidence(), source_kind='fitted_reference', split='validation').summarize(iterations=20)
+
+
+@pytest.mark.parametrize('split, status', [('validation', 'not_evaluated'), ('test', 'pass')])
+def test_declared_heldout_split_must_match_acceptance_contract(split, status):
+    # Artificial rows exercise declarations only; this is not real held-out data.
+    ev = bound()
+    registry = copy.deepcopy(ev.registry)
+    registry['source_kind'] = 'fitted_reference'
+    registry['manifest']['license_status'] = 'locally_authorized'
+    registry['comparisons'][ev.metric]['split'] = split
+    for row in registry['manifest']['records']:
+        if row['split'] == 'engineering_replay':
+            row['split'] = split
+    stats = replace(ev.statistics, source_kind='fitted_reference', split='train')
+    ev = replace(ev, registry=registry, statistics=stats, source_kind='fitted_reference', split=split)
+    result = preregistered_gates({}, paired_evidence=(ev,))
+    assert result['ambiguity_energy_relative_improvement'] == status
+    assert result['energy_paired_ci_supports_improvement'] == status
+    assert result['mechanism_efficacy_claim'] == 'not_certified_by_numeric_gates'
 
 
 @pytest.mark.parametrize('field', ['subject', 'original_action', 'sequence', 'rig', 'source_path', 'frames'])

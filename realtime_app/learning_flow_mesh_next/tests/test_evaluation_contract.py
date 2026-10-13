@@ -31,8 +31,14 @@ def records(proposed=1.):
 
 
 def evidence(metric='standardized_joint_energy', proposed=1.):
-    return PairedEvidence(records(proposed), metric, 'registered_fixture_stratum', 'engineering_fixture',
-                          'analytic_fixture', 'known_fixture_records', 'G0', 'G1', 'same_K32_declared_fixture_budget')
+    if metric == 'standardized_joint_energy':
+        stratum, baseline, candidate, budget = ('preregistered_ambiguity', 'F0', 'F_info',
+                                                'declared_fixed_K32_shared_acquisition')
+    else:
+        stratum, baseline, candidate, budget = ('preregistered_evaluation', 'strongest_deployable_baseline',
+                                                'proposed_whole_candidate_risk', 'declared_same_candidate_cache')
+    return PairedEvidence(records(proposed), metric, stratum, 'engineering_fixture',
+                          'analytic_fixture', 'known_fixture_records', baseline, candidate, budget)
 
 
 def test_unit_invariance_separate_scores_and_original_aliases():
@@ -109,3 +115,23 @@ def test_ci_crossing_zero_zero_baseline_and_no_cherry_picked_seeds():
         replace(evidence(), records=tuple({**r, 'baseline': 0.} for r in records())).summarize(iterations=20)
     with pytest.raises(ValueError, match='seed coverage'):
         replace(evidence(), records=records()[:-1]).summarize(iterations=20)
+
+
+@pytest.mark.parametrize('metric, improvement, ci', [
+    ('standardized_joint_energy', 'ambiguity_energy_relative_improvement', 'energy_paired_ci_supports_improvement'),
+    ('selected_error', 'aggregation_relative_improvement', 'aggregation_paired_ci_supports_improvement'),
+])
+@pytest.mark.parametrize('field', ['stratum', 'baseline_method', 'proposed_method', 'budget_scope'])
+def test_unrelated_comparison_keeps_report_but_cannot_pass_gate(metric, improvement, ci, field):
+    ev = replace(evidence(metric), **{field: 'unrelated_comparison'})
+    result = preregistered_gates({}, paired_evidence=(ev,))
+    assert result[improvement] == result[ci] == 'not_evaluated'
+    report = result['paired_evidence'][metric]
+    assert report['relative_improvement'] == .5 and report['gate_contract_mismatches'] == [field]
+
+
+@pytest.mark.parametrize('reverse', [False, True])
+def test_duplicate_metric_strata_cannot_overwrite_each_other(reverse):
+    reports = (evidence(), replace(evidence(), stratum='strong_geometry_only'))
+    with pytest.raises(ValueError, match='distinct paired-evidence'):
+        preregistered_gates({}, paired_evidence=reports[::-1] if reverse else reports)
