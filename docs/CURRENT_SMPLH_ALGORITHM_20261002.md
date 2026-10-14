@@ -1652,3 +1652,110 @@ contact_enabled = false
 ### 35.4 后续实验必须与当前主线分开
 
 后续加速度跟踪、脚跟固定、MHE/EKF和神经网络都以该二维主线作为身体初始化/对照，但不能把拟合后的三维模型回投误差当作独立二维真值。建议先单独实现“二维观测闭环的p/v/a状态估计”，再将状态接入SMPL-H运动学；脚跟硬约束与3D关节点约束均另设显式消融，结果不得回写当前主线。所有新实验保留旧主线和当前二维主线的完整失败、拒绝、参数和输出路径。
+
+## 36. 已实现：相机相对双目像素反馈 p/v/a 基线（2026-10-14）
+
+本轮只实现第34节候选A，目标是验证“真实时间积分预测 + 当帧左右鱼眼像素纠正”的因果闭环。算法为 `realtime_app/pose_app/stereo_pva_tracker.py`，回放和曲线入口为 `realtime_app/tools/run_stereo_pva_baseline.py`，相关测试为 `realtime_app/tests/test_stereo_pva_tracker.py`。复用 NumPy、OpenCV 和现有鱼眼投影，不安装新滤波/优化框架。当前正式人体和场景选择不变。
+
+### 36.1 输入、初始条件与坐标语义
+
+- 数据为原 `people_1/input_448pairs` 的 `0..447`，同源左右 `c3_predictions/{left,right}/pmpose/raw_predictions.json`。只跟踪 COCO `5..16` 共12点：双肩、肘、腕、髋、膝、踝。腕/踝是肢段端点，不包含手指、脚跟或脚部姿态。左右输入各帧必须只有一个已关联人物、ID有序连续；本基线不另做人关联。
+- `raw_side` 按 left_ccw90/right_cw90 的逆变换返回原始1920×1080像素。标定读取 `realtime_app/calibration/results`，右目点为 `p_R=R_cam0_to_cam1*p_L+T_cam0_to_cam1_mm`，使用完整旋转和毫米平移。
+- 首帧单独重跑当前 SMPL-H 二维重投影方法，四份输入只保留 frame0；原448共享beta和逐帧拟合结果不进入初始化。沿用原reliability参数和A30/B30/C300/D100/D100/0预算、seed0，体型及局部手姿也只由首帧推断；12点从该单帧 `predicted_coco` 的米坐标转换为毫米。拟合自己的手部模块仅用于完成当前方法的初始化，不产生后续手部跟踪状态。
+- `--initial-fit` 只接受 `pair_id=[0]`、`predicted_coco.shape=(1,17,3)`，拒绝完整序列拟合文件。首帧 `v=a=0` 为先验；不再用首帧像素更新一次，避免把已被初始化拟合使用的像素重复当成新证据。
+- 时间来自 `selection_manifest.csv` 对齐采集 `stereo_pairs.csv` 的左右 frame_id 和 host_read_return_perf_counter_ns，整数纳秒先减原点，再取双目返回时间均值。严格递增，不以名义30FPS替换。
+
+`p=p_C(t)` 是各时刻左相机系的位置，`v` 和 `a` 是该坐标信号的潜在一阶/二阶运动学状态。因此相机运动也进入这些量；这版**不需要假设助步器相机真的静止**。它既不是固定世界速度在相机轴上的表达，也不是力/关节力矩。离散输出位置还包含测量校正，`v/a` 不等于把输出位置数组直接差分得到的数值。所有帧输出 `coordinate_frame=current_left_camera` 和 `world_state_available=false`。此前草稿中 `left_camera_reference_assumed_static` 的命名不适用于这里的相机相对信号语义，最终版本已纠正。
+
+### 36.2 预测、观测与纠正
+
+每点独立维护9维状态和9×9协方差，顺序为 `[p_x,p_y,p_z,v_x,v_y,v_z,a_x,a_y,a_z]`。初始化协方差对角标准差为位置100mm、速度1000mm/s、加速度5000mm/s²。这是工程先验，尚未统计校准。
+
+```text
+F(dt) = [[I, dt*I, 0.5*dt²*I],
+         [0,    I,       dt*I],
+         [0,    0,          I]]
+x_pred = F*x
+P_pred = F*P*F^T + Q
+
+Q = q * kron([[dt^5/20, dt^4/8, dt^3/6],
+              [dt^4/8,  dt^3/3, dt^2/2],
+              [dt^3/6,  dt^2/2,     dt]], I)
+```
+
+模型是 `da=sqrt(q)dW`，`q=1e8 mm²/s⁵`，表示允许加速度随时间变化；不是把全程加速度锁为常量，也不是已知控制输入。该白jerk的谱密度单位不能误写为某个 mm/s³ 标准差的平方。Q的时间组合性质已有测试，非均匀采样下不会把按帧二阶项当成物理加速度。
+
+每次观测先检查：有限数、两视图原始边界、两侧分数均≥0.2且≤1、两射线夹角≥1°、双目三角化正深度、左右最坏回投≤25px。三角化仅做配对几何检查及失跟恢复初始化，**不会作为第二份3D位置测量更新已跟踪状态**。这些是本诊断基线自己的门，不能写成正式strict分支的accepted或物理正确性。拒绝原因逐点保留。
+
+通过后直接构造4维像素观测 `[u_L,v_L,u_R,v_R]`，预测像素为当前p的左右鱼眼投影。投影位置Jacobian用±1mm中心差分；完整H为 `[J,0,0]`。统一像素 `R=4²*I`，检测分数只作门，不直接解释为概率或逆方差。
+
+```text
+innovation = observed_pixels - project(p_pred)
+S = H*P_pred*H^T + R
+NIS = innovation^T * solve(S, innovation)
+K = P_pred*H^T*S^-1
+x_candidate = x_pred + K*innovation
+```
+
+`NIS>64` 拒绝；该64是四维统计量的工程门，不能称经过校准的“8sigma事件概率”。K的p/v/a交叉协方差使像素残差同时纠正位置、速度和加速度；历史信息已经压缩在状态及协方差中，无须重复把二维差分作为独立测量。
+
+本轮真实回放发现：大预测偏差/大协方差时，线性创新会允许一次错误更新，候选的**实际非线性鱼眼回投**可能仍达300–500px。最终版本追加一次真实投影：候选必须正深度、各视图≤25px且像素残差平方和不增加，否则记 `nonlinear_update_rejected` 或 `update_out_of_domain`，保留预测状态。成功后使用Joseph形式更新P并对称化；没有添加重复迭代、优化框架或显示平滑。
+
+### 36.3 缺失、拒绝、失效与恢复
+
+| 状态 | 含义 |
+|---|---|
+| initialized | 单帧SMPL-H初值，或从未有过轨迹的首次双目定位；零v/a是先验 |
+| updated | 当帧双目像素被实际接受，且非线性候选通过 |
+| predicted | 当前观测缺失/拒绝，仅按模型外推，P继续增长 |
+| expired | 距最后初始化/像素更新超过0.5s，或预测离开正深度域；p/v/a及协方差输出null |
+| reinitialized | 合格双目点建立新segment，v/a重置为0先验，P重置 |
+| uninitialized | 尚无可用初始位置 |
+
+无obs时不调用测量更新，也不无限外推。下一帧若已经跨过0.5s，即使重新看到像素也先断旧轨迹，再用当帧双目点恢复；不沿用旧速度/加速度。`segment_id`、`prediction_age_s`、具体reason和NIS逐点保存，失效不删帧。曲线在恢复/断段处留空，灰带表示仅预测；初值和恢复的零值不能解释成真实静止。缺一只相机时这版保守地只预测，单目降级更新尚未实现。
+
+### 36.4 实际448帧结果及必要验证
+
+实验根为 `research_records/engineering_validation/G20261014_stereo_pva_baseline448_v2`；`protocol.json`、`first_frame_inputs/`、`first_frame_fit_args.json` 和 `first_frame_fit/result.npz` 保留初始化来源。最终输出为 `tracking_final/trajectory.jsonl`、`summary.json`、`velocity_components.png` 和 `acceleration_components.png`。每条JSONL均保留12点的p/v/a、协方差对角、状态/段、时间、几何/创新/回投诊断。
+
+| 项目 | 最终实测 |
+|---|---|
+| 完整帧数/时长 | 448 / 16.035239s |
+| 12×448槽位 | 5376，全部保留 |
+| 初始化/像素更新/仅预测 | 12 / 5024 / 310 |
+| 重启/失效 | 13 / 17；数量为关节样本，不是整帧数量 |
+| dt最小/中位/最大 | 0.006982 / 0.039763 / 0.069505s |
+| 左右返回时差绝对值中位/P95/最大 | 3.5254 / 5.9745 / 9.2775ms；不等于曝光时差 |
+| updated两视图回投中位/P95/最大 | 5.2339 / 15.0132 / 24.6766px；同源内部一致性 |
+| updated速度模长中位/P95/最大 | 0.1971 / 0.6251 / 1.8651m/s |
+| updated加速度模长中位/P95/最大 | 1.8785 / 4.8633 / 12.7176m/s²；相机相对估计 |
+| 每帧几何+预测+像素更新中位/P95/最大 | 8.1885 / 9.9569 / 13.0518ms，CPU；不含检测、初帧SMPL-H、读取/画图 |
+
+最终原因计数中有265个双目回投拒绝、32个创新拒绝、20个非线性候选拒绝、10个候选负深度拒绝。13次重启主要在左臂和右膝；右膝仅325次updated，另110预测、7失效、5重启，不能把“有输出”当成全时有效观测。
+
+8项单元测试通过：物理积分和Q时间组合、首帧不重复像素、非均匀时间已知加速度的像素恢复、缺失预测/协方差增长/超时/恢复、左右不一致和边界拒绝、几何有效但大创新拒绝、线性NIS小而非线性回投错误的拒绝、时间和初始化接口。合成轨迹测试只验证估计逻辑，不代表真实448精度。Ruff E9/F和编译通过。实际检查448有序记录、updated有限、expired为null、所有updated真实回投≤25px、首帧零v/a和世界不可用；没有全仓重跑或额外审计脚本。
+
+失败证据保留：较早v1序列化失败只留下空JSONL；v2的 `tracking/` 保存未加非线性检查的完整回放，12个updated样本回投超过25px、最大541.58px，summary明确标记已被取代。修复后仅重跑跟踪，首帧拟合没有重复执行；曲线灰带调整只从最终JSONL重新绘制。
+
+### 36.5 已暴露的问题、解决顺序与停止点
+
+1. **人体形状没有持续约束。** 各点独立，首帧人体模型不能保证后续骨架。双方都updated时，右上臂端点距离范围147.75–266.03mm，右小腿321.53–569.37mm；COCO端点距离本身也不等于解剖骨长，但这些波动足以说明自由点模型缺乏人体一致性。下一步先将p由冻结形状的SMPL-H根/局部旋转生成，统一估计运动状态，不能仅裁剪p而不修正v/a及P。
+2. **像素抖动、深度方向弱约束及初始收敛仍影响a。** 曲线有高频波动和缺观测时的常加速度平台；模长最大12.72m/s²不能被认定为实际人体峰值，也不能只靠减小它来排名。仅预测段速度P95达2.974m/s、最大7.261m/s：frame203左腕距最后更新0.4955s，继承前次大加速度外推，说明0.5s时限仍可能过长。0.5s历史拟合窗口与0.5s外推时限是不同参数；后续应在遮挡恢复试验中缩短预测时限或按位置不确定度停发，不能通过速度截断假造合理运动。先用重复静态采集/少量独立人工像素估计噪声，固定独立验证片段检验峰值和时滞，再调整R/Q。有骨架后可用约0.5s过去窗口联合投影拟合p/v/a；这是下一候选，本轮没有混入结果。
+3. **大偏差线性化已修正，但仍会失跟。** 当前拒绝+0.5s超时恢复能避免接受严重候选，也会造成断段，特别是右膝。先核对这一点的原始两侧像素、遮挡/配对；若观测可信再考虑少量迭代EKF/短窗，不能放宽门或删除右膝来提高覆盖。
+4. **运动相机和时间源限制。** 当前 v/a 含相机运动，返回时差/非均匀dt也可能混入伪高频。世界量要使用可信独立相机相对轨迹在固定窗口坐标中拟合，或按第34.2节完整求导；不直接对有跳变的VO做二阶差分。后续采集需要曝光时间/硬件同步信息，当前返回时间不能补成该信息。
+5. **零初速、恢复与不确定度是先验。** 只有单帧无法识别真实初速/初加速度；重启后的导数会有暂态。应保留段边界和初始P，验证后再决定是否用前几帧因果短窗初始化速度。协方差目前未校准，不能从其大小给出真实覆盖概率。
+6. **双脚跟约束的坐标前提未满足。** 本轮不加入Stage和脚跟；按用户已确定方案，后续人体版本仍应对移动助步器全阶段实施双heel世界硬锚，并与无heel版本做单变量对比。需要真实模型heel点及可信世界变换，COCO踝不能替代heel。不能把双脚踝锁在正在移动的相机系里。
+
+本次停止点是这个独立基线的代码、448完整回放和问题定位已完成。可以作为人体运动学短窗/网络的因果对照；目前不足以替代正式人体主线或输出可信世界加速度，不增加RL、接触求解或新场景后端。
+
+重放现有单帧初值（输出须使用空目录）：
+
+```powershell
+.venv-cuda/Scripts/python.exe realtime_app/tools/run_stereo_pva_baseline.py `
+  --left-predictions research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/left/pmpose/raw_predictions.json `
+  --right-predictions research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/right/pmpose/raw_predictions.json `
+  --input-pairs research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/input_448pairs `
+  --calibration-dir realtime_app/calibration/results `
+  --initial-fit research_records/engineering_validation/G20261014_stereo_pva_baseline448_v2/first_frame_fit/result.npz `
+  --output research_records/engineering_validation/G20261014_stereo_pva_baseline448_v2/new_replay
+```

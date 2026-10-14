@@ -1,5 +1,17 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-14 相机相对双目p/v/a因果基线已实现并完成448回放
+
+按用户批注先实现最小像素反馈基线。新增pose_app/stereo_pva_tracker.py、tools/run_stereo_pva_baseline.py和8项相关测试；复用NumPy/OpenCV/鱼眼投影，12个COCO肩肘腕髋膝踝独立9维[p,v,a]与协方差、真实dt、白jerk谱密度Q、左右4维像素EKF反馈、Joseph更新。分数只作0.2门，R=4px工程假设；每帧检查原始边界、正深度、射线角>=1deg和双目最坏回投<=25px。三角化只作几何门/重启，非额外3D测量；首帧初始化像素不重复计权。单独用当前reliability/2D方法拟合frame0（全部输入仅frame0、seed0、原560步），不用整段beta/姿态泄漏未来；初速/初加速度0为先验。
+
+输出research_records/engineering_validation/G20261014_stereo_pva_baseline448_v2/tracking_final，首帧输入/参数/fit及protocol同根。当前p是每时刻左相机系位置，v/a是该时变坐标信号的潜在导数、包括相机运动；无需相机真实静止，但不能称世界量。缺失/拒绝只预测，超过0.5s失效为null；合格双目重启新segment且v/a零先验。每帧JSONL保留所有状态/原因/段/协方差与几何诊断，速度/加速度12面板分量图在断段留空、灰带标预测。不加入SMPL-H持续骨约束、Stage、heel或网络，正式选择不变。
+
+实测448/16.035239s全部保留，共5376关节槽：initialized12、updated5024、predicted310、reinitialized13、expired17；右膝325更新/110预测/7失效/5恢复较弱。updated两视图同源回投median5.2339/P9515.0132/max24.6766px；速度模长P950.6251m/s，加速度P954.8633/max12.7176m/s²，均是相机相对工程估计。纯几何/预测/反馈CPU调用median8.1885/P959.9569ms，不含检测/首帧拟合/文件/画图，不称整套实时。dt范围0.006982..0.069505s、返回时差median3.5254/P955.9745ms不是曝光同步证明。
+
+实际首回放发现线性创新会接受非线性错误候选：12个updated回投>25px，max541.58px。已补真实投影须误差不增加且各视图<=25px的候选检查，拒绝后保留预测；该回放在tracking/明确标superseded并保留，v1空JSONL序列化失败也保留。修复后只重跑跟踪，同一单帧初值复用；8项测试（含非线性失败复现、真实dt已知加速度、失观超时/恢复等）、Ruff E9/F/编译通过，448记录/更新有限/失效null/真实回投门/初速0/世界不可用检查通过，无全仓重跑或额外验证基础设施。
+
+问题与下一步见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第36节：独立点导致肢段端点距离漂移（右上臂147.75..266.03mm、右小腿321.53..569.37mm），加速度仍有波动/预测平台，R/Q和初始P未校准。仅预测速度P95达2.974/max7.261m/s，frame203左腕失观0.4955s的大a外推暴露0.5s时限过长的风险；与0.5s历史拟合窗口区分，下一步在遮挡恢复试验里缩短时限或按位置不确定度停发，不裁剪速度假造运动。先接冻结形状的人体运动学与独立噪声/时滞验证，随后才评估过去约0.5s短窗；世界量和完整移动助步器阶段双heel硬锚须可信相机轨迹，踝不替代heel。当前基线完成，可以作因果对照，不提升为人体/场景主线或真实精度。
+
 ## 2026-10-14 当前人体主线切换为二维鱼眼重投影约束
 
 用户明确要求把主线改为上一次已完成的“用二维关节点约束、不用3D关节点约束”方案。本轮已将`realtime_app/configs/current_mainline.json/mainline_selection`切换到`research_records/engineering_validation/G20261013_reliability448_view_v1`的448帧PMPose/SMPL-H结果。当前身体结果为`fit/result.npz`，参数入口为`fit/fit_args.json`，解析参数为`fit/resolved_options.json`，同源页面与场景在`view/`。

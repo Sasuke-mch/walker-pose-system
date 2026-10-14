@@ -1,0 +1,13 @@
+{
+  "objective": "Causal stereo pixel feedback [p,v,a] for 12 limb endpoints; no world/contact estimate.",
+  "input_frames": "people_1/input_448pairs;0..447",
+  "source_fit_arguments": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\fit_args.json",
+  "first_frame_fit": "same current 2D-reprojection SMPL-H method with only frame 0 inputs; seed0",
+  "comparison": "Direct stereo positions are geometry/initialization diagnostics, not independent truth. No SMPL-H sequence output feeds tracking.",
+  "variable": "New per-joint causal p/v/a estimator, subsequent observations current raw stereo pixels only.",
+  "success": "Correct synthetic acceleration recovery, missing/rejected pixels do not update, long gaps yield NaN and separate restart segments; retain all 448 frames and reasons.",
+  "stop": "Invalid inputs/time/calibration, failed first-frame fit or numerical solve stops without relaxing gates or filling frames.",
+  "outputs": "first_frame_fit/result.npz; tracking_final/{trajectory.jsonl,summary.json,velocity_components.png,acceleration_components.png}",
+  "limitations": "R/Q/gates uncalibrated; detector-only paired person; host return not exposure; no independent real 3D or derivative truth.",
+  "prior_attempts": "v1 retained empty trajectory after serializer failure; v2/tracking retained full pre-fix output with 12 excessive nonlinear updated residuals. Only tracking rerun with the same first-frame initializer after nonlinear rejection correction."
+}
