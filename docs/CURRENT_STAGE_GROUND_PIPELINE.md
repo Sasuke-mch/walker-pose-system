@@ -417,3 +417,46 @@ E_visual = sum_t w_t rho(||D^-1 Log(delta_vis_t^-1 T_(t-1)^-1 T_t)||^2)
 - MASt3R-SLAM、Fast3R 和 BLASt3R：https://arxiv.org/html/2412.12392v1 、https://github.com/facebookresearch/fast3r 、https://github.com/naver/blast3r
 - OnlineHMR论文与实现：https://arxiv.org/html/2603.17355v1 、https://github.com/Tsukasane/Video-OnlineHMR
 - JOSH论文/项目与实现：https://vail.cs.ucla.edu/JOSH/ 、https://github.com/genforce/JOSH
+
+## 2026-10-14 ORB-SLAM3 / cuVSLAM 同源448帧实施与比较
+
+本节接续上面的设计及此前被中断的部署，已实际实现、运行两个独立视觉后端并完成共同诊断。结果未通过升级门，仍不修改mainline或人体拟合。Stage完全未进入两个后端，未用脚锚、旧场景轨迹、插值或Stage回填制造视觉成功。
+
+### 输入、实现与运行边界
+
+固定G20261013_reliability448_view_v1的448对原始图像与fit/result.npz。当前比较在G20261014_visual_rig_compare448_v1，protocol.json保存变量、帧范围和原定门：带原生几何支持的位姿覆盖至少90%，tracking调用P95不超过33.333ms；物理精度仍需独立轨迹。共同input_primary/manifest.json由prepare_visual_rig_comparison.py生成：逆转正的raw fisheye、960×540、按像素中心缩放内参、完整双目R及米制t、人体关键点凸包/肢体padding、参考助步器杆件投影与共同前向半球域。两后端收到相同图像与排除mask；不能因此预设它们内部都完全遵守mask。参考助步器安装和mask仅经视觉核对，未物理认证。
+
+本次manifest仍使用名义30FPS时间，保留左右主机返回差，不能从这些秒数认证曝光同步或人体物理加速度。当前实际主机返回时间跨度16.035239秒，另见身体算法第33/34节。首轮固定栅格留出曾在4帧得零合格双目诊断点，因此保留input但主比较不使用它；primary诊断是同源背景一致性，不是独立留出或世界精度。
+
+ORB部署在Ubuntu-22.04 WSL2，库/runner位于/home/itachi/walker_orb_build/ORB_SLAM3，Pangolin库位于同级pangolin_install/lib；使用项目third_party/ORB_SLAM3/Vocabulary/ORBvoc.txt。源码入口walker_tools/scene/orbslam3_runner.cpp和orbslam3_static_mask.patch。补丁在原生特征提取阶段排除mask及描述子支持，修正右鱼眼读取左畸变的错误；没有改stereo初始化门。依赖补丁对官方clean index检查通过，完整目标已编译。
+
+cuVSLAM使用隔离WSL环境中的17.0.1+cu12，入口walker_tools/scene/cuvslam_backend.py；完整R/t构造以左光心为rig原点，右rig_from_camera为标定逆变换。同步SLAM开启，原生odom pose与map pose分开保存。SDK请求Precision不等于实际primary名单；当前同配置构造检查get_primary_cameras返回[0]，代码记录实际值，不把配置文本当事实。
+
+### 实际结果与结论
+
+| 指标 | ORB-SLAM3最终v4 | cuVSLAM已完成primary |
+|---|---:|---:|
+| 保留帧数 | 448 | 448 |
+| 原生位姿且有非空导出3D支持 | 0（0%） | 373（83.26%） |
+| tracking调用中位/P95，ms | 13.77 / 17.48（均未初始化） | 3.80 / 21.99 |
+| 完整replay，s | 88.35（另初始化11.55） | 100.57（另初始化0.982） |
+| 覆盖门通过 | 否 | 否 |
+| 可用于世界速度/加速度或主线升级 | 否 | 否 |
+
+ORB全448为not_initialized，输入缺失0、mask中心违规0、最终地图segment始终0。左右特征数最大49/168，同帧总特征最大217，低于原生StereoInitialization要求N>500；不能据空位姿称通过，也不能用未初始化的调用时间宣称成功定位实时。保留原配置缺overlappingBegin失败、v2在frame51的空描述子崩溃、v3时间溢出中止。已修复空侧rowRange/vconcat处理；runner将timestamp_ns整型token在内存转为等值JSON实数，避免OpenCV32位读入溢出。frame51针对性检查及v4完整448时间逐项匹配通过，无虚假时间倒退/reset。
+
+cuVSLAM所有448帧都有native位姿proposal；包装层将13帧初始化和62帧无导出3D支持列为不可用，所以373不是原生明确报告的“可靠米制成功”。get_last_landmarks只导出last-frame的tracks3d，373帧的中位/P95/最大点数1/3/6不是整张地图或求解器内点数。保守输出分为6段（最长241帧），不等于确认native地图reset。连续367边相邻平移P95约0.384m、最大19.476m；300边平移数值不变，不能由此区分真实静止、保持或预测。SDK未提供可靠视觉更新/预测标志，metric_pose_usable保持false。CPU读图和导出诊断也占时，完整帧中位/P95约180.12/536.75ms，不能将3.80ms调用等同端到端速度。
+
+共同background_diagnostics共30个可投影点，cu残差中位0.767px/P9584.64px；没有任何边有至少4个诊断点，ORB无可用边，所以没有可供排名的充分共同残差或独立精度。不能用较小中位数盖住样本不足和高尾部。
+
+实际mask诊断还发现cu全448导出右目89个观察中76个深入排除区>3px，左目无>3px深层违规；这些只是native导出对应，不能据此确认它们全部被最终求解器作为内点。但35个右目对应且有finite3D的点中，10个右鱼眼回投误差<=2px，其中8个仍深入右mask；原始像素坐标解释与版本源码相符，不能将该现象归为坐标误用。右目排除契约尚未完全实现，具体内部原因未确定。现有原始结果全部保留，没有黑填图、删点或重写轨迹伪造成功。
+
+last landmark的Python文档称world，17.0.1源码与584点回投却显示为当前rig坐标（直接回投中位0.266px；误当world逆pose中位26.32px）。后端没有将该字段当world消费，新增明确语义说明。原生ODOM/map坐标不是初始地面认证坐标；地图重置/优化或包装层断段不能跨段求导。
+
+### 保存结果与下一阶段
+
+最终ORB在orbslam3_primary_v4/visual_rig_pose.jsonl与runner_summary.json，cu在cuvslam_primary.jsonl与metadata；comparison_v1/comparison.json保存共同统计，background_diagnostics.jsonl保存全帧诊断。比较器按同一native变换导出真实冻结人体mesh/COCO、刚体助步器和两个光心到*_world_geometry.npz，失败帧NaN、段标识保留；字段metric_pose_usable=false/world_pose_certified=false，不作为正式世界输出。
+
+当前可复现运行入口是prepare_visual_rig_comparison.py、orbslam3_runner、cuvslam_backend.py和compare_visual_rig_poses.py，实际路径/参数继续从protocol、manifest、settings和metadata读取。8项针对性单测（标定方向、单位、同源网格/对象转换、失败保留、支持不重复计数、深层mask违规）与4个Python入口Ruff E9/F通过；ORB真实编译、边界帧及完整448运行通过。不增加无关全流程验证。
+
+结论是完成两条工程适配与比较，独立视觉世界轨迹尚未达标。下一修复应围绕已定位的静态背景有效特征/双目支持不足及cu右目匹配排除实效，并先用小范围同源输入证明修复，再决定是否全片重跑；不盲增模型、放宽门或把Stage硬填补称视觉成功。Stage辅助融合未实施，因为本轮没有通过的独立视觉观测可供主线融合。人体相机相对运动状态可独立继续研究；世界速度/加速度暂不可用，具体实现意见见身体算法第34节。

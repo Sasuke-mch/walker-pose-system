@@ -1,0 +1,150 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 016e743..9d6299e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -20 +20 @@ if(COMPILER_SUPPORTS_CXX11)
+-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
++   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+@@ -140,0 +141,10 @@ endif()
++# Build only the project adapter target when requested explicitly.
++set(WALKER_RUNNER_SOURCE
++    ${PROJECT_SOURCE_DIR}/../../realtime_app/walker_tools/scene/orbslam3_runner.cpp
++    CACHE FILEPATH "Walker project's masked stereo replay adapter")
++add_executable(orbslam3_runner
++    ${WALKER_RUNNER_SOURCE})
++target_link_libraries(orbslam3_runner ${PROJECT_NAME})
++set_target_properties(orbslam3_runner PROPERTIES
++    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
++
+diff --git a/src/Frame.cc b/src/Frame.cc
+--- a/src/Frame.cc
++++ b/src/Frame.cc
+@@ -1113 +1113,7 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeStamp,
+-    cv::vconcat(mDescriptors,mDescriptorsRight,mDescriptors);
++    // Exclusion masks can leave either camera without static features.
++    if(mDescriptors.empty())
++        mDescriptors = mDescriptorsRight.clone();
++    else if(!mDescriptorsRight.empty())
++        cv::vconcat(mDescriptors,mDescriptorsRight,mDescriptors);
++    // With an empty right side the left descriptors are already complete.
++
+@@ -1131,3 +1137,0 @@ void Frame::ComputeStereoFishEyeMatches() {
+-    cv::Mat stereoDescLeft = mDescriptors.rowRange(monoLeft, mDescriptors.rows);
+-    cv::Mat stereoDescRight = mDescriptorsRight.rowRange(monoRight, mDescriptorsRight.rows);
+-
+@@ -1139,0 +1143,8 @@ void Frame::ComputeStereoFishEyeMatches() {
++    // Preserve unavailable stereo support instead of slicing an empty Mat.
++    // This is the masked frame51 failure; no matching threshold is changed.
++    if(stereoLeft.empty() || stereoRight.empty())
++        return;
++
++    cv::Mat stereoDescLeft = mDescriptors.rowRange(monoLeft, mDescriptors.rows);
++    cv::Mat stereoDescRight = mDescriptorsRight.rowRange(monoRight, mDescriptorsRight.rows);
++
+diff --git a/include/LoopClosing.h b/include/LoopClosing.h
+index c9ccb26..13df56c 100644
+--- a/include/LoopClosing.h
++++ b/include/LoopClosing.h
+@@ -226 +226,3 @@ protected:
+-    bool mnFullBAIdx;
++    // Native code increments and compares this BA generation counter. C++17
++    // rejects bool++; keep the intended generation semantics as an integer.
++    int mnFullBAIdx;
+diff --git a/include/ORBextractor.h b/include/ORBextractor.h
+index bb7aace..9c7e3ba 100644
+--- a/include/ORBextractor.h
++++ b/include/ORBextractor.h
+@@ -56 +56,4 @@ public:
+-    // Mask is ignored in the current implementation.
++    // External exclusion masks are applied before octree feature allocation.
++    // Nonzero pixels exclude the full ORB descriptor support; image intensities
++    // are never changed, so mask boundaries cannot create artificial corners.
++    void SetExclusionMask(const cv::Mat& mask) { mExclusionMask = mask.clone(); }
+@@ -85,0 +89 @@ protected:
++    cv::Mat mExclusionMask;
+diff --git a/include/System.h b/include/System.h
+index 872c86e..22b553e 100644
+--- a/include/System.h
++++ b/include/System.h
+@@ -179,0 +180,6 @@ public:
++    // Call these in the same main thread as TrackStereo. Export retains native
++    // map IDs and raw fisheye keys, including lost/uninitialized frame state.
++    void SetStereoExclusionMasks(const cv::Mat& left, const cv::Mat& right);
++    unsigned long GetCurrentMapId();
++    const Frame& GetCurrentFrameForExport() const;
++
+diff --git a/include/Tracking.h b/include/Tracking.h
+index 863c98e..25cf4b6 100644
+--- a/include/Tracking.h
++++ b/include/Tracking.h
+@@ -65,0 +66,6 @@ public:
++    void SetStereoExclusionMasks(const cv::Mat& left, const cv::Mat& right)
++    {
++        mpORBextractorLeft->SetExclusionMask(left);
++        mpORBextractorRight->SetExclusionMask(right);
++    }
++
+diff --git a/src/ORBextractor.cc b/src/ORBextractor.cc
+index 970b7cc..e807042 100644
+--- a/src/ORBextractor.cc
++++ b/src/ORBextractor.cc
+@@ -793,0 +794,18 @@ namespace ORB_SLAM3
++            cv::Mat levelExclusion;
++            if(!mExclusionMask.empty())
++            {
++                CV_Assert(mExclusionMask.type() == CV_8UC1);
++                cv::Mat floatMask, resizedMask;
++                cv::compare(mExclusionMask, 0, floatMask, cv::CMP_GT);
++                floatMask.convertTo(floatMask, CV_32F);
++                // Area aggregation retains thin excluded structures at coarse
++                // pyramid levels; nearest-neighbor could silently erase them.
++                cv::resize(floatMask, resizedMask, mvImagePyramid[level].size(), 0, 0, cv::INTER_AREA);
++                cv::compare(resizedMask, 0, levelExclusion, cv::CMP_GT);
++                // Rotated descriptor pattern reaches ~19 pixels, plus the
++                // Gaussian descriptor prefilter. A 22-pixel halo prevents
++                // dynamic pixels from entering retained descriptors.
++                cv::dilate(levelExclusion, levelExclusion,
++                    cv::getStructuringElement(cv::MORPH_RECT, cv::Size(45,45)));
++            }
++
+@@ -866,0 +885,7 @@ namespace ORB_SLAM3
++                            if(!levelExclusion.empty())
++                            {
++                                const int x = cvRound((*vit).pt.x + minBorderX);
++                                const int y = cvRound((*vit).pt.y + minBorderY);
++                                if(levelExclusion.at<unsigned char>(y,x) != 0)
++                                    continue;
++                            }
+diff --git a/src/Settings.cc b/src/Settings.cc
+index 93a50be..e62ef9f 100644
+--- a/src/Settings.cc
++++ b/src/Settings.cc
+@@ -318,4 +318,4 @@ namespace ORB_SLAM3 {
+-            float k0 = readParameter<float>(fSettings,"Camera1.k1",found);
+-            float k1 = readParameter<float>(fSettings,"Camera1.k2",found);
+-            float k2 = readParameter<float>(fSettings,"Camera1.k3",found);
+-            float k3 = readParameter<float>(fSettings,"Camera1.k4",found);
++            float k0 = readParameter<float>(fSettings,"Camera2.k1",found);
++            float k1 = readParameter<float>(fSettings,"Camera2.k2",found);
++            float k2 = readParameter<float>(fSettings,"Camera2.k3",found);
++            float k3 = readParameter<float>(fSettings,"Camera2.k4",found);
+diff --git a/src/System.cc b/src/System.cc
+index 60d9c51..1c6240d 100644
+--- a/src/System.cc
++++ b/src/System.cc
+@@ -1320,0 +1321,15 @@ void System::SaveDebugData(const int &initIdx)
++void System::SetStereoExclusionMasks(const cv::Mat& left, const cv::Mat& right)
++{
++    mpTracker->SetStereoExclusionMasks(left, right);
++}
++
++unsigned long System::GetCurrentMapId()
++{
++    return mpAtlas->GetCurrentMap()->GetId();
++}
++
++const Frame& System::GetCurrentFrameForExport() const
++{
++    return mpTracker->mCurrentFrame;
++}
++

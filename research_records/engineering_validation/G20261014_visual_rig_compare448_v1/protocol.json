@@ -1,0 +1,48 @@
+{
+  "status": "completed_backend_comparison_no_candidate_promoted",
+  "source_plan": "research_records/engineering_validation/G20261013_reliability448_view_v1/plan.json",
+  "frame_ids": "0..447",
+  "pair_count": 448,
+  "input": "input_primary/manifest.json",
+  "frozen_body": "research_records/engineering_validation/G20261013_reliability448_view_v1/fit/result.npz",
+  "backends": [
+    "official_ORB_SLAM3_fisheye_stereo_masked",
+    "official_cuVSLAM17_stereo_SLAM_masked"
+  ],
+  "variable": "visual backend only",
+  "common_inputs": "Same inverse-rotated original raw fisheye,960x540,formal calibration,person hull and limb padding,coarse walker projection,forward hemisphere",
+  "stage_used": false,
+  "temporal_fill": false,
+  "scale_alignment": false,
+  "independent_truth_available": false,
+  "diagnostic_scope": "Same-source background consistency; not strict held-out or physical accuracy",
+  "failed_cell_holdout": "Initial fixed-grid disjoint stereo holdout had zero accepted test stereo points on4 sampled frames; prepared input retained, not used as primary",
+  "deployment_gate": {
+    "minimum_tracking_fraction": 0.9,
+    "maximum_track_call_p95_ms": 33.333,
+    "metric_support": "Native pose needs initialized geometry; identity proposal with zero landmarks is not metric success"
+  },
+  "promotion": "No promotion based on coverage, smoothness or reprojection alone",
+  "stop": "Retain native failures and all448 frames; noStagefallback or interpolation; targeted fixes only after specific failure",
+  "outputs": {
+    "orbslam": "orbslam3_primary_v4/visual_rig_pose.jsonl",
+    "cuvslam": "cuvslam_primary.jsonl",
+    "comparison": "comparison_v1/comparison.json",
+    "candidate_geometry": "comparison_v1/*_world_geometry.npz"
+  },
+  "decision": "Both coverage gates fail; ORB never initialized, cu pose jumps and deep right-mask exported correspondences unresolved. No independent world trajectory, no Stage fusion or writer injection.",
+  "source_files": [
+    "realtime_app/walker_tools/scene/prepare_visual_rig_comparison.py",
+    "realtime_app/walker_tools/scene/orbslam3_runner.cpp",
+    "realtime_app/walker_tools/scene/orbslam3_static_mask.patch",
+    "realtime_app/walker_tools/scene/cuvslam_backend.py",
+    "realtime_app/walker_tools/scene/compare_visual_rig_poses.py"
+  ],
+  "retained_failed_runs": [
+    "orbslam3_primary.log",
+    "orbslam3_primary_v2.log",
+    "orbslam3_primary_v3.log",
+    "input/"
+  ],
+  "timing_limit": "Manifest nominal 30FPS, exposure synchronization unknown; do not interpret nominal derivative as physical acceleration."
+}

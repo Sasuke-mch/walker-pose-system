@@ -1,5 +1,15 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-14 两种独立双目视觉后端全448实现与比较完成，均未升级
+
+接续此前被中断的ORB-SLAM3/cuVSLAM部署，用户明确要求子智能体继续。固定G20261013_reliability448_view_v1的448原图/人体，G20261014_visual_rig_compare448_v1/input_primary的raw-fisheye960×540、正式完整R/t、人体/参考助步器排除mask和前向域，两后端完全不读Stage或脚锚。protocol原覆盖90%及native调用P9533.333ms门保留。ORB部署于Ubuntu-22.04 WSL2，cu17.0.1+cu12；源码为walker_tools/scene/{prepare_visual_rig_comparison.py,cuvslam_backend.py,orbslam3_runner.cpp,orbslam3_static_mask.patch,compare_visual_rig_poses.py}，实际结果及下一问题见docs/CURRENT_STAGE_GROUND_PIPELINE.md末节。
+
+ORB v4完整448退出成功但全部not_initialized，0有效pose；左右特征max49/168、同帧总max217不足原生N>500初始化条件，mask中心违规/输入缺失0，段0。实际修复右鱼眼误读左畸变、单侧空描述子rowRange/vconcat崩溃、OpenCV32位JSON纳秒溢出；frame51和最终448时间/完整R/t检查通过。原配置/v2崩溃/v3时间重置运行保留，v4没有放宽门或伪造位姿。tracking中位/P9513.77/17.48ms只是未初始化调用，replay88.35s另初始化11.55s，不声称有效定位实时。
+
+cu原始全448已完成，不重复运行或重写。所有帧有native proposal，但仅373（83.26%）有last-frame非空3D支持，13初始化/62支持缺失；导出点median1/P953/max6不是总地图或solver内点，6个包装层断段也非native reset。相邻367边平移P950.384m/max19.476m，不能用于世界导数。调用中位/P953.80/21.99ms，完整帧180.12/536.75ms，wall100.57s。全帧89个右目导出观察中76个深入排除区>3px；右目10个回投<=2px的3D对应仍有8个深入mask，排除仅坐标误用的解释，但具体SDK内部原因/solver是否使用这些对应未知。native实际primary[0]、语义及mask未认证记录在source；metric_pose_usable仍false。
+
+共同compare已真实运行，comparison_v1/comparison.json记录两种覆盖门均失败；仅30个同源背景诊断点、无任何边>=4点，cu残差中位0.767/P9584.64px，不能做独立精度或充分排名。*_world_geometry.npz使用同一候选视觉变换导出冻结真实mesh、人体、刚体walker和双光心，失败NaN/段标识/不可用等级保留，不注入writer，不实施尚无合格视觉观测的Stage融合。后端输入名义30FPS仍不证明曝光同步。8项相关单测与4入口Ruff E9/F通过，ORB库/runner编译及补丁对官方clean index检查通过；没有全仓重复验证。更新既有protocol及场景文档，源码/文档增量本地提交，大型结果/部署资产不入Git，其他工作区改动保留，不推送。
+
 ## 2026-10-14 四肢运动学跟踪调研与现有基线速度曲线
 
 用户提出第一帧人体位姿/零初速、以关节加速度驱动拟合双目二维投影、移动助步器时固定双脚跟，随后比较神经网络。本轮核验Mimic2DM（CVPR2026）、PhysHMR（SIGGRAPH Asia2025）、GVHMR/WHAM/PhysPT（2024）及VideoMimic（CoRL2025），并查现有09-18跟踪失败记录。详细方案、文献阅读范围、状态方程、脚跟/相机循环依赖和有序对照见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第33节。没有实现或运行新的MHE、神经网络或RL；正式360身体、最近448拟合与场景选择保留。
