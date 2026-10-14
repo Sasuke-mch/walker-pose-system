@@ -1,5 +1,13 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-14 强化学习人体跟踪研究与实施方案完成，尚未训练
+
+用户要求承担RL路线、先检索研究并给出实现方案。本轮核验Mimic2DM正文/附录与官方mimic2dm_release、PhysHMR方法/评价与实现，补充InterMimic作者机制、AssistMimic官方协议和MimicKit/MuJoCo/MJWarp/mjlab接口/平台资料；阅读范围及方案见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第37节。不安装依赖、不实现RL环境、不运行训练或重拟合；当前448二维身体与supported_stop_fixed_lag场景选择保持。
+
+方案为同定义固定形状人体、左右raw-fisheye二维反馈、因果过去0.5秒、PPO输出PD目标角及动力学积分；不独立驱动COCO点、不把控制量当关节点加速度。先已知world/camera的合成单环境，再无heel学习、全Stage2硬锚单变量对照、真实448条件场景试验。普通MuJoCo等式是软约束，硬锚需显式受限积分/位置与速度一致投影、≤1mm数值门并保留反力/冲量/不可行；腕部支撑、COCO表面点与仿真关节映射、非均匀dt及到达观测后的估计时序均明确。无独立相机pose/人工或3D真值不能声称world/物理精度，Stage脚锚不能自证场景；原片训练只称片段拟合。
+
+现场本机RTX5070 Ti Laptop/12227MiB/compute12.0、Torch2.11/cu128，所查仿真/RL包均未安装；旧IsaacGym/cu116不直接复制，优先隔离MuJoCo CPU验证，GPU候选MJWarp/mjlab但Windows/WSL稳定性与吞吐待测。下一阶段R0只做同定义人体/鱼眼/积分接口，不等其他场景路线完成即可开展合成研究。拟先64再256环境、首轮100万transitions/2小时取先到，三种子及两次修订停止；未来数据不喂因果actor，未来标签Stage的延迟公平处理，同仿真经典控制和同链经典跟踪均待实现后才能评价RL必要性。以上预算/门均为方案，不是运行结果；相关检查只做文档差异/路径与来源核对。
+
 ## 2026-10-14 相机相对双目p/v/a因果基线已实现并完成448回放
 
 按用户批注先实现最小像素反馈基线。新增pose_app/stereo_pva_tracker.py、tools/run_stereo_pva_baseline.py和8项相关测试；复用NumPy/OpenCV/鱼眼投影，12个COCO肩肘腕髋膝踝独立9维[p,v,a]与协方差、真实dt、白jerk谱密度Q、左右4维像素EKF反馈、Joseph更新。分数只作0.2门，R=4px工程假设；每帧检查原始边界、正深度、射线角>=1deg和双目最坏回投<=25px。三角化只作几何门/重启，非额外3D测量；首帧初始化像素不重复计权。单独用当前reliability/2D方法拟合frame0（全部输入仅frame0、seed0、原560步），不用整段beta/姿态泄漏未来；初速/初加速度0为先验。
