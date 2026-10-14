@@ -1,0 +1,191 @@
+{
+  "status": "completed_engineering_SMPLH_motion_baseline",
+  "frames": 448,
+  "output_model": "SMPLH:6890 vertices,13776 faces,full body pose,root,betas,frozen hand poses",
+  "observation_term": "2d_stereo_pixels_only;no_triangulation_or_3d_position_term",
+  "pose_available_frames": 448,
+  "frame_status_counts": {
+    "initialized": 1,
+    "updated": 443,
+    "predicted": 3,
+    "reinitialized": 1
+  },
+  "joint_status_counts": {
+    "initialized": 12,
+    "updated": 5205,
+    "predicted": 93,
+    "inferred": 54,
+    "reinitialized": 12
+  },
+  "view_reason_counts": {
+    "first_frame_initialization_pixels_not_reused": 24,
+    "used_2d": 10434,
+    "stereo_epipolar_rejected": 222,
+    "nonlinear_update_rejected": 72
+  },
+  "all_valid_raw_view_reprojection_px": {
+    "count": 10752,
+    "min": 0.36410001326659175,
+    "median": 36.237250276667645,
+    "p95": 135.28642713433476,
+    "max": 486.7636875646581
+  },
+  "used_view_reprojection_px": {
+    "count": 10434,
+    "min": 0.36410001326659175,
+    "median": 35.56040925226611,
+    "p95": 133.3815845042574,
+    "max": 486.7636875646581
+  },
+  "derivative_available_joint_samples": 1065,
+  "derivative_reason_counts": {
+    "derivative_warmup": 96,
+    "available": 1065,
+    "poor_or_stale_pixel_fit": 4161,
+    "no_recent_own_pixels": 54
+  },
+  "update_gain_scale": {
+    "count": 444,
+    "min": 0.08811621872503608,
+    "median": 0.233120018035757,
+    "p95": 0.9529698094790542,
+    "max": 1.0
+  },
+  "reported_speed_norm_m_s": {
+    "count": 1065,
+    "min": 0.007208746343516497,
+    "median": 0.18834332239200588,
+    "p95": 0.5271531086320803,
+    "max": 1.141272427949872
+  },
+  "reported_acceleration_norm_m_s2": {
+    "count": 1065,
+    "min": 0.01565969545295197,
+    "median": 0.9987423448312852,
+    "p95": 3.839065554128699,
+    "max": 32.26396270816009
+  },
+  "raw_acceleration_norm_m_s2_before_derivative_mask": {
+    "count": 5376,
+    "min": 0.0,
+    "median": 0.9900465479027012,
+    "p95": 5.158415416320878,
+    "max": 43.51731207149323
+  },
+  "internal_kinematic_limb_length_spread_max_mm": 0.00023566249623963031,
+  "step_ms_model_geometry_state_update_and_derivative_decode": {
+    "count": 448,
+    "min": 51.10739999508951,
+    "median": 71.972249999817,
+    "p95": 99.61366999559687,
+    "max": 600.9919999924023
+  },
+  "timestamp_span_s": 16.035239,
+  "dt_s": {
+    "count": 447,
+    "min": 0.0069816000000000045,
+    "median": 0.03976310000000005,
+    "p95": 0.0614030649999998,
+    "max": 0.06950539999999972
+  },
+  "abs_host_return_skew_ms": {
+    "count": 448,
+    "min": 0.094,
+    "median": 3.5254,
+    "p95": 5.974509999999996,
+    "max": 9.2775
+  },
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 0.4,
+    "latent_prior_sigma": 1.5,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "coordinate_frame": "current_left_camera",
+  "world_state_available": false,
+  "initialization": "frame0-only model parameters; when labels supplied, refine frame0 in pure 2D and freeze new shape; no stored 3D observations read",
+  "limits": [
+    "No independent metric 3D or derivative truth; pose availability and smoothness are not accuracy.",
+    "Shape from one frame is frozen and can be biased; regressed surface keypoint distances need not be perfectly rigid.",
+    "R/Q and covariance are engineering assumptions; ignored model bias is not covered by covariance.",
+    "Unobserved points may be inferred from the model, but derivatives expire after 0.1s without own pixel support.",
+    "All derivatives include camera motion. No world, Stage or heel contact constraint is estimated.",
+    "Host-return timestamps do not prove exposure times or stereo synchronization.",
+    "Combined model and conservative parameter changes; comparison to free-point tracker is not a single-variable ablation."
+  ],
+  "model_consistency": {
+    "frames": 448,
+    "vertices_shape": [
+      448,
+      6890,
+      3
+    ],
+    "faces_shape": [
+      13776,
+      3
+    ],
+    "real_faces_equal_model": true,
+    "frozen_shape_hands_equal_initial_model": true,
+    "sample_regeneration_frames": [
+      0,
+      224,
+      447
+    ],
+    "vposer_parameter_mesh_max_difference_m": 4.172325134277344e-07,
+    "published_axis_angle_mesh_max_difference_m": 3.5762786865234375e-07,
+    "all_frame_regressor_from_saved_mesh_max_difference_m": 1.1920928955078125e-07,
+    "first_velocity_acceleration_zero_prior": true,
+    "masked_derivative_nan_matches_flags": true,
+    "world_state_available": false
+  },
+  "all_valid_raw_view_fraction_within_25px": 0.34188988095238093,
+  "pixel_fit_assessment": "insufficient_full_sequence_fit;not_promoted_to_mainline_or_physical_kinematics",
+  "per_joint_derivative_available_samples": {
+    "left_shoulder": 126,
+    "right_shoulder": 152,
+    "left_elbow": 84,
+    "right_elbow": 169,
+    "left_wrist": 58,
+    "right_wrist": 81,
+    "left_hip": 29,
+    "right_hip": 25,
+    "left_knee": 78,
+    "right_knee": 34,
+    "left_ankle": 138,
+    "right_ankle": 91
+  },
+  "derivative_peak_example": {
+    "frame": 292,
+    "joint": "right_ankle",
+    "acceleration_norm_m_s2": 32.26396270816009,
+    "reprojection_px": [
+      23.549907505704407,
+      6.902095561967606
+    ],
+    "meaning": "Even good 2D fit does not establish true acceleration."
+  },
+  "first_frame_manual_reference": {
+    "source": "D:\\my_works\\walker_pose_system\\research_records\\annotation_handoffs\\H20261014_people1_pair0000\\labels",
+    "manual_points": 16,
+    "hand_foot_semantics": "user_confirmed_wrist_ankle",
+    "frame0_only": true,
+    "manual_reprojection_median_px": 10.384501934051514,
+    "manual_reprojection_max_px": 61.646949768066406,
+    "raw_pixel_Sampson_right_shoulder_px": 30.166,
+    "diagnostic_meaning": "Anatomical correspondence/calibration/synchronization inconsistency needs separate checks; does not identify its cause."
+  }
+}

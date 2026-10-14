@@ -1,0 +1,105 @@
+{
+  "objective": "Direct complete SMPL-H causal motion estimation from its COCO-regressed raw stereo 2D projections, with no independent Cartesian joint states or 3D observation term.",
+  "inputs": {
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results",
+    "initial_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_manual_v1\\first_frame_fit\\result.npz",
+    "smplh_model": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+    "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+    "vposer_dir": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05",
+    "mano_left": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+    "mano_right": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+  },
+  "capture_pairs": "D:\\my_works\\walker_pose_system\\realtime_app\\outputs\\people_1\\20260908_203954_366\\stereo_pairs.csv",
+  "frame_range": [
+    0,
+    447
+  ],
+  "manual_labels": "D:\\my_works\\walker_pose_system\\research_records\\annotation_handoffs\\H20261014_people1_pair0000\\labels",
+  "manual_semantics": "human-confirmed hand=wrist,foot=ankle; leftt_hand explicit alias;16 points;frame0 only",
+  "initialization": {
+    "original_frame0_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_stereo_pva_baseline448_v2\\first_frame_fit\\result.npz",
+    "historical_cold_start": "Current-method frame0 initializer used triangulation; only model parameter fields are read, no 3D point data term.",
+    "manual_refined_model": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_manual_v1\\first_frame_fit\\result.npz",
+    "refine_steps": 500,
+    "manual_sigma_px": 4,
+    "auto_sigma_px": 15,
+    "huber_normalized_norm": 3,
+    "vposer_prior_sigma": 1.5,
+    "beta_prior_sigma": 2,
+    "learning_rates": {
+      "latent": 0.02,
+      "root_translation": 0.005,
+      "beta": 0.01
+    },
+    "shape_frozen_after_first_frame": true,
+    "zero_velocity_acceleration": "priors, not measured truth",
+    "frame0_pixels_not_reused_in_filter": true
+  },
+  "estimator": {
+    "state": "t3,SO3 root tangent3,VPoser32; each carries velocity/acceleration; covariance114x114",
+    "measurement": "calibrated raw left/right fisheye pixels,finite/score/bounds and 2D epipolar gate",
+    "history": "recursive past state;current pixels;no future or batch short window",
+    "update": "single error-state EKF with robust per-point R, soft VPoser regularizer, bounded common gain for q/v/a AND Joseph covariance",
+    "configuration": {
+      "min_score": 0.2,
+      "pixel_sigma_px": 8.0,
+      "huber_px": 25.0,
+      "max_stereo_epipolar_px": 35.0,
+      "min_observed_joints": 4,
+      "max_prediction_s": 0.1,
+      "derivative_warmup_s": 0.15,
+      "max_position_std_m": 0.1,
+      "max_derivative_reprojection_px": 25.0,
+      "translation_jerk_density": 0.25,
+      "rotation_jerk_density": 1.0,
+      "latent_jerk_density": 4.0,
+      "max_translation_correction_m": 0.08,
+      "max_root_correction_rad": 0.12,
+      "max_latent_correction_norm": 0.4,
+      "latent_prior_sigma": 1.5,
+      "max_abs_latent": 6.0,
+      "derivative_step_s": 0.01
+    },
+    "derivatives": "full SMPL-H model-point instantaneous derivatives with curvature, eps0.01s; retain raw values and mask poor/stale-fit public derivatives"
+  },
+  "validation_target": "Complete licensed-model mesh and parameter regeneration; exact COCO-regressor interface; causal dt/expiry/masking/scaled covariance contracts. No 3D accuracy claim.",
+  "comparison": "Standalone baseline; previous free-point and intermediate versions differ in more than one factor, not a controlled single-variable ablation.",
+  "success": "Implementation/export contracts and 13 targeted tests passed; all448 records retained. Numerical pose availability is separate from 2D fit or derivative quality.",
+  "quality_result": "Insufficient full-sequence 2D fit: median36.23725/P95135.28643px; no mainline promotion or physical kinematics claim.",
+  "stop": "Source/image/calibration/time/model contract mismatch or non-finite numerical state stops. Rejected updates keep short prediction;0.1s loss expires; no relaxed gates, interpolation, old fits or future frames. No further blind parameter sweep this phase.",
+  "outputs": {
+    "final": "run_final_v3",
+    "model": "run_final_v3/result.npz",
+    "records": "run_final_v3/trajectory.jsonl",
+    "parameters": "run_final_v3/run_parameters.json",
+    "summary": "run_final_v3/summary.json",
+    "plots": [
+      "run_final_v3/velocity_components.png",
+      "run_final_v3/acceleration_components.png",
+      "run_final_v3/full_mesh_stereo_overlay.jpg"
+    ],
+    "static_2d_diagnostic": "run_final_v2/static_fit_diagnostic.json",
+    "first_fit_summary": "run_manual_v1/first_frame_fit/summary.json"
+  },
+  "diagnostic_design": "Fixed same shape/hands/foot/neck/head and calibration; midpoint224 and worst per-frame median412; current-frame-only 2D Adam200 steps,latent lr0.02/root0.003/transl0.001,sigma8px,Huber25px,zprior1.5; remove temporal prior/correction cap; not inserted into final trajectory. v2/v3 q/v/a arrays verified identical.",
+  "preserved_versions": {
+    "run": "36 available; hard latent3, rejected updates and truncated statuses",
+    "run_v2": "448 but poor pixel fit/model-innovation gate bias",
+    "run_v3": "pure2D epipolar gate, still poor fit",
+    "run_manual_v1": "manual frame0 refinement; reused initializer, earlier motion implementation",
+    "run_final": "failed constrained iterative update; mean clipped but full covariance information caused drift,P95677.54px",
+    "run_final_v2": "matched gain/Joseph; current rejection quality handling subsequently tightened",
+    "run_final_v3": "current complete baseline; inadequate image fit remains"
+  },
+  "limits": [
+    "No independent 3D pose, derivative, exposure-time, contact or world truth.",
+    "Frozen single-frame shape and regressor anatomical correspondence may be biased.",
+    "Engineering R/Q/covariance and fit masks are not calibrated probabilities or correctness certificates.",
+    "Camera-coordinate derivatives include camera motion; world/Stage/heel constraint and short-window extension remain unimplemented.",
+    "The user whole walker-motion-stage fixed-world-heel assumption is retained for a separate world comparison; annotated ankles are not heels."
+  ],
+  "implementation_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section39; AI_PROGRESS.md current entry"
+}

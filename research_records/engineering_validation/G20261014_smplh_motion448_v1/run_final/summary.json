@@ -1,0 +1,115 @@
+{
+  "status": "failed_motion_tracking_version_preserved",
+  "frames": 448,
+  "output_model": "SMPLH:6890 vertices,13776 faces,full body pose,root,betas,frozen hand poses",
+  "observation_term": "2d_stereo_pixels_only;no_triangulation_or_3d_position_term",
+  "pose_available_frames": 442,
+  "frame_status_counts": {
+    "initialized": 1,
+    "updated": 417,
+    "predicted": 13,
+    "reinitialized": 11,
+    "expired": 6
+  },
+  "joint_status_counts": {
+    "initialized": 12,
+    "updated": 4893,
+    "predicted": 211,
+    "inferred": 56,
+    "reinitialized": 132,
+    "expired": 72
+  },
+  "view_reason_counts": {
+    "first_frame_initialization_pixels_not_reused": 24,
+    "used_2d": 10050,
+    "stereo_epipolar_rejected": 222,
+    "nonlinear_update_rejected": 456
+  },
+  "all_valid_raw_view_reprojection_px": {
+    "count": 10608,
+    "min": 0.28471021639401684,
+    "median": 69.6100219566172,
+    "p95": 677.536081014461,
+    "max": 1696.1231156523252
+  },
+  "used_view_reprojection_px": {
+    "count": 10050,
+    "min": 0.28471021639401684,
+    "median": 68.16302576625384,
+    "p95": 671.4146796912844,
+    "max": 1639.3650337973163
+  },
+  "derivative_available_joint_samples": 619,
+  "reported_speed_norm_m_s": {
+    "count": 619,
+    "min": 0.011643011023051911,
+    "median": 0.18512649479148954,
+    "p95": 0.9289609875122647,
+    "max": 2.085543239391725
+  },
+  "reported_acceleration_norm_m_s2": {
+    "count": 619,
+    "min": 0.1152734606219146,
+    "median": 1.562141130957781,
+    "p95": 7.058199500358137,
+    "max": 19.044417354947008
+  },
+  "internal_kinematic_limb_length_spread_max_mm": 0.00046886591648087617,
+  "step_ms_model_geometry_state_update_and_derivative_decode": {
+    "count": 448,
+    "min": 28.02969999902416,
+    "median": 98.33615000388818,
+    "p95": 132.11967999086482,
+    "max": 227.41659999883268
+  },
+  "timestamp_span_s": 16.035239,
+  "dt_s": {
+    "count": 447,
+    "min": 0.0069816000000000045,
+    "median": 0.03976310000000005,
+    "p95": 0.0614030649999998,
+    "max": 0.06950539999999972
+  },
+  "abs_host_return_skew_ms": {
+    "count": 448,
+    "min": 0.094,
+    "median": 3.5254,
+    "p95": 5.974509999999996,
+    "max": 9.2775
+  },
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "iterations_per_frame": 3,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 0.4,
+    "latent_prior_sigma": 1.5,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "coordinate_frame": "current_left_camera",
+  "world_state_available": false,
+  "initialization": "frame0-only model parameters; when labels supplied, refine frame0 in pure 2D and freeze new shape; no stored 3D observations read",
+  "limits": [
+    "No independent metric 3D or derivative truth; pose availability and smoothness are not accuracy.",
+    "Shape from one frame is frozen and can be biased; regressed surface keypoint distances need not be perfectly rigid.",
+    "R/Q and covariance are engineering assumptions; ignored model bias is not covered by covariance.",
+    "Unobserved points may be inferred from the model, but derivatives expire after 0.1s without own pixel support.",
+    "All derivatives include camera motion. No world, Stage or heel contact constraint is estimated.",
+    "Host-return timestamps do not prove exposure times or stereo synchronization.",
+    "Combined model and conservative parameter changes; comparison to free-point tracker is not a single-variable ablation."
+  ],
+  "superseded_by": "run_final_v3",
+  "version_assessment": "failed constrained iterative update; mean clipped but full covariance information caused drift,P95677.54px"
+}

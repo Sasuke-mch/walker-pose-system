@@ -1,0 +1,28 @@
+{
+  "purpose": "separate temporal estimation lag from fixed-model 2D fit capacity; diagnostic only, not a replacement trajectory",
+  "fixed": "same beta,hand/foot/neck/head rotations,calibration,regressor,VPoser prior,2D gate",
+  "removed": "temporal state prior and per-frame correction cap",
+  "frames": [
+    {
+      "frame": 224,
+      "selection": "midpoint",
+      "steps": 200,
+      "baseline_all_views_median_px": 36.37022399902344,
+      "diagnostic_static_all_views_median_px": 10.830057144165039,
+      "baseline_all_views_p95_px": 88.65604934692377,
+      "diagnostic_static_all_views_p95_px": 36.700226593017575,
+      "accepted_view_count": 24
+    },
+    {
+      "frame": 412,
+      "selection": "largest_per_frame_median_raw_residual",
+      "steps": 200,
+      "baseline_all_views_median_px": 151.00743103027344,
+      "diagnostic_static_all_views_median_px": 36.660648345947266,
+      "baseline_all_views_p95_px": 395.0353683471678,
+      "diagnostic_static_all_views_p95_px": 122.64782485961912,
+      "accepted_view_count": 22
+    }
+  ],
+  "source": "SMPLHMotionTracker saved states; current raw pixels only"
+}

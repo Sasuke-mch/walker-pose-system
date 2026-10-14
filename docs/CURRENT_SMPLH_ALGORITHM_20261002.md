@@ -1933,3 +1933,210 @@ R0就是下一次首个交付阶段；当前请求到方案为止，不把尚未
 ```
 
 已完成结果不需要重复evaluate；它会保留已有最终目录，诊断读取analysis/JSONL/NPZ即可。完整训练参数及日志见各seed目录；修正前失败证据和所有真实失效尾段均保留，大型策略/轨迹/图像/合成数据不纳入Git。
+
+## 39. 2026-10-14 直接约束完整SMPL-H的因果二维运动基线
+
+本节落实用户的修正：**被估计的是完整SMPL-H，COCO回归骨架只是二维观测接口。** 每个时刻的6890个顶点、13776个真实三角面、根位姿、身体姿态和冻结的体型/手姿均可导出；没有把独立三维关节点滤波后再另拟合一个网格。跟踪更新只使用左右原始鱼眼二维点，不运行三角化、不读取逐帧三维观测、不添加三维位置目标。模型自身仍是三维参数模型。
+
+当前最终结果为`research_records/engineering_validation/G20261014_smplh_motion448_v1/run_final_v3`。实现与输出契约已完成；**整段二维拟合仍不充分，不晋升主线，也不作为可靠人体运动学测量。** 本节与第38节物理PPO实验分别记录；本基线不采用仿真、接触力或网络训练。
+
+### 39.1 输入、来源与首帧人工标注
+
+- 左/右二维输入：`research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/{left,right}/pmpose/raw_predictions.json`。
+- 图像与时间：同一people_1下的`input_448pairs`，pair0..447。读取采集记录的左右host-return时间中点，减首帧形成秒；完整448帧对应16.035239s，dt范围0.0069816..0.0695054s。返回时差median3.5254/P955.97451/max9.2775ms不能证明曝光同步。
+- 标定：`realtime_app/calibration/results`；cam0=LEFT、cam1=RIGHT，原始图1920×1080。右目点用完整`R_cam0_to_cam1`和`T_cam0_to_cam1_mm/1000`变换，内部统一米，投影残差为像素。
+- 模型资产：`third_party/WiLoR/mano_data/models/SMPLH_male.pkl`及同目录MANO_LEFT/RIGHT；`models/smpl/J_regressor_coco.npy`；`models/VPoser02_05/V02_05`。MANO只补旧SMPL-H资产缺失的PCA/mean字段；最终用SMPLHLayer真实矩阵旋转与面，VPoser和模型权重冻结。
+- 起点仍为之前当前方法的**frame0-only**模型参数。其历史冷启动用过三角化；本次读取字段仅transl/global_orient/body_pose/betas/VPoser/手姿，未读保存的三角化点或predicted_coco作为测量。不使用整段拟合的共享beta或未来帧初值。
+- 人工标注：`research_records/annotation_handoffs/H20261014_people1_pair0000/labels/{left,right}_pair_0000.json`，左右各8点，共16点。用户明确确认hand=腕关节、foot=踝关节；左图`leftt_hand`作为显式别名映射到左腕，不作模糊猜名。
+
+标注映射：左右肩COCO5/6，左右腕9/10，左右膝13/14，左右踝15/16。肘7/8、髋11/12仍用首帧自动点；首帧以后全部回到原始自动检测，不传播人工真值。
+
+先验证标注JSON声明1080×1920，`imagePath`所指图与选定pair0000转正图像素相同，避免标错来源。左图原先逆时针转90度，标注(u,y)恢复raw=(1919-y,u)；右图原先顺时针转90度，恢复raw=(y,1079-u)。越界、非有限、重复解剖点和不支持的标签直接报错。OpenCV读图用imdecode+fromfile，解决Windows中文路径读取失败。人工score=1只表示纳入，不表示校准概率。
+
+首帧另做一次纯二维SMPL-H细化：Adam500步，latent学习率0.02、根轴角/平移0.005、beta0.01；人工/自动点sigma分别4/15px，二维点向量范数采用3sigma Huber，VPoser先验sigma1.5、beta先验sigma2。优化根、姿态、10维beta，手/足/颈/头局部旋转固定；细化结束后beta冻结，初速/初加速度均设0。没有三维数据项。初值结果位于`run_manual_v1/first_frame_fit/result.npz`，原始500步损失与16点残差见同目录summary。
+
+最终回放复用这一个已细化的首帧，`--first-frame-refine-steps 0`避免重复优化。frame0只初始化，不再次当作EKF新测量。人工16点首帧残差median10.38450/max61.64695px；最大的左目右肩残差没有被删除或改动标注。
+
+### 39.2 完整模型、观测接口与状态定义
+
+实现文件：
+
+- `realtime_app/pose_app/smplh_motion_tracker.py`：MotionPose、真实SMPLHObservationMap、状态预测/二维反馈/导数与失效处理。
+- `realtime_app/pose_app/smplh_first_frame_labels.py`：显式标注语义、逆旋转、首帧二维细化。
+- `realtime_app/tools/run_smplh_motion_baseline.py`：有序回放、全模型NPZ、逐帧JSONL、统计与曲线；复用已有PVA工具的原始二维读取、时间读取和画图函数。
+- 两个对应测试文件：`realtime_app/tests/test_smplh_motion_tracker.py`和`test_smplh_first_frame_labels.py`。
+
+名义位姿是q=(t,R,z)：t为3维米制根平移，R为SO(3)根旋转，z为32维VPoser。局部误差维度38，速度和加速度各38，联合协方差114×114；不是12个自由点各自运动。R存3×3矩阵，局部误差/更新用右乘旋转向量，避免根轴角跨π造成假跳变。
+
+VPoser解码21个身体局部旋转后，冻结排除root的索引9/10（双足）、11/14（颈/头），其余身体旋转由同一latent控制；双手各45维姿态和10维beta冻结。身体全局姿态、手部完整网格仍随根和身体链运动，腕点可观测；没有从hand标签去优化手指。
+
+模型侧点严格为`J_COCO @ vertices`，得到COCO17；跟踪使用5..16的肩、肘、腕、髋、膝、踝12点。每次评估均由同一组完整模型参数生成网格和回归点。原生52关节用于内部骨长检查；COCO是表面回归点，其距离受pose blend影响，不要求像原生运动学骨段一样绝对刚性，不补一个自由骨架或逐帧骨长项。
+
+### 39.3 预测、过程噪声及二维反馈的实际顺序
+
+帧k开始先用真实dt和上一帧后验预测：
+
+\[
+t^-_{k+1}=t_k+v_tdt+\tfrac12a_tdt^2,\quad
+R^-_{k+1}=R_k\operatorname{Exp}(\omega dt+\tfrac12\alpha dt^2),\quad
+z^-_{k+1}=z_k+v_zdt+\tfrac12a_zdt^2,
+\qquad v^-=v+adt.
+\]
+
+加速度不是全片硬常量：每个预测步加入白jerk过程噪声，单坐标[p,v,a]的Q块是
+
+\[
+q_j\begin{bmatrix}
+dt^5/20&dt^4/8&dt^3/6\\
+dt^4/8&dt^3/3&dt^2/2\\
+dt^3/6&dt^2/2&dt
+\end{bmatrix}.
+\]
+
+平移、旋转、latent的谱密度分别0.25m²/s⁵、1rad²/s⁵、4latent²/s⁵。F包含根旋转误差的Exp(-drive)和SO(3)右Jacobian传播；其余为常加速度块。初始标准差按(t,root,z)分组：位姿(0.10m,0.35rad,0.5)，速度(0.5m/s,1rad/s,1.5/s)，加速度(1m/s²,2rad/s²,3/s²)。这些都是工程设定，不是数据校准的分布。
+
+随后执行：
+
+1. 检查当帧各视图有限值、原始边界及score∈[0.2,1]。分数只作门，不直接换算逆方差。两眼均有效的同名点再作二维极线检查：鱼眼反畸变到归一化射线，以E=[T]×R计算Sampson一阶raw像素距离，超过35px拒绝这对点；不产生三维点。单目有效时可参与更新，但不被解释为独立米制深度。
+2. 至少4个不同关节有有效像素才更新；模型12点在两相机中都需正深度。投影模型用原始鱼眼函数，不把转正坐标直接送入标定。
+3. 在当前预测模型上，以各参数±0.001作中心差分，77个模型批量评估产生像素和模型点Jacobian。观测H只依赖位姿块，v/a通过协方差交叉块被同一二维残差纠正，不通过差分二维再造一个三维加速度测量。
+4. 每个二维点残差向量采用25px Huber，基础sigma8px；大残差提高该点的等效噪声。把latent零均值sigma1.5作为姿态正则一起处理；它不是三维观测，也不能用于准确性证明。
+5. 计算一次EKF增益与联合状态修正。平移/root/latent每帧修正范数上限分别0.08m/0.12rad/0.40；取共同缩放s，并检查s、s/2、s/4的真实非线性投影。候选须保持正深度、|latent分量|≤6，且“Huber像素+状态位移先验+latent先验”总目标不增。此检查保证总目标，**不保证每个像素误差下降或达到25px**。
+6. 接受后，q、v、a都用同一s修正；协方差用同一个缩放增益K'=sK做Joseph更新：
+
+\[
+P^+=(I-K'H)P^-(I-K'H)^T+K'R_{\rm eff}K'^T.
+\]
+
+再执行SO(3)误差坐标重置、对称化，并在已接受模型重算点Jacobian。禁止“均值只走小步，协方差却按完整增益收缩”。没有内循环把同一批像素重复当新证据。拒绝更新则只保留预测及原因。
+
+滤波状态递归保留历史信息，当前更新没有读取未来帧；此版还未实现0.5秒批量短窗。加速度是被估计的运动状态，不是已识别的关节力矩、驱动力或接触力。
+
+### 39.4 失观、恢复和导数的保守可用性
+
+整体连续0.10s没有成功更新就失效；短失观可预测。恢复时从最近接受的模型位姿开始，只用当前二维点重新校正，v/a清零、协方差恢复初值，segment加1；不从三角化或旧逐帧拟合补洞。数值可解码、正深度只表示`pose_available`，不表示模型贴合图像。
+
+每个关节点还需要自己的像素支持：缺失0.10s以后虽可被运动学链推断位置，其导数不再发表。新segment的前0.15s留空；位置协方差经当前点Jacobian传播，最大主轴标准差需≤0.10m；当前所有有限/界内/达score门的原始像素最坏回投需≤25px，最近一次被实际使用且拟合良好的本点观测也不得早于0.10s。当前被拒绝的像素仍参与拟合质量诊断，不能用空used mask把坏投影变成“良好”。
+
+失观预测会刷新当前模型的点Jacobian，避免把上一姿态的Jacobian冒充当前位置不确定性。输出保留`updated/predicted/inferred/initialized/reinitialized/expired`，以及`derivative_warmup/poor_or_stale_pixel_fit/no_recent_own_pixels/position_uncertainty/model_unavailable/available`导数原因。字符串采用object数组，修正了早版把reinitialized截成reinitial的实际问题。
+
+速度/加速度从同一模型的瞬时参数轨迹求得。eps=0.01s，在q上分别施加±v eps+0.5a eps²、由完整SMPL-H回归点中心差分得到v与a；包含旋转及非线性模型映射的曲率项，不把a简单写成J a_q。测试包含恒角速度的向心加速度。它们是当前后验运动模型的瞬时导数，不是把所有观测修正跳变后的网格序列再做位置差分。
+
+不满足导数条件时，公开曲线与`joint_velocity_mm_s/joint_acceleration_mm_s2`为NaN；原始模型导数另存`raw_joint_*`及JSONL的raw字段，用来查尖峰，不静默删除。不生成插值、后处理平滑或伪连续段。模型失效时公开网格、模型参数和点为NaN/JSON null；JSONL内部名义参数可保留调试，但必须看pose_available标志。
+
+### 39.5 最终输出格式与实际结果
+
+最终`run_final_v3/result.npz`主要字段：
+
+| 字段 | 形状/单位与含义 |
+|---|---|
+| vertices / faces | 448×6890×3米 / 13776×3真实拓扑 |
+| transl / global_orient / root_rotation | 448×3米 / 448×3轴角弧度 / 448×3×3 |
+| body_pose / body_rotations | 448×63轴角弧度 / 448×21×3×3，含冻结关节的实际旋转 |
+| betas / left_hand_pose / right_hand_pose | 1×10 / 各1×45弧度，整段冻结 |
+| vposer_latent | 448×32，供跟踪状态复现；也可直接用body_pose重建网格 |
+| predicted_coco / smplh_joints | 448×17×3米 / 448×52×3米 |
+| generalized_velocity / generalized_acceleration | 各448×38；平移、根角速率、latent分组单位不同 |
+| joint_velocity_mm_s / joint_acceleration_mm_s2 | 各448×12×3，导数条件失败处NaN |
+| raw_joint_velocity_mm_s / raw_joint_acceleration_mm_s2 | 同形状，保存尚未通过导数条件的模型估计 |
+| pair_id / timestamp_s / pose_available / derivative_valid / segment_id | 完整帧、真实dt来源、数值状态、12点导数门、重启段 |
+
+`trajectory.jsonl`保留448条有序记录：当前全部点、所有raw回投误差、used/views拒绝原因、导数原因及原始/发表导数、q/v/a、协方差对角、缩放增益、返回时差、世界不可用标志。summary分别统计全部原始有效观测与实际使用观测；极线拒绝点仍进入全部raw误差统计，不靠筛选改善结论。
+
+最终数值：
+
+| 项目 | 实际值 |
+|---|---|
+| 数值可解码模型 | 448/448；initialized1、updated443、predicted3、reinitialized1（frame76） |
+| 全部raw两眼观测误差 | 10752个槽，median36.23725 / P95135.28643 / max486.76369px |
+| 实际使用视图误差 | 10434个，median35.56041 / P95133.38158px |
+| raw观测≤25px比例 | 34.18899%，只表示同源二维一致性 |
+| 满足导数输出条件 | 1065/5376=19.81027%；warmup96、poor/stale fit4161、无近期本点54 |
+| 发表速度模长 | median0.18834 / P950.52715 / max1.14127m/s |
+| 发表加速度模长 | median0.99874 / P953.83907 / max32.26396m/s² |
+| 导数门前原始加速度 | median0.99005 / P955.15842 / max43.51731m/s²；全部5376保留 |
+| 原生四肢骨长极差最大 | 0.00023566mm，模型运动学内部一致性，不是人体尺寸真值 |
+| 增益共同缩放s | median0.23312，范围0.08812..1，频繁受保守限幅影响 |
+| 单步耗时 | median71.97225 / P9599.61367 / max600.99200ms |
+
+耗时含真实模型/Jacobian、几何、状态更新、导数解码，不含PMPose、首帧500步、文件压缩/绘图，不称端到端实时。最大耗时包括首帧懒加载/批量评估，不按中位数掩盖。
+
+12点可发表样本数按肩/肘/腕/髋/膝/踝分别为：左126/84/58/29/78/138；右152/169/81/25/34/91。详细计数以当前summary为准。
+
+生成并实看`velocity_components.png`和`acceleration_components.png`，各12面板，黑色XYZ不同线型、灰预测带，重启/不可用留空，不裁剪尖峰。`full_mesh_stereo_overlay.jpg`用本次真实faces/vertices投影到同源双目图，展示frame0/224/412/447完整模型；灰网格、青色回归点、紫色当前二维点，frame0使用人工16点。没有混入Stage/地面/旧网格，也没有生成虚构世界场景。
+
+### 39.6 实际失败与修复记录
+
+各目录保留原始结果、错误状态和日志，不删除失败帧：
+
+| 目录 | 发生的问题/结果 | 最终处理 |
+|---|---|---|
+| run | latent硬界3使实际序列频繁不能更新，仅36/448数值可用；状态字符串截断 | 改柔性VPoser先验与宽数值界6；完整状态名；旧结果不采用 |
+| run_v2 | 数值448，但raw median39.03/P95161.04px；模型预测门可能自证偏差 | 不把可用率当拟合成功；改二维极线归属检查 |
+| run_v3 | raw median42.27/P95165.65px，仍欠拟合 | 加入用户首帧人工点，限定只用frame0 |
+| run_manual_v1 | 人工首帧细化后median35.41/P95102.17px；仍有未贴合关节及大导数 | 保留完整网格结果作为中间版本；细化首帧复用，补导数门和协方差处理 |
+| run_final | 三次迭代、限幅均值却按完整信息收缩协方差；442可用、median69.61/P95677.54px，明显漂移 | 放弃该迭代实现；单次反馈，联合均值/Joseph协方差统一使用sK |
+| run_final_v2 | 同步增益修复后448，median36.24/P95135.29px；1069导数点 | 补拒绝像素的拟合诊断、当前Jacobian和完整原始导数，未改检测门 |
+| run_final_v3 | 最终状态/参数轨迹一致；4个额外导数点被排除，发表1065 | 作为本次实现结果保存，拟合仍不足，不晋升 |
+
+版本之间同时有初始化、正则、数值和导数门差异，不是严格单变量算法比较；最终版也没有在所有误差统计上优于run_manual_v1。修复协方差一致性不等于姿态精度提升；较低的删选后导数P95也不能证明真实运动更准确。
+
+### 39.7 问题定位与下一步方案
+
+**第一，跟踪滞后有实测依据。** 在当前同一模型、冻结beta/手足颈头、相同二维门/标定/回归器/VPoser先验下，分别选中点frame224与全片逐帧median最差的frame412，从当前估计开始作当帧静态二维Adam200步诊断。只移除时序先验/每帧步长上限：latent学习率0.02、root0.003、平移0.001；基础sigma8px、Huber25px、latent先验1.5。没有优化beta、没有未来帧、没有三维观测，不把静态结果替换进轨迹。
+
+结果记录于`run_final_v2/static_fit_diagnostic.json`（v2/v3模型参数轨迹相同，差别仅导数可用性）：
+
+| 帧 | 原跟踪median/P95 | 当帧静态二维诊断median/P95 |
+|---|---|---|
+| 224，中点 | 36.37/88.66px | 10.83/36.70px |
+| 412，最差帧 | 151.01/395.04px | 36.66/122.65px |
+
+所以不能直接断言“SMPL-H表示不了这些姿态”；保守限幅、常加速度模型和单次局部反馈确实损失了像素贴合。下一阶段优先同一冻结模型的0.3–0.5s因果短窗，直接联合拟合历史二维投影与q/v/a，而非先差分二维噪声再积分三维加速度。仍保留全部raw误差和相同导数门，单独比较贴合/滞后/导数，不先叠加RL或新图像网络。**此短窗尚未实现。**
+
+**第二，观测/标定/点语义有冲突，不能全归滤波。** 首帧人工同名点的raw像素Sampson一阶距离，按左肩/右肩/左腕/右腕/左膝/右膝/左踝/右踝为16.026/30.166/2.300/13.272/9.283/15.638/4.825/16.761px。右肩两眼与当前标定并不精确一致；首帧细化后左目右肩仍61.65px，而右目9.98px。它提示需要分别核对解剖点定义、遮挡判断、双目同步和独立静态标定，尚不能区分哪项主导。不能把manual sigma=4px当已成立的误差模型，也不能靠人体拟合“校准”相机或改动人工点来消除冲突。
+
+**第三，好的二维投影不保证好的加速度。** frame292右踝两眼误差23.55/6.90px，仍出现32.26m/s²模型导数。Huber/25px导数门解决明显不贴合的发表问题，但没有验证导数。R/Q、初始协方差和真实时基需独立校验；先用已知模型运动、遮挡和检测噪声的合成片测滞后与导数误差，再用人工多帧/真实物理参考检验。不可仅凭更平滑或峰值更小认定方案优越。
+
+**第四，完整网格能生成，不代表完整表面可识别。** 二维骨架对胸腹厚度、体型和肢段绕轴旋转约束弱；初始10维beta从一帧估计且冻结，当前全网格预览仍有表面形状偏差。此版保守地不允许体型逐帧漂移，但冻结不能消除初始偏差。后续应在单独实验中加入少量独立人体尺寸或同源轮廓约束，再确定体型；不把关键点贴合当表面精度证明。
+
+**第五，当前量属于相机坐标信号。** p_C(t)在每个时刻的左相机中，v/a包含相机运动。世界转换不仅是把v/a乘R：
+
+\[
+p_W=Rp_C+t,\quad
+\dot p_W=R\dot p_C+\dot Rp_C+\dot t,\quad
+\ddot p_W=R\ddot p_C+2\dot R\dot p_C+\ddot Rp_C+\ddot t.
+\]
+
+可靠的独立相机轨迹未接入前，不发表世界速度/加速度；以后优先将窗口内模型点和相机运动放到固定局部坐标一起拟合，避免直接二阶差分噪声相机pose。用户指定移动助步器全阶段双脚跟硬固定的假设仍保留为后续世界对照；此次manual foot是踝，不能替代脚跟。当前基线不加载Stage/地面或脚跟锚，未声称实现该世界约束。
+
+**第六，速度瓶颈已量化。** 77姿态差分批评估加当前模型重线性化是明显成本；单步约72ms中位数已慢于数据平均帧间隔。后续可保持数学模型不变，单独比较自动微分/解析平移旋转Jacobian减少评估的收益；尚未实施，不把GPU调用等同实时。
+
+### 39.8 已完成检查、复现与停止条件
+
+13项相关测试通过，分别对应：初始化不重复像素/完整状态名、非均匀dt已知加速度、旋转曲率、短失观/超时/恢复、缺少本点导数、有限修正与真实投影目标、极线坏点、极小限幅不能声称完整观测信息、坏拟合及拒绝像素仍标导数不可用、根跨π、时间/边界/不确定性、人工别名/逆旋转/仅首帧、错图/重复点/中文路径。没有新增全仓验证设施或全仓运行。
+
+Ruff E9/F通过，五个本次Python文件编译通过。最终NPZ/JSONL保留全部448有序帧、真实faces、冻结beta/手姿、初始v/a零先验和世界不可用标志；导数NaN与mask一致。真实资产核对：
+
+- frame0/224/447由保存VPoser+根参数再生成mesh，最大差4.17233e-7m。
+- 同三帧直接用保存global_orient/body_pose轴角及手姿生成mesh，最大差3.57628e-7m，证明最终SMPL-H能脱离跟踪器参数载入。
+- 全448保存vertices经同一COCO回归器再生成点，最大差1.19209e-7m。
+
+以上验证软件接口、几何映射和内部状态一致性，不验证真实三维姿态或导数。首帧模型已完成500步细化后，本轮只修复/回放跟踪；未重新检测448，也未重跑原正式流水线。
+
+命令（复用当前人工细化首帧，输出须是新的空目录，避免覆盖已有结果）：
+
+```powershell
+.venv-cuda/Scripts/python.exe realtime_app/tools/run_smplh_motion_baseline.py `
+  --left-predictions research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/left/pmpose/raw_predictions.json `
+  --right-predictions research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/right/pmpose/raw_predictions.json `
+  --input-pairs research_records/engineering_validation/V20260908_people0_1_2_pmpose_c3_chain/people_1/input_448pairs `
+  --initial-fit research_records/engineering_validation/G20261014_smplh_motion448_v1/run_manual_v1/first_frame_fit/result.npz `
+  --first-frame-labels research_records/annotation_handoffs/H20261014_people1_pair0000/labels `
+  --first-frame-refine-steps 0 `
+  --output research_records/engineering_validation/G20261014_smplh_motion448_v1/new_run
+```
+
+若要重新细化首帧，使用未细化的frame0-only初值并省略`--first-frame-refine-steps 0`（默认500），不要从当前终帧或整段beta开始。完整参数路径/阈值见当前`run_parameters.json`，实验目标/失败版本/成功边界见本根`protocol.json`。
+
+停止条件：原始像素/源图/标定/时间/模型身份不符直接失败；观测不足/更新拒绝保留失败及短预测，超时失效；不得放宽门、用未来帧或旧拟合补洞。当前已完成此基线、针对性检查和问题分析，停止继续盲目扫R/Q/限幅参数；短窗与相机世界轨迹接入须作为下一独立阶段。大NPZ、图像、模型权重和原始标注只保留本地，版本控制记录源码、既有文档增量及必要小参数/结果记录。
