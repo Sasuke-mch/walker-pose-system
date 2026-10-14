@@ -98,7 +98,7 @@
       "full_replacement_accepted": false
     },
     "default_alias": "mainline",
-    "body_route_change_scope": "This promotion changes only Stage/ground default routing and exporter compatibility; existing body selection and frozen comparisons remain unchanged.",
+    "body_route_change_scope": "On 2026-10-14 the user selected the completed 448-frame 2D-fisheye-reprojection-only body candidate. This changes the active body selection only; scene routing and supported_stop_fixed_lag remain unchanged.",
     "promotion_record": "research_records/engineering_validation/G20261012_supported_stop448_v1/mainline_promotion.json",
     "capture_contract": "every walker camera stop means four feet on the same flat ground; no stationary hover",
     "nominal_output_lag_sec": 0.5,
@@ -106,75 +106,80 @@
     "acceptance_scope": "Engineering algorithm promotion for declared supported-stop captures; 448-frame evidence retained, no claim of new 360-frame or live-device validation.",
     "previous_default_profile": "baseline"
   },
-  "legacy_fields_scope": "frames, frame_ids, body_candidate, matched_control, profile, frozen_scalar_options and body entries describe the unchanged frozen 448-frame comparison, not the current 360-frame scene selection.",
+  "legacy_fields_scope": "Top-level frames/body_candidate/matched_control/frozen_scalar_options remain the historical 448-frame cold-start comparison metadata. The active body and scene choice is mainline_selection; historical fields do not override it.",
   "mainline_selection": {
-    "decision_date": "2026-10-05",
-    "level": "selected_engineering_route_not_physical_validation",
+    "dataset": "research_records\\engineering_validation\\G20261013_reliability448_view_v1",
+    "frames": 448,
+    "frame_ids": "0..447",
+    "source_pair_ids": "0..447",
+    "frames_metadata": "research_records\\engineering_validation\\G20261005_old_capture_reference25_v1\\frames.json",
+    "scene_reproduction_command": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/scene_replay_command.json",
+    "visualization_title": "SMPL-H \u00b7 448\u5e27 \u00b7 \u4ec5\u4e8c\u7ef4\u9c7c\u773c\u91cd\u6295\u5f71\u4eba\u4f53\u7ea6\u675f",
     "detector": "pmpose",
-    "frames": 360,
-    "frame_ids": "0..359",
-    "source_pair_ids": "1157..1516",
-    "dataset": "research_records/engineering_validation/G20261003_repositioned360_manual_v1",
     "detector_inputs": {
-      "left": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/left_pmpose_raw.json",
-      "right": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/right_pmpose_raw.json",
-      "images": "research_records/engineering_validation/G20261003_repositioned360_cold_smplh_v2/input"
+      "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+      "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+      "images": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs"
     },
-    "strict_scene_input": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/first_instance_strict.jsonl",
-    "strict_scene_accepted_points": 3031,
-    "scene_profile_alias": "mainline",
-    "resolved_scene_profile": "supported_stop_fixed_lag",
-    "scene_reference": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/scene",
-    "scene_reproduction_command": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/scene_replay_command.json",
     "body": {
-      "result": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit/result.npz",
-      "source_command": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit_args.json",
-      "audit": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/fit/initialization_audit.json",
-      "level": "selected_engineering_mainline_not_physical_validation",
-      "accepted_for_main_fit": false,
+      "result": "research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\result.npz",
+      "reproduction_arguments": "research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\fit_args.json",
+      "resolved_options": "research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\resolved_options.json",
+      "body_weighting": "quality",
+      "fit_policy": "reliability",
       "wrist_reference_enabled": false,
-      "beta_policy": "joint_shared_sequence",
-      "native_mano_pose_prior": true,
+      "accepted_for_main_fit": false,
+      "fresh_cold_fit": true,
+      "display_smoothing": false,
+      "level": "selected_engineering_2d_reprojection_route_not_physical_validation",
+      "evidence": "engineering_candidate; body_3d_weight=0; raw-fisheye 2D reprojection is the body observation constraint; triangulated 3D remains initialization/diagnostic only",
+      "body_3d_weight": 0.0,
+      "body_observation_mode": "reprojection_only",
+      "body_reprojection_weight": 0.004,
+      "body_reprojection_scale_px": 25.0,
+      "body_ankle_reprojection_multiplier": 2.0,
+      "triangulation_role": "initialization_and_diagnostic_only_not_a_body_loss_constraint",
       "contact_enabled": false,
-      "body_temporal_weight": 0.0,
-      "body_weighting": "reference",
-      "reference_parameters": {
-        "reprojection_px": 25.0,
-        "ray_gap_mm": 80.0,
-        "confidence_floor": 0.6,
-        "tail_power": 4,
-        "minimum_tail": 0.0001
-      },
-      "resolved_options": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/runs/reference25/resolved_options.json",
-      "reproduction_arguments": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_fit_args.json",
-      "selection_record": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_decision.json",
-      "evaluation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/review_v2/evaluation.json",
-      "original_quality_field": "body_quality",
-      "effective_fit_weight_field": "body_fit_weights",
-      "acceptance_scope": "accepted_for_main_fit=false retains the unpassed physical/contact gate; selection as engineering mainline is explicit",
-      "selection_validation": "research_records/engineering_validation/G20261005_reference_weight_fit_v1/mainline_selection_validation.json",
-      "solver_maintenance": {
-        "date": "2026-10-13",
-        "record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#27-smpl-h基线的方法结构分析与精简2026-10-13",
-        "scope": "Source-only simplification: local-hand objective execution, inactive geometry branches skipped, shared hand rotations decoded once; original objective, budgets and Adam resets retained.",
-        "selected_result_recomputed": false,
-        "new_accuracy_or_performance_claim": false
-      },
-      "method_revision": {
-        "date": "2026-10-13",
-        "implementation_guide": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#implementation-guide",
-        "record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#28-置信度加权旋转锚与接触保持项的实际修正2026-10-13",
-        "selected_result_fit_policy": "legacy",
-        "new_general_fitter_default": "reliability",
-        "historical_replay_requires": "--fit-policy legacy",
-        "changes": "Zero-floor reliability, fixed-slot data losses, SO3 root anchor weighted by source shoulders/hips, body observations retained during contact refinement.",
-        "empirical_confidence_calibration": false,
-        "overall_refinement_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#29-整体求解一致性与初始化精简2026-10-13",
-        "overall_refinements": "Complete shared-hand initialization hypothesis; reliability-weighted initialization gate; bounded wrist association; per-joint temporal support; fixed contact reduction; single template forward.",
-        "selected_result_recomputed": false,
-        "new_accuracy_claim": false
-      }
+      "body_temporal_weight": 0.0
     },
+    "frame_count_resolution": "full original 448 pairs, 0..447",
+    "minimal_visualization_title": "SMPL-H \u00b7 \u65b0448\u5e27\u4eba\u4f53",
+    "user_selection": "Fresh current reliability fit with latest 448 2D/ankle settings, no display smoothing",
+    "decision_date": "2026-10-14",
+    "level": "selected_engineering_2d_reprojection_route_not_physical_validation",
+    "selection_reason": "User promotes the latest completed 448-frame PMPose SMPL-H route whose body objective uses raw left/right fisheye 2D reprojection only (body_3d_weight=0); the existing 3D triangulation is retained only where the implementation needs initialization or diagnostic provenance. This supersedes the historical 360-frame reference25 selection for the body route; scene profile remains supported_stop_fixed_lag.",
+    "known_limits": [
+      "No body 3D joint residual/constraint is active; this does not mean all 3D-derived arrays disappear, because triangulated points can still initialize and audit the fit.",
+      "No independent metric 3D truth, physical contact truth, or cross-capture accuracy validation.",
+      "The selected result is a completed 448-frame engineering candidate and accepted_for_main_fit remains false.",
+      "Scene supported_stop_fixed_lag remains an engineering scene profile; independent ORB/cuVSLAM visual-rig candidates did not pass their coverage gates.",
+      "\u4e8c\u7ef4\u91cd\u6295\u5f71\u4f18\u5316\u53ef\u5728\u6df1\u5ea6\u6216\u5168\u5c40\u59ff\u6001\u4e0a\u5b58\u5728\u4e0d\u53ef\u89c2\u6d4b/\u591a\u89e3\uff0c\u5fc5\u987b\u4fdd\u7559\u539f\u59cb\u4e8c\u7ef4\u63a9\u7801\u3001\u5931\u8d25\u5e27\u548c\u521d\u59cb\u5316\u6765\u6e90\u3002"
+    ],
+    "visualization": {
+      "page": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/body.html",
+      "browser_page": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/body_browser.html",
+      "preview": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/preview.jpg",
+      "protocol": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/protocol.json",
+      "frames": 448,
+      "scene_profile": "mainline -> supported_stop_fixed_lag",
+      "level": "selected engineering 2D reprojection body display; not independent 3D/contact validation",
+      "smoothing": false,
+      "interpolation": false,
+      "body_observation_constraint": "raw left/right fisheye PMPose 2D reprojection",
+      "body_3d_constraint": false,
+      "entry": "realtime_app/build_current_mainline_view.py",
+      "validation_entry": "realtime_app/validate_current_mainline_view.py",
+      "source_validation": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/source_validation.json",
+      "browser_validation": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/browser_validation.json"
+    },
+    "scene_reference_resolved_profile": "supported_stop_fixed_lag",
+    "scene_profile_alias": "mainline",
+    "body_route_change_scope": "User-selected promotion of the completed 448-frame 2D-reprojection-only body candidate; scene routing remains supported_stop_fixed_lag and independent visual-rig candidates remain unpromoted.",
+    "strict_scene_input": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/first_instance_strict.jsonl",
+    "strict_scene_accepted_points": 5286,
+    "resolved_scene_profile": "supported_stop_fixed_lag",
+    "scene_reference": "research_records/engineering_validation/G20261013_reliability448_view_v1/view/scene",
+    "scene_logic_decision_date": "2026-10-12",
     "live": {
       "entry": "realtime_app/run_stereo.py",
       "required_stage_flags": [
@@ -182,71 +187,9 @@
         "--dynamic-ground-full-se3"
       ],
       "ground_reference_option": "--dynamic-ground-reference",
-      "landing_candidate_integrated": false,
       "full_body_fit_is_offline": true,
-      "end_to_end_realtime_certified": false
-    },
-    "known_limits": [
-      "Supported-stop ground recovery requires every walker stop to be supported on the same flat ground; 0.5-second fixed-lag output. Other captures require contract confirmation or explicit baseline.",
-      "Missing background rotation and strict foot points retain unavailable/rejected states.",
-      "Body fitting and strict scene triangulation have distinct accepted masks; do not relabel body inputs as strict scene points.",
-      "Historical walker installation is a display reference, not this capture physical-contact truth.",
-      "No independent metric 3D truth, validated hand/sole contact, or end-to-end real-time body fit.",
-      "Reference25 improves aggregate arm agreement and leg indexed motion but worsens some elbow/wrist slots and fixed-original-quality RMS; no universal joint accuracy claim.",
-      "25 px / 80 mm / confidence floor 0.6 are provisional shared engineering parameters, not calibrated per-joint probabilities."
-    ],
-    "retained_comparison_scope": "448-frame Sapiens2 body candidate and PMPose matched control retain their existing levels and all frozen options.",
-    "candidate_promotion": {
-      "landing_fixed_lag": false,
-      "joint_stage_window": false,
-      "supported_stop_fixed_lag": true
-    },
-    "decision_reason": "Reference25 remains the selected 360-frame engineering body route. On 2026-10-12 user promotes supported_stop_fixed_lag scene logic using the separately validated supported-stop448 capture. Frozen body comparisons and prior baseline outputs retain their evidence levels.",
-    "previous_body_control": {
-      "result": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit/result.npz",
-      "source_command": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/fit_command.json",
-      "audit": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/implementation_audit.json",
-      "level": "engineering_candidate",
-      "accepted_for_main_fit": false,
-      "wrist_reference_enabled": false,
-      "beta_policy": "joint_shared_sequence",
-      "native_mano_pose_prior": true,
-      "contact_enabled": false,
-      "body_temporal_weight": 0.0
-    },
-    "scene_reference_scope": "Retained historical 360-frame baseline reference and command; not a new-profile output. Fresh exports and scene.mainline resolve supported_stop_fixed_lag. Body selection unchanged; current evidence is the separate supported-stop448 capture.",
-    "follow_up_priorities": [
-      {
-        "topic": "per_joint_observation_weight_and_confidence_rules",
-        "priority": "high",
-        "status": "deferred_research_not_part_of_this_promotion",
-        "scope": [
-          "Separate detector confidence, stereo geometry diagnostics, and effective fit weights.",
-          "Define ordinary versus extreme anomalies by joint, anatomical side, view visibility and geometry sensitivity.",
-          "Check elbow/wrist, knee and ankle tails and interactions with shared shape and pose priors; do not tune only one event.",
-          "Use complete same-source controlled windows and cross-capture/independent labels when available; retain all rejected states."
-        ],
-        "provisional_rule": "Keep shared reference25 until a separately recorded controlled comparison supports a replacement."
-      }
-    ],
-    "previous_scene_reference": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review",
-    "previous_strict_scene_input": "research_records/engineering_validation/G20261003_repositioned360_manual_v1/pmpose/first_instance_strict.jsonl",
-    "visualization": {
-      "page": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/body.html",
-      "preview": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/preview.jpg",
-      "protocol": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/protocol.json",
-      "source_validation": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/source_validation.json",
-      "browser_validation": "research_records/engineering_validation/G20261005_reference25_mainline_view_v2/browser_validation.json",
-      "entry": "realtime_app/build_current_mainline_view.py",
-      "validation_entry": "realtime_app/validate_current_mainline_view.py",
-      "frames": 360,
-      "scene_profile": "mainline -> baseline",
-      "level": "historical_360_baseline_display_retained; not a supported-stop mainline replay",
-      "smoothing": false,
-      "interpolation": false,
-      "raw_observation_scope": "Black body skeleton connects original DLT body observations; orange marks strict scene rejection. Actual scene strict XYZ supplies Stage inputs and accepted ankle trails; masks remain distinct."
-    },
-    "scene_logic_decision_date": "2026-10-12",
-    "scene_reference_resolved_profile": "baseline"
+      "end_to_end_realtime_certified": false,
+      "body_observation_constraint": "raw left/right fisheye 2D reprojection; no body 3D residual"
+    }
   }
 }

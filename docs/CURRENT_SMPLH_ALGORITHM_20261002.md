@@ -1599,3 +1599,56 @@ pixel_R,i = fisheye_right(T_right_from_left * T_Ci_from_F * p_j^F(t_i))
 比较A与人体B时固定检测、标定、时间、初值和相机轨迹来源；B再单变量比较无脚跟约束与完整移动助步器区间的双脚跟世界硬锚，延续用户选择，不筛静止子集、不静默放松。相机系位置可用而世界轨迹不可用时，分别标明world_velocity/world_acceleration unavailable；Stage辅助产生的量只能按该假设降级记录。最终输出p/v/a及坐标语义、观测/预测/失效状态，评价独立位置/速度/加速度误差与峰值/相位保存，不能单用“更小a”排名。先做状态估计器，再考虑网络学习未知运动项。
 
 数学/实现参照：[Stone Soup常加速度状态模型](https://stonesoup.readthedocs.io/en/latest/stonesoup.models.transition.html#stonesoup.models.transition.linear.ConstantAcceleration)、[GTSAM固定窗示例](https://borglab.github.io/gtsam/fixedlagsmootherexample/)、[视觉投影Jacobian](https://petercorke.github.io/machinevision-toolbox-python/stubs/camera/CentralCamera/machinevisiontoolbox.Camera.CentralCamera.visjac_p.html)。本节变换及噪声例子是直接求导/计算，不来自外部系统本机性能。
+
+## 35. 当前人体主线切换为二维鱼眼重投影约束（2026-10-14）
+
+用户将当前人体主线切换为最近完成的448帧 PMPose/SMPL-H 二维约束结果：`research_records/engineering_validation/G20261013_reliability448_view_v1/fit/result.npz`。正式索引为 `realtime_app/configs/current_mainline.json/mainline_selection`；场景别名仍解析为 `supported_stop_fixed_lag`。这次切换只改变身体候选的选择身份，不把未通过的独立 ORB-SLAM3/cuVSLAM 视觉世界轨迹提升为场景主线。
+
+### 35.1 主线的“二维约束”到底指什么
+
+该结果实际使用：
+
+```text
+body_3d_weight = 0
+body_observation_mode = reprojection_only
+body_reprojection_weight = 0.004
+body_reprojection_scale_px = 25
+body_ankle_reprojection_multiplier = 2
+fit_policy = reliability
+body_weighting = quality
+body_temporal_weight = 0
+contact_enabled = false
+```
+
+在优化目标中，身体模型 COCO-17 点由 SMPL-H 网格经固定 `17×6890` 回归器得到；每个有效左右视图将同一个模型点投影回**原始左/右鱼眼像素**，与PMPose二维点计算Huber回投影项。`body_3d_weight=0`明确关闭身体三角化点到模型点的三维残差及其梯度，因此本主线不使用“三角化3D关节点作为身体拟合约束”。左右二维有效性、边界、置信度和拒绝原因仍逐帧分别保存，缺失/拒绝不通过重归一化变成强约束。
+
+“二维约束”不等于“完全没有三维数组”：SMPL-H前向本身必须在三维模型空间生成网格和COCO回归点；当前实现还可能读取三角化结果完成冷启动、初始化门或诊断记录。它们不能被误称为本次身体优化的3D监督。`fit/result.npz`中的三角化、`body_accepted`、`body_quality`与回投影统计必须继续保留来源区分。
+
+踝倍率2只作用于COCO 15/16的二维Huber分子并保留原置信度分母；它提高踝二维观测的任务优先级，不表示踝点真实接触、脚跟固定或足底受力。身体时序项和接触项关闭；本次主线也没有启用用户后来提出的脚跟硬约束，该约束应作为后续单变量实验，不要 retroactively 写入当前结果。
+
+### 35.2 为什么选择该结果，为什么不选择旧reference25
+
+旧`mainline_selection`是360帧 `reference25`：它把身体三维几何项作为有效拟合约束，适用于此前的3D工程路线。最近448帧结果是在同源原始鱼眼二维数据上完成的全448冷启动，保存了完整fit参数、二维/三角化来源、失败槽位和同源场景重放，并已完成页面和入口检查。用户本次明确要求“用二维关节点为约束，不用3D关节点约束”，因此索引现在指向该448帧 `reprojection_only`结果，旧360/reference25保留为历史对照，不删除、不覆盖、不把旧结果参数混入新主线。
+
+主线切换不构成真实三维精度提升。二维投影存在深度、全局旋转和人体形状的不可观测方向；同一二维残差可能对应多个三维姿态。当前结果仍是 `selected_engineering_2d_reprojection_route_not_physical_validation`，`accepted_for_main_fit=false`，没有独立人工二维真值、同步外部三维轨迹或物理接触真值。
+
+### 35.3 输入、输出与复现边界
+
+权威输入和输出如下：
+
+| 项目 | 当前值 |
+|---|---|
+| 帧范围 | 448帧，`0..447`，原始有序 `input_448pairs` |
+| 观测 | 同源左右PMPose原始鱼眼二维预测 |
+| 标定 | `realtime_app/calibration/results/stereo_fisheye.json` |
+| 身体结果 | `G20261013_reliability448_view_v1/fit/result.npz` |
+| 参数命令 | `G20261013_reliability448_view_v1/fit/fit_args.json` |
+| 解析参数 | `G20261013_reliability448_view_v1/fit/resolved_options.json` |
+| 页面 | `G20261013_reliability448_view_v1/view/body.html`及同目录浏览器页面 |
+| 场景 | 当前索引的 `mainline -> supported_stop_fixed_lag`，独立视觉后端未注入 |
+
+复现时必须读取 `mainline_selection.body.reproduction_arguments`，确认 `body_3d_weight=0`、`body_observation_mode=reprojection_only` 和二维参数与保存的 `fit_summary.json`一致；不能只看网页标题或把 `body_3d_weight=0`解释成没有任何三维模型计算。可视化入口重新计算严格二维/三角化诊断与场景变换，但不重拟合所选身体；当前页面本身也不升级三维或接触证据。
+
+### 35.4 后续实验必须与当前主线分开
+
+后续加速度跟踪、脚跟固定、MHE/EKF和神经网络都以该二维主线作为身体初始化/对照，但不能把拟合后的三维模型回投误差当作独立二维真值。建议先单独实现“二维观测闭环的p/v/a状态估计”，再将状态接入SMPL-H运动学；脚跟硬约束与3D关节点约束均另设显式消融，结果不得回写当前主线。所有新实验保留旧主线和当前二维主线的完整失败、拒绝、参数和输出路径。

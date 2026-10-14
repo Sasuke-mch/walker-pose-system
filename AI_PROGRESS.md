@@ -1,5 +1,15 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-14 当前人体主线切换为二维鱼眼重投影约束
+
+用户明确要求把主线改为上一次已完成的“用二维关节点约束、不用3D关节点约束”方案。本轮已将`realtime_app/configs/current_mainline.json/mainline_selection`切换到`research_records/engineering_validation/G20261013_reliability448_view_v1`的448帧PMPose/SMPL-H结果。当前身体结果为`fit/result.npz`，参数入口为`fit/fit_args.json`，解析参数为`fit/resolved_options.json`，同源页面与场景在`view/`。
+
+主线的身体目标明确为：`body_3d_weight=0`、`body_observation_mode=reprojection_only`、`body_reprojection_weight=0.004`、`body_reprojection_scale_px=25`、`body_ankle_reprojection_multiplier=2`、`fit_policy=reliability`、`body_weighting=quality`。因此三角化3D关节点不进入身体拟合残差或梯度；SMPL-H自身仍在三维模型空间前向，三角化数组仍可能用于冷启动、初始化门和诊断，不能把这条主线表述成完全不读取任何3D数据。左右原始鱼眼二维点、有效性、置信度、边界和拒绝原因继续保留，踝倍率只改变二维Huber项的踝点优先级。
+
+这次切换替代旧的360帧`reference25`身体选择；旧360结果、G20261012踝权重448结果和G20261013 reliability页面均保留，不能混合参数或旧网格。场景别名仍为`mainline -> supported_stop_fixed_lag`；ORB-SLAM3/cuVSLAM独立视觉候选未过覆盖/几何门，因此没有被提升为场景主线，也不影响本次人体主线切换。当前候选仍是`selected_engineering_2d_reprojection_route_not_physical_validation`，`accepted_for_main_fit=false`，不构成真实三维精度、接触或跨采集泛化结论。
+
+详细目标语义、选择理由、复现字段与后续边界见`docs/CURRENT_SMPLH_ALGORITHM_20261002.md`第35节；应用入口说明见`realtime_app/README.md`“当前身体主线：448帧二维鱼眼重投影约束”。本轮只切换索引并同步说明，不重拟合、不重渲染、不修改旧结果。
+
 ## 2026-10-14 历史双目加速度跟踪的具体实现意见
 
 用户提出用过去若干帧二维位移经双目求相机系三维加速度、积分速度/位置再转地面。本轮子智能体结合已有跟踪源码及状态估计主源，明确应做持续位置反馈的p/v/a联合估计：积分只预测，当前左右raw-fisheye像素纠正全部状态；不先噪声二阶差分再开环双积分。相机移动时世界v/a还含Rdot/Rddot及相机原点导数，不能只乘R。详细公式、漂移示例、常加速度EKF对照、固定局部相机快照的短窗投影拟合与SMPL-H运动学方案见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第34节。

@@ -4,6 +4,12 @@
 
 本机RTX5070Ti Laptop对当前448帧/560步方法实测：完整solver 42.0031s（10.6659帧/s离线吞吐）；已有参数单帧解码中位14.3135ms，批448解码29.7663ms。数据和详细计时边界见`G20261013_smplh_runtime448_v1/runtime.json`与算法第32节；解码速度不等于从观测求参数的完整拟合速度。
 
+## 当前身体主线：448帧二维鱼眼重投影约束（2026-10-14）
+
+当前正式人体索引为`configs/current_mainline.json/mainline_selection`，指向`research_records/engineering_validation/G20261013_reliability448_view_v1`。该主线使用SMPL-H三维模型生成模型侧COCO-17点，但身体优化的观测约束是左右原始鱼眼二维回投影：`body_3d_weight=0`、`body_observation_mode=reprojection_only`、二维回投影权重`0.004`、像素尺度`25`、踝点二维倍率`2`。因此三角化3D关节点不进入身体拟合残差；三角化数组仍可能用于冷启动/初始化和诊断，不能把“二维约束”误写成完全不读取三维数据。
+
+该结果是448帧全片工程候选，`accepted_for_main_fit=false`仍保留。旧360帧reference25及G20261012踝权重结果保留为历史对照，不混入当前身体参数。场景仍由`mainline -> supported_stop_fixed_lag`解析；独立视觉ORB/cuVSLAM候选未通过覆盖/几何门，不改变场景主线。详细目标、输入、参数和证据边界见[现有算法第35节](../docs/CURRENT_SMPLH_ALGORITHM_20261002.md#35-当前人体主线切换为二维鱼眼重投影约束-2026-10-14)。
+
 速度入口从仓库根执行，每次用新输出目录：
 
 ```powershell
@@ -28,9 +34,9 @@ body.fit_smplh_wilor_sequence默认--fit-policy reliability；tools/run_smplh_re
 
 公式、输入拒绝原因和接触证据边界见../docs/CURRENT_SMPLH_ALGORITHM_20261002.md第28节。本轮只做方法和单元检查，未重拟合已保存的360/448序列。下方2026-10-05段落保留旧身体结果语义，场景mainline当前解析为supported_stop_fixed_lag。
 
-## 当前360帧身体工程主线（2026-10-05）
+## 历史360帧身体工程主线（2026-10-05）
 
-选择来源为configs/current_mainline.json/mainline_selection.body；当前为reference25完整冷启动结果。身体权重采用reference，25px回投影平台、80mm射线间距平台、0.6置信度参考下限；body_quality与body_fit_weights分存。各关节权重/置信度规则登记为后续重点，详细取舍见../docs/CURRENT_SMPLH_ALGORITHM_20261002.md第25节。Stage/地面仍为baseline，448帧冻结profile保持quality。通用求解器省略参数的兼容默认不能冒充此主线。
+该节只记录历史reference25完整冷启动结果，不再代表当前身体选择。当前选择已切换到上面的448帧二维鱼眼重投影主线；reference25仍作为可复现历史对照保留。通用求解器省略参数的兼容默认不能冒充任一冻结结果。
 
 复现读取选择清单的显式参数，输出改到新的不存在目录；以下只替换输出，其他原输入/冷启动预算全部保留：
 
@@ -42,9 +48,9 @@ $fitArgs[[Array]::IndexOf($fitArgs, '--output-dir') + 1] = 'research_records/eng
 & ./.venv-cuda/Scripts/python.exe -B realtime_app/run_tool.py body.fit_smplh_wilor_sequence @fitArgs
 ```
 
-最新主线可视化入口：`build_current_mainline_view.py --output <新目录>`（本地Python从仓库根调用）。它读取当前选择的reference25身体，重新计算三角化、重放mainline→baseline，并生成完整自包含body.html；不重拟合身体。随后用`validate_current_mainline_view.py --view <目录>`核对网格/点/严格踝拖尾/相机/助步器与新变换。已验证页面路径保存在current_mainline.json/mainline_selection.visualization。
+最新主线可视化入口：`build_current_mainline_view.py --output <新目录>`（本地Python从仓库根调用）。它读取当前选择的二维重投影身体，重新计算三角化、重放mainline→supported_stop_fixed_lag，并生成完整自包含body.html；不重拟合身体。随后用`validate_current_mainline_view.py --view <目录>`核对网格/点/严格踝拖尾/相机/助步器与新变换。已验证页面路径保存在current_mainline.json/mainline_selection.visualization。
 
-命令从仓库根运行；本地授权模型/缓存缺失则报告不可用。新显示应读取选择的reference25网格和同源baseline变换，历史HTML不可冒充新结果。工程主线选择仍不表示独立三维精度或物理接触认证。
+命令从仓库根运行；本地授权模型/缓存缺失则报告不可用。新显示应读取选择的二维重投影网格和同源supported-stop变换，历史HTML不可冒充新结果。工程主线选择仍不表示独立三维精度或物理接触认证。
 
 
 `realtime_app` 是助步器项目的实时视觉程序。当前代码把三类职责分开：
