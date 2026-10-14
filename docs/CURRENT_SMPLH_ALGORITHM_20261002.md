@@ -1543,3 +1543,59 @@ MHE目标可写为L_2D(q)+lambda_pose L_pose(q)+lambda_u sum(||u_k||^2 dt_k)+lam
 输出位于G20261013_reliability448_view_v1/motion_curves/：world_motion.png、pelvis_relative_motion.png、joint_motion.csv（448×12×2=10752行），包含xyz位置/速度/加速度、模长、时间来源、Stage、地面状态和strict支持。图为四肢分别三点的速度/加速度模长，白底黑线；没有新的跟踪/RL曲线。世界加速度模长P95约21.83、最大155.45m/s²；去骨盆平移后P95约26.73、最大140.38m/s²。这里只描述保存轨迹的导数，尖峰含估计误差、坐标和主机时间抖动；不能解释为人的真实生理加速度或证明其来源已定位。
 
 运行命令：`.venv-cuda/Scripts/python.exe realtime_app/tools/plot_body_joint_motion_curves.py`。脚本AST及实际运行通过，非均匀时间已知线性/二次函数的导数检查通过，CSV帧数/关节/两坐标框架与失效掩码检查通过；两图已实看无裁切。生成图和CSV不进入Git，源码与本节记录保留，当前其他用户改动不混入。
+
+## 34. 历史双目观测驱动的加速度状态跟踪：具体实现意见（2026-10-14）
+
+用户进一步提出由过去若干帧的二维位移，经双目得到相机相对三维加速度，再积分速度/位置，最后转换到地面。本节为具体设计意见；没有实现或运行新人体跟踪器。本轮实际完成的是场景ORB-SLAM3/cuVSLAM适配及比较，两个后端均未达独立世界轨迹门，详见场景说明2026-10-14实施节。相机相对跟踪可继续研究，世界运动学量暂不能由这些候选轨迹认证。
+
+### 34.1 保留加速度状态，但必须有位置观测闭环
+
+双目标定、左右关联和深度可观测方向充分时，当前左右二维位置提供米制位置约束；过去若干帧再提供速度/加速度信息。主链应同时估计p/v/a，以积分预测下一时刻，再用当前左右原始二维位置纠正全部状态；不先对抖动位置二阶差分得到a，再长期开环双积分。
+
+对单关节点，候选A为相机相对常加速度EKF：x=[p_C,v_C,a_C]，其中v_C和a_C明确是时变相机坐标p_C(t)的导数，不是世界速度/加速度在相机轴上的简单表达。真实时间间隔下的状态转移为：
+
+```text
+p_pred = p + v*dt + 0.5*a*dt^2
+v_pred = v + a*dt
+a_pred = a
+y_L = fisheye_left(p_pred)
+y_R = fisheye_right(R_right_from_left*p_pred + t_right_from_left)
+```
+
+当帧像素创新经投影Jacobian更新p/v/a及其协方差；白噪声jerk过程项Q按dt缩放，不将未校准检测分数直接作为逆方差。零初速仅作先验，初始a可置零但给不确定度；相机运动会进入相对运动过程噪声。短缺失允许prediction_only，失效原因和不确定度增长保留；不能标成观测支持或无限外推。投影后的固定骨长修正必须同步处理v/a，否则滤波状态不一致。A用于低成本受控对照，不能称完整人体动力学。
+
+直接由二维流求a还需要投影曲率项：ddot(y)=J_projection*a+[v^T H_projection_component v]，并不是二维二阶差分乘某个深度尺度。平行校正双目的Z=fB/d只作说明，二阶导数包含2fB*dot(d)^2/d^3-fB*ddot(d)/d^2；本项目必须使用完整双鱼眼标定，不能按平行双目公式代替几何。
+
+独立位置噪声1cm、30Hz时，三点二阶差分噪声标准差约sqrt(6)*0.01/(1/30)^2=22m/s²；恒定加速度偏差0.05m/s²开环10秒造成0.5*0.05*10²=2.5m位置偏差。这些是解析示例，不能据此断言当前尖峰的实际来源。先差分再积分没有增加独立信息，持续位置反馈才阻止漂移累积。
+
+### 34.2 移动相机下的位置、速度、加速度变换不同
+
+令R(t)、c(t)为相机到固定世界的旋转及相机原点世界位置，且v_C=dot(p_C)、a_C=ddot(p_C)：
+
+```text
+p_W = R*p_C + c
+v_W = R*v_C + dot(R)*p_C + dot(c)
+a_W = R*a_C + 2*dot(R)*v_C + ddot(R)*p_C + ddot(c)
+```
+
+只在相机相对世界静止时，v/a才能简化为乘R。人世界静止而助步器相机加速，a_C非零而a_W=0，是直接反例。Stage标签和每帧R/c不会自动补齐导数；地面重锚、SLAM地图reset/优化跳变及不可用边界必须断段。初速度0也须注明参考系：人世界静止不意味着相机相对初速0。
+
+不要直接对噪声VO位姿作二阶差分再叠加大补偿。候选B（首选人体版本）在每个窗口建立一个固定局部坐标快照F=C_k；F仅与当前相机瞬时重合，在窗口内保持不动。根据可信相机轨迹计算历史每帧T_Ci_from_F，直接拟合：
+
+```text
+p_j^F(t_i) = p_j,k^F + v_j,k^F*(t_i-t_k) + 0.5*a_j,k^F*(t_i-t_k)^2
+pixel_L,i = fisheye_left(T_Ci_from_F * p_j^F(t_i))
+pixel_R,i = fisheye_right(T_right_from_left * T_Ci_from_F * p_j^F(t_i))
+```
+
+对过去约0.5秒全部有效左右像素做鲁棒联合估计，二维位移的信息已经进入目标，不另造噪声二阶像素输入。换窗口时以同一物理状态的恒定坐标重新表达p'=S*p+d、v'=S*v、a'=S*a；它不是移动坐标的时间求导，所以没有dot(S)项。此v/a是固定空间轨迹在局部轴上的表达，不能命名“相对于正在移动的相机的导数”。只需要窗口内相机相对轨迹可靠，不必先完成全房间表面重建；但当前两后端不满足这一前提，不能用其跳变轨迹硬启用B的世界量。
+
+### 34.3 从关节点最小验证进入人体运动学链
+
+先以候选A或单点/自由点局部二次投影拟合验证时间、双目误差和短时遮挡恢复；每帧都反馈当前位置，不与纯二阶差分平滑混称。主要人体候选随后将自由p替换为冻结形状的SMPL-H运动学p_j(q)，状态含根/局部姿态与广义速度，加速度u驱动积分；像素残差是主数据项，驱动变化是弱先验，关节点笛卡尔加速度由J_j(q)u+dot(J_j)v产生。12点不能观测骨轴扭转，不能将所有估计角速度称解剖真值。
+
+复用现有PyTorch投影、SMPL-H及历史窗口读入，不盲装大型因子图库。causal_skeleton_tracker目前只有位姿、按帧根预测/二阶位置项和COCO踝软静止；不是显式p/v/a或heel硬约束实现。skeleton_factor_graph的骨段世界方向也不等于父子局部关节链。先单独初始化第一帧/独立体型，不能拿全片共享beta或非因果temporal_body_prefit当因果输入。
+
+比较A与人体B时固定检测、标定、时间、初值和相机轨迹来源；B再单变量比较无脚跟约束与完整移动助步器区间的双脚跟世界硬锚，延续用户选择，不筛静止子集、不静默放松。相机系位置可用而世界轨迹不可用时，分别标明world_velocity/world_acceleration unavailable；Stage辅助产生的量只能按该假设降级记录。最终输出p/v/a及坐标语义、观测/预测/失效状态，评价独立位置/速度/加速度误差与峰值/相位保存，不能单用“更小a”排名。先做状态估计器，再考虑网络学习未知运动项。
+
+数学/实现参照：[Stone Soup常加速度状态模型](https://stonesoup.readthedocs.io/en/latest/stonesoup.models.transition.html#stonesoup.models.transition.linear.ConstantAcceleration)、[GTSAM固定窗示例](https://borglab.github.io/gtsam/fixedlagsmootherexample/)、[视觉投影Jacobian](https://petercorke.github.io/machinevision-toolbox-python/stubs/camera/CentralCamera/machinevisiontoolbox.Camera.CentralCamera.visjac_p.html)。本节变换及噪声例子是直接求导/计算，不来自外部系统本机性能。

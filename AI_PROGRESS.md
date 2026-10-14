@@ -1,5 +1,11 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-14 历史双目加速度跟踪的具体实现意见
+
+用户提出用过去若干帧二维位移经双目求相机系三维加速度、积分速度/位置再转地面。本轮子智能体结合已有跟踪源码及状态估计主源，明确应做持续位置反馈的p/v/a联合估计：积分只预测，当前左右raw-fisheye像素纠正全部状态；不先噪声二阶差分再开环双积分。相机移动时世界v/a还含Rdot/Rddot及相机原点导数，不能只乘R。详细公式、漂移示例、常加速度EKF对照、固定局部相机快照的短窗投影拟合与SMPL-H运动学方案见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第34节。
+
+本轮没有实现/运行新人体跟踪器；保留第一帧单独初始化/形状冻结、真实时间、完整移动助步器阶段双脚跟世界硬锚和全帧失败规则。相机相对跟踪可独立研究，世界量需要可靠的相机相对轨迹；本轮ORB/cuVSLAM未通过，不能用其跳变轨迹求物理加速度或升级场景。旧causal tracker只有位姿、按帧二阶项与踝软静止，temporal prefit非因果，均不称新p/v/a实现。仅更新既有算法说明与此记录，没有训练、人体重拟合或新曲线结果。
+
 ## 2026-10-14 两种独立双目视觉后端全448实现与比较完成，均未升级
 
 接续此前被中断的ORB-SLAM3/cuVSLAM部署，用户明确要求子智能体继续。固定G20261013_reliability448_view_v1的448原图/人体，G20261014_visual_rig_compare448_v1/input_primary的raw-fisheye960×540、正式完整R/t、人体/参考助步器排除mask和前向域，两后端完全不读Stage或脚锚。protocol原覆盖90%及native调用P9533.333ms门保留。ORB部署于Ubuntu-22.04 WSL2，cu17.0.1+cu12；源码为walker_tools/scene/{prepare_visual_rig_comparison.py,cuvslam_backend.py,orbslam3_runner.cpp,orbslam3_static_mask.patch,compare_visual_rig_poses.py}，实际结果及下一问题见docs/CURRENT_STAGE_GROUND_PIPELINE.md末节。
