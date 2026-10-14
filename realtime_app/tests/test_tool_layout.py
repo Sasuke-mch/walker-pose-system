@@ -44,7 +44,18 @@ assert not {{'torch', 'cv2', 'numpy', 'transformers'}}.intersection(sys.modules)
     assert result.returncode == 0, result.stderr
 
 
+def test_rl_tracking_catalog_entry_and_legacy_shim():
+    name = "body.run_rl_physics_tracking"
+    filename = commands()[name]
+    assert command_path(name).is_file()
+    assert command_path(name) == command_path(filename)
+    shim = APP_ROOT / "tools" / filename
+    assert shim.is_file()
+    assert "walker_tools." + name in shim.read_text(encoding="utf-8")
+
+
 @pytest.mark.parametrize("name", [
+    "body.run_rl_physics_tracking",
     "body.run_sapiens_cold_smplh",
     "body.fit_smplh_wilor_sequence",
     "body.refine_body_with_constructed_grasp",

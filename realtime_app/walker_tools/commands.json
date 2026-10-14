@@ -18,6 +18,7 @@
   "body.fit_smplh_wilor_sequence": "fit_smplh_wilor_sequence.py",
   "body.freeze_result_manifest": "freeze_result_manifest.py",
   "body.refine_body_with_constructed_grasp": "refine_body_with_constructed_grasp.py",
+  "body.run_rl_physics_tracking": "run_rl_physics_tracking.py",
   "body.run_sapiens_cold_smplh": "run_sapiens_cold_smplh.py",
   "body.run_sapiens_smplh": "run_sapiens_smplh.py",
   "body.summarize_stage_c_gradient_audit": "summarize_stage_c_gradient_audit.py",

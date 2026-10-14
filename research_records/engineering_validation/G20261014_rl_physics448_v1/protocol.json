@@ -1,0 +1,52 @@
+{
+  "objective": "Conditional scene raw-fisheye physics/PPO tracking, all real448",
+  "real_frames": "0..447",
+  "initial_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_stereo_pva_baseline448_v2\\first_frame_fit\\result.npz",
+  "pixel_source": "V20260908_people0_1_2_pmpose_c3_chain/people_1/c3_predictions/{left,right}/pmpose/raw_predictions.json",
+  "scene_source": "G20261013_reliability448_view_v1/view/scene/scene_transforms.npz",
+  "scene_semantics": "frozen Stage conditional trajectory, not independent world truth; nominal release delay .5s",
+  "training": "synthetic PD teacher rollouts, clips0..11; held-out complete clips12..15; real448 never rewards training",
+  "synthetic_clip_counts": {
+    "0": 120,
+    "1": 71,
+    "2": 120,
+    "3": 64,
+    "4": 120,
+    "5": 47,
+    "6": 120,
+    "7": 44,
+    "8": 113,
+    "9": 67,
+    "10": 120,
+    "11": 45,
+    "12": 120,
+    "13": 45,
+    "14": 120,
+    "15": 76
+  },
+  "observation": "past<=.5s summary,current pixels,state; no future poses/actions",
+  "physical_model": "22 ball-jointed links, fixed frame0 shape and frozen hands, 63.4kg uncalibrated capsule surrogate; no self collisions",
+  "observation_map": "exact selected SMPL-H surface vertices with pose blends and all52 LBS transforms",
+  "initial_mapping_max_m": 1.7544408562366529e-07,
+  "action": "63 residual PD-angle targets relative to frame0, .4rad component scale, torques120Nm",
+  "support": "initial model wrists define assumed camera-rigid grips, K900N/m,D45Ns/m, force<=300N each; all replay frames; independent support validation unavailable",
+  "heel": "Training/teacher and held-out synthetic use explicit historical rigid sites. Final real hard-heel outputs use exact SMPL-H surface3387/6787 position/velocity projection, <=1mm tolerance; weights frozen, not retrained for surface constraints.",
+  "controls": "same simulated body/actions: zero PD hold, one-step pixel Jacobian control, PPO; each with noheel/hardheel",
+  "success": "complete448 records incl failures; exact initial map, actual dt, no clipping of published derivatives, constrained heel numerical gate",
+  "accuracy_gate": "held-out synthetic and complete real diagnostics, plus user16 first-frame manual references; no independent real sequence-level manual/3D truth, so accuracy promotion unavailable",
+  "stop": "numerical/input/map failure; bounded PPO budget; real invalid frames retained, no silent reset/mixing",
+  "first_frame_annotation": "User16 labels, hand=wrist and foot=ankle confirmed; first-frame-only reference, not training/reward/init-refit.",
+  "completed_training_steps": 301056,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "training_budget_result": "100352steps each, CPU single-environment PPO; wall668.573/636.544/641.763s. No GPU batch backend used.",
+  "failures_retained": [
+    "derivative_pre_fix",
+    "rigid_heel_pre_fix"
+  ],
+  "code": "realtime_app/learning_rl_tracking/{data,body,environment,run,analyze,annotations}.py",
+  "final_decision": "Stop current candidate: real complete448 pixel recovery failed, synthetic gain over PD hold marginal; no mainline promotion."
+}
