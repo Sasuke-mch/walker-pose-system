@@ -101,5 +101,73 @@
     "Camera-coordinate derivatives include camera motion; world/Stage/heel constraint and short-window extension remain unimplemented.",
     "The user whole walker-motion-stage fixed-world-heel assumption is retained for a separate world comparison; annotated ankles are not heels."
   ],
-  "implementation_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section39; AI_PROGRESS.md current entry"
+  "implementation_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section39; AI_PROGRESS.md current entry",
+  "followup_20261015": {
+    "objective": "Detailed whole-sequence diagnosis and one-variable correction-limit probe; improve the existing estimator before proposing new models.",
+    "one_variable_probe": {
+      "baseline": "run_final_v3",
+      "candidate": "run_latent_cap12",
+      "changed_parameter": "max_latent_correction_norm",
+      "values": [
+        0.4,
+        1.2
+      ],
+      "same": "all input paths,manual initial fit,shape,hands,faces,timestamps,calibration,R/Q,epipolar and derivative gates",
+      "frames_each": 448,
+      "common_valid_derivative_samples": 892,
+      "evidence": "443/443 normal corrections dominated by latent;423/443 saturated at0.4; compare all raw pixels and common derivative set"
+    },
+    "decision": "Keep0.4 reference/default; use explicit1.2 candidate in subsequent pixel-fit experiments. No further limit sweep; no formal-mainline or physical-accuracy promotion.",
+    "result_paths": [
+      "run_final_v3/summary.json",
+      "run_latent_cap12/run_parameters.json",
+      "run_latent_cap12/summary.json",
+      "run_latent_cap12/trajectory.jsonl",
+      "run_latent_cap12/result.npz",
+      "run_latent_cap12/step_bound_comparison.png",
+      "run_latent_cap12/full_mesh_stereo_overlay.jpg"
+    ],
+    "known_remaining_issues": [
+      "Hip/knee projection bias despite arm/ankle improvement.",
+      "Initial manual-vs-automatic observation-source transition; manual frame0 is fitting data, not held-out.",
+      "Host-return midpoint is not exposure time.",
+      "VPoser pose coordinates and their engineering rate priors are not physical joint drives.",
+      "Same-source pixel fit and smaller derivative peaks do not establish metric3D or acceleration accuracy."
+    ],
+    "primary_research": [
+      {
+        "title": "SMPLify-X / VPoser (CVPR2019)",
+        "url": "https://arxiv.org/html/1904.05866",
+        "use": "parameterized full-model fitting and static pose prior, not a motion guarantee"
+      },
+      {
+        "title": "HuMoR / VPoser-t (ICCV2021)",
+        "url": "https://arxiv.org/html/2105.04668",
+        "official_code": "https://github.com/davrempe/humor",
+        "use": "temporal optimization and pose/motion prior distinction; oversmoothing warning; static-camera30fps batch assumptions prevent direct copy"
+      },
+      {
+        "title": "SLAHMR (CVPR2023)",
+        "url": "https://vye16.github.io/slahmr/",
+        "use": "camera/human motion separation before world derivatives; not a new backend implementation this phase"
+      }
+    ],
+    "future_plan_status": "not_implemented",
+    "future_plan_order": [
+      "Check hip/knee point semantics,independent calibration/occlusion and exposure timing; unused sparse manual references.",
+      "Known non-quadratic SMPL-H motion/2D noise/occlusion/camera-motion clips,3D GT evaluation only; whole-clip development/held-out split.",
+      "If remaining temporal failure is demonstrated,replace feedback with0.3s causal2D short-window q/v/a fitting,shape/map/gates fixed; no stacked smoothing or duplicated window-data posterior prior.",
+      "After reliable independent camera trajectory,fit in a fixed local coordinate frame;shared human/camera/walker transform;user full walker-motion-stage world heel hard-anchor control,not ankle.",
+      "One learned motion prior only after evidence of added value and satisfied coordinate/input contracts."
+    ],
+    "proposed_next_success_gate": {
+      "heldout_known_motion_acceleration_RMSE_reduction_fraction": 0.2,
+      "position_error_relative_increase_max": 0.05,
+      "must_report": "lag,coverage,all sample denominators,common valid set,hip/knee separately,all failures",
+      "real448": "No future/point deletion/old-output mixing; same-source consistency only,not real3D/derivative truth",
+      "revisions_max_before_stop": 2
+    },
+    "implementation_and_plan_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md sections39-40;AI_PROGRESS.md current entry",
+    "checks": "CLI full448 actual run;one-variable config equality;all448 output and frozen model fields/derivative masks;Ruff E9/F and compile for changed runner;previous13 motion/label tests not unnecessarily rerun."
+  }
 }

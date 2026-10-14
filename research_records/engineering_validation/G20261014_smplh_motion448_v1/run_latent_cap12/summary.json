@@ -1,0 +1,360 @@
+{
+  "status": "completed_engineering_SMPLH_motion_baseline",
+  "frames": 448,
+  "output_model": "SMPLH:6890 vertices,13776 faces,full body pose,root,betas,frozen hand poses",
+  "observation_term": "2d_stereo_pixels_only;no_triangulation_or_3d_position_term",
+  "pose_available_frames": 448,
+  "frame_status_counts": {
+    "initialized": 1,
+    "updated": 444,
+    "predicted": 2,
+    "reinitialized": 1
+  },
+  "joint_status_counts": {
+    "initialized": 12,
+    "updated": 5218,
+    "predicted": 77,
+    "inferred": 57,
+    "reinitialized": 12
+  },
+  "view_reason_counts": {
+    "first_frame_initialization_pixels_not_reused": 24,
+    "used_2d": 10458,
+    "stereo_epipolar_rejected": 222,
+    "nonlinear_update_rejected": 48
+  },
+  "all_valid_raw_view_reprojection_px": {
+    "count": 10752,
+    "min": 0.270124875963817,
+    "median": 18.045033694191012,
+    "p95": 61.76466088540165,
+    "max": 143.50354086476855
+  },
+  "used_view_reprojection_px": {
+    "count": 10458,
+    "min": 0.270124875963817,
+    "median": 17.77325983770952,
+    "p95": 58.630587998993654,
+    "max": 136.63420958434705
+  },
+  "derivative_available_joint_samples": 2846,
+  "derivative_reason_counts": {
+    "derivative_warmup": 120,
+    "available": 2846,
+    "poor_or_stale_pixel_fit": 2358,
+    "no_recent_own_pixels": 52
+  },
+  "update_gain_scale": {
+    "count": 445,
+    "min": 0.7430758396433019,
+    "median": 1.0,
+    "p95": 1.0,
+    "max": 1.0
+  },
+  "reported_speed_norm_m_s": {
+    "count": 2846,
+    "min": 0.008374973850216324,
+    "median": 0.1580310025835021,
+    "p95": 0.4446109082079682,
+    "max": 1.4019913264977
+  },
+  "reported_acceleration_norm_m_s2": {
+    "count": 2846,
+    "min": 0.06005667110788142,
+    "median": 1.4081052689999232,
+    "p95": 5.476442293028677,
+    "max": 16.465241557596656
+  },
+  "raw_acceleration_norm_m_s2_before_derivative_mask": {
+    "count": 5376,
+    "min": 8.33000234328132e-05,
+    "median": 1.136127693691202,
+    "p95": 4.705079545093481,
+    "max": 24.44219771811425
+  },
+  "internal_kinematic_limb_length_spread_max_mm": 0.00024033480067187085,
+  "step_ms_model_geometry_state_update_and_derivative_decode": {
+    "count": 448,
+    "min": 45.16120000334922,
+    "median": 73.39019999926677,
+    "p95": 98.36701999956857,
+    "max": 581.0512000025483
+  },
+  "timestamp_span_s": 16.035239,
+  "dt_s": {
+    "count": 447,
+    "min": 0.0069816000000000045,
+    "median": 0.03976310000000005,
+    "p95": 0.0614030649999998,
+    "max": 0.06950539999999972
+  },
+  "abs_host_return_skew_ms": {
+    "count": 448,
+    "min": 0.094,
+    "median": 3.5254,
+    "p95": 5.974509999999996,
+    "max": 9.2775
+  },
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 1.5,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "coordinate_frame": "current_left_camera",
+  "world_state_available": false,
+  "initialization": "frame0-only model parameters; when labels supplied, refine frame0 in pure 2D and freeze new shape; no stored 3D observations read",
+  "limits": [
+    "No independent metric 3D or derivative truth; pose availability and smoothness are not accuracy.",
+    "Shape from one frame is frozen and can be biased; regressed surface keypoint distances need not be perfectly rigid.",
+    "R/Q and covariance are engineering assumptions; ignored model bias is not covered by covariance.",
+    "Unobserved points may be inferred from the model, but derivatives expire after 0.1s without own pixel support.",
+    "All derivatives include camera motion. No world, Stage or heel contact constraint is estimated.",
+    "Host-return timestamps do not prove exposure times or stereo synchronization.",
+    "Combined model and conservative parameter changes; comparison to free-point tracker is not a single-variable ablation."
+  ],
+  "all_valid_raw_view_fraction_within_25px": 0.6688058035714286,
+  "pixel_fit_assessment": "improved_candidate_still_insufficient_for_physical_kinematics_or_mainline_promotion",
+  "comparison_to_cap04": {
+    "name": "one_variable_latent_step_bound_probe",
+    "base_run": "run_final_v3",
+    "probe_run": "run_latent_cap12",
+    "changed_configuration": {
+      "max_latent_correction_norm": [
+        0.4,
+        1.2
+      ]
+    },
+    "same_inputs_frozen_shape_hands_faces_times": true,
+    "all_frames_each": 448,
+    "all_raw_25px_fraction": [
+      0.34188988095238093,
+      0.6688058035714286
+    ],
+    "derivative_available_fraction": [
+      0.19810267857142858,
+      0.5293898809523809
+    ],
+    "common_derivative_samples": 892,
+    "common_acceleration_norm_m_s2_quantiles_median_p95_max": [
+      [
+        1.026142866009444,
+        3.965644710512554,
+        32.26396270816009
+      ],
+      [
+        1.0596209850875282,
+        4.024714469074754,
+        13.75064317026267
+      ]
+    ],
+    "time_blocks": [
+      {
+        "frames": [
+          0,
+          63
+        ],
+        "median_px": [
+          21.56326029549694,
+          18.913937477263648
+        ],
+        "p95_px": [
+          79.87402192907106,
+          65.27552740437505
+        ],
+        "derivative_fraction": [
+          0.4114583333333333,
+          0.4973958333333333
+        ]
+      },
+      {
+        "frames": [
+          64,
+          127
+        ],
+        "median_px": [
+          26.97495060447183,
+          19.381405317532312
+        ],
+        "p95_px": [
+          113.39972572004794,
+          66.79712051127746
+        ],
+        "derivative_fraction": [
+          0.3307291666666667,
+          0.49609375
+        ]
+      },
+      {
+        "frames": [
+          128,
+          191
+        ],
+        "median_px": [
+          48.74522563254476,
+          19.713926863463108
+        ],
+        "p95_px": [
+          153.92874004764357,
+          69.5565810409118
+        ],
+        "derivative_fraction": [
+          0.09635416666666667,
+          0.4791666666666667
+        ]
+      },
+      {
+        "frames": [
+          192,
+          255
+        ],
+        "median_px": [
+          38.85727324515551,
+          15.937344205637825
+        ],
+        "p95_px": [
+          117.81300834809764,
+          57.251484289386056
+        ],
+        "derivative_fraction": [
+          0.13932291666666666,
+          0.5950520833333334
+        ]
+      },
+      {
+        "frames": [
+          256,
+          319
+        ],
+        "median_px": [
+          27.152584691969096,
+          16.32342462168575
+        ],
+        "p95_px": [
+          64.29232010137561,
+          53.09834405443348
+        ],
+        "derivative_fraction": [
+          0.24479166666666666,
+          0.5846354166666666
+        ]
+      },
+      {
+        "frames": [
+          320,
+          383
+        ],
+        "median_px": [
+          36.13111154245678,
+          16.789805329583796
+        ],
+        "p95_px": [
+          99.93518881913477,
+          51.853335022848995
+        ],
+        "derivative_fraction": [
+          0.13932291666666666,
+          0.5950520833333334
+        ]
+      },
+      {
+        "frames": [
+          384,
+          447
+        ],
+        "median_px": [
+          73.70296013907009,
+          18.85687997627368
+        ],
+        "p95_px": [
+          265.30930644642785,
+          63.403895928252616
+        ],
+        "derivative_fraction": [
+          0.024739583333333332,
+          0.4583333333333333
+        ]
+      }
+    ],
+    "median_pixel_reduction_fraction": 0.5020308230779362,
+    "p95_pixel_reduction_fraction": 0.5434526419707169,
+    "interpretation": "The arbitrary latent bound caused material projection lag; improvements are same-source pixel consistency, not 3D or derivative accuracy. Report both full raw and masked populations.",
+    "decision": "cap1.2 is the better pixel-fit candidate for next tests; class default0.4 reference retained. No further bound search or new model this phase."
+  },
+  "per_joint_analysis": {
+    "left_shoulder": {
+      "raw_two_view_median_px": 15.07854770347431,
+      "raw_two_view_p95_px": 35.13464724539521,
+      "derivative_samples": 278
+    },
+    "right_shoulder": {
+      "raw_two_view_median_px": 16.37714157803194,
+      "raw_two_view_p95_px": 31.648364471261026,
+      "derivative_samples": 286
+    },
+    "left_elbow": {
+      "raw_two_view_median_px": 16.571294351469803,
+      "raw_two_view_p95_px": 43.867925037312304,
+      "derivative_samples": 283
+    },
+    "right_elbow": {
+      "raw_two_view_median_px": 11.957542058589816,
+      "raw_two_view_p95_px": 29.32403399140305,
+      "derivative_samples": 362
+    },
+    "left_wrist": {
+      "raw_two_view_median_px": 13.055495317323626,
+      "raw_two_view_p95_px": 35.767937931206646,
+      "derivative_samples": 325
+    },
+    "right_wrist": {
+      "raw_two_view_median_px": 10.559286545796635,
+      "raw_two_view_p95_px": 30.652911519473825,
+      "derivative_samples": 359
+    },
+    "left_hip": {
+      "raw_two_view_median_px": 36.22339003879994,
+      "raw_two_view_p95_px": 72.70685501289957,
+      "derivative_samples": 28
+    },
+    "right_hip": {
+      "raw_two_view_median_px": 41.480170947884346,
+      "raw_two_view_p95_px": 80.98237373303508,
+      "derivative_samples": 22
+    },
+    "left_knee": {
+      "raw_two_view_median_px": 25.04261752929763,
+      "raw_two_view_p95_px": 69.1434621940135,
+      "derivative_samples": 169
+    },
+    "right_knee": {
+      "raw_two_view_median_px": 31.127775685966576,
+      "raw_two_view_p95_px": 92.24808869987825,
+      "derivative_samples": 96
+    },
+    "left_ankle": {
+      "raw_two_view_median_px": 14.212193654284588,
+      "raw_two_view_p95_px": 40.7824987113554,
+      "derivative_samples": 332
+    },
+    "right_ankle": {
+      "raw_two_view_median_px": 16.169481971870226,
+      "raw_two_view_p95_px": 43.82947618319635,
+      "derivative_samples": 306
+    }
+  }
+}

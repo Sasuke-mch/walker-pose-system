@@ -187,5 +187,83 @@
     "manual_reprojection_max_px": 61.646949768066406,
     "raw_pixel_Sampson_right_shoulder_px": 30.166,
     "diagnostic_meaning": "Anatomical correspondence/calibration/synchronization inconsistency needs separate checks; does not identify its cause."
+  },
+  "full_sequence_analysis": {
+    "purpose": "Whole-448 distribution and the active correction cap, using saved model states and timestamps; no estimator rerun.",
+    "accepted_update_frames": 443,
+    "largest_normalized_correction_group_counts": {
+      "translation": 0,
+      "root_rotation": 0,
+      "VPoser_latent": 443
+    },
+    "max_normalized_correction": [
+      0.2275196444136666,
+      0.37087834733076325,
+      1.0000000000000009
+    ],
+    "near_full_half_quarter_cap_counts": [
+      423,
+      0,
+      0
+    ],
+    "time_blocks": [
+      {
+        "start_frame": 0,
+        "end_frame_exclusive": 64,
+        "median_reprojection_px": 21.56326029549694,
+        "p95_reprojection_px": 79.87402192907106,
+        "raw_25px_fraction": 0.5735677083333334,
+        "derivative_available_fraction": 0.4114583333333333
+      },
+      {
+        "start_frame": 64,
+        "end_frame_exclusive": 128,
+        "median_reprojection_px": 26.97495060447183,
+        "p95_reprojection_px": 113.39972572004794,
+        "raw_25px_fraction": 0.4674479166666667,
+        "derivative_available_fraction": 0.3307291666666667
+      },
+      {
+        "start_frame": 128,
+        "end_frame_exclusive": 192,
+        "median_reprojection_px": 48.74522563254476,
+        "p95_reprojection_px": 153.92874004764357,
+        "raw_25px_fraction": 0.20442708333333334,
+        "derivative_available_fraction": 0.09635416666666667
+      },
+      {
+        "start_frame": 192,
+        "end_frame_exclusive": 256,
+        "median_reprojection_px": 38.85727324515551,
+        "p95_reprojection_px": 117.81300834809764,
+        "raw_25px_fraction": 0.2877604166666667,
+        "derivative_available_fraction": 0.13932291666666666
+      },
+      {
+        "start_frame": 256,
+        "end_frame_exclusive": 320,
+        "median_reprojection_px": 27.152584691969096,
+        "p95_reprojection_px": 64.29232010137561,
+        "raw_25px_fraction": 0.4479166666666667,
+        "derivative_available_fraction": 0.24479166666666666
+      },
+      {
+        "start_frame": 320,
+        "end_frame_exclusive": 384,
+        "median_reprojection_px": 36.13111154245678,
+        "p95_reprojection_px": 99.93518881913477,
+        "raw_25px_fraction": 0.3248697916666667,
+        "derivative_available_fraction": 0.13932291666666666
+      },
+      {
+        "start_frame": 384,
+        "end_frame_exclusive": 448,
+        "median_reprojection_px": 73.70296013907009,
+        "p95_reprojection_px": 265.30930644642785,
+        "raw_25px_fraction": 0.08723958333333333,
+        "derivative_available_fraction": 0.024739583333333332
+      }
+    ],
+    "inference": "Latent group dominates every accepted correction in this run; not independent 3D or motion accuracy."
   }
 }

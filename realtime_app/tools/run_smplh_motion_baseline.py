@@ -44,7 +44,7 @@ def run(args) -> dict:
         if args.first_frame_refine_steps > 0:
             effective_initial_fit = refine_first_frame_2d(model, cal, np.array([left[0, JOINT_INDICES], right[0, JOINT_INDICES]]),
                                                           manual, args.output/"first_frame_fit", args.first_frame_refine_steps)
-    config = SMPLHMotionConfig()
+    config = SMPLHMotionConfig(max_latent_correction_norm=args.max_latent_correction_norm)
     tracker = SMPLHMotionTracker(model, cal, config)
     parameters = {"inputs": {key: str(getattr(args, key).resolve()) for key in
                              ("left_predictions", "right_predictions", "input_pairs", "calibration_dir",
@@ -174,6 +174,8 @@ def main():
     parser.add_argument("--first-frame-labels", type=Path, default=None)
     parser.add_argument("--first-frame-refine-steps", type=int, default=500,
                         help="0 reuses an already refined single-frame input model")
+    parser.add_argument("--max-latent-correction-norm", type=float, default=.4,
+                        help="single-frame latent correction bound; recorded in run parameters")
     run(parser.parse_args())
 
 
