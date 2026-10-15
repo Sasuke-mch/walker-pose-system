@@ -168,6 +168,13 @@
       "revisions_max_before_stop": 2
     },
     "implementation_and_plan_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md sections39-40;AI_PROGRESS.md current entry",
-    "checks": "CLI full448 actual run;one-variable config equality;all448 output and frozen model fields/derivative masks;Ruff E9/F and compile for changed runner;previous13 motion/label tests not unnecessarily rerun."
+    "checks": "CLI full448 actual run;one-variable config equality;all448 output and frozen model fields/derivative masks;Ruff E9/F and compile for changed runner;previous13 motion/label tests not unnecessarily rerun.",
+    "short_window_plan_clarifications": {
+      "status": "not_implemented",
+      "rotation_rates": "omega/alpha are instantaneous current body rates; historic body angular velocity uses Jr(xi)*(omega+alpha*tau), not constant physical angular acceleration over the full window.",
+      "uncertainty": "Do not reuse EKF covariance. Proposed engineering window approximation: data information Jdata^T W Jdata plus fixed prior curvature Lambda; map its inverse through current model-point Jacobian. Ill-conditioned/non-finite means unavailable. Regularization does not establish data identifiability or calibrated probability.",
+      "derivative_gate": "Retain pixel/age/warmup conditions; validate window uncertainty and position standard-deviation threshold with known-noise/motion before inheriting 0.1m. Report data weak directions and prior contribution.",
+      "overlap": "Previous solution is warm start only; each window pixel counted once in that objective; overlapping outputs are correlated, not independent observations."
+    }
   }
 }
