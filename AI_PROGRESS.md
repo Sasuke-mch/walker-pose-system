@@ -18,6 +18,8 @@
 
 完整记录在research_records/engineering_validation/G20261015_phc_pretrained448_v1/EXPERIMENT.md，数值在analysis.json及各run/summary.json；失败、轨迹、解码、曲线和权重留本地，不提交大型产物。view_v2三页分别输入source_smplh.html、无支撑replay448_physx_recovery.html、有支撑replay448_physx_support.html，含原图叠点和逐帧诊断；本轮strict/Stage/地面从同源原图新重放，R/t/Stage/时间与控制器条件场景核对一致，旧动态数据仅比较、不进入显示。首版frame_times缺字段失败保留；实际浏览器已核对显示及交互，截图留view_v2。离线三点导数曲线仅分析，不作为因果发布v/a。阶段结论：预训练接入可行，当前直接后处理不合格；先解决观测-模型/同体型物理参考接口与二维闭环，不继续盲目加训练或放宽门，不提升主线。
 
+PHC原因诊断进一步新增learning_phc/diagnose.py与本实验diagnosis.json：冻结输出单组参数替换，不再仿真/训练；原始三方法回投复算与analysis.json按1e-6px对齐、每批pelvis检查2e-6m。支撑版只恢复输入骨盆位置仍69.75px（原74.53，P95反而190.45→208.91），不能把退化只归整体漂移；只恢复根朝向/局部关节旋转为99.69/114.33px，存在耦合，不能加总贡献或当可执行修复。原生骨盆误差median72.72mm、去整体平移后24体均误差median61.61mm；相同旋转下源前22关节与作者中性骨架位置差median22.72/P9538.21mm，说明坐标可逆并不等于同体型。无支撑174/447次观测触发作者远距恢复，支撑0次；支撑动作分量无±1裁幅，归一化输入分量约0.286%越±5，尚无证据以动作裁死或严重整体数值异常解释失败。固定腕目标与输入腕差median21.24mm；移动目标速度阻尼遗漏项P959.14N，尚无消融，不定为主因。约7..70ms不匀host时基、接触参考不一致、PHC任务只含参考位置/速度不直接含目标旋转及raw2D、heel硬约束缺失均分层记录。站立通过不代表动态全链复现；先查官方动态接口与同体型参考，再构建二维反馈/阶段接触闭环，不直接扩大训练。详细证据、非因果几何替换边界和复现命令更新原EXPERIMENT；Ruff/编译通过，原输出及页面不改。
+
 ## 2026-10-15 二维优先整体VPoser研究与完整对照，迭代候选改善像素但未通过导数门
 
 按用户新要求不加膝肘等局部先验，三角化仅诊断、原主线beta冻结。检索并核验IEKF/固定prior MAP、WNOJ、LM/线搜索、VPoser/HuMoR官方资料；现有Q已是white-jerk形式，保留非均匀q/v/a。新增可选同帧完整Pqq Cholesky白化迭代MAP，真实Huber回溯、相对固定预测chart求Jacobian，q/v/a一次条件纠偏，收敛才最终一次Joseph/IRLS-GN后验；未收敛保留raw、不收缩P、不发表导数。runner显式update-method/整体latent-prior-sigma/map-iterations，默认EKF不变，不引入人体3D或额外滤波器。

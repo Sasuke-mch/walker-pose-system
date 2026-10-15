@@ -1,0 +1,223 @@
+{
+  "scope": "saved448 outputs only; no retraining, simulation correction or promotion",
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\world_contact_20261015\\run_world_unconstrained\\result.npz",
+  "denominator": 10752,
+  "counterfactual": "substitute one saved parameter group with source; not an executable physical trajectory; nonlinear effects are not additive",
+  "source_score": {
+    "raw_reprojection_px": {
+      "count": 10752,
+      "median": 23.24258372562082,
+      "mean": 31.976489908296116,
+      "p95": 84.27530101456772,
+      "max": 224.77432303778156
+    },
+    "all_slots_within25_fraction": 0.5319010416666666
+  },
+  "methods": {
+    "replay448_physx_recovery": {
+      "root_error_mm": {
+        "count": 448,
+        "median": 163.36033433188325,
+        "mean": 314.95318787120493,
+        "p95": 1050.6142978491196,
+        "max": 1096.0577435130872
+      },
+      "root_relative_mean_body_error_mm": {
+        "count": 448,
+        "median": 194.81330845663217,
+        "mean": 241.67731579782094,
+        "p95": 586.0967144580319,
+        "max": 626.3532670435409
+      },
+      "far_recovery_observation_count": 174,
+      "action_component_clipped_fraction": 0.0006160230846545407,
+      "counterfactuals": {
+        "restore_root_position": {
+          "raw_reprojection_px": {
+            "count": 10112,
+            "median": 139.22397864608936,
+            "mean": 239.40117031031167,
+            "p95": 791.5986353075327,
+            "max": 1730.8129813581306
+          },
+          "all_slots_within25_fraction": 0.05133928571428571
+        },
+        "restore_root_rotation": {
+          "raw_reprojection_px": {
+            "count": 8598,
+            "median": 179.34261224158308,
+            "mean": 257.71628592587643,
+            "p95": 815.187971678513,
+            "max": 1740.2441955280829
+          },
+          "all_slots_within25_fraction": 0.024739583333333332
+        },
+        "restore_body_rotation": {
+          "raw_reprojection_px": {
+            "count": 9396,
+            "median": 188.92849267084057,
+            "mean": 284.7981635324945,
+            "p95": 871.4832202778693,
+            "max": 1731.4789504279317
+          },
+          "all_slots_within25_fraction": 0.02222842261904762
+        }
+      },
+      "actual_score": {
+        "raw_reprojection_px": {
+          "count": 8992,
+          "median": 168.78806418784987,
+          "mean": 269.3156309931975,
+          "p95": 957.7529061391307,
+          "max": 1709.2047509734127
+        },
+        "all_slots_within25_fraction": 0.045665922619047616
+      }
+    },
+    "replay448_physx_support": {
+      "root_error_mm": {
+        "count": 448,
+        "median": 72.72139099675441,
+        "mean": 75.49615766034006,
+        "p95": 122.0453659362623,
+        "max": 155.3950995023925
+      },
+      "root_relative_mean_body_error_mm": {
+        "count": 448,
+        "median": 61.60839727350471,
+        "mean": 71.20875897192433,
+        "p95": 132.98485174051132,
+        "max": 173.8222434023463
+      },
+      "far_recovery_observation_count": 0,
+      "action_component_clipped_fraction": 0.0,
+      "counterfactuals": {
+        "restore_root_position": {
+          "raw_reprojection_px": {
+            "count": 10752,
+            "median": 69.74868309711387,
+            "mean": 86.10331664285984,
+            "p95": 208.90512737814316,
+            "max": 508.20122534024443
+          },
+          "all_slots_within25_fraction": 0.08937872023809523
+        },
+        "restore_root_rotation": {
+          "raw_reprojection_px": {
+            "count": 10702,
+            "median": 99.6927027123539,
+            "mean": 119.57745798498591,
+            "p95": 285.58964692048755,
+            "max": 1142.1378505569594
+          },
+          "all_slots_within25_fraction": 0.06677827380952381
+        },
+        "restore_body_rotation": {
+          "raw_reprojection_px": {
+            "count": 10752,
+            "median": 114.3289759577305,
+            "mean": 124.15813493525808,
+            "p95": 247.2262197608831,
+            "max": 699.4437070253673
+          },
+          "all_slots_within25_fraction": 0.027901785714285716
+        }
+      },
+      "actual_score": {
+        "raw_reprojection_px": {
+          "count": 10752,
+          "median": 74.53361261154204,
+          "mean": 87.09378262167327,
+          "p95": 190.44486002977393,
+          "max": 412.9829997337681
+        },
+        "all_slots_within25_fraction": 0.08947172619047619
+      }
+    }
+  },
+  "same_rotations_neutral_retarget_joint_difference_mm": {
+    "count": 9856,
+    "median": 22.720012419081602,
+    "mean": 22.16251482518754,
+    "p95": 38.20882347298632,
+    "max": 48.802199158658766
+  },
+  "retarget_joint_median_mm_smpl0to21": [
+    0.0,
+    19.754311273086078,
+    12.42497784208047,
+    17.58614226446617,
+    22.747874770965176,
+    25.36616209151383,
+    21.192814405720434,
+    26.92401449782453,
+    35.2819313984226,
+    17.445007104818487,
+    23.584589488798006,
+    22.79451497122945,
+    7.861487095272958,
+    10.155780805481207,
+    9.998446495751224,
+    24.029029108063078,
+    28.121005747227137,
+    20.37188133879419,
+    37.91888899826406,
+    27.756107599058904,
+    39.03319189031561,
+    27.924605815807258
+  ],
+  "host_capture_dt_s": {
+    "count": 447,
+    "median": 0.03976310000000005,
+    "mean": 0.03587301789709173,
+    "p95": 0.0614030649999998,
+    "max": 0.06950539999999972
+  },
+  "dt_below20ms_count": 127,
+  "dt_above45ms_count": 186,
+  "reference_wrist_vs_assumed_fixed_camera_target_mm": {
+    "count": 896,
+    "median": 21.244986712084383,
+    "mean": 22.55250191712165,
+    "p95": 39.80859283098547,
+    "max": 55.820586739882316
+  },
+  "omitted_moving_target_damping_term_norm_n": {
+    "count": 894,
+    "median": 0.0,
+    "mean": 1.5678380401679475,
+    "p95": 9.143451048509146,
+    "max": 27.91737311208475
+  },
+  "interpretation": "detector consistency and saved geometry; no independent3D truth; wrist force and timing causal effects need separate simulation ablation",
+  "normalized_observation_clipping": {
+    "replay448_physx_recovery": {
+      "primitive": {
+        "component_fraction": 0.018887044095752557,
+        "self_component_fraction": 0.005755314761351281,
+        "task_component_fraction": 0.04065166956665838,
+        "frames_with_any_clipping": 322
+      },
+      "composer": {
+        "component_fraction": 0.018887044095752557,
+        "self_component_fraction": 0.005755314761351281,
+        "task_component_fraction": 0.04065166956665838,
+        "frames_with_any_clipping": 322
+      }
+    },
+    "replay448_physx_support": {
+      "primitive": {
+        "component_fraction": 0.0028646259616958588,
+        "self_component_fraction": 0.0003686900878607226,
+        "task_component_fraction": 0.007001408567404093,
+        "frames_with_any_clipping": 157
+      },
+      "composer": {
+        "component_fraction": 0.0028646259616958588,
+        "self_component_fraction": 0.0003686900878607226,
+        "task_component_fraction": 0.007001408567404093,
+        "frames_with_any_clipping": 157
+      }
+    }
+  }
+}
