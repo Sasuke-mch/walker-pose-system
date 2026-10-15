@@ -1,0 +1,1340 @@
+{
+  "date": "2026-10-16",
+  "scope": "geometry-only selected frames0/35/61 left/right;no detector inference or full448 replay;current tracker observations unchanged",
+  "changes": [
+    "support aiming averages unit directions rather than gnomonic lengths",
+    "focal fit uses max absolute half-extent around fixed principal point,not max-min span",
+    "required FOV above configured max raises explicit ValueError instead of silently clipping selected support",
+    "remap negative/near-zero original-camera Z is black border -1,avoiding OpenCV hemisphere fold",
+    "virtual_to_raw rejects original-camera negative/near-zero Z explicitly"
+  ],
+  "defaults": {
+    "margin": 1.35,
+    "min_hfov_deg": 35,
+    "max_hfov_deg": 130,
+    "unchanged": true
+  },
+  "tests": {
+    "before_patch_first_three_regressions": "3 failed,5 passed",
+    "before_hemisphere_patch_two_regressions": "2 failed,8 passed",
+    "after_patch": "10 passed",
+    "ruff_E9_F": "passed",
+    "related_refinement_and_rotation": "5 passed,15 subtests passed",
+    "git_diff_check": "passed for2 changed source/test files"
+  },
+  "compatibility": "Only optional local-perspective helper changes. Existing bbox centre aim remains; symmetric forward roundtrips remain subpixel. Support-based aim/framing changes intentionally. Former silent crop now fails explicitly. run_stereo._attempt_local_refinement catches and records failure then retains baseline; historical offline map_local_result does not catch mapping exception and will fail visibly rather than fold an invalid prediction. No full448 detector path uses this helper in current experiment.",
+  "conclusion": "Earlier six-view rejection/cropping reflects both aiming/framing defects and genuine configured-FOV limits,not proof that perspective rectification is impossible. Unit-mean repair alone does not solve six-view coverage. Diagnostic angular-bound midpoint can contain all selected points with margin at about130-149deg but exceeds130deg in all6 cases;do not silently raise maxFOV or substitute into detector. Coverage only certifies selected observed points,not unobserved silhouette/body.",
+  "views": [
+    {
+      "side": "left",
+      "frame": 0,
+      "prediction_source": "research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+      "selected_support_coco17": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "raw_support_xy_px": [
+        [
+          1801.0573173666758,
+          380.1985652700382
+        ],
+        [
+          1835.9232471632579,
+          410.48503348675195
+        ],
+        [
+          1799.6673483848572,
+          344.9095694739767
+        ],
+        [
+          1830.145102640939,
+          495.22435645346945
+        ],
+        [
+          1750.0262941405886,
+          325.17660264512324
+        ],
+        [
+          1699.4704798819525,
+          645.9358032256998
+        ],
+        [
+          1558.5205661645011,
+          310.4702564807649
+        ],
+        [
+          1625.6723827558849,
+          821.77188423593
+        ],
+        [
+          1403.4637690498716,
+          210.40170808929088
+        ],
+        [
+          1537.6660930694097,
+          969.2867626839493
+        ],
+        [
+          1217.4988534488375,
+          79.14217865720707
+        ],
+        [
+          1070.0733233784872,
+          729.1552175663887
+        ],
+        [
+          1016.8316906368918,
+          447.6648254014076
+        ],
+        [
+          688.0200560282146,
+          780.3011138565996
+        ],
+        [
+          659.9981593480188,
+          509.12767278894466
+        ],
+        [
+          348.74794166807123,
+          803.6156273065728
+        ],
+        [
+          366.24080243186336,
+          613.6279981745051
+        ]
+      ],
+      "old_default": {
+        "status": null,
+        "reason": null,
+        "all_support_inside": false,
+        "support_outside_count": 2,
+        "support_outside_coco17_indices": [
+          15,
+          16
+        ],
+        "focal_px": 447.65535182879864
+      },
+      "repaired_default": {
+        "status": "view_rejected",
+        "reason": "subject support with margin requires horizontal FOV 165.408 deg above configured maximum 130.000 deg"
+      },
+      "angular_bounds_midpoint_geometric_control": {
+        "implementation_status": "diagnostic only;not adopted by builder or detector",
+        "margin": 1.35,
+        "required_hfov_deg": 133.44769603565442,
+        "under_existing_130deg_limit": false,
+        "all_selected_support_forward": true,
+        "all_selected_support_inside": true,
+        "support_raw_virtual_raw_max_abs_px": 3.410605131648481e-13,
+        "forward_source_hemisphere_pixel_fraction": 1.0,
+        "source_in_bounds_and_forward_pixel_fraction": 0.8653862847222222,
+        "forward_pixel_fraction_is_not_support_coverage": true,
+        "virtual_support_xy_px": [
+          [
+            1577.3928459125352,
+            425.4930112495077
+          ],
+          [
+            1646.1966999131332,
+            444.5339879859098
+          ],
+          [
+            1583.1859591921248,
+            394.7291544105532
+          ],
+          [
+            1624.026423205968,
+            519.3606370539471
+          ],
+          [
+            1498.084828009288,
+            390.3878368519921
+          ],
+          [
+            1415.8605451212156,
+            633.2944175835828
+          ],
+          [
+            1270.2027037892349,
+            410.15854729101346
+          ],
+          [
+            1361.5184216374598,
+            759.480346169747
+          ],
+          [
+            1157.5690273412126,
+            356.5744096242772
+          ],
+          [
+            1310.0940699670268,
+            875.4870308787383
+          ],
+          [
+            1046.5005627809433,
+            272.13796727867515
+          ],
+          [
+            949.0011695363364,
+            663.6012087083321
+          ],
+          [
+            919.1589490016743,
+            505.8835117519528
+          ],
+          [
+            702.7562051906042,
+            715.0219247598156
+          ],
+          [
+            693.9767287769706,
+            537.4321701342483
+          ],
+          [
+            248.75925925925924,
+            823.9917537718752
+          ],
+          [
+            346.2189559374234,
+            622.7980321368185
+          ]
+        ]
+      }
+    },
+    {
+      "side": "left",
+      "frame": 35,
+      "prediction_source": "research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+      "selected_support_coco17": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "raw_support_xy_px": [
+        [
+          1773.4883343757144,
+          354.3815103667848
+        ],
+        [
+          1807.1816196857937,
+          380.6302695502627
+        ],
+        [
+          1770.0193488560026,
+          312.92519583854255
+        ],
+        [
+          1807.2770463814811,
+          461.8560175997145
+        ],
+        [
+          1724.464648731171,
+          294.8923247088778
+        ],
+        [
+          1683.5055719065288,
+          597.6452295628001
+        ],
+        [
+          1551.0571310028197,
+          298.77240655777314
+        ],
+        [
+          1643.0227933951787,
+          734.7922693972891
+        ],
+        [
+          1395.3863422605727,
+          204.85931287927815
+        ],
+        [
+          1584.6642127453333,
+          867.8025995213932
+        ],
+        [
+          1223.2437729230003,
+          89.96139757049855
+        ],
+        [
+          1056.5421229468452,
+          708.2814796605007
+        ],
+        [
+          1009.6640128710915,
+          446.84054985198554
+        ],
+        [
+          699.0581795677308,
+          767.8623650606644
+        ],
+        [
+          671.2813130787445,
+          533.6772123854212
+        ],
+        [
+          397.8289269038605,
+          818.2026761947793
+        ],
+        [
+          418.09380971817745,
+          654.4164231787336
+        ]
+      ],
+      "old_default": {
+        "status": null,
+        "reason": null,
+        "all_support_inside": false,
+        "support_outside_count": 2,
+        "support_outside_coco17_indices": [
+          15,
+          16
+        ],
+        "focal_px": 447.65535182879864
+      },
+      "repaired_default": {
+        "status": "view_rejected",
+        "reason": "subject support with margin requires horizontal FOV 159.895 deg above configured maximum 130.000 deg"
+      },
+      "angular_bounds_midpoint_geometric_control": {
+        "implementation_status": "diagnostic only;not adopted by builder or detector",
+        "margin": 1.35,
+        "required_hfov_deg": 130.26864917631394,
+        "under_existing_130deg_limit": false,
+        "all_selected_support_forward": true,
+        "all_selected_support_inside": true,
+        "support_raw_virtual_raw_max_abs_px": 2.2737367544323206e-13,
+        "forward_source_hemisphere_pixel_fraction": 1.0,
+        "source_in_bounds_and_forward_pixel_fraction": 0.8896923225308642,
+        "forward_pixel_fraction_is_not_support_coverage": true,
+        "virtual_support_xy_px": [
+          [
+            1547.7004822567974,
+            429.9363108707511
+          ],
+          [
+            1608.3480797950033,
+            445.4665049242295
+          ],
+          [
+            1549.460746304754,
+            394.2832445778687
+          ],
+          [
+            1602.3889367213833,
+            516.6918094861991
+          ],
+          [
+            1477.7390509000177,
+            390.2840897049977
+          ],
+          [
+            1414.609521062268,
+            627.2266764049932
+          ],
+          [
+            1273.3041595575041,
+            421.666444609212
+          ],
+          [
+            1389.627720505485,
+            732.3226347547587
+          ],
+          [
+            1154.9324648392978,
+            370.15643473263117
+          ],
+          [
+            1359.1852211771559,
+            842.3878887543383
+          ],
+          [
+            1046.565083991158,
+            295.41104270260746
+          ],
+          [
+            932.7656277910453,
+            687.7539986261786
+          ],
+          [
+            905.3965233213912,
+            528.0788807621577
+          ],
+          [
+            677.5441299398581,
+            749.3976009136372
+          ],
+          [
+            672.4907081607264,
+            579.4144847707875
+          ],
+          [
+            248.75925925925924,
+            882.8544258711347
+          ],
+          [
+            358.00402571171173,
+            690.2760578479958
+          ]
+        ]
+      }
+    },
+    {
+      "side": "left",
+      "frame": 61,
+      "prediction_source": "research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+      "selected_support_coco17": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "raw_support_xy_px": [
+        [
+          1873.7959348833751,
+          334.0331477357986
+        ],
+        [
+          1918.5637278840654,
+          360.5421852482127
+        ],
+        [
+          1883.0003444126673,
+          291.05451527301284
+        ],
+        [
+          1954.9093887597796,
+          450.17094431278565
+        ],
+        [
+          1843.5326183561294,
+          264.2338738593651
+        ],
+        [
+          1812.0535737143623,
+          667.0529543009211
+        ],
+        [
+          1646.0204915924678,
+          267.5930340036434
+        ],
+        [
+          1659.4694464131007,
+          856.2272592859067
+        ],
+        [
+          1428.5917821914431,
+          175.42208940932096
+        ],
+        [
+          1571.0461914501493,
+          937.9289552810344
+        ],
+        [
+          1227.0067365737189,
+          81.53454900295174
+        ],
+        [
+          1135.123101923201,
+          764.9429402249923
+        ],
+        [
+          1079.1264409262037,
+          402.42071284131816
+        ],
+        [
+          669.2808383759998,
+          781.2028523252366
+        ],
+        [
+          659.6078830446513,
+          460.1234327402519
+        ],
+        [
+          236.0357966650099,
+          766.971431975669
+        ],
+        [
+          299.87393214210624,
+          582.423875451088
+        ]
+      ],
+      "old_default": {
+        "status": "view_rejected",
+        "reason": "subject support spans directions behind the local virtual camera",
+        "all_support_inside": null,
+        "support_outside_count": null,
+        "support_outside_coco17_indices": null,
+        "focal_px": null
+      },
+      "repaired_default": {
+        "status": "view_rejected",
+        "reason": "subject support spans directions behind the local virtual camera"
+      },
+      "angular_bounds_midpoint_geometric_control": {
+        "implementation_status": "diagnostic only;not adopted by builder or detector",
+        "margin": 1.35,
+        "required_hfov_deg": 149.2539233497034,
+        "under_existing_130deg_limit": false,
+        "all_selected_support_forward": true,
+        "all_selected_support_inside": true,
+        "support_raw_virtual_raw_max_abs_px": 4.547473508864641e-13,
+        "forward_source_hemisphere_pixel_fraction": 1.0,
+        "source_in_bounds_and_forward_pixel_fraction": 0.6137610918209877,
+        "forward_pixel_fraction_is_not_support_coverage": true,
+        "virtual_support_xy_px": [
+          [
+            1459.7497703190493,
+            431.60357070846493
+          ],
+          [
+            1549.1990796603313,
+            435.8619823331419
+          ],
+          [
+            1491.8708948160868,
+            398.3323057944168
+          ],
+          [
+            1630.9582835189653,
+            490.99535566127196
+          ],
+          [
+            1427.3176105844877,
+            393.85883081698523
+          ],
+          [
+            1365.0605273795243,
+            624.6595149248443
+          ],
+          [
+            1211.870015010277,
+            436.11235828028816
+          ],
+          [
+            1247.3683858146035,
+            710.1992865513237
+          ],
+          [
+            1095.4503221143043,
+            412.3807776425412
+          ],
+          [
+            1197.6495861036526,
+            745.8478836735004
+          ],
+          [
+            1014.8983950797106,
+            377.29481268771326
+          ],
+          [
+            973.6789722857637,
+            638.331092022078
+          ],
+          [
+            952.5920012841403,
+            507.4907999624681
+          ],
+          [
+            779.317058912904,
+            660.5331242123395
+          ],
+          [
+            785.2356855941738,
+            523.3418872386987
+          ],
+          [
+            248.75925925925935,
+            756.6257321732085
+          ],
+          [
+            462.9389949739846,
+            584.3857219778491
+          ]
+        ]
+      },
+      "score025_subset_control": {
+        "selected_support_coco17": [
+          0,
+          1,
+          2,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "raw_support_xy_px": [
+          [
+            1873.7959348833751,
+            334.0331477357986
+          ],
+          [
+            1918.5637278840654,
+            360.5421852482127
+          ],
+          [
+            1883.0003444126673,
+            291.05451527301284
+          ],
+          [
+            1843.5326183561294,
+            264.2338738593651
+          ],
+          [
+            1812.0535737143623,
+            667.0529543009211
+          ],
+          [
+            1646.0204915924678,
+            267.5930340036434
+          ],
+          [
+            1659.4694464131007,
+            856.2272592859067
+          ],
+          [
+            1428.5917821914431,
+            175.42208940932096
+          ],
+          [
+            1571.0461914501493,
+            937.9289552810344
+          ],
+          [
+            1227.0067365737189,
+            81.53454900295174
+          ],
+          [
+            1135.123101923201,
+            764.9429402249923
+          ],
+          [
+            1079.1264409262037,
+            402.42071284131816
+          ],
+          [
+            669.2808383759998,
+            781.2028523252366
+          ],
+          [
+            659.6078830446513,
+            460.1234327402519
+          ],
+          [
+            236.0357966650099,
+            766.971431975669
+          ],
+          [
+            299.87393214210624,
+            582.423875451088
+          ]
+        ],
+        "repaired_default": {
+          "status": "view_rejected",
+          "reason": "subject support spans directions behind the local virtual camera"
+        },
+        "angular_bounds_midpoint_geometric_control": {
+          "implementation_status": "diagnostic only;not adopted by builder or detector",
+          "margin": 1.35,
+          "required_hfov_deg": 147.3812429034823,
+          "under_existing_130deg_limit": false,
+          "all_selected_support_forward": true,
+          "all_selected_support_inside": true,
+          "support_raw_virtual_raw_max_abs_px": 2.2737367544323206e-13,
+          "forward_source_hemisphere_pixel_fraction": 1.0,
+          "source_in_bounds_and_forward_pixel_fraction": 0.660757137345679,
+          "forward_pixel_fraction_is_not_support_coverage": true,
+          "virtual_support_xy_px": [
+            [
+              1519.4904076162852,
+              419.302904658369
+            ],
+            [
+              1623.415780403839,
+              423.05355470910274
+            ],
+            [
+              1556.5880141565576,
+              381.98810179882156
+            ],
+            [
+              1482.1346676583335,
+              377.95686879117386
+            ],
+            [
+              1411.3786859588931,
+              632.5903683374315
+            ],
+            [
+              1239.2814034284493,
+              426.90024885249943
+            ],
+            [
+              1279.0860546827282,
+              725.0196513167807
+            ],
+            [
+              1111.441320512767,
+              402.5543073387208
+            ],
+            [
+              1223.9453293927127,
+              763.0157425322716
+            ],
+            [
+              1024.334916516751,
+              366.01498129232414
+            ],
+            [
+              980.5407676255289,
+              644.7971602953503
+            ],
+            [
+              957.9114100652954,
+              505.4514699233794
+            ],
+            [
+              776.2857919450082,
+              666.7626378787006
+            ],
+            [
+              782.2459012316405,
+              522.7461128009085
+            ],
+            [
+              248.75925925925935,
+              759.2791836025248
+            ],
+            [
+              456.4753703276761,
+              586.0906988754429
+            ]
+          ]
+        },
+        "reason": "joint6 confidence below.25;kept explicit;main all17 control matches earlier six-view record"
+      }
+    },
+    {
+      "side": "right",
+      "frame": 0,
+      "prediction_source": "research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+      "selected_support_coco17": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "raw_support_xy_px": [
+        [
+          105.39606928446938,
+          503.2692566120877
+        ],
+        [
+          92.64622031317822,
+          462.486380318378
+        ],
+        [
+          78.14092683035233,
+          542.3008576530092
+        ],
+        [
+          151.33741455986387,
+          428.51330502743394
+        ],
+        [
+          118.34348927982273,
+          614.715691454867
+        ],
+        [
+          327.8331914364344,
+          385.0524458149646
+        ],
+        [
+          281.80956423850284,
+          740.4827640716067
+        ],
+        [
+          452.4357278536236,
+          241.5790728863251
+        ],
+        [
+          351.4236292347075,
+          870.3105436664946
+        ],
+        [
+          594.5588307304988,
+          83.45863738465846
+        ],
+        [
+          490.3392259052821,
+          1021.9707104233985
+        ],
+        [
+          897.1446820819192,
+          431.3419792423856
+        ],
+        [
+          906.6857539434282,
+          726.0017247580467
+        ],
+        [
+          1266.249766894749,
+          422.0719822087185
+        ],
+        [
+          1300.668738092695,
+          688.9647391298981
+        ],
+        [
+          1574.5019595736549,
+          433.84452069566623
+        ],
+        [
+          1628.94702897753,
+          625.8742943266602
+        ]
+      ],
+      "old_default": {
+        "status": "view_rejected",
+        "reason": "subject support spans directions behind the local virtual camera",
+        "all_support_inside": null,
+        "support_outside_count": null,
+        "support_outside_coco17_indices": null,
+        "focal_px": null
+      },
+      "repaired_default": {
+        "status": "view_rejected",
+        "reason": "subject support with margin requires horizontal FOV 167.129 deg above configured maximum 130.000 deg"
+      },
+      "angular_bounds_midpoint_geometric_control": {
+        "implementation_status": "diagnostic only;not adopted by builder or detector",
+        "margin": 1.35,
+        "required_hfov_deg": 134.8809803685024,
+        "under_existing_130deg_limit": false,
+        "all_selected_support_forward": true,
+        "all_selected_support_inside": true,
+        "support_raw_virtual_raw_max_abs_px": 3.410605131648481e-13,
+        "forward_source_hemisphere_pixel_fraction": 1.0,
+        "source_in_bounds_and_forward_pixel_fraction": 0.8530275848765432,
+        "forward_pixel_fraction_is_not_support_coverage": true,
+        "virtual_support_xy_px": [
+          [
+            313.5396028881005,
+            520.379851933609
+          ],
+          [
+            279.19054532017185,
+            486.2343552282203
+          ],
+          [
+            248.75925925925935,
+            554.3382296830587
+          ],
+          [
+            396.22356304063976,
+            463.03153626153875
+          ],
+          [
+            337.55275622180784,
+            609.2428049833961
+          ],
+          [
+            621.0100586531408,
+            444.93597803567286
+          ],
+          [
+            566.8652982798201,
+            675.4264952444855
+          ],
+          [
+            710.6824491197202,
+            359.756595771043
+          ],
+          [
+            614.0159490577712,
+            759.9156657778124
+          ],
+          [
+            790.9448729689484,
+            254.62992546184267
+          ],
+          [
+            702.5393161007144,
+            862.1411692177326
+          ],
+          [
+            989.0062890285249,
+            480.1544806237633
+          ],
+          [
+            992.14280508604,
+            637.213210419955
+          ],
+          [
+            1211.911931636095,
+            469.08587431999104
+          ],
+          [
+            1236.2052226926107,
+            635.5692193158419
+          ],
+          [
+            1557.939473646508,
+            460.55844269932834
+          ],
+          [
+            1660.7864542127052,
+            638.2494858267288
+          ]
+        ]
+      }
+    },
+    {
+      "side": "right",
+      "frame": 35,
+      "prediction_source": "research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+      "selected_support_coco17": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "raw_support_xy_px": [
+        [
+          115.8041878125025,
+          533.9163180031674
+        ],
+        [
+          106.18050722470366,
+          494.93567748779924
+        ],
+        [
+          84.60456037899803,
+          568.7146909744183
+        ],
+        [
+          153.44635179686156,
+          465.7323029624654
+        ],
+        [
+          111.70861056494323,
+          646.7823466265454
+        ],
+        [
+          328.1574170702979,
+          421.12249562588136
+        ],
+        [
+          277.4923777353197,
+          772.0693827740688
+        ],
+        [
+          447.51232038982334,
+          267.65881542702937
+        ],
+        [
+          364.79821804591575,
+          908.3560439360904
+        ],
+        [
+          596.1777438966055,
+          89.12328674945456
+        ],
+        [
+          496.1910465179926,
+          1027.4799958936712
+        ],
+        [
+          886.6100541901969,
+          480.55254371115507
+        ],
+        [
+          895.1158117642481,
+          764.1777292388551
+        ],
+        [
+          1238.1597497879511,
+          467.00069438142964
+        ],
+        [
+          1268.6794438589186,
+          714.4063069516042
+        ],
+        [
+          1532.195107762776,
+          456.38418592544303
+        ],
+        [
+          1570.6968019273545,
+          641.4728147349458
+        ]
+      ],
+      "old_default": {
+        "status": null,
+        "reason": null,
+        "all_support_inside": false,
+        "support_outside_count": 2,
+        "support_outside_coco17_indices": [
+          15,
+          16
+        ],
+        "focal_px": 447.65535182879864
+      },
+      "repaired_default": {
+        "status": "view_rejected",
+        "reason": "subject support with margin requires horizontal FOV 160.027 deg above configured maximum 130.000 deg"
+      },
+      "angular_bounds_midpoint_geometric_control": {
+        "implementation_status": "diagnostic only;not adopted by builder or detector",
+        "margin": 1.35,
+        "required_hfov_deg": 130.47761296185922,
+        "under_existing_130deg_limit": false,
+        "all_selected_support_forward": true,
+        "all_selected_support_inside": true,
+        "support_raw_virtual_raw_max_abs_px": 2.2737367544323206e-13,
+        "forward_source_hemisphere_pixel_fraction": 1.0,
+        "source_in_bounds_and_forward_pixel_fraction": 0.8900925925925925,
+        "forward_pixel_fraction_is_not_support_coverage": true,
+        "virtual_support_xy_px": [
+          [
+            320.58797905440144,
+            540.1653754845353
+          ],
+          [
+            297.7867341938585,
+            507.4477364698899
+          ],
+          [
+            248.75925925925924,
+            572.9522766578162
+          ],
+          [
+            388.19776702590696,
+            484.21526339206326
+          ],
+          [
+            301.9583590186845,
+            637.2020934549645
+          ],
+          [
+            614.0460143789282,
+            458.14620740661235
+          ],
+          [
+            543.1789837147757,
+            706.0918159845253
+          ],
+          [
+            704.4476048252425,
+            358.4277293367917
+          ],
+          [
+            607.5442223389396,
+            802.3220378708857
+          ],
+          [
+            793.0343498664812,
+            227.6475183561609
+          ],
+          [
+            700.6907984159118,
+            888.3454050391178
+          ],
+          [
+            1002.2253903338069,
+            499.27546544027734
+          ],
+          [
+            1003.854243653709,
+            668.6554407406351
+          ],
+          [
+            1237.3754224566671,
+            488.6539441314607
+          ],
+          [
+            1262.1949264645993,
+            661.1697756082345
+          ],
+          [
+            1589.8887066784682,
+            471.121157803001
+          ],
+          [
+            1661.0093746089947,
+            653.9774892503674
+          ]
+        ]
+      }
+    },
+    {
+      "side": "right",
+      "frame": 61,
+      "prediction_source": "research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+      "selected_support_coco17": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "raw_support_xy_px": [
+        [
+          40.77235205400552,
+          438.30378570962466
+        ],
+        [
+          23.92810595981655,
+          397.51850010739986
+        ],
+        [
+          5.6569802155570414,
+          477.1067214696966
+        ],
+        [
+          73.83187410944993,
+          352.6726535457244
+        ],
+        [
+          31.51728794309838,
+          547.8900883603603
+        ],
+        [
+          253.98429448263983,
+          287.2125443042594
+        ],
+        [
+          181.72998197116544,
+          675.7857485451598
+        ],
+        [
+          486.908875851404,
+          171.7945468983753
+        ],
+        [
+          309.07305834406907,
+          867.4934049286742
+        ],
+        [
+          612.2240986294216,
+          47.425603313648935
+        ],
+        [
+          491.13001836292324,
+          1023.1613833904266
+        ],
+        [
+          863.2615237917216,
+          300.117457793114
+        ],
+        [
+          867.0601453629752,
+          632.4963152839782
+        ],
+        [
+          1280.0786492332581,
+          279.6172357163532
+        ],
+        [
+          1293.9439883459181,
+          591.7595078894433
+        ],
+        [
+          1673.6748429858499,
+          355.25922875962374
+        ],
+        [
+          1708.6824966763693,
+          564.7271393638975
+        ]
+      ],
+      "old_default": {
+        "status": "view_rejected",
+        "reason": "subject support spans directions behind the local virtual camera",
+        "all_support_inside": null,
+        "support_outside_count": null,
+        "support_outside_coco17_indices": null,
+        "focal_px": null
+      },
+      "repaired_default": {
+        "status": "view_rejected",
+        "reason": "subject support spans directions behind the local virtual camera"
+      },
+      "angular_bounds_midpoint_geometric_control": {
+        "implementation_status": "diagnostic only;not adopted by builder or detector",
+        "margin": 1.35,
+        "required_hfov_deg": 145.63466015063557,
+        "under_existing_130deg_limit": false,
+        "all_selected_support_forward": true,
+        "all_selected_support_inside": true,
+        "support_raw_virtual_raw_max_abs_px": 2.8421709430404007e-13,
+        "forward_source_hemisphere_pixel_fraction": 1.0,
+        "source_in_bounds_and_forward_pixel_fraction": 0.7082966820987654,
+        "forward_pixel_fraction_is_not_support_coverage": true,
+        "virtual_support_xy_px": [
+          [
+            346.37329777802677,
+            487.10974420994324
+          ],
+          [
+            288.6464191974668,
+            453.6542020914319
+          ],
+          [
+            248.75925925925924,
+            513.0898057987771
+          ],
+          [
+            401.6144731093341,
+            431.6196827115979
+          ],
+          [
+            329.12082011184566,
+            564.9417195104979
+          ],
+          [
+            639.0941888999391,
+            420.54112507639206
+          ],
+          [
+            577.010166595911,
+            625.2721886308763
+          ],
+          [
+            790.0364977980164,
+            380.5280116295307
+          ],
+          [
+            667.108422397725,
+            717.794885366001
+          ],
+          [
+            842.4631985841884,
+            316.9889578590359
+          ],
+          [
+            766.7699404820218,
+            791.2340737401926
+          ],
+          [
+            968.6572847510871,
+            448.89691774029006
+          ],
+          [
+            970.5272966225816,
+            581.1226443338818
+          ],
+          [
+            1162.9539601248496,
+            424.0562946974981
+          ],
+          [
+            1162.8270383146805,
+            571.9643635097813
+          ],
+          [
+            1602.1786115652817,
+            411.28619362939713
+          ],
+          [
+            1663.169082105089,
+            587.7432749851688
+          ]
+        ]
+      }
+    }
+  ],
+  "support_policy": "main six-view control uses same17 finite raw-in-bounds points as earlier diagnostic,including low-score joint6 left61;score.25 subset explicitly retained for that view",
+  "code_files": [
+    "realtime_app/pose_app/local_perspective.py",
+    "realtime_app/tests/test_local_perspective.py"
+  ]
+}

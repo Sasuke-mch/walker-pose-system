@@ -291,6 +291,21 @@
       "lint": "uvx --offline ruff E9,F passed",
       "compile": "world tracker and prefix diagnostic passed",
       "independent_review": "no blocking error;contact posterior remains uncertified local approximation"
+    },
+    "optional_perspective": {
+      "record": "local_perspective_review.json",
+      "changes": [
+        "unit ray direction mean",
+        "fixed principal point maxabs extent",
+        "explicit FOV rejection",
+        "original camera back hemisphere remap black border and point inverse rejection"
+      ],
+      "tests": "10 local perspective tests;5 pipeline/rotation tests and15 subtests;five new regressions failed before repairs;Ruff passed",
+      "real_six_views": "4 FOV limit rejections,2 virtual direction rejections at unchanged130deg;no detector run",
+      "diagnostic_angular_midpoint_only": "complete selected support needs130.27..149.25deg;not adopted",
+      "current448_uses_helper": false,
+      "errata": "older support_score_min0.25 description did not match left61 low-score point;new record preserves full17 original comparison plus explicit16-point threshold subset",
+      "decision": "retain helper correctness repairs;do not substitute failed FOV views or claim current448 pose improvement"
     }
   }
 }

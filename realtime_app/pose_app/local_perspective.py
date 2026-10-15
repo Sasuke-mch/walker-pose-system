@@ -90,6 +90,8 @@ class LocalPerspectiveView:
             ]
         )
         camera_rays = virtual_rays @ self.camera_from_virtual.T
+        if np.any(camera_rays[:, 2] <= 1e-9):
+            raise ValueError("virtual point lies behind the original fisheye camera")
         projected, _ = cv2.fisheye.projectPoints(
             camera_rays.reshape(-1, 1, 3),
             np.zeros((3, 1), dtype=np.float64),
@@ -179,12 +181,13 @@ class LocalPerspectiveModelInput:
         return np.column_stack([right, down, forward])
 
     def build(self, bbox_xyxy: list[float] | tuple[float, float, float, float], *, support_points: np.ndarray | None = None) -> LocalPerspectiveView:
-        """Create a view that contains the supplied raw-fisheye bounding box.
+        """Create a view containing the selected raw-fisheye support.
 
-        The field of view is fitted from all four box corners in the local
-        pinhole plane and then expanded by ``margin``.  It is clamped to a
-        documented range so a faulty 2D box cannot create a nearly singular
-        virtual camera.
+        Support is the supplied finite in-image keypoints when at least four
+        are available, otherwise the four clipped box corners.  Fit symmetric
+        extents about the fixed virtual principal point with ``margin``.
+        Reject a required FOV above the configured maximum instead of silently
+        clipping support.  This is not a guarantee about unobserved body parts.
         """
 
         if len(bbox_xyxy) < 4:
@@ -219,10 +222,12 @@ class LocalPerspectiveModelInput:
         # explicit target: that point must land at the virtual-image centre.
         # Averaging the four corner rays is not equivalent for fisheye pixels
         # and can visibly displace a centred subject.  With four or more
-        # high-confidence pose points, keep the established support-ray aim so
-        # that the view follows the observed body rather than an imperfect box.
+        # high-confidence pose points, average unit directions: the gnomonic
+        # [x/z, y/z, 1] rays have length sec(theta), which otherwise overweights
+        # fisheye-edge points and can aim the virtual camera past other support.
         if using_keypoint_support:
-            center_ray = np.sum(camera_rays, axis=0)
+            unit_rays = camera_rays / np.linalg.norm(camera_rays, axis=1, keepdims=True)
+            center_ray = np.sum(unit_rays, axis=0)
         else:
             bbox_center = np.asarray(
                 [[(x1 + x2) * 0.5, (y1 + y2) * 0.5]], dtype=np.float64
@@ -234,16 +239,22 @@ class LocalPerspectiveModelInput:
             raise ValueError("subject support spans directions behind the local virtual camera")
         local_x = local_rays[:, 0] / local_rays[:, 2]
         local_y = local_rays[:, 1] / local_rays[:, 2]
-        span_x = max(1e-6, float(local_x.max() - local_x.min()))
-        span_y = max(1e-6, float(local_y.max() - local_y.min()))
+        radius_x = max(1e-6, float(np.max(np.abs(local_x))))
+        radius_y = max(1e-6, float(np.max(np.abs(local_y))))
         output_width, output_height = self.output_size
         focal = min(
-            output_width / (self.margin * span_x),
-            output_height / (self.margin * span_y),
+            (output_width - 1.0) / (2.0 * self.margin * radius_x),
+            (output_height - 1.0) / (2.0 * self.margin * radius_y),
         )
-        min_focal = output_width / (2.0 * math.tan(math.radians(self.max_horizontal_fov_deg) * 0.5))
-        max_focal = output_width / (2.0 * math.tan(math.radians(self.min_horizontal_fov_deg) * 0.5))
-        focal = float(np.clip(focal, min_focal, max_focal))
+        min_focal = (output_width - 1.0) / (2.0 * math.tan(math.radians(self.max_horizontal_fov_deg) * 0.5))
+        max_focal = (output_width - 1.0) / (2.0 * math.tan(math.radians(self.min_horizontal_fov_deg) * 0.5))
+        if focal < min_focal:
+            required_fov = math.degrees(2.0 * math.atan((output_width - 1.0) / (2.0 * focal)))
+            raise ValueError(
+                f"subject support with margin requires horizontal FOV {required_fov:.3f} deg "
+                f"above configured maximum {self.max_horizontal_fov_deg:.3f} deg"
+            )
+        focal = float(min(focal, max_focal))
 
         xx, yy = np.meshgrid(
             np.arange(output_width, dtype=np.float64),
@@ -258,13 +269,20 @@ class LocalPerspectiveModelInput:
             axis=-1,
         ).reshape(-1, 3)
         camera_rays = virtual_rays @ camera_from_virtual.T
+        forward = camera_rays[:, 2] > 1e-9
+        # OpenCV's perspective-normalized fisheye projection folds negative-Z
+        # rays onto the front hemisphere.  They are outside this calibrated
+        # model's domain; preserve them as black border pixels in the input.
+        safe_rays = camera_rays.copy()
+        safe_rays[~forward] = [0.0, 0.0, 1.0]
         projected, _ = cv2.fisheye.projectPoints(
-            camera_rays.reshape(-1, 1, 3),
+            safe_rays.reshape(-1, 1, 3),
             np.zeros((3, 1), dtype=np.float64),
             np.zeros((3, 1), dtype=np.float64),
             self.K,
             self.D,
         )
+        projected[~forward] = -1.0
         raw_pixels = projected.reshape(output_height, output_width, 2)
         return LocalPerspectiveView(
             K_fisheye=self.K,

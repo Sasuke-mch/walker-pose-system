@@ -1180,5 +1180,10 @@
       "candidate only improves accepted-point count by losing hard joints"
     ]
   },
-  "conclusion": "Current projection parity excludes specific geometry implementation errors only. Fish-eye-dependent neural prediction bias/domain mismatch remains an untested plausible contributor. Existing raw-rotated detections have no calibrated rectification and local configs do not certify fish-eye training;do not expand numeric projection pass into all fish-eye effects excluded."
+  "conclusion": "Current projection parity excludes specific geometry implementation errors only. Fish-eye-dependent neural prediction bias/domain mismatch remains an untested plausible contributor. Existing raw-rotated detections have no calibrated rectification and local configs do not certify fish-eye training;do not expand numeric projection pass into all fish-eye effects excluded.",
+  "errata_20261016": {
+    "record": "local_perspective_review.json",
+    "support_score_description": "old six-view support included left61 COCO6 below0.25;do not interpret all selected points as threshold-passing. New record preserves original17 point comparison and separately lists16-point threshold subset.",
+    "implementation_review": "some old view failures also reflect unnormalized aim and focal centring defects;default130deg still does not cover six views after minimal repairs;no current448 observations changed"
+  }
 }
