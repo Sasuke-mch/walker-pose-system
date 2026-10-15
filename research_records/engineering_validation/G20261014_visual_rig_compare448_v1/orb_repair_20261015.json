@@ -1,0 +1,325 @@
+{
+  "date": "2026-10-15",
+  "status": "completed_two_bounded_repairs_no_temporal_trajectory",
+  "input_primary": "input_primary/manifest.json",
+  "input_full_resolution": "input_fullres_orb_v6/manifest.json",
+  "code_change": {
+    "files": [
+      "realtime_app/walker_tools/scene/orbslam3_static_mask.patch",
+      "realtime_app/walker_tools/scene/orbslam3_runner.cpp"
+    ],
+    "problem": "A masked high-FAST corner prevented min-FAST fallback for unmasked weaker corners in the same extraction cell.",
+    "fix": "Filter excluded corners before deciding whether the native low-FAST fallback is needed; apply the same descriptor support exclusion to fallback results.",
+    "added_diagnostic": "native_stereo_triangulated_point_count counts finite native left-to-right triangulated points before initialization, independently of native OK.",
+    "unchanged": "FAST20/7,6000 target,8 pyramid levels,1.2 scale,22-level-pixel descriptor halo,Lowe0.7,native triangulation gates and N>500 initialization remain unchanged."
+  },
+  "variables_in_order": [
+    "v4 to v5: masked FAST fallback ordering only",
+    "v5 to v6: restore original1920x1080 instead of960x540 through existing input preparer; retain mask semantics and calibrated scaling"
+  ],
+  "scope": "Same-source engineering repair; unmasked feature extraction is diagnostic only and never feeds a pose. No Stage, temporal fill, calibration fitting or dynamic features allowed.",
+  "primary_unmasked_feature_counts": {
+    "left": {
+      "median": 4395.5,
+      "minimum": 2629,
+      "maximum": 5548
+    },
+    "right": {
+      "median": 5587.0,
+      "minimum": 3649,
+      "maximum": 5932
+    }
+  },
+  "primary_masked_feature_counts": {
+    "left": {
+      "before_median_max": [
+        4.0,
+        49
+      ],
+      "fixed_median_max": [
+        6.0,
+        53
+      ],
+      "gained_frames": 316,
+      "total_added_keypoints": 2284
+    },
+    "right": {
+      "before_median_max": [
+        40.0,
+        168
+      ],
+      "fixed_median_max": [
+        61.5,
+        175
+      ],
+      "gained_frames": 391,
+      "total_added_keypoints": 7268
+    }
+  },
+  "fallback_regression": {
+    "source": "orb_feature_probe.cpp",
+    "command_switch": "--regression",
+    "old_weak_static_corner_count": 0,
+    "fixed_weak_static_corner_count": 1,
+    "excluded_feature_centers": 0,
+    "case": "Same native FAST cell contains excluded high-contrast texture and valid low-contrast texture; fixed native extractor finds valid weak corner."
+  },
+  "fallback_run": {
+    "output": "orbslam3_mask_fallback_v5/visual_rig_pose.jsonl",
+    "frame_count": 448,
+    "status_counts": {
+      "not_initialized": 448
+    },
+    "track_ms_median_p95": [
+      18.355601,
+      34.73967089999997
+    ],
+    "mask_center_violations": 0,
+    "largest_same_frame_total_keypoints": 227,
+    "runner_summary": {
+      "backend": "orbslam3_stereo_fisheye",
+      "frame_count": 448,
+      "tracked_count": 0,
+      "input_unavailable_count": 0,
+      "initialization_ms": 16679.95687,
+      "replay_wall_ms": 99254.43565,
+      "shutdown_ms": 0.787553,
+      "feature_count": 6000,
+      "mask_applied_at_feature_extraction": true,
+      "descriptor_exclusion_halo_level_px": 22,
+      "minimum_finite_inlier_map_observations": 1,
+      "stage_used": false,
+      "world_pose_certified": false
+    }
+  },
+  "descriptor_support_region_diagnostic": "orb_descriptor_regions_20261015.json",
+  "fullres32_preflight": {
+    "output": "orbslam3_fullres32_preflight/visual_rig_pose.jsonl",
+    "status_counts": {
+      "no_3d_support": 16,
+      "lost": 16
+    },
+    "native_stereo_triangulated_points_all_frames": 0,
+    "same_frame_total_keypoint_range": [
+      592,
+      1127
+    ]
+  },
+  "fullres4_stereo_diagnostic": {
+    "source": "orb_native_stereo_probe.cpp",
+    "output": "orb_fullres4_native_stereo_diagnostics.jsonl",
+    "frame_ids": [
+      0,
+      34,
+      86,
+      156
+    ],
+    "ratio_match_counts": [
+      3,
+      3,
+      15,
+      11
+    ],
+    "native_triangulated_point_counts": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "total_reject_counts_minus1_to_minus5": [
+      0,
+      11,
+      1,
+      19,
+      1
+    ],
+    "reject_meanings": {
+      "-1": "insufficient_parallax",
+      "-2": "nonpositive_left_depth",
+      "-3": "nonpositive_right_depth",
+      "-4": "left_reprojection_above_native_octave_gate",
+      "-5": "right_reprojection_above_native_octave_gate"
+    },
+    "conclusion": "Original resolution restores enough 2D features to cross the initialization count, but the few descriptor ratio matches are rejected by native depth/reprojection checks. This is sparse/incorrect common static stereo correspondence, not evidence to relax geometric gates."
+  },
+  "native_geometry_sanity": {
+    "synthetic_visible_points": 18,
+    "native_accepted_points": 18,
+    "maximum_reconstruction_error_m": 1.054215772e-05,
+    "reject_counts_minus1_to_minus5": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "native_geometry_sanity_scope": "Exact same formal calibration and native KB projection/triangulation; verifies transform/unit/API consistency on synthetic visible points, not physical calibration accuracy.",
+  "checks": [
+    "Dependency patch applies to clean official index: git -C third_party/ORB_SLAM3 apply --cached --check --unidiff-zero <absolute project patch>",
+    "Native WSL orbslam3_runner actual CMake target rebuilt",
+    "Native synthetic mask regression fails before and passes after",
+    "All448 fallback outputs retained without input loss or excluded feature centers"
+  ],
+  "official_sources": [
+    "https://github.com/UZ-SLAMLab/ORB_SLAM3/blob/master/src/ORBextractor.cc",
+    "https://github.com/UZ-SLAMLab/ORB_SLAM3/blob/master/src/Tracking.cc",
+    "https://github.com/UZ-SLAMLab/ORB_SLAM3/blob/master/src/CameraModels/KannalaBrandt8.cpp"
+  ],
+  "commands": {
+    "build": "wsl -d Ubuntu-22.04 -- bash -lc \"cmake --build /home/itachi/walker_orb_build/orbslam3_local --target orbslam3_runner -j4\"",
+    "prepare_fullres": "./.venv-cuda/Scripts/python.exe -B realtime_app/walker_tools/scene/prepare_visual_rig_comparison.py --source-plan research_records/engineering_validation/G20261013_reliability448_view_v1/plan.json --calibration realtime_app/calibration/results/stereo_fisheye.json --walker-model research_records/engineering_validation/G20260918_offline_walker_frame_evidence_v1/coarse_complete_model_v2_camera_rail/coarse_walker_model.json --width 1920 --output research_records/engineering_validation/G20261014_visual_rig_compare448_v1/input_fullres_orb_v6",
+    "replay_fullres": "LD_LIBRARY_PATH=/home/itachi/walker_orb_build/pangolin_install/lib:$LD_LIBRARY_PATH /home/itachi/walker_orb_build/ORB_SLAM3/bin/orbslam3_runner /mnt/d/my_works/walker_pose_system/research_records/engineering_validation/G20261014_visual_rig_compare448_v1/input_fullres_orb_v6/manifest.json /mnt/d/my_works/walker_pose_system/research_records/engineering_validation/G20261014_visual_rig_compare448_v1/orbslam3_fullres_v6 /mnt/d/my_works/walker_pose_system/third_party/ORB_SLAM3/Vocabulary/ORBvoc.txt",
+    "probe_build": "g++ -std=c++17 -O2 -Wno-deprecated-declarations orb_native_stereo_probe.cpp -I/home/itachi/walker_orb_build/ORB_SLAM3 -I/home/itachi/walker_orb_build/ORB_SLAM3/include -I/usr/include/eigen3 -I/home/itachi/walker_orb_build/ORB_SLAM3/Thirdparty/Sophus -L/home/itachi/walker_orb_build/ORB_SLAM3/lib -lORB_SLAM3 $(pkg-config --cflags --libs opencv4) -Wl,-rpath,/home/itachi/walker_orb_build/ORB_SLAM3/lib -Wl,-rpath-link,/home/itachi/walker_orb_build/pangolin_install/lib -o /tmp/orb_native_stereo_probe",
+    "probe_run": "LD_LIBRARY_PATH=/home/itachi/walker_orb_build/pangolin_install/lib:$LD_LIBRARY_PATH /tmp/orb_native_stereo_probe orb_fullres4_preflight_manifest.json orb_fullres4_native_stereo_diagnostics.jsonl",
+    "geometry_sanity": "same native probe command plus --geometry-sanity; output orb_native_geometry_sanity.json"
+  },
+  "decision": "Stop this ORB route after two cause-based revisions: fallback ordering fixed, original resolution restores enough2D features but fails common static stereo geometry and temporal continuation.14/448 geometry-supported initialization seeds, all identity after active-map resets; no usable world trajectory or acceleration; native map_id0 alone cannot certify continuity. No Stage fusion or mainline promotion.",
+  "fullres_run": {
+    "output": "orbslam3_fullres_v6/visual_rig_pose.jsonl",
+    "frame_count": 448,
+    "status_counts": {
+      "no_3d_support": 210,
+      "lost": 224,
+      "tracked": 14
+    },
+    "supported_native_pose_proposals": 14,
+    "supported_fraction": 0.03125,
+    "all_supported_pose_proposals_identity": true,
+    "accepted_frame_map_support": [
+      [
+        48,
+        0,
+        4,
+        3,
+        3
+      ],
+      [
+        164,
+        0,
+        3,
+        2,
+        2
+      ],
+      [
+        178,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        190,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        200,
+        0,
+        3,
+        2,
+        2
+      ],
+      [
+        322,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        324,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        326,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        330,
+        0,
+        3,
+        2,
+        2
+      ],
+      [
+        332,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        338,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        346,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        388,
+        0,
+        2,
+        1,
+        1
+      ],
+      [
+        446,
+        0,
+        3,
+        2,
+        2
+      ]
+    ],
+    "same_segment_consecutive_accepted_edges": 0,
+    "native_stereo_triangulated_count_distribution": {
+      "0": 424,
+      "3": 1,
+      "1": 17,
+      "2": 6
+    },
+    "map_segment_count": 1,
+    "track_ms_median_p95_max": [
+      126.2834555,
+      194.35525765,
+      683.552544
+    ],
+    "input_unavailable_count": 0,
+    "mask_center_violations": 0,
+    "runner_summary": {
+      "backend": "orbslam3_stereo_fisheye",
+      "frame_count": 448,
+      "tracked_count": 14,
+      "input_unavailable_count": 0,
+      "initialization_ms": 19203.03567,
+      "replay_wall_ms": 450411.1165,
+      "shutdown_ms": 1.933242,
+      "feature_count": 6000,
+      "mask_applied_at_feature_extraction": true,
+      "descriptor_exclusion_halo_level_px": 22,
+      "minimum_finite_inlier_map_observations": 1,
+      "stage_used": false,
+      "world_pose_certified": false
+    },
+    "translation_jump_statistics": "undefined: no consecutive supported poses; all14 proposals are identity initialization seeds after active-map resets, and native map_id remains0 even across resets",
+    "native_map_id_reused_during_active_reset": true,
+    "valid_contiguous_runs": 14,
+    "longest_valid_contiguous_run_frames": 1
+  },
+  "timing_limit": "Recorded wall times under actual concurrent machine load, not a controlled paired speed benchmark. Never infer successful localization speed from uninitialized/no-support calls."
+}

@@ -193,6 +193,11 @@ int main(int argc,char** argv) {
             const bool mapUpdated=slam.MapChanged();
             previousMap=mapId;haveMap=true;
             const auto& frame=slam.GetCurrentFrameForExport();
+            int stereoTriangulatedPoints=0;
+            for(size_t i=0;i<frame.mvLeftToRightMatch.size();++i) {
+                if(frame.mvLeftToRightMatch[i]>=0 && i<frame.mvStereo3Dpoints.size()
+                   && frame.mvStereo3Dpoints[i].allFinite()) ++stereoTriangulatedPoints;
+            }
             const int maskViolations=excludedFeatureCenters(frame.mvKeys,leftMask)+excludedFeatureCenters(frame.mvKeysRight,rightMask);
             int pointCount=0,inlierPointCount=0; bool first=true;
             std::ostringstream observations;
@@ -225,6 +230,7 @@ int main(int argc,char** argv) {
                   <<",\"map_segment_id\":"<<mapId<<",\"map_changed\":"<<(mapChanged?"true":"false")
                   <<",\"map_update_reported\":"<<(mapUpdated?"true":"false")<<",\"pose_frame\":\"backend_map_segment\""
                   <<",\"left_keypoint_count\":"<<frame.mvKeys.size()<<",\"right_keypoint_count\":"<<frame.mvKeysRight.size()
+                  <<",\"native_stereo_triangulated_point_count\":"<<stereoTriangulatedPoints
                   <<",\"masked_feature_center_violations\":"<<maskViolations
                   <<",\"finite_inlier_map_observation_count\":"<<inlierPointCount
                   <<",\"native_pose_proposal_world_from_left_camera_m\":";

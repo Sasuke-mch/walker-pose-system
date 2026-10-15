@@ -44,5 +44,24 @@
     "orbslam3_primary_v3.log",
     "input/"
   ],
-  "timing_limit": "Manifest nominal 30FPS, exposure synchronization unknown; do not interpret nominal derivative as physical acceleration."
+  "timing_limit": "Manifest nominal 30FPS, exposure synchronization unknown; do not interpret nominal derivative as physical acceleration.",
+  "orb_repair_20261015": {
+    "status": "completed_no_temporal_trajectory",
+    "details": "orb_repair_20261015.json",
+    "changes": [
+      "masked high FAST filtering before low FAST fallback",
+      "restore native1920x1080 resolution with same semantic exclusions"
+    ],
+    "fallback_complete_448": "orbslam3_mask_fallback_v5/visual_rig_pose.jsonl",
+    "fullres_complete_448": "orbslam3_fullres_v6/visual_rig_pose.jsonl",
+    "nonempty_geometry_candidates": 14,
+    "candidate_fraction": 0.03125,
+    "continuous_supported_edges": 0,
+    "longest_valid_run_frames": 1,
+    "all_candidates_identity_initialization_seeds": true,
+    "native_map_id_reused_during_reset": true,
+    "native_match_diagnostic": "32 Lowe candidates on4 fixed frames, all rejected by depth/reprojection,18/18 synthetic KB contract passed",
+    "promotion": false,
+    "decision": "static background stereo correspondences insufficient; stop after two bounded changes, no relaxed gates or Stage fill"
+  }
 }

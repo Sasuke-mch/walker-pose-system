@@ -85,10 +85,9 @@ index 863c98e..25cf4b6 100644
 +    }
 +
 diff --git a/src/ORBextractor.cc b/src/ORBextractor.cc
-index 970b7cc..e807042 100644
 --- a/src/ORBextractor.cc
 +++ b/src/ORBextractor.cc
-@@ -793,0 +794,18 @@ namespace ORB_SLAM3
+@@ -793,0 +794,18 @@
 +            cv::Mat levelExclusion;
 +            if(!mExclusionMask.empty())
 +            {
@@ -107,7 +106,26 @@ index 970b7cc..e807042 100644
 +                    cv::getStructuringElement(cv::MORPH_RECT, cv::Size(45,45)));
 +            }
 +
-@@ -866,0 +885,7 @@ namespace ORB_SLAM3
+@@ -824,0 +843,14 @@
++                    // Excluded strong corners must not suppress the native
++                    // low-FAST fallback for valid static corners in this cell.
++                    const auto removeExcluded = [&]() {
++                        if(levelExclusion.empty()) return;
++                        for(auto it = vKeysCell.begin(); it != vKeysCell.end();)
++                        {
++                            const int x = cvRound(it->pt.x + iniX);
++                            const int y = cvRound(it->pt.y + iniY);
++                            if(levelExclusion.at<unsigned char>(y,x) != 0)
++                                it = vKeysCell.erase(it);
++                            else
++                                ++it;
++                        }
++                    };
+@@ -827,0 +860 @@
++                    removeExcluded();
+@@ -846,0 +880 @@
++                        removeExcluded();
+@@ -866,0 +901,7 @@
 +                            if(!levelExclusion.empty())
 +                            {
 +                                const int x = cvRound((*vit).pt.x + minBorderX);
