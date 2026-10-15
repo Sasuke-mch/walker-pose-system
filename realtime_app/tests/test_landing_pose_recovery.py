@@ -22,6 +22,7 @@ class RecoveryTests(unittest.TestCase):
         actions=None,
         human_frames=None,
         protocol="flat_ground_supported_after_motion",
+        sample_times=None,
     ):
         initial = WorldPose(np.eye(3), np.array([0.0, 0.0, 700.0]))
         recovery = LandingPoseRecovery(
@@ -42,7 +43,8 @@ class RecoveryTests(unittest.TestCase):
             },
         )
         rows, output = [], io.StringIO()
-        for i in range(18):
+        times = sample_times if sample_times is not None else [i * 0.05 for i in range(18)]
+        for i, time in enumerate(times):
             if i == 1:
                 estimator.pose = WorldPose(
                     rotation, np.array([50.0, 20.0, 700.0 + height])
@@ -52,7 +54,7 @@ class RecoveryTests(unittest.TestCase):
             human_now = human if human_frames is None else i in human_frames
             payload = {
                 "pair_id": i,
-                "pair_timestamp_sec": i * 0.05,
+                "pair_timestamp_sec": time,
                 "persons_3d": [
                     {
                         "keypoints_3d": [
@@ -84,7 +86,7 @@ class RecoveryTests(unittest.TestCase):
             }
             rows.append(row)
             recovery.update(estimator, row, payload, stage)
-            recovery.flush(output, i * 0.05)
+            recovery.flush(output, time)
         recovery.flush(output)
         return (
             initial,
@@ -240,6 +242,19 @@ class RecoveryTests(unittest.TestCase):
             actions={i: "transition" for i in range(1, 9)})
         self.assertTrue(recovery.events)
         self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 700)
+
+    def test_recent_stop_evidence_survives_short_ambiguity_with_irregular_times(self):
+        # Real-frame368..376 pattern: brief observed stops, a short ambiguity,
+        # another observed stop, then only two ambiguous frames. Measuring the
+        # gap solely from the last moving frame incorrectly discards the episode.
+        times = [i*.05 for i in range(9)] + [.45,.46,.51,.56,.61,.65,.70,.75,.79,.84,.90,.95,1.0]
+        actions = {i: "transition" for i in (11,12,13,15,16)}
+        _, estimator, recovery, _, emitted = self.simulate(
+            human=False, protocol="supported_at_camera_stop",
+            actions=actions, sample_times=times)
+        self.assertEqual(len(recovery.events), 1)
+        self.assertAlmostEqual(estimator.pose.translation_world_from_camera_mm[2], 700)
+        self.assertEqual(len(emitted), len(times))
 
     def test_unconfirmed_brief_stops_do_not_erase_prior_camera_motion_episode(self):
         _, estimator, recovery, _, _ = self.simulate(

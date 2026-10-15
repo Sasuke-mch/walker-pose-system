@@ -63,6 +63,7 @@ class LandingPoseRecovery:
         self.events = []
         self.previous_time = None
         self.last_motion_time = None
+        self.last_stop_evidence_time = None
 
     def update(self, estimator, row, payload, stage):
         time = float(payload["pair_timestamp_sec"])
@@ -88,6 +89,7 @@ class LandingPoseRecovery:
                          and not stage["stage"]["handoff"].get("instantaneous_stop", False))
         if action == STAGE2 or camera_moving:
             self.last_motion_time = time
+            self.last_stop_evidence_time = None
             if (self.motion_start is None
                     or (self.stop_start is not None and self.protocol != "supported_at_camera_stop")):
                 self.motion_start = time
@@ -97,6 +99,7 @@ class LandingPoseRecovery:
             self.human_samples = 0
             self.recovering = False
         elif action == STAGE1 and self.motion_start is not None:
+            self.last_stop_evidence_time = time
             if self.stop_start is None:
                 self.stop_start = time
             human = any(
@@ -216,10 +219,13 @@ class LandingPoseRecovery:
                     return True
         elif (self.protocol == "supported_at_camera_stop" and self.motion_start is not None
               and self.last_motion_time is not None
-              and time - self.last_motion_time <= 0.3
+              and time - max(self.last_motion_time, self.last_stop_evidence_time
+                             if self.last_stop_evidence_time is not None
+                             else self.last_motion_time) <= 0.3
               and stage["stage"].get("background", {}).get("fused", {}).get("available")):
-            # A short deceleration ambiguity must not erase observed preceding
-            # motion. It never supplies stop evidence or relaxes foot gates.
+            # Bound the gap since the latest observed motion OR stop. A recent
+            # stop vote is real evidence even if its duration did not qualify;
+            # an ambiguous frame does not refresh this clock or confirm support.
             audit["reason"] = "bounded_camera_transition_wait"
             self.stop_start = None
             self.human_samples = 0
@@ -231,6 +237,7 @@ class LandingPoseRecovery:
             self.stop_start = None
             self.human_samples = 0
             self.recovering = False
+            self.last_stop_evidence_time = None
         if (
             self.mode == "joint_window"
             and action != STAGE1

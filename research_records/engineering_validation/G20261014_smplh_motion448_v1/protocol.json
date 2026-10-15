@@ -320,5 +320,50 @@
       ],
       "interpretation": "Same-detector visibility output is not independent occlusion truth; no new gate introduced."
     }
+  },
+  "support_recovery_fix_20261015": {
+    "status": "verified_bug_fix",
+    "source": [
+      "realtime_app/pose_app/landing_pose_recovery.py",
+      "realtime_app/tests/test_landing_pose_recovery.py"
+    ],
+    "failure": "Real368..376 stopped/ambiguous pattern at nonuniform times discarded motion episode using last_motion_time despite new observed stop evidence; sustained static walker retained elevated/tilted pose.",
+    "change": "Bound ambiguous gap since latest moving OR observed static vote; ambiguous frames never refresh the clock or confirm support. Reset stop qualification across gaps as before.",
+    "unchanged": "0.3s unknown-gap bound,0.12s observed stop confirmation,150mm/8deg rejection,legacy human-resume protocol,strict gates and0.5s unpublished buffer contract",
+    "old_scene": "run_latent_cap12/view/scene",
+    "fixed_scene": "run_latent_cap12/view_v2/scene",
+    "command": "run_latent_cap12/view_v2/scene_replay_command.json",
+    "same_inputs": "Original ordered images, fresh strict records from initial visualization task, original calibrated R/t/static walker/ground and true host-return time mapping.",
+    "strict_points_and_masks_unchanged": true,
+    "recovery_event_pair_ids_before": [
+      34,
+      86,
+      156,
+      228,
+      298
+    ],
+    "recovery_event_pair_ids_after": [
+      34,
+      86,
+      156,
+      228,
+      298,
+      379
+    ],
+    "frames380_391_walker_four_feet_height_mm_before": [
+      20.810193,
+      24.774433,
+      2.220143,
+      6.184383
+    ],
+    "frames380_391_walker_four_feet_height_mm_after": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "remaining_nonzero_stage1": "Only frame217 before stop confirmation, max absolute18.1895mm; no persistent stationary floating interval.",
+    "validation": "New irregular-time regression failed before fix, passes after;26 recovery/handoff tests passed; real448 replay preserved all records and failed states.",
+    "limits": "Protocol support restoration, not independent world pose or physical contact truth."
   }
 }
