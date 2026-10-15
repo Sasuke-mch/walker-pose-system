@@ -97,7 +97,9 @@ def run(args) -> dict:
         scene_data["pose_status"] = [json.loads(line)["pose_audit"]["status"] for line in (scene/"dynamic_ground_pose.jsonl").read_text(encoding="utf-8").splitlines()]
         tracker = SMPLHWorldMotionTracker(model, cal, config, scene_data["rotation_ground_from_left"][0],
                  scene_data["translation_ground_from_left_mm"][0]/1000, load_sole_vertex_indices(args.surface_sets),
-                 WorldGroundConfig(max_heel_displacement_m=args.max_foot_displacement_mm/1000),
+                 WorldGroundConfig(max_heel_displacement_m=args.max_foot_displacement_mm/1000,
+                                   maximum_iterations=getattr(args, 'ground_map_iterations', 30),
+                                   bootstrap_iterations=getattr(args, 'ground_bootstrap_iterations', 80)),
                  constrain_ground=args.ground_constraint_policy == "contact")
     else:
         if args.ground_constraint_policy != "none":
@@ -332,6 +334,10 @@ def build_parser():
     parser.add_argument("--ground-constraint-policy", choices=("none", "contact"), default="none")
     parser.add_argument("--surface-sets", type=Path, default=Path("research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/contact_surface_sets_smplh_v1/contact_vertex_sets.json"))
     parser.add_argument("--max-foot-displacement-mm", type=float, default=10.)
+    parser.add_argument("--ground-map-iterations", type=int, default=30,
+                        help="Explicit budget for each existing constrained MAP support branch.")
+    parser.add_argument("--ground-bootstrap-iterations", type=int, default=80,
+                        help="Contact feasibility warm-start budget; does not reuse pixels.")
     return parser
 
 
