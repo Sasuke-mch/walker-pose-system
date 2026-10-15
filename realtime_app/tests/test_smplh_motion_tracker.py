@@ -104,6 +104,58 @@ class SMPLHMotionTests(unittest.TestCase):
         np.testing.assert_array_equal(restored["generalized_velocity"], np.zeros(7))
         self.assertFalse(restored["derivative_valid"].any())
 
+    def test_out_of_domain_prediction_expires_without_current_pixels(self):
+        tr = tracker(SMPLHMotionConfig(max_abs_latent=1.))
+        px = observation(tr)
+        tr.step(0., px[0], px[1])
+        tr.pose.latent[:] = .95
+        tr.last_accepted_pose = tr.pose.copy()
+        tr.velocity[-1] = 1.
+        tr.acceleration[-1] = 4.
+        missing = np.full((12, 3), np.nan)
+        result = tr.step(.05, missing, missing)
+        self.assertEqual(result["status"], "expired")
+        self.assertFalse(result["pose_available"])
+        self.assertEqual(result["segment_id"], 0)
+        self.assertTrue(np.isnan(result["vertices_m"]).all())
+        self.assertTrue(np.isnan(result["position_mm"]).all())
+        self.assertTrue(np.isnan(result["raw_velocity_mm_s"]).all())
+        self.assertFalse(result["derivative_valid"].any())
+        self.assertEqual(result["prediction_rejection"]["reason"], "latent_prediction_out_of_domain")
+        np.testing.assert_allclose(result["prediction_rejection"]["predicted_latent"], [1.005])
+        # Recovery restores the last accepted model, rather than clipping the
+        # predicted latent to the boundary and calling it an observed pose.
+        np.testing.assert_allclose(tr.pose.latent, [.95])
+        px = observation(tr)
+        restored = tr.step(.08, px[0], px[1])
+        self.assertEqual(restored["status"], "reinitialized")
+        self.assertEqual(restored["segment_id"], 1)
+        self.assertLessEqual(abs(restored["vposer_latent"]).max(), 1.)
+        self.assertIsNone(restored["prediction_rejection"])
+        np.testing.assert_array_equal(restored["generalized_velocity"], np.zeros(7))
+        np.testing.assert_array_equal(restored["generalized_acceleration"], np.zeros(7))
+        self.assertFalse(restored["derivative_valid"].any())
+
+    def test_out_of_domain_prediction_restarts_using_current_pixels(self):
+        tr = tracker(SMPLHMotionConfig(max_abs_latent=1.))
+        px = observation(tr)
+        tr.step(0., px[0], px[1])
+        tr.pose.latent[:] = .95
+        tr.last_accepted_pose = tr.pose.copy()
+        px = observation(tr)
+        tr.velocity[-1] = 1.
+        tr.acceleration[-1] = 4.
+        result = tr.step(.05, px[0], px[1])
+        self.assertEqual(result["status"], "reinitialized")
+        self.assertTrue(result["pose_available"])
+        self.assertEqual(result["segment_id"], 1)
+        self.assertTrue(result["used_views"].all())
+        self.assertLessEqual(abs(result["vposer_latent"]).max(), 1.)
+        np.testing.assert_allclose(result["prediction_rejection"]["predicted_latent"], [1.005])
+        np.testing.assert_array_equal(result["generalized_velocity"], np.zeros(7))
+        np.testing.assert_array_equal(result["generalized_acceleration"], np.zeros(7))
+        self.assertFalse(result["derivative_valid"].any())
+
     def test_non_observed_joint_derivatives_are_unavailable(self):
         tr = tracker(SMPLHMotionConfig(max_position_std_m=100.))
         px = observation(tr)

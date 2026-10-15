@@ -147,6 +147,7 @@ def run(args) -> dict:
                       "velocity_mm_s": _json_array(result["velocity_mm_s"]), "acceleration_mm_s2": _json_array(result["acceleration_mm_s2"]),
                       "derivative_valid": result["derivative_valid"].tolist(), "position_std_m": _json_array(result["position_std_m"]),
                       "derivative_reason": result["derivative_reason"].tolist(), "update_scale": result["update_scale"],
+                      "prediction_rejection": result["prediction_rejection"],
                       "raw_velocity_mm_s": _json_array(result["raw_velocity_mm_s"]),
                       "raw_acceleration_mm_s2": _json_array(result["raw_acceleration_mm_s2"]),
                       "joint_observation_age_s": _json_array(result["joint_observation_age_s"]), "reprojection_px": _json_array(error),

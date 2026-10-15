@@ -174,6 +174,7 @@ class SMPLHMotionTracker:
         self.last_accepted_pose = self.pose.copy()
         self.last_point_jacobian: np.ndarray | None = None
         self.update_scale = 0.
+        self.prediction_rejection: dict | None = None
 
     def _pixels(self, points: np.ndarray) -> np.ndarray | None:
         points = points[:, 5:17]
@@ -387,11 +388,13 @@ class SMPLHMotionTracker:
                 "vposer_latent": self.pose.latent.copy(), "generalized_velocity": self.velocity.copy(),
                 "generalized_acceleration": self.acceleration.copy(), "covariance_diag": np.diag(self.covariance).copy(),
                 "update_scale": self.update_scale,
+                "prediction_rejection": self.prediction_rejection,
                 "vertices_m": data["vertices_m"][0], "joints_m": data["joints_m"][0],
                 "coco_m": data["coco_m"][0], "body_rotations": data["body_rotations"][0]}
 
     def step(self, now: float, left: np.ndarray, right: np.ndarray) -> dict:
         self.update_scale = 0.
+        self.prediction_rejection = None
         pixels = np.asarray([left, right], dtype=float)
         if pixels.shape != (2, 12, 3):
             raise ValueError("expected two views of 12 raw-pixel [x,y,score] points")
@@ -406,16 +409,28 @@ class SMPLHMotionTracker:
         restarted = False
         if now - self.last_support > self.config.max_prediction_s:
             self.active = False
+        if self.active:
+            self._predict(now - self.last_time)
+            latent = self.pose.latent
+            if not np.isfinite(latent).all() or np.any(abs(latent) > self.config.max_abs_latent):
+                # The update's proposal bound alone does not bound q+v*dt+a*dt²/2.
+                # Retain the rejected prediction, then use the existing current-
+                # pixel recovery path. Clipping would invent a valid pose.
+                self.prediction_rejection = {
+                    "reason": "latent_prediction_out_of_domain",
+                    "predicted_latent": [float(value) if np.isfinite(value) else None for value in latent],
+                    "max_abs_latent": self.config.max_abs_latent,
+                }
+                self.active = False
         if not self.active:
             self.pose = self.last_accepted_pose.copy()
             self.velocity[:] = self.acceleration[:] = 0
             self.covariance = self.initial_covariance.copy()
+            self.last_point_jacobian = None
             if np.any(valid, axis=0).sum() < self.config.min_observed_joints:
                 self.last_time = now
                 return self._output(now, "expired", np.zeros_like(valid), reasons, pixels)
             restarted = True
-        else:
-            self._predict(now - self.last_time)
         accepted, used, status = self._update(pixels, valid, reasons)
         if accepted:
             self.active = True
