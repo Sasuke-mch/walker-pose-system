@@ -1,0 +1,34 @@
+{
+  "status": "failed_backend_standing_gate",
+  "backend": "MuJoCo transfer; not author PhysX reproduction",
+  "finite": true,
+  "steps": 300,
+  "requested_steps": 300,
+  "initial_global_rotation_max_matrix_error": 6.938893903907228e-16,
+  "pelvis_min_height_m": 0.08359464555235491,
+  "joint_tracking_error_m": {
+    "count": 7200,
+    "mean": 1.057597202459344,
+    "median": 1.0675135453889548,
+    "p95": 2.158880519294389,
+    "max": 2.581449852913726
+  },
+  "step_ms": {
+    "count": 300,
+    "mean": 85.9466463332501,
+    "median": 85.79384999939066,
+    "p95": 123.76263500063945,
+    "max": 200.8483999998134
+  },
+  "torque_max_nm": 500.0,
+  "external_force": false,
+  "weights_frozen": true,
+  "source_xml": "D:\\my_works\\walker_pose_system\\third_party\\PHC\\phc\\data\\assets\\mjcf\\smpl_0_humanoid.xml",
+  "primitive": "D:\\my_works\\walker_pose_system\\models\\phc\\phc_kp_2.pth",
+  "composer": "D:\\my_works\\walker_pose_system\\models\\phc\\phc_comp_kp_2.pth",
+  "motion": "D:\\my_works\\walker_pose_system\\models\\phc\\standing.pkl",
+  "versions": {
+    "torch": "2.14.1+cpu"
+  },
+  "accuracy": "backend engineering test with static reference; no real 3D truth"
+}

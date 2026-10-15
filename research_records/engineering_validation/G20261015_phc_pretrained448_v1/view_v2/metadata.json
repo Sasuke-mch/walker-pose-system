@@ -1,0 +1,39 @@
+{
+  "frames": 448,
+  "vertices": 6890,
+  "faces": 13776,
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261015_phc_pretrained448_v1\\view_v2\\scene",
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\world_contact_20261015\\run_world_unconstrained\\result.npz",
+  "methods": {
+    "source_smplh": "输入 SMPL-H",
+    "replay448_physx_recovery": "PHC+ 无腕支撑",
+    "replay448_physx_support": "PHC+ 假设腕支撑"
+  },
+  "display_map": "X,-Y,Z",
+  "smoothing": false,
+  "interpolation": false,
+  "scene_replayed_matches_controller_conditioning": true,
+  "browser_status": "passed actual IAB rendering and interactions",
+  "browser_checked_frames": [
+    0,
+    99,
+    143,
+    335,
+    447
+  ],
+  "browser_checks": [
+    "three method pages load",
+    "frame slider and numeric entry",
+    "play/pause",
+    "method navigation retains current frame",
+    "failure frame99 fallen_finite visible",
+    "stage2 frame143 heel315.1/458.1mm",
+    "last frame447 and capture16.035s",
+    "original stereo image overlays aligned to rotated full resolution"
+  ],
+  "screenshots": [
+    "support_frame143.jpg",
+    "support_frame335.jpg",
+    "support_overlay447.jpg"
+  ]
+}

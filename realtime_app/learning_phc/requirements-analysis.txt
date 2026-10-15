@@ -1,0 +1,13 @@
+# Windows Python3.12; licensed SMPL-H/MANO assets are separately provisioned.
+torch==2.14.1
+numpy==1.26.4
+scipy==1.14.1
+smplx==0.1.28
+chumpy==0.70
+matplotlib==3.11.2
+joblib==1.6.0
+gdown==6.4.2
+opencv-python>=4.8
+mujoco==3.16.0
+# Author network comparison additionally uses rl-games==1.6.5 installed
+# with --no-deps; its unrelated training stack is not used by our runtime.

@@ -1,5 +1,15 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-15 PHC+官方预训练接入、完整448对照与可视化：可运行但不晋升
+
+用户授权推进现成预训练方案并要求详细实现记录。本轮隔离新增realtime_app/learning_phc，使用官方PHC primitive/composer冻结权重、24原生刚体/574维v7观测/69维PD目标；直接对作者网络和观测纯函数核对，通过7项接口/旋转/真实dt/参考prefix/缺失/远距离恢复单测。MuJoCo迁移4版均未过站立门，保留失败并停止迁移；实际转用WSL Ubuntu22.04/Python3.8/torch1.13.1 CPU与NVIDIA IsaacGym Preview4原生PhysX，10秒300步无外力站立均误差18.84mm、pelvis最低0.931m，后端门通过。未训练/微调、未替换正式主线或重算上游人体。
+
+参考为G20261014_smplh_motion448_v1/world_contact_20261015/run_world_unconstrained完整因果SMPL-H候选，原全片预校准beta冻结；场景为该次Stage条件地面，含踝锚及约0.5秒固定延迟，不是独立世界真值。当前姿态和场景转作者中性骨架，速度只后向差分；按实际到帧dt积分，无i+1参考或全片高度修正。原生旋转反解相同beta/冻结手姿的完整6890顶点、13776面SMPL-H；参考往返全448网格最大坐标差1.31e-6m。原生中性碰撞体与解码形状并不物理等价，不据此认证皮肤接触。
+
+最终无/有假设腕支撑仅改变外力（相机刚性腕目标K900/D45/300N每侧），均448有限、frame0后无重置；无支撑49帧pelvis<0.3m、24体均误差406.8mm，有支撑0跌倒、97.45mm，最大单腕力278.59N。原始双目10752槽位回投中位输入23.24px、无支撑168.79px、有支撑74.53px；全片≤25px分别53.19%/4.57%/8.95%，无支撑1760不可回投槽位保留失败。Stage2全115帧，支撑版解码heel段内最大位移458.12mm，未满足10mm固定要求。脚底穿地下界改善同时浮空与像素退化，不能称真实精度或完整方法成功。控制+物理中位8.24ms仅子模块，非端到端实时。
+
+完整记录在research_records/engineering_validation/G20261015_phc_pretrained448_v1/EXPERIMENT.md，数值在analysis.json及各run/summary.json；失败、轨迹、解码、曲线和权重留本地，不提交大型产物。view_v2三页分别输入source_smplh.html、无支撑replay448_physx_recovery.html、有支撑replay448_physx_support.html，含原图叠点和逐帧诊断；本轮strict/Stage/地面从同源原图新重放，R/t/Stage/时间与控制器条件场景核对一致，旧动态数据仅比较、不进入显示。首版frame_times缺字段失败保留；实际浏览器已核对显示及交互，截图留view_v2。离线三点导数曲线仅分析，不作为因果发布v/a。阶段结论：预训练接入可行，当前直接后处理不合格；先解决观测-模型/同体型物理参考接口与二维闭环，不继续盲目加训练或放宽门，不提升主线。
+
 ## 2026-10-15 二维优先整体VPoser研究与完整对照，迭代候选改善像素但未通过导数门
 
 按用户新要求不加膝肘等局部先验，三角化仅诊断、原主线beta冻结。检索并核验IEKF/固定prior MAP、WNOJ、LM/线搜索、VPoser/HuMoR官方资料；现有Q已是white-jerk形式，保留非均匀q/v/a。新增可选同帧完整Pqq Cholesky白化迭代MAP，真实Huber回溯、相对固定预测chart求Jacobian，q/v/a一次条件纠偏，收敛才最终一次Joseph/IRLS-GN后验；未收敛保留raw、不收缩P、不发表导数。runner显式update-method/整体latent-prior-sigma/map-iterations，默认EKF不变，不引入人体3D或额外滤波器。

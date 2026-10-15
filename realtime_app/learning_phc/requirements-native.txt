@@ -1,0 +1,7 @@
+# WSL Ubuntu / Python3.8; install Isaac Gym Preview4 from NVIDIA separately.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==1.13.1+cpu
+numpy==1.23.5
+scipy==1.10.1
+joblib==1.4.2
+pillow==10.4.0

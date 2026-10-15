@@ -1,0 +1,17 @@
+{
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\world_contact_20261015\\run_world_unconstrained\\result.npz",
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\world_contact_20261015\\scene\\scene_transforms.npz",
+  "xml": "D:\\my_works\\walker_pose_system\\third_party\\PHC\\phc\\data\\assets\\mjcf\\smpl_0_humanoid.xml",
+  "output": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261015_phc_pretrained448_v1\\reference448.npz",
+  "frames": 448,
+  "duration_s": 16.035239,
+  "source_model": "complete causal SMPL-H state estimator; frozen full-clip pre-calibrated beta",
+  "scene_semantics": "frozen same-source Stage conditional ground, nominal0.5s publication lag; not independent world truth",
+  "retarget": "preserve current world root/pelvis and joint rotations; author neutral body lengths",
+  "terminal_hands": "coarse2 links initialized from first finger-base rotations, not full hands",
+  "reference_velocity": "backward difference within segment, zero on initialization/reinitialization",
+  "future_reference_frames": 0,
+  "height_fix": false,
+  "smoothing": false,
+  "accuracy": "retargeted reference is not independent3D truth; beta calibration and conditional scene disclosed"
+}
