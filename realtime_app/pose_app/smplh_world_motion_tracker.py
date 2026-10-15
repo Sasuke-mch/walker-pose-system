@@ -227,7 +227,10 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             vertical[2] = self.ground_config.ground_tolerance_m-self.ground_config.feasibility_tolerance_m-initial_geometry["sole_min_m"].min()
             starts.append(vertical)
         def physically_feasible(delta):
-            return self._conditions(evaluate(delta)["geometry"]).min() >= -1e-6
+            geometry = evaluate(delta)["geometry"]
+            branch_feasible = (self.stage2 or geometry["sole_min_m"][self._solver_support_side]
+                               <= self.ground_config.ground_tolerance_m+1e-6)
+            return branch_feasible and self._conditions(geometry).min() >= -1e-6
         candidates = []
         branches = (None,) if self.stage2 else (0, 1)
         for side in branches:
@@ -255,7 +258,7 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
                          "ftol": self.ground_config.optimizer_objective_tolerance})
             val = evaluate(solution.x, True)
             slack = self._conditions(val["geometry"])
-            feasible = val["pixels"] is not None and np.isfinite(solution.x).all() and slack.min() >= -1e-6
+            feasible = val["pixels"] is not None and np.isfinite(solution.x).all() and physically_feasible(solution.x)
             optimizer_last_slack = float(slack.min())
             optimizer_last_geometry = {key: val["geometry"][key].tolist() for key in ("sole_min_m", "heel_m")}
             converged = bool(solution.success and feasible)
@@ -266,7 +269,7 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
                 chosen_delta, chosen_cost = incumbent["delta"], incumbent["cost"]
                 val = evaluate(chosen_delta, True)
                 slack = self._conditions(val["geometry"])
-                feasible = bool(slack.min() >= -1e-6)
+                feasible = bool(physically_feasible(chosen_delta))
                 selected_estimate = "best_feasible_improving_current_frame_iterate"
             # A finite-budget estimate must improve a known feasible start.
             # Failure remains explicit, without information shrink or published

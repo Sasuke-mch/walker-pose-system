@@ -98,6 +98,33 @@ class WorldMotionTests(unittest.TestCase):
         self.assertLess(abs(sole_min[1]), .005)
         self.assertLess(final_error, initial_error*.9)
 
+    def test_opposite_foot_cannot_certify_selected_support_branch(self):
+        tr = world_tracker(contact=True)
+        px = observe(tr)
+        tr.step(0., px[0], px[1])
+        target = tr.pose.copy()
+        target.root_rotation = Rotation.from_rotvec([0., .12, 0.]).as_matrix()
+        geometry = tr._geometry(tr.model.evaluate(target, mesh=True)["vertices_m"][0])
+        target.translation_m[2] += .003-geometry["sole_min_m"].min()
+        geometry = tr._geometry(tr.model.evaluate(target, mesh=True)["vertices_m"][0])
+        self.assertGreater(geometry["sole_min_m"][0], .005)
+        self.assertLess(geometry["sole_min_m"][1], .005)
+        delta = np.r_[target.translation_m-tr.pose.translation_m,
+                      Rotation.from_matrix(tr.pose.root_rotation.T @ target.root_rotation).as_rotvec(),
+                      target.latent-tr.pose.latent]
+        def opposite_support_result(fun, x0, **kwargs):
+            return SimpleNamespace(x=delta.copy(), fun=fun(delta), success=True,
+                                   status=0, message="test successful proposal", nit=1)
+        with patch("pose_app.smplh_world_motion_tracker._minimize_scaled_pose", side_effect=opposite_support_result):
+            pixels = observe(tr, target)
+            accepted, _, _ = tr._constrained_update(pixels, np.ones((2, 12), bool),
+                                                   np.full((2, 12), "available", dtype=object))
+        self.assertTrue(accepted)
+        branches = tr.contact_diagnostic["support_branch_results"]
+        self.assertFalse(branches[0]["accepted"])
+        self.assertTrue(branches[1]["accepted"])
+        self.assertEqual(tr.contact_diagnostic["selected_support_side"], 1)
+
     def test_pose_scaling_preserves_problem_and_avoids_mixed_unit_one_step_stop(self):
         # Millimetre translation and order-one latent variables reproduce the
         # premature success observed with the real frame48 full covariance.
