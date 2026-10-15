@@ -57,9 +57,13 @@ def run(args) -> dict:
             effective_initial_fit = refine_first_frame_2d(model, cal, np.array([left[0, JOINT_INDICES], right[0, JOINT_INDICES]]),
                                                           manual, args.output/"first_frame_fit", args.first_frame_refine_steps,
                                                           optimize_shape=args.first_frame_shape_policy == "refine")
-    config = SMPLHMotionConfig(max_latent_correction_norm=args.max_latent_correction_norm)
+    config = SMPLHMotionConfig(max_latent_correction_norm=args.max_latent_correction_norm,
+                              latent_prior_sigma=args.latent_prior_sigma)
+    optimizer_config = None
     scene_data = None
     if args.world_scene is not None:
+        if args.update_method != "ekf":
+            raise ValueError("iterated-map currently estimates camera motion states; world contact has its own MAP solver")
         from pose_app.smplh_world_motion_tracker import SMPLHWorldMotionTracker, WorldGroundConfig
         from pose_app.smplh_ground_constraints import load_sole_vertex_indices
         scene = args.world_scene
@@ -82,11 +86,18 @@ def run(args) -> dict:
     else:
         if args.ground_constraint_policy != "none":
             raise ValueError("contact requires an explicit same-run world scene")
-        tracker = SMPLHMotionTracker(model, cal, config)
+        if args.update_method == "iterated-map":
+            from pose_app.smplh_iterated_motion_tracker import SMPLHIteratedMotionTracker, IteratedMAPConfig
+            optimizer_config = IteratedMAPConfig(maximum_iterations=args.map_iterations)
+            tracker = SMPLHIteratedMotionTracker(model, cal, config, optimizer_config)
+        else:
+            tracker = SMPLHMotionTracker(model, cal, config)
     parameters = {"inputs": {key: str(getattr(args, key).resolve()) for key in
                              ("left_predictions", "right_predictions", "input_pairs", "calibration_dir",
                               "initial_fit", "smplh_model", "regressor", "vposer_dir", "mano_left", "mano_right")},
                   "capture_pairs": str(capture_path.resolve()), "configuration": asdict(config),
+                  "update_method": args.update_method,
+                  "iterated_map_configuration": None if optimizer_config is None else asdict(optimizer_config),
                   "device": args.device, "frames": len(left), "joint_indices_coco17": JOINT_INDICES,
                   "effective_initial_fit": str(effective_initial_fit.resolve()),
                   "first_frame_labels": None if args.first_frame_labels is None else str(args.first_frame_labels.resolve()),
@@ -106,9 +117,12 @@ def run(args) -> dict:
     if scene_data is not None:
         parameters.update(world_state_available=True, scene_role="stage_conditioned_world_estimation",
                           ground_configuration=asdict(tracker.ground_config), surface_sets=str(args.surface_sets.resolve()))
+    if optimizer_config is not None:
+        parameters["source"].append("realtime_app/pose_app/smplh_iterated_motion_tracker.py")
     (args.output / "run_parameters.json").write_text(json.dumps(parameters, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     records, outputs, elapsed = [], [], []
     all_errors, used_errors, pixel_reasons = [], [], Counter()
+    eligible_raw_slots = 0
     states, joint_states, segments = [], [], []
     with (args.output / "trajectory.jsonl").open("w", encoding="utf-8") as stream:
         for i in range(len(left)):
@@ -133,6 +147,7 @@ def run(args) -> dict:
             joint_states.append(status)
             segments.append(np.repeat(result["segment_id"], 12))
             valid, _ = tracker._supported_pixels(np.array([l, r]), epipolar=False)
+            eligible_raw_slots += int(valid.sum())
             error = np.full((2, 12), np.nan)
             if result["projected_pixels"] is not None and result["pose_available"]:
                 error = np.linalg.norm(result["projected_pixels"] - np.array([l, r])[..., :2], axis=2)
@@ -148,6 +163,7 @@ def run(args) -> dict:
                       "derivative_valid": result["derivative_valid"].tolist(), "position_std_m": _json_array(result["position_std_m"]),
                       "derivative_reason": result["derivative_reason"].tolist(), "update_scale": result["update_scale"],
                       "prediction_rejection": result["prediction_rejection"],
+                      "iterated_update": result.get("iterated_update"),
                       "raw_velocity_mm_s": _json_array(result["raw_velocity_mm_s"]),
                       "raw_acceleration_mm_s2": _json_array(result["raw_acceleration_mm_s2"]),
                       "joint_observation_age_s": _json_array(result["joint_observation_age_s"]), "reprojection_px": _json_array(error),
@@ -207,6 +223,12 @@ def run(args) -> dict:
                "pose_available_frames": int(available.sum()), "frame_status_counts": dict(Counter(r["model_status"] for r in records)),
                "joint_status_counts": dict(Counter(np.asarray(joint_states).ravel())), "view_reason_counts": dict(pixel_reasons),
                "all_valid_raw_view_reprojection_px": _stats(np.array(all_errors)), "used_view_reprojection_px": _stats(np.array(used_errors)),
+               "all_raw_view_slots": len(outputs)*24, "eligible_raw_view_slots": eligible_raw_slots,
+               "eligible_raw_view_slots_with_available_model": len(all_errors),
+               "eligible_raw_view_fit_within25px_slots": int(np.sum(np.asarray(all_errors) <= 25.)),
+               "eligible_raw_view_fit_within25px_rate_including_failures": float(np.sum(np.asarray(all_errors) <= 25.)/eligible_raw_slots) if eligible_raw_slots else None,
+               "update_method": args.update_method,
+               "iterated_update_status_counts": dict(Counter(r["iterated_update"]["status"] for r in records if r["iterated_update"] is not None)),
                "derivative_available_joint_samples": int(np.array([o["derivative_valid"] for o in outputs]).sum()),
                "derivative_reason_counts": dict(Counter(np.array([o["derivative_reason"] for o in outputs]).ravel())),
                "update_gain_scale": _stats(np.array([o["update_scale"] for o in outputs if o["update_scale"] > 0])),
@@ -255,7 +277,7 @@ def run(args) -> dict:
     return summary
 
 
-def main():
+def build_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     for key in ("left_predictions", "right_predictions", "input_pairs", "initial_fit", "output"):
         parser.add_argument("--"+key.replace("_", "-"), type=Path, required=True)
@@ -274,11 +296,19 @@ def main():
                         help="explicit pre-calibrated shared beta only; requires fixed-shape frame0 refinement")
     parser.add_argument("--max-latent-correction-norm", type=float, default=.4,
                         help="single-frame latent correction bound; recorded in run parameters")
+    parser.add_argument("--update-method", choices=("ekf", "iterated-map"), default="ekf")
+    parser.add_argument("--latent-prior-sigma", type=float, default=1.5,
+                        help="whole-body VPoser prior sigma; halving sigma multiplies its weight by four")
+    parser.add_argument("--map-iterations", type=int, default=15)
     parser.add_argument("--world-scene", type=Path)
     parser.add_argument("--ground-constraint-policy", choices=("none", "contact"), default="none")
     parser.add_argument("--surface-sets", type=Path, default=Path("research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/contact_surface_sets_smplh_v1/contact_vertex_sets.json"))
     parser.add_argument("--max-foot-displacement-mm", type=float, default=10.)
-    run(parser.parse_args())
+    return parser
+
+
+def main():
+    run(build_parser().parse_args())
 
 
 if __name__ == "__main__":
