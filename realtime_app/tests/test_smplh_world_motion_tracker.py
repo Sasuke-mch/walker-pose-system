@@ -45,6 +45,59 @@ def observe(tr, pose=None):
 
 
 class WorldMotionTests(unittest.TestCase):
+    def test_current_support_can_switch_feet_without_extra_upper_bound(self):
+        tr = world_tracker(contact=True)
+        vertices = tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0].copy()
+        vertices[tr.sole_indices[0], 2] = .025
+        vertices[tr.sole_indices[1], 2] = .003
+        # The old solver froze this predicted point as the support point.
+        tr.support_vertices = [(0, 0)]
+        geometry = tr._geometry(vertices)
+        self.assertGreater(tr._conditions(geometry).min(), 0.)
+        self.assertGreater(tr._solver_conditions(geometry).min(), 0.)
+
+    def test_stage2_current_contact_vertex_can_change_within_each_foot(self):
+        tr = world_tracker(contact=True)
+        tr.stage2 = True
+        vertices = tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0].copy()
+        for indices in tr.sole_indices:
+            vertices[indices, 2] = .020
+            vertices[indices[-1], 2] = .003
+        tr.support_vertices = [(0, 0), (1, 0)]
+        geometry = tr._geometry(vertices)
+        self.assertGreater(tr._conditions(geometry).min(), 0.)
+        self.assertGreater(tr._solver_conditions(geometry).min(), 0.)
+
+    def test_pixel_fit_can_transfer_support_in_a_tilted_model(self):
+        tr = world_tracker(contact=True)
+        px = observe(tr)
+        tr.step(0., px[0], px[1])
+        target = tr.pose.copy()
+        target.root_rotation = Rotation.from_rotvec([0., .12, 0.]).as_matrix()
+        geometry = tr._geometry(tr.model.evaluate(target, mesh=True)["vertices_m"][0])
+        target.translation_m[2] += .002-geometry["sole_min_m"].min()
+        px = observe(tr, target)
+        initial_error = np.linalg.norm(tr._pixels(tr.model.evaluate(tr.pose)["coco_m"])[0]-px[..., :2], axis=-1).mean()
+        priors = []
+        def solve_with_frozen_prior(*args, **kwargs):
+            priors.append(tr.covariance.copy())
+            return _minimize_scaled_pose(*args, **kwargs)
+        with patch("pose_app.smplh_world_motion_tracker._minimize_scaled_pose", side_effect=solve_with_frozen_prior):
+            out = tr.step(.03, px[0], px[1])
+        final_error = np.linalg.norm(tr._pixels(tr.model.evaluate(tr.pose)["coco_m"])[0]-px[..., :2], axis=-1).mean()
+        self.assertEqual(out["status"], "updated")
+        self.assertTrue(out["ground_constraint"]["constraint_satisfied"])
+        self.assertEqual(out["ground_constraint"]["support_extra_solver_calls"], 1)
+        self.assertEqual(out["ground_constraint"]["map_solver_calls"], 2)
+        self.assertEqual(out["ground_constraint"]["feasibility_solver_calls"], 0)
+        self.assertEqual(len(priors), 2)
+        np.testing.assert_array_equal(priors[0], priors[1])
+        sole_min = np.array(out["ground_constraint"]["sole_min_m"])
+        self.assertEqual(out["ground_constraint"]["selected_support_side"], 1)
+        self.assertGreater(sole_min[0], .0055)
+        self.assertLess(abs(sole_min[1]), .005)
+        self.assertLess(final_error, initial_error*.9)
+
     def test_pose_scaling_preserves_problem_and_avoids_mixed_unit_one_step_stop(self):
         # Millimetre translation and order-one latent variables reproduce the
         # premature success observed with the real frame48 full covariance.
@@ -124,6 +177,8 @@ class WorldMotionTests(unittest.TestCase):
         px = observe(tr)
         out = tr.step(0., px[0], px[1])
         self.assertTrue(out["ground_constraint"]["constraint_satisfied"])
+        self.assertEqual(out["ground_constraint"]["map_solver_calls"], 1)
+        self.assertEqual(out["ground_constraint"]["support_extra_solver_calls"], 0)
         self.assertLessEqual(max(abs(np.array(out["ground_constraint"]["sole_min_m"]))), .0052)
         anchor = tr.sole_anchors.copy()
         tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "transition", "held")

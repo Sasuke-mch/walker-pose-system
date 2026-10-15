@@ -115,16 +115,21 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
     def _solver_conditions(self, geometry):
         """Smooth per-vertex form; keep a small interior numerical margin.
 
-        Differentiating min(sole_z) or max(point_distance) switches vertices
-        near a flat foot and stalled SLSQP with float32 mesh evaluations. All
-        lower bounds and point balls are equivalent per-vertex inequalities.
-        A support vertex is selected once from the predicted model each frame.
+        Lower bounds and point balls are smooth per-vertex inequalities. The
+        upper bound uses the current sole minimum, allowing its active vertex
+        to change with the pose. Outside Stage2 each foot is solved separately
+        and the lower-cost feasible branch is selected under the same prior. A
+        vertex fixed from the prediction would impose a stronger condition than
+        the public physical check and could oppose the current-frame pixels.
         """
         sole = geometry["sole_points_m"]
         tolerance = self.ground_config.ground_tolerance_m-self.ground_config.feasibility_tolerance_m
         radius = self.ground_config.max_heel_displacement_m-self.ground_config.feasibility_tolerance_m
         result = [(sole[..., 2]+tolerance).reshape(sole.shape[:-3]+(-1,))]
-        support = np.stack([sole[..., side, index, 2] for side, index in self.support_vertices], axis=-1)
+        support = geometry["sole_min_m"]
+        if not self.stage2:
+            side = getattr(self, "_solver_support_side", None)
+            support = np.min(support, axis=-1, keepdims=True) if side is None else support[..., side:side+1]
         result.append(tolerance-support)
         if self.stage2 and self.heel_anchors is not None:
             heel_squared = np.sum((geometry["heel_m"]-self.heel_anchors)**2, axis=-1)
@@ -142,9 +147,6 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
         n, P = self.n, self.covariance.copy()
         prior = self.pose.copy()
         initial_geometry = self._geometry(self.model.evaluate(prior, mesh=True)["vertices_m"][0])
-        indices = np.argmin(initial_geometry["sole_points_m"][..., 2], axis=-1)
-        sides = (0, 1) if self.stage2 else (int(np.argmin(initial_geometry["sole_min_m"])),)
-        self.support_vertices = [(side, int(indices[side])) for side in sides]
         used = valid.copy()
         if not initialize and np.any(used, axis=0).sum() < self.config.min_observed_joints:
             reasons[used] = "insufficient_joint_support"
@@ -190,7 +192,9 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             data_cost = np.sum(np.where(norm <= self.config.huber_px, .5*norm**2,
                                       self.config.huber_px*(norm-.5*self.config.huber_px)))/self.config.pixel_sigma_px**2
             cost = data_cost + .5*delta @ precision @ delta + (0. if initialize else .5*np.sum(val["pose"].latent**2)/self.config.latent_prior_sigma**2)
-            if np.isfinite(cost) and self._conditions(val["geometry"]).min() >= -1e-6:
+            branch_feasible = (self.stage2 or val["geometry"]["sole_min_m"][self._solver_support_side]
+                               <= self.ground_config.ground_tolerance_m+1e-6)
+            if np.isfinite(cost) and branch_feasible and self._conditions(val["geometry"]).min() >= -1e-6:
                 if not incumbent or cost < incumbent["cost"]:
                     incumbent.update(delta=delta.copy(), cost=float(cost))
             return cost
@@ -224,53 +228,81 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             starts.append(vertical)
         def physically_feasible(delta):
             return self._conditions(evaluate(delta)["geometry"]).min() >= -1e-6
-        feasible_starts = [(objective(start), start) for start in starts if physically_feasible(start)]
-        bootstrap = None
-        if not feasible_starts:
-            # A newly activated two-foot condition need not be feasible at the
-            # one-foot walking prediction. Find a contact-only warm start; no
-            # pixels or covariance are consumed in this feasibility solve.
-            bootstrap = _minimize_scaled_pose(lambda delta: .5*delta @ precision @ delta, starts[0],
-                jac=lambda delta: precision @ delta, bounds=bounds, covariance=P[:n, :n],
-                constraints={"type": "ineq", "fun": conditions, "jac": condition_jacobian},
-                options={"maxiter": self.ground_config.bootstrap_iterations,
-                         "ftol": self.ground_config.optimizer_objective_tolerance})
-            if physically_feasible(bootstrap.x):
-                feasible_starts.append((objective(bootstrap.x), bootstrap.x.copy()))
-        initial_cost, initial_delta = min(feasible_starts, key=lambda item: item[0]) if feasible_starts else (np.inf, starts[0])
-        solution = _minimize_scaled_pose(objective, initial_delta, jac=gradient, bounds=bounds,
-                    covariance=P[:n, :n],
+        candidates = []
+        branches = (None,) if self.stage2 else (0, 1)
+        for side in branches:
+            self._solver_support_side = side
+            cache.clear()
+            incumbent.clear()
+            feasible_starts = [(objective(start), start) for start in starts
+                               if physically_feasible(start) and conditions(start).min() >= -1e-6]
+            bootstrap = None
+            if not feasible_starts:
+                # Find a contact-only warm start for this support branch. No
+                # pixels or covariance are consumed by the feasibility solve.
+                bootstrap = _minimize_scaled_pose(lambda delta: .5*delta @ precision @ delta, starts[0],
+                    jac=lambda delta: precision @ delta, bounds=bounds, covariance=P[:n, :n],
                     constraints={"type": "ineq", "fun": conditions, "jac": condition_jacobian},
-                    options={"maxiter": self.ground_config.maximum_iterations,
+                    options={"maxiter": self.ground_config.bootstrap_iterations,
                              "ftol": self.ground_config.optimizer_objective_tolerance})
-        val = evaluate(solution.x, True)
-        slack = self._conditions(val["geometry"])
-        feasible = val["pixels"] is not None and np.isfinite(solution.x).all() and slack.min() >= -1e-6
-        optimizer_last_slack = float(slack.min())
-        optimizer_last_geometry = {key: val["geometry"][key].tolist() for key in ("sole_min_m", "heel_m")}
-        converged = bool(solution.success and feasible)
-        chosen_delta, chosen_cost = solution.x, float(solution.fun)
-        selected_estimate = "optimizer_last_iterate"
-        if (not converged and getattr(solution, "status", None) == 9 and incumbent
-                and np.isfinite(initial_cost) and incumbent["cost"] < initial_cost-self.ground_config.optimizer_objective_tolerance):
-            chosen_delta, chosen_cost = incumbent["delta"], incumbent["cost"]
-            val = evaluate(chosen_delta, True)
+                if physically_feasible(bootstrap.x) and conditions(bootstrap.x).min() >= -1e-6:
+                    feasible_starts.append((objective(bootstrap.x), bootstrap.x.copy()))
+            initial_cost, initial_delta = min(feasible_starts, key=lambda item: item[0]) if feasible_starts else (np.inf, starts[0])
+            solution = _minimize_scaled_pose(objective, initial_delta, jac=gradient, bounds=bounds,
+                covariance=P[:n, :n],
+                constraints={"type": "ineq", "fun": conditions, "jac": condition_jacobian},
+                options={"maxiter": self.ground_config.maximum_iterations,
+                         "ftol": self.ground_config.optimizer_objective_tolerance})
+            val = evaluate(solution.x, True)
             slack = self._conditions(val["geometry"])
-            feasible = bool(slack.min() >= -1e-6)
-            selected_estimate = "best_feasible_improving_current_frame_iterate"
-        # A finite-budget constrained estimate is allowed only if it improves a
-        # known feasible start. Optimizer failure remains explicit; no posterior
-        # information shrink or derivative publication is claimed in that case.
-        feasible_budget = bool(not solution.success and getattr(solution, "status", None) == 9
+            feasible = val["pixels"] is not None and np.isfinite(solution.x).all() and slack.min() >= -1e-6
+            optimizer_last_slack = float(slack.min())
+            optimizer_last_geometry = {key: val["geometry"][key].tolist() for key in ("sole_min_m", "heel_m")}
+            converged = bool(solution.success and feasible)
+            chosen_delta, chosen_cost = solution.x, float(solution.fun)
+            selected_estimate = "optimizer_last_iterate"
+            if (not converged and getattr(solution, "status", None) == 9 and incumbent
+                and np.isfinite(initial_cost) and incumbent["cost"] < initial_cost-self.ground_config.optimizer_objective_tolerance):
+                chosen_delta, chosen_cost = incumbent["delta"], incumbent["cost"]
+                val = evaluate(chosen_delta, True)
+                slack = self._conditions(val["geometry"])
+                feasible = bool(slack.min() >= -1e-6)
+                selected_estimate = "best_feasible_improving_current_frame_iterate"
+            # A finite-budget estimate must improve a known feasible start.
+            # Failure remains explicit, without information shrink or published
+            # derivatives, even if this branch has the best physical objective.
+            feasible_budget = bool(not solution.success and getattr(solution, "status", None) == 9
                               and feasible and np.isfinite(initial_cost)
                               and chosen_cost < initial_cost-self.ground_config.optimizer_objective_tolerance)
-        accepted = bool(feasible and (converged or feasible_budget))
+            accepted = bool(feasible and (converged or feasible_budget))
+            candidates.append(dict(side=side, solution=solution, bootstrap=bootstrap,
+                initial_cost=initial_cost, delta=chosen_delta.copy(), cost=chosen_cost,
+                converged=converged, accepted=accepted, selected_estimate=selected_estimate,
+                last_slack=optimizer_last_slack, last_geometry=optimizer_last_geometry))
+        chosen = min(candidates, key=lambda item: (not item["accepted"], item["cost"]))
+        self._solver_support_side = chosen["side"]
+        cache.clear()
+        chosen_delta, chosen_cost = chosen["delta"], chosen["cost"]
+        solution, bootstrap, initial_cost = chosen["solution"], chosen["bootstrap"], chosen["initial_cost"]
+        converged, accepted, selected_estimate = chosen["converged"], chosen["accepted"], chosen["selected_estimate"]
+        val = evaluate(chosen_delta, True)
+        slack = self._conditions(val["geometry"])
         self.contact_diagnostic = {"status": ("constrained" if converged else "feasible_unconverged") if accepted else "constraint_conflict",
             "optimizer_success": bool(solution.success), "optimizer_message": str(solution.message),
             "iterations": int(solution.nit), "minimum_slack_m": float(slack.min()),
             "objective": float(chosen_cost), "feasible_start_objective": None if not np.isfinite(initial_cost) else float(initial_cost), "stage2": self.stage2,
             "selected_estimate": selected_estimate, "optimizer_last_objective": float(solution.fun),
-            "optimizer_last_minimum_slack_m": optimizer_last_slack, "optimizer_last_geometry": optimizer_last_geometry,
+            "optimizer_last_minimum_slack_m": chosen["last_slack"], "optimizer_last_geometry": chosen["last_geometry"],
+            "support_selection": "current_pose_sole_minimum", "selected_support_side": chosen["side"],
+            "support_extra_solver_calls": len(candidates)-1,
+            "map_solver_calls": len(candidates),
+            "feasibility_solver_calls": sum(item["bootstrap"] is not None for item in candidates),
+            "support_branch_results": [{"side": item["side"], "accepted": item["accepted"],
+                "optimizer_success": bool(item["solution"].success), "objective": float(item["cost"]),
+                "iterations": int(item["solution"].nit), "optimizer_message": str(item["solution"].message),
+                "minimum_slack_m": float(item["last_slack"]),
+                "bootstrap_iterations": 0 if item["bootstrap"] is None else int(item["bootstrap"].nit)}
+                for item in candidates],
             "heel_anchors_m": None if self.heel_anchors is None else self.heel_anchors.tolist()}
         if bootstrap is not None:
             self.contact_diagnostic["feasibility_bootstrap"] = {"optimizer_success": bool(bootstrap.success),
