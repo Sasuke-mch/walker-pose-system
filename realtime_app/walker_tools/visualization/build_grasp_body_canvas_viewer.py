@@ -25,6 +25,12 @@ ROOT = _tool_project_root
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy
 from walker_tools.visualization.build_surface_contact_canvas_viewer import PAGE
 
+COCO_EDGES = (
+    (0, 1), (0, 2), (1, 3), (2, 4), (3, 5), (4, 6),
+    (5, 6), (5, 7), (7, 9), (6, 8), (8, 10), (5, 11),
+    (6, 12), (11, 12), (11, 13), (13, 15), (12, 14), (14, 16),
+)
+
 
 def simplify_cold_viewer_text(page, label, frames):
     """Edit labels around the embedded payload; preserve numerical data exactly."""
@@ -123,9 +129,9 @@ def build_canvas_page(data, vg, cg, metadata):
     page = page.replace('<dl class="metrics">', '<dl class="metrics"><div><dt>腕偏差 左/右</dt><dd id="wrist">—</dd></div>')
     page = page.replace("(d.hm[fi]===null?'—':(d.hm[fi]*1000).toFixed(1)+' mm')", "d.hand_state[fi].join(' / ')")
     page = page.replace("unpack(d.a)]).then(([v,w,t,he,c,ankle])", "unpack(d.a),unpack(d.j)]).then(([v,w,t,he,c,ankle,model])")
-    page = page.replace('const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;', 'const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;const E=[[0,1],[0,2],[1,3],[2,4],[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];window.viewerAudit={vertices:NV,faces:faces.length,indexEntries:faces.length*3,frames:N,displayMap:"X,-Y,Z",sceneFresh:true};')
+    page = page.replace('const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;', 'const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;const E='+json.dumps(COCO_EDGES,separators=(',',':'))+';window.viewerAudit={vertices:NV,faces:faces.length,indexEntries:faces.length*3,frames:N,displayMap:"X,-Y,Z",sceneFresh:true};')
     marker = "if(document.getElementById('walker').checked){"
-    overlay = """for(const e of E){const[a,b]=e,A=[t[fi*51+a*3],-t[fi*51+a*3+1],t[fi*51+a*3+2]],B=[t[fi*51+b*3],-t[fi*51+b*3+1],t[fi*51+b*3+2]];if(A.every(Number.isFinite)&&B.every(Number.isFinite)){ctx.setLineDash([]);seg(A,B,'#000000',1.5);ctx.setLineDash([])}}for(let k=0;k<17;k++)dot([model[fi*51+k*3],-model[fi*51+k*3+1],model[fi*51+k*3+2]],'#1678bc',2);seg([c[fi*6],-c[fi*6+1],c[fi*6+2]],[c[fi*6+3],-c[fi*6+4],c[fi*6+5]],'#4b555d',1.5);"""
+    overlay = """let observationEdgesDrawn=0;for(const e of E){const[a,b]=e,A=[t[fi*51+a*3],-t[fi*51+a*3+1],t[fi*51+a*3+2]],B=[t[fi*51+b*3],-t[fi*51+b*3+1],t[fi*51+b*3+2]];if(A.every(Number.isFinite)&&B.every(Number.isFinite)){ctx.setLineDash([]);seg(A,B,'#000000',1.5);ctx.setLineDash([]);observationEdgesDrawn++}}window.viewerAudit.observationEdgesDrawn=observationEdgesDrawn;window.viewerAudit.observationEdges=E.length;for(let k=0;k<17;k++)dot([model[fi*51+k*3],-model[fi*51+k*3+1],model[fi*51+k*3+2]],'#1678bc',2);seg([c[fi*6],-c[fi*6+1],c[fi*6+2]],[c[fi*6+3],-c[fi*6+4],c[fi*6+5]],'#4b555d',1.5);"""
     # Canvas follows the project's render order: solid walker, raw points,
     # translucent real mesh, observation bones, model COCO points. Keep the
     # reusable template but relocate its mesh block rather than redraw a proxy.
@@ -144,6 +150,7 @@ def build_canvas_page(data, vg, cg, metadata):
     page = page.replace("pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))", "pitch+=dy*.007")
     page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
     page = page.replace('d.reprojection[fi].map(x=>x.toFixed(1))', "d.reprojection[fi].map(x=>x===null?'—':x.toFixed(1))")
+    page = page.replace("'回投median L/R: '", "'黑色骨架线: '+observationEdgesDrawn+'/'+E.length+'（仅缺失坐标不连）\\n回投median L/R: '")
     page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x===null?'—':x.toFixed(1)+' mm').join(' / ');")
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
     page = page.replace(".filter(Boolean).join(';');window.viewerAudit.frame=fi;",

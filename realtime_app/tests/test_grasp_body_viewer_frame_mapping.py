@@ -8,6 +8,28 @@ sys.path.insert(0,str(Path(__file__).parents[1]/'tools'))
 from build_grasp_body_canvas_viewer import validate_frame_ids, recorded_strict_gate, build_canvas_page
 
 
+def test_motion_display_keeps_finite_rejected_points_and_strict_trails():
+    from build_smplh_motion_viewer import scene_observations
+
+    raw = np.arange(102, dtype=float).reshape(2, 17, 3)
+    strict = raw.copy()
+    strict[:, 14:17] = np.nan
+    display, ankles = scene_observations({
+        'detector_only_triangulated_points_mm': raw,
+        'raw_triangulated_points_mm': strict,
+    }, np.array([1]))
+    np.testing.assert_array_equal(display, raw[1:2])
+    assert np.isnan(ankles).all()
+    assert np.isnan(strict[:, 14:17]).all()
+    from walker_tools.visualization.build_grasp_body_canvas_viewer import COCO_EDGES
+    assert (12, 14) in COCO_EDGES and (14, 16) in COCO_EDGES
+    assert (3, 5) in COCO_EDGES and (4, 6) in COCO_EDGES
+    page = build_canvas_page({'n': 1, 'ids': [1]}, np.zeros((1, 6890, 3)), raw[1:2], {})
+    assert "seg(A,B,'#000000',1.5)" in page
+    assert 'observationEdgesDrawn++' in page
+    assert 'if(A.every(Number.isFinite)&&B.every(Number.isFinite))' in page
+
+
 def test_failed_mesh_frames_do_not_poison_fixed_view_center():
     coco = np.zeros((3, 17, 3))
     coco[1] = np.nan

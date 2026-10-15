@@ -49,6 +49,19 @@ def json_array(values):
     return np.where(np.isfinite(array), array, None).tolist()
 
 
+def scene_observations(scene, ids):
+    """Keep finite raw points for display and strict ankles for accepted trails.
+
+    The scene's raw_triangulated_points_mm field is actually accepted-only.
+    Detector-only points remain diagnostic geometry, never restored Stage input.
+    """
+    raw = np.asarray(scene['detector_only_triangulated_points_mm'])[ids]
+    strict = np.asarray(scene['raw_triangulated_points_mm'])[ids]
+    if raw.shape != (len(ids), 17, 3) or strict.shape != raw.shape:
+        raise ValueError('expected aligned raw and strict COCO-17 scene points')
+    return raw, strict[:, [15, 16]]
+
+
 def motion_page(page, data):
     """Add motion diagnostics without changing the supplied scene or mesh arrays."""
     page = page.replace('<title>PMPose</title>', '<title>'+TITLE+'</title>')
@@ -135,7 +148,7 @@ def run(args):
         r = {key:stored[key] for key in ('pair_id','vertices','faces','predicted_coco','betas','timestamp_s','pose_available',
              'joint_velocity_mm_s','joint_acceleration_mm_s2','raw_joint_velocity_mm_s','raw_joint_acceleration_mm_s2','derivative_valid','segment_id')}
     with np.load(scene/'scene_transforms.npz',allow_pickle=False) as stored:
-        s = {key:stored[key] for key in ('rotation_ground_from_left','translation_ground_from_left_mm','accepted','raw_triangulated_points_mm','pair_timestamp_sec')}
+        s = {key:stored[key] for key in ('rotation_ground_from_left','translation_ground_from_left_mm','accepted','raw_triangulated_points_mm','detector_only_triangulated_points_mm','pair_timestamp_sec')}
     ids = validate_frame_ids(r['pair_id'],len(s['rotation_ground_from_left']))
     n = len(ids)
     if n!=448 or [row['frame_index'] for row in records]!=ids.tolist():
@@ -154,7 +167,9 @@ def run(args):
     R=s['rotation_ground_from_left'][ids]; tr=s['translation_ground_from_left_mm'][ids]/1000
     def xf(values):
         return np.einsum('nij,nvj->nvi',R,values)+tr[:,None]
-    vg,cg,tg=xf(r['vertices']),xf(r['predicted_coco']),xf(s['raw_triangulated_points_mm']/1000)
+    raw_points, strict_ankles = scene_observations(s, ids)
+    vg,cg,tg=xf(r['vertices']),xf(r['predicted_coco']),xf(raw_points/1000)
+    ankle_ground = xf(strict_ankles/1000)
     world = p.get('world_state_available', False)
     if world:
         if Path(p['world_scene']).resolve() != scene:
@@ -195,7 +210,7 @@ def run(args):
     fit_acc=np.zeros((n,17),bool)
     fit_acc[:,5:17]=np.any(np.array([row['used_views'] for row in records]),axis=1)
     data={'v':encode(vg),'j':encode(cg),'t':encode(tg),'w':encode(wg),'he':encode(he),'c':encode(cameras),
-          'a':encode(tg[:,[15,16]]),'av':strict[:,[15,16]].ravel().tolist(),
+          'a':encode(ankle_ground),'av':strict[:,[15,16]].ravel().tolist(),
           'n':n,'nv':6890,'faces':r['faces'].tolist(),'ids':ids.tolist(),'wn':names,
           'we':[[names.index(a),names.index(b)] for a,b in w['edges']], 'si':soles.tolist(),'pi':[],
           'acc':strict.ravel().tolist(),'fit_acc':fit_acc.tolist(),'stage':[row['stage']['operational'] for row in stage_rows],
@@ -226,6 +241,8 @@ def run(args):
     metadata={'result':str(run_dir/'result.npz'),'records':str(run_dir/'trajectory.jsonl'),'scene':str(scene),
         'strict_input':str(args.strict_jsonl.resolve()),'surface_sets':str(args.surface_sets.resolve()),'frames':n,
         'vertices':6890,'faces':13776,'display_map':'X,-Y,Z','smoothing':False,'interpolation':False,
+        'observation_display_source':'same_scene_detector_only_triangulated_points_mm',
+        'strict_points_role':'unchanged_stage_inputs_and_accepted_ankle_trails',
         'beta':data['motion']['beta'],'shape_fit':p.get('shape_fit'),
         'world_state_available':world,'world_pose_certified':False,
         'derivative_coordinate_frame':p.get('coordinate_frame','current_left_camera'),
