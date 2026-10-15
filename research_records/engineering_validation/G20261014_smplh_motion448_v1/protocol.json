@@ -176,5 +176,149 @@
       "derivative_gate": "Retain pixel/age/warmup conditions; validate window uncertainty and position standard-deviation threshold with known-noise/motion before inheriting 0.1m. Report data weak directions and prior contribution.",
       "overlap": "Previous solution is warm start only; each window pixel counted once in that objective; overlapping outputs are correlated, not independent observations."
     }
+  },
+  "observation_diagnosis_20261015": {
+    "status": "completed_observation_diagnosis_only_no_estimator_change",
+    "candidate": "run_latent_cap12",
+    "inputs": "Unmodified run_parameters.json inputs, saved result.npz/predicted_coco and trajectory.jsonl; original automatic raw-fisheye points from existing reader.",
+    "frames_automatic_diagnosis": [
+      1,
+      447
+    ],
+    "excluded_frame0_reason": "Manual replacement pixels are initialization fitting data; all448 original output records remain preserved.",
+    "source": [
+      "realtime_app/pose_app/body_observations.py/raw_side",
+      "realtime_app/pose_app/fisheye_camera.py/load_stereo_fisheye,fisheye_project_numpy",
+      "realtime_app/pose_app/smplh_motion_tracker.py/_supported_pixels"
+    ],
+    "method": "Reproject saved COCO points without model forward or state update. E=[T]xR; Sampson abs(xR^T E xL)/norm(raw-pixel gradient) with inverse-fisheye derivative central step0.25px, same existing35px gate. Signed displacement is model minus detection in upright images. Pair-width ratio is per-frame norm(modelL-modelR)/norm(obsL-obsR), then median.",
+    "validation_question": "Does saved-model reprojection recover the recorded residuals, or does new analysis mix pixel conventions/inputs?",
+    "saved_projection_vs_record_residual_max_difference_px": 0.0,
+    "observation_contract": {
+      "coco_indices": {
+        "left_hip": 11,
+        "right_hip": 12,
+        "right_knee": 14
+      },
+      "regressor": "Local17x6890 array numerically equals the Pose2Mesh author-published array. Rows11/12 are not the same operator as native male SMPL-H rows1/2; coefficient difference does not establish different anatomical targets.",
+      "official_sources": [
+        "https://github.com/hongsukchoi/Pose2Mesh_RELEASE/blob/master/data/COCO/dataset.py",
+        "https://github.com/hongsukchoi/Pose2Mesh_RELEASE/blob/master/lib/smpl.py",
+        "https://raw.githubusercontent.com/hongsukchoi/Pose2Mesh_RELEASE/master/data/COCO/J_regressor_coco.npy"
+      ],
+      "decision": "No confirmed index, inverse-rotation, fullR/t or unit mismatch. Exact anatomical equivalence under real occlusion remains unverified."
+    },
+    "all12_joint_epipolar_rejected_pairs_frames1_447": 111,
+    "per_joint": {
+      "left_hip": {
+        "sampson_median_p95_px": [
+          9.184816661865604,
+          22.64145102114931
+        ],
+        "sampson_over35_frames": 2,
+        "left_right_reprojection_median_px": [
+          36.51907910467902,
+          35.49028422911608
+        ],
+        "sampson_le5_frames": 111,
+        "left_right_reprojection_median_sampson_le5_px": [
+          35.49822417762016,
+          29.368875163355955
+        ]
+      },
+      "right_hip": {
+        "sampson_median_p95_px": [
+          8.889725849464078,
+          24.133485724889265
+        ],
+        "sampson_over35_frames": 2,
+        "left_right_reprojection_median_px": [
+          37.12482503340274,
+          43.832005120384466
+        ],
+        "sampson_le5_frames": 136,
+        "left_right_reprojection_median_sampson_le5_px": [
+          41.21143149682691,
+          49.23768493992097
+        ]
+      },
+      "right_knee": {
+        "sampson_median_p95_px": [
+          21.818981064049684,
+          46.2973645792867
+        ],
+        "sampson_over35_frames": 80,
+        "left_right_reprojection_median_px": [
+          21.816361160191953,
+          41.32535518705853
+        ],
+        "sampson_le5_frames": 13,
+        "left_right_reprojection_median_sampson_le5_px": [
+          7.554009196359686,
+          9.08298701486627
+        ],
+        "left_right_score_min": [
+          0.6868411302566528,
+          0.7168748378753662
+        ],
+        "right_view_upright_vertical_residual_median_px": 38.39141703841506,
+        "right_view_upright_vertical_residual_positive_frames": 447
+      }
+    },
+    "pair_separation_model_over_detection_median_left_right": {
+      "hip": [
+        0.7429957082981408,
+        0.7420332174520234
+      ],
+      "knee": [
+        0.9691954546168785,
+        0.9877275004033683
+      ],
+      "ankle": [
+        1.024468445967031,
+        1.0087580562053615
+      ]
+    },
+    "fixed_image_sample": {
+      "selection": "Centers of seven consecutive64-frame blocks; not selected by low/high residual.",
+      "frames": [
+        32,
+        96,
+        160,
+        224,
+        288,
+        352,
+        416
+      ],
+      "overlay": "run_latent_cap12/observation_diagnostic_7frames.png",
+      "input": "Same input_448pairs left_ccw90/right_cw90 pair_NNNN.png, inverse mapping of raw observed/model points to upright; no new manual labels.",
+      "inspection": "Images and overlays inspected. Clothing covers these anatomical locations; visibility/anatomical centers cannot be certified from overlays."
+    },
+    "interpretation": "Right-knee bilateral pixel incompatibility differs from persistent hip projection-width mismatch. Sampson conditioning is descriptive, not independent evaluation or a causal intervention. Cannot attribute either to filter lag alone or identify beta/detector/calibration/exposure causes.",
+    "decision": "Keep1.2 candidate/mainline/model/gates unchanged. Complete observation substage; require unused multiframe hip/knee references with unconfirmable occlusion retained for real-data attribution. No short-window or learned module justified by this diagnosis alone.",
+    "known_motion_followup_status": "not_implemented",
+    "known_motion_followup_constraints": [
+      "Use explicit raw pixels and synthetic times directly with model map and tracker.step, not PMPose inverse-rotation/capture reader.",
+      "Fixed known model/shape is a disclosed closure condition; primary frame0-2D initialization must not read generator truth q0/v0/a0.",
+      "Independent continuous-trajectory truth derivatives, not the estimator local quadratic derivative rule.",
+      "Moving-camera truth transforms fixed world model points and evaluates camera-coordinate derivatives.",
+      "Same-model closure removes real point/shape mismatch and cannot establish that the real hip problem is solved."
+    ],
+    "not_run": [
+      "Real448 fit/replay",
+      "First-frame refinement",
+      "Known-motion SMPL-H replay",
+      "Short-window implementation",
+      "Training",
+      "Full-repository tests"
+    ],
+    "detector_auxiliary_visibility": {
+      "reader": "Uses keypoint score only; original JSON has separate presence/visibility.",
+      "right_knee_visibility_median_left_right": [
+        0.9544003,
+        0.94863033
+      ],
+      "interpretation": "Same-detector visibility output is not independent occlusion truth; no new gate introduced."
+    }
   }
 }
