@@ -101,7 +101,7 @@
     "Camera-coordinate derivatives include camera motion; world/Stage/heel constraint and short-window extension remain unimplemented.",
     "The user whole walker-motion-stage fixed-world-heel assumption is retained for a separate world comparison; annotated ankles are not heels."
   ],
-  "implementation_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section39; AI_PROGRESS.md current entry",
+  "implementation_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#causal-smplh; docs/HANDOFF_SMPLH_TRACKING_20261015.md; AI_PROGRESS.md current entry",
   "followup_20261015": {
     "objective": "Detailed whole-sequence diagnosis and one-variable correction-limit probe; improve the existing estimator before proposing new models.",
     "one_variable_probe": {
@@ -167,7 +167,7 @@
       "real448": "No future/point deletion/old-output mixing; same-source consistency only,not real3D/derivative truth",
       "revisions_max_before_stop": 2
     },
-    "implementation_and_plan_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md sections39-40;AI_PROGRESS.md current entry",
+    "implementation_and_plan_record": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md#tracking-results and #next-plan; docs/HANDOFF_SMPLH_TRACKING_20261015.md",
     "checks": "CLI full448 actual run;one-variable config equality;all448 output and frozen model fields/derivative masks;Ruff E9/F and compile for changed runner;previous13 motion/label tests not unnecessarily rerun.",
     "short_window_plan_clarifications": {
       "status": "not_implemented",
