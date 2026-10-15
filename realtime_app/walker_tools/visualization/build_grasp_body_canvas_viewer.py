@@ -106,7 +106,11 @@ def build_canvas_page(data, vg, cg, metadata):
     page = page.replace('zoom=1.0', 'zoom=.65').replace('zoom=1;', 'zoom=.65;')
     # One fixed viewing center for the entire sequence. Camera framing only:
     # never recenter per frame, or apparent world motion would be hidden.
-    center = np.median(cg[:, [11, 12], :2].reshape(-1, 2), axis=0)
+    centers = cg[:, [11, 12], :2].reshape(-1, 2)
+    centers = centers[np.isfinite(centers).all(axis=1)]
+    if not len(centers):
+        raise ValueError('viewer has no finite pelvis position for fixed framing')
+    center = np.median(centers, axis=0)
     center[1] *= -1  # project() receives the common [X,-Y,Z] display map.
     page = page.replace('let x=p[0]*cy-p[1]*sy,y=p[0]*sy+p[1]*cy,z=p[2];',
         f'const px=p[0]-({center[0]:.9g}),py=p[1]-({center[1]:.9g});let x=px*cy-py*sy,y=px*sy+py*cy,z=p[2];')
@@ -139,6 +143,7 @@ def build_canvas_page(data, vg, cg, metadata):
     page = page.replace("if(document.getElementById('trails').checked){", ticks + "if(document.getElementById('trails').checked){")
     page = page.replace("pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))", "pitch+=dy*.007")
     page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
+    page = page.replace('d.reprojection[fi].map(x=>x.toFixed(1))', "d.reprojection[fi].map(x=>x===null?'—':x.toFixed(1))")
     page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x===null?'—':x.toFixed(1)+' mm').join(' / ');")
     page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
     page = page.replace(".filter(Boolean).join(';');window.viewerAudit.frame=fi;",

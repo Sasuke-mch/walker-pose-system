@@ -5,7 +5,18 @@ import numpy as np
 import pytest
 
 sys.path.insert(0,str(Path(__file__).parents[1]/'tools'))
-from build_grasp_body_canvas_viewer import validate_frame_ids, recorded_strict_gate
+from build_grasp_body_canvas_viewer import validate_frame_ids, recorded_strict_gate, build_canvas_page
+
+
+def test_failed_mesh_frames_do_not_poison_fixed_view_center():
+    coco = np.zeros((3, 17, 3))
+    coco[1] = np.nan
+    page = build_canvas_page({'n': 3, 'ids': [0, 1, 2]}, np.zeros((3, 6890, 3)), coco, {})
+    assert 'const px=p[0]-(0)' in page
+    assert 'p[0]-(nan)' not in page
+    assert "x===null?'—':x.toFixed(1)" in page
+    with pytest.raises(ValueError, match='no finite pelvis'):
+        build_canvas_page({'n': 3, 'ids': [0, 1, 2]}, np.zeros((3, 6890, 3)), np.full_like(coco, np.nan), {})
 
 
 def test_window_keeps_original_scene_indices():
