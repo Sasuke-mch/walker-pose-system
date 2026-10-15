@@ -117,6 +117,10 @@ def build_canvas_page(data, vg, cg, metadata):
     if not len(centers):
         raise ValueError('viewer has no finite pelvis position for fixed framing')
     center = np.median(centers, axis=0)
+    if metadata.get('view_center_ground_m') is not None:
+        center = np.asarray(metadata['view_center_ground_m'], dtype=float).copy()
+        if center.shape != (2,) or not np.isfinite(center).all():
+            raise ValueError('fixed comparison view center must be finite ground XY')
     center[1] *= -1  # project() receives the common [X,-Y,Z] display map.
     page = page.replace('let x=p[0]*cy-p[1]*sy,y=p[0]*sy+p[1]*cy,z=p[2];',
         f'const px=p[0]-({center[0]:.9g}),py=p[1]-({center[1]:.9g});let x=px*cy-py*sy,y=px*sy+py*cy,z=p[2];')

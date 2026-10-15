@@ -79,6 +79,14 @@ def motion_page(page, data):
     world = data['motion'].get('world', False)
     if world:
         page = page.replace('SMPL-H 二维运动跟踪 · 固定主线体型','SMPL-H 世界运动 · Stage条件约束候选')
+    method = data['motion'].get('updateMethod', 'ekf')
+    method_label = '迭代MAP' if method == 'iterated-map' else 'EKF'
+    sigma = data['motion'].get('latentPriorSigma', 1.5)
+    weight = (1.5/sigma)**2
+    method_section = f'<section><h2>求解方法</h2><p>{method_label}；整体VPoser权重 ×{weight:g}（相对本次EKF），σ={sigma:g}。</p><p>收敛状态逐帧保留；未收敛不发布导数，可勾选原始估计检查。</p></section>'
+    if 'updateMethod' in data['motion']:
+        page = re.sub(r'<title>.*?</title>', '<title>SMPL-H · '+method_label+f' · VPoser ×{weight:g}</title>', page, count=1)
+        page = re.sub(r'<h1>.*?</h1>', '<h1>SMPL-H · '+method_label+f' · VPoser ×{weight:g}</h1>', page, count=1)
     page = re.sub(r'document.getElementById\(\'wrist\'\)\.textContent=d\.wrist_mm\[fi\].*?;', '', page)
     # The existing renderer updates its metrics after the frame label. Run the
     # motion diagnostics at the end of draw, after those legacy assignments.
@@ -89,7 +97,7 @@ def motion_page(page, data):
                    '人体来自保存的因果跟踪结果；地面、相机和助步器仅用本轮Stage重放作显示参考。三角化只用于显示，未进入人体跟踪损失。速度、加速度仍是相机系估计。')
     page = page.replace('<section><h2>参考来源</h2><p>', '<section><h2>坐标与来源</h2><p>'+source_text)
     page = page.replace('<section><h2>操作</h2>', '<section><h2>视角</h2><div><button data-motion-view="recommended">推荐</button><button data-motion-view="front">正视</button><button data-motion-view="side">侧视</button><button data-motion-view="top">俯视</button></div></section><section><h2>操作</h2>')
-    page = page.replace('<section><h2>视角</h2>',shape_section+'<section><h2>视角</h2>',1)
+    page = page.replace('<section><h2>视角</h2>',method_section+shape_section+'<section><h2>视角</h2>',1)
     page = page.replace('<input id="slider"', '<span id="time"></span><input id="frame-number" type="number" min="0" max="447" value="0" aria-label="帧号"><input id="slider"')
     page = page.replace('</style>', '</style>'+STYLE, 1)
     options = ''.join(f'<option value="{j}">{name}</option>' for j,name in enumerate(NAMES))
@@ -170,6 +178,22 @@ def run(args):
     raw_points, strict_ankles = scene_observations(s, ids)
     vg,cg,tg=xf(r['vertices']),xf(r['predicted_coco']),xf(raw_points/1000)
     ankle_ground = xf(strict_ankles/1000)
+    framing_run = getattr(args, 'framing_run', None)
+    framing_source = run_dir
+    framing_coco = cg
+    if framing_run is not None:
+        framing_source = framing_run.resolve()
+        framing_parameters = json.loads((framing_source/'run_parameters.json').read_text(encoding='utf-8'))
+        if framing_parameters['inputs'] != p['inputs']:
+            raise ValueError('comparison framing must use the same observation and model inputs')
+        with np.load(framing_source/'result.npz', allow_pickle=False) as reference:
+            if (not np.array_equal(reference['pair_id'], r['pair_id'])
+                    or not np.array_equal(reference['timestamp_s'], r['timestamp_s'])
+                    or not np.array_equal(reference['betas'], r['betas'])):
+                raise ValueError('comparison framing frame IDs, time or beta differ')
+            framing_coco = xf(reference['predicted_coco'])
+    centers = framing_coco[:, [11, 12], :2].reshape(-1, 2)
+    center = np.median(centers[np.isfinite(centers).all(axis=1)], axis=0)
     world = p.get('world_state_available', False)
     if world:
         if Path(p['world_scene']).resolve() != scene:
@@ -221,6 +245,9 @@ def run(args):
           'hand_state':[['冻结手姿','冻结手姿'] for _ in range(n)],'wrist_mm':[[None,None] for _ in range(n)],
           'reprojection':json_array(np.nanmedian(reprojection,axis=2)),'reject_reasons':reasons.tolist()}
     data['motion']={'names':NAMES,'time':r['timestamp_s'].tolist(),'segment':r['segment_id'].tolist(),
+        'updateMethod':p.get('update_method', 'ekf'),
+        'latentPriorSigma':p['configuration']['latent_prior_sigma'],
+        'iteratedUpdate':[row.get('iterated_update') for row in records],
         'world':world,'groundConstraint':[row.get('ground_constraint') for row in records],
         'footLimitMm':p.get('ground_configuration',{}).get('max_heel_displacement_m',.01)*1000,
         'beta':r['betas'].tolist(),'shapeCalibrated':p.get('shape_fit') is not None,
@@ -232,7 +259,7 @@ def run(args):
         'status':[row['model_status'] for row in records],'used':[row['used_views'] for row in records],
         'viewReason':[row['view_reason'] for row in records],'observed':json_array(obs),'projected':json_array(projected),
         'imageRoot':os.path.relpath(p['inputs']['input_pairs'],output.parent).replace('\\','/')}
-    page=build_canvas_page(data,vg,cg,{'inputs':{},'cold_start':True,'detector':'pmpose'})
+    page=build_canvas_page(data,vg,cg,{'inputs':{},'cold_start':True,'detector':'pmpose','view_center_ground_m':center})
     embedded,browser,compressed=motion_page(page,data)
     output.parent.mkdir(parents=True,exist_ok=True)
     output.write_text(embedded,encoding='utf-8')
@@ -246,6 +273,9 @@ def run(args):
         'beta':data['motion']['beta'],'shape_fit':p.get('shape_fit'),
         'world_state_available':world,'world_pose_certified':False,
         'derivative_coordinate_frame':p.get('coordinate_frame','current_left_camera'),
+        'update_method':data['motion']['updateMethod'],'latent_prior_sigma':data['motion']['latentPriorSigma'],
+        'optimizer_status_counts':dict(Counter(row['status'] for row in data['motion']['iteratedUpdate'] if row is not None)),
+        'fixed_view_center_ground_m':center.tolist(),'framing_result':str(framing_source/'result.npz'),
         'scene_role':'stage_conditioned_world_estimation' if world else 'display_reference_only',
         'stage_counts':dict(Counter(data['stage'])),'derivative_available_samples':int(r['derivative_valid'].sum()),
         'reprojection_vs_record_max_difference_px':difference,
@@ -263,4 +293,5 @@ if __name__=='__main__':
     for arg in ('run','scene','strict-jsonl','surface-sets','output'):
         parser.add_argument('--'+arg,type=Path,required=True)
     parser.add_argument('--replace-view',action='store_true',help='Replace an existing export of the same result; model outputs are read-only.')
+    parser.add_argument('--framing-run',type=Path,help='Use this same-input run only for a common fixed comparison view center.')
     run(parser.parse_args())

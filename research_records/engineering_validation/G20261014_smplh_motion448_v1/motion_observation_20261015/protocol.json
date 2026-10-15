@@ -252,5 +252,74 @@
     "strong_whole_vposer_knee_diagnostic": "local knee rotvec x<-5deg counts(left,right):EKF159/101,MAP316/252,strongMAP144/0;not clinical angles or anatomical accuracy"
   },
   "completed": true,
-  "comparison_limits": "EKF-to-MAP changes nonlinear solver AND replaces shared correction cap with nonlinear line search;not an isolated iteration-count ablation. MAP sigma1.5-to.75 changes whole-VPoser prior strength only."
+  "comparison_limits": "EKF-to-MAP changes nonlinear solver AND replaces shared correction cap with nonlinear line search;not an isolated iteration-count ablation. MAP sigma1.5-to.75 changes whole-VPoser prior strength only.",
+  "visualization_20261015": {
+    "entry": "visualization/index.html",
+    "source_runs": [
+      "ekf_sigma15",
+      "map_sigma15",
+      "map_sigma075"
+    ],
+    "frames_per_run": 448,
+    "human_fits_rerun": false,
+    "exporter": "realtime_app/tools/build_smplh_motion_viewer.py",
+    "comparison_builder": "realtime_app/tools/build_smplh_motion_comparison.py",
+    "export_arguments": {
+      "--run": "<experiment>/<variant>",
+      "--scene": "<experiment>/visualization/scene",
+      "--strict-jsonl": "<experiment>/visualization/first_instance_strict.jsonl",
+      "--surface-sets": "research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/contact_surface_sets_smplh_v1/contact_vertex_sets.json",
+      "--output": "<experiment>/<variant>/view/body.html",
+      "--framing-run": "<experiment>/ekf_sigma15"
+    },
+    "comparison_arguments": {
+      "--root": "research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015"
+    },
+    "fresh_scene_sources": "visualization/scene/scene_sources.json",
+    "fresh_scene_command": "visualization/scene_replay_command.json",
+    "strict": "visualization/first_instance_strict.jsonl",
+    "timestamps": "visualization/frame_times.json",
+    "old_dynamic_scene_inputs_used": false,
+    "scene_role": "display_reference_only_not_independent_world_truth",
+    "strict_accepted": 5286,
+    "raw_finite": 7534,
+    "raw_finite_rejected": 2248,
+    "finite_black_edges": 7915,
+    "black_edge_denominator": 8064,
+    "display_rejections_do_not_hide_finite_edges": true,
+    "no_interpolation_or_smoothing": true,
+    "common_fixed_framing_from": "ekf_sigma15; camera framing only; no modification of model or trajectory",
+    "same_frame_time_beta_checked": true,
+    "saved_mesh_and_raw_points_same_Rt_checked": true,
+    "reprojection_max_difference_px": 0,
+    "validation": "16 viewer tests; Ruff E9/F; Node syntax on all3 exported scripts and index; actual IAB rendering and controls",
+    "browser_frames_checked": {
+      "ekf_sigma15": [
+        0,
+        188
+      ],
+      "map_sigma15": [
+        188
+      ],
+      "map_sigma075": [
+        335,
+        349
+      ]
+    },
+    "browser_controls_checked": [
+      "frame synchronization",
+      "variant switch retaining frame and side view",
+      "recommended view",
+      "raw derivative toggle",
+      "play and pause with parent synchronized",
+      "same-frame stereo overlays"
+    ],
+    "preview": "visualization/preview_frame335.jpg",
+    "browser_deliverable_open": true,
+    "console_note": "One MutationObserver error without source URL; no such interface in exported code; no zero-error claim.",
+    "limitations": [
+      "Both MAP runs retain447 feasible_unconverged updates and0 published derivative samples; raw estimates available through explicit toggle.",
+      "Pixel residuals, finite skeleton and display scene do not establish true pose accuracy, physical contact or independent world motion."
+    ]
+  }
 }

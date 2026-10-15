@@ -1,0 +1,224 @@
+{
+  "result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\map_sigma075\\result.npz",
+  "records": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\map_sigma075\\trajectory.jsonl",
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\visualization\\scene",
+  "strict_input": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\visualization\\first_instance_strict.jsonl",
+  "surface_sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260927_wilor_smplh_full448_v1\\contact_surface_sets_smplh_v1\\contact_vertex_sets.json",
+  "frames": 448,
+  "vertices": 6890,
+  "faces": 13776,
+  "display_map": "X,-Y,Z",
+  "smoothing": false,
+  "interpolation": false,
+  "observation_display_source": "same_scene_detector_only_triangulated_points_mm",
+  "strict_points_role": "unchanged_stage_inputs_and_accepted_ankle_trails",
+  "beta": [
+    [
+      1.1298097372055054,
+      -0.31224068999290466,
+      0.6401214599609375,
+      -0.022837277501821518,
+      0.2672803997993469,
+      -0.23431605100631714,
+      -0.11013275384902954,
+      -0.0018150045070797205,
+      -0.2465878129005432,
+      0.2786286175251007
+    ]
+  ],
+  "shape_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\result.npz",
+  "world_state_available": false,
+  "world_pose_certified": false,
+  "derivative_coordinate_frame": "current_left_camera",
+  "update_method": "iterated-map",
+  "latent_prior_sigma": 0.75,
+  "optimizer_status_counts": {
+    "not_run": 1,
+    "feasible_unconverged": 447
+  },
+  "fixed_view_center_ground_m": [
+    0.08713135236316204,
+    -0.020596214452988537
+  ],
+  "framing_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\ekf_sigma15\\result.npz",
+  "scene_role": "display_reference_only",
+  "stage_counts": {
+    "warming_up": 5,
+    "transition": 114,
+    "stage2_feet_static_walker_moving": 115,
+    "stage1_walker_static_human_moving": 214
+  },
+  "derivative_available_samples": 0,
+  "reprojection_vs_record_max_difference_px": 0.0,
+  "joints": {
+    "0": {
+      "finite": 448,
+      "accepted": 256,
+      "finite_rejected": 192,
+      "reject_reasons": {
+        "high_reprojection_error": 191,
+        "association_failed": 1
+      }
+    },
+    "1": {
+      "finite": 433,
+      "accepted": 244,
+      "finite_rejected": 189,
+      "reject_reasons": {
+        "high_reprojection_error": 186,
+        "out_of_raw_image_bounds": 17,
+        "association_failed": 1
+      }
+    },
+    "2": {
+      "finite": 439,
+      "accepted": 234,
+      "finite_rejected": 205,
+      "reject_reasons": {
+        "high_reprojection_error": 204,
+        "out_of_raw_image_bounds": 9,
+        "association_failed": 1
+      }
+    },
+    "3": {
+      "finite": 390,
+      "accepted": 295,
+      "finite_rejected": 95,
+      "reject_reasons": {
+        "high_reprojection_error": 95,
+        "out_of_raw_image_bounds": 57,
+        "association_failed": 1
+      }
+    },
+    "4": {
+      "finite": 448,
+      "accepted": 356,
+      "finite_rejected": 92,
+      "reject_reasons": {
+        "high_reprojection_error": 91,
+        "association_failed": 1
+      }
+    },
+    "5": {
+      "finite": 448,
+      "accepted": 300,
+      "finite_rejected": 148,
+      "reject_reasons": {
+        "high_reprojection_error": 147,
+        "association_failed": 1
+      }
+    },
+    "6": {
+      "finite": 448,
+      "accepted": 414,
+      "finite_rejected": 34,
+      "reject_reasons": {
+        "high_reprojection_error": 33,
+        "association_failed": 1
+      }
+    },
+    "7": {
+      "finite": 448,
+      "accepted": 265,
+      "finite_rejected": 183,
+      "reject_reasons": {
+        "high_reprojection_error": 182,
+        "association_failed": 1
+      }
+    },
+    "8": {
+      "finite": 448,
+      "accepted": 377,
+      "finite_rejected": 71,
+      "reject_reasons": {
+        "high_reprojection_error": 70,
+        "association_failed": 1
+      }
+    },
+    "9": {
+      "finite": 448,
+      "accepted": 278,
+      "finite_rejected": 170,
+      "reject_reasons": {
+        "high_reprojection_error": 167,
+        "association_failed": 1,
+        "low_2d_score": 2
+      }
+    },
+    "10": {
+      "finite": 448,
+      "accepted": 430,
+      "finite_rejected": 18,
+      "reject_reasons": {
+        "high_reprojection_error": 17,
+        "association_failed": 1
+      }
+    },
+    "11": {
+      "finite": 448,
+      "accepted": 326,
+      "finite_rejected": 122,
+      "reject_reasons": {
+        "high_reprojection_error": 121,
+        "association_failed": 1
+      }
+    },
+    "12": {
+      "finite": 448,
+      "accepted": 325,
+      "finite_rejected": 123,
+      "reject_reasons": {
+        "high_reprojection_error": 122,
+        "association_failed": 1
+      }
+    },
+    "13": {
+      "finite": 448,
+      "accepted": 356,
+      "finite_rejected": 92,
+      "reject_reasons": {
+        "high_reprojection_error": 91,
+        "association_failed": 1
+      }
+    },
+    "14": {
+      "finite": 448,
+      "accepted": 84,
+      "finite_rejected": 364,
+      "reject_reasons": {
+        "high_reprojection_error": 363,
+        "association_failed": 1
+      }
+    },
+    "15": {
+      "finite": 448,
+      "accepted": 317,
+      "finite_rejected": 131,
+      "reject_reasons": {
+        "high_reprojection_error": 130,
+        "association_failed": 1
+      }
+    },
+    "16": {
+      "finite": 448,
+      "accepted": 429,
+      "finite_rejected": 19,
+      "reject_reasons": {
+        "high_reprojection_error": 18,
+        "association_failed": 1
+      }
+    }
+  },
+  "pages": [
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\map_sigma075\\view\\body.html",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\map_sigma075\\view\\body_browser.html"
+  ],
+  "browser_status": "passed_render_and_controls_at_selected_frames",
+  "browser_frames_checked": [
+    335,
+    349
+  ],
+  "finite_black_edges": 7915,
+  "black_edge_denominator": 8064,
+  "browser_console_note": "One MutationObserver error without source URL; generated viewer has no MutationObserver; no zero-error claim."
+}

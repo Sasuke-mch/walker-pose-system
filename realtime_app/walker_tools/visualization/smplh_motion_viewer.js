@@ -6,6 +6,7 @@ function drawMotion() {
   const reasonLabels = {available:'可发布', derivative_warmup:'重启热身',
     poor_or_stale_pixel_fit:'像素拟合差或已过期', no_recent_own_pixels:'近期无本点像素',
     constraint_conflict:'地面约束冲突', feasible_unconverged:'几何可行但优化未收敛',
+    iterated_map_unconverged:'迭代MAP未收敛', position_uncertainty:'位置不确定性过大',
     high_position_uncertainty:'位置不确定性过大'};
   document.getElementById('motion-status').textContent =
     `帧 ${fi} · ${d.motion.time[fi].toFixed(3)} s · ${d.motion.names[j]} · ` +
@@ -26,11 +27,19 @@ function drawMotion() {
     if(!reason.startsWith('used_2d')) viewCounts[reason]=(viewCounts[reason]||0)+1;
   }
   document.getElementById('qa').textContent =
+    `黑色骨架线：${window.viewerAudit.observationEdgesDrawn}/${window.viewerAudit.observationEdges}（仅缺失坐标不连）\n` +
     `二维更新视图：${d.motion.used[fi].flat().filter(Boolean).length}/24\n` +
     `严格几何通过：${d.acc.slice(fi*17,fi*17+17).filter(Boolean).length}/17\n` +
     `跟踪观测状态：${Object.entries(viewCounts).map(([reason,count])=>(viewLabels[reason]||reason)+' ×'+count).join('；') || '全部用于二维反馈'}\n` +
     `地面状态：${d.pose[fi]}；${d.ground_reasons[fi] || '无拒绝原因'}\n` +
     `导数不可用：${d.motion.names.map((name,k)=>d.motion.valid[fi][k]?'':name+'：'+(reasonLabels[d.motion.reason[fi][k]]||d.motion.reason[fi][k])).filter(Boolean).join('；') || '无'}`;
+  const optimizer=d.motion.iteratedUpdate?.[fi];
+  if(optimizer) {
+    const state={not_run:'首帧未重复优化',converged:'已收敛',feasible_unconverged:'可行改善 · 未收敛',rejected:'更新被拒绝'};
+    document.getElementById('qa').textContent += `\n迭代MAP：${state[optimizer.status]||optimizer.status}；迭代 ${optimizer.iterations??0} 次\n停止原因：${optimizer.termination||'未执行'}；后验更新 ${optimizer.posterior_updates??0} 次`;
+    document.getElementById('wrist').textContent += ' · '+(state[optimizer.status]||optimizer.status);
+    window.viewerAudit.optimizerStatus=optimizer.status;
+  } else { window.viewerAudit.optimizerStatus='baseline_ekf'; }
   if(d.motion.world) {
     const c=d.motion.groundConstraint[fi];
     const mm=values=>values ? values.map(x=>x===null?'—':(x*1000).toFixed(2)).join(' / ') : '未设锚';
@@ -45,6 +54,8 @@ function drawMotion() {
   window.viewerAudit.derivativeAvailable = d.motion.valid[fi].filter(Boolean).length;
   window.viewerAudit.segment = d.motion.segment[fi];
   window.viewerAudit.timestamp = d.motion.time[fi];
+  if(window.parent!==window) window.parent.postMessage({type:'smplh-frame-changed',frame:fi,
+    view:{yaw,pitch,zoom,panX,panY}},location.origin==='null'?'*':location.origin);
 }
 
 function plotMotion(id, values, joint, label) {
@@ -61,6 +72,7 @@ function plotMotion(id, values, joint, label) {
   g.lineWidth = scale; g.strokeStyle = '#000000'; g.fillStyle = '#000000';
   g.beginPath(); g.moveTo(left,top); g.lineTo(left,bottom); g.lineTo(right,bottom); g.stroke();
   g.fillText(label, left, 16*scale);
+  if(!all.length) g.fillText('无可发布数据；可勾选原始估计',left,top+20*scale);
   for(let k=-2;k<=2;k++) {
     const val=extent*k/2, yy=y(val);
     g.fillText(val.toFixed(Math.abs(extent)>100?0:1), 3*scale, yy+4*scale);
@@ -139,3 +151,18 @@ document.querySelectorAll('[data-motion-view]').forEach(button=>button.onclick=(
   const angles={recommended:[.4,.4],front:[0,0],side:[Math.PI/2,0],top:[0,Math.PI/2]};
   [yaw,pitch]=angles[button.dataset.motionView];panX=panY=0;draw();
 });
+const requestedFrame=Number(new URLSearchParams(location.search).get('frame')||0);
+if(Number.isInteger(requestedFrame)&&requestedFrame>=0&&requestedFrame<N) {
+  fi=requestedFrame;document.getElementById('slider').value=fi;
+}
+window.addEventListener('message',event=>{
+  if(event.source!==window.parent||event.origin!==location.origin||event.data?.type!=='smplh-set-frame') return;
+  const frame=event.data.frame;
+  if(!Number.isInteger(frame)||frame<0||frame>=N) return;
+  fi=frame;playing=false;document.getElementById('play').textContent='播放';
+  const view=event.data.view;
+  if(view&&['yaw','pitch','zoom','panX','panY'].every(key=>Number.isFinite(view[key]))&&view.zoom>0)
+    ({yaw,pitch,zoom,panX,panY}=view);
+  document.getElementById('slider').value=fi;draw();
+});
+if(window.parent!==window) window.parent.postMessage({type:'smplh-ready'},location.origin==='null'?'*':location.origin);

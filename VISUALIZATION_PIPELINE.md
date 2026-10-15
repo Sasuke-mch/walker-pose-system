@@ -1,5 +1,7 @@
 # Walker Pose 可视化固定实现规范
 
+2026-10-15二维优先三组完整448检查入口：`research_records/engineering_validation/G20261014_smplh_motion448_v1/motion_observation_20261015/visualization/index.html`。可在同帧同视角切换`ekf_sigma15`、`map_sigma15`和`map_sigma075`的view/body_browser.html（各配GZ及完整离线body.html）；显示实际保存网格、同源双目叠点、固定主线beta、整体VPoser相对权重及逐帧未收敛状态。三角化黑线保留全部有限原始点及18边，误差只统计，strict与Stage不回填；本轮场景重新重放，仅为显示参考。共享固定取景中心不改变模型/轨迹。16项显示测试、生成JS语法和数组核对通过，实际浏览器检查切换、帧同步/播放、视角、原始导数开关及双目叠点；335帧预览留visualization/preview_frame335.jpg。两个MAP无收敛更新，发布v/a空缺保持，页面不代表姿态或物理正确。来源/命令与限制见该实验protocol.json的visualization_20261015。
+
 2026-10-15 Stage条件世界q/v/a及10mm整sole约束检查页：`research_records/engineering_validation/G20261014_smplh_motion448_v1/world_contact_20261015/run_contact_v7/view/body.html`及`body_browser.html`+GZ。全448保留、441可解码，全部115移动帧中101满足/14失败，页面保留冲突、失效网格和NaN，不作为整段约束成功。显示固定原主线beta、真实sole高度/全部sole最大位移、optimizer收敛与未收敛可行状态；v/a由Stage条件固定地面系状态直接估计，不旋转旧相机系导数。场景本轮新重放、strict重新计算且同源一致，Stage含脚踝锚和0.5s固定延迟，不是独立世界轨迹。浏览器失败帧NaN污染全片中心缺陷已修，只用有限pelvis确定一个固定中心，不改变任何失败输出或动态数据。详细身份、结果与停止决定见算法5.7和实验protocol。
 
 2026-10-15用户指定固定原主线体型后的检查页：`research_records/engineering_validation/G20261014_smplh_motion448_v1/run_calibrated_beta12/view/body.html`及同目录`body_browser.html`+`body_data.json.gz`。beta只从原主线全片共享体型读取并冻结，首帧二维仅细化姿态；页面显示beta、左右脚底及助步器四脚高度。场景来自本任务新重放并修复停止歧义计时的`run_latent_cap12/view_v2/scene`，同源输入/真实时基/strict保持，380/391支撑恢复0mm。人体脚部仍有浮空/穿地和像素拟合不足，明确作为检查候选保留，不吸附/平滑/补点，不晋升主线；v/a保持原相机系。原view及旧beta结果保留，详细比较见当前算法第5.6节与实验protocol的`calibrated_shape_20261015`。

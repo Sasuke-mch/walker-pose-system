@@ -1,0 +1,41 @@
+{
+  "executable": "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+  "argv": [
+    "realtime_app/tools/replay_fitted_body_scene.py",
+    "--scene-profile",
+    "mainline",
+    "--left-video",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\visualization\\not_consumed_left.mp4",
+    "--right-video",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\visualization\\not_consumed_right.mp4",
+    "--input-pair-dir",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "--left-pmpose",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "--right-pmpose",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "--calibration",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results\\stereo_fisheye.json",
+    "--ground-reference",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260914_static_ground_reference_v1\\estimate_stationary_20pairs_v2\\ground_reference.json",
+    "--walker-model",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json",
+    "--strict-jsonl",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\visualization\\first_instance_strict.jsonl",
+    "--frames-metadata",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\visualization\\frame_times.json",
+    "--output",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\motion_observation_20261015\\visualization\\scene"
+  ],
+  "old_dynamic_inputs_consumed": false,
+  "raw_video_consumed": false,
+  "stage_profile": "mainline",
+  "body_fit_run": false,
+  "observation_source": "original automatic first-instance raw stereo pixels",
+  "strict_gates": {
+    "keypoint_threshold": 0.25,
+    "max_association_cost": 0.05,
+    "max_reprojection_error_px": 10,
+    "max_matches": 1
+  }
+}

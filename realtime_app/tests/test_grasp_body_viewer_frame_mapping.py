@@ -41,6 +41,18 @@ def test_failed_mesh_frames_do_not_poison_fixed_view_center():
         build_canvas_page({'n': 3, 'ids': [0, 1, 2]}, np.zeros((3, 6890, 3)), np.full_like(coco, np.nan), {})
 
 
+def test_comparison_center_changes_framing_only():
+    coco = np.zeros((1, 17, 3))
+    vertices = np.ones((1, 6890, 3))
+    page = build_canvas_page({'n': 1, 'ids': [0]}, vertices, coco,
+                             {'view_center_ground_m': [1.25, -2.5]})
+    assert 'const px=p[0]-(1.25),py=p[1]-(2.5)' in page
+    assert np.all(vertices == 1) and np.all(coco == 0)
+    with pytest.raises(ValueError, match='finite ground XY'):
+        build_canvas_page({'n': 1, 'ids': [0]}, vertices, coco,
+                          {'view_center_ground_m': [np.nan, 0]})
+
+
 def test_window_keeps_original_scene_indices():
     ids=validate_frame_ids(np.arange(60,91),448)
     scene=np.arange(448)*10
