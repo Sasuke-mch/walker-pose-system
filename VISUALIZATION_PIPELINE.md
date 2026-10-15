@@ -1,5 +1,7 @@
 # Walker Pose 可视化固定实现规范
 
+2026-10-15完整SMPL-H因果跟踪1.2候选页面：`research_records/engineering_validation/G20261014_smplh_motion448_v1/run_latent_cap12/view/body.html`及同目录`body_browser.html`（配套`body_data.json.gz`）。全部448帧保存网格与本轮同源strict/Stage/地面重放统一显示；人体跟踪仍只用二维，重三角化和Stage只用于显示参考。速度/加速度曲线保持当前左相机系及真实非均匀时间、NaN和重启段，不转换成世界导数；原始估计开关明确区分未通过发布门的值。无平滑/插值，完整17点含右膝按实际strict门显示；真实面、实体拓扑、相机/踝拖尾、同源双目叠点和浏览器交互已核对。页面来源/逐关节拒绝计数见同目录`metadata.json`，证据边界见实验根protocol的`visualization_20261015`。
+
 2026-10-13 新448帧reliability人体页面：`research_records/engineering_validation/G20261013_reliability448_view_v1/view/body.html`（完整离线）和`body_browser.html`（同目录GZ配套）。人体在本轮重新冷启动拟合；strict/Stage/地面从原有序448图像本轮重算，采用当前mainline→supported_stop_fixed_lag。显示原始新网格，无参数/显示平滑或插值，全部17点按当前质量门处理；真实面、拒绝状态、黑色观测骨架、实体拓扑、相机/轨迹与统一变换遵守本文。19项同源/坐标检查和浏览器0/22/380/391/447及控件检查通过；证据只限工程输出及显示一致性，不提升正式身体选择或物理接触等级。
 
 本文是仓库内双鱼眼人体、地面和助步器可视化的固定规范。以后新建或修改可视化页面，必须先按本文检查输入来源、坐标系、Stage 1/2、助步器模型和渲染层级。本文约束的是可视化数据组织与显示语义，不把显示结果升级为姿态精度、触地或承重真值。

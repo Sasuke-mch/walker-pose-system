@@ -321,6 +321,94 @@
       "interpretation": "Same-detector visibility output is not independent occlusion truth; no new gate introduced."
     }
   },
+  "visualization_20261015": {
+    "status": "completed_display_with_user_identified_shape_and_scene_defects",
+    "result": "run_latent_cap12/result.npz",
+    "records": "run_latent_cap12/trajectory.jsonl",
+    "pages": [
+      "run_latent_cap12/view/body.html",
+      "run_latent_cap12/view/body_browser.html"
+    ],
+    "browser_data": "run_latent_cap12/view/body_data.json.gz",
+    "preview": "run_latent_cap12/view/preview.jpg",
+    "metadata": "run_latent_cap12/view/metadata.json",
+    "scene": "run_latent_cap12/view/scene",
+    "source": [
+      "realtime_app/tools/build_smplh_motion_viewer.py",
+      "realtime_app/walker_tools/visualization/smplh_motion_viewer.js",
+      "realtime_app/walker_tools/visualization/build_grasp_body_canvas_viewer.py/build_canvas_page",
+      "realtime_app/walker_tools/scene/replay_fitted_body_scene.py",
+      "realtime_app/pose_app/triangulation.py/triangulate_matches"
+    ],
+    "same_inputs": "Candidate run_parameters.json raw predictions,calibration and ordered input_448pairs. Fresh strict geometry uses automatic points; frame0 stereo2D display uses actual manually replaced initialization points, not a new fit.",
+    "strict_gate": {
+      "per_view_score": 0.25,
+      "max_association_cost": 0.05,
+      "max_reprojection_error_px": 10,
+      "max_matches": 1
+    },
+    "scene_command": "run_latent_cap12/view/scene_replay_command.json",
+    "scene_profile": "mainline->supported_stop_fixed_lag",
+    "static_ground": "research_records/engineering_validation/G20260914_static_ground_reference_v1/estimate_stationary_20pairs_v2/ground_reference.json",
+    "static_walker": "research_records/engineering_validation/G20260918_offline_walker_frame_evidence_v1/coarse_complete_model_v2_camera_rail/coarse_walker_model.json",
+    "time": "Selected same-session host-return timestamps, not exposure; numeric curves retain exact saved times. Frame playback uses nominal30fps with0.5/1/2x as visualization specification.",
+    "mesh": {
+      "frames": 448,
+      "vertices": 6890,
+      "faces": 13776,
+      "index_entries": 41328,
+      "coordinates": "saved current camera mesh->fresh same-frame T_G<-C->display[X,-Y,Z]",
+      "smoothing": false,
+      "interpolation": false
+    },
+    "stage_counts": {
+      "warming_up": 5,
+      "transition": 114,
+      "stage2_feet_static_walker_moving": 115,
+      "stage1_walker_static_human_moving": 214
+    },
+    "derivatives": {
+      "coordinate_frame": "current_left_camera",
+      "world_state_available": false,
+      "published_samples": 2846,
+      "total_samples": 5376,
+      "preserve": "saved raw/public XYZ mm/s,mm/s2,NaN masks and segment breaks; no rotating-only world derivative",
+      "display": "12-joint choice; black/gray axis curves; optional explicitly raw pre-gate values; current reason"
+    },
+    "limits": "Scene/world position transform is a display reference, not independently validated world tracking, and never enters SMPL-H pixel loss. Static walker installation and stop-support protocol remain assumptions; no contact/clinical/independent3D claim. Original view retained after user identified altered shape, body sole floating/penetration and missed stationary walker support; rendering checks did not establish geometric validity.",
+    "checks": {
+      "existing_tests": "19 frame mapping and scene replay tests passed",
+      "compile": "2 changed Python modules",
+      "lint": "Ruff E9/F via uvx offline;JS and generated page syntax passed",
+      "arrays": "exact faces,raw/public derivative arrays,masks,segments,times preserved;common newR/t mesh and COCO verified",
+      "reprojection_vs_record_max_difference_px": 0.0,
+      "prior_renderer": "extracted existing render statements unchanged"
+    },
+    "browser_checks": {
+      "pages": [
+        "body.html",
+        "body_browser.html"
+      ],
+      "frames": [
+        0,
+        224,
+        406,
+        447
+      ],
+      "frame406": "reinitialized;0/12 derivatives; gaps retained",
+      "controls": "frame input, joint selection, raw/public switch, visible scene rotation/zoom and nominal30fps playback; no interpolation",
+      "images": "Same-source left/right upright images and model projections visibly loaded",
+      "console_errors": [],
+      "preview": "preview.jpg"
+    },
+    "not_run": [
+      "SMPL-H fitting/refinement",
+      "Tracking rerun",
+      "Training",
+      "World derivative inference",
+      "Full-repository tests"
+    ]
+  },
   "support_recovery_fix_20261015": {
     "status": "verified_bug_fix",
     "source": [

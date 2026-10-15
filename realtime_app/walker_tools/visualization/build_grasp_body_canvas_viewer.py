@@ -87,6 +87,74 @@ def recorded_strict_gate(path, ids):
     return accepted, reasons
 
 
+def build_canvas_page(data, vg, cg, metadata):
+    """Render supplied same-run arrays with the existing fixed-ground Canvas page."""
+    n = data["n"]
+    ids = np.asarray(data["ids"])
+    page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":")))
+    notes = "助步器采用静态安装参考，未认证本次机位的实物对齐。"
+    if metadata.get("hand_position_source") == "body_fit_native_finger_rotation_only":
+        notes += "腕位置由身体拟合得到；WiLoR仅约束手指旋转。"
+    page = page.replace('<section><h2>操作</h2>', '<section><h2>参考来源</h2><p>'+notes+'</p></section><section><h2>操作</h2>')
+    page = page.replace('<button id="play" class="play">播放</button>', '<button id="play" class="play">播放</button><select id="rate" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>')
+    page = page.replace('t-lastT>33', "t-lastT>=1000/(30*Number(document.getElementById('rate').value))")
+    page = page.replace('pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))', 'pitch+=dy*.007')
+    page = page.replace('<title>SMPL surface contact Canvas viewer</title>', '<title>SMPL-H 固定手部约束拟合</title>')
+    page = page.replace('.metrics div{display:flex;', '.metrics div{display:flex;gap:8px;')
+    page = page.replace('.metrics dt{color:#65737d}', '.metrics dt{color:#65737d;flex:0 0 90px}')
+    page = page.replace('.metrics dd{margin:0;text-align:right}', '.metrics dd{margin:0;text-align:right;min-width:0;overflow-wrap:anywhere}')
+    page = page.replace('zoom=1.0', 'zoom=.65').replace('zoom=1;', 'zoom=.65;')
+    # One fixed viewing center for the entire sequence. Camera framing only:
+    # never recenter per frame, or apparent world motion would be hidden.
+    center = np.median(cg[:, [11, 12], :2].reshape(-1, 2), axis=0)
+    center[1] *= -1  # project() receives the common [X,-Y,Z] display map.
+    page = page.replace('let x=p[0]*cy-p[1]*sy,y=p[0]*sy+p[1]*cy,z=p[2];',
+        f'const px=p[0]-({center[0]:.9g}),py=p[1]-({center[1]:.9g});let x=px*cy-py*sy,y=px*sy+py*cy,z=p[2];')
+    page = page.replace('const sideX=-3.8;', 'const sideX=-1.8;')
+    page = page.replace('窗口 60..90 · 31 帧 · 无外部库', f'第{ids[0]}..{ids[-1]}帧 · {n}帧 · 6890顶点 / 13776真实三角面 · 本次重放')
+    page = page.replace('male SMPL 表面手脚接触拟合', 'SMPL-H 固定手部约束拟合')
+    page = page.replace('min="0" max="30"', f'min="0" max="{n-1}"')
+    page = page.replace('手部 surface 中位', '双手几何状态').replace('脚部 surface 中位', '脚底最低高度')
+    page = page.replace('COCO 3D 误差', '身体观测残差')
+    page = page.replace('<dl class="metrics">', '<dl class="metrics"><div><dt>腕偏差 左/右</dt><dd id="wrist">—</dd></div>')
+    page = page.replace("(d.hm[fi]===null?'—':(d.hm[fi]*1000).toFixed(1)+' mm')", "d.hand_state[fi].join(' / ')")
+    page = page.replace("unpack(d.a)]).then(([v,w,t,he,c,ankle])", "unpack(d.a),unpack(d.j)]).then(([v,w,t,he,c,ankle,model])")
+    page = page.replace('const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;', 'const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;const E=[[0,1],[0,2],[1,3],[2,4],[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];window.viewerAudit={vertices:NV,faces:faces.length,indexEntries:faces.length*3,frames:N,displayMap:"X,-Y,Z",sceneFresh:true};')
+    marker = "if(document.getElementById('walker').checked){"
+    overlay = """for(const e of E){const[a,b]=e,A=[t[fi*51+a*3],-t[fi*51+a*3+1],t[fi*51+a*3+2]],B=[t[fi*51+b*3],-t[fi*51+b*3+1],t[fi*51+b*3+2]];if(A.every(Number.isFinite)&&B.every(Number.isFinite)){ctx.setLineDash([]);seg(A,B,'#000000',1.5);ctx.setLineDash([])}}for(let k=0;k<17;k++)dot([model[fi*51+k*3],-model[fi*51+k*3+1],model[fi*51+k*3+2]],'#1678bc',2);seg([c[fi*6],-c[fi*6+1],c[fi*6+2]],[c[fi*6+3],-c[fi*6+4],c[fi*6+5]],'#4b555d',1.5);"""
+    # Canvas follows the project's render order: solid walker, raw points,
+    # translucent real mesh, observation bones, model COCO points. Keep the
+    # reusable template but relocate its mesh block rather than redraw a proxy.
+    mesh_start = page.index("if(document.getElementById('mesh').checked){")
+    mesh_end = page.index("if(document.getElementById('contact').checked){", mesh_start)
+    mesh_block = page[mesh_start:mesh_end]
+    page = page[:mesh_start]+page[mesh_end:]
+    contact_start = page.index("if(document.getElementById('contact').checked){")
+    contact_end = page.index(marker,contact_start)
+    contact_block = page[contact_start:contact_end]
+    page = page[:contact_start]+page[contact_end:]
+    page = page.replace("document.getElementById('stage').textContent=d.stage[fi];", mesh_block+contact_block+overlay+"document.getElementById('stage').textContent=d.stage[fi];")
+    page = page.replace("p[2]<0?4.5:3.0", "p[2]<0?1.2:1.0")
+    ticks = """for(let u=0;u<=4.5;u+=.5){for(const P of [[u,0,0],[0,u,0]]){const q=project(P);ctx.fillStyle='#27332d';ctx.font='12px sans-serif';ctx.fillText(u.toFixed(1)+'m',q[0]+3,q[1]-3)}}"""
+    page = page.replace("if(document.getElementById('trails').checked){", ticks + "if(document.getElementById('trails').checked){")
+    page = page.replace("pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))", "pitch+=dy*.007")
+    page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
+    page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x===null?'—':x.toFixed(1)+' mm').join(' / ');")
+    page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
+    page = page.replace(".filter(Boolean).join(';');window.viewerAudit.frame=fi;",
+                        ".filter(Boolean).join(';')+'\\n地面拒绝: '+(d.ground_reasons[fi]||'—')+'\\n未观测旋转边: '+d.rotation_missing[fi];window.viewerAudit.frame=fi;")
+    if metadata.get('cold_start'):
+        detector_label = 'PMPose' if metadata.get('detector') == 'pmpose' else 'Sapiens2'
+        page = page.replace('SMPL-H 固定手部约束拟合', detector_label)
+        page = page.replace('腕偏差 左/右', '腕偏差（左/右）')
+        page = page.replace('project([-6,-6,0]),project([6,-6,0]),project([6,6,0]),project([-6,6,0])',
+                            'project([-2.5,-2.5,0]),project([2.5,-2.5,0]),project([2.5,2.5,0]),project([-2.5,2.5,0])')
+        page = page.replace("for(let k=-6;k<=6;k++){seg([k,-6,0],[k,6,0],'#b9c8c0',1);seg([-6,k,0],[6,k,0],'#b9c8c0',1)}",
+                            "for(let k=-2.5;k<=2.5;k+=.5){seg([k,-2.5,0],[k,2.5,0],'#b9c8c0',1);seg([-2.5,k,0],[2.5,k,0],'#b9c8c0',1)}")
+        page = simplify_cold_viewer_text(page, detector_label, n)
+    return page
+
+
 def main():
     p = argparse.ArgumentParser()
     for name in ("result", "scene", "surface-sets", "geometry-audit", "output"):
@@ -199,67 +267,7 @@ def main():
         data['wrist_mm'] = (np.linalg.norm(r['wrist_walker_m']-wrist_target,axis=-1)*1000).tolist()
     else:
         data['wrist_mm'] = [[None, None] for _ in range(n)]
-    page = PAGE.replace('DATA', json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(",", ":")))
-    notes = "助步器采用静态安装参考，未认证本次机位的实物对齐。"
-    if metadata.get("hand_position_source") == "body_fit_native_finger_rotation_only":
-        notes += "腕位置由身体拟合得到；WiLoR仅约束手指旋转。"
-    page = page.replace('<section><h2>操作</h2>', '<section><h2>参考来源</h2><p>'+notes+'</p></section><section><h2>操作</h2>')
-    page = page.replace('<button id="play" class="play">播放</button>', '<button id="play" class="play">播放</button><select id="rate" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>')
-    page = page.replace('t-lastT>33', "t-lastT>=1000/(30*Number(document.getElementById('rate').value))")
-    page = page.replace('pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))', 'pitch+=dy*.007')
-    page = page.replace('<title>SMPL surface contact Canvas viewer</title>', '<title>SMPL-H 固定手部约束拟合</title>')
-    page = page.replace('.metrics div{display:flex;', '.metrics div{display:flex;gap:8px;')
-    page = page.replace('.metrics dt{color:#65737d}', '.metrics dt{color:#65737d;flex:0 0 90px}')
-    page = page.replace('.metrics dd{margin:0;text-align:right}', '.metrics dd{margin:0;text-align:right;min-width:0;overflow-wrap:anywhere}')
-    page = page.replace('zoom=1.0', 'zoom=.65').replace('zoom=1;', 'zoom=.65;')
-    # One fixed viewing center for the entire sequence. Camera framing only:
-    # never recenter per frame, or apparent world motion would be hidden.
-    center = np.median(cg[:, [11, 12], :2].reshape(-1, 2), axis=0)
-    center[1] *= -1  # project() receives the common [X,-Y,Z] display map.
-    page = page.replace('let x=p[0]*cy-p[1]*sy,y=p[0]*sy+p[1]*cy,z=p[2];',
-        f'const px=p[0]-({center[0]:.9g}),py=p[1]-({center[1]:.9g});let x=px*cy-py*sy,y=px*sy+py*cy,z=p[2];')
-    page = page.replace('const sideX=-3.8;', 'const sideX=-1.8;')
-    page = page.replace('窗口 60..90 · 31 帧 · 无外部库', f'第{ids[0]}..{ids[-1]}帧 · {n}帧 · 6890顶点 / 13776真实三角面 · 本次重放')
-    page = page.replace('male SMPL 表面手脚接触拟合', 'SMPL-H 固定手部约束拟合')
-    page = page.replace('min="0" max="30"', f'min="0" max="{n-1}"')
-    page = page.replace('手部 surface 中位', '双手几何状态').replace('脚部 surface 中位', '脚底最低高度')
-    page = page.replace('COCO 3D 误差', '身体观测残差')
-    page = page.replace('<dl class="metrics">', '<dl class="metrics"><div><dt>腕偏差 左/右</dt><dd id="wrist">—</dd></div>')
-    page = page.replace("(d.hm[fi]===null?'—':(d.hm[fi]*1000).toFixed(1)+' mm')", "d.hand_state[fi].join(' / ')")
-    page = page.replace("unpack(d.a)]).then(([v,w,t,he,c,ankle])", "unpack(d.a),unpack(d.j)]).then(([v,w,t,he,c,ankle,model])")
-    page = page.replace('const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;', 'const N=d.n,NV=d.nv,faces=d.faces,si=d.si,pi=d.pi,WN=d.wn.length,av=d.av;const E=[[0,1],[0,2],[1,3],[2,4],[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];window.viewerAudit={vertices:NV,faces:faces.length,indexEntries:faces.length*3,frames:N,displayMap:"X,-Y,Z",sceneFresh:true};')
-    marker = "if(document.getElementById('walker').checked){"
-    overlay = """for(const e of E){const[a,b]=e,A=[t[fi*51+a*3],-t[fi*51+a*3+1],t[fi*51+a*3+2]],B=[t[fi*51+b*3],-t[fi*51+b*3+1],t[fi*51+b*3+2]];if(A.every(Number.isFinite)&&B.every(Number.isFinite)){ctx.setLineDash([]);seg(A,B,'#000000',1.5);ctx.setLineDash([])}}for(let k=0;k<17;k++)dot([model[fi*51+k*3],-model[fi*51+k*3+1],model[fi*51+k*3+2]],'#1678bc',2);seg([c[fi*6],-c[fi*6+1],c[fi*6+2]],[c[fi*6+3],-c[fi*6+4],c[fi*6+5]],'#4b555d',1.5);"""
-    # Canvas follows the project's render order: solid walker, raw points,
-    # translucent real mesh, observation bones, model COCO points. Keep the
-    # reusable template but relocate its mesh block rather than redraw a proxy.
-    mesh_start = page.index("if(document.getElementById('mesh').checked){")
-    mesh_end = page.index("if(document.getElementById('contact').checked){", mesh_start)
-    mesh_block = page[mesh_start:mesh_end]
-    page = page[:mesh_start]+page[mesh_end:]
-    contact_start = page.index("if(document.getElementById('contact').checked){")
-    contact_end = page.index(marker,contact_start)
-    contact_block = page[contact_start:contact_end]
-    page = page[:contact_start]+page[contact_end:]
-    page = page.replace("document.getElementById('stage').textContent=d.stage[fi];", mesh_block+contact_block+overlay+"document.getElementById('stage').textContent=d.stage[fi];")
-    page = page.replace("p[2]<0?4.5:3.0", "p[2]<0?1.2:1.0")
-    ticks = """for(let u=0;u<=4.5;u+=.5){for(const P of [[u,0,0],[0,u,0]]){const q=project(P);ctx.fillStyle='#27332d';ctx.font='12px sans-serif';ctx.fillText(u.toFixed(1)+'m',q[0]+3,q[1]-3)}}"""
-    page = page.replace("if(document.getElementById('trails').checked){", ticks + "if(document.getElementById('trails').checked){")
-    page = page.replace("pitch=Math.max(-1.48,Math.min(1.48,pitch+dy*.007))", "pitch+=dy*.007")
-    page = page.replace("document.getElementById('pose').textContent=d.pose[fi];", "document.getElementById('pose').textContent=d.pose[fi];document.getElementById('qa').textContent='回投median L/R: '+d.reprojection[fi].map(x=>x.toFixed(1)).join('/')+' px\\n严格accepted: '+d.acc.slice(fi*17,fi*17+17).filter(Boolean).length+'/17；拟合候选: '+d.fit_acc[fi].filter(Boolean).length+'/17\\n拒绝原因: '+d.reject_reasons[fi].map((x,i)=>x===null?'':i+':'+x).filter(Boolean).join(';');window.viewerAudit.frame=fi;")
-    page = page.replace("window.viewerAudit.frame=fi;", "window.viewerAudit.frame=fi;document.getElementById('wrist').textContent=d.wrist_mm[fi].map(x=>x===null?'—':x.toFixed(1)+' mm').join(' / ');")
-    page = page.replace('<section><h2>操作</h2>', '<section><h2>当前质量与拒绝</h2><pre id="qa" style="white-space:pre-wrap;font-size:12px"></pre></section><section><h2>操作</h2>')
-    page = page.replace(".filter(Boolean).join(';');window.viewerAudit.frame=fi;",
-                        ".filter(Boolean).join(';')+'\\n地面拒绝: '+(d.ground_reasons[fi]||'—')+'\\n未观测旋转边: '+d.rotation_missing[fi];window.viewerAudit.frame=fi;")
-    if metadata.get('cold_start'):
-        detector_label = 'PMPose' if metadata.get('detector') == 'pmpose' else 'Sapiens2'
-        page = page.replace('SMPL-H 固定手部约束拟合', detector_label)
-        page = page.replace('腕偏差 左/右', '腕偏差（左/右）')
-        page = page.replace('project([-6,-6,0]),project([6,-6,0]),project([6,6,0]),project([-6,6,0])',
-                            'project([-2.5,-2.5,0]),project([2.5,-2.5,0]),project([2.5,2.5,0]),project([-2.5,2.5,0])')
-        page = page.replace("for(let k=-6;k<=6;k++){seg([k,-6,0],[k,6,0],'#b9c8c0',1);seg([-6,k,0],[6,k,0],'#b9c8c0',1)}",
-                            "for(let k=-2.5;k<=2.5;k+=.5){seg([k,-2.5,0],[k,2.5,0],'#b9c8c0',1);seg([-2.5,k,0],[2.5,k,0],'#b9c8c0',1)}")
-        page = simplify_cold_viewer_text(page, detector_label, n)
+    page = build_canvas_page(data, vg, cg, metadata)
     a.output.write_text(page, encoding="utf-8")
     joint_audit = {str(j): {"finite": int(np.isfinite(tri[:, j]).all(1).sum()), "strict_accepted": int(strict[:, j].sum()), "finite_rejected": int((np.isfinite(tri[:, j]).all(1) & ~strict[:, j]).sum()), 'rejection_reasons':{str(value):int((reasons[:,j]==value).sum()) for value in set(reasons[:,j]) if value is not None}} for j in range(17)}
     (a.output.parent / "viewer_validation.json").write_text(json.dumps({"status": "file_checks_passed_browser_pending", "vertices": 6890, "faces": 13776, "index_entries": 41328, "frames": n, "joints": joint_audit, "source": str(a.result.resolve()), "scene": str(a.scene.resolve()), "stage_counts": {x: stages.count(x) for x in set(stages)}, "no_display_smoothing": True}, indent=2), encoding="utf-8")
