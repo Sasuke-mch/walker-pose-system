@@ -1,0 +1,84 @@
+{
+  "purpose": "Exact duplicate hard inequalities leave feasible set and optimum unchanged; test whether contact pseudo-observation covariance incorrectly depends on duplication",
+  "method": "existing SurfaceBodyMap, same feasible pose/initial P, no pixels reused (initialize=True), same held successful zero-delta optimizer result, repeat every identical constraint row; no fitted real-accuracy claim",
+  "rows_before_fix": [
+    {
+      "duplicate_copies": 1,
+      "accepted": true,
+      "pose_translation": [
+        0.0,
+        0.0,
+        0.03520000000000004
+      ],
+      "physical_slack_m": [
+        0.00020000000000003609,
+        0.00020000000000003609,
+        0.009799999999999965
+      ],
+      "prior_z_std_mm": 100.0,
+      "posterior_z_std_mm": 0.11941323669803,
+      "posterior_q_logdet": -57.568637204096824
+    },
+    {
+      "duplicate_copies": 2,
+      "accepted": true,
+      "pose_translation": [
+        0.0,
+        0.0,
+        0.03520000000000004
+      ],
+      "physical_slack_m": [
+        0.00020000000000003609,
+        0.00020000000000003609,
+        0.009799999999999965
+      ],
+      "prior_z_std_mm": 100.0,
+      "posterior_z_std_mm": 0.0844382564706022,
+      "posterior_q_logdet": -59.64805289771059
+    },
+    {
+      "duplicate_copies": 10,
+      "accepted": true,
+      "pose_translation": [
+        0.0,
+        0.0,
+        0.03520000000000004
+      ],
+      "physical_slack_m": [
+        0.00020000000000003609,
+        0.00020000000000003609,
+        0.009799999999999965
+      ],
+      "prior_z_std_mm": 100.0,
+      "posterior_z_std_mm": 0.037762060438469705,
+      "posterior_q_logdet": -64.47634595618135
+    }
+  ],
+  "regression_test": "realtime_app/tests/test_smplh_world_motion_tracker.py::WorldMotionTests::test_duplicate_hard_inequalities_do_not_add_independent_covariance_information",
+  "old_code_test_result": "FAILED: initialization incorrectly shrank q covariance despite no new pixel/VPoser information; maximum absolute covariance difference0.12249936",
+  "rows_after_fix": [
+    {
+      "duplicate_copies": 1,
+      "accepted": true,
+      "posterior_z_std_mm": 100.0,
+      "covariance_max_difference_from_prior": 0.0,
+      "contact_covariance_certified": false
+    },
+    {
+      "duplicate_copies": 2,
+      "accepted": true,
+      "posterior_z_std_mm": 100.0,
+      "covariance_max_difference_from_prior": 0.0,
+      "contact_covariance_certified": false
+    },
+    {
+      "duplicate_copies": 10,
+      "accepted": true,
+      "posterior_z_std_mm": 100.0,
+      "covariance_max_difference_from_prior": 0.0,
+      "contact_covariance_certified": false
+    }
+  ],
+  "checks_after_fix": "43 passed,4 subtests passed:world motion tracker+ground constraints+base motion tracker",
+  "limits": "Analytic counterexample proves duplication-dependent covariance information,not actual-sequence improvement or calibrated uncertainty. Real-sequence controlled replay remains separate."
+}

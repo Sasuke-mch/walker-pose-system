@@ -235,5 +235,62 @@
     "browser": "Actual IAB checked variant/frame/view controls, before147 unavailable versus fixed147 recovered, fixed75 feasible_unconverged without derivatives, original61 versus fixed61 foot heights; final fixed61 side-view screenshot saved.",
     "physical_or_independent_world_truth": false,
     "screenshot": "visualization/preview_fixed_frame61.png"
+  },
+  "review_20261016": {
+    "purpose": "Review repaired logic for additional concrete errors;single-variable contact covariance repair first on0..61",
+    "new_findings": [
+      "Hard inequality normals were treated as independent1mm Gaussian observations;posterior depends on repeated equivalent constraints",
+      "Local perspective aim used nonunit rays and focal span around fixed principal point could clip asymmetric support"
+    ],
+    "covariance_prefix_protocol": {
+      "frames": [
+        0,
+        61
+      ],
+      "baseline": "run_contact80_feasible",
+      "candidate": "contact_covariance_prefix.json",
+      "only_change": "Remove active contact inequality pseudo-observations from posterior;hard constraints/80budget/pixels/beta/VPoser/scene unchanged",
+      "baseline_raw_median_px": 21.154024562563357,
+      "baseline_raw_p95_px": 132.19495735088702,
+      "criteria_for_full_replay": "all62 model/contact available;median andp95 each no>5percent regression;35..61 meanankle rise no worse than42.4487293mm",
+      "stop": "If criteria fail retain honest bugfix evidence without repeated weight/budget sweeps;do not call geometric feasibility physical accuracy"
+    },
+    "covariance_prefix_result": {
+      "single_variable": "Remove active hard inequality rows from Gaussian posterior;identical pixels/wholeVPoser/PVA/5mm/10mm/80 budget",
+      "frames": [
+        0,
+        61
+      ],
+      "baseline": "run_contact80_feasible",
+      "status": "completed",
+      "seconds": 151.71783059999996,
+      "raw_median_px": 18.852464355680738,
+      "raw_p95_px": 124.07590198150992,
+      "all_contact": 62,
+      "stage2": 4,
+      "stage2_satisfied": 4,
+      "mean_ankle_35_61_rise_mm": 45.01715302467346,
+      "baseline_metrics": {
+        "raw_median_px": 21.154024562563357,
+        "raw_p95_px": 132.19495735088702,
+        "mean_ankle_35_61_rise_mm": 42.4487293
+      },
+      "checks": {
+        "all62_contact": true,
+        "raw_median_within5percent": true,
+        "raw_p95_within5percent": true,
+        "ankle_rise_no_worse": false
+      },
+      "full448_eligible": false,
+      "decision": "retain mathematical bugfix, but no new full448: pixel consistency improves while Stage1 ankle rise worsens42.449->45.017mm;not a successful stair-motion repair;do not sweep weights or budgets"
+    },
+    "latest_full448_result": "run_contact80_feasible remains latest complete448;new covariance fix evaluated0..61 only and did not qualify for another full replay",
+    "covariance_validation": {
+      "tests": "44 passed and4 subtests;world,ground,base tracker tests",
+      "regressions": "same hard feasible set duplicated1/10 leaves P invariant both initialization and online;online equals independent pixel+VPoser Joseph and retains information shrink",
+      "lint": "uvx --offline ruff E9,F passed",
+      "compile": "world tracker and prefix diagnostic passed",
+      "independent_review": "no blocking error;contact posterior remains uncertified local approximation"
+    }
   }
 }

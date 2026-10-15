@@ -45,6 +45,74 @@ def observe(tr, pose=None):
 
 
 class WorldMotionTests(unittest.TestCase):
+    def test_duplicate_hard_inequalities_do_not_add_independent_covariance_information(self):
+        posteriors = []
+        for copies in (1, 10):
+            tr = world_tracker(contact=True)
+            tr.pose.translation_m[2] -= .0048
+            original_conditions = tr._solver_conditions
+            tr._solver_conditions = lambda geometry, original=original_conditions, copies=copies: np.tile(
+                original(geometry), (1,)*(geometry["sole_min_m"].ndim-1)+(copies,))
+            initial_covariance = tr.covariance.copy()
+            pixels = observe(tr)
+
+            def held_feasible_optimum(fun, initial, **kwargs):
+                delta = np.zeros(tr.n)
+                return SimpleNamespace(x=delta, fun=fun(delta), success=True, status=0,
+                                       message="fixed feasible optimum to isolate covariance", nit=1)
+
+            with patch("pose_app.smplh_world_motion_tracker._minimize_scaled_pose", side_effect=held_feasible_optimum):
+                accepted, _, _ = tr._constrained_update(pixels, np.ones((2, 12), bool),
+                    np.full((2, 12), "available", dtype=object), initialize=True)
+            self.assertTrue(accepted)
+            self.assertGreaterEqual(tr._conditions(tr._geometry(
+                tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0])).min(), 0.)
+            posteriors.append(tr.covariance)
+            # Initialization consumes no new pixels or VPoser prior. A hard
+            # feasible-set boundary has no calibrated independent noise model.
+            np.testing.assert_allclose(tr.covariance, initial_covariance, atol=1e-12)
+            self.assertFalse(tr.contact_diagnostic["contact_covariance_certified"])
+            self.assertEqual(tr.contact_diagnostic["covariance_observation_policy"],
+                             "pixels_and_whole_vposer_only;hard_inequalities_not_independent_observations")
+        np.testing.assert_allclose(posteriors[0], posteriors[1], atol=1e-12)
+
+    def test_online_posterior_uses_pixels_and_vposer_independent_of_hard_constraint_duplicates(self):
+        posteriors = []
+        for copies in (1, 10):
+            tr = world_tracker(contact=True)
+            tr.pose.translation_m[2] -= .0048
+            original_conditions = tr._solver_conditions
+            tr._solver_conditions = lambda geometry, original=original_conditions, copies=copies: np.tile(
+                original(geometry), (1,)*(geometry["sole_min_m"].ndim-1)+(copies,))
+            pixels = observe(tr)
+            P = tr.covariance.copy()
+            pixel_jacobian = tr._linearize()[1]
+            latent_jacobian = np.zeros((tr.n-6, tr.n))
+            latent_jacobian[:, 6:] = np.eye(tr.n-6)
+            Hq = np.r_[pixel_jacobian, latent_jacobian]
+            H = np.c_[Hq, np.zeros((len(Hq), 2*tr.n))]
+            variance = np.r_[np.full(48, tr.config.pixel_sigma_px**2),
+                             np.full(tr.n-6, tr.config.latent_prior_sigma**2)]
+            gain = np.linalg.solve(H @ P @ H.T+np.diag(variance), H @ P).T
+            A = np.eye(3*tr.n)-gain @ H
+            expected = A @ P @ A.T+(gain*variance) @ gain.T
+
+            def held_feasible_optimum(fun, initial, **kwargs):
+                delta = np.zeros(tr.n)
+                return SimpleNamespace(x=delta, fun=fun(delta), success=True, status=0,
+                                       message="fixed feasible optimum to isolate online covariance", nit=1)
+
+            with patch("pose_app.smplh_world_motion_tracker._minimize_scaled_pose", side_effect=held_feasible_optimum):
+                accepted, used, status = tr._constrained_update(pixels, np.ones((2, 12), bool),
+                    np.full((2, 12), "available", dtype=object), initialize=False)
+            self.assertTrue(accepted)
+            self.assertTrue(used.all())
+            self.assertEqual(status, "updated")
+            np.testing.assert_allclose(tr.covariance, expected, atol=1e-12)
+            self.assertLess(np.trace(tr.covariance[:tr.n, :tr.n]), np.trace(P[:tr.n, :tr.n]))
+            posteriors.append(tr.covariance)
+        np.testing.assert_allclose(posteriors[0], posteriors[1], atol=1e-12)
+
     def test_current_support_can_switch_feet_without_extra_upper_bound(self):
         tr = world_tracker(contact=True)
         vertices = tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0].copy()

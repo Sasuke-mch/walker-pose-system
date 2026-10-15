@@ -302,6 +302,8 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             "budget_acceptance_reference": ("known_feasible_start_objective" if np.isfinite(initial_cost)
                 else ("first_feasible_current_frame_estimate" if accepted and not converged else "no_feasible_start_found")),
             "selected_estimate": selected_estimate, "optimizer_last_objective": float(solution.fun),
+            "covariance_observation_policy": "pixels_and_whole_vposer_only;hard_inequalities_not_independent_observations",
+            "contact_covariance_certified": False,
             "optimizer_last_minimum_slack_m": chosen["last_slack"], "optimizer_last_geometry": chosen["last_geometry"],
             "support_selection": "current_pose_sole_minimum", "selected_support_side": chosen["side"],
             "support_extra_solver_calls": len(candidates)-1,
@@ -333,12 +335,16 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
         Hprior = np.zeros((0 if initialize else n-6, n))
         if not initialize:
             Hprior[:, 6:] = np.eye(n-6)
-        solver_slack = self._solver_conditions(val["geometry"])
-        active = solver_slack < .0005
-        Hq = np.r_[J, Hprior, val["condition_jacobian"][active]]
+        # Hard inequalities restrict the optimizer's feasible set; they are not
+        # independent noisy measurements. Appending near-boundary vertex normals
+        # as 1 mm Gaussian rows made P depend on sole sampling density and could
+        # lock subsequent poses to a spuriously certain contact-boundary fit.
+        # This unconstrained local information approximation does not certify a
+        # truncated/contact posterior. Keep the full constraints in the solve.
+        Hq = np.r_[J, Hprior]
         H = np.c_[Hq, np.zeros((len(Hq), 2*n))]
         variance = np.r_[self.config.pixel_sigma_px**2/weights,
-                         np.repeat(self.config.latent_prior_sigma**2, len(Hprior)), np.repeat(.001**2, active.sum())]
+                         np.repeat(self.config.latent_prior_sigma**2, len(Hprior))]
         gain = np.linalg.solve(H @ P @ H.T + np.diag(variance), H @ P).T
         A = np.eye(3*n)-gain @ H
         posterior = A @ P @ A.T + (gain*variance) @ gain.T if converged else P
