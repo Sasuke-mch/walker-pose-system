@@ -1,0 +1,136 @@
+{
+  "status": "completed_engineering_SMPLH_motion_baseline",
+  "frames": 448,
+  "output_model": "SMPLH:6890 vertices,13776 faces,full body pose,root,betas,frozen hand poses",
+  "observation_term": "2d_stereo_pixels_only;no_triangulation_or_3d_position_term",
+  "pose_available_frames": 448,
+  "frame_status_counts": {
+    "initialized": 1,
+    "updated": 447
+  },
+  "joint_status_counts": {
+    "initialized": 12,
+    "updated": 5253,
+    "predicted": 57,
+    "inferred": 54
+  },
+  "view_reason_counts": {
+    "first_frame_initialization_pixels_not_reused": 24,
+    "used_2d_feasible_unconverged": 10506,
+    "stereo_epipolar_rejected": 222
+  },
+  "all_valid_raw_view_reprojection_px": {
+    "count": 10752,
+    "min": 0.1278414989309643,
+    "median": 18.060923216052686,
+    "p95": 95.19756701761276,
+    "max": 227.89254542702562
+  },
+  "used_view_reprojection_px": {
+    "count": 10506,
+    "min": 0.1278414989309643,
+    "median": 17.704473827218823,
+    "p95": 90.0291224684928,
+    "max": 201.96746909120196
+  },
+  "all_raw_view_slots": 10752,
+  "eligible_raw_view_slots": 10752,
+  "eligible_raw_view_slots_with_available_model": 10752,
+  "eligible_raw_view_fit_within25px_slots": 7224,
+  "eligible_raw_view_fit_within25px_rate_including_failures": 0.671875,
+  "update_method": "iterated-map",
+  "iterated_update_status_counts": {
+    "not_run": 1,
+    "feasible_unconverged": 447
+  },
+  "derivative_available_joint_samples": 0,
+  "derivative_reason_counts": {
+    "derivative_warmup": 12,
+    "iterated_map_unconverged": 5364
+  },
+  "update_gain_scale": {
+    "count": 447,
+    "min": 1.0,
+    "median": 1.0,
+    "p95": 1.0,
+    "max": 1.0
+  },
+  "reported_speed_norm_m_s": {
+    "count": 0,
+    "min": null,
+    "median": null,
+    "p95": null,
+    "max": null
+  },
+  "reported_acceleration_norm_m_s2": {
+    "count": 0,
+    "min": null,
+    "median": null,
+    "p95": null,
+    "max": null
+  },
+  "raw_acceleration_norm_m_s2_before_derivative_mask": {
+    "count": 5376,
+    "min": 0.0,
+    "median": 0.09115425122400124,
+    "p95": 1.2908135265194447,
+    "max": 10.13875549011826
+  },
+  "internal_kinematic_limb_length_spread_max_mm": 0.0002624281229546277,
+  "step_ms_model_geometry_state_update_and_derivative_decode": {
+    "count": 448,
+    "min": 210.25530000042636,
+    "median": 636.0085000014806,
+    "p95": 4162.6041650055395,
+    "max": 9624.713700002758
+  },
+  "timestamp_span_s": 16.035239,
+  "dt_s": {
+    "count": 447,
+    "min": 0.0069816000000000045,
+    "median": 0.03976310000000005,
+    "p95": 0.0614030649999998,
+    "max": 0.06950539999999972
+  },
+  "abs_host_return_skew_ms": {
+    "count": 448,
+    "min": 0.094,
+    "median": 3.5254,
+    "p95": 5.974509999999996,
+    "max": 9.2775
+  },
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 0.75,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "coordinate_frame": "current_left_camera",
+  "world_state_available": false,
+  "initialization": "frame0-only pose seed; current frame0 pixels refine pose; calibrated shared shape when explicitly supplied, otherwise seed/refined frame0 shape; no stored3D observations or future poses read",
+  "shape_information": "precalibrated_shared_shape_from_full_sequence",
+  "shape_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\result.npz",
+  "limits": [
+    "No independent metric 3D or derivative truth; pose availability and smoothness are not accuracy.",
+    "Shape from one frame is frozen and can be biased; regressed surface keypoint distances need not be perfectly rigid.",
+    "R/Q and covariance are engineering assumptions; ignored model bias is not covered by covariance.",
+    "Unobserved points may be inferred from the model, but derivatives expire after 0.1s without own pixel support.",
+    "All derivatives include camera motion. No world, Stage or heel contact constraint is estimated.",
+    "Host-return timestamps do not prove exposure times or stereo synchronization.",
+    "Combined model and conservative parameter changes; comparison to free-point tracker is not a single-variable ablation."
+  ]
+}

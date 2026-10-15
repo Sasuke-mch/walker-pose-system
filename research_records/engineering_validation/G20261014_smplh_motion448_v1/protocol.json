@@ -802,5 +802,16 @@
       "near-static local foot rotations may force hip/knee compensation under all-sole10mm"
     ],
     "stopping_boundary": "no full448 rerun;existing views only have corrected observation skeleton,not corrected body trajectories;no promotion or new3D residual"
+  },
+  "motion_observation_20261015": {
+    "protocol": "motion_observation_20261015/protocol.json",
+    "comparison": "motion_observation_20261015/comparison.json",
+    "known_motion": "motion_observation_20261015/known_motion_v1/results.json",
+    "triangulation": "motion_observation_20261015/triangulation_diagnostic.json",
+    "implementation": "realtime_app/pose_app/smplh_iterated_motion_tracker.py",
+    "status": "completed_three_full448_and_known_motion_comparisons;both_MAP_configs_unconverged_not_promoted",
+    "user_constraints": "pixel consistency primary;wholeVPoser only;triangulation diagnostic only;frozen shared beta",
+    "current_decision": "keep EKF default;retain optional pixel-fit MAP candidate and validated support-selection fix;no locally specialized pose priors",
+    "documentation": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section5.9"
   }
 }

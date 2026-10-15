@@ -1,0 +1,256 @@
+{
+  "objective": "Prioritize complete-SMPLH raw stereo2D consistency;retain whole-body VPoser;triangulated points diagnostic only",
+  "authorized_constraints": [
+    "fixed original mainline shared beta",
+    "no joint-specific anatomical priors",
+    "no3D body observation term",
+    "preserve finite raw black observation skeleton",
+    "true nonuniform host-return dt;not exposure synchronization truth"
+  ],
+  "first_stage": "same-prior iterated MAP replaces one-step EKF feedback;single final posterior;no stacked smoother",
+  "comparisons": [
+    {
+      "name": "ekf_sigma15",
+      "update": "ekf",
+      "latent_prior_sigma": 1.5
+    },
+    {
+      "name": "map_sigma15",
+      "update": "iterated-map",
+      "latent_prior_sigma": 1.5
+    },
+    {
+      "name": "map_sigma075",
+      "update": "iterated-map",
+      "latent_prior_sigma": 0.75
+    }
+  ],
+  "real_frame_range": [
+    0,
+    447
+  ],
+  "initial_fit": "../run_calibrated_beta12/first_frame_fit/result.npz",
+  "initialization": "reuse same calibrated-beta frame0-only pose;no repeated500step refinement;manual frame0 pixels not reused in update",
+  "primary_evaluation": "same complete10752 raw view slots;available/finite counts and <=25px fit with failed frames in denominator;per joint and per view median/P95;pose and optimizer failures and runtime",
+  "vposer_weight_selection": "one predeclared4x whole-body prior candidate;not adopt if stereo fit meaningfully worsens;117x is not the chosen weight",
+  "synthetic_protocol": {
+    "role": "known-model,known-shape,known-initial-pose engineering check;truth derivatives evaluation only",
+    "real_model": "same completeSMPLH and COCO regressor,actual fisheye",
+    "motions": "nonquadratic root translation and rotation;body stationary-camera moving,truth derivatives in camera frame",
+    "articulation_limitation": "frozen body local pose in these new analytic derivative clips;does not validate latent articulated dynamics",
+    "frames_each": 64,
+    "dt_pattern_s": [
+      0.025,
+      0.035,
+      0.045,
+      0.03
+    ],
+    "clips": [
+      {
+        "id": "dev_sine0",
+        "split": "development",
+        "motion": "sine",
+        "noise_px": 0,
+        "occlusion": false
+      },
+      {
+        "id": "dev_camera2",
+        "split": "development",
+        "motion": "camera",
+        "noise_px": 2,
+        "occlusion": false
+      },
+      {
+        "id": "held_turn2",
+        "split": "held_out",
+        "motion": "turn",
+        "noise_px": 2,
+        "occlusion": false
+      },
+      {
+        "id": "held_camera8",
+        "split": "held_out",
+        "motion": "camera",
+        "noise_px": 8,
+        "occlusion": false
+      },
+      {
+        "id": "held_sine8_gap",
+        "split": "held_out",
+        "motion": "sine",
+        "noise_px": 8,
+        "occlusion": true
+      },
+      {
+        "id": "held_turn0",
+        "split": "held_out",
+        "motion": "turn",
+        "noise_px": 0,
+        "occlusion": false
+      }
+    ],
+    "truth": "continuous rigidly transformed same-model COCO;analytic first/second derivatives;not tracker central-difference formula",
+    "initial_rates": "tracker v/a zero prior,never supplied generator truth",
+    "metrics": "whole time axis position/velocity/acceleration RMSE,coverage,common available samples,latency/step runtime;after0.3s scored separately"
+  },
+  "stop": "No tuning on held_out;no wider prior sweep beyond one justified revision;no promotion from smoothness or finite values alone;contact branch repaired separately,not mixed into camera-only solver ablation",
+  "research_sources": [
+    "https://users.aalto.fi/~ssarkka/pub/bfs_book_2023_online.pdf",
+    "https://arxiv.org/html/1809.06518v2",
+    "https://users.aalto.fi/~ssarkka/pub/lm-eks-camera.pdf",
+    "https://github.com/nghorbani/human_body_prior/blob/main/human_body_prior/models/vposer_model.py",
+    "https://openaccess.thecvf.com/content/ICCV2021/papers/Rempe_HuMoR_3D_Human_Motion_Model_for_Robust_Pose_Estimation_ICCV_2021_paper.pdf"
+  ],
+  "implementation": {
+    "current_frame_map": "realtime_app/pose_app/smplh_iterated_motion_tracker.py",
+    "known_motion_evaluation": "realtime_app/tools/evaluate_smplh_motion_known_motion.py",
+    "real_runner": "realtime_app/tools/run_smplh_motion_baseline.py",
+    "whole_vposer_only": true,
+    "qva_update": "fixed full predicted P;Cholesky(Pqq) whitening;conditional qva mean;one final covariance only if converged",
+    "contact_support_fix": "current sole minimum;nonStage2 same-prior left/right branches;one posterior;Stage2 same10mm balls",
+    "contact_fix_validation_scope": "14 world tests;two original wrong-support failures and selected-branch false acceptance reproduced first;shared prior tilted-model support switch;not real448 contact validation"
+  },
+  "results": {
+    "real_comparison": "comparison.json",
+    "known_motion": "known_motion_v1/results.json",
+    "triangulation_diagnostic": "triangulation_diagnostic.json",
+    "solver_diagnostic": "lm_damping_frame1_diagnostic.json",
+    "plot": "pixel_comparison.png",
+    "real_runs_complete": {
+      "ekf_sigma15": {
+        "frames": 448,
+        "raw_slots": 10752,
+        "pose_available": 448,
+        "pixel_median": 20.835356542835893,
+        "pixel_p95": 107.05486329314162,
+        "within25px_rate": 0.5842633928571429,
+        "derivatives": 2143,
+        "optimizer_status": {},
+        "step_ms": {
+          "count": 448,
+          "min": 47.187800002575386,
+          "median": 69.07359999968321,
+          "p95": 95.30247500042606,
+          "max": 409.9475999973947
+        }
+      },
+      "map_sigma15": {
+        "frames": 448,
+        "raw_slots": 10752,
+        "pose_available": 448,
+        "pixel_median": 19.147786449205483,
+        "pixel_p95": 80.18426262102219,
+        "within25px_rate": 0.6299293154761905,
+        "derivatives": 0,
+        "optimizer_status": {
+          "not_run": 1,
+          "feasible_unconverged": 447
+        },
+        "step_ms": {
+          "count": 448,
+          "min": 277.69099999568425,
+          "median": 754.7455999956583,
+          "p95": 1404.7466150030214,
+          "max": 6845.939800004999
+        }
+      },
+      "map_sigma075": {
+        "frames": 448,
+        "raw_slots": 10752,
+        "pose_available": 448,
+        "pixel_median": 18.060923216052686,
+        "pixel_p95": 95.19756701761276,
+        "within25px_rate": 0.671875,
+        "derivatives": 0,
+        "optimizer_status": {
+          "not_run": 1,
+          "feasible_unconverged": 447
+        },
+        "step_ms": {
+          "count": 448,
+          "min": 210.25530000042636,
+          "median": 636.0085000014806,
+          "p95": 4162.6041650055395,
+          "max": 9624.713700002758
+        }
+      }
+    },
+    "known_motion_complete": "6 clips x64 frames x3 estimators;2 dev/4 heldout clips;full model fixed local pose;analytic camera-coordinate rigid-motion derivatives;not articulated-trajectory validation",
+    "known_motion_heldout": {
+      "variants": {
+        "ekf_sigma15": {
+          "denominator_joint_samples_after0_3s": 2592,
+          "published_derivative_samples": 2500,
+          "available_pose_joint_samples": 2568,
+          "position_available_norm_rmse_m_units": 0.00522478826889654,
+          "velocity_available_norm_rmse_m_units": 0.04204039129848888,
+          "acceleration_available_norm_rmse_m_units": 0.7341976550619707,
+          "raw_velocity_available_norm_rmse_m_units": 0.051066328258130046,
+          "raw_acceleration_available_norm_rmse_m_units": 0.7465132981324196
+        },
+        "map_sigma15": {
+          "denominator_joint_samples_after0_3s": 2592,
+          "published_derivative_samples": 1224,
+          "available_pose_joint_samples": 2568,
+          "position_available_norm_rmse_m_units": 0.00796035484035057,
+          "velocity_available_norm_rmse_m_units": 0.013711812185649324,
+          "acceleration_available_norm_rmse_m_units": 0.20223786848911446,
+          "raw_velocity_available_norm_rmse_m_units": 0.060754133133723555,
+          "raw_acceleration_available_norm_rmse_m_units": 0.7678634593030732
+        },
+        "map_sigma075": {
+          "denominator_joint_samples_after0_3s": 2592,
+          "published_derivative_samples": 48,
+          "available_pose_joint_samples": 2568,
+          "position_available_norm_rmse_m_units": 0.008961264667506515,
+          "velocity_available_norm_rmse_m_units": 0.006616811834871666,
+          "acceleration_available_norm_rmse_m_units": 0.18941453434765212,
+          "raw_velocity_available_norm_rmse_m_units": 0.10295316035288901,
+          "raw_acceleration_available_norm_rmse_m_units": 0.36949835219428484
+        }
+      },
+      "paired_published": {
+        "ekf_sigma15_vs_map_sigma15": {
+          "common_samples": 1224,
+          "denominator": 2592,
+          "variants": {
+            "ekf_sigma15": {
+              "position": 0.0027598513856876756,
+              "velocity": 0.014350449207144856,
+              "acceleration": 0.2621455060182673
+            },
+            "map_sigma15": {
+              "position": 0.002650645269602079,
+              "velocity": 0.013711812185649324,
+              "acceleration": 0.20223786848911446
+            }
+          }
+        },
+        "map_sigma15_vs_map_sigma075": {
+          "common_samples": 48,
+          "denominator": 2592,
+          "variants": {
+            "map_sigma15": {
+              "position": 0.0018821538589930363,
+              "velocity": 0.00573052948680371,
+              "acceleration": 0.20797651365877534
+            },
+            "map_sigma075": {
+              "position": 0.004650144299849619,
+              "velocity": 0.006616811834871666,
+              "acceleration": 0.18941453434765212
+            }
+          }
+        }
+      }
+    },
+    "selection": "Do not promote either15-iteration MAP configuration. Preserve EKF default. MAP improves real pixel consistency but447/447 updates unconverged and0 published derivatives;stronger prior improves aggregate median but worsens hips/tail and known-motion position.",
+    "bounded_lm_revision": "Only one in-memory frame1 revision;target180.987189->180.992463,gradient6.662946->.846590,still unconverged;not adopted. Original15->60 iterations target180.972782 butstillgradient2.892990;autograd gradient6.653408 agrees with original finite difference6.662946;not solely float32 FD noise.",
+    "unresolved": "model/regressor/detector lowerbody geometry mismatch;reliable fullbody nonlinear convergence;articulated motion and independent-world derivatives;contact repair only targeted tests,not complete real448 contact replay",
+    "validation": "38 targeted tests across base13/world14/iterated8/evaluation3;E9/F lint and Python compilation pass;no browser page regenerated",
+    "stage_decision": "stop this bounded solver/prior experiment;next evidence should resolve observation/model mapping and nonlinear convergence before broader motion model or stronger weights",
+    "strong_whole_vposer_knee_diagnostic": "local knee rotvec x<-5deg counts(left,right):EKF159/101,MAP316/252,strongMAP144/0;not clinical angles or anatomical accuracy"
+  },
+  "completed": true,
+  "comparison_limits": "EKF-to-MAP changes nonlinear solver AND replaces shared correction cap with nonlinear line search;not an isolated iteration-count ablation. MAP sigma1.5-to.75 changes whole-VPoser prior strength only."
+}

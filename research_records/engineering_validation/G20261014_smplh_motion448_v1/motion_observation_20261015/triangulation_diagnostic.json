@@ -1,0 +1,3772 @@
+{
+  "objective": "Diagnostic only: distinguish bilateral pixel incompatibility from shared full-body fit limitations;no optimization input change",
+  "inputs": {
+    "run_parameters": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_calibrated_beta12\\run_parameters.json",
+    "model_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_calibrated_beta12\\result.npz",
+    "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_latent_cap12\\view_v2\\scene\\scene_transforms.npz",
+    "triangulated_array": "detector_only_triangulated_points_mm;current left-camera millimetres",
+    "strict_records": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_latent_cap12\\view\\first_instance_strict.jsonl",
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "calibration": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results\\stereo_fisheye.json"
+  },
+  "frame0_policy": "All448 comparison uses original automatic pixels for BOTH methods. Saved model frame0 initialized with manual replacement of some pixels;frame0 actual fitting residual separately preserved. Automatic447 removes this source switch without hiding full448.",
+  "boundaries": [
+    "Free triangulated points are an operational reprojection reference,not true3D and not a rigorous global lower bound in distorted pixel metric.",
+    "No strict/positive-depth/reprojection-error subset selected for main statistics. Missing/out-of-bounds/negative-depth counts remain explicit.",
+    "Heads0..4 not optimized by current tracker;body12 joints5..16 primary.",
+    "Triangle points remain diagnostic only;no model or parameters modified."
+  ],
+  "sources": [
+    "realtime_app/pose_app/body_observations.py:raw_side/raw_triangulate",
+    "realtime_app/pose_app/fisheye_camera.py:fisheye_project_numpy",
+    "realtime_app/pose_app/smplh_motion_tracker.py:_supported_pixels",
+    "realtime_app/walker_tools/scene/replay_fitted_body_scene.py:left_points/right_points.astype(float32) scene contract"
+  ],
+  "checks": {
+    "stored_scene_tri_equals_current_same_input_float32_scene_triangulation": true,
+    "scene_input_float_policy": "raw float64 reader points cast float32 by original scene replay;diagnostic residuals against unrounded raw detector pixels",
+    "model_reprojection_vs_record_auto447_max_px": 4.369837824924616e-13,
+    "frames": 448,
+    "optimized12_view_slots": 10752,
+    "all17_point_slots": 7616,
+    "tri_finite_all17": 7534,
+    "strict_accepted_all17": 5286
+  },
+  "all448": {
+    "all_coco17_views": {
+      "triangulated": {
+        "slots": 15232,
+        "finite": 15068,
+        "missing_or_nonfinite": 164,
+        "median": 6.329190346837348,
+        "p95": 23.875434278856744,
+        "max": 91.94643900689908,
+        "at_most_25px_count": 14385,
+        "at_most_25px_fraction_complete_denominator": 0.9443933823529411
+      },
+      "model": {
+        "slots": 15232,
+        "finite": 15232,
+        "missing_or_nonfinite": 0,
+        "median": 24.8175068711036,
+        "p95": 92.76125100876479,
+        "max": 216.9883250598067,
+        "at_most_25px_count": 7663,
+        "at_most_25px_fraction_complete_denominator": 0.5030856092436975
+      }
+    },
+    "optimized12_views": {
+      "triangulated": {
+        "slots": 10752,
+        "finite": 10752,
+        "missing_or_nonfinite": 0,
+        "median": 6.105884795480451,
+        "p95": 21.230224987859053,
+        "max": 91.94643900689908,
+        "at_most_25px_count": 10406,
+        "at_most_25px_fraction_complete_denominator": 0.9678199404761905
+      },
+      "model": {
+        "slots": 10752,
+        "finite": 10752,
+        "missing_or_nonfinite": 0,
+        "median": 19.841802506695153,
+        "p95": 110.56879785086026,
+        "max": 216.9883250598067,
+        "at_most_25px_count": 6529,
+        "at_most_25px_fraction_complete_denominator": 0.6072358630952381
+      }
+    },
+    "joints": {
+      "nose": {
+        "coco17_index": 0,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 7.712014205374286,
+          "p95": 30.512557735566816,
+          "max": 56.62843559012933,
+          "at_most_25px_count": 796,
+          "at_most_25px_fraction_complete_denominator": 0.8883928571428571
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 41.741403011501205,
+          "p95": 81.81009236048935,
+          "max": 113.18524430769409,
+          "at_most_25px_count": 168,
+          "at_most_25px_fraction_complete_denominator": 0.1875
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 8.276236429938098,
+            "p95": 33.58003409572925,
+            "max": 56.62843559012933,
+            "at_most_25px_count": 383,
+            "at_most_25px_fraction_complete_denominator": 0.8549107142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 46.74660333887902,
+            "p95": 87.60111431054358,
+            "max": 113.18524430769409,
+            "at_most_25px_count": 46,
+            "at_most_25px_fraction_complete_denominator": 0.10267857142857142
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 7.266701168084881,
+            "p95": 28.320717491997247,
+            "max": 48.22612771857378,
+            "at_most_25px_count": 413,
+            "at_most_25px_fraction_complete_denominator": 0.921875
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 36.037279553690354,
+            "p95": 73.69638500342576,
+            "max": 103.35627124498592,
+            "at_most_25px_count": 122,
+            "at_most_25px_fraction_complete_denominator": 0.27232142857142855
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 32.56062281337782,
+          "p95": 71.69246067209288,
+          "max": 84.73347818142685
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 6.081021450546434,
+          "p95": 24.472360323793172,
+          "max": 53.787271591775024
+        },
+        "epipolar_rejected_pair_count": 8,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 191,
+          "accepted": 256,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_eye": {
+        "coco17_index": 1,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 866,
+          "missing_or_nonfinite": 30,
+          "median": 8.010351123130025,
+          "p95": 31.127784153156284,
+          "max": 55.50885512917445,
+          "at_most_25px_count": 762,
+          "at_most_25px_fraction_complete_denominator": 0.8504464285714286
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 28.751100140360617,
+          "p95": 59.72484256049941,
+          "max": 86.69454726517422,
+          "at_most_25px_count": 389,
+          "at_most_25px_fraction_complete_denominator": 0.4341517857142857
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 433,
+            "missing_or_nonfinite": 15,
+            "median": 9.253036382231306,
+            "p95": 35.742165823909986,
+            "max": 55.50885512917445,
+            "at_most_25px_count": 362,
+            "at_most_25px_fraction_complete_denominator": 0.8080357142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 31.93241821012441,
+            "p95": 64.80914633352464,
+            "max": 86.69454726517422,
+            "at_most_25px_count": 170,
+            "at_most_25px_fraction_complete_denominator": 0.3794642857142857
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 433,
+            "missing_or_nonfinite": 15,
+            "median": 7.163625127675251,
+            "p95": 27.603422762446503,
+            "max": 44.72316677783102,
+            "at_most_25px_count": 400,
+            "at_most_25px_fraction_complete_denominator": 0.8928571428571429
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 25.445154214324635,
+            "p95": 55.32237185251078,
+            "max": 66.84891709490095,
+            "at_most_25px_count": 219,
+            "at_most_25px_fraction_complete_denominator": 0.4888392857142857
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 433,
+          "missing_or_nonfinite": 15,
+          "median": 19.827856402453,
+          "p95": 48.8156432627146,
+          "max": 58.235393486851656
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 433,
+          "missing_or_nonfinite": 15,
+          "median": 5.942697609099422,
+          "p95": 23.086327630219138,
+          "max": 49.50276771578268
+        },
+        "epipolar_rejected_pair_count": 5,
+        "triangulation_finite_count": 433,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 433,
+          "out_of_raw_image_bounds": 15
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 186,
+          "accepted": 244,
+          "out_of_raw_image_bounds": 17,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 15,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_eye": {
+        "coco17_index": 2,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 878,
+          "missing_or_nonfinite": 18,
+          "median": 9.030003776173729,
+          "p95": 32.02062353221721,
+          "max": 55.69471982459899,
+          "at_most_25px_count": 758,
+          "at_most_25px_fraction_complete_denominator": 0.8459821428571429
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 27.540276716334077,
+          "p95": 59.136349292958386,
+          "max": 77.25312032042031,
+          "at_most_25px_count": 403,
+          "at_most_25px_fraction_complete_denominator": 0.4497767857142857
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 439,
+            "missing_or_nonfinite": 9,
+            "median": 9.17779841331905,
+            "p95": 34.002060046275005,
+            "max": 55.69471982459899,
+            "at_most_25px_count": 375,
+            "at_most_25px_fraction_complete_denominator": 0.8370535714285714
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 35.77246193306312,
+            "p95": 62.52139851024581,
+            "max": 77.25312032042031,
+            "at_most_25px_count": 163,
+            "at_most_25px_fraction_complete_denominator": 0.3638392857142857
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 439,
+            "missing_or_nonfinite": 9,
+            "median": 8.714129088938842,
+            "p95": 31.046101862710984,
+            "max": 52.147265245244775,
+            "at_most_25px_count": 383,
+            "at_most_25px_fraction_complete_denominator": 0.8549107142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 23.87085289526143,
+            "p95": 52.533964820890944,
+            "max": 73.07214597696564,
+            "at_most_25px_count": 240,
+            "at_most_25px_fraction_complete_denominator": 0.5357142857142857
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 439,
+          "missing_or_nonfinite": 9,
+          "median": 18.28704230102345,
+          "p95": 44.57975361959931,
+          "max": 60.2197368040003
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 439,
+          "missing_or_nonfinite": 9,
+          "median": 6.548174934567779,
+          "p95": 24.58256396069061,
+          "max": 51.19606268663258
+        },
+        "epipolar_rejected_pair_count": 5,
+        "triangulation_finite_count": 439,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 439,
+          "out_of_raw_image_bounds": 9
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 204,
+          "accepted": 234,
+          "out_of_raw_image_bounds": 9,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 9,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_ear": {
+        "coco17_index": 3,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 780,
+          "missing_or_nonfinite": 116,
+          "median": 5.775653024023395,
+          "p95": 16.543841834744192,
+          "max": 33.0455392203865,
+          "at_most_25px_count": 775,
+          "at_most_25px_fraction_complete_denominator": 0.8649553571428571
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 41.61761289298015,
+          "p95": 73.3155482260409,
+          "max": 87.89954125551708,
+          "at_most_25px_count": 89,
+          "at_most_25px_fraction_complete_denominator": 0.09933035714285714
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 390,
+            "missing_or_nonfinite": 58,
+            "median": 7.030449808074589,
+            "p95": 18.89121278797507,
+            "max": 33.0455392203865,
+            "at_most_25px_count": 385,
+            "at_most_25px_fraction_complete_denominator": 0.859375
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 36.92061393865916,
+            "p95": 67.45858449315028,
+            "max": 83.96169164879404,
+            "at_most_25px_count": 74,
+            "at_most_25px_fraction_complete_denominator": 0.16517857142857142
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 390,
+            "missing_or_nonfinite": 58,
+            "median": 4.686596958810272,
+            "p95": 12.831096359423183,
+            "max": 22.288131488061683,
+            "at_most_25px_count": 390,
+            "at_most_25px_fraction_complete_denominator": 0.8705357142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 44.15709994708817,
+            "p95": 75.33656783032193,
+            "max": 87.89954125551708,
+            "at_most_25px_count": 15,
+            "at_most_25px_fraction_complete_denominator": 0.033482142857142856
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 390,
+          "missing_or_nonfinite": 58,
+          "median": 33.0148452041379,
+          "p95": 68.71725930799914,
+          "max": 81.61754782177108
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 390,
+          "missing_or_nonfinite": 58,
+          "median": 4.975435939482413,
+          "p95": 12.029440507811277,
+          "max": 24.92945499932928
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 390,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 390,
+          "out_of_raw_image_bounds": 58
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 95,
+          "accepted": 295,
+          "out_of_raw_image_bounds": 57,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 58,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_ear": {
+        "coco17_index": 4,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 5.003402075821391,
+          "p95": 16.83923187747524,
+          "max": 28.426542726905744,
+          "at_most_25px_count": 888,
+          "at_most_25px_fraction_complete_denominator": 0.9910714285714286
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 43.180856121486286,
+          "p95": 85.67600064058612,
+          "max": 111.05577464705785,
+          "at_most_25px_count": 85,
+          "at_most_25px_fraction_complete_denominator": 0.09486607142857142
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 4.83289434795449,
+            "p95": 16.747036585844885,
+            "max": 28.097237866285308,
+            "at_most_25px_count": 444,
+            "at_most_25px_fraction_complete_denominator": 0.9910714285714286
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 50.520698861343796,
+            "p95": 93.19419701466856,
+            "max": 111.05577464705785,
+            "at_most_25px_count": 23,
+            "at_most_25px_fraction_complete_denominator": 0.05133928571428571
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 5.325407126969083,
+            "p95": 17.312456768984312,
+            "max": 28.426542726905744,
+            "at_most_25px_count": 444,
+            "at_most_25px_fraction_complete_denominator": 0.9910714285714286
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 37.042194248816365,
+            "p95": 66.55445763297298,
+            "max": 82.5935253949884,
+            "at_most_25px_count": 62,
+            "at_most_25px_fraction_complete_denominator": 0.13839285714285715
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 37.215173301189935,
+          "p95": 76.79229233410659,
+          "max": 94.33511545997415
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 3.8471499529576847,
+          "p95": 12.476722810463691,
+          "max": 27.6287766250359
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 356,
+          "high_reprojection_error": 91,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_shoulder": {
+        "coco17_index": 5,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 4.964621217938123,
+          "p95": 28.932073785501537,
+          "max": 52.39867073264623,
+          "at_most_25px_count": 837,
+          "at_most_25px_fraction_complete_denominator": 0.9341517857142857
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 23.61028412534077,
+          "p95": 42.277047379448675,
+          "max": 56.95111699002216,
+          "at_most_25px_count": 484,
+          "at_most_25px_fraction_complete_denominator": 0.5401785714285714
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 6.29742006617676,
+            "p95": 34.787555335406694,
+            "max": 52.39867073264623,
+            "at_most_25px_count": 389,
+            "at_most_25px_fraction_complete_denominator": 0.8683035714285714
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 21.297127084042273,
+            "p95": 43.791194734439685,
+            "max": 56.95111699002216,
+            "at_most_25px_count": 270,
+            "at_most_25px_fraction_complete_denominator": 0.6026785714285714
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 3.8802371706089813,
+            "p95": 17.177337733333772,
+            "max": 22.806441997714387,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 25.445933478477087,
+            "p95": 39.488209105384975,
+            "max": 48.69491137109129,
+            "at_most_25px_count": 214,
+            "at_most_25px_fraction_complete_denominator": 0.47767857142857145
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 17.36117081585227,
+          "p95": 28.690530767476506,
+          "max": 35.92493143353005
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 6.047865851405411,
+          "p95": 26.417619452048633,
+          "max": 35.443654883402935
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 300,
+          "high_reprojection_error": 147,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_shoulder": {
+        "coco17_index": 6,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 3.921804160132729,
+          "p95": 11.21027017160426,
+          "max": 20.393033888694255,
+          "at_most_25px_count": 896,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 23.298583770753197,
+          "p95": 51.79669672831627,
+          "max": 71.10394925461415,
+          "at_most_25px_count": 503,
+          "at_most_25px_fraction_complete_denominator": 0.5613839285714286
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 3.395212512831739,
+            "p95": 9.46699049689097,
+            "max": 14.595935428093453,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 34.68480978964065,
+            "p95": 57.029201487732,
+            "max": 71.10394925461415,
+            "at_most_25px_count": 122,
+            "at_most_25px_fraction_complete_denominator": 0.27232142857142855
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 4.347699572572736,
+            "p95": 12.07761608128039,
+            "max": 20.393033888694255,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 14.380186383212,
+            "p95": 29.01330541011193,
+            "max": 33.982295442023094,
+            "at_most_25px_count": 381,
+            "at_most_25px_fraction_complete_denominator": 0.8504464285714286
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 20.044992939969962,
+          "p95": 30.992591133826977,
+          "max": 36.82882219611644
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 4.598771241620536,
+          "p95": 11.900328735386381,
+          "max": 20.702593239522077
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 414,
+          "high_reprojection_error": 33,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_elbow": {
+        "coco17_index": 7,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 7.424509267562973,
+          "p95": 31.43244621897153,
+          "max": 91.94643900689908,
+          "at_most_25px_count": 810,
+          "at_most_25px_fraction_complete_denominator": 0.9040178571428571
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 18.08438897299905,
+          "p95": 51.50728060395491,
+          "max": 109.87332094974352,
+          "at_most_25px_count": 634,
+          "at_most_25px_fraction_complete_denominator": 0.7075892857142857
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 10.466408088271997,
+            "p95": 44.01915835155677,
+            "max": 91.94643900689908,
+            "at_most_25px_count": 380,
+            "at_most_25px_fraction_complete_denominator": 0.8482142857142857
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 16.595003147181224,
+            "p95": 62.47442437233105,
+            "max": 109.87332094974352,
+            "at_most_25px_count": 320,
+            "at_most_25px_fraction_complete_denominator": 0.7142857142857143
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 5.621259989057158,
+            "p95": 21.30679543552078,
+            "max": 41.487083886995286,
+            "at_most_25px_count": 430,
+            "at_most_25px_fraction_complete_denominator": 0.9598214285714286
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 18.989449203143145,
+            "p95": 41.88226423103339,
+            "max": 102.30997112418295,
+            "at_most_25px_count": 314,
+            "at_most_25px_fraction_complete_denominator": 0.7008928571428571
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 9.551134668043947,
+          "p95": 31.15390936024145,
+          "max": 72.41788921283114
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 9.191756053713263,
+          "p95": 37.590249575267514,
+          "max": 76.19102722900433
+        },
+        "epipolar_rejected_pair_count": 23,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 182,
+          "accepted": 265,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_elbow": {
+        "coco17_index": 8,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 6.0608907361065185,
+          "p95": 13.317248604374385,
+          "max": 21.192075328794743,
+          "at_most_25px_count": 896,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 15.125598223783978,
+          "p95": 37.908729385918946,
+          "max": 56.00868642082541,
+          "at_most_25px_count": 740,
+          "at_most_25px_fraction_complete_denominator": 0.8258928571428571
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 4.915362165233544,
+            "p95": 10.306675695769696,
+            "max": 14.503354924350843,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 14.128599608567015,
+            "p95": 28.855915521975383,
+            "max": 49.0446632751514,
+            "at_most_25px_count": 397,
+            "at_most_25px_fraction_complete_denominator": 0.8861607142857143
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 7.2367344797734745,
+            "p95": 14.849659360662217,
+            "max": 21.192075328794743,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 16.85193968502785,
+            "p95": 45.70100287421982,
+            "max": 56.00868642082541,
+            "at_most_25px_count": 343,
+            "at_most_25px_fraction_complete_denominator": 0.765625
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 9.889927950851401,
+          "p95": 22.765358269675286,
+          "max": 30.587519818378436
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 7.157322765348708,
+          "p95": 14.845022696019424,
+          "max": 20.633230175289697
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 377,
+          "high_reprojection_error": 70,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_wrist": {
+        "coco17_index": 9,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 7.560702579348112,
+          "p95": 20.90077153863413,
+          "max": 36.68745476932342,
+          "at_most_25px_count": 872,
+          "at_most_25px_fraction_complete_denominator": 0.9732142857142857
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 16.779509198574218,
+          "p95": 41.141545107690895,
+          "max": 69.81074819131557,
+          "at_most_25px_count": 659,
+          "at_most_25px_fraction_complete_denominator": 0.7354910714285714
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 10.356973943638948,
+            "p95": 25.3301909132882,
+            "max": 36.68745476932342,
+            "at_most_25px_count": 424,
+            "at_most_25px_fraction_complete_denominator": 0.9464285714285714
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 14.690864894559361,
+            "p95": 39.67493283253028,
+            "max": 69.81074819131557,
+            "at_most_25px_count": 357,
+            "at_most_25px_fraction_complete_denominator": 0.796875
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 5.557494402044726,
+            "p95": 13.128409512450906,
+            "max": 18.595659973258453,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 19.22719040819552,
+            "p95": 43.71557853074394,
+            "max": 67.51431785349301,
+            "at_most_25px_count": 302,
+            "at_most_25px_fraction_complete_denominator": 0.6741071428571429
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 9.017623022810843,
+          "p95": 28.139000564665693,
+          "max": 52.54973330982105
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 8.97053313338657,
+          "p95": 21.723313181791372,
+          "max": 31.28506112187021
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 167,
+          "accepted": 278,
+          "association_failed": 1,
+          "low_2d_score": 2
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_wrist": {
+        "coco17_index": 10,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 3.4890446993247104,
+          "p95": 10.575756109733103,
+          "max": 18.050342109876546,
+          "at_most_25px_count": 896,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 14.964029442432405,
+          "p95": 38.37974534872429,
+          "max": 90.02428663535021,
+          "at_most_25px_count": 735,
+          "at_most_25px_fraction_complete_denominator": 0.8203125
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 2.7359893677917277,
+            "p95": 7.086179775045365,
+            "max": 10.063944826258831,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 17.8415627402865,
+            "p95": 38.53881788277289,
+            "max": 90.02428663535021,
+            "at_most_25px_count": 336,
+            "at_most_25px_fraction_complete_denominator": 0.75
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 4.6968356106686295,
+            "p95": 12.076889726222737,
+            "max": 18.050342109876546,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 11.431108622723498,
+            "p95": 35.65079623868978,
+            "max": 69.53050709852218,
+            "at_most_25px_count": 399,
+            "at_most_25px_fraction_complete_denominator": 0.890625
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 11.397876127202116,
+          "p95": 27.82566227687796,
+          "max": 68.15625607317395
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 4.227535100981308,
+          "p95": 10.812358658606293,
+          "max": 15.686988415273145
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 430,
+          "high_reprojection_error": 17,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_hip": {
+        "coco17_index": 11,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 6.373623812842325,
+          "p95": 16.012388922028055,
+          "max": 33.44319820938637,
+          "at_most_25px_count": 890,
+          "at_most_25px_fraction_complete_denominator": 0.9933035714285714
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 66.81356881828523,
+          "p95": 166.59243683548414,
+          "max": 197.04039680107513,
+          "at_most_25px_count": 91,
+          "at_most_25px_fraction_complete_denominator": 0.1015625
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 6.80446451881216,
+            "p95": 17.472507384414737,
+            "max": 33.44319820938637,
+            "at_most_25px_count": 444,
+            "at_most_25px_fraction_complete_denominator": 0.9910714285714286
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 33.754898980531294,
+            "p95": 65.07290783574513,
+            "max": 80.85803186647684,
+            "at_most_25px_count": 91,
+            "at_most_25px_fraction_complete_denominator": 0.203125
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 6.058353569932729,
+            "p95": 14.728803285924561,
+            "max": 27.43098484261136,
+            "at_most_25px_count": 446,
+            "at_most_25px_fraction_complete_denominator": 0.9955357142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 122.43195507748811,
+            "p95": 179.84326207654186,
+            "max": 197.04039680107513,
+            "at_most_25px_count": 0,
+            "at_most_25px_fraction_complete_denominator": 0.0
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 73.89128300852926,
+          "p95": 105.55057714253203,
+          "max": 121.37814545630714
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 9.184324007988277,
+          "p95": 22.598116032631893,
+          "max": 42.22789834419169
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 326,
+          "high_reprojection_error": 121,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_hip": {
+        "coco17_index": 12,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 6.322777070285113,
+          "p95": 16.83330981441023,
+          "max": 29.792344756233284,
+          "at_most_25px_count": 892,
+          "at_most_25px_fraction_complete_denominator": 0.9955357142857143
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 64.53177209391461,
+          "p95": 170.94963184285828,
+          "max": 216.9883250598067,
+          "at_most_25px_count": 91,
+          "at_most_25px_fraction_complete_denominator": 0.1015625
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 5.938335516830687,
+            "p95": 15.962197953692415,
+            "max": 25.855565898990207,
+            "at_most_25px_count": 446,
+            "at_most_25px_fraction_complete_denominator": 0.9955357142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 114.75984707514083,
+            "p95": 180.91321919968104,
+            "max": 216.9883250598067,
+            "at_most_25px_count": 0,
+            "at_most_25px_fraction_complete_denominator": 0.0
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 6.736857041716464,
+            "p95": 18.612969970529917,
+            "max": 29.792344756233284,
+            "at_most_25px_count": 446,
+            "at_most_25px_fraction_complete_denominator": 0.9955357142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 39.1147013146517,
+            "p95": 62.083722418587406,
+            "max": 82.38983188724441,
+            "at_most_25px_count": 91,
+            "at_most_25px_fraction_complete_denominator": 0.203125
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 68.72939130365408,
+          "p95": 105.0420130351863,
+          "max": 114.82236423361509
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 8.881055019985666,
+          "p95": 24.133485724889276,
+          "max": 38.87712151692846
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 325,
+          "high_reprojection_error": 122,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_knee": {
+        "coco17_index": 13,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 6.321630063384778,
+          "p95": 13.597075095704197,
+          "max": 32.54790904778923,
+          "at_most_25px_count": 890,
+          "at_most_25px_fraction_complete_denominator": 0.9933035714285714
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 20.252467071100174,
+          "p95": 50.37014095478989,
+          "max": 100.27023924569129,
+          "at_most_25px_count": 560,
+          "at_most_25px_fraction_complete_denominator": 0.625
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 6.696946751096913,
+            "p95": 14.018533529560514,
+            "max": 32.54790904778923,
+            "at_most_25px_count": 444,
+            "at_most_25px_fraction_complete_denominator": 0.9910714285714286
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 25.501884592143433,
+            "p95": 58.35696098607307,
+            "max": 100.27023924569129,
+            "at_most_25px_count": 216,
+            "at_most_25px_fraction_complete_denominator": 0.48214285714285715
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 6.025071818956082,
+            "p95": 12.310694990580714,
+            "max": 26.317707213528546,
+            "at_most_25px_count": 446,
+            "at_most_25px_fraction_complete_denominator": 0.9955357142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 16.775637027569644,
+            "p95": 41.05175804794507,
+            "max": 58.279356827592714,
+            "at_most_25px_count": 344,
+            "at_most_25px_fraction_complete_denominator": 0.7678571428571429
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 14.814214344513829,
+          "p95": 40.6780241036871,
+          "max": 66.5662723893712
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 8.875753558805624,
+          "p95": 18.25946111769717,
+          "max": 40.61871222164536
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 356,
+          "high_reprojection_error": 91,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_knee": {
+        "coco17_index": 14,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 15.558329975956102,
+          "p95": 35.121315448006484,
+          "max": 63.29993111768957,
+          "at_most_25px_count": 737,
+          "at_most_25px_fraction_complete_denominator": 0.8225446428571429
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 30.37403228423141,
+          "p95": 86.99864814723267,
+          "max": 127.59198879049428,
+          "at_most_25px_count": 367,
+          "at_most_25px_fraction_complete_denominator": 0.4095982142857143
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 14.350516556885434,
+            "p95": 29.66751363677746,
+            "max": 47.13958019456554,
+            "at_most_25px_count": 393,
+            "at_most_25px_fraction_complete_denominator": 0.8772321428571429
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 18.297568658121598,
+            "p95": 63.10481960075641,
+            "max": 116.32616351016392,
+            "at_most_25px_count": 299,
+            "at_most_25px_fraction_complete_denominator": 0.6674107142857143
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 17.03500090314472,
+            "p95": 37.05971104323785,
+            "max": 63.29993111768957,
+            "at_most_25px_count": 344,
+            "at_most_25px_fraction_complete_denominator": 0.7678571428571429
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 39.54184329565268,
+            "p95": 93.4615523909168,
+            "max": 127.59198879049428,
+            "at_most_25px_count": 68,
+            "at_most_25px_fraction_complete_denominator": 0.15178571428571427
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 13.790907746758043,
+          "p95": 47.52447430181057,
+          "max": 63.48048920407988
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 21.9101680212246,
+          "p95": 46.29736457928671,
+          "max": 75.64884569992873
+        },
+        "epipolar_rejected_pair_count": 80,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 363,
+          "accepted": 84,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_ankle": {
+        "coco17_index": 15,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 6.7535406979136745,
+          "p95": 17.001921547393884,
+          "max": 26.9384394046446,
+          "at_most_25px_count": 894,
+          "at_most_25px_fraction_complete_denominator": 0.9977678571428571
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 10.769922172111634,
+          "p95": 29.977058439049358,
+          "max": 63.5217207799086,
+          "at_most_25px_count": 826,
+          "at_most_25px_fraction_complete_denominator": 0.921875
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 7.4233992369742605,
+            "p95": 17.984000749916184,
+            "max": 26.9384394046446,
+            "at_most_25px_count": 446,
+            "at_most_25px_fraction_complete_denominator": 0.9955357142857143
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 12.006104364673092,
+            "p95": 36.24399226153086,
+            "max": 56.95552570030556,
+            "at_most_25px_count": 393,
+            "at_most_25px_fraction_complete_denominator": 0.8772321428571429
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 6.025010925419837,
+            "p95": 15.321303989554178,
+            "max": 23.84824506993563,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 10.308172509213088,
+            "p95": 22.46466468119427,
+            "max": 63.5217207799086,
+            "at_most_25px_count": 433,
+            "at_most_25px_fraction_complete_denominator": 0.9665178571428571
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 4.136090009101685,
+          "p95": 14.364225238301954,
+          "max": 50.86290747013648
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 7.88797282954226,
+          "p95": 20.238913157223962,
+          "max": 30.475137540748644
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 130,
+          "accepted": 317,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_ankle": {
+        "coco17_index": 16,
+        "frames": 448,
+        "triangulated_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 4.491731143401129,
+          "p95": 10.124120233506613,
+          "max": 17.88344091489313,
+          "at_most_25px_count": 896,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 896,
+          "finite": 896,
+          "missing_or_nonfinite": 0,
+          "median": 10.574351838179538,
+          "p95": 28.705690721296172,
+          "max": 58.40957767826398,
+          "at_most_25px_count": 839,
+          "at_most_25px_fraction_complete_denominator": 0.9363839285714286
+        },
+        "left": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 4.2348505312025075,
+            "p95": 9.16737958128745,
+            "max": 15.219827692385083,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 10.694808393721289,
+            "p95": 25.436096521863305,
+            "max": 58.40957767826398,
+            "at_most_25px_count": 422,
+            "at_most_25px_fraction_complete_denominator": 0.9419642857142857
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 4.696766151028308,
+            "p95": 10.451350425049045,
+            "max": 17.88344091489313,
+            "at_most_25px_count": 448,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 448,
+            "finite": 448,
+            "missing_or_nonfinite": 0,
+            "median": 10.380618677063392,
+            "p95": 29.83120154935783,
+            "max": 48.74062196769982,
+            "at_most_25px_count": 417,
+            "at_most_25px_fraction_complete_denominator": 0.9308035714285714
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 6.053195573472241,
+          "p95": 20.370864448885072,
+          "max": 45.81419158022982
+        },
+        "sampson_px": {
+          "slots": 448,
+          "finite": 448,
+          "missing_or_nonfinite": 0,
+          "median": 5.618605337688386,
+          "p95": 12.52179150746343,
+          "max": 19.979569009151888
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 448,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 448
+        },
+        "strict_reason_counts": {
+          "accepted": 429,
+          "high_reprojection_error": 18,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      }
+    }
+  },
+  "automatic447": {
+    "all_coco17_views": {
+      "triangulated": {
+        "slots": 15198,
+        "finite": 15034,
+        "missing_or_nonfinite": 164,
+        "median": 6.3251769361158,
+        "p95": 23.85776129305798,
+        "max": 91.94643900689908,
+        "at_most_25px_count": 14354,
+        "at_most_25px_fraction_complete_denominator": 0.9444663771548888
+      },
+      "model": {
+        "slots": 15198,
+        "finite": 15198,
+        "missing_or_nonfinite": 0,
+        "median": 24.81477011970998,
+        "p95": 92.72301357926962,
+        "max": 216.9883250598067,
+        "at_most_25px_count": 7646,
+        "at_most_25px_fraction_complete_denominator": 0.5030925121726543
+      }
+    },
+    "optimized12_views": {
+      "triangulated": {
+        "slots": 10728,
+        "finite": 10728,
+        "missing_or_nonfinite": 0,
+        "median": 6.104307581989713,
+        "p95": 21.22815010725916,
+        "max": 91.94643900689908,
+        "at_most_25px_count": 10384,
+        "at_most_25px_fraction_complete_denominator": 0.9679343773303505
+      },
+      "model": {
+        "slots": 10728,
+        "finite": 10728,
+        "missing_or_nonfinite": 0,
+        "median": 19.817355459307567,
+        "p95": 110.40280196323475,
+        "max": 216.9883250598067,
+        "at_most_25px_count": 6518,
+        "at_most_25px_fraction_complete_denominator": 0.6075689783743475
+      }
+    },
+    "joints": {
+      "nose": {
+        "coco17_index": 0,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 7.688430170669088,
+          "p95": 30.517345467615044,
+          "max": 56.62843559012933,
+          "at_most_25px_count": 794,
+          "at_most_25px_fraction_complete_denominator": 0.8881431767337807
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 41.741403011501205,
+          "p95": 81.81374574266721,
+          "max": 113.18524430769409,
+          "at_most_25px_count": 168,
+          "at_most_25px_fraction_complete_denominator": 0.18791946308724833
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 8.259280905654222,
+            "p95": 33.58938339171263,
+            "max": 56.62843559012933,
+            "at_most_25px_count": 382,
+            "at_most_25px_fraction_complete_denominator": 0.854586129753915
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 46.77034909356563,
+            "p95": 87.60675368801947,
+            "max": 113.18524430769409,
+            "at_most_25px_count": 46,
+            "at_most_25px_fraction_complete_denominator": 0.1029082774049217
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 7.175603929519213,
+            "p95": 28.32786984351073,
+            "max": 48.22612771857378,
+            "at_most_25px_count": 412,
+            "at_most_25px_fraction_complete_denominator": 0.9217002237136466
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 36.15230438218996,
+            "p95": 73.70955512493533,
+            "max": 103.35627124498592,
+            "at_most_25px_count": 122,
+            "at_most_25px_fraction_complete_denominator": 0.27293064876957496
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 32.56554524215184,
+          "p95": 71.69947350049101,
+          "max": 84.73347818142685
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 6.0445706265092705,
+          "p95": 24.473946422533665,
+          "max": 53.787271591775024
+        },
+        "epipolar_rejected_pair_count": 8,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 190,
+          "accepted": 256,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_eye": {
+        "coco17_index": 1,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 864,
+          "missing_or_nonfinite": 30,
+          "median": 8.000562494645388,
+          "p95": 31.143502498758668,
+          "max": 55.50885512917445,
+          "at_most_25px_count": 761,
+          "at_most_25px_fraction_complete_denominator": 0.8512304250559284
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 28.75959885266475,
+          "p95": 59.74051934936724,
+          "max": 86.69454726517422,
+          "at_most_25px_count": 387,
+          "at_most_25px_fraction_complete_denominator": 0.43288590604026844
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 432,
+            "missing_or_nonfinite": 15,
+            "median": 9.155387594877366,
+            "p95": 35.80137326979963,
+            "max": 55.50885512917445,
+            "at_most_25px_count": 362,
+            "at_most_25px_fraction_complete_denominator": 0.8098434004474273
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 32.03036418786899,
+            "p95": 64.81812928050209,
+            "max": 86.69454726517422,
+            "at_most_25px_count": 169,
+            "at_most_25px_fraction_complete_denominator": 0.378076062639821
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 432,
+            "missing_or_nonfinite": 15,
+            "median": 7.163625127675251,
+            "p95": 27.60607869147684,
+            "max": 44.72316677783102,
+            "at_most_25px_count": 399,
+            "at_most_25px_fraction_complete_denominator": 0.8926174496644296
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 25.61047176444119,
+            "p95": 55.339686018549436,
+            "max": 66.84891709490095,
+            "at_most_25px_count": 218,
+            "at_most_25px_fraction_complete_denominator": 0.48769574944071586
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 432,
+          "missing_or_nonfinite": 15,
+          "median": 19.84097795294832,
+          "p95": 48.822982735292015,
+          "max": 58.235393486851656
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 432,
+          "missing_or_nonfinite": 15,
+          "median": 5.930720244866176,
+          "p95": 23.086327630219138,
+          "max": 49.50276771578268
+        },
+        "epipolar_rejected_pair_count": 5,
+        "triangulation_finite_count": 432,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 432,
+          "out_of_raw_image_bounds": 15
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 185,
+          "accepted": 244,
+          "out_of_raw_image_bounds": 17,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 15,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_eye": {
+        "coco17_index": 2,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 876,
+          "missing_or_nonfinite": 18,
+          "median": 8.934363073683517,
+          "p95": 32.025574289541055,
+          "max": 55.69471982459899,
+          "at_most_25px_count": 756,
+          "at_most_25px_fraction_complete_denominator": 0.8456375838926175
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 27.636188286743916,
+          "p95": 59.150274110111056,
+          "max": 77.25312032042031,
+          "at_most_25px_count": 401,
+          "at_most_25px_fraction_complete_denominator": 0.44854586129753915
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 438,
+            "missing_or_nonfinite": 9,
+            "median": 9.173375179872805,
+            "p95": 34.0021853315568,
+            "max": 55.69471982459899,
+            "at_most_25px_count": 374,
+            "at_most_25px_fraction_complete_denominator": 0.8366890380313199
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 35.84571506246903,
+            "p95": 62.5294954985512,
+            "max": 77.25312032042031,
+            "at_most_25px_count": 162,
+            "at_most_25px_fraction_complete_denominator": 0.3624161073825503
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 438,
+            "missing_or_nonfinite": 9,
+            "median": 8.714129088938842,
+            "p95": 31.051494920473882,
+            "max": 52.147265245244775,
+            "at_most_25px_count": 382,
+            "at_most_25px_fraction_complete_denominator": 0.854586129753915
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 23.889284100785723,
+            "p95": 52.54026940291953,
+            "max": 73.07214597696564,
+            "at_most_25px_count": 239,
+            "at_most_25px_fraction_complete_denominator": 0.5346756152125279
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 438,
+          "missing_or_nonfinite": 9,
+          "median": 18.296741894260656,
+          "p95": 44.58228141897694,
+          "max": 60.2197368040003
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 438,
+          "missing_or_nonfinite": 9,
+          "median": 6.53547598469018,
+          "p95": 24.582819427687006,
+          "max": 51.19606268663258
+        },
+        "epipolar_rejected_pair_count": 5,
+        "triangulation_finite_count": 438,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 438,
+          "out_of_raw_image_bounds": 9
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 203,
+          "accepted": 234,
+          "out_of_raw_image_bounds": 9,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 9,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_ear": {
+        "coco17_index": 3,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 778,
+          "missing_or_nonfinite": 116,
+          "median": 5.6884681065174005,
+          "p95": 16.587003983121267,
+          "max": 33.0455392203865,
+          "at_most_25px_count": 773,
+          "at_most_25px_fraction_complete_denominator": 0.8646532438478747
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 41.632037070069046,
+          "p95": 73.32966621107892,
+          "max": 87.89954125551708,
+          "at_most_25px_count": 88,
+          "at_most_25px_fraction_complete_denominator": 0.09843400447427293
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 389,
+            "missing_or_nonfinite": 58,
+            "median": 6.923699126333403,
+            "p95": 18.901955759050146,
+            "max": 33.0455392203865,
+            "at_most_25px_count": 384,
+            "at_most_25px_fraction_complete_denominator": 0.8590604026845637
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 37.07563662463065,
+            "p95": 67.50985262452355,
+            "max": 83.96169164879404,
+            "at_most_25px_count": 73,
+            "at_most_25px_fraction_complete_denominator": 0.16331096196868009
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 389,
+            "missing_or_nonfinite": 58,
+            "median": 4.665648643918156,
+            "p95": 12.84130659495086,
+            "max": 22.288131488061683,
+            "at_most_25px_count": 389,
+            "at_most_25px_fraction_complete_denominator": 0.8702460850111857
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 44.15877704431379,
+            "p95": 75.3366683449032,
+            "max": 87.89954125551708,
+            "at_most_25px_count": 15,
+            "at_most_25px_fraction_complete_denominator": 0.03355704697986577
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 389,
+          "missing_or_nonfinite": 58,
+          "median": 33.04389893017786,
+          "p95": 68.80143638985608,
+          "max": 81.61754782177108
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 389,
+          "missing_or_nonfinite": 58,
+          "median": 4.968224663806084,
+          "p95": 12.039046672947519,
+          "max": 24.92945499932928
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 389,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 389,
+          "out_of_raw_image_bounds": 58
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 94,
+          "accepted": 295,
+          "out_of_raw_image_bounds": 57,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 58,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_ear": {
+        "coco17_index": 4,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 5.013975072993571,
+          "p95": 16.83923187747524,
+          "max": 28.426542726905744,
+          "at_most_25px_count": 886,
+          "at_most_25px_fraction_complete_denominator": 0.9910514541387024
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 43.18816161714768,
+          "p95": 85.71968525259892,
+          "max": 111.05577464705785,
+          "at_most_25px_count": 84,
+          "at_most_25px_fraction_complete_denominator": 0.09395973154362416
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 4.840592303586931,
+            "p95": 16.752586884337685,
+            "max": 28.097237866285308,
+            "at_most_25px_count": 443,
+            "at_most_25px_fraction_complete_denominator": 0.9910514541387024
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 50.532950181708344,
+            "p95": 93.21905511597397,
+            "max": 111.05577464705785,
+            "at_most_25px_count": 23,
+            "at_most_25px_fraction_complete_denominator": 0.05145413870246085
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 5.331744138124859,
+            "p95": 17.31574783813512,
+            "max": 28.426542726905744,
+            "at_most_25px_count": 443,
+            "at_most_25px_fraction_complete_denominator": 0.9910514541387024
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 37.08913967538931,
+            "p95": 66.56367844008227,
+            "max": 82.5935253949884,
+            "at_most_25px_count": 61,
+            "at_most_25px_fraction_complete_denominator": 0.13646532438478748
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 37.222893503534465,
+          "p95": 76.80605964956354,
+          "max": 94.33511545997415
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 3.847690493544094,
+          "p95": 12.476722810463691,
+          "max": 27.6287766250359
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 355,
+          "high_reprojection_error": 91,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_shoulder": {
+        "coco17_index": 5,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 4.963509885600444,
+          "p95": 28.932073785501537,
+          "max": 52.39867073264623,
+          "at_most_25px_count": 835,
+          "at_most_25px_fraction_complete_denominator": 0.9340044742729307
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 23.61028412534077,
+          "p95": 42.27956000080659,
+          "max": 56.95111699002216,
+          "at_most_25px_count": 483,
+          "at_most_25px_fraction_complete_denominator": 0.540268456375839
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 6.29742006617676,
+            "p95": 34.787555335406694,
+            "max": 52.39867073264623,
+            "at_most_25px_count": 388,
+            "at_most_25px_fraction_complete_denominator": 0.8680089485458613
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 21.294159493367793,
+            "p95": 43.798327851709914,
+            "max": 56.95111699002216,
+            "at_most_25px_count": 270,
+            "at_most_25px_fraction_complete_denominator": 0.6040268456375839
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 3.8609928391662187,
+            "p95": 17.177337733333772,
+            "max": 22.806441997714387,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 25.450693753202305,
+            "p95": 39.4903197053971,
+            "max": 48.69491137109129,
+            "at_most_25px_count": 213,
+            "at_most_25px_fraction_complete_denominator": 0.47651006711409394
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 17.428929620339627,
+          "p95": 28.690557975217793,
+          "max": 35.92493143353005
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 6.032536421352185,
+          "p95": 26.417619452048633,
+          "max": 35.443654883402935
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 299,
+          "high_reprojection_error": 147,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_shoulder": {
+        "coco17_index": 6,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 3.921804160132729,
+          "p95": 11.21027017160426,
+          "max": 20.393033888694255,
+          "at_most_25px_count": 894,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 23.29497486696068,
+          "p95": 51.82217892734184,
+          "max": 71.10394925461415,
+          "at_most_25px_count": 502,
+          "at_most_25px_fraction_complete_denominator": 0.5615212527964206
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 3.395212512831739,
+            "p95": 9.46699049689097,
+            "max": 14.595935428093453,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 34.62444467052357,
+            "p95": 57.05533247382323,
+            "max": 71.10394925461415,
+            "at_most_25px_count": 122,
+            "at_most_25px_fraction_complete_denominator": 0.27293064876957496
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 4.299411608248296,
+            "p95": 12.094284566661303,
+            "max": 20.393033888694255,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 14.326438996170017,
+            "p95": 29.02117469707724,
+            "max": 33.982295442023094,
+            "at_most_25px_count": 380,
+            "at_most_25px_fraction_complete_denominator": 0.8501118568232662
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 20.04203465657802,
+          "p95": 30.992782907570145,
+          "max": 36.82882219611644
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 4.598771241620536,
+          "p95": 11.900607232247438,
+          "max": 20.702593239522077
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 413,
+          "high_reprojection_error": 33,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_elbow": {
+        "coco17_index": 7,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 7.391578865571681,
+          "p95": 31.43244621897153,
+          "max": 91.94643900689908,
+          "at_most_25px_count": 809,
+          "at_most_25px_fraction_complete_denominator": 0.9049217002237137
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 18.08438897299905,
+          "p95": 51.548655572744366,
+          "max": 109.87332094974352,
+          "at_most_25px_count": 633,
+          "at_most_25px_fraction_complete_denominator": 0.7080536912751678
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 10.35971312859223,
+            "p95": 44.34614337893673,
+            "max": 91.94643900689908,
+            "at_most_25px_count": 380,
+            "at_most_25px_fraction_complete_denominator": 0.8501118568232662
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 16.597550744672905,
+            "p95": 62.48781281191417,
+            "max": 109.87332094974352,
+            "at_most_25px_count": 319,
+            "at_most_25px_fraction_complete_denominator": 0.7136465324384788
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 5.553533289579102,
+            "p95": 21.429562559681138,
+            "max": 41.487083886995286,
+            "at_most_25px_count": 429,
+            "at_most_25px_fraction_complete_denominator": 0.959731543624161
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 18.9890728881911,
+            "p95": 41.916996498927844,
+            "max": 102.30997112418295,
+            "at_most_25px_count": 314,
+            "at_most_25px_fraction_complete_denominator": 0.7024608501118568
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 9.565405699391984,
+          "p95": 31.15885220586963,
+          "max": 72.41788921283114
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 9.17568737492267,
+          "p95": 37.85163770881579,
+          "max": 76.19102722900433
+        },
+        "epipolar_rejected_pair_count": 23,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 181,
+          "accepted": 265,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_elbow": {
+        "coco17_index": 8,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 6.055985804905097,
+          "p95": 13.332934070099133,
+          "max": 21.192075328794743,
+          "at_most_25px_count": 894,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 15.114201405956111,
+          "p95": 37.94800681359556,
+          "max": 56.00868642082541,
+          "at_most_25px_count": 738,
+          "at_most_25px_fraction_complete_denominator": 0.825503355704698
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 4.907041557906878,
+            "p95": 10.315125600718547,
+            "max": 14.503354924350843,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 14.126473783413925,
+            "p95": 28.86484015703731,
+            "max": 49.0446632751514,
+            "at_most_25px_count": 396,
+            "at_most_25px_fraction_complete_denominator": 0.8859060402684564
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 7.232671804084102,
+            "p95": 14.851062671956056,
+            "max": 21.192075328794743,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 16.833828008980046,
+            "p95": 45.71399826028501,
+            "max": 56.00868642082541,
+            "at_most_25px_count": 342,
+            "at_most_25px_fraction_complete_denominator": 0.7651006711409396
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 9.859784619916113,
+          "p95": 22.79386440743823,
+          "max": 30.587519818378436
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 7.141604462894139,
+          "p95": 14.852775654699704,
+          "max": 20.633230175289697
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 376,
+          "high_reprojection_error": 70,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_wrist": {
+        "coco17_index": 9,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 7.527835462938282,
+          "p95": 20.663037908309846,
+          "max": 36.68745476932342,
+          "at_most_25px_count": 871,
+          "at_most_25px_fraction_complete_denominator": 0.9742729306487695
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 16.737533779153217,
+          "p95": 41.08485466374133,
+          "max": 67.51431785349301,
+          "at_most_25px_count": 658,
+          "at_most_25px_fraction_complete_denominator": 0.7360178970917226
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 10.33467246094048,
+            "p95": 24.94896857235748,
+            "max": 36.68745476932342,
+            "at_most_25px_count": 424,
+            "at_most_25px_fraction_complete_denominator": 0.9485458612975392
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 14.66316656887619,
+            "p95": 39.56123481216827,
+            "max": 64.54826835746172,
+            "at_most_25px_count": 357,
+            "at_most_25px_fraction_complete_denominator": 0.7986577181208053
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 5.512476410582343,
+            "p95": 13.09389514900261,
+            "max": 18.595659973258453,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 19.2262005742986,
+            "p95": 43.80923277110957,
+            "max": 67.51431785349301,
+            "at_most_25px_count": 301,
+            "at_most_25px_fraction_complete_denominator": 0.6733780760626398
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 9.017521528960618,
+          "p95": 28.150328567251503,
+          "max": 52.54973330982105
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 8.967526867735206,
+          "p95": 21.513292701404442,
+          "max": 31.28506112187021
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 166,
+          "accepted": 278,
+          "association_failed": 1,
+          "low_2d_score": 2
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_wrist": {
+        "coco17_index": 10,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 3.5007647476965724,
+          "p95": 10.577539520203512,
+          "max": 18.050342109876546,
+          "at_most_25px_count": 894,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 14.964029442432405,
+          "p95": 38.38425270119135,
+          "max": 90.02428663535021,
+          "at_most_25px_count": 734,
+          "at_most_25px_fraction_complete_denominator": 0.8210290827740492
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 2.7359893677917277,
+            "p95": 7.0892351927398165,
+            "max": 10.063944826258831,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 17.866557226706764,
+            "p95": 38.548453835891785,
+            "max": 90.02428663535021,
+            "at_most_25px_count": 335,
+            "at_most_25px_fraction_complete_denominator": 0.7494407158836689
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 4.69749974434747,
+            "p95": 12.084743275693555,
+            "max": 18.050342109876546,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 11.425956892551538,
+            "p95": 35.66885518781056,
+            "max": 69.53050709852218,
+            "at_most_25px_count": 399,
+            "at_most_25px_fraction_complete_denominator": 0.8926174496644296
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 11.39146598423903,
+          "p95": 27.828299745719512,
+          "max": 68.15625607317395
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 4.231054781808387,
+          "p95": 10.818120933302806,
+          "max": 15.686988415273145
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 429,
+          "high_reprojection_error": 17,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_hip": {
+        "coco17_index": 11,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 6.3776355008937005,
+          "p95": 16.014735035362634,
+          "max": 33.44319820938637,
+          "at_most_25px_count": 888,
+          "at_most_25px_fraction_complete_denominator": 0.9932885906040269
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 66.81356881828523,
+          "p95": 166.66029724006975,
+          "max": 197.04039680107513,
+          "at_most_25px_count": 91,
+          "at_most_25px_fraction_complete_denominator": 0.1017897091722595
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 6.838754651380974,
+            "p95": 17.52773294792921,
+            "max": 33.44319820938637,
+            "at_most_25px_count": 443,
+            "at_most_25px_fraction_complete_denominator": 0.9910514541387024
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 33.72478660700538,
+            "p95": 65.11350304205584,
+            "max": 80.85803186647684,
+            "at_most_25px_count": 91,
+            "at_most_25px_fraction_complete_denominator": 0.203579418344519
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 6.15359724132124,
+            "p95": 14.728803285924561,
+            "max": 27.43098484261136,
+            "at_most_25px_count": 445,
+            "at_most_25px_fraction_complete_denominator": 0.9955257270693513
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 122.30726375234303,
+            "p95": 179.92548158334782,
+            "max": 197.04039680107513,
+            "at_most_25px_count": 0,
+            "at_most_25px_fraction_complete_denominator": 0.0
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 73.80634055417529,
+          "p95": 105.55825832785405,
+          "max": 121.37814545630714
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 9.184816661865591,
+          "p95": 22.64145102114932,
+          "max": 42.22789834419169
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 325,
+          "high_reprojection_error": 121,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_hip": {
+        "coco17_index": 12,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 6.3283994292361445,
+          "p95": 16.83330981441023,
+          "max": 29.792344756233284,
+          "at_most_25px_count": 890,
+          "at_most_25px_fraction_complete_denominator": 0.9955257270693513
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 64.53177209391461,
+          "p95": 170.9525359770577,
+          "max": 216.9883250598067,
+          "at_most_25px_count": 91,
+          "at_most_25px_fraction_complete_denominator": 0.1017897091722595
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 5.9878888997235515,
+            "p95": 15.962197953692415,
+            "max": 25.855565898990207,
+            "at_most_25px_count": 445,
+            "at_most_25px_fraction_complete_denominator": 0.9955257270693513
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 114.74282072093594,
+            "p95": 180.94348965765576,
+            "max": 216.9883250598067,
+            "at_most_25px_count": 0,
+            "at_most_25px_fraction_complete_denominator": 0.0
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 6.759883047544091,
+            "p95": 18.616802061870196,
+            "max": 29.792344756233284,
+            "at_most_25px_count": 445,
+            "at_most_25px_fraction_complete_denominator": 0.9955257270693513
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 39.09335746522249,
+            "p95": 62.10897675849188,
+            "max": 82.38983188724441,
+            "at_most_25px_count": 91,
+            "at_most_25px_fraction_complete_denominator": 0.203579418344519
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 68.71033992783572,
+          "p95": 105.04983616552781,
+          "max": 114.82236423361509
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 8.889725849464055,
+          "p95": 24.133485724889276,
+          "max": 38.87712151692846
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 324,
+          "high_reprojection_error": 122,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_knee": {
+        "coco17_index": 13,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 6.334586288155792,
+          "p95": 13.598104227771941,
+          "max": 32.54790904778923,
+          "at_most_25px_count": 888,
+          "at_most_25px_fraction_complete_denominator": 0.9932885906040269
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 20.223466138786165,
+          "p95": 50.3703556821164,
+          "max": 100.27023924569129,
+          "at_most_25px_count": 560,
+          "at_most_25px_fraction_complete_denominator": 0.6263982102908278
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 6.697083399886836,
+            "p95": 14.018533529560514,
+            "max": 32.54790904778923,
+            "at_most_25px_count": 443,
+            "at_most_25px_fraction_complete_denominator": 0.9910514541387024
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 25.43366000389804,
+            "p95": 58.36139743635983,
+            "max": 100.27023924569129,
+            "at_most_25px_count": 216,
+            "at_most_25px_fraction_complete_denominator": 0.48322147651006714
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 6.0323538343923095,
+            "p95": 12.31740467647365,
+            "max": 26.317707213528546,
+            "at_most_25px_count": 445,
+            "at_most_25px_fraction_complete_denominator": 0.9955257270693513
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 16.70194137772734,
+            "p95": 41.06429266448277,
+            "max": 58.279356827592714,
+            "at_most_25px_count": 344,
+            "at_most_25px_fraction_complete_denominator": 0.7695749440715883
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 14.809528888482179,
+          "p95": 40.69612225283944,
+          "max": 66.5662723893712
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 8.875753558805624,
+          "p95": 18.262024814839485,
+          "max": 40.61871222164536
+        },
+        "epipolar_rejected_pair_count": 2,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 355,
+          "high_reprojection_error": 91,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_knee": {
+        "coco17_index": 14,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 15.558329975956102,
+          "p95": 35.16178147200958,
+          "max": 63.29993111768957,
+          "at_most_25px_count": 735,
+          "at_most_25px_fraction_complete_denominator": 0.8221476510067114
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 30.37403228423141,
+          "p95": 86.99949166853332,
+          "max": 127.59198879049428,
+          "at_most_25px_count": 367,
+          "at_most_25px_fraction_complete_denominator": 0.4105145413870246
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 14.313439898078062,
+            "p95": 29.66751363677746,
+            "max": 47.13958019456554,
+            "at_most_25px_count": 392,
+            "at_most_25px_fraction_complete_denominator": 0.8769574944071589
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 18.27615704231335,
+            "p95": 63.118494480858715,
+            "max": 116.32616351016392,
+            "at_most_25px_count": 299,
+            "at_most_25px_fraction_complete_denominator": 0.668903803131991
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 17.03500090314472,
+            "p95": 37.05971104323785,
+            "max": 63.29993111768957,
+            "at_most_25px_count": 343,
+            "at_most_25px_fraction_complete_denominator": 0.767337807606264
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 39.44107758600869,
+            "p95": 93.46254077590201,
+            "max": 127.59198879049428,
+            "at_most_25px_count": 68,
+            "at_most_25px_fraction_complete_denominator": 0.15212527964205816
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 13.771851139001281,
+          "p95": 47.54899832659676,
+          "max": 63.48048920407988
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 21.81898106404969,
+          "p95": 46.29736457928671,
+          "max": 75.64884569992873
+        },
+        "epipolar_rejected_pair_count": 80,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "high_reprojection_error": 362,
+          "accepted": 84,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "left_ankle": {
+        "coco17_index": 15,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 6.731340289727942,
+          "p95": 17.002029510425913,
+          "max": 26.9384394046446,
+          "at_most_25px_count": 892,
+          "at_most_25px_fraction_complete_denominator": 0.9977628635346756
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 10.769922172111634,
+          "p95": 30.079963409562946,
+          "max": 63.5217207799086,
+          "at_most_25px_count": 824,
+          "at_most_25px_fraction_complete_denominator": 0.9217002237136466
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 7.416010003792128,
+            "p95": 18.016039394777508,
+            "max": 26.9384394046446,
+            "at_most_25px_count": 445,
+            "at_most_25px_fraction_complete_denominator": 0.9955257270693513
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 12.010112507352167,
+            "p95": 36.25758116930799,
+            "max": 56.95552570030556,
+            "at_most_25px_count": 392,
+            "at_most_25px_fraction_complete_denominator": 0.8769574944071589
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 6.025010925419837,
+            "p95": 15.334390494765952,
+            "max": 23.84824506993563,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 10.228076376541102,
+            "p95": 22.482880054506776,
+            "max": 63.5217207799086,
+            "at_most_25px_count": 432,
+            "at_most_25px_fraction_complete_denominator": 0.9664429530201343
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 4.139643073529491,
+          "p95": 14.38139962551818,
+          "max": 50.86290747013648
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 7.873143290059461,
+          "p95": 20.238913157223962,
+          "max": 30.475137540748644
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 317,
+          "high_reprojection_error": 129,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      },
+      "right_ankle": {
+        "coco17_index": 16,
+        "frames": 447,
+        "triangulated_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 4.481701728747526,
+          "p95": 10.124120233506613,
+          "max": 17.88344091489313,
+          "at_most_25px_count": 894,
+          "at_most_25px_fraction_complete_denominator": 1.0
+        },
+        "model_reprojection_px": {
+          "slots": 894,
+          "finite": 894,
+          "missing_or_nonfinite": 0,
+          "median": 10.567217357814425,
+          "p95": 28.714326223932236,
+          "max": 58.40957767826398,
+          "at_most_25px_count": 837,
+          "at_most_25px_fraction_complete_denominator": 0.9362416107382551
+        },
+        "left": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 4.2186197676433554,
+            "p95": 9.16737958128745,
+            "max": 15.219827692385083,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 10.69228933044834,
+            "p95": 25.444393610031234,
+            "max": 58.40957767826398,
+            "at_most_25px_count": 421,
+            "at_most_25px_fraction_complete_denominator": 0.941834451901566
+          }
+        },
+        "right": {
+          "triangulated": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 4.69564589371351,
+            "p95": 10.455952456785623,
+            "max": 17.88344091489313,
+            "at_most_25px_count": 447,
+            "at_most_25px_fraction_complete_denominator": 1.0
+          },
+          "model": {
+            "slots": 447,
+            "finite": 447,
+            "missing_or_nonfinite": 0,
+            "median": 10.37726821614225,
+            "p95": 29.876000530898484,
+            "max": 48.74062196769982,
+            "at_most_25px_count": 416,
+            "at_most_25px_fraction_complete_denominator": 0.930648769574944
+          }
+        },
+        "model_minus_triangulated_pairmean_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 6.045451086884462,
+          "p95": 20.3795937055768,
+          "max": 45.81419158022982
+        },
+        "sampson_px": {
+          "slots": 447,
+          "finite": 447,
+          "missing_or_nonfinite": 0,
+          "median": 5.618605337688386,
+          "p95": 12.52179150746343,
+          "max": 19.979569009151888
+        },
+        "epipolar_rejected_pair_count": 0,
+        "triangulation_finite_count": 447,
+        "triangulation_negative_depth_count": 0,
+        "triangulation_reason_counts": {
+          "None": 447
+        },
+        "strict_reason_counts": {
+          "accepted": 428,
+          "high_reprojection_error": 18,
+          "association_failed": 1
+        },
+        "raw_low_score_view_count": 0,
+        "raw_out_of_bounds_view_count": 0,
+        "raw_nonfinite_view_count": 0
+      }
+    }
+  },
+  "frame0_model_actual_manual_mixed_training_residual_px": [
+    [
+      14.996979048164771,
+      83.34934510813466,
+      16.156362127110622,
+      20.21324156829797,
+      2.2107960747854998,
+      11.884208399766187,
+      50.489987722672886,
+      127.24645525881277,
+      8.739839584266457,
+      10.572787775392692,
+      5.0536825631279845,
+      10.99297668305873
+    ],
+    [
+      30.80382347717294,
+      9.887998249388165,
+      30.527288629375175,
+      24.48398005615237,
+      4.513728320639187,
+      7.648769733584031,
+      122.83666250618053,
+      53.178522804732864,
+      5.493856367739077,
+      11.71623223795155,
+      4.831682465597939,
+      13.624296466720848
+    ]
+  ],
+  "selected_frames": {
+    "0": {
+      "left_hip": {
+        "triangulated_left_right_px": [
+          3.5882697266875208,
+          3.2356262820711077
+        ],
+        "model_left_right_px": [
+          50.489987722672886,
+          122.83666250618063
+        ],
+        "sampson_px": 4.806068600697318,
+        "strict_reason": "accepted"
+      },
+      "right_hip": {
+        "triangulated_left_right_px": [
+          3.571526025191517,
+          4.213473133700021
+        ],
+        "model_left_right_px": [
+          127.24645525881277,
+          53.178522804732864
+        ],
+        "sampson_px": 5.4425636094366245,
+        "strict_reason": "accepted"
+      },
+      "right_knee": {
+        "triangulated_left_right_px": [
+          14.838578176962008,
+          18.508634489773495
+        ],
+        "model_left_right_px": [
+          25.241543972941113,
+          59.82379487154064
+        ],
+        "sampson_px": 23.069260948688036,
+        "strict_reason": "high_reprojection_error"
+      }
+    },
+    "48": {
+      "left_hip": {
+        "triangulated_left_right_px": [
+          6.110736944807028,
+          5.308352100644775
+        ],
+        "model_left_right_px": [
+          34.27444353242749,
+          168.9745328396527
+        ],
+        "sampson_px": 8.014622405500889,
+        "strict_reason": "accepted"
+      },
+      "right_hip": {
+        "triangulated_left_right_px": [
+          5.022362232035509,
+          5.993776961479202
+        ],
+        "model_left_right_px": [
+          120.49129287129267,
+          17.3157660366641
+        ],
+        "sampson_px": 7.6792131699679755,
+        "strict_reason": "accepted"
+      },
+      "right_knee": {
+        "triangulated_left_right_px": [
+          25.3039107184257,
+          32.15531299317007
+        ],
+        "model_left_right_px": [
+          47.881198771728336,
+          114.90958252605166
+        ],
+        "sampson_px": 39.71845319832141,
+        "strict_reason": "high_reprojection_error"
+      }
+    },
+    "188": {
+      "left_hip": {
+        "triangulated_left_right_px": [
+          24.556712052287246,
+          19.846679225790673
+        ],
+        "model_left_right_px": [
+          31.694861794646762,
+          174.1032834542904
+        ],
+        "sampson_px": 30.85126379672836,
+        "strict_reason": "high_reprojection_error"
+      },
+      "right_hip": {
+        "triangulated_left_right_px": [
+          12.122523237220891,
+          13.97751276068187
+        ],
+        "model_left_right_px": [
+          170.97141284935378,
+          2.4018280197776765
+        ],
+        "sampson_px": 18.26522857301746,
+        "strict_reason": "high_reprojection_error"
+      },
+      "right_knee": {
+        "triangulated_left_right_px": [
+          25.31522563981408,
+          32.432046388983714
+        ],
+        "model_left_right_px": [
+          58.333918516162115,
+          78.85960100836057
+        ],
+        "sampson_px": 39.89108274707932,
+        "strict_reason": "high_reprojection_error"
+      }
+    },
+    "335": {
+      "left_hip": {
+        "triangulated_left_right_px": [
+          3.9365651369974874,
+          3.4001801014695747
+        ],
+        "model_left_right_px": [
+          43.903812716805916,
+          83.15839711764438
+        ],
+        "sampson_px": 5.147733554780493,
+        "strict_reason": "accepted"
+      },
+      "right_hip": {
+        "triangulated_left_right_px": [
+          0.6298512162312443,
+          0.7182033209982891
+        ],
+        "model_left_right_px": [
+          101.1546416753291,
+          59.59634230143257
+        ],
+        "sampson_px": 0.9468997008481917,
+        "strict_reason": "accepted"
+      },
+      "right_knee": {
+        "triangulated_left_right_px": [
+          16.20124844666816,
+          19.460187719574137
+        ],
+        "model_left_right_px": [
+          34.9766562321967,
+          84.67749662294801
+        ],
+        "sampson_px": 24.832985240890388,
+        "strict_reason": "high_reprojection_error"
+      }
+    }
+  },
+  "pair_geometry_diagnostic_not_truth": {
+    "hip_width": {
+      "free_triangulated": {
+        "finite": 448,
+        "median_mm": 197.8534620720859,
+        "p05_mm": 187.0471370089028,
+        "p95_mm": 208.96999883633163,
+        "min_mm": 178.75491712201028,
+        "max_mm": 213.97782119447447
+      },
+      "saved_model": {
+        "finite": 448,
+        "median_mm": 134.28990030239981,
+        "p05_mm": 131.8857374305464,
+        "p95_mm": 137.57825084168283,
+        "min_mm": 131.31607965189662,
+        "max_mm": 139.16826444669385
+      }
+    },
+    "shoulder_width": {
+      "free_triangulated": {
+        "finite": 448,
+        "median_mm": 300.8086137939898,
+        "p05_mm": 280.9547852157695,
+        "p95_mm": 331.8564084228236,
+        "min_mm": 272.0066158064078,
+        "max_mm": 355.6545865320943
+      },
+      "saved_model": {
+        "finite": 448,
+        "median_mm": 328.45725398457495,
+        "p05_mm": 304.7076383274752,
+        "p95_mm": 350.0120638496211,
+        "min_mm": 298.7594671654365,
+        "max_mm": 354.88832422163216
+      }
+    },
+    "left_thigh": {
+      "free_triangulated": {
+        "finite": 448,
+        "median_mm": 264.81717987767934,
+        "p05_mm": 237.84435409781725,
+        "p95_mm": 302.24505888408436,
+        "min_mm": 228.2968115590354,
+        "max_mm": 323.5895298160344
+      },
+      "saved_model": {
+        "finite": 448,
+        "median_mm": 357.64073841079147,
+        "p05_mm": 354.71289543091956,
+        "p95_mm": 362.3969395599731,
+        "min_mm": 354.11761168745164,
+        "max_mm": 362.8327355137131
+      }
+    },
+    "right_thigh": {
+      "free_triangulated": {
+        "finite": 448,
+        "median_mm": 262.6048561008479,
+        "p05_mm": 222.4554741511996,
+        "p95_mm": 308.6755413586269,
+        "min_mm": 212.46741258894284,
+        "max_mm": 323.8373104409912
+      },
+      "saved_model": {
+        "finite": 448,
+        "median_mm": 366.17124692273416,
+        "p05_mm": 362.04386867104955,
+        "p95_mm": 369.38733917318933,
+        "min_mm": 358.9583977834651,
+        "max_mm": 370.06899122182324
+      }
+    },
+    "left_shin": {
+      "free_triangulated": {
+        "finite": 448,
+        "median_mm": 418.10155117678096,
+        "p05_mm": 381.19533060764036,
+        "p95_mm": 446.4558087352962,
+        "min_mm": 353.3048733066756,
+        "max_mm": 471.3444612703957
+      },
+      "saved_model": {
+        "finite": 448,
+        "median_mm": 389.8277958089185,
+        "p05_mm": 387.7919163753942,
+        "p95_mm": 391.6866997757483,
+        "min_mm": 387.4127025652117,
+        "max_mm": 392.5552662839249
+      }
+    },
+    "right_shin": {
+      "free_triangulated": {
+        "finite": 448,
+        "median_mm": 430.56510132229675,
+        "p05_mm": 380.48781263936013,
+        "p95_mm": 495.4929935961313,
+        "min_mm": 320.8835089689842,
+        "max_mm": 555.8189206833334
+      },
+      "saved_model": {
+        "finite": 448,
+        "median_mm": 391.5211670870146,
+        "p05_mm": 389.00086244744926,
+        "p95_mm": 396.27833688691715,
+        "min_mm": 388.4491321069599,
+        "max_mm": 398.9512185665636
+      }
+    }
+  }
+}
