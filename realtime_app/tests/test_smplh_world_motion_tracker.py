@@ -4,10 +4,11 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 import numpy as np
+from scipy.optimize import minimize as scipy_minimize
 from scipy.spatial.transform import Rotation
 
 from pose_app.smplh_motion_tracker import MotionPose, SMPLHMotionConfig
-from pose_app.smplh_world_motion_tracker import SMPLHWorldMotionTracker
+from pose_app.smplh_world_motion_tracker import SMPLHWorldMotionTracker, _minimize_scaled_pose
 from tests.test_smplh_motion_tracker import AnalyticBodyMap, tracker
 
 
@@ -44,6 +45,57 @@ def observe(tr, pose=None):
 
 
 class WorldMotionTests(unittest.TestCase):
+    def test_pose_scaling_preserves_problem_and_avoids_mixed_unit_one_step_stop(self):
+        # Millimetre translation and order-one latent variables reproduce the
+        # premature success observed with the real frame48 full covariance.
+        scale = np.array([.001, .25])
+        covariance = np.outer(scale, scale)*np.array([[1., .8], [.8, 1.]])
+        precision = np.linalg.inv(covariance)
+        projection = np.array([[1000., 40.], [0., 20.]])
+        pixels = np.array([100., 40.])
+        def objective(delta):
+            return .5*np.sum((projection @ delta-pixels)**2)/64+.5*delta @ precision @ delta
+        def gradient(delta):
+            return projection.T @ (projection @ delta-pixels)/64+precision @ delta
+        constraints = {"type": "ineq",
+            "fun": lambda delta: 100*np.array([.0048-delta[0]-.03*delta[1], delta[0]+.03*delta[1]+.0048]),
+            "jac": lambda delta: 100*np.array([[-1., -.03], [1., .03]])}
+        bounds, initial = [(None, None), (-6., 6.)], np.zeros(2)
+        options = {"maxiter": 30, "ftol": .01}
+        unscaled = scipy_minimize(objective, initial, jac=gradient, bounds=bounds,
+            constraints=constraints, method="SLSQP", options=options)
+        self.assertTrue(unscaled.success)
+        self.assertEqual(unscaled.nit, 1)
+        captured = {}
+
+        def inspect_scaled_problem(fun, coordinates, **kwargs):
+            probe = np.array([.0004, .12])
+            scaled_probe = probe/scale
+            np.testing.assert_array_equal(coordinates*scale, initial)
+            self.assertAlmostEqual(fun(scaled_probe), objective(probe))
+            np.testing.assert_allclose(kwargs["jac"](scaled_probe), gradient(probe)*scale)
+            eps = 1e-6
+            numerical = np.array([(fun(scaled_probe+axis*eps)-fun(scaled_probe-axis*eps))/(2*eps)
+                                  for axis in np.eye(2)])
+            np.testing.assert_allclose(kwargs["jac"](scaled_probe), numerical, rtol=1e-6, atol=1e-6)
+            np.testing.assert_allclose(kwargs["constraints"]["fun"](scaled_probe), constraints["fun"](probe))
+            np.testing.assert_allclose(kwargs["constraints"]["jac"](scaled_probe),
+                                       constraints["jac"](probe)*scale[None])
+            self.assertEqual(kwargs["bounds"], [(None, None), (-24., 24.)])
+            self.assertEqual(kwargs["options"], options)
+            result = scipy_minimize(fun, coordinates, **kwargs)
+            captured["optimizer_gradient"] = result.jac.copy()
+            return result
+
+        with patch("pose_app.smplh_world_motion_tracker.minimize", side_effect=inspect_scaled_problem):
+            scaled = _minimize_scaled_pose(objective, initial, jac=gradient, bounds=bounds,
+                constraints=constraints, covariance=covariance, options=options)
+        self.assertTrue(scaled.success)
+        self.assertLess(scaled.fun, unscaled.fun-5.)
+        self.assertGreaterEqual(constraints["fun"](scaled.x).min(), -1e-7)
+        self.assertAlmostEqual(scaled.fun, objective(scaled.x))
+        np.testing.assert_allclose(scaled.jac, captured["optimizer_gradient"]/scale)
+
     def test_shaped_pelvis_transform_preserves_every_mesh_vertex(self):
         rotation = Rotation.from_rotvec([.13, .05, -.08]).as_matrix()
         tr = world_tracker(rotation=rotation)
@@ -142,7 +194,8 @@ class WorldMotionTests(unittest.TestCase):
         true = tr.pose.copy(); true.translation_m[0] += .005
         px = observe(tr, true)
         def budget_result(fun, x0, **kwargs):
-            candidate = x0.copy(); candidate[0] += .001
+            candidate = x0.copy()
+            candidate[0] += .001/np.sqrt(tr.covariance[0, 0])
             return SimpleNamespace(x=candidate, fun=fun(candidate), success=False,
                                    status=9, message="Iteration limit reached", nit=30)
         with patch("pose_app.smplh_world_motion_tracker.minimize", side_effect=budget_result):
@@ -169,10 +222,10 @@ class WorldMotionTests(unittest.TestCase):
         def failed_last_iterate(fun, x0, **kwargs):
             captured["covariance"] = tr.covariance.copy()
             earlier = x0.copy()
-            earlier[0] += .002
+            earlier[0] += .002/np.sqrt(tr.covariance[0, 0])
             captured["earlier_cost"] = fun(earlier)
             last = x0.copy()
-            last[0] += .020
+            last[0] += .020/np.sqrt(tr.covariance[0, 0])
             # This evaluation also overwrites the model cache. The incumbent
             # must own its delta rather than aliasing that mutable cache.
             return SimpleNamespace(x=last, fun=fun(last), success=False,

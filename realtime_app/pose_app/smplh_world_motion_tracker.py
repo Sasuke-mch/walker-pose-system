@@ -16,6 +16,25 @@ from pose_app.smplh_motion_tracker import MotionPose, SMPLHMotionTracker, retrac
 from pose_app.smplh_ground_constraints import foot_geometry, ground_inequalities
 
 
+def _minimize_scaled_pose(fun, initial_delta, *, jac, bounds, constraints, covariance, options):
+    """Change optimizer coordinates, preserving the full physical MAP problem."""
+    scale = np.sqrt(np.diag(covariance))
+    scaled_bounds = [(None if lower is None else lower/scale[i],
+                      None if upper is None else upper/scale[i])
+                     for i, (lower, upper) in enumerate(bounds)]
+    result = minimize(lambda coordinates: fun(coordinates*scale), initial_delta/scale,
+        jac=lambda coordinates: jac(coordinates*scale)*scale, method="SLSQP", bounds=scaled_bounds,
+        constraints={"type": constraints["type"],
+                     "fun": lambda coordinates: constraints["fun"](coordinates*scale),
+                     "jac": lambda coordinates: constraints["jac"](coordinates*scale)*scale[None]},
+        options=options)
+    # All callers, feasibility checks, and incumbent deltas use physical units.
+    result.x = result.x*scale
+    if hasattr(result, "jac"):
+        result.jac = result.jac/scale
+    return result
+
+
 @dataclass(frozen=True)
 class WorldGroundConfig:
     ground_tolerance_m: float = .005
@@ -211,15 +230,16 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             # A newly activated two-foot condition need not be feasible at the
             # one-foot walking prediction. Find a contact-only warm start; no
             # pixels or covariance are consumed in this feasibility solve.
-            bootstrap = minimize(lambda delta: .5*delta @ precision @ delta, starts[0],
-                jac=lambda delta: precision @ delta, method="SLSQP", bounds=bounds,
+            bootstrap = _minimize_scaled_pose(lambda delta: .5*delta @ precision @ delta, starts[0],
+                jac=lambda delta: precision @ delta, bounds=bounds, covariance=P[:n, :n],
                 constraints={"type": "ineq", "fun": conditions, "jac": condition_jacobian},
                 options={"maxiter": self.ground_config.bootstrap_iterations,
                          "ftol": self.ground_config.optimizer_objective_tolerance})
             if physically_feasible(bootstrap.x):
                 feasible_starts.append((objective(bootstrap.x), bootstrap.x.copy()))
         initial_cost, initial_delta = min(feasible_starts, key=lambda item: item[0]) if feasible_starts else (np.inf, starts[0])
-        solution = minimize(objective, initial_delta, jac=gradient, method="SLSQP", bounds=bounds,
+        solution = _minimize_scaled_pose(objective, initial_delta, jac=gradient, bounds=bounds,
+                    covariance=P[:n, :n],
                     constraints={"type": "ineq", "fun": conditions, "jac": condition_jacobian},
                     options={"maxiter": self.ground_config.maximum_iterations,
                              "ftol": self.ground_config.optimizer_objective_tolerance})
