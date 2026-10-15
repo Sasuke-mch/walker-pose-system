@@ -1,0 +1,456 @@
+{
+  "pair_id": 0,
+  "detector": "Sapiens2-0.4B",
+  "coordinate_space": "raw_fisheye_pixels",
+  "sources": {
+    "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\left_sapiens_raw.jsonl",
+    "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\right_sapiens_raw.jsonl"
+  },
+  "images": {
+    "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\left_ccw90\\pair_0000.png",
+    "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\right_cw90\\pair_0000.png"
+  },
+  "mapping": {
+    "13": "left_ankle",
+    "14": "right_ankle",
+    "15": "left_big_toe",
+    "16": "left_small_toe",
+    "17": "left_heel",
+    "18": "right_big_toe",
+    "19": "right_small_toe",
+    "20": "right_heel"
+  },
+  "points": {
+    "left_ankle": {
+      "sapiens308_index": 13,
+      "upright_left_xy_score": [
+        803.9175935915002,
+        1547.5008337731456,
+        0.92033851146698
+      ],
+      "upright_right_xy_score": [
+        635.2407523824281,
+        1570.0636108996823,
+        0.9069227576255798
+      ],
+      "raw_left_xy_score": [
+        371.4991662268544,
+        803.9175935915002,
+        0.92033851146698
+      ],
+      "raw_right_xy_score": [
+        1570.0636108996823,
+        443.7592476175719,
+        0.9069227576255798
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 2.482326441875981,
+      "free_triangulation_left_mm": [
+        -602.8527697954994,
+        259.7473960000016,
+        505.40005186957006
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        2.200131558842793,
+        1.842670914978804
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    },
+    "right_ankle": {
+      "sapiens308_index": 14,
+      "upright_left_xy_score": [
+        617.360976888247,
+        1541.0198360517916,
+        0.9074094295501709
+      ],
+      "upright_right_xy_score": [
+        453.4584715828221,
+        1621.9336974200078,
+        0.9217832088470459
+      ],
+      "raw_left_xy_score": [
+        377.9801639482084,
+        617.360976888247,
+        0.9074094295501709
+      ],
+      "raw_right_xy_score": [
+        1621.9336974200078,
+        625.5415284171779,
+        0.9217832088470459
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 2.8879062943616396,
+      "free_triangulation_left_mm": [
+        -637.2604017420239,
+        84.25396147514248,
+        581.6112219473088
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        2.1578639008981253,
+        2.553251732860052
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    },
+    "left_big_toe": {
+      "sapiens308_index": 15,
+      "upright_left_xy_score": [
+        788.1632983721988,
+        1713.410471224317,
+        0.9622921943664551
+      ],
+      "upright_right_xy_score": [
+        737.9039576640305,
+        1700.3382391088153,
+        0.9702305793762207
+      ],
+      "raw_left_xy_score": [
+        205.589528775683,
+        788.1632983721988,
+        0.9622921943664551
+      ],
+      "raw_right_xy_score": [
+        1700.3382391088153,
+        341.0960423359695,
+        0.9702305793762207
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 2.2109965570222494,
+      "free_triangulation_left_mm": [
+        -670.8117072190594,
+        215.66355532663997,
+        330.4708501261438
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        2.839018175839092,
+        1.894124738145981
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    },
+    "left_small_toe": {
+      "sapiens308_index": 16,
+      "upright_left_xy_score": [
+        863.9644055441411,
+        1677.6125471077712,
+        0.9766083359718323
+      ],
+      "upright_right_xy_score": [
+        763.8554128402191,
+        1649.2821528116865,
+        0.9647793769836426
+      ],
+      "raw_left_xy_score": [
+        241.3874528922288,
+        863.9644055441411,
+        0.9766083359718323
+      ],
+      "raw_right_xy_score": [
+        1649.2821528116865,
+        315.14458715978094,
+        0.9647793769836426
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 4.355069213313241,
+      "free_triangulation_left_mm": [
+        -668.6854641122247,
+        294.9402282934351,
+        352.7784373378537
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        5.430537375507373,
+        3.3315134109315774
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    },
+    "left_heel": {
+      "sapiens308_index": 17,
+      "upright_left_xy_score": [
+        801.4878470460783,
+        1572.4434599034926,
+        0.8653033375740051
+      ],
+      "upright_right_xy_score": [
+        599.5420690206959,
+        1600.8734691096288,
+        0.8880375623703003
+      ],
+      "raw_left_xy_score": [
+        346.55654009650743,
+        801.4878470460783,
+        0.8653033375740051
+      ],
+      "raw_right_xy_score": [
+        1600.8734691096288,
+        479.45793097930414,
+        0.8880375623703003
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 6.153959271820171,
+      "free_triangulation_left_mm": [
+        -744.022261933341,
+        309.209109454783,
+        583.7949947478411
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        5.580953631863519,
+        4.812069735768496
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    },
+    "right_big_toe": {
+      "sapiens308_index": 18,
+      "upright_left_xy_score": [
+        521.1779820332354,
+        1668.9602601294428,
+        0.9680832624435425
+      ],
+      "upright_right_xy_score": [
+        475.9603779827737,
+        1776.7025411269242,
+        0.9767744541168213
+      ],
+      "raw_left_xy_score": [
+        250.03973987055724,
+        521.1779820332354,
+        0.9680832624435425
+      ],
+      "raw_right_xy_score": [
+        1776.7025411269242,
+        603.0396220172263,
+        0.9767744541168213
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 0.13902707812874585,
+      "free_triangulation_left_mm": [
+        -691.9450051797977,
+        -14.67747692469966,
+        433.11183648126047
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        0.12593482767290556,
+        0.16779230701574765
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    },
+    "right_small_toe": {
+      "sapiens308_index": 19,
+      "upright_left_xy_score": [
+        499.9939639505915,
+        1627.4429473876953,
+        0.9722994565963745
+      ],
+      "upright_right_xy_score": [
+        399.0497840486896,
+        1752.3412412007647,
+        0.9781394004821777
+      ],
+      "raw_left_xy_score": [
+        291.5570526123047,
+        499.9939639505915,
+        0.9722994565963745
+      ],
+      "raw_right_xy_score": [
+        1752.3412412007647,
+        679.9502159513104,
+        0.9781394004821777
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 0.8775021068330946,
+      "free_triangulation_left_mm": [
+        -726.3154308867897,
+        -38.77359602837395,
+        515.5469405706475
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        0.705494924916882,
+        1.0403343065450694
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    },
+    "right_heel": {
+      "sapiens308_index": 20,
+      "upright_left_xy_score": [
+        656.5368761292302,
+        1563.392426210291,
+        0.900439977645874
+      ],
+      "upright_right_xy_score": [
+        466.19568718415894,
+        1643.1186596739526,
+        0.8572269678115845
+      ],
+      "raw_left_xy_score": [
+        355.607573789709,
+        656.5368761292302,
+        0.900439977645874
+      ],
+      "raw_right_xy_score": [
+        1643.1186596739526,
+        612.8043128158411,
+        0.8572269678115845
+      ],
+      "explicit_visibility": null,
+      "finite_in_raw_bounds": true,
+      "sampson_raw_px": 0.6387691658709383,
+      "free_triangulation_left_mm": [
+        -752.952424116606,
+        140.09020822711955,
+        636.1485980786694
+      ],
+      "free_triangulation_reprojection_lr_px": [
+        0.5091536326633982,
+        0.5689162812688945
+      ],
+      "mean_reprojection_le10px": true,
+      "positive_depth_lr": true
+    }
+  },
+  "orientation_diagnostics": {
+    "left": {
+      "toe_midpoint_minus_heel_mm": [
+        74.27367626769899,
+        -53.90721764474546,
+        -242.17035101584236
+      ],
+      "toe_midpoint_heel_length_mm": 258.9769217742253,
+      "toe_width_mm": 82.38288799041699,
+      "ankle_heel_distance_mm": 168.88177426006163,
+      "triangle_altitude_to_axis_mm": 73.73084261808948,
+      "triangulated_triangle_normal_unit": [
+        0.9424618652517103,
+        -0.11373797133995854,
+        0.314371287527563
+      ],
+      "use_for_optimization": false,
+      "quality_semantics": "geometry-only diagnostic; point correspondence, visibility and anatomical sole mapping unverified",
+      "image_direction_cues": [
+        {
+          "view": "left",
+          "toe_midpoint_minus_heel_upright_px": [
+            24.576004912091662,
+            123.06804926255154
+          ],
+          "toe_midpoint_minus_ankle_upright_px": [
+            22.146258366669713,
+            148.01067539289852
+          ],
+          "heel_minus_ankle_upright_px": [
+            -2.429746545421949,
+            24.94262613034698
+          ]
+        },
+        {
+          "view": "right",
+          "toe_midpoint_minus_heel_upright_px": [
+            151.3376162314289,
+            73.93672685062211
+          ],
+          "toe_midpoint_minus_ankle_upright_px": [
+            115.63893286969665,
+            104.74658506056858
+          ],
+          "heel_minus_ankle_upright_px": [
+            -35.698683361732265,
+            30.80985820994647
+          ]
+        }
+      ]
+    },
+    "right": {
+      "toe_midpoint_minus_heel_mm": [
+        43.82220608331238,
+        -166.81574470365635,
+        -161.8192095527154
+      ],
+      "toe_midpoint_heel_length_mm": 236.50229387325058,
+      "toe_width_mm": 92.50673221645218,
+      "ankle_heel_distance_mm": 139.55879007702092,
+      "triangle_altitude_to_axis_mm": 80.38682502074965,
+      "triangulated_triangle_normal_unit": [
+        -0.9284134220775561,
+        0.102532136960778,
+        -0.3571213779606282
+      ],
+      "use_for_optimization": false,
+      "quality_semantics": "geometry-only diagnostic; point correspondence, visibility and anatomical sole mapping unverified",
+      "image_direction_cues": [
+        {
+          "view": "left",
+          "toe_midpoint_minus_heel_upright_px": [
+            -145.9509031373168,
+            84.80917754827806
+          ],
+          "toe_midpoint_minus_ankle_upright_px": [
+            -106.7750038963336,
+            107.18176770677746
+          ],
+          "heel_minus_ankle_upright_px": [
+            39.1758992409832,
+            22.372590158499406
+          ]
+        },
+        {
+          "view": "right",
+          "toe_midpoint_minus_heel_upright_px": [
+            -28.69060616842728,
+            121.40323148989182
+          ],
+          "toe_midpoint_minus_ankle_upright_px": [
+            -15.953390567090423,
+            142.58819374383665
+          ],
+          "heel_minus_ankle_upright_px": [
+            12.737215601336857,
+            21.184962253944832
+          ]
+        }
+      ]
+    }
+  },
+  "visibility_evidence": {
+    "stored_visibility_or_occlusion_labels": false,
+    "stored_fields": [
+      "bbox",
+      "bbox_score",
+      "keypoints308",
+      "keypoint_scores"
+    ],
+    "runner_display_visible_all_ones": "third_party/sapiens2/repo/sapiens/pose/tools/vis/run_sapiens2_from_yolo26_bboxes.py:328-331",
+    "score_is_independent_visibility": false
+  },
+  "scope": "first pair only; no fitting, new objective, whole-clip run, filtering, interpolation or model parameter change",
+  "limits": [
+    "COCO17 provides only ankle and cannot observe sole orientation.",
+    "Toe/heel image predictions may supply an orientation cue but are not skin-sole or contact ground truth.",
+    "Calibrated geometric consistency and high scores cannot establish visual visibility or anatomical correspondence."
+  ],
+  "visual_review": {
+    "overlay": "distal_foot_overlay.png",
+    "reviewed": true,
+    "toe_regions": "Toe predictions lie near visible forefoot/toe or slipper-opening/edge regions. Some predictions correspond to footwear rather than directly visible skin anatomy.",
+    "heel_regions": "Heel predictions lie near the trouser cuff/rearfoot region. The anatomical heel is not independently visible and identifiable in both views, so heel localization cannot be visually certified.",
+    "no_manual_distal_labels": true,
+    "sole_surface_visible": false
+  },
+  "decision": {
+    "cue_available": "First-frame image-space forefoot direction candidate; retain all eight ankle/toe/heel source landmarks for independent reference review.",
+    "reliable_anatomical_sole_orientation_available": false,
+    "usable_as_contact_truth": false,
+    "optimization_change_this_run": false,
+    "next_required_question": "Confirm the intended toe/heel anatomical or footwear landmarks with independent sparse labels before defining corresponding SMPL-H surface points; do not silently map footwear predictions to sole vertices.",
+    "noted_internal_issue": "Despite high scores and low per-point reprojection, freely triangulated ankle-to-heel distances are 168.88/139.56 mm. This is a model/observation-correspondence diagnostic, not proof of an anatomical error or calibrated depth."
+  }
+}

@@ -1,0 +1,1027 @@
+{
+  "comparison": {
+    "ekf_sigma15": {
+      "frames": 448,
+      "all_raw_view_slots": 10752,
+      "raw_error_px": {
+        "finite": 10752,
+        "median": 23.692183061812457,
+        "p95": 84.61594731380495,
+        "max": 217.92601590614106
+      },
+      "fit_le25px_count": 5635,
+      "fit_le25px_rate_whole10752": 0.5240885416666666,
+      "pose_available_frames": 448,
+      "derivative_available_samples": 1957,
+      "derivative_denominator": 5376,
+      "model_status_counts": {
+        "initialized": 1,
+        "updated": 447
+      },
+      "optimizer_status_counts": {},
+      "optimizer_termination_counts": {},
+      "prediction_out_of_domain_frames": [],
+      "latent_norm": {
+        "finite": 448,
+        "median": 8.885378908095525,
+        "p95": 10.287065828027083,
+        "max": 10.697084809715173
+      },
+      "step_ms": {
+        "count": 448,
+        "min": 67.15519999988828,
+        "median": 336.84025000002293,
+        "p95": 410.61033000025867,
+        "max": 623.5947999998643
+      },
+      "whole_vposer_sigma": 1.5,
+      "knee_local_rotvec_diagnostic_not_clinical": {
+        "left_x": {
+          "finite": 448,
+          "median": -11.263017897840953,
+          "p95": -8.329156644076127,
+          "max": -0.40612225748523945
+        },
+        "right_x": {
+          "finite": 448,
+          "median": -7.50143036635421,
+          "p95": 0.22800910804900476,
+          "max": 11.278048058273177
+        },
+        "left_abs_y": {
+          "finite": 448,
+          "median": 3.3419329308836376,
+          "p95": 8.614161838841586,
+          "max": 14.288669697878438
+        },
+        "right_abs_y": {
+          "finite": 448,
+          "median": 4.2286260342160915,
+          "p95": 11.781368950342538,
+          "max": 17.694384632859975
+        },
+        "left_x_below_minus5_degrees_frames": 441,
+        "right_x_below_minus5_degrees_frames": 331
+      },
+      "per_joint": {
+        "left_shoulder": {
+          "all_views": {
+            "finite": 896,
+            "median": 21.901597638796815,
+            "p95": 47.23487313065258,
+            "max": 66.25349265385533
+          },
+          "left": {
+            "finite": 448,
+            "median": 27.066064129480445,
+            "p95": 50.031830034885914,
+            "max": 66.25349265385533
+          },
+          "right": {
+            "finite": 448,
+            "median": 16.84144987502792,
+            "p95": 39.25355694154374,
+            "max": 50.11147459713629
+          },
+          "fit_le25px_count": 545,
+          "whole_view_slots": 896
+        },
+        "right_shoulder": {
+          "all_views": {
+            "finite": 896,
+            "median": 26.08011818026236,
+            "p95": 47.08930454649149,
+            "max": 66.85003188793407
+          },
+          "left": {
+            "finite": 448,
+            "median": 23.664638266681564,
+            "p95": 46.26101620341371,
+            "max": 54.66888705979411
+          },
+          "right": {
+            "finite": 448,
+            "median": 27.534941864233346,
+            "p95": 47.81925103533705,
+            "max": 66.85003188793407
+          },
+          "fit_le25px_count": 415,
+          "whole_view_slots": 896
+        },
+        "left_elbow": {
+          "all_views": {
+            "finite": 896,
+            "median": 18.142082017800426,
+            "p95": 44.684405030529014,
+            "max": 77.26387083504835
+          },
+          "left": {
+            "finite": 448,
+            "median": 16.87537134430421,
+            "p95": 47.8932705978198,
+            "max": 77.26387083504835
+          },
+          "right": {
+            "finite": 448,
+            "median": 18.7981989237048,
+            "p95": 40.8077542858112,
+            "max": 57.15632561763089
+          },
+          "fit_le25px_count": 663,
+          "whole_view_slots": 896
+        },
+        "right_elbow": {
+          "all_views": {
+            "finite": 896,
+            "median": 16.432923335011935,
+            "p95": 38.82039852545649,
+            "max": 53.22689177525941
+          },
+          "left": {
+            "finite": 448,
+            "median": 17.66421387998639,
+            "p95": 39.00355276888245,
+            "max": 51.0364732388369
+          },
+          "right": {
+            "finite": 448,
+            "median": 14.695861989264568,
+            "p95": 37.80870502753388,
+            "max": 53.22689177525941
+          },
+          "fit_le25px_count": 695,
+          "whole_view_slots": 896
+        },
+        "left_wrist": {
+          "all_views": {
+            "finite": 896,
+            "median": 16.3218447623387,
+            "p95": 41.43186553244702,
+            "max": 100.2356387635733
+          },
+          "left": {
+            "finite": 448,
+            "median": 13.073971174188483,
+            "p95": 39.02508989146671,
+            "max": 100.2356387635733
+          },
+          "right": {
+            "finite": 448,
+            "median": 18.78525363189663,
+            "p95": 42.333348079848584,
+            "max": 60.18862529848999
+          },
+          "fit_le25px_count": 697,
+          "whole_view_slots": 896
+        },
+        "right_wrist": {
+          "all_views": {
+            "finite": 896,
+            "median": 12.665793343247554,
+            "p95": 37.22767653740575,
+            "max": 56.13403702352751
+          },
+          "left": {
+            "finite": 448,
+            "median": 14.120595991307624,
+            "p95": 39.96746239171683,
+            "max": 52.99143312574122
+          },
+          "right": {
+            "finite": 448,
+            "median": 11.419340774374103,
+            "p95": 34.992963270680235,
+            "max": 56.13403702352751
+          },
+          "fit_le25px_count": 759,
+          "whole_view_slots": 896
+        },
+        "left_hip": {
+          "all_views": {
+            "finite": 896,
+            "median": 52.40476451942854,
+            "p95": 92.92354159814141,
+            "max": 123.78738538646242
+          },
+          "left": {
+            "finite": 448,
+            "median": 51.30078086299573,
+            "p95": 91.47191705237273,
+            "max": 112.60232161097385
+          },
+          "right": {
+            "finite": 448,
+            "median": 53.196761236156576,
+            "p95": 96.36849000494261,
+            "max": 123.78738538646242
+          },
+          "fit_le25px_count": 54,
+          "whole_view_slots": 896
+        },
+        "right_hip": {
+          "all_views": {
+            "finite": 896,
+            "median": 53.59706915110864,
+            "p95": 103.61563825077954,
+            "max": 141.8669866228585
+          },
+          "left": {
+            "finite": 448,
+            "median": 54.04658123067531,
+            "p95": 97.47011528504483,
+            "max": 120.26920031228703
+          },
+          "right": {
+            "finite": 448,
+            "median": 53.165505930736586,
+            "p95": 109.28493159799248,
+            "max": 141.8669866228585
+          },
+          "fit_le25px_count": 54,
+          "whole_view_slots": 896
+        },
+        "left_knee": {
+          "all_views": {
+            "finite": 896,
+            "median": 46.59025773198076,
+            "p95": 110.68536289474252,
+            "max": 150.96723523018423
+          },
+          "left": {
+            "finite": 448,
+            "median": 46.31835267668778,
+            "p95": 117.31868080275376,
+            "max": 150.96723523018423
+          },
+          "right": {
+            "finite": 448,
+            "median": 47.290782176954494,
+            "p95": 107.122699389227,
+            "max": 121.2709370523695
+          },
+          "fit_le25px_count": 167,
+          "whole_view_slots": 896
+        },
+        "right_knee": {
+          "all_views": {
+            "finite": 896,
+            "median": 49.84233211623147,
+            "p95": 123.2438497415198,
+            "max": 217.92601590614106
+          },
+          "left": {
+            "finite": 448,
+            "median": 46.69836961237337,
+            "p95": 106.41234986773566,
+            "max": 125.41058868732398
+          },
+          "right": {
+            "finite": 448,
+            "median": 56.343472126382395,
+            "p95": 148.36857794621773,
+            "max": 217.92601590614106
+          },
+          "fit_le25px_count": 170,
+          "whole_view_slots": 896
+        },
+        "left_ankle": {
+          "all_views": {
+            "finite": 896,
+            "median": 15.498823227718843,
+            "p95": 50.39689705942084,
+            "max": 111.36967573415707
+          },
+          "left": {
+            "finite": 448,
+            "median": 19.85654495718378,
+            "p95": 64.10779734291941,
+            "max": 111.36967573415707
+          },
+          "right": {
+            "finite": 448,
+            "median": 12.534658067074787,
+            "p95": 29.191257799690398,
+            "max": 68.72508963870781
+          },
+          "fit_le25px_count": 688,
+          "whole_view_slots": 896
+        },
+        "right_ankle": {
+          "all_views": {
+            "finite": 896,
+            "median": 13.600574436216558,
+            "p95": 58.05153687346257,
+            "max": 102.44791767251395
+          },
+          "left": {
+            "finite": 448,
+            "median": 13.068033433054168,
+            "p95": 53.93995247490552,
+            "max": 102.44791767251395
+          },
+          "right": {
+            "finite": 448,
+            "median": 14.112457440957927,
+            "p95": 60.24763302369622,
+            "max": 95.82035931418477
+          },
+          "fit_le25px_count": 728,
+          "whole_view_slots": 896
+        }
+      }
+    },
+    "map_sigma15": {
+      "frames": 448,
+      "all_raw_view_slots": 10752,
+      "raw_error_px": {
+        "finite": 10752,
+        "median": 19.61686140464119,
+        "p95": 76.5599586344999,
+        "max": 398.8691784309523
+      },
+      "fit_le25px_count": 6681,
+      "fit_le25px_rate_whole10752": 0.6213727678571429,
+      "pose_available_frames": 448,
+      "derivative_available_samples": 0,
+      "derivative_denominator": 5376,
+      "model_status_counts": {
+        "initialized": 1,
+        "updated": 447
+      },
+      "optimizer_status_counts": {
+        "not_run": 1,
+        "feasible_unconverged": 447
+      },
+      "optimizer_termination_counts": {
+        "not_run": 1,
+        "iteration_budget": 430,
+        "line_search_failed": 17
+      },
+      "prediction_out_of_domain_frames": [],
+      "latent_norm": {
+        "finite": 448,
+        "median": 6.953997180990514,
+        "p95": 8.649430632439,
+        "max": 9.35042389686315
+      },
+      "step_ms": {
+        "count": 448,
+        "min": 258.22489999973186,
+        "median": 779.5016000000032,
+        "p95": 3957.3433949999744,
+        "max": 6486.069799999768
+      },
+      "whole_vposer_sigma": 1.5,
+      "knee_local_rotvec_diagnostic_not_clinical": {
+        "left_x": {
+          "finite": 448,
+          "median": -11.716372314275263,
+          "p95": 29.38762887946359,
+          "max": 38.80489589822996
+        },
+        "right_x": {
+          "finite": 448,
+          "median": -6.046881081344145,
+          "p95": 39.7748466885508,
+          "max": 52.36093988200682
+        },
+        "left_abs_y": {
+          "finite": 448,
+          "median": 3.742385522899598,
+          "p95": 7.40056480838702,
+          "max": 42.39801069454185
+        },
+        "right_abs_y": {
+          "finite": 448,
+          "median": 1.8935098856505856,
+          "p95": 8.888330199891397,
+          "max": 34.097826991880886
+        },
+        "left_x_below_minus5_degrees_frames": 361,
+        "right_x_below_minus5_degrees_frames": 275
+      },
+      "per_joint": {
+        "left_shoulder": {
+          "all_views": {
+            "finite": 896,
+            "median": 21.51202771912563,
+            "p95": 40.423890565787474,
+            "max": 63.567840383333895
+          },
+          "left": {
+            "finite": 448,
+            "median": 23.66990666345034,
+            "p95": 44.15110044719216,
+            "max": 63.567840383333895
+          },
+          "right": {
+            "finite": 448,
+            "median": 20.014176151474487,
+            "p95": 33.64905119951798,
+            "max": 41.32008117358238
+          },
+          "fit_le25px_count": 590,
+          "whole_view_slots": 896
+        },
+        "right_shoulder": {
+          "all_views": {
+            "finite": 896,
+            "median": 24.03310432730939,
+            "p95": 46.07586701067693,
+            "max": 67.49154628079046
+          },
+          "left": {
+            "finite": 448,
+            "median": 25.088248075247236,
+            "p95": 49.331431303092394,
+            "max": 67.49154628079046
+          },
+          "right": {
+            "finite": 448,
+            "median": 22.77185264825092,
+            "p95": 35.35232785715575,
+            "max": 42.81838380667768
+          },
+          "fit_le25px_count": 498,
+          "whole_view_slots": 896
+        },
+        "left_elbow": {
+          "all_views": {
+            "finite": 896,
+            "median": 17.796983574865298,
+            "p95": 35.12470654176869,
+            "max": 75.84840916612782
+          },
+          "left": {
+            "finite": 448,
+            "median": 16.965291640239002,
+            "p95": 35.529357895765365,
+            "max": 66.4892409836392
+          },
+          "right": {
+            "finite": 448,
+            "median": 18.701163687848663,
+            "p95": 34.73425847450061,
+            "max": 75.84840916612782
+          },
+          "fit_le25px_count": 785,
+          "whole_view_slots": 896
+        },
+        "right_elbow": {
+          "all_views": {
+            "finite": 896,
+            "median": 15.898489314506547,
+            "p95": 26.748966469878503,
+            "max": 50.2349701691913
+          },
+          "left": {
+            "finite": 448,
+            "median": 14.964128843359706,
+            "p95": 27.203583708165496,
+            "max": 40.12119189135112
+          },
+          "right": {
+            "finite": 448,
+            "median": 16.538903627130324,
+            "p95": 26.286049964555083,
+            "max": 50.2349701691913
+          },
+          "fit_le25px_count": 830,
+          "whole_view_slots": 896
+        },
+        "left_wrist": {
+          "all_views": {
+            "finite": 896,
+            "median": 12.401656386099328,
+            "p95": 25.97825658171831,
+            "max": 45.932426707108554
+          },
+          "left": {
+            "finite": 448,
+            "median": 8.16031685597158,
+            "p95": 16.30403293895211,
+            "max": 27.574650715817658
+          },
+          "right": {
+            "finite": 448,
+            "median": 16.06436973641243,
+            "p95": 30.075273229237254,
+            "max": 45.932426707108554
+          },
+          "fit_le25px_count": 839,
+          "whole_view_slots": 896
+        },
+        "right_wrist": {
+          "all_views": {
+            "finite": 896,
+            "median": 12.832394209108273,
+            "p95": 24.015874193262363,
+            "max": 37.482945499834415
+          },
+          "left": {
+            "finite": 448,
+            "median": 16.43348806639436,
+            "p95": 26.234495282618592,
+            "max": 37.482945499834415
+          },
+          "right": {
+            "finite": 448,
+            "median": 7.4041848945849935,
+            "p95": 18.016437927849708,
+            "max": 28.820029490858325
+          },
+          "fit_le25px_count": 863,
+          "whole_view_slots": 896
+        },
+        "left_hip": {
+          "all_views": {
+            "finite": 896,
+            "median": 49.58802161869657,
+            "p95": 137.82114963745346,
+            "max": 194.9405099511021
+          },
+          "left": {
+            "finite": 448,
+            "median": 44.85095507882008,
+            "p95": 71.58892176991827,
+            "max": 114.7938898681275
+          },
+          "right": {
+            "finite": 448,
+            "median": 54.90463505274208,
+            "p95": 164.05112241742464,
+            "max": 194.9405099511021
+          },
+          "fit_le25px_count": 34,
+          "whole_view_slots": 896
+        },
+        "right_hip": {
+          "all_views": {
+            "finite": 896,
+            "median": 56.25734338677621,
+            "p95": 126.13326351746312,
+            "max": 206.72332510510427
+          },
+          "left": {
+            "finite": 448,
+            "median": 60.828869724007006,
+            "p95": 154.41564204154773,
+            "max": 206.72332510510427
+          },
+          "right": {
+            "finite": 448,
+            "median": 53.39898399732007,
+            "p95": 74.96022778039332,
+            "max": 88.28026848344851
+          },
+          "fit_le25px_count": 57,
+          "whole_view_slots": 896
+        },
+        "left_knee": {
+          "all_views": {
+            "finite": 896,
+            "median": 37.48497153458834,
+            "p95": 84.85757427360406,
+            "max": 329.3112915066705
+          },
+          "left": {
+            "finite": 448,
+            "median": 40.761220865310385,
+            "p95": 90.17768853703105,
+            "max": 329.3112915066705
+          },
+          "right": {
+            "finite": 448,
+            "median": 34.48361715277744,
+            "p95": 81.08512886199128,
+            "max": 222.92172638241314
+          },
+          "fit_le25px_count": 293,
+          "whole_view_slots": 896
+        },
+        "right_knee": {
+          "all_views": {
+            "finite": 896,
+            "median": 45.447501715192594,
+            "p95": 124.59494317699314,
+            "max": 398.8691784309523
+          },
+          "left": {
+            "finite": 448,
+            "median": 34.03495948074427,
+            "p95": 102.1545005341813,
+            "max": 286.64994650757194
+          },
+          "right": {
+            "finite": 448,
+            "median": 55.21189680706015,
+            "p95": 159.78066416741183,
+            "max": 398.8691784309523
+          },
+          "fit_le25px_count": 219,
+          "whole_view_slots": 896
+        },
+        "left_ankle": {
+          "all_views": {
+            "finite": 896,
+            "median": 11.727564609018602,
+            "p95": 31.676171853869477,
+            "max": 58.912869612691885
+          },
+          "left": {
+            "finite": 448,
+            "median": 18.559791509493675,
+            "p95": 36.83826339253358,
+            "max": 58.912869612691885
+          },
+          "right": {
+            "finite": 448,
+            "median": 8.117037610965774,
+            "p95": 15.060943041144327,
+            "max": 29.964327120213373
+          },
+          "fit_le25px_count": 800,
+          "whole_view_slots": 896
+        },
+        "right_ankle": {
+          "all_views": {
+            "finite": 896,
+            "median": 11.688484572460046,
+            "p95": 22.320607098116295,
+            "max": 53.00589445471862
+          },
+          "left": {
+            "finite": 448,
+            "median": 11.567357309059412,
+            "p95": 23.163394493689243,
+            "max": 53.00589445471862
+          },
+          "right": {
+            "finite": 448,
+            "median": 11.777654207611056,
+            "p95": 20.98331082110347,
+            "max": 29.645902462777567
+          },
+          "fit_le25px_count": 873,
+          "whole_view_slots": 896
+        }
+      }
+    },
+    "map_sigma075": {
+      "frames": 448,
+      "all_raw_view_slots": 10752,
+      "raw_error_px": {
+        "finite": 10752,
+        "median": 18.131929348178826,
+        "p95": 93.57651070066689,
+        "max": 287.31264186766344
+      },
+      "fit_le25px_count": 7187,
+      "fit_le25px_rate_whole10752": 0.6684337797619048,
+      "pose_available_frames": 448,
+      "derivative_available_samples": 0,
+      "derivative_denominator": 5376,
+      "model_status_counts": {
+        "initialized": 1,
+        "updated": 447
+      },
+      "optimizer_status_counts": {
+        "not_run": 1,
+        "feasible_unconverged": 447
+      },
+      "optimizer_termination_counts": {
+        "not_run": 1,
+        "iteration_budget": 446,
+        "line_search_failed": 1
+      },
+      "prediction_out_of_domain_frames": [],
+      "latent_norm": {
+        "finite": 448,
+        "median": 4.579200587138813,
+        "p95": 5.370065019540123,
+        "max": 5.819573532288674
+      },
+      "step_ms": {
+        "count": 448,
+        "min": 365.02840000002834,
+        "median": 650.7486000000426,
+        "p95": 974.3527149998499,
+        "max": 1317.496200000278
+      },
+      "whole_vposer_sigma": 0.75,
+      "knee_local_rotvec_diagnostic_not_clinical": {
+        "left_x": {
+          "finite": 448,
+          "median": 5.467565777132349,
+          "p95": 30.392157502247287,
+          "max": 32.52729409369475
+        },
+        "right_x": {
+          "finite": 448,
+          "median": 12.265496823332832,
+          "p95": 39.61082494735436,
+          "max": 44.629696275584635
+        },
+        "left_abs_y": {
+          "finite": 448,
+          "median": 2.2953590352541706,
+          "p95": 6.96091617354102,
+          "max": 15.658902207568666
+        },
+        "right_abs_y": {
+          "finite": 448,
+          "median": 1.563987733919901,
+          "p95": 8.845703187463668,
+          "max": 15.394163641987607
+        },
+        "left_x_below_minus5_degrees_frames": 158,
+        "right_x_below_minus5_degrees_frames": 0
+      },
+      "per_joint": {
+        "left_shoulder": {
+          "all_views": {
+            "finite": 896,
+            "median": 22.256225621929758,
+            "p95": 38.566109864906196,
+            "max": 57.83743304433508
+          },
+          "left": {
+            "finite": 448,
+            "median": 18.84128503641181,
+            "p95": 38.608146792607016,
+            "max": 50.016372309961234
+          },
+          "right": {
+            "finite": 448,
+            "median": 24.358863583273745,
+            "p95": 38.53358619988063,
+            "max": 57.83743304433508
+          },
+          "fit_le25px_count": 547,
+          "whole_view_slots": 896
+        },
+        "right_shoulder": {
+          "all_views": {
+            "finite": 896,
+            "median": 22.11703440716881,
+            "p95": 54.43359429477191,
+            "max": 70.09339726813474
+          },
+          "left": {
+            "finite": 448,
+            "median": 33.40787465348487,
+            "p95": 58.18560827833578,
+            "max": 70.09339726813474
+          },
+          "right": {
+            "finite": 448,
+            "median": 12.925974752014403,
+            "p95": 29.990868999520174,
+            "max": 38.032324912557364
+          },
+          "fit_le25px_count": 533,
+          "whole_view_slots": 896
+        },
+        "left_elbow": {
+          "all_views": {
+            "finite": 896,
+            "median": 17.363262161603977,
+            "p95": 37.683922817569915,
+            "max": 91.41082917769354
+          },
+          "left": {
+            "finite": 448,
+            "median": 16.613695090990653,
+            "p95": 40.297891334638024,
+            "max": 87.22046310562138
+          },
+          "right": {
+            "finite": 448,
+            "median": 18.38120077415966,
+            "p95": 35.6360671686449,
+            "max": 91.41082917769354
+          },
+          "fit_le25px_count": 779,
+          "whole_view_slots": 896
+        },
+        "right_elbow": {
+          "all_views": {
+            "finite": 896,
+            "median": 15.655919982201585,
+            "p95": 31.185953578386496,
+            "max": 86.98624372195746
+          },
+          "left": {
+            "finite": 448,
+            "median": 12.791095282890485,
+            "p95": 22.11976128116662,
+            "max": 33.69876489948363
+          },
+          "right": {
+            "finite": 448,
+            "median": 18.759665114352487,
+            "p95": 38.016842683112465,
+            "max": 86.98624372195746
+          },
+          "fit_le25px_count": 810,
+          "whole_view_slots": 896
+        },
+        "left_wrist": {
+          "all_views": {
+            "finite": 896,
+            "median": 12.17865308823686,
+            "p95": 24.120668617831356,
+            "max": 44.465541795116984
+          },
+          "left": {
+            "finite": 448,
+            "median": 8.851079119573152,
+            "p95": 14.103803361912924,
+            "max": 25.7378577126151
+          },
+          "right": {
+            "finite": 448,
+            "median": 17.208809193838484,
+            "p95": 30.31675955290805,
+            "max": 44.465541795116984
+          },
+          "fit_le25px_count": 856,
+          "whole_view_slots": 896
+        },
+        "right_wrist": {
+          "all_views": {
+            "finite": 896,
+            "median": 12.04080172544801,
+            "p95": 21.813186546704934,
+            "max": 36.691437749603715
+          },
+          "left": {
+            "finite": 448,
+            "median": 17.624578220759787,
+            "p95": 23.260179328897227,
+            "max": 36.691437749603715
+          },
+          "right": {
+            "finite": 448,
+            "median": 7.462152213475359,
+            "p95": 12.26223556819185,
+            "max": 17.65493218140649
+          },
+          "fit_le25px_count": 886,
+          "whole_view_slots": 896
+        },
+        "left_hip": {
+          "all_views": {
+            "finite": 896,
+            "median": 58.29713135290676,
+            "p95": 161.32837687667086,
+            "max": 191.56454473930958
+          },
+          "left": {
+            "finite": 448,
+            "median": 39.11966135769322,
+            "p95": 63.89549084762195,
+            "max": 117.10955579881696
+          },
+          "right": {
+            "finite": 448,
+            "median": 101.82161285048183,
+            "p95": 168.84395496737812,
+            "max": 191.56454473930958
+          },
+          "fit_le25px_count": 45,
+          "whole_view_slots": 896
+        },
+        "right_hip": {
+          "all_views": {
+            "finite": 896,
+            "median": 60.75140075232215,
+            "p95": 170.02777262454933,
+            "max": 201.72243761651947
+          },
+          "left": {
+            "finite": 448,
+            "median": 98.08248650741061,
+            "p95": 176.56114182201014,
+            "max": 201.72243761651947
+          },
+          "right": {
+            "finite": 448,
+            "median": 42.88349951159482,
+            "p95": 65.43875909628795,
+            "max": 86.81131314379218
+          },
+          "fit_le25px_count": 79,
+          "whole_view_slots": 896
+        },
+        "left_knee": {
+          "all_views": {
+            "finite": 896,
+            "median": 20.722751129086944,
+            "p95": 64.00389031801717,
+            "max": 287.31264186766344
+          },
+          "left": {
+            "finite": 448,
+            "median": 26.355366965363206,
+            "p95": 64.30880783863897,
+            "max": 287.31264186766344
+          },
+          "right": {
+            "finite": 448,
+            "median": 15.800269352085593,
+            "p95": 63.888969586521455,
+            "max": 195.72100982039154
+          },
+          "fit_le25px_count": 542,
+          "whole_view_slots": 896
+        },
+        "right_knee": {
+          "all_views": {
+            "finite": 896,
+            "median": 32.99739855905014,
+            "p95": 88.84881377003506,
+            "max": 257.4546217915981
+          },
+          "left": {
+            "finite": 448,
+            "median": 16.8375863878746,
+            "p95": 67.8154076595681,
+            "max": 169.12432239763612
+          },
+          "right": {
+            "finite": 448,
+            "median": 41.269961027491206,
+            "p95": 93.08030324358579,
+            "max": 257.4546217915981
+          },
+          "fit_le25px_count": 340,
+          "whole_view_slots": 896
+        },
+        "left_ankle": {
+          "all_views": {
+            "finite": 896,
+            "median": 9.895005948834559,
+            "p95": 21.442608128918987,
+            "max": 36.58972809703115
+          },
+          "left": {
+            "finite": 448,
+            "median": 12.724491231938767,
+            "p95": 23.247718598818697,
+            "max": 36.58972809703115
+          },
+          "right": {
+            "finite": 448,
+            "median": 7.800061943492362,
+            "p95": 14.331594773230773,
+            "max": 24.182308983751113
+          },
+          "fit_le25px_count": 881,
+          "whole_view_slots": 896
+        },
+        "right_ankle": {
+          "all_views": {
+            "finite": 896,
+            "median": 8.030375083978619,
+            "p95": 18.458020847769685,
+            "max": 49.98830266600522
+          },
+          "left": {
+            "finite": 448,
+            "median": 8.030375083978619,
+            "p95": 17.004414901102802,
+            "max": 49.98830266600522
+          },
+          "right": {
+            "finite": 448,
+            "median": 8.04047004329648,
+            "p95": 18.79604856815083,
+            "max": 26.55999126567917
+          },
+          "fit_le25px_count": 889,
+          "whole_view_slots": 896
+        }
+      }
+    }
+  },
+  "fixed_beta": [
+    [
+      1.1298097372055054,
+      -0.31224068999290466,
+      0.6401214599609375,
+      -0.022837277501821518,
+      0.2672803997993469,
+      -0.23431605100631714,
+      -0.11013275384902954,
+      -0.0018150045070797205,
+      -0.2465878129005432,
+      0.2786286175251007
+    ]
+  ],
+  "fixed_timestamps": true,
+  "observation_scope": "same whole448 actual tracker inputs;frame0 substitutions identical across variants;no3D observation term",
+  "frame0_labels": null,
+  "frame0_detector_observations": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\first_frame_observations.json",
+  "limits": "Raw residual statistics require coverage;local knee axis angles are model diagnostics,not clinical angles;no independent real3D or derivative truth"
+}

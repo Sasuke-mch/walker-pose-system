@@ -5,6 +5,7 @@ import argparse
 import base64
 from collections import Counter
 import gzip
+from html import escape
 import json
 import os
 from pathlib import Path
@@ -17,7 +18,7 @@ APP = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(APP), str(APP / 'tools')]
 
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy  # noqa: E402
-from pose_app.smplh_first_frame_labels import apply_first_frame_labels  # noqa: E402
+from pose_app.smplh_first_frame_labels import apply_first_frame_labels, apply_first_frame_observations  # noqa: E402
 from run_stereo_pva_baseline import _load_predictions  # noqa: E402
 from walker_tools.visualization.build_grasp_body_canvas_viewer import (  # noqa: E402
     build_canvas_page, encode, recorded_strict_gate, validate_frame_ids,
@@ -95,6 +96,12 @@ def motion_page(page, data):
         raise ValueError('existing Canvas drawing hook changed')
     source_text = ('本候选在固定地面系联合估计q/v/a，使用本轮Stage相机变换回投双目像素；Stage本身含脚踝锚和约0.5秒固定延迟。脚底约束和世界运动均条件于该采集假设，不是独立世界轨迹或物理接触认证。' if world else
                    '人体来自保存的因果跟踪结果；地面、相机和助步器仅用本轮Stage重放作显示参考。三角化只用于显示，未进入人体跟踪损失。速度、加速度仍是相机系估计。')
+    if data['motion'].get('firstFrameDetector'):
+        detector = escape(str(data['motion']['firstFrameDetector']))
+        source_text += f'本次仅首帧人体二维观测为{detector}，其余447帧为PMPose；没有人工点覆盖。黑色三角化及Stage场景始终来自同图PMPose，作为单独诊断参考。'
+        initial_sigma = data['motion'].get('initializationPriorSigma')
+        if initial_sigma is not None:
+            source_text += f'首帧拟合整体VPoser σ={initial_sigma:g}；上方求解方法权重指后续跟踪。'
     page = page.replace('<section><h2>参考来源</h2><p>', '<section><h2>坐标与来源</h2><p>'+source_text)
     page = page.replace('<section><h2>操作</h2>', '<section><h2>视角</h2><div><button data-motion-view="recommended">推荐</button><button data-motion-view="front">正视</button><button data-motion-view="side">侧视</button><button data-motion-view="top">俯视</button></div></section><section><h2>操作</h2>')
     page = page.replace('<section><h2>视角</h2>',method_section+shape_section+'<section><h2>视角</h2>',1)
@@ -222,8 +229,16 @@ def run(args):
     if len(foot_nodes)!=4:
         raise ValueError('static walker topology must identify four bottom foot nodes')
     obs=np.stack([_load_predictions(Path(p['inputs'][side+'_predictions']),side) for side in ('left','right')],1)
+    frame0_detector = None
+    initialization_sigma = None
     if p.get('first_frame_labels'):
         apply_first_frame_labels(Path(p['first_frame_labels']),Path(p['inputs']['input_pairs']),obs[:,0],obs[:,1])
+    if p.get('first_frame_observations'):
+        frame0_source = apply_first_frame_observations(Path(p['first_frame_observations']),Path(p['inputs']['input_pairs']),obs[:,0],obs[:,1])
+        frame0_detector = frame0_source.get('detector', 'external_detector')
+        initial_summary = Path(p['effective_initial_fit']).parent/'summary.json'
+        if initial_summary.exists():
+            initialization_sigma = json.loads(initial_summary.read_text(encoding='utf-8')).get('whole_vposer_prior_sigma')
     model=r['predicted_coco'].astype(float)
     projected=np.stack([fisheye_project_numpy(model,cal.K0,cal.D0),fisheye_project_numpy(model@cal.R_cam0_to_cam1.T+cal.T_cam0_to_cam1_mm/1000,cal.K1,cal.D1)],1)
     reprojection=np.linalg.norm(projected[:,:,5:17]-obs[:,:,5:17,:2],axis=-1)
@@ -245,6 +260,8 @@ def run(args):
           'hand_state':[['冻结手姿','冻结手姿'] for _ in range(n)],'wrist_mm':[[None,None] for _ in range(n)],
           'reprojection':json_array(np.nanmedian(reprojection,axis=2)),'reject_reasons':reasons.tolist()}
     data['motion']={'names':NAMES,'time':r['timestamp_s'].tolist(),'segment':r['segment_id'].tolist(),
+        'firstFrameDetector':frame0_detector,
+        'initializationPriorSigma':initialization_sigma,
         'updateMethod':p.get('update_method', 'ekf'),
         'latentPriorSigma':p['configuration']['latent_prior_sigma'],
         'iteratedUpdate':[row.get('iterated_update') for row in records],
@@ -271,6 +288,7 @@ def run(args):
         'observation_display_source':'same_scene_detector_only_triangulated_points_mm',
         'strict_points_role':'unchanged_stage_inputs_and_accepted_ankle_trails',
         'beta':data['motion']['beta'],'shape_fit':p.get('shape_fit'),
+        'first_frame_detector':frame0_detector,'initialization_vposer_sigma':initialization_sigma,
         'world_state_available':world,'world_pose_certified':False,
         'derivative_coordinate_frame':p.get('coordinate_frame','current_left_camera'),
         'update_method':data['motion']['updateMethod'],'latent_prior_sigma':data['motion']['latentPriorSigma'],

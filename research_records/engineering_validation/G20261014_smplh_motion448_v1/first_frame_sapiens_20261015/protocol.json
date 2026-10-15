@@ -1,0 +1,228 @@
+{
+  "request": "Sapiens2 frame0 only;PMPose frames1..447 unchanged;fixed original full-sequence calibrated beta",
+  "scope": "reinitialize from original frame0-only seed,not old manual-refined pose;no manual pixel input;no future pose",
+  "diagnosis_before_fit": {
+    "spine1_x_deg_seed_vs_manual": [
+      10.599,
+      22.409
+    ],
+    "latent_norm_seed_vs_manual": [
+      1.8767,
+      4.587
+    ],
+    "caveat": "seed and manual fit also differ slightly in beta;not pure manual-label causality",
+    "current_ground_role": "display only;new initialization cannot guarantee later contact",
+    "ankle_rotations": "native7/8 free;fixed native10/11 are distal feet,not ankles",
+    "sapiens_limit": "hips occluded;two knees retain stereo conflict;not ground truth"
+  },
+  "first_frame_input": "first_frame_observations.json",
+  "seed": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_stereo_pva_baseline448_v2\\first_frame_fit\\result.npz",
+  "shape_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\result.npz",
+  "first_stage": {
+    "optimizer": "existing Adam500",
+    "manual_points": 0,
+    "auto_sigma_px": 15,
+    "whole_vposer_sigma": 1.5,
+    "shape_optimized": false,
+    "tracking_not_started_until_frame0_review": true,
+    "role": "original first attempt only;selected method and prior are specified in selected_initialization_prior_sigma/initialization_graph"
+  },
+  "controls": "same observations1..447,tracking parameters,model,frame times and beta;change initialization strategy only",
+  "stopping": "inspect first-frame pixel fit,body rotations,sole heights before full replay;retain poor results;no weight sweep or local body priors",
+  "first_frame_review": "initialization_review.json",
+  "first_frame_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\initialization_double_sigma075\\result.npz",
+  "initialization_polish": {
+    "source": "initialization_sigma075/result.npz",
+    "selected_output": "initialization_double_sigma075/result.npz",
+    "method": "L-BFGS strong_wolfe, double and scaled coordinates; same sigma0.75 2D+wholeVPoser objective",
+    "max_iterations": 150,
+    "actual_evaluations": 44,
+    "final_scaled_gradient_inf": 0.1493382051738188,
+    "convergence_claim": false
+  },
+  "full_replay_decision": "run all3 existing estimator configurations with one identical selected first-frame initialization;no local priors or new ground constraints;preserve failure and contact limitations",
+  "variants": [
+    {
+      "name": "ekf_sigma15",
+      "method": "ekf",
+      "sigma": 1.5
+    },
+    {
+      "name": "map_sigma15",
+      "method": "iterated-map",
+      "sigma": 1.5
+    },
+    {
+      "name": "map_sigma075",
+      "method": "iterated-map",
+      "sigma": 0.75
+    }
+  ],
+  "scene_role": "freshly replayed all-PMPose diagnostic display;frame0 body Sapiens2 explicit;not3D optimization input or independent world",
+  "selected_initialization_prior_sigma": 0.75,
+  "selection_reason": "bounded two whole-VPoser candidates: sigma0.75 reduces left knee reverse-local-x from-7.90 to about-0.41deg and abs sole offsets;median stereo fit17.27px vs16.89px,hip/tail worsens explicitly retained;not claimed physically correct",
+  "numerical_review": "both existing objectives polished in double precision,scaled latent/root/translation0.5/0.35/0.1;150budget;recorded gradients remain nonzero;no convergence claim",
+  "incomplete_trial": {
+    "path": "ekf_sigma15",
+    "last_frame": 164,
+    "initial_fit": "initialization_lbfgs150/result.npz",
+    "state": "interrupted_before_completion_after_lower_limb_review;partial trajectory retained;not included as448result"
+  },
+  "final_runs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init",
+  "initialization_graph": [
+    {
+      "output": "initialization_adam500",
+      "source": "original frame0-only seed with supplied original-mainline beta",
+      "function": "refine_first_frame_2d",
+      "steps": 500,
+      "optimize_shape": false,
+      "latent_prior_sigma": 1.5,
+      "lbfgs_steps": 0
+    },
+    {
+      "output": "initialization_lbfgs150",
+      "source": "initialization_adam500/result.npz",
+      "steps": 0,
+      "optimize_shape": false,
+      "latent_prior_sigma": 1.5,
+      "lbfgs_steps": 150,
+      "lbfgs_double": false
+    },
+    {
+      "output": "initialization_sigma075",
+      "source": "original frame0-only seed with supplied original-mainline beta",
+      "steps": 500,
+      "optimize_shape": false,
+      "latent_prior_sigma": 0.75,
+      "lbfgs_steps": 150,
+      "lbfgs_double": false
+    },
+    {
+      "output": "initialization_double_sigma15",
+      "source": "initialization_lbfgs150/result.npz",
+      "steps": 0,
+      "optimize_shape": false,
+      "latent_prior_sigma": 1.5,
+      "lbfgs_steps": 150,
+      "lbfgs_double": true
+    },
+    {
+      "output": "initialization_double_sigma075",
+      "source": "initialization_sigma075/result.npz",
+      "steps": 0,
+      "optimize_shape": false,
+      "latent_prior_sigma": 0.75,
+      "lbfgs_steps": 150,
+      "lbfgs_double": true
+    }
+  ],
+  "initialization_implementation": "realtime_app/pose_app/smplh_first_frame_labels.py:refine_first_frame_2d;raw fisheye stereo current pair0 only;existing manual mask allfalse;auto sigma15px;normalized vector Huber3;entire VPoser prior;beta frozen;no3D or ground term",
+  "numerical_initialization_limits": "The final double gradients are retained;L-BFGS budget or small objective change is not stationarity or independent accuracy. Exported float32 model must reproduce source pose/mesh and pixel residuals within precision before display.",
+  "next_stage_stop": "One complete448 replay per existing3 estimator configs;compare frames1..447 separately from changed frame0;retain contact problems and optimizer failures;no further initial-prior sweep.",
+  "first_frame_selected_diagnostic": "selected_initialization_diagnostic.json",
+  "distal_foot_diagnostic": "distal_foot_diagnostic.json",
+  "distal_foot_decision": "not used as additional fitting targets:shoe/toe/heel semantic and surface correspondence unverified despite low stereo residual;current experiment keeps body COCO17 targets",
+  "implementation_checks": "33 targeted annotation/model/viewer tests passed including frame0-only substitution and dtype restoration after deliberately failed double polish;Ruff E9/F passed;actual saved double/float model projections agree<0.001px;selected beta exact unchanged",
+  "results": {
+    "status": "completed_all3_full448;not_promoted",
+    "comparison": "replay_selected_init/comparison.json",
+    "same_post_frame0_comparison": "replay_selected_init/initialization_replay_comparison.json",
+    "first_frame_selected": "selected_initialization_diagnostic.json",
+    "retained_incomplete_trial": "ekf_sigma15/trajectory.jsonl;164lastframe;interrupted and excluded from complete comparisons",
+    "source_scope": "frame0 Sapiens2 only;frame1..447 PMPose identical;beta,time,per-method estimator settings verified exact same",
+    "decision": "new first frame reduces tilt/sole offsets but does not solve full-sequence lower-limb geometry or MAP convergence;do not replace mainline or loosen gates;stop further initialization weight search",
+    "variants": {
+      "ekf_sigma15": {
+        "frames": 448,
+        "pose_available_frames": 448,
+        "all_valid_raw_view_reprojection_px": {
+          "count": 10752,
+          "min": 0.24204630202844302,
+          "median": 23.692183061812457,
+          "p95": 84.61594731380495,
+          "max": 217.92601590614106
+        },
+        "derivative_available_joint_samples": 1957,
+        "iterated_update_status_counts": {},
+        "step_ms_model_geometry_state_update_and_derivative_decode": {
+          "count": 448,
+          "min": 67.15519999988828,
+          "median": 336.84025000002293,
+          "p95": 410.61033000025867,
+          "max": 623.5947999998643
+        }
+      },
+      "map_sigma15": {
+        "frames": 448,
+        "pose_available_frames": 448,
+        "all_valid_raw_view_reprojection_px": {
+          "count": 10752,
+          "min": 0.01784287210124005,
+          "median": 19.61686140464119,
+          "p95": 76.5599586344999,
+          "max": 398.8691784309523
+        },
+        "derivative_available_joint_samples": 0,
+        "iterated_update_status_counts": {
+          "not_run": 1,
+          "feasible_unconverged": 447
+        },
+        "step_ms_model_geometry_state_update_and_derivative_decode": {
+          "count": 448,
+          "min": 258.22489999973186,
+          "median": 779.5016000000032,
+          "p95": 3957.3433949999744,
+          "max": 6486.069799999768
+        }
+      },
+      "map_sigma075": {
+        "frames": 448,
+        "pose_available_frames": 448,
+        "all_valid_raw_view_reprojection_px": {
+          "count": 10752,
+          "min": 0.03324344350862546,
+          "median": 18.131929348178826,
+          "p95": 93.57651070066689,
+          "max": 287.31264186766344
+        },
+        "derivative_available_joint_samples": 0,
+        "iterated_update_status_counts": {
+          "not_run": 1,
+          "feasible_unconverged": 447
+        },
+        "step_ms_model_geometry_state_update_and_derivative_decode": {
+          "count": 448,
+          "min": 365.02840000002834,
+          "median": 650.7486000000426,
+          "p95": 974.3527149998499,
+          "max": 1317.496200000278
+        }
+      }
+    }
+  },
+  "visualization": {
+    "entry": "replay_selected_init/visualization/index.html",
+    "scene": "visualization/scene",
+    "scene_sources": "visualization/scene/scene_sources.json",
+    "replay_command": "visualization/scene_replay_command.json",
+    "strict": "visualization/first_instance_strict.jsonl",
+    "times": "visualization/frame_times.json",
+    "body_inputs": "frame0 Sapiens2,post0PMPose;actual overlays and recorded residuals use this mixed-in-time source explicitly",
+    "black_skeleton_and_stage": "all448 same-image originalPMPose;not Sapiens2 observations;finite rejection points retained,strict/Stage unaffected",
+    "raw_finite": 7534,
+    "strict_accepted": 5286,
+    "finite_edges": 7915,
+    "edge_denominator": 8064,
+    "old_dynamic_inputs_consumed": false,
+    "ground_is_independent_truth": false,
+    "same_Rt_mesh_raw_points_check_passed": true,
+    "encoded_time_mask_check_passed": true,
+    "encoded_observations_frame0_equals_sapiens_and_post0_equals_pmpose": true,
+    "reprojection_vs_record_max_difference_px": 0,
+    "no_smoothing_interpolation_or_ground_snapping": true,
+    "generated_script_syntax": "3 viewer scripts and comparison index Node check passed",
+    "browser": "actual IAB checked EKF0/188,MAP335,strongMAP188/0,source labels,raw toggle,frame/view switch,stereo overlays",
+    "preview": "visualization/preview_selected_frame0.jpg",
+    "first_frame_overlay": "initialization_selected_pixel_review.png"
+  }
+}

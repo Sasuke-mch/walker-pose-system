@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -21,11 +22,12 @@ a{color:#000}#summary{font-variant-numeric:tabular-nums}</style>
 <label>帧 <input id="frame" type="number" min="0" max="447" value="0" aria-label="对照帧"></label>
 <input id="seek" type="range" min="0" max="447" value="0" aria-label="对照进度"><span id="time"></span>
 <a id="standalone" target="_blank">独立打开当前结果</a></div>
-<p id="summary"></p><p>切换保留帧与观察视角。三组固定同一主线beta、同源图像及本轮场景。黑色实线保留全部有限三角化点；误差只统计，真正缺失不补点。
-地面与助步器是Stage条件显示参考，不能据此认定独立世界运动。两组MAP尚未收敛，速度/加速度默认留空，可在下方勾选原始估计。</p></header>
+<p id="summary"></p><p id="initialization"></p><p>切换保留帧与观察视角。三组固定同一主线beta、同源图像及本轮场景。黑色实线保留全部有限三角化点；误差只统计，真正缺失不补点。
+地面与助步器是Stage条件显示参考，不能据此认定独立世界运动。未收敛/未通过发布门的速度与加速度留空，可在下方勾选原始估计。</p></header>
 <iframe id="viewer" title="当前结果的完整三维与双目检查"></iframe>
 <script>
 const config=__CONFIG__;
+document.getElementById('initialization').textContent=config.initializationNote;
 const select=document.getElementById('variant'),iframe=document.getElementById('viewer');
 let frame=0,view=null;
 for(const variant of config.variants){const option=document.createElement('option');option.value=variant.name;option.textContent=variant.label;select.append(option);}
@@ -63,12 +65,15 @@ def build(root: Path):
     comparison = json.loads((root / 'comparison.json').read_text(encoding='utf-8'))['comparison']
     variants = []
     reference = None
+    frame0_sources = set()
     labels = {'ekf_sigma15': 'EKF · 整体VPoser ×1',
               'map_sigma15': '迭代MAP · 整体VPoser ×1',
               'map_sigma075': '迭代MAP · 整体VPoser ×4'}
     for name, label in labels.items():
         run = root / name
         metadata = json.loads((run / 'view/metadata.json').read_text(encoding='utf-8'))
+        parameters = json.loads((run / 'run_parameters.json').read_text(encoding='utf-8'))
+        frame0_sources.add(parameters.get('first_frame_observations'))
         with np.load(run / 'result.npz') as result:
             identity = [result[key].copy() for key in ('pair_id', 'timestamp_s', 'betas')]
         if reference is None:
@@ -81,10 +86,24 @@ def build(root: Path):
         variants.append({'name': name, 'label': label, 'page': f'../{name}/view/body_browser.html',
                          'summary': f"{label}；双目原始回投中位 {stats['raw_error_px']['median']:.2f} px / P95 {stats['raw_error_px']['p95']:.2f} px；"
                                     f"≤25px {stats['fit_le25px_rate_whole10752']:.2%}；可发布关节导数 {stats['derivative_available_samples']}/5376。"})
-    config = {'variants': variants, 'times': reference[1].tolist()}
+    if len(frame0_sources) != 1:
+        raise ValueError('first-frame detector source differs across variants')
+    frame0_source = next(iter(frame0_sources))
+    note = '三组使用同一个保存的首帧初始化。'
+    if frame0_source:
+        detector = json.loads(Path(frame0_source).read_text(encoding='utf-8')).get('detector', 'external_detector')
+        note = f'本轮仅首帧改用{detector}重新初始化、无人工点覆盖；后续447帧仍为原PMPose。黑色三角化与Stage场景始终来自同图PMPose，单独用作诊断参考。'
+    config = {'variants': variants, 'times': reference[1].tolist(), 'initializationNote': note}
     output = root / 'visualization/index.html'
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(PAGE.replace('__CONFIG__', json.dumps(config, ensure_ascii=False)), encoding='utf-8')
+    page = PAGE.replace('__CONFIG__', json.dumps(config, ensure_ascii=False))
+    if frame0_source:
+        review = Path(frame0_source).parent / 'initialization_selected_pixel_review.png'
+        if review.exists():
+            relative = os.path.relpath(review, output.parent).replace('\\', '/')
+            page = page.replace('<p id="initialization"></p>', '<p id="initialization"></p>'
+                                f'<p><a href="{relative}" target="_blank">首帧双目叠点：旧初始化与本轮初始化</a></p>')
+    output.write_text(page, encoding='utf-8')
     return output
 
 

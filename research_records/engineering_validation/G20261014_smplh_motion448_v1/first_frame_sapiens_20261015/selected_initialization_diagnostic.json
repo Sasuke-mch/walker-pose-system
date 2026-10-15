@@ -1,0 +1,268 @@
+{
+  "purpose": "Read-only final selected first-frame diagnosis;not full-sequence validation",
+  "frame_index": 0,
+  "observations": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\first_frame_observations.json",
+  "same_sapiens_for_both_models": true,
+  "images": {
+    "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\left_ccw90\\pair_0000.png",
+    "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\right_cw90\\pair_0000.png"
+  },
+  "stage_reference_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\visualization\\scene\\scene_transforms.npz",
+  "stage_reference_role": "Shared just-replayed display reference;Stage/ground are engineering assumptions,not independent truth;not a fitting input",
+  "sole_sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260927_wilor_smplh_full448_v1\\contact_surface_sets_smplh_v1\\contact_vertex_sets.json",
+  "beta_exact_equal": true,
+  "beta_max_abs_difference": 0.0,
+  "betas": [
+    [
+      1.1298097372055054,
+      -0.31224068999290466,
+      0.6401214599609375,
+      -0.022837277501821518,
+      0.2672803997993469,
+      -0.23431605100631714,
+      -0.11013275384902954,
+      -0.0018150045070797205,
+      -0.2465878129005432,
+      0.2786286175251007
+    ]
+  ],
+  "strategy_change": "New Sapiens2 automatic frame0 observations replace prior manual+PMPose mixture;new selected polish whole VPoser sigma0.75 vs old1.5;fixed beta,hands,foot tips,neck,head;not single-factor detector ablation",
+  "selected_optimizer": {
+    "double_precision": true,
+    "budget": 150,
+    "closure_evaluations": 44,
+    "final_gradient_inf": 0.1493382051738188,
+    "convergence_claimed": false
+  },
+  "models": {
+    "old_manual": {
+      "fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_calibrated_beta12\\first_frame_fit\\result.npz",
+      "parameter_dtype": "float64",
+      "mesh_dtype": "float32",
+      "reconstructed_mesh_max_abs_difference_m": 2.384185791015625e-07,
+      "pelvis_neck_inclination_deg_stage_reference": 19.927769713938073,
+      "pelvis_neck_vector_ground_m": [
+        0.017616309683411407,
+        -0.16986876462373857,
+        0.47106044781860823
+      ],
+      "lower_upper_spine_bend_deg_model_segments": 29.498218503471072,
+      "local_axis_angle_degrees_not_clinical": {
+        "left_knee_xyz": [
+          15.85440760087753,
+          -2.6339838185037685,
+          -0.9210599716049627
+        ],
+        "right_knee_xyz": [
+          26.3806910462779,
+          -1.5585071092996112,
+          -0.32704315984235943
+        ],
+        "left_ankle_xyz": [
+          -12.191437227556051,
+          10.248540960442083,
+          2.620973736198735
+        ],
+        "right_ankle_xyz": [
+          -11.024581451615573,
+          -5.112720872714773,
+          2.7283223335810147
+        ],
+        "spine1_xyz": [
+          22.40870152231776,
+          0.6579965197728969,
+          -1.08165965824964
+        ],
+        "spine2_xyz": [
+          -6.362433475648573,
+          -2.1987303175762327,
+          -1.892997314607589
+        ],
+        "spine3_xyz": [
+          5.7283907360240764,
+          0.6202822373431123,
+          3.9602328255609947
+        ]
+      },
+      "sole_min_mm_stage_reference_left_right": [
+        20.853846940452,
+        35.4502861994136
+      ],
+      "latent_norm": 4.586960315704346,
+      "raw_reprojection_to_same_sapiens_px_coco17": [
+        [
+          35.766139511900725,
+          19.208208072527185,
+          21.489950599325116,
+          10.67874607276527,
+          32.4105911055093,
+          49.38799403900598,
+          36.097888634161684,
+          88.82625586996316,
+          7.031521223199187,
+          67.47139589907555,
+          13.817494306821503,
+          2.1996589691315473,
+          104.04780838403308,
+          33.18149682002469,
+          13.68293574390438,
+          16.128611052820695,
+          11.324310181032937
+        ],
+        [
+          29.819481846786143,
+          6.311619087926486,
+          0.9971530579615397,
+          11.815930130435172,
+          14.221416563721183,
+          26.56598653344428,
+          47.62905228461815,
+          45.81950146804627,
+          52.5113298677849,
+          17.184937229849464,
+          45.86146853104815,
+          97.11409856237016,
+          19.42380015015956,
+          7.522793180143538,
+          35.34548641968331,
+          18.76669649626097,
+          16.743644510760262
+        ]
+      ],
+      "body12_raw_reprojection_median_px": 29.873741676734486,
+      "body12_raw_reprojection_p95_px": 95.87092215850909,
+      "body12_raw_reprojection_max_px": 104.04780838403308,
+      "hips_raw_reprojection_px": {
+        "left_camera_left_hip": 2.1996589691315473,
+        "left_camera_right_hip": 104.04780838403308,
+        "right_camera_left_hip": 97.11409856237016,
+        "right_camera_right_hip": 19.42380015015956
+      }
+    },
+    "selected_sapiens": {
+      "fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\initialization_double_sigma075\\result.npz",
+      "parameter_dtype": "float64",
+      "mesh_dtype": "float32",
+      "reconstructed_mesh_max_abs_difference_m": 3.5762786865234375e-07,
+      "pelvis_neck_inclination_deg_stage_reference": 11.054202741997853,
+      "pelvis_neck_vector_ground_m": [
+        0.0032561335447889583,
+        -0.09860940438651072,
+        0.5050266834619659
+      ],
+      "lower_upper_spine_bend_deg_model_segments": 20.942683450818745,
+      "local_axis_angle_degrees_not_clinical": {
+        "left_knee_xyz": [
+          -0.40612225748523945,
+          1.4768622555929887,
+          0.11522062458082706
+        ],
+        "right_knee_xyz": [
+          6.586572592930412,
+          -3.9804241656629755,
+          -0.8264990994163942
+        ],
+        "left_ankle_xyz": [
+          -4.044857459518378,
+          9.364592229492697,
+          1.0553871368812096
+        ],
+        "right_ankle_xyz": [
+          -3.2160906484345713,
+          -4.576501961263776,
+          5.521515590840322
+        ],
+        "spine1_xyz": [
+          3.407851057518276,
+          2.728877853170666,
+          -2.617006490829786
+        ],
+        "spine2_xyz": [
+          11.967872429423803,
+          -4.330379545855253,
+          0.28420223899789043
+        ],
+        "spine3_xyz": [
+          -2.1462195535469997,
+          1.7340155646460003,
+          2.1416109388031206
+        ]
+      },
+      "sole_min_mm_stage_reference_left_right": [
+        10.873305373618525,
+        -8.95500778512115
+      ],
+      "latent_norm": 3.8079138579833307,
+      "raw_reprojection_to_same_sapiens_px_coco17": [
+        [
+          55.75163235055616,
+          27.348416439544035,
+          32.062060641573275,
+          5.583684805822243,
+          28.859959980285716,
+          24.952298933508448,
+          11.976213906430269,
+          7.844550124764613,
+          14.3656745125877,
+          11.175805785514935,
+          17.99639912876913,
+          21.32784680018105,
+          70.38299412318672,
+          35.31163988147263,
+          26.003486822498175,
+          6.204603294349306,
+          9.032312850989703
+        ],
+        [
+          47.76378230160897,
+          23.328992488345584,
+          17.27850980209604,
+          23.136049650353897,
+          3.1066463857695052,
+          5.731492167837488,
+          28.025751814659518,
+          9.84356017800127,
+          22.418910400023552,
+          16.450892562243673,
+          13.552890719644811,
+          58.478971705819305,
+          43.03798094713079,
+          18.16446194519655,
+          41.29188225717722,
+          8.453423344072153,
+          14.935522548291294
+        ]
+      ],
+      "body12_raw_reprojection_median_px": 17.223645845506404,
+      "body12_raw_reprojection_p95_px": 56.162823092016,
+      "body12_raw_reprojection_max_px": 70.38299412318672,
+      "hips_raw_reprojection_px": {
+        "left_camera_left_hip": 21.32784680018105,
+        "left_camera_right_hip": 70.38299412318672,
+        "right_camera_left_hip": 58.478971705819305,
+        "right_camera_right_hip": 43.03798094713079
+      }
+    }
+  },
+  "selected_minus_old": {
+    "pelvis_neck_inclination_deg_stage_reference": -8.87356697194022,
+    "lower_upper_spine_bend_deg_model_segments": -8.555535052652328,
+    "latent_norm": -0.779046457721015,
+    "body12_raw_reprojection_median_px": -12.650095831228082,
+    "body12_raw_reprojection_p95_px": -39.70809906649309,
+    "body12_raw_reprojection_max_px": -33.664814260846356,
+    "left_knee_right_knee_left_ankle_right_ankle_geodesic_rotation_deg": [
+      16.80371946719177,
+      19.94203014837194,
+      8.334279627424694,
+      8.304063751073393
+    ]
+  },
+  "limits": [
+    "No independent body/ground/contact truth",
+    "Model local axis angles are not clinical joint angles",
+    "Inclination and spine metrics do not establish natural posture",
+    "Both complete17-point observation skeletons retained;no residual-based point deletion",
+    "Initialization improvement does not establish full tracking improvement"
+  ]
+}

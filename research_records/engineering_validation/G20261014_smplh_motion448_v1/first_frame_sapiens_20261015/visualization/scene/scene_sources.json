@@ -1,0 +1,137 @@
+{
+  "raw_left_video": null,
+  "raw_right_video": null,
+  "raw_video_consumed": false,
+  "input_pair_dir": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+  "raw_left_pmpose": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+  "raw_right_pmpose": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+  "calibration": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results\\stereo_fisheye.json",
+  "static_ground_reference": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260914_static_ground_reference_v1\\estimate_stationary_20pairs_v2\\ground_reference.json",
+  "static_walker_model": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260918_offline_walker_frame_evidence_v1\\coarse_complete_model_v2_camera_rail\\coarse_walker_model.json",
+  "strict_input": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\visualization\\first_instance_strict.jsonl",
+  "strict_scope": "same first instances as fitter; original association and per-point gates",
+  "export_mask_source": "strict_input_not_detector_only_retriangulation",
+  "ground_export_source": "closed_published_dynamic_ground_pose_jsonl",
+  "scene_profile": "mainline",
+  "resolved_scene_profile": "supported_stop_fixed_lag",
+  "old_stage_jsonl_read": false,
+  "old_dynamic_ground_read": false,
+  "old_dynamic_walker_pose_read": false,
+  "static_installation_pose_assumption_consumed": true,
+  "stage_algorithm": "StageHandoffPolicy / RealtimeStageWalkerWriter evidence",
+  "ground_algorithm": "StageHandoffGroundWriter candidate",
+  "stage_handoff_candidate": true,
+  "single_ankle_fallback": false,
+  "latest_stationary_anchor": false,
+  "ankle_bearing_fallback": false,
+  "stage1_reanchor": false,
+  "landing_recovery": "fixed_lag",
+  "landing_protocol": "supported_at_camera_stop",
+  "dropout_prediction": false,
+  "frames_metadata": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\visualization\\frame_times.json",
+  "timestamp_kind": "host_return_not_exposure",
+  "foot_observation_mode": "causal_median",
+  "fps_left": 30.0,
+  "fps_right": 30.0,
+  "video_frame_counts_before_truncation": null,
+  "frames": 448,
+  "opencv_threads": 28,
+  "image_source": "selected original stereo pair images, inverse-rotated to raw camera pixels",
+  "stage_summary": {
+    "legacy_summary": {
+      "completed": true,
+      "record_count": 448,
+      "output_jsonl": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\visualization\\scene\\stage1_stage2.jsonl",
+      "stage_counts": {
+        "warming_up": 5,
+        "transition": 114,
+        "stage2_feet_static_walker_moving": 115,
+        "stage1_walker_static_human_moving": 214
+      },
+      "processing_width": 480,
+      "reconstruction_interval": 10,
+      "mean_processing_ms": 166.1710064732093,
+      "p95_processing_ms": 230.81539999993765,
+      "last_reconstruction_status": "basic_candidate",
+      "reconstruction_attempts": 12,
+      "successful_reconstructions": 6,
+      "failed_reconstructions": 6,
+      "last_reconstruction_point_count": 5,
+      "truth_label_used": false
+    },
+    "candidate_stage_counts": {
+      "stage2_feet_static_walker_moving": 115,
+      "warming_up": 5,
+      "stage1_walker_static_human_moving": 214,
+      "transition": 114
+    }
+  },
+  "ground_summary": {
+    "completed": true,
+    "record_count": 448,
+    "accepted_dynamic_pose_updates": 78,
+    "stage_counts": {
+      "transition": 37,
+      "stage1_walker_static_human_moving": 322,
+      "stage2_feet_static_walker_moving": 89
+    },
+    "mean_processing_ms": 0.9545029017802774,
+    "p95_processing_ms": 2.4819649999244575,
+    "output_jsonl": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\visualization\\scene\\ground_measurement_updates.jsonl",
+    "pose_model": "stage_conditioned_stereo_rotation_plus_two_foot_xyz_full_se3",
+    "landing_recovery": {
+      "mode": "fixed_lag",
+      "events": [
+        {
+          "pair_id": 34,
+          "motion_window_start_sec": 0.8568403000026592,
+          "stop_start_sec": 1.106480400001601,
+          "confirmation_sec": 1.2581895000002987,
+          "height_error_mm": 0.0,
+          "tilt_error_deg": 0.0
+        },
+        {
+          "pair_id": 86,
+          "motion_window_start_sec": 2.761693500004185,
+          "stop_start_sec": 3.0094866000035836,
+          "confirmation_sec": 3.161310550003691,
+          "height_error_mm": 35.289005541447864,
+          "tilt_error_deg": 5.8358099887375054
+        },
+        {
+          "pair_id": 156,
+          "motion_window_start_sec": 5.424065549999796,
+          "stop_start_sec": 5.6576722000027075,
+          "confirmation_sec": 5.818778950000706,
+          "height_error_mm": 26.118471195263623,
+          "tilt_error_deg": 4.803576124685807
+        },
+        {
+          "pair_id": 228,
+          "motion_window_start_sec": 8.009584500003257,
+          "stop_start_sec": 8.27575005000108,
+          "confirmation_sec": 8.409511350004323,
+          "height_error_mm": 4.925727958169887,
+          "tilt_error_deg": 2.9885513852175176
+        },
+        {
+          "pair_id": 298,
+          "motion_window_start_sec": 10.426422550001007,
+          "stop_start_sec": 10.674740550002753,
+          "confirmation_sec": 10.824689550001494,
+          "height_error_mm": 31.100612028679052,
+          "tilt_error_deg": 5.378258649142081
+        },
+        {
+          "pair_id": 379,
+          "motion_window_start_sec": 13.226715500004502,
+          "stop_start_sec": 13.492485500002658,
+          "confirmation_sec": 13.626385400002619,
+          "height_error_mm": 25.230488574919036,
+          "tilt_error_deg": 3.588522716802257
+        }
+      ],
+      "support_source": "explicit_capture_protocol_not_contact_truth"
+    }
+  }
+}

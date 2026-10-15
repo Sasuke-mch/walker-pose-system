@@ -813,5 +813,13 @@
     "user_constraints": "pixel consistency primary;wholeVPoser only;triangulation diagnostic only;frozen shared beta",
     "current_decision": "keep EKF default;retain optional pixel-fit MAP candidate and validated support-selection fix;no locally specialized pose priors",
     "documentation": "docs/CURRENT_SMPLH_ALGORITHM_20261002.md section5.9"
+  },
+  "sapiens_frame0_reinitialization_20261015": {
+    "protocol": "first_frame_sapiens_20261015/protocol.json",
+    "scope": "Sapiens2 frame0 initialization only;PMPose1..447 and original mainline beta fixed",
+    "complete_runs": 3,
+    "frames_each": 448,
+    "accepted_for_mainline": false,
+    "decision": "first-frame tilt/sole geometry improved,full-sequence lower limbs and nonlinear convergence unresolved"
   }
 }

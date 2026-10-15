@@ -1,0 +1,465 @@
+{
+  "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+  "frame": 0,
+  "manual_image_identity_check": "exact decoded pixels match same pair_0000 upright PNG in both views",
+  "sources": {
+    "pmpose": [
+      "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+      "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json"
+    ],
+    "sapiens2": [
+      "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\left_sapiens_coco17_model_input.json",
+      "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\right_sapiens_coco17_model_input.json"
+    ],
+    "manual_labels": "D:\\my_works\\walker_pose_system\\research_records\\annotation_handoffs\\H20261014_people1_pair0000\\labels"
+  },
+  "model_input_rotation": {
+    "left": "ccw90",
+    "right": "cw90"
+  },
+  "comparisons": {
+    "pmpose": {
+      "left_hip": {
+        "available": true,
+        "raw_left_xy_score": [
+          1070.0733233784872,
+          729.1552175663887,
+          0.848659873008728
+        ],
+        "raw_right_xy_score": [
+          897.1446820819192,
+          431.3419792423856,
+          0.8563600778579712
+        ],
+        "sampson_raw_px": 4.806068600697318,
+        "free_triangulation_left_mm": [
+          46.463477297524165,
+          114.57330336565029,
+          440.2040730329809
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          3.588233383325637,
+          3.235659497405329
+        ],
+        "positive_depth_lr": true
+      },
+      "right_hip": {
+        "available": true,
+        "raw_left_xy_score": [
+          1016.8316906368918,
+          447.6648254014076,
+          0.8645346164703369
+        ],
+        "raw_right_xy_score": [
+          906.6857539434282,
+          726.0017247580467,
+          0.8472341299057007
+        ],
+        "sampson_raw_px": 5.4425636094366245,
+        "free_triangulation_left_mm": [
+          16.560023966085232,
+          -61.19810148415923,
+          510.16269069443695
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          3.5715286902465446,
+          4.213471106085989
+        ],
+        "positive_depth_lr": true
+      },
+      "left_knee": {
+        "available": true,
+        "raw_left_xy_score": [
+          688.0200560282146,
+          780.3011138565996,
+          0.8424676656723022
+        ],
+        "raw_right_xy_score": [
+          1266.249766894749,
+          422.0719822087185,
+          0.858056902885437
+        ],
+        "sampson_raw_px": 5.800172779498747,
+        "free_triangulation_left_mm": [
+          -205.22829308110357,
+          159.56268266335448,
+          447.5487339392325
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          4.337725751755586,
+          3.967190064267997
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          34.17739724920558,
+          35.41786405000175
+        ]
+      },
+      "right_knee": {
+        "available": true,
+        "raw_left_xy_score": [
+          659.9981593480188,
+          509.12767278894466,
+          0.8629263043403625
+        ],
+        "raw_right_xy_score": [
+          1300.668738092695,
+          688.9647391298981,
+          0.8401463627815247
+        ],
+        "sampson_raw_px": 23.069260948688036,
+        "free_triangulation_left_mm": [
+          -230.43981457882683,
+          -19.814085893441927,
+          506.9842725879361
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          14.838542154568335,
+          18.50867873923425
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          34.622258577667615,
+          48.12368629160261
+        ]
+      },
+      "left_ankle": {
+        "available": true,
+        "raw_left_xy_score": [
+          348.74794166807123,
+          803.6156273065728,
+          0.9211506843566895
+        ],
+        "raw_right_xy_score": [
+          1574.5019595736549,
+          433.84452069566623,
+          0.9301992654800415
+        ],
+        "sampson_raw_px": 12.880621016342243,
+        "free_triangulation_left_mm": [
+          -609.0644552756978,
+          261.4940330060378,
+          486.1551531027725
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          11.629184230192806,
+          9.737994652188641
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          7.697579659366208,
+          11.695632503229172
+        ]
+      },
+      "right_ankle": {
+        "available": true,
+        "raw_left_xy_score": [
+          366.24080243186336,
+          613.6279981745051,
+          0.9167619347572327
+        ],
+        "raw_right_xy_score": [
+          1628.94702897753,
+          625.8742943266602,
+          0.9282166361808777
+        ],
+        "sampson_raw_px": 6.978412299619308,
+        "free_triangulation_left_mm": [
+          -647.0723992159715,
+          82.2150427026368,
+          575.6458889148171
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          5.221928439271521,
+          6.277401037222031
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          10.4654351114403,
+          21.892040250347097
+        ]
+      }
+    },
+    "sapiens2": {
+      "left_hip": {
+        "available": true,
+        "raw_left_xy_score": [
+          1116.4380516725428,
+          706.4188662973374,
+          0.6719613075256348
+        ],
+        "raw_right_xy_score": [
+          867.6676124497953,
+          451.7449077611195,
+          0.7270745038986206
+        ],
+        "sampson_raw_px": 6.880881652921632,
+        "free_triangulation_left_mm": [
+          70.88316116768648,
+          104.66345241507108,
+          451.3874515562195
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          5.092845959987836,
+          4.664696275490966
+        ],
+        "positive_depth_lr": true
+      },
+      "right_hip": {
+        "available": true,
+        "raw_left_xy_score": [
+          1064.8265476600795,
+          450.1573909489898,
+          0.7115776538848877
+        ],
+        "raw_right_xy_score": [
+          873.3316674325979,
+          719.5428464400206,
+          0.7268929481506348
+        ],
+        "sampson_raw_px": 8.65018603463235,
+        "free_triangulation_left_mm": [
+          43.26165160585442,
+          -58.66858319841882,
+          512.784268651935
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          5.698256737859463,
+          6.659974534850946
+        ],
+        "positive_depth_lr": true
+      },
+      "left_knee": {
+        "available": true,
+        "raw_left_xy_score": [
+          680.8429347019569,
+          789.6944030392233,
+          0.8365335464477539
+        ],
+        "raw_right_xy_score": [
+          1295.154879551308,
+          418.5384914113588,
+          0.8610086441040039
+        ],
+        "sampson_raw_px": 21.86225875942011,
+        "free_triangulation_left_mm": [
+          -222.49760247448023,
+          167.86449247610804,
+          451.59947677085984
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          16.647836409473765,
+          14.744554715554484
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          24.603412204955802,
+          7.536855886145464
+        ]
+      },
+      "right_knee": {
+        "available": true,
+        "raw_left_xy_score": [
+          647.9150395860861,
+          511.95887213352466,
+          0.8334619402885437
+        ],
+        "raw_right_xy_score": [
+          1326.8361529181984,
+          693.5921098898843,
+          0.8534774780273438
+        ],
+        "sampson_raw_px": 15.50608866791093,
+        "free_triangulation_left_mm": [
+          -249.20229963297325,
+          -18.19782627963519,
+          516.9243496834288
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          10.021336057284783,
+          12.424281503645771
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          22.316457782143875,
+          24.267031449091608
+        ]
+      },
+      "left_ankle": {
+        "available": true,
+        "raw_left_xy_score": [
+          371.4991662268544,
+          803.9175935915002,
+          0.92033851146698
+        ],
+        "raw_right_xy_score": [
+          1570.0636108996823,
+          443.7592476175719,
+          0.9069227576255798
+        ],
+        "sampson_raw_px": 2.482326441875981,
+        "free_triangulation_left_mm": [
+          -602.8527697954994,
+          259.7473960000016,
+          505.40005186957006
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          2.200131558842793,
+          1.842670914978804
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          20.955082670499824,
+          15.67629284114878
+        ]
+      },
+      "right_ankle": {
+        "available": true,
+        "raw_left_xy_score": [
+          377.9801639482084,
+          617.360976888247,
+          0.9074094295501709
+        ],
+        "raw_right_xy_score": [
+          1621.9336974200078,
+          625.5415284171779,
+          0.9217832088470459
+        ],
+        "sampson_raw_px": 2.8879062943616396,
+        "free_triangulation_left_mm": [
+          -637.2604017420239,
+          84.25396147514248,
+          581.6112219473088
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          2.1578639008981253,
+          2.553251732860052
+        ],
+        "positive_depth_lr": true,
+        "manual_distance_lr_px": [
+          17.45244998825427,
+          17.935950554362236
+        ]
+      }
+    },
+    "manual": {
+      "left_hip": {
+        "available": false,
+        "reason": "not_labeled"
+      },
+      "right_hip": {
+        "available": false,
+        "reason": "not_labeled"
+      },
+      "left_knee": {
+        "available": true,
+        "raw_left_xy_score": [
+          656.560975609756,
+          793.6585365853658,
+          1.0
+        ],
+        "raw_right_xy_score": [
+          1301.6666666666667,
+          422.33333333333326,
+          1.0
+        ],
+        "sampson_raw_px": 9.2829475242255,
+        "free_triangulation_left_mm": [
+          -237.743597580221,
+          175.3786103861418,
+          457.6723524894049
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          7.019353971603127,
+          6.330946160802006
+        ],
+        "positive_depth_lr": true
+      },
+      "right_knee": {
+        "available": true,
+        "raw_left_xy_score": [
+          627.2926829268292,
+          520.4878048780487,
+          1.0
+        ],
+        "raw_right_xy_score": [
+          1348.3333333333333,
+          682.3333333333333,
+          1.0
+        ],
+        "sampson_raw_px": 15.637804210576352,
+        "free_triangulation_left_mm": [
+          -264.96745482283535,
+          -11.75390764235506,
+          513.1497764264943
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          10.127633944474255,
+          12.52561019379054
+        ],
+        "positive_depth_lr": true
+      },
+      "left_ankle": {
+        "available": true,
+        "raw_left_xy_score": [
+          351.68292682926835,
+          810.7317073170731,
+          1.0
+        ],
+        "raw_right_xy_score": [
+          1585.0,
+          439.0,
+          1.0
+        ],
+        "sampson_raw_px": 4.8253431070193376,
+        "free_triangulation_left_mm": [
+          -640.942263800433,
+          276.6202865178465,
+          506.72095713803213
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          4.415688836719193,
+          3.6305578877622726
+        ],
+        "positive_depth_lr": true
+      },
+      "right_ankle": {
+        "available": true,
+        "raw_left_xy_score": [
+          361.43902439024396,
+          622.9268292682926,
+          1.0
+        ],
+        "raw_right_xy_score": [
+          1615.0,
+          609.0,
+          1.0
+        ],
+        "sampson_raw_px": 16.761077759612437,
+        "free_triangulation_left_mm": [
+          -621.0671597866084,
+          92.31737558570411,
+          553.1443714144996
+        ],
+        "free_triangulation_reprojection_lr_px": [
+          12.442233503540654,
+          14.914039937625171
+        ],
+        "positive_depth_lr": true
+      }
+    }
+  },
+  "limits": "Manual knee/ankle points are reference only for this diagnostic; no hip manual points. Free triangulation and epipolar error measure internal geometric consistency, not accuracy.",
+  "identity": {
+    "left": {
+      "448_ordered_paths_match": true,
+      "448_ids_and_names_match": true,
+      "frame0_adapter_exact_native_mapping": true
+    },
+    "right": {
+      "448_ordered_paths_match": true,
+      "448_ids_and_names_match": true,
+      "frame0_adapter_exact_native_mapping": true
+    }
+  }
+}
