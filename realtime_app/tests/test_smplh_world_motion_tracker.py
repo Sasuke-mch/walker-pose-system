@@ -331,6 +331,95 @@ class WorldMotionTests(unittest.TestCase):
         np.testing.assert_array_equal(tr.sole_anchors, anchors)
         np.testing.assert_allclose(tr.covariance, captured["covariance"], rtol=1e-10, atol=1e-12)
 
+    def test_budget_can_find_first_feasible_pose_without_a_feasible_start(self):
+        for feasible_last in (True, False):
+            with self.subTest(feasible_last=feasible_last):
+                tr = world_tracker(contact=True)
+                tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+                px = observe(tr)
+                tr.step(0., px[0], px[1])
+                anchors = tr.sole_anchors.copy()
+                tr.pose.translation_m[0] += .03
+                tr.last_accepted_pose = tr.pose.copy()
+                covariance = tr.covariance.copy()
+                correction = np.zeros(tr.n); correction[0] = -.03
+                calls = []
+
+                def budget_finds_contact(fun, x0, **kwargs):
+                    calls.append(1)
+                    if len(calls) == 1:
+                        # Bootstrap does not provide a valid start.
+                        return SimpleNamespace(x=x0.copy(), fun=fun(x0), success=False,
+                                               status=9, message="Iteration limit reached", nit=80)
+                    fun(correction)
+                    last = correction.copy() if feasible_last else x0.copy()
+                    return SimpleNamespace(x=last, fun=fun(last), success=False,
+                                           status=9, message="Iteration limit reached", nit=80)
+
+                reasons = np.full((2, 12), "available", dtype=object)
+                with patch("pose_app.smplh_world_motion_tracker._minimize_scaled_pose", side_effect=budget_finds_contact):
+                    accepted, used, status = tr._constrained_update(px, np.ones((2, 12), bool), reasons)
+                self.assertTrue(accepted)
+                self.assertEqual(status, "feasible_unconverged")
+                diagnostic = tr.contact_diagnostic
+                self.assertIsNone(diagnostic["feasible_start_objective"])
+                self.assertFalse(diagnostic["feasible_start_available"])
+                self.assertEqual(diagnostic["budget_acceptance_reference"], "first_feasible_current_frame_estimate")
+                self.assertFalse(diagnostic["optimizer_success"])
+                self.assertEqual(diagnostic["selected_estimate"], "best_feasible_current_frame_iterate_without_feasible_start")
+                self.assertGreaterEqual(tr._conditions(tr._geometry(tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0])).min(), -1e-6)
+                np.testing.assert_array_equal(tr.sole_anchors, anchors)
+                np.testing.assert_allclose(tr.covariance, covariance, rtol=1e-10, atol=1e-12)
+                output = tr._output(.03, status, used, reasons, px)
+                self.assertFalse(output["derivative_valid"].any())
+                self.assertTrue(np.isnan(output["velocity_mm_s"]).all())
+
+    def test_no_feasible_start_does_not_admit_bad_geometry_or_other_solver_failures(self):
+        for failure_status, evaluate_feasible in ((9, False), (8, True)):
+            with self.subTest(failure_status=failure_status):
+                tr = world_tracker(contact=True)
+                tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+                px = observe(tr); tr.step(0., px[0], px[1])
+                tr.pose.translation_m[0] += .03
+                tr.last_accepted_pose = tr.pose.copy()
+                prior = tr.pose.copy()
+                correction = np.zeros(tr.n); correction[0] = -.03
+                calls = []
+
+                def failed_solver(fun, x0, **kwargs):
+                    calls.append(1)
+                    if len(calls) > 1 and evaluate_feasible:
+                        fun(correction)
+                    last = correction if len(calls) > 1 and evaluate_feasible else x0
+                    return SimpleNamespace(x=last.copy(), fun=fun(last), success=False,
+                                           status=failure_status, message="test failed solve", nit=80)
+
+                with patch("pose_app.smplh_world_motion_tracker._minimize_scaled_pose", side_effect=failed_solver):
+                    accepted, used, status = tr._constrained_update(px, np.ones((2, 12), bool),
+                        np.full((2, 12), "available", dtype=object))
+                self.assertFalse(accepted)
+                self.assertFalse(used.any())
+                self.assertEqual(status, "constraint_conflict")
+                np.testing.assert_array_equal(tr.pose.translation_m, prior.translation_m)
+
+    def test_known_feasible_start_still_requires_budget_objective_improvement(self):
+        tr = world_tracker(contact=True)
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+        px = observe(tr); tr.step(0., px[0], px[1])
+
+        def unchanged_budget_result(fun, x0, **kwargs):
+            return SimpleNamespace(x=x0.copy(), fun=fun(x0), success=False,
+                                   status=9, message="Iteration limit reached", nit=80)
+
+        with patch("pose_app.smplh_world_motion_tracker._minimize_scaled_pose", side_effect=unchanged_budget_result):
+            accepted, used, status = tr._constrained_update(px, np.ones((2, 12), bool),
+                np.full((2, 12), "available", dtype=object))
+        self.assertFalse(accepted)
+        self.assertFalse(used.any())
+        self.assertEqual(status, "constraint_conflict")
+        self.assertTrue(tr.contact_diagnostic["feasible_start_available"])
+        self.assertEqual(tr.contact_diagnostic["budget_acceptance_reference"], "known_feasible_start_objective")
+
     def test_position_velocity_acceleration_are_jointly_corrected(self):
         tr = world_tracker()
         px = observe(tr); tr.step(0., px[0], px[1])

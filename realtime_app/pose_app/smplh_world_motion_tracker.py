@@ -264,19 +264,23 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             converged = bool(solution.success and feasible)
             chosen_delta, chosen_cost = solution.x, float(solution.fun)
             selected_estimate = "optimizer_last_iterate"
+            has_feasible_start = bool(np.isfinite(initial_cost))
             if (not converged and getattr(solution, "status", None) == 9 and incumbent
-                and np.isfinite(initial_cost) and incumbent["cost"] < initial_cost-self.ground_config.optimizer_objective_tolerance):
+                and (not has_feasible_start or incumbent["cost"] < initial_cost-self.ground_config.optimizer_objective_tolerance)):
                 chosen_delta, chosen_cost = incumbent["delta"], incumbent["cost"]
                 val = evaluate(chosen_delta, True)
                 slack = self._conditions(val["geometry"])
                 feasible = bool(physically_feasible(chosen_delta))
-                selected_estimate = "best_feasible_improving_current_frame_iterate"
-            # A finite-budget estimate must improve a known feasible start.
-            # Failure remains explicit, without information shrink or published
-            # derivatives, even if this branch has the best physical objective.
+                selected_estimate = ("best_feasible_improving_current_frame_iterate" if has_feasible_start
+                                     else "best_feasible_current_frame_iterate_without_feasible_start")
+            # A known feasible start still requires objective improvement. If
+            # the solve first discovers feasibility, retain that current-frame
+            # estimate rather than rejecting it for lacking a feasible baseline.
+            # Neither case certifies convergence, shrinks P, or publishes v/a.
             feasible_budget = bool(not solution.success and getattr(solution, "status", None) == 9
-                              and feasible and np.isfinite(initial_cost)
-                              and chosen_cost < initial_cost-self.ground_config.optimizer_objective_tolerance)
+                              and feasible and np.isfinite(chosen_cost)
+                              and (not has_feasible_start
+                                   or chosen_cost < initial_cost-self.ground_config.optimizer_objective_tolerance))
             accepted = bool(feasible and (converged or feasible_budget))
             candidates.append(dict(side=side, solution=solution, bootstrap=bootstrap,
                 initial_cost=initial_cost, delta=chosen_delta.copy(), cost=chosen_cost,
@@ -294,6 +298,9 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             "optimizer_success": bool(solution.success), "optimizer_message": str(solution.message),
             "iterations": int(solution.nit), "minimum_slack_m": float(slack.min()),
             "objective": float(chosen_cost), "feasible_start_objective": None if not np.isfinite(initial_cost) else float(initial_cost), "stage2": self.stage2,
+            "feasible_start_available": bool(np.isfinite(initial_cost)),
+            "budget_acceptance_reference": ("known_feasible_start_objective" if np.isfinite(initial_cost)
+                else ("first_feasible_current_frame_estimate" if accepted and not converged else "no_feasible_start_found")),
             "selected_estimate": selected_estimate, "optimizer_last_objective": float(solution.fun),
             "optimizer_last_minimum_slack_m": chosen["last_slack"], "optimizer_last_geometry": chosen["last_geometry"],
             "support_selection": "current_pose_sole_minimum", "selected_support_side": chosen["side"],
