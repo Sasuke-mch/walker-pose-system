@@ -26,7 +26,8 @@
 |---|---|---|
 | 身体主线 | `research_records/engineering_validation/G20261013_reliability448_view_v1/fit/result.npz`，PMPose、448帧、离线整段SMPL-H | 2026-10-14已选择的二维工程路线；`accepted_for_main_fit=false` |
 | 场景主线 | `mainline -> supported_stop_fixed_lag` | 同平地、停止即四脚支撑的采集假设；名义发布延迟0.5s；未完成现场端到端认证 |
-| 当前跟踪候选 | `G20261014_smplh_motion448_v1/run_latent_cap12` | 完整SMPL-H因果二维反馈；仅候选，未替换身体或场景主线 |
+| 当前固定体型跟踪候选 | `G20261014_smplh_motion448_v1/run_calibrated_beta12` | 用户指定全帧校准beta；姿态二维因果反馈，脚部/像素拟合仍不足，未替换主线 |
+| 原1.2跟踪候选 | 同根`run_latent_cap12` | 首帧联合细化beta；保留完整原结果及0.4/1.2单变量证据 |
 | 跟踪原始对照 | 同根`run_final_v3` | latent修正上限0.4，仍为类/CLI默认；下一轮显式使用1.2候选 |
 | 历史身体对照 | `G20261005_reference_weight_fit_v1/runs/reference25`，360帧 | 已被448二维选择替代；保留结果，不混入当前参数 |
 | 物理PPO / 独立视觉位姿 | `G20261014_rl_physics448_v1` / `G20261014_visual_rig_compare448_v1` | 已真实运行但未通过，未晋升；见第7节 |
@@ -380,7 +381,7 @@ history的loss/诊断来自该步**更新前**前向，虽然日志在`optim.ste
 - 图像与时间：同一people_1下的`input_448pairs`，pair0..447。读取采集记录的左右host-return时间中点，减首帧形成秒；完整448帧对应16.035239s，dt范围0.0069816..0.0695054s。返回时差median3.5254/P955.97451/max9.2775ms不能证明曝光同步。
 - 标定：`realtime_app/calibration/results`；cam0=LEFT、cam1=RIGHT，原始图1920×1080。右目点用完整`R_cam0_to_cam1`和`T_cam0_to_cam1_mm/1000`变换，内部统一米，投影残差为像素。
 - 模型资产：`third_party/WiLoR/mano_data/models/SMPLH_male.pkl`及同目录MANO_LEFT/RIGHT；`models/smpl/J_regressor_coco.npy`；`models/VPoser02_05/V02_05`。MANO只补旧SMPL-H资产缺失的PCA/mean字段；最终用SMPLHLayer真实矩阵旋转与面，VPoser和模型权重冻结。
-- 起点仍为之前当前方法的**frame0-only**模型参数。其历史冷启动用过三角化；本次读取字段仅transl/global_orient/body_pose/betas/VPoser/手姿，未读保存的三角化点或predicted_coco作为测量。不使用整段拟合的共享beta或未来帧初值。
+- 原0.4/1.2对照起点为之前当前方法的**frame0-only**模型参数。其历史冷启动用过三角化；读取字段仅transl/global_orient/body_pose/betas/VPoser/手姿，未读保存的三角化点或predicted_coco作为测量。这两个旧对照不使用整段beta或未来帧初值；下述用户指定校准体型版本例外只读取全片共享beta。
 - 人工标注：`research_records/annotation_handoffs/H20261014_people1_pair0000/labels/{left,right}_pair_0000.json`，左右各8点，共16点。用户明确确认hand=腕关节、foot=踝关节；左图`leftt_hand`作为显式别名映射到左腕，不作模糊猜名。
 
 标注映射：左右肩COCO5/6，左右腕9/10，左右膝13/14，左右踝15/16。肘7/8、髋11/12仍用首帧自动点；首帧以后全部回到原始自动检测，不传播人工真值。
@@ -390,6 +391,8 @@ history的loss/诊断来自该步**更新前**前向，虽然日志在`optim.ste
 首帧另做一次纯二维SMPL-H细化：Adam500步，latent学习率0.02、根轴角/平移0.005、beta0.01；人工/自动点sigma分别4/15px，二维点向量范数采用3sigma Huber，VPoser先验sigma1.5、beta先验sigma2。优化根、姿态、10维beta，手/足/颈/头局部旋转固定；细化结束后beta冻结，初速/初加速度均设0。没有三维数据项。初值结果位于`run_manual_v1/first_frame_fit/result.npz`，原始500步损失与16点残差见同目录summary。
 
 0.4与1.2对照均复用这一个已细化的首帧，`--first-frame-refine-steps 0`避免重复优化。frame0只初始化，不再次当作EKF新测量。人工16点首帧残差median10.38450/max61.64695px；最大的左目右肩残差没有被删除或改动标注。
+
+**2026-10-15用户指定校准体型。** `run_calibrated_beta12`显式传`--shape-fit G20261013_reliability448_view_v1/fit/result.npz --first-frame-shape-policy fixed`，只读取共享1×10beta，禁止读取未来姿态/网格。以原始frame0-only种子和相同人工二维重新500步优化q，beta不参与Adam，再运行原1.2跟踪器。beta为[1.1298097,-0.3122407,0.6401215,-0.0228373,0.2672804,-0.2343161,-0.1101328,-0.0018150,-0.2465878,0.2786286]；输出与主线beta逐值相同，期间冻结。它明确使用全片预校准体型，不能混称首帧-only体型或与旧对照同信息。旧`refine`默认及结果保留；首帧16点仍是拟合输入而非held-out。
 
 ### 4.2 完整模型、观测接口与状态定义
 
@@ -585,6 +588,16 @@ Sampson使用同一标定的E=[T]×R及逆鱼眼局部像素Jacobian，扰动±0
 固定抽取七个64帧区间中点32/96/160/224/288/352/416，保存同源转正图上的自动点圆圈、模型投影叉号及COCO编号于`run_latent_cap12/observation_diagnostic_7frames.png`并实看；衣物覆盖髋膝，不能把目测或本图变成独立解剖标签。数值与方法记录在实验根`protocol.json/observation_diagnosis_20261015`。
 
 阶段决定：完成这一轮观测诊断，不改模型、删点、补偏置、松门或晋升1.2；短窗仍未获时序真值证据。真实归因需要未参与拟合的多帧髋膝点及可见/遮挡状态，遮挡点只能标不可确认，不能要求人工猜测。已知运动仍可另行检验估计器，但同映射合成主动消除了真实点定义/体型错配，不能借其成功宣布本片髋问题解决。
+
+### 5.6 固定主线beta与停止恢复修复后的结果
+
+用户看到的体型变化确来自首帧二维联合优化：旧beta为[3.1383,-1.7428,2.3555,0.8654,0.0179,0.5304,1.6632,-2.8012,-3.4949,2.5916]，不是显示时读错模型。按用户指定固定第4.1节全片主线beta后，当前candidate保存`run_calibrated_beta12`；全448可解码，updated441/predicted4/reinitialized2（111/263）/initialized1。全10752 raw median19.795/P95110.569/max216.988px，发布导数2229/5376；均不能写成比原1.2更优。初始化策略/体型信息改变，旧0.4/1.2单变量结论仍只针对原共享初值。
+
+可视化使用本轮严格点与新重放Stage场景。停止恢复在真实非均匀时间下漏掉368..376事件：只从最后运动时刻计算歧义间隔，忽略373的新停止证据。修复后按最后运动或停止证据保持0.3s间隔界限，歧义不刷新证据/不累计停止时长；确认、最大修正、strict和已发布输出规则不变。事件增加379，380/391的助步器四脚从最高24.77mm恢复为0。Stage1只余217确认前单帧最高18.19mm，未把短暂动作标签直接当支撑事实。
+
+同一修复场景的左右脚底候选height有符号median从56.524降至13.939mm，但新absolute median33.778/P9587.774mm，301/896脚时刻绝对偏离>50mm；frame188右脚+131.287mm、335左脚−117.604mm。脚部固定局部姿态与旧主线相同，仍随小腿朝向变化；335左踝16.72/8.44px回投不能保证脚底高度。该高度来自Stage显示参考，不是独立接触真值；没有将脚或人体向地面吸附，也没有通过旋转v/a假造世界导数。
+
+旧离线主线的reliability、踝二维倍率2、共享体型与弱先验可供后续求解参考，但其使用全片信息且surface-foot-contact=0，不能直接把它当当前因果精度真值。残余下肢姿态/点深度/足底朝向未解决，需遵循已知运动与world阶段门；本轮不盲目扫权重、放门或增加地面/heel观测。当前页面为`run_calibrated_beta12/view/body.html`及浏览器版，beta与左右脚底/助步器四脚height明确显示，原raw/NaN、拒绝与segment均保留。
 
 <a id="next-plan"></a>
 

@@ -36,6 +36,17 @@ def run(args) -> dict:
     times, skew, pair_ids, capture_path = _read_capture_times(args.input_pairs, len(left))
     model = SMPLHObservationMap(args.initial_fit, args.smplh_model, args.regressor, args.vposer_dir,
                                 args.mano_left, args.mano_right, args.device)
+    if args.shape_fit is not None:
+        if (args.first_frame_shape_policy != "fixed" or args.first_frame_refine_steps <= 0
+                or args.first_frame_labels is None):
+            raise ValueError("a calibrated shape requires fixed-shape frame0 pose refinement with labels")
+        # Read only the explicitly supplied shared shape. Future poses and mesh
+        # fields are never used as a frame0 pose or as tracking observations.
+        with np.load(args.shape_fit, allow_pickle=False) as fit:
+            shape = fit["betas"].copy()
+        if shape.shape != (1, 10) or not np.isfinite(shape).all():
+            raise ValueError("calibrated shape must be one finite shared1x10 beta")
+        model.betas = model.torch.as_tensor(shape, dtype=model.torch.float32, device=model.device)
     args.output.mkdir(parents=True)
     effective_initial_fit = args.initial_fit
     if args.first_frame_labels is not None:
@@ -43,7 +54,8 @@ def run(args) -> dict:
         (args.output/"first_frame_labels.json").write_text(json.dumps(label_record, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
         if args.first_frame_refine_steps > 0:
             effective_initial_fit = refine_first_frame_2d(model, cal, np.array([left[0, JOINT_INDICES], right[0, JOINT_INDICES]]),
-                                                          manual, args.output/"first_frame_fit", args.first_frame_refine_steps)
+                                                          manual, args.output/"first_frame_fit", args.first_frame_refine_steps,
+                                                          optimize_shape=args.first_frame_shape_policy == "refine")
     config = SMPLHMotionConfig(max_latent_correction_norm=args.max_latent_correction_norm)
     tracker = SMPLHMotionTracker(model, cal, config)
     parameters = {"inputs": {key: str(getattr(args, key).resolve()) for key in
@@ -54,6 +66,9 @@ def run(args) -> dict:
                   "effective_initial_fit": str(effective_initial_fit.resolve()),
                   "first_frame_labels": None if args.first_frame_labels is None else str(args.first_frame_labels.resolve()),
                   "first_frame_refine_steps_this_run": args.first_frame_refine_steps,
+                  "first_frame_shape_policy": args.first_frame_shape_policy,
+                  "shape_fit": None if args.shape_fit is None else str(args.shape_fit.resolve()),
+                  "shape_information": "precalibrated_shared_shape_from_full_sequence" if args.shape_fit is not None else "frame0_seed_or_refinement",
                   "fit_object": "complete_SMPLH_model", "observation": "raw_fisheye_2d_only",
                   "regressor_role": "model_vertices_to_2d_observation_skeleton", "world_state_available": False,
                   "fixed_body_rotation_indices_zero_based_excluding_root": model.fixed_body_indices,
@@ -112,7 +127,8 @@ def run(args) -> dict:
     body_pose[available] = Rotation.from_matrix(body_rotations[available].reshape(-1, 3, 3)).as_rotvec().reshape(-1, 63)
     global_orient[available] = Rotation.from_matrix(array("root_rotation")[available]).as_rotvec()
     with np.load(effective_initial_fit, allow_pickle=False) as init:
-        frozen = {key: init[key].copy() for key in ("betas", "left_hand_pose", "right_hand_pose")}
+        frozen = {key: init[key].copy() for key in ("left_hand_pose", "right_hand_pose")}
+    frozen["betas"] = model.betas.detach().cpu().numpy().copy()
     np.savez_compressed(args.output / "result.npz", pair_id=np.arange(len(outputs)), timestamp_s=times,
                         pose_available=available, vertices=array("vertices_m"), faces=model.faces,
                         predicted_coco=array("coco_m"), smplh_joints=array("joints_m"),
@@ -147,7 +163,8 @@ def run(args) -> dict:
                "step_ms_model_geometry_state_update_and_derivative_decode": _stats(np.asarray(elapsed)),
                "timestamp_span_s": float(times[-1]), "dt_s": _stats(np.diff(times)), "abs_host_return_skew_ms": _stats(abs(skew)),
                "configuration": asdict(config), "coordinate_frame": "current_left_camera", "world_state_available": False,
-               "initialization": "frame0-only model parameters; when labels supplied, refine frame0 in pure 2D and freeze new shape; no stored 3D observations read",
+               "initialization": "frame0-only pose seed; current frame0 pixels refine pose; calibrated shared shape when explicitly supplied, otherwise seed/refined frame0 shape; no stored3D observations or future poses read",
+               "shape_information": parameters["shape_information"], "shape_fit": parameters["shape_fit"],
                "limits": ["No independent metric 3D or derivative truth; pose availability and smoothness are not accuracy.",
                           "Shape from one frame is frozen and can be biased; regressed surface keypoint distances need not be perfectly rigid.",
                           "R/Q and covariance are engineering assumptions; ignored model bias is not covered by covariance.",
@@ -174,6 +191,10 @@ def main():
     parser.add_argument("--first-frame-labels", type=Path, default=None)
     parser.add_argument("--first-frame-refine-steps", type=int, default=500,
                         help="0 reuses an already refined single-frame input model")
+    parser.add_argument("--first-frame-shape-policy", choices=("refine", "fixed"), default="refine",
+                        help="refine reproduces prior frame0 joint shape fitting; fixed optimizes pose only")
+    parser.add_argument("--shape-fit", type=Path, default=None,
+                        help="explicit pre-calibrated shared beta only; requires fixed-shape frame0 refinement")
     parser.add_argument("--max-latent-correction-norm", type=float, default=.4,
                         help="single-frame latent correction bound; recorded in run parameters")
     run(parser.parse_args())

@@ -453,5 +453,144 @@
     "remaining_nonzero_stage1": "Only frame217 before stop confirmation, max absolute18.1895mm; no persistent stationary floating interval.",
     "validation": "New irregular-time regression failed before fix, passes after;26 recovery/handoff tests passed; real448 replay preserved all records and failed states.",
     "limits": "Protocol support restoration, not independent world pose or physical contact truth."
+  },
+  "calibrated_shape_20261015": {
+    "status": "completed_requested_shape_calibration_and_448_replay_body_foot_quality_failed",
+    "human_authorization": "User explicitly chose full-frame original mainline fitted beta,2026-10-15.",
+    "run": "run_calibrated_beta12",
+    "shape_fit": "research_records/engineering_validation/G20261013_reliability448_view_v1/fit/result.npz",
+    "beta": [
+      [
+        1.1298097372055054,
+        -0.31224068999290466,
+        0.6401214599609375,
+        -0.022837277501821518,
+        0.2672803997993469,
+        -0.23431605100631714,
+        -0.11013275384902954,
+        -0.0018150045070797205,
+        -0.2465878129005432,
+        0.2786286175251007
+      ]
+    ],
+    "shape_read_contract": "Only1x10 beta from full sequence; future poses,vertices and3D points not consumed. Pose seed is original frame0-only model, historical triangulation initialization disclosed.",
+    "pose_seed": "research_records/engineering_validation/G20261014_stereo_pva_baseline448_v2/first_frame_fit/result.npz",
+    "first_frame_shape_policy": "fixed",
+    "first_frame_refine_steps": 500,
+    "shape_optimized": false,
+    "beta_exactly_equals_requested_source": true,
+    "command": "run_calibrated_beta12_command.json",
+    "parameters": "run_calibrated_beta12/run_parameters.json",
+    "first_frame_summary": "run_calibrated_beta12/first_frame_fit/summary.json",
+    "summary": "run_calibrated_beta12/summary.json",
+    "sources": [
+      "realtime_app/pose_app/smplh_first_frame_labels.py/refine_first_frame_2d",
+      "realtime_app/tools/run_smplh_motion_baseline.py"
+    ],
+    "unchanged_tracking": "Same38D model pose/114D motion EKF,1.2 bound,raw2D observation set,gates,R/Q,latent prior,dt/frozen local hands/feet; no new module or ground/contact loss.",
+    "shape_information": "Full-sequence pre-calibrated shape, not frame0-only causal shape. Online pose updates stay causal; do not compare as identical-information shape estimation.",
+    "comparison_scope": "Shape information and initial refinement strategy differ from previous jointly refined-beta1.2 run; not one scalar-only matched initial-state ablation.",
+    "frames": 448,
+    "pose_available": 448,
+    "frame_status_counts": {
+      "initialized": 1,
+      "updated": 441,
+      "predicted": 4,
+      "reinitialized": 2
+    },
+    "reset_frames": [
+      111,
+      263
+    ],
+    "all10752_raw_reprojection_px": {
+      "count": 10752,
+      "min": 0.3447439180632676,
+      "median": 19.795323589057837,
+      "p95": 110.56879785086026,
+      "max": 216.9883250598067
+    },
+    "derivative_available_samples": 2229,
+    "total_derivative_samples": 5376,
+    "derivative_accuracy": "No independent derivative truth; no improvement claim. New rawpixelP95 is worse than original1.2.",
+    "visualization": {
+      "pages": [
+        "run_calibrated_beta12/view/body.html",
+        "run_calibrated_beta12/view/body_browser.html"
+      ],
+      "data": "run_calibrated_beta12/view/body_data.json.gz",
+      "metadata": "run_calibrated_beta12/view/metadata.json",
+      "scene": "run_latent_cap12/view_v2/scene",
+      "scene_same_task_same_inputs": true,
+      "display_scene_only": true,
+      "world_derivatives": false,
+      "smoothing": false,
+      "interpolation": false,
+      "browser": {
+        "frames": [
+          0,
+          188,
+          335,
+          391
+        ],
+        "beta": "Mainline calibrated beta visibly listed",
+        "391": "Walker4 heights0; bodyL/R16.5/-64.6mm",
+        "188": "Right sole131.3mm retained",
+        "335": "Left sole-117.6mm retained",
+        "console_errors": [],
+        "preview": "preview.jpg"
+      }
+    },
+    "body_feet_display_diagnosis": {
+      "coordinate": "relative to same fresh Stage display ground, not contact truth",
+      "all_896_sole_samples": 896,
+      "old_signed_height_median_mm": 56.524,
+      "new_signed_height_median_mm": 13.939,
+      "new_signed_min_max_mm": [
+        -117.60388566506164,
+        131.2873788263833
+      ],
+      "new_absolute_height_median_p95_max_mm": [
+        33.778,
+        87.774,
+        131.287
+      ],
+      "abs_over50mm_samples": 301,
+      "worst_float": {
+        "frame": 188,
+        "side": "right",
+        "sole_mm": 131.287,
+        "model_ankle_height_mm": 196.186,
+        "strict_ankle_height_mm": 132.168,
+        "strict_accepted": true,
+        "left_right_model_pixel_error_px": [
+          25.156,
+          29.004
+        ]
+      },
+      "worst_penetration": {
+        "frame": 335,
+        "side": "left",
+        "sole_mm": -117.604,
+        "model_ankle_height_mm": 58.555,
+        "strict_ankle_accepted": false,
+        "left_right_model_pixel_error_px": [
+          16.722,
+          8.439
+        ]
+      },
+      "local_foot_rotations": "Original frame0 seed equals old mainline frame0, not a viewer angle bug; fixed foot local pose still moves with shin/root.",
+      "ankle_minus_sole_range_mm": [
+        48.55,
+        180.66
+      ],
+      "old_offline_ankle_minus_sole_range_mm": [
+        68.72,
+        121.74
+      ],
+      "decision": "Body foot quality remains failed. Do not floor-snap,hide frames,triangulate into tracking loss or claim copying offline ankle2 weight restores contact. Need existing estimator/observability stages before world/heel hypothesis."
+    },
+    "checks": "58 targeted tests including new failed-then-passed support regression; compile/Ruff/JS;actual all448;exact beta;raw/public derivatives,masks,time,segment/mesh faces/currentR/t unchanged in export;original renderer statement extraction unchanged.",
+    "mainline_promoted": false,
+    "retained": "All original baseline/candidate logs,model outputs and failed states; prior local workspace changes preserved."
   }
 }

@@ -56,7 +56,8 @@ def apply_first_frame_labels(labels: Path, input_pairs: Path, left: np.ndarray, 
     return manual, record
 
 
-def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, output: Path, steps: int = 500) -> Path:
+def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, output: Path, steps: int = 500,
+                          *, optimize_shape: bool = True) -> Path:
     """Only model parameters and frame-0 pixel residuals; never triangulates."""
     import torch
     from smplx.lbs import batch_rodrigues
@@ -64,8 +65,12 @@ def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, ou
     z = torch.nn.Parameter(torch.tensor(model.initial_pose.latent[None], dtype=torch.float32, device=model.device))
     root = torch.nn.Parameter(torch.tensor(Rotation.from_matrix(model.initial_pose.root_rotation).as_rotvec()[None], dtype=torch.float32, device=model.device))
     translation = torch.nn.Parameter(torch.tensor(model.initial_pose.translation_m[None], dtype=torch.float32, device=model.device))
-    beta = torch.nn.Parameter(model.betas.clone())
-    optimizer = torch.optim.Adam([{"params": [z], "lr": .02}, {"params": [root, translation], "lr": .005}, {"params": [beta], "lr": .01}])
+    initial_beta = model.betas.detach().clone()
+    beta = torch.nn.Parameter(initial_beta.clone(), requires_grad=optimize_shape)
+    groups = [{"params": [z], "lr": .02}, {"params": [root, translation], "lr": .005}]
+    if optimize_shape:
+        groups.append({"params": [beta], "lr": .01})
+    optimizer = torch.optim.Adam(groups)
     valid = np.isfinite(pixels).all(axis=2) & (pixels[..., 2] >= .2)
     valid &= ((pixels[..., 0] >= 0) & (pixels[..., 0] < cal.image_width)
               & (pixels[..., 1] >= 0) & (pixels[..., 1] < cal.image_height))
@@ -101,6 +106,8 @@ def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, ou
         if i % 50 == 0 or i == steps-1:
             history.append({"step": i, "loss": float(loss.detach()), "data": float(data_loss.detach())})
     model.betas = beta.detach().clone()
+    if not optimize_shape and not torch.equal(model.betas, initial_beta):
+        raise ValueError("fixed first-frame shape changed")
     model.initial_pose = MotionPose(translation.detach().cpu().numpy()[0].astype(float),
                                     Rotation.from_rotvec(root.detach().cpu().numpy()[0]).as_matrix(),
                                     z.detach().cpu().numpy()[0].astype(float))
@@ -118,6 +125,8 @@ def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, ou
         errors = torch.linalg.vector_norm(projected-target, dim=2).cpu().numpy()
     report = {"steps": steps, "objective": "frame0_2d_pixels_only_plus_VPoser_and_beta_priors", "manual_points": int(manual.sum()),
               "manual_sigma_px": 4., "auto_sigma_px": 15., "manual_reprojection_px": errors[manual].tolist(),
-              "all_reprojection_px": errors.tolist(), "history": history, "shape_frozen_after_this_fit": True}
+              "all_reprojection_px": errors.tolist(), "history": history, "shape_frozen_after_this_fit": True,
+              "shape_optimized_in_this_fit": optimize_shape, "initial_betas": initial_beta.cpu().tolist(),
+              "final_betas": model.betas.cpu().tolist()}
     (output/"summary.json").write_text(json.dumps(report, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     return path
