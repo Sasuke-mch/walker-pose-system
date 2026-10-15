@@ -702,5 +702,105 @@
       "p95": 9.918182399693716,
       "max": 40.48725185889167
     }
+  },
+  "body_diagnosis_20261015": {
+    "objective": "diagnose implausible body separately from observation skeleton display; preserve existing whole448 results",
+    "triangulation_role": {
+      "camera_tracker": "no body3D residual; historical frame0 initializer used triangulated seed",
+      "world_contact": "no body3D residual; indirect Stage ankle-anchor dependency"
+    },
+    "shape_comparison": "camera,world-none,contact beta identical elementwise to selected offline full-sequence beta",
+    "display_fix": {
+      "raw_source": "same scene detector_only_triangulated_points_mm,diagnostic display only",
+      "strict_source": "raw_triangulated_points_mm,accepted-only;unchanged Stage and accepted ankle trails",
+      "frames": 448,
+      "finite_raw_points": 7534,
+      "finite_rejected_points": 2248,
+      "strict_accepted_points": 5286,
+      "coco_edges": 18,
+      "finite_edge_instances": 7915,
+      "possible_edge_instances": 8064,
+      "views": [
+        "run_calibrated_beta12/view/body_browser.html",
+        "world_contact_20261015/run_contact_v7/view/body_browser.html"
+      ],
+      "browser_status": "blocked by browser security policy;new pages not browser-reverified",
+      "file_checks": "15 viewer tests;python compile;Node syntax;source raw/strict transforms and masks"
+    },
+    "pose_prior_scale": {
+      "comparison": "old reliability .004/(34*625) sum score*task*Huber25;pose .01/32 sum(z^2);current data sum(Huber25)/64;pose .5/2.25 sum(z^2);additional full recursive precision",
+      "approximate_relative_pose_weakening_ignoring_scores_and_ankle_task": 116.73,
+      "not_a_new_weight_or_causal_proof": true,
+      "latent_norm_median": {
+        "offline_mainline": 2.05,
+        "camera": 7.44,
+        "world_none": 8.78,
+        "contact_v7": 7.36
+      },
+      "world_knee_local_rotvec_x_below_minus5_degrees_frames_left_right": [
+        356,
+        320
+      ],
+      "contact_left_knee_local_rotvec_y_median_degrees": -20.99,
+      "frame335_contact_vs_mainline_left_knee_local_rotvec_y_degrees": [
+        -28.07,
+        -1.97
+      ],
+      "clinical_angles_or_training_distribution_claim": false
+    },
+    "static_current_frame_diagnostic": {
+      "record": "current_frame_pose_diagnostic_20261015.json",
+      "frames": [
+        188,
+        335
+      ],
+      "only_change": "remove recursive prediction prior;200 Adam steps,same current pixels,beta and other terms",
+      "remaining_failure": "hip tail residuals above100px and knee twisting;frame335 P95 worsened;not inserted into old trajectory"
+    },
+    "prediction_domain_fix": {
+      "source": "realtime_app/pose_app/smplh_motion_tracker.py",
+      "cause": "update-only max_abs_latent did not bound constant-acceleration prediction",
+      "reproduced_camera_frames": [
+        109,
+        110,
+        261,
+        262
+      ],
+      "reproduced_world_frames": [
+        400,
+        401,
+        402
+      ],
+      "repair": "retain prediction_rejection;restore last accepted pose,reset v/a and P;current2D recovery or expired/NaN;no clipping",
+      "new_regressions": 2,
+      "base_tests": 13,
+      "runner_records_rejected_prediction": true
+    },
+    "map_scaling_fix": {
+      "source": "realtime_app/pose_app/smplh_world_motion_tracker.py",
+      "record": "world_contact_20261015/map_parameter_scaling_diagnostic_frame48.json",
+      "old_one_iteration_success_frames": 373,
+      "counterfactual": "only optimizer variable coordinates dq=sqrt(diag(actualPqq))*y;full prior precision,objective,pixels,constraints,bounds,initial point,30iterations unchanged",
+      "frame48_objective_before_after": [
+        480.2036,
+        338.8209
+      ],
+      "frame48_raw_median_px_before_after": [
+        65.734,
+        34.774
+      ],
+      "frame48_new_status": "feasible_unconverged;30 iterations;minimum physical slack .003440m",
+      "fixed_path_matches_counterfactual": true,
+      "unconverged_covariance_information_shrink": false,
+      "published_derivatives_all_nan": true,
+      "world_tests": 10
+    },
+    "unresolved": [
+      "prior scaling and anatomical pose feasibility",
+      "hip model/detector projection mismatch",
+      "fixed predicted support foot is stronger than any-foot public condition",
+      "near-static local foot rotations may force hip/knee compensation under all-sole10mm"
+    ],
+    "stopping_boundary": "no full448 rerun;existing views only have corrected observation skeleton,not corrected body trajectories;no promotion or new3D residual"
   }
 }

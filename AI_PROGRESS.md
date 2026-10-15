@@ -1,5 +1,15 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-15 人体异常诊断：黑线数据源、预测边界和约束求解尺度
+
+用户明确黑色观测骨架必须完整、误差仅统计。已确认motion exporter误用scene中实际accepted-only的raw_triangulated_points_mm，2248个有限rejected点被隐藏。改用同源detector-only原始三角化仅供显示，并补齐项目18边耳肩连接；calibrated_beta12与contact_v7两页重新导出，有限点7534、严格accepted5286、有限黑边7915/8064。accepted/Stage/严格踝拖尾保持，真正缺失不补；15项显示相关测试、Python/生成JS语法和同R/t数组检查通过。本次浏览器安全策略拒绝页面读取，metadata已记blocked，不能称浏览器复核通过。用户偏好已按明确“牢记”要求保存长期记忆增量。
+
+三角化未作为人体3D残差：相机候选只用当前双目二维和递归/VPoser先验；world/contact通过Stage脚踝锚间接依赖三角化，历史frame0也用过三角化初始化。三组beta与原主线逐值一致。当前VPoser先验与原主线归一尺度不同，忽略score/踝倍率后相对像素项约弱117倍；latent范数median主线2.05、相机7.44/world8.78/contact7.36，已保存异常膝局部旋转。不是训练分布外或临床角度结论，不能直接将117倍当调参答案。188/335固定当帧去递归先验诊断改善部分中位像素，仍有>100px髋残差和扭转，不能只怪时序或beta。详见算法5.8及current_frame_pose_diagnostic_20261015.json。
+
+修复明确预测漏洞：原update检查|z|≤6而predict绕过；现越界保留prediction_rejection原预测，按当前二维重启，不clip，缺测expired/NaN，成功才新segment。base13项（含两项先失败回归）和world继承10项通过；runner保存新拒绝字段。另修复SLSQP混合单位过早停机：真实Pqq仅作变量坐标缩放，完整目标/precision、边界、10mm条件及预算不变，bootstrap/MAP梯度与约束映射通过针对性测试。v7旧373帧1步success；frame48同prior反事实目标480.204→338.821、raw65.734→34.774px且可行；修后实际路径复现，30次仍未收敛，保持feasible_unconverged、P不收缩和发表v/a NaN。真实Pqq/输入/结果见world_contact_20261015/map_parameter_scaling_diagnostic_frame48.json。
+
+本轮止于问题定位与上述小修，未重算448或更改姿态先验/支撑脚策略。现有两页人体仍是修前结果，不能称身体合理或整片约束通过；原全448及失败保留、不晋升主线。预测固定支撑脚比任意一脚条件更强、几乎不动的足局部旋转可能迫使髋膝代偿，仍待独立对照。下一步应先处理姿态先验尺度/关节可行域和髋观测语义，再判断是否加入三角化项，不能把同源二维及其三角化当两份独立信息。
+
 ## 2026-10-15 世界q/v/a与10mm整脚底约束完成448，整段要求仍未通过
 
 用户明确允许本轮实现并调用子智能体；小范围移动上限确认10mm。原主线全片beta继续冻结，完整SMPL-H和原始双目二维反馈保持。新增可选Stage条件固定地面q/v/a，而非事后旋转相机系导数；SMPL-H根变换显式处理shaped rest pelvis J0。每帧用当帧相机变换逆投影到原鱼眼，位置/速度/加速度由联合预测协方差持续纠偏。相机变换来自本轮重新重放world_contact_20261015/scene，含Stage脚踝锚及名义0.5s固定延迟，不能当独立世界轨迹或即时因果测量。
