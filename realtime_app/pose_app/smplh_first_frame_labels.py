@@ -16,6 +16,27 @@ LABEL_JOINTS = {"left_shoulder": 5, "right_shoulder": 6, "left_knee": 13, "right
                 "left_hand": 9, "leftt_hand": 9, "right_hand": 10, "left_foot": 15, "right_foot": 16}
 
 
+def apply_first_frame_observations(path: Path, input_pairs: Path, left: np.ndarray,
+                                   right: np.ndarray) -> dict:
+    """Replace frame zero only, preserving detector scores and later observations."""
+    record = json.loads(path.read_text(encoding="utf-8"))
+    if record["pair_id"] != 0 or record["coordinate_space"] != "raw_fisheye_pixels":
+        raise ValueError("first-frame observations must be raw fisheye pair0")
+    values = np.asarray(record["keypoints"], dtype=float)
+    if values.shape != (2, 17, 3) or not np.isfinite(values).all():
+        raise ValueError("expected finite stereo COCO17 detector points")
+    if (np.any((values[..., 2] < 0) | (values[..., 2] > 1))
+            or np.any((values[..., 0] < 0) | (values[..., 0] >= 1920))
+            or np.any((values[..., 1] < 0) | (values[..., 1] >= 1080))):
+        raise ValueError("invalid first-frame detector score or raw bounds")
+    for side, folder in (("left", "left_ccw90"), ("right", "right_cw90")):
+        selected = input_pairs / folder / "pair_0000.png"
+        if not Path(record["images"][side]).samefile(selected):
+            raise ValueError("first-frame detector image differs from selected pair0")
+    left[0], right[0] = values
+    return record
+
+
 def apply_first_frame_labels(labels: Path, input_pairs: Path, left: np.ndarray, right: np.ndarray) -> tuple[np.ndarray, dict]:
     """Hand/foot semantics are user-confirmed wrist/ankle; no fuzzy name matching."""
     manual = np.zeros((2, 12), dtype=bool)
@@ -57,10 +78,13 @@ def apply_first_frame_labels(labels: Path, input_pairs: Path, left: np.ndarray, 
 
 
 def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, output: Path, steps: int = 500,
-                          *, optimize_shape: bool = True) -> Path:
+                          *, optimize_shape: bool = True, lbfgs_steps: int = 0,
+                          latent_prior_sigma: float = 1.5, lbfgs_double: bool = False) -> Path:
     """Only model parameters and frame-0 pixel residuals; never triangulates."""
     import torch
     from smplx.lbs import batch_rodrigues
+    if latent_prior_sigma <= 0 or not np.isfinite(latent_prior_sigma):
+        raise ValueError('first-frame whole-body latent prior sigma must be positive')
     output.mkdir(parents=True)
     z = torch.nn.Parameter(torch.tensor(model.initial_pose.latent[None], dtype=torch.float32, device=model.device))
     root = torch.nn.Parameter(torch.tensor(Rotation.from_matrix(model.initial_pose.root_rotation).as_rotvec()[None], dtype=torch.float32, device=model.device))
@@ -90,22 +114,75 @@ def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, ou
         projected = torch.stack((fisheye_project_torch(points[5:17], cal.K0, cal.D0),
                                  fisheye_project_torch(right[5:17], cal.K1, cal.D1)))
         return mesh, points, projected, body, right
-    history = []
-    for i in range(steps):
-        optimizer.zero_grad()
+    def objective():
         mesh, points, projected, body, other = decode()
         if bool((points[5:17, 2] <= 1e-4).any() or (other[5:17, 2] <= 1e-4).any()):
             raise ValueError("first-frame optimization left the projection domain")
         norm = torch.linalg.vector_norm(projected-target, dim=2) / sigma
         data_loss = torch.where(norm <= 3., .5*norm.square(), 3.*(norm-1.5))[mask].sum()
-        loss = data_loss + .5*z.square().sum()/1.5**2 + .5*beta.square().sum()/2.**2
+        loss = data_loss + .5*z.square().sum()/latent_prior_sigma**2 + .5*beta.square().sum()/2.**2
         if not bool(torch.isfinite(loss)):
             raise ValueError("non-finite first-frame 2D objective")
+        return loss, data_loss
+    history = []
+    for i in range(steps):
+        optimizer.zero_grad()
+        loss, data_loss = objective()
         loss.backward()
         optimizer.step()
         if i % 50 == 0 or i == steps-1:
             history.append({"step": i, "loss": float(loss.detach()), "data": float(data_loss.detach())})
-    model.betas = beta.detach().clone()
+    try:
+        lbfgs_evaluations = 0
+        final_parameters = [p for group in groups for p in group['params']]
+        if lbfgs_steps:
+            if lbfgs_double:
+                model.model.double()
+                model.vposer.double()
+                model.fixed_body = model.fixed_body.double()
+                model.regressor = model.regressor.double()
+                model.hand_rotations = [h.double() for h in model.hand_rotations]
+                target, sigma, R01, t01 = [x.double() for x in (target, sigma, R01, t01)]
+                beta = beta.detach().double().requires_grad_(optimize_shape)
+                packed = torch.nn.Parameter(torch.cat((z.detach().double().ravel()/.5,
+                                                       root.detach().double().ravel()/.35,
+                                                       translation.detach().double().ravel()/.1)))
+                parameters = [packed] + ([beta] if optimize_shape else [])
+            else:
+                parameters = [z, root, translation] + ([beta] if optimize_shape else [])
+            polish = torch.optim.LBFGS(parameters, lr=.5, max_iter=lbfgs_steps,
+                                       tolerance_grad=1e-5, tolerance_change=1e-9,
+                                       line_search_fn='strong_wolfe')
+            def closure():
+                nonlocal lbfgs_evaluations, z, root, translation
+                polish.zero_grad()
+                if lbfgs_double:
+                    z, root, translation = packed[:32][None]*.5, packed[32:35][None]*.35, packed[35:][None]*.1
+                loss, _ = objective()
+                loss.backward()
+                lbfgs_evaluations += 1
+                return loss
+            polish.step(closure)
+            if lbfgs_double:
+                z, root, translation = packed[:32][None]*.5, packed[32:35][None]*.35, packed[35:][None]*.1
+            final_parameters = parameters
+        optimizer.zero_grad()
+        for parameter in final_parameters:
+            parameter.grad = None
+        final_loss, final_data = objective()
+        final_loss.backward()
+        final_gradient = max(float(p.grad.abs().max()) for p in final_parameters)
+        with torch.no_grad():
+            _, _, projected, _, _ = decode()
+            errors = torch.linalg.vector_norm(projected-target, dim=2).cpu().numpy()
+    finally:
+        if lbfgs_steps and lbfgs_double:
+            model.model.float()
+            model.vposer.float()
+            model.fixed_body = model.fixed_body.float()
+            model.regressor = model.regressor.float()
+            model.hand_rotations = [h.float() for h in model.hand_rotations]
+    model.betas = beta.detach().to(dtype=initial_beta.dtype).clone()
     if not optimize_shape and not torch.equal(model.betas, initial_beta):
         raise ValueError("fixed first-frame shape changed")
     model.initial_pose = MotionPose(translation.detach().cpu().numpy()[0].astype(float),
@@ -120,13 +197,15 @@ def refine_first_frame_2d(model, cal, pixels: np.ndarray, manual: np.ndarray, ou
                         global_orient=root.detach().cpu().numpy(), transl=translation.detach().cpu().numpy(),
                         vposer_latent=z.detach().cpu().numpy(), body_pose=body_pose,
                         left_hand_pose=hands[0], right_hand_pose=hands[1])
-    with torch.no_grad():
-        _, _, projected, _, _ = decode()
-        errors = torch.linalg.vector_norm(projected-target, dim=2).cpu().numpy()
     report = {"steps": steps, "objective": "frame0_2d_pixels_only_plus_VPoser_and_beta_priors", "manual_points": int(manual.sum()),
               "manual_sigma_px": 4., "auto_sigma_px": 15., "manual_reprojection_px": errors[manual].tolist(),
               "all_reprojection_px": errors.tolist(), "history": history, "shape_frozen_after_this_fit": True,
               "shape_optimized_in_this_fit": optimize_shape, "initial_betas": initial_beta.cpu().tolist(),
               "final_betas": model.betas.cpu().tolist()}
+    report.update(lbfgs_max_iterations=lbfgs_steps, lbfgs_evaluations=lbfgs_evaluations,
+                  lbfgs_double=lbfgs_double, lbfgs_parameter_scales={'latent':.5,'root':.35,'translation_m':.1} if lbfgs_double else None,
+                  whole_vposer_prior_sigma=latent_prior_sigma,
+                  final_objective=float(final_loss.detach()), final_data=float(final_data.detach()),
+                  final_gradient_inf=final_gradient)
     (output/"summary.json").write_text(json.dumps(report, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
     return path

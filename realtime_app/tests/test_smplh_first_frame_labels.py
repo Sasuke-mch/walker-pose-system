@@ -3,14 +3,60 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 import cv2
 import numpy as np
 
-from pose_app.smplh_first_frame_labels import apply_first_frame_labels
+from pose_app.smplh_first_frame_labels import apply_first_frame_labels, apply_first_frame_observations, refine_first_frame_2d
 
 
 class FirstFrameLabelTests(unittest.TestCase):
+    def test_failed_double_polish_restores_shared_model_precision(self):
+        import torch
+        class FailingVPoser(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.register_buffer('value', torch.ones(1))
+
+            def decode(self, latent):
+                raise ValueError('deliberate projection failure')
+        model = SimpleNamespace(
+            device='cpu', initial_pose=SimpleNamespace(latent=np.zeros(32), root_rotation=np.eye(3), translation_m=np.array([0., 0., 2.])),
+            betas=torch.zeros((1, 10)), model=torch.nn.Linear(1, 1), vposer=FailingVPoser(),
+            fixed_body=torch.eye(3).repeat(21, 1, 1), regressor=torch.zeros((17, 6890)),
+            hand_rotations=[torch.eye(3)[None, None].repeat(1, 15, 1, 1) for _ in range(2)])
+        cal = SimpleNamespace(image_width=1920, image_height=1080, R_cam0_to_cam1=np.eye(3), T_cam0_to_cam1_mm=np.ones(3))
+        pixels = np.tile([500., 300., .75], (2, 12, 1))
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, 'deliberate projection'):
+                refine_first_frame_2d(model, cal, pixels, np.zeros((2, 12), bool), Path(directory)/'fit',
+                                      steps=0, optimize_shape=False, lbfgs_steps=2, lbfgs_double=True)
+        for tensor in (model.model.weight, model.vposer.value, model.fixed_body, model.regressor, *model.hand_rotations):
+            self.assertEqual(tensor.dtype, torch.float32)
+        self.assertTrue(torch.equal(model.betas, torch.zeros((1, 10))))
+
+    def test_detector_override_is_pair0_only_and_keeps_confidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            _, pairs = self.make_sources(directory)
+            values = np.tile([500., 300., .75], (2, 17, 1))
+            record = {"pair_id": 0, "coordinate_space": "raw_fisheye_pixels",
+                      "keypoints": values.tolist(), "images": {
+                          side: str(pairs/folder/"pair_0000.png") for side, folder in
+                          (("left", "left_ccw90"), ("right", "right_cw90"))}}
+            path = Path(directory)/"observations.json"
+            path.write_text(json.dumps(record), encoding='utf-8')
+            left, right = np.zeros((3, 17, 3)), np.ones((3, 17, 3))
+            apply_first_frame_observations(path, pairs, left, right)
+            np.testing.assert_array_equal(left[0], values[0])
+            np.testing.assert_array_equal(right[0], values[1])
+            self.assertFalse(left[1:].any())
+            self.assertTrue(np.all(right[1:] == 1))
+            record['images']['right'] = record['images']['left']
+            path.write_text(json.dumps(record), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'differs from selected'):
+                apply_first_frame_observations(path, pairs, left, right)
+
     def make_sources(self, directory):
         root = Path(directory)
         labels = root/"labels"

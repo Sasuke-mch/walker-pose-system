@@ -17,7 +17,7 @@ sys.path.insert(0, str(APP))
 
 from pose_app.fisheye_camera import load_stereo_fisheye  # noqa: E402
 from pose_app.smplh_motion_tracker import SMPLHMotionConfig, SMPLHMotionTracker, SMPLHObservationMap  # noqa: E402
-from pose_app.smplh_first_frame_labels import apply_first_frame_labels, refine_first_frame_2d  # noqa: E402
+from pose_app.smplh_first_frame_labels import apply_first_frame_labels, apply_first_frame_observations, refine_first_frame_2d  # noqa: E402
 from run_stereo_pva_baseline import (  # noqa: E402
     JOINT_INDICES, JOINT_NAMES, _json_array, _load_predictions, _plot_curves,
     _read_capture_times, _stats,
@@ -25,6 +25,9 @@ from run_stereo_pva_baseline import (  # noqa: E402
 
 
 def run(args) -> dict:
+    frame0_observations = getattr(args, 'first_frame_observations', None)
+    if frame0_observations is not None and args.first_frame_labels is not None:
+        raise ValueError("choose detector frame0 observations or manual labels")
     if args.output.exists() and any(args.output.iterdir()):
         raise ValueError(f"refusing nonempty output: {args.output}")
     left, right = _load_predictions(args.left_predictions, "left"), _load_predictions(args.right_predictions, "right")
@@ -37,7 +40,7 @@ def run(args) -> dict:
     model = SMPLHObservationMap(args.initial_fit, args.smplh_model, args.regressor, args.vposer_dir,
                                 args.mano_left, args.mano_right, args.device)
     if args.shape_fit is not None:
-        if (args.first_frame_shape_policy != "fixed" or args.first_frame_labels is None):
+        if (args.first_frame_shape_policy != "fixed" or (args.first_frame_labels is None and frame0_observations is None)):
             raise ValueError("a calibrated shape requires fixed-shape frame0 pose refinement with labels")
         # Read only the explicitly supplied shared shape. Future poses and mesh
         # fields are never used as a frame0 pose or as tracking observations.
@@ -50,13 +53,26 @@ def run(args) -> dict:
         model.betas = model.torch.as_tensor(shape, dtype=model.torch.float32, device=model.device)
     args.output.mkdir(parents=True)
     effective_initial_fit = args.initial_fit
+    if frame0_observations is not None:
+        source_record = apply_first_frame_observations(frame0_observations, args.input_pairs, left, right)
+        (args.output/"first_frame_observations.json").write_text(json.dumps(source_record, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
+        if args.first_frame_refine_steps > 0:
+            effective_initial_fit = refine_first_frame_2d(model, cal, np.array([left[0, JOINT_INDICES], right[0, JOINT_INDICES]]),
+                                                          np.zeros((2, 12), dtype=bool), args.output/"first_frame_fit",
+                                                          args.first_frame_refine_steps, optimize_shape=args.first_frame_shape_policy == "refine",
+                                                          lbfgs_steps=getattr(args, 'first_frame_lbfgs_steps', 0),
+                                                          latent_prior_sigma=getattr(args, 'first_frame_latent_prior_sigma', 1.5),
+                                                          lbfgs_double=getattr(args, 'first_frame_lbfgs_double', False))
     if args.first_frame_labels is not None:
         manual, label_record = apply_first_frame_labels(args.first_frame_labels, args.input_pairs, left, right)
         (args.output/"first_frame_labels.json").write_text(json.dumps(label_record, ensure_ascii=False, indent=2)+"\n", encoding="utf-8")
         if args.first_frame_refine_steps > 0:
             effective_initial_fit = refine_first_frame_2d(model, cal, np.array([left[0, JOINT_INDICES], right[0, JOINT_INDICES]]),
                                                           manual, args.output/"first_frame_fit", args.first_frame_refine_steps,
-                                                          optimize_shape=args.first_frame_shape_policy == "refine")
+                                                          optimize_shape=args.first_frame_shape_policy == "refine",
+                                                          lbfgs_steps=getattr(args, 'first_frame_lbfgs_steps', 0),
+                                                          latent_prior_sigma=getattr(args, 'first_frame_latent_prior_sigma', 1.5),
+                                                          lbfgs_double=getattr(args, 'first_frame_lbfgs_double', False))
     config = SMPLHMotionConfig(max_latent_correction_norm=args.max_latent_correction_norm,
                               latent_prior_sigma=args.latent_prior_sigma)
     optimizer_config = None
@@ -101,7 +117,11 @@ def run(args) -> dict:
                   "device": args.device, "frames": len(left), "joint_indices_coco17": JOINT_INDICES,
                   "effective_initial_fit": str(effective_initial_fit.resolve()),
                   "first_frame_labels": None if args.first_frame_labels is None else str(args.first_frame_labels.resolve()),
+                  "first_frame_observations": None if frame0_observations is None else str(frame0_observations.resolve()),
                   "first_frame_refine_steps_this_run": args.first_frame_refine_steps,
+                  "first_frame_lbfgs_steps_this_run": getattr(args, 'first_frame_lbfgs_steps', 0),
+                  "first_frame_latent_prior_sigma": getattr(args, 'first_frame_latent_prior_sigma', 1.5),
+                  "first_frame_lbfgs_double": getattr(args, 'first_frame_lbfgs_double', False),
                   "first_frame_shape_policy": args.first_frame_shape_policy,
                   "shape_fit": None if args.shape_fit is None else str(args.shape_fit.resolve()),
                   "shape_information": "precalibrated_shared_shape_from_full_sequence" if args.shape_fit is not None else "frame0_seed_or_refinement",
@@ -288,8 +308,16 @@ def build_parser():
         parser.add_argument("--"+key.replace("_", "-"), type=Path, default=Path(default))
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     parser.add_argument("--first-frame-labels", type=Path, default=None)
+    parser.add_argument("--first-frame-observations", type=Path, default=None,
+                        help="Explicit same-image raw stereo detector points for pair0 only; excludes manual labels.")
     parser.add_argument("--first-frame-refine-steps", type=int, default=500,
                         help="0 reuses an already refined single-frame input model")
+    parser.add_argument("--first-frame-lbfgs-steps", type=int, default=0,
+                        help="Optional first-frame L-BFGS polish on the same objective after Adam.")
+    parser.add_argument("--first-frame-lbfgs-double", action='store_true',
+                        help="Use double precision and scaled parameters for optional L-BFGS initialization.")
+    parser.add_argument("--first-frame-latent-prior-sigma", type=float, default=1.5,
+                        help="Whole-body VPoser prior for initialization only; no local anatomical prior.")
     parser.add_argument("--first-frame-shape-policy", choices=("refine", "fixed"), default="refine",
                         help="refine reproduces prior frame0 joint shape fitting; fixed optimizes pose only")
     parser.add_argument("--shape-fit", type=Path, default=None,
