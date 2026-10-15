@@ -63,23 +63,31 @@ def motion_page(page, data):
     shape_section = '<section><h2>固定体型</h2><p>'+shape_label+'；跟踪期间冻结。</p><pre style="white-space:pre-wrap;font-size:12px">['+beta+']</pre></section>'
     if data['motion']['shapeCalibrated']:
         page = page.replace(TITLE,'SMPL-H 二维运动跟踪 · 固定主线体型')
+    world = data['motion'].get('world', False)
+    if world:
+        page = page.replace('SMPL-H 二维运动跟踪 · 固定主线体型','SMPL-H 世界运动 · Stage条件约束候选')
     page = re.sub(r'document.getElementById\(\'wrist\'\)\.textContent=d\.wrist_mm\[fi\].*?;', '', page)
     # The existing renderer updates its metrics after the frame label. Run the
     # motion diagnostics at the end of draw, after those legacy assignments.
     page = page.replace("}function wn(i)", "drawMotion();renderInputs();document.getElementById('frame-number').value=fi;}function wn(i)")
     if 'drawMotion();renderInputs();' not in page:
         raise ValueError('existing Canvas drawing hook changed')
-    page = page.replace('<section><h2>参考来源</h2><p>', '<section><h2>坐标与来源</h2><p>人体来自保存的因果跟踪结果；地面、相机和助步器仅用本轮Stage重放作显示参考。三角化只用于显示，未进入人体跟踪损失。速度、加速度仍是相机系估计。')
+    source_text = ('本候选在固定地面系联合估计q/v/a，使用本轮Stage相机变换回投双目像素；Stage本身含脚踝锚和约0.5秒固定延迟。脚底约束和世界运动均条件于该采集假设，不是独立世界轨迹或物理接触认证。' if world else
+                   '人体来自保存的因果跟踪结果；地面、相机和助步器仅用本轮Stage重放作显示参考。三角化只用于显示，未进入人体跟踪损失。速度、加速度仍是相机系估计。')
+    page = page.replace('<section><h2>参考来源</h2><p>', '<section><h2>坐标与来源</h2><p>'+source_text)
     page = page.replace('<section><h2>操作</h2>', '<section><h2>视角</h2><div><button data-motion-view="recommended">推荐</button><button data-motion-view="front">正视</button><button data-motion-view="side">侧视</button><button data-motion-view="top">俯视</button></div></section><section><h2>操作</h2>')
     page = page.replace('<section><h2>视角</h2>',shape_section+'<section><h2>视角</h2>',1)
     page = page.replace('<input id="slider"', '<span id="time"></span><input id="frame-number" type="number" min="0" max="447" value="0" aria-label="帧号"><input id="slider"')
     page = page.replace('</style>', '</style>'+STYLE, 1)
     options = ''.join(f'<option value="{j}">{name}</option>' for j,name in enumerate(NAMES))
     panel = PANEL.replace('JOINT_OPTIONS',options)
+    if world:
+        panel = panel.replace('当前左相机系 XYZ（含相机运动）', 'Stage条件固定地面系 XYZ（未经独立世界验证）')
     page = page.replace('<script id="data"', panel+'<script id="data"',1)
     additions = (APP / 'walker_tools/visualization/smplh_motion_viewer.js').read_text(encoding='utf-8')
     page = page.replace("document.getElementById('slider').oninput=e=>", additions+"\ndocument.getElementById('slider').oninput=e=>",1)
-    page = page.replace('window.viewerAudit={vertices:', 'window.viewerAudit={worldDerivatives:false,worldStateAvailable:false,displaySceneOnly:true,vertices:')
+    flags = 'worldDerivatives:true,worldStateAvailable:true,worldPoseCertified:false,displaySceneOnly:false,' if world else 'worldDerivatives:false,worldStateAvailable:false,displaySceneOnly:true,'
+    page = page.replace('window.viewerAudit={vertices:', 'window.viewerAudit={'+flags+'vertices:')
     # Hide optional hand/handle proxy overlays which the tracker never estimated.
     page = page.replace('id="handles" type="checkbox" checked', 'id="handles" type="checkbox"')
     compact = json.dumps(data,ensure_ascii=False,allow_nan=False,separators=(',',':'))
@@ -147,6 +155,13 @@ def run(args):
     def xf(values):
         return np.einsum('nij,nvj->nvi',R,values)+tr[:,None]
     vg,cg,tg=xf(r['vertices']),xf(r['predicted_coco']),xf(s['raw_triangulated_points_mm']/1000)
+    world = p.get('world_state_available', False)
+    if world:
+        if Path(p['world_scene']).resolve() != scene:
+            raise ValueError('world tracker and displayed scene differ')
+        with np.load(run_dir/'result.npz',allow_pickle=False) as stored:
+            if not np.allclose(vg,stored['world_vertices'],atol=2e-6,rtol=0,equal_nan=True):
+                raise ValueError('camera/world mesh export transform disagrees')
     w=json.loads((scene/'static_walker_model.json').read_text(encoding='utf-8'))
     names=sorted(set(name for edge in w['edges'] for name in edge))
     Rc=np.asarray(w['rotation_left_camera_from_walker']); tc=np.asarray(w['translation_left_camera_from_walker_mm'])/1000
@@ -191,6 +206,8 @@ def run(args):
           'hand_state':[['冻结手姿','冻结手姿'] for _ in range(n)],'wrist_mm':[[None,None] for _ in range(n)],
           'reprojection':json_array(np.nanmedian(reprojection,axis=2)),'reject_reasons':reasons.tolist()}
     data['motion']={'names':NAMES,'time':r['timestamp_s'].tolist(),'segment':r['segment_id'].tolist(),
+        'world':world,'groundConstraint':[row.get('ground_constraint') for row in records],
+        'footLimitMm':p.get('ground_configuration',{}).get('max_heel_displacement_m',.01)*1000,
         'beta':r['betas'].tolist(),'shapeCalibrated':p.get('shape_fit') is not None,
         'soleHeight':json_array(np.stack([vg[:,indices,2].min(1)*1000 for indices in side_soles],axis=1)),
         'walkerFootHeight':json_array(wg[:,foot_nodes,2]*1000),
@@ -210,7 +227,9 @@ def run(args):
         'strict_input':str(args.strict_jsonl.resolve()),'surface_sets':str(args.surface_sets.resolve()),'frames':n,
         'vertices':6890,'faces':13776,'display_map':'X,-Y,Z','smoothing':False,'interpolation':False,
         'beta':data['motion']['beta'],'shape_fit':p.get('shape_fit'),
-        'world_state_available':False,'derivative_coordinate_frame':'current_left_camera','scene_role':'display_reference_only',
+        'world_state_available':world,'world_pose_certified':False,
+        'derivative_coordinate_frame':p.get('coordinate_frame','current_left_camera'),
+        'scene_role':'stage_conditioned_world_estimation' if world else 'display_reference_only',
         'stage_counts':dict(Counter(data['stage'])),'derivative_available_samples':int(r['derivative_valid'].sum()),
         'reprojection_vs_record_max_difference_px':difference,
         'joints':{str(j):{'finite':int(np.isfinite(tg[:,j]).all(1).sum()),'accepted':int(strict[:,j].sum()),

@@ -601,9 +601,27 @@ Sampson使用同一标定的E=[T]×R及逆鱼眼局部像素Jacobian，扰动±0
 
 <a id="next-plan"></a>
 
+### 5.7 用户指定10mm整足约束的Stage条件世界估计
+
+本轮按用户新授权实现工程假设对照，未将独立视觉轨迹/已知运动研究门改写成已通过。入口仍为run_smplh_motion_baseline.py，显式`--world-scene`和`--ground-constraint-policy contact`启用；未提供时保留原相机系基线。新代码为pose_app/smplh_world_motion_tracker.py与smplh_ground_constraints.py。体型读取原主线共享beta后冻结，复用已按该beta细化的frame0-only初值；复用时逐值核对beta，避免再次500步细化。当前原始17点、12拟合点、鱼眼/极线门及真实时基保持，没有三维人体观测。
+
+**坐标与状态。** 内部直接在固定地面系估计q/v/a，每帧使用当前R_GC、t_GC将模型点逆变换为p_C=R_GC^T(p_G−t_GC)，再原双目投影。由于SMPL-H绕shaped rest pelvis J0旋转，根参数必须按t_G=R_GC(t_C+J0)+t_GC−J0、R_root,G=R_GC R_root,C转换；直接R t_C+t会使网格错位。保存result的vertices/transl/root仍是当前相机系供旧接口再生，同时另存world_vertices/world_transl/world_root_rotation；generalized及关节v/a明确为Stage条件地面系。不是旋转旧相机速度得到世界导数。
+
+**同帧约束MAP。** 先由原q/v/a与真实dt预测，使用该预测联合协方差的Pqq作为姿态先验。一次同帧目标为原双目Huber像素项、VPoser弱先验和dq^T Pqq^−1 dq/2；SLSQP迭代只求同一目标，不逐次重复收缩P。得到dq后，联合均值通过P_xq Pqq^−1 dq同步纠正v/a。收敛时才在最终点构造一次局部Laplace/Joseph近似，并做SO(3)误差坐标transport；active几何约束的1mm近似尺度及所有R/Q均为工程假设，不是校准置信概率。MAP不沿用旧EKF的latent1.2共同gain限幅，仍有|latent_i|≤6边界；因此world-none EKF与contact MAP不是纯足底项单变量消融。
+
+**几何范围。** 每侧54个真实候选sole点，取各侧min z定义近地面；heel顶点3387/6787仅做相对运动锚，不把heel的z置0，因为它们不在sole集合。所有帧候选sole不得低于−5mm；全部115个operational Stage2帧双sole min∈[−5,5]mm，首次可行姿态建立两侧heel及全部sole点的三维episode锚，之后每点距其对应锚≤10mm。短transition保留锚供Stage2恢复，不重新设锚；transition本身仍按非Stage2近地面条件，不伪称移动/静止已知。明确Stage1后解锚。非Stage2另采用至少一侧sole接近地面的本段行走假设，允许另一脚摆动；这是新增假设，不是原主线contact classifier的真值。solver使用向内0.2mm余量，实际输出按物理5/10mm界检查，只有1微米数值容差，不将10.2mm算通过。
+
+**数值求解与失败。** 逐点z下界及逐点平方距离球避免min/max的活动顶点切换造成有限差分不稳定；每帧固定预测模型的候选支撑点来实现上界。新双脚约束尚不可行时，只用几何/预测先验寻找warm start，不消耗像素或收缩P。之后保留同一帧目标下真正改善且满足全部物理界的可行iterate；若最终迭代不可行/达预算，仅可采用比该帧可行初值更低目标的incumbent，标记feasible_unconverged。optimizer最后cost、slack、foot geometry和失败原因全部另存，不能改称收敛；该状态仅更新联合均值并transport协方差，不收缩像素/active/导数先验信息，不发表v/a。没有可行改善仍constraint_conflict，预测/失效及原始导数保留，发表导数NaN，不吸附显示或补洞。
+
+收敛Stage2另以真实模型q(t±eps)计算heel v/a，包含曲率，进行保持q固定的零heel导数条件近似；只是工程先验，既未证明整足瞬时速度精确0，也未证明真实加速度。角度/latent曲率对v的完整Jacobian未纳入该单次近似，相关结构保持是局部近似；不得把较小曲线峰值当准确。
+
+**输入与证据边界。** 本轮world_contact_20261015/scene由原有序448图像/二维/strict和host-return时基新重放，未读取旧动态场景。该相机变换已用脚踝锚、停止支撑假设和名义0.5s固定延迟，因此身体接触符合它只证明条件工程一致性，不能自证独立世界轨迹。known-camera-motion零世界速度、J0所有网格变换、非均匀q/v/a、全sole球、短失观/NaN、同帧可行incumbent及失败协方差路径已有针对性测试；这不是第6节完整合成clip/噪声/held-out导数验证。实际所有完整/中断试跑、参数、冲突数量和停止决定见实验protocol的world_contact_20261015，最终数字以完成summary为准，不晋升正式主线。
+
+最终完整v7保留448帧，441可解码，满足全部几何434帧；移动Stage2满足101/115，14帧76..79、139..140、275、436..442仍失败。满足的移动帧sole min最大绝对高度4.959mm、每侧全部sole点最大位移9.975mm；所有移动输出含失败最大40.487mm。constrained390/feasible_unconverged43/conflict15；raw可计算10584/10752槽median41.397/P95156.791px，发表导数635/5376，step median204.18/P951383.66ms。world-none EKF参考448帧raw23.211/84.275px。约束改善了几何接近性，却恶化像素拟合并仍有失败，因此整段10mm目标和实时要求均未达成；停止本轮求解扩展，不放宽条件或换更多模型。结果与页面留world_contact_20261015/run_contact_v7，所有早期失败目录保留。
+
 ## 6. 研究依据与未实施改进
 
-本节均为后续设计；已完成的是第4节估计器和第5节限幅对照。保留同一SMPL-H/回归器/观测契约，先处理已定位问题，不以新网络或物理模块替代诊断。
+本节研究设计仍未整体完成；已实现第4节估计器、第5节各项对照及5.7的Stage条件约束候选。完整已知运动held-out、短窗和独立世界融合仍未实施，不能由5.7的工程结果替代。保留同一SMPL-H/回归器/观测契约，先处理已定位问题，不以新网络或物理模块替代诊断。
 
 ### 6.1 核验的已有研究及实际借鉴范围
 

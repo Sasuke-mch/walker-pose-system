@@ -1,0 +1,172 @@
+{
+  "status": "completed_stage_conditioned_world_engineering_candidate",
+  "frames": 448,
+  "output_model": "SMPLH:6890 vertices,13776 faces,full body pose,root,betas,frozen hand poses",
+  "observation_term": "raw_fisheye_stereo_2d_body_data_plus_explicit_stage_conditioned_ground_priors;no_3d_body_measurements",
+  "pose_available_frames": 441,
+  "frame_status_counts": {
+    "initialized": 1,
+    "updated": 389,
+    "feasible_unconverged": 40,
+    "predicted": 8,
+    "expired": 7,
+    "reinitialized": 3
+  },
+  "joint_status_counts": {
+    "initialized": 12,
+    "updated": 5037,
+    "predicted": 153,
+    "inferred": 54,
+    "expired": 84,
+    "reinitialized": 36
+  },
+  "view_reason_counts": {
+    "first_frame_initialization_pixels_not_reused": 24,
+    "used_2d_ground_assumption": 10146,
+    "stereo_epipolar_rejected": 222,
+    "constraint_conflict": 360
+  },
+  "all_valid_raw_view_reprojection_px": {
+    "count": 10584,
+    "min": 0.2525677148850531,
+    "median": 41.39733487489205,
+    "p95": 156.79069678715274,
+    "max": 284.73991155779925
+  },
+  "used_view_reprojection_px": {
+    "count": 10146,
+    "min": 0.2525677148850531,
+    "median": 40.74926765267152,
+    "p95": 157.75910632154947,
+    "max": 284.73991155779925
+  },
+  "derivative_available_joint_samples": 635,
+  "derivative_reason_counts": {
+    "derivative_warmup": 120,
+    "poor_or_stale_pixel_fit": 3873,
+    "available": 635,
+    "feasible_unconverged": 516,
+    "no_recent_own_pixels": 52,
+    "constraint_conflict": 180
+  },
+  "update_gain_scale": {
+    "count": 432,
+    "min": 1.0,
+    "median": 1.0,
+    "p95": 1.0,
+    "max": 1.0
+  },
+  "reported_speed_norm_m_s": {
+    "count": 635,
+    "min": 0.009568963152573664,
+    "median": 0.12169245737900286,
+    "p95": 0.3898966944810639,
+    "max": 0.9381101707123428
+  },
+  "reported_acceleration_norm_m_s2": {
+    "count": 635,
+    "min": 0.0533802773136478,
+    "median": 0.776952892761732,
+    "p95": 3.5986588881742283,
+    "max": 10.728690966034408
+  },
+  "raw_acceleration_norm_m_s2_before_derivative_mask": {
+    "count": 5292,
+    "min": 0.0,
+    "median": 0.6128829040680781,
+    "p95": 3.236475683596616,
+    "max": 25.040982577332677
+  },
+  "internal_kinematic_limb_length_spread_max_mm": 0.0003409492877470832,
+  "step_ms_model_geometry_state_update_and_derivative_decode": {
+    "count": 448,
+    "min": 142.06189999822527,
+    "median": 204.18085000164865,
+    "p95": 1383.6569800003415,
+    "max": 3144.214200001443
+  },
+  "timestamp_span_s": 16.035239,
+  "dt_s": {
+    "count": 447,
+    "min": 0.0069816000000000045,
+    "median": 0.03976310000000005,
+    "p95": 0.0614030649999998,
+    "max": 0.06950539999999972
+  },
+  "abs_host_return_skew_ms": {
+    "count": 448,
+    "min": 0.094,
+    "median": 3.5254,
+    "p95": 5.974509999999996,
+    "max": 9.2775
+  },
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 1.5,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "coordinate_frame": "stage_conditioned_fixed_ground",
+  "world_state_available": true,
+  "initialization": "frame0-only pose seed; current frame0 pixels refine pose; calibrated shared shape when explicitly supplied, otherwise seed/refined frame0 shape; no stored3D observations or future poses read",
+  "shape_information": "precalibrated_shared_shape_from_full_sequence",
+  "shape_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261013_reliability448_view_v1\\fit\\result.npz",
+  "limits": [
+    "Stage camera transforms already use triangulated ankle anchors and stop-support assumptions; contact agreement is circular engineering consistency, not independent world accuracy.",
+    "Scene uses fixed-lag output nominally0.5s and is not immediate causal output.",
+    "Controlled walking assumption: at least one candidate sole within5mm of ground; both only during all declared Stage2 frames.",
+    "Whole54-point sole surface and heel ball use episode anchors after feasible contact; transitions retain anchors until Stage1.",
+    "Solver uses0.2mm interior margin; actual physical5/10mm bounds allow1micrometre numerical tolerance. Active-set covariance and derivative conditioning are local approximations.",
+    "No independent metric position/velocity/acceleration or physical contact truth; rejected/failed output remains recorded."
+  ],
+  "world_pose_certified": false,
+  "scene_role": "stage_conditioned_world_estimation;fixed_lag_not_independent_visual_odometry",
+  "ground_constraint_policy": "contact",
+  "ground_configuration": {
+    "ground_tolerance_m": 0.005,
+    "max_heel_displacement_m": 0.01,
+    "maximum_iterations": 30,
+    "bootstrap_iterations": 80,
+    "optimizer_objective_tolerance": 0.01,
+    "feasibility_tolerance_m": 0.0002,
+    "heel_velocity_sigma_m_s": 0.02,
+    "heel_acceleration_sigma_m_s2": 0.2
+  },
+  "constraint_status_counts": {
+    "constrained": 390,
+    "feasible_unconverged": 43,
+    "constraint_conflict": 15
+  },
+  "constraint_satisfied_frames": 434,
+  "stage2_frames": 115,
+  "stage2_constraint_satisfied_frames": 101,
+  "sole_height_mm": {
+    "count": 882,
+    "min": -7.320165634155273,
+    "median": 4.713296890258789,
+    "p95": 49.36737120151516,
+    "max": 63.078463077545166
+  },
+  "stage2_sole_max_displacement_mm": {
+    "count": 216,
+    "min": 0.0,
+    "median": 6.472674858068196,
+    "p95": 9.918182399693716,
+    "max": 40.48725185889167
+  },
+  "model_storage_frame": "current_left_camera"
+}

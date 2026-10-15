@@ -1,0 +1,242 @@
+{
+  "scope": "Existing ground/contact loss and geometry review for Stage-conditioned model-level constraints. No tracking rerun or world accuracy evaluation.",
+  "sources": {
+    "model": "research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_calibrated_beta12\\result.npz",
+    "scene": "research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\run_latent_cap12\\view_v2\\scene",
+    "sole_vertex_sets": "research_records\\engineering_validation\\G20260927_wilor_smplh_full448_v1\\contact_surface_sets_smplh_v1\\contact_vertex_sets.json",
+    "mainline_options": "research_records/engineering_validation/G20261013_reliability448_view_v1/fit/resolved_options.json",
+    "original_surface_loss": "realtime_app/pose_app/smpl_surface_contact.py",
+    "optional_fitting_gate": "realtime_app/pose_app/smplh_fitting/contact.py",
+    "candidate_gate": "realtime_app/pose_app/contact_state.py"
+  },
+  "original_mainline": {
+    "contact_labels": null,
+    "surface_foot_contact_weight": 0.0,
+    "surface_hand_contact_weight": 0.0,
+    "body_temporal_weight": 0.0,
+    "body_ankle_reprojection_multiplier": 2.0,
+    "decision": "Mainline had optional contact implementation but did not activate contact losses."
+  },
+  "surface_geometry": {
+    "heel_vertex_ids": [
+      3387,
+      6787
+    ],
+    "sole_candidate_count_by_side": [
+      54,
+      54
+    ],
+    "heel_in_sole_candidates": [
+      false,
+      false
+    ],
+    "sole_vertex_ids_by_side": [
+      [
+        3218,
+        3220,
+        3221,
+        3224,
+        3225,
+        3228,
+        3229,
+        3237,
+        3238,
+        3239,
+        3240,
+        3250,
+        3251,
+        3253,
+        3254,
+        3259,
+        3261,
+        3262,
+        3263,
+        3264,
+        3275,
+        3276,
+        3277,
+        3278,
+        3287,
+        3288,
+        3290,
+        3293,
+        3295,
+        3296,
+        3297,
+        3300,
+        3305,
+        3306,
+        3307,
+        3310,
+        3315,
+        3352,
+        3353,
+        3354,
+        3355,
+        3357,
+        3358,
+        3359,
+        3360,
+        3361,
+        3362,
+        3363,
+        3455,
+        3456,
+        3461,
+        3462,
+        3463,
+        3464
+      ],
+      [
+        6616,
+        6619,
+        6620,
+        6621,
+        6622,
+        6626,
+        6629,
+        6630,
+        6636,
+        6637,
+        6639,
+        6640,
+        6651,
+        6652,
+        6653,
+        6654,
+        6659,
+        6660,
+        6661,
+        6663,
+        6664,
+        6674,
+        6675,
+        6677,
+        6678,
+        6686,
+        6687,
+        6689,
+        6693,
+        6695,
+        6696,
+        6697,
+        6701,
+        6705,
+        6706,
+        6707,
+        6711,
+        6716,
+        6752,
+        6753,
+        6754,
+        6755,
+        6756,
+        6757,
+        6758,
+        6759,
+        6760,
+        6761,
+        6762,
+        6763,
+        6837,
+        6838,
+        6839,
+        6840
+      ]
+    ],
+    "frame0_heel_height_mm": [
+      49.66997627599123,
+      53.68327873880263
+    ],
+    "frame0_sole_min_mm": [
+      20.853846940452,
+      35.4502861994136
+    ],
+    "frame0_heel_above_sole_mm": [
+      28.81612933553923,
+      18.232992539389038
+    ],
+    "decision": "Never project heel anchors to z=0. First solve a contact-feasible pose then freeze actual heel and all sole candidate positions. A heel-only anchor allows forefoot rotation."
+  },
+  "original_surface_parameters": {
+    "temperature_m": 0.005,
+    "delta_m": 0.01,
+    "penetration_weight": 1.0,
+    "contact_stage_index_minimum": 4,
+    "reliability_normalization": "sum labels*surface loss/(2N), then objective lambda",
+    "nonpenetration_helper": "relu(margin-z)^2; margin +3mm is positive clearance, not tolerated -3mm penetration"
+  },
+  "candidate_contact_gate": {
+    "enter_distance_m": 0.015,
+    "exit_distance_m": 0.025,
+    "normal_speed_m_s": 0.08,
+    "sticking_tangent_speed_m_s": 0.06,
+    "sliding_tangent_speed_m_s": 0.12,
+    "enter_duration_ms": 80.0,
+    "exit_duration_ms": 100.0,
+    "min_quality": 0.25,
+    "max_ground_jump_m": 0.06,
+    "constructed_extra_gate": "baseline min sole >= -3mm; current/previous finite accepted frame; only sticking candidate enables tangential loss",
+    "decision": "Same-source engineered candidate, not physical contact. Do not use it to shrink the full requested Stage2 interval."
+  },
+  "stage2": {
+    "frames": 115,
+    "contiguous_ranges_inclusive": [
+      [
+        22,
+        22
+      ],
+      [
+        25,
+        27
+      ],
+      [
+        68,
+        81
+      ],
+      [
+        128,
+        143
+      ],
+      [
+        145,
+        149
+      ],
+      [
+        198,
+        213
+      ],
+      [
+        220,
+        224
+      ],
+      [
+        269,
+        286
+      ],
+      [
+        352,
+        367
+      ],
+      [
+        426,
+        446
+      ]
+    ],
+    "gaps": "Keep existing episode anchors through transitions; unlock on Stage1 confirmation; do not repeatedly re-anchor fragmented Stage2 portions."
+  },
+  "new_tool": {
+    "source": "realtime_app/pose_app/smplh_ground_constraints.py",
+    "tests": "realtime_app/tests/test_smplh_ground_constraints.py",
+    "default_ground_tolerance_m": 0.005,
+    "default_anchor_ball_radius_m": 0.01,
+    "constraint": "all selected sole minima >= -5mm; Stage2 both minima <= +5mm; each heel and each of the 54 sole candidates within 10mm of fixed episode anchor",
+    "test_result": "12 targeted tests passed; Ruff E9/F passed. Geometry, inequality and batching only; no solver success claim."
+  },
+  "limits": [
+    "All coordinates here are conditioned on the existing Stage/ground support protocol, which reuses ankle observations and includes 0.5s fixed-lag future evidence.",
+    "Sole sets are actual naked SMPL-H surface candidates, not measured shoe soles.",
+    "Hard pose constraints need joint q/v/a correction and explicit infeasibility recording in the tracker; these geometry tools do not solve or suppress conflicts.",
+    "The original balanced-grasp median/representative-frame anchors use whole segments and cannot be copied as causal anchors."
+  ]
+}

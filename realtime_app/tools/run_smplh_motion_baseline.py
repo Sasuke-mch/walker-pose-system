@@ -37,8 +37,7 @@ def run(args) -> dict:
     model = SMPLHObservationMap(args.initial_fit, args.smplh_model, args.regressor, args.vposer_dir,
                                 args.mano_left, args.mano_right, args.device)
     if args.shape_fit is not None:
-        if (args.first_frame_shape_policy != "fixed" or args.first_frame_refine_steps <= 0
-                or args.first_frame_labels is None):
+        if (args.first_frame_shape_policy != "fixed" or args.first_frame_labels is None):
             raise ValueError("a calibrated shape requires fixed-shape frame0 pose refinement with labels")
         # Read only the explicitly supplied shared shape. Future poses and mesh
         # fields are never used as a frame0 pose or as tracking observations.
@@ -46,6 +45,8 @@ def run(args) -> dict:
             shape = fit["betas"].copy()
         if shape.shape != (1, 10) or not np.isfinite(shape).all():
             raise ValueError("calibrated shape must be one finite shared1x10 beta")
+        if args.first_frame_refine_steps == 0 and not np.array_equal(shape, model.betas.detach().cpu().numpy()):
+            raise ValueError("reused frame0 pose must already have the supplied calibrated beta")
         model.betas = model.torch.as_tensor(shape, dtype=model.torch.float32, device=model.device)
     args.output.mkdir(parents=True)
     effective_initial_fit = args.initial_fit
@@ -57,7 +58,31 @@ def run(args) -> dict:
                                                           manual, args.output/"first_frame_fit", args.first_frame_refine_steps,
                                                           optimize_shape=args.first_frame_shape_policy == "refine")
     config = SMPLHMotionConfig(max_latent_correction_norm=args.max_latent_correction_norm)
-    tracker = SMPLHMotionTracker(model, cal, config)
+    scene_data = None
+    if args.world_scene is not None:
+        from pose_app.smplh_world_motion_tracker import SMPLHWorldMotionTracker, WorldGroundConfig
+        from pose_app.smplh_ground_constraints import load_sole_vertex_indices
+        scene = args.world_scene
+        source = json.loads((scene/"scene_sources.json").read_text(encoding="utf-8"))
+        if any(source.get(key, False) for key in ("old_stage_jsonl_read", "old_dynamic_ground_read", "old_dynamic_walker_pose_read")):
+            raise ValueError("old dynamic inputs cannot define this world's transforms")
+        for name, key in (("left_predictions", "raw_left_pmpose"), ("right_predictions", "raw_right_pmpose"), ("input_pairs", "input_pair_dir")):
+            if Path(source[key]).resolve() != getattr(args, name).resolve():
+                raise ValueError("world scene and body observation sources differ")
+        with np.load(scene/"scene_transforms.npz", allow_pickle=False) as fitted:
+            scene_data = {key: fitted[key].copy() for key in ("rotation_ground_from_left", "translation_ground_from_left_mm", "pair_timestamp_sec")}
+        if len(scene_data["rotation_ground_from_left"]) != len(times) or not np.allclose(times, scene_data["pair_timestamp_sec"], atol=1e-7, rtol=0):
+            raise ValueError("world scene and real capture timestamps differ")
+        scene_data["stage"] = [json.loads(line)["stage"]["operational"] for line in (scene/"stage1_stage2.jsonl").read_text(encoding="utf-8").splitlines()]
+        scene_data["pose_status"] = [json.loads(line)["pose_audit"]["status"] for line in (scene/"dynamic_ground_pose.jsonl").read_text(encoding="utf-8").splitlines()]
+        tracker = SMPLHWorldMotionTracker(model, cal, config, scene_data["rotation_ground_from_left"][0],
+                 scene_data["translation_ground_from_left_mm"][0]/1000, load_sole_vertex_indices(args.surface_sets),
+                 WorldGroundConfig(max_heel_displacement_m=args.max_foot_displacement_mm/1000),
+                 constrain_ground=args.ground_constraint_policy == "contact")
+    else:
+        if args.ground_constraint_policy != "none":
+            raise ValueError("contact requires an explicit same-run world scene")
+        tracker = SMPLHMotionTracker(model, cal, config)
     parameters = {"inputs": {key: str(getattr(args, key).resolve()) for key in
                              ("left_predictions", "right_predictions", "input_pairs", "calibration_dir",
                               "initial_fit", "smplh_model", "regressor", "vposer_dir", "mano_left", "mano_right")},
@@ -72,7 +97,15 @@ def run(args) -> dict:
                   "fit_object": "complete_SMPLH_model", "observation": "raw_fisheye_2d_only",
                   "regressor_role": "model_vertices_to_2d_observation_skeleton", "world_state_available": False,
                   "fixed_body_rotation_indices_zero_based_excluding_root": model.fixed_body_indices,
-                  "source": ["realtime_app/pose_app/smplh_motion_tracker.py", "realtime_app/tools/run_smplh_motion_baseline.py"]}
+                  "source": ["realtime_app/pose_app/smplh_motion_tracker.py", "realtime_app/tools/run_smplh_motion_baseline.py"],
+                  "world_scene": None if args.world_scene is None else str(args.world_scene.resolve()),
+                  "ground_constraint_policy": args.ground_constraint_policy,
+                  "world_pose_certified": False,
+                  "model_storage_frame": "current_left_camera",
+                  "coordinate_frame": "current_left_camera" if scene_data is None else "stage_conditioned_fixed_ground"}
+    if scene_data is not None:
+        parameters.update(world_state_available=True, scene_role="stage_conditioned_world_estimation",
+                          ground_configuration=asdict(tracker.ground_config), surface_sets=str(args.surface_sets.resolve()))
     (args.output / "run_parameters.json").write_text(json.dumps(parameters, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     records, outputs, elapsed = [], [], []
     all_errors, used_errors, pixel_reasons = [], [], Counter()
@@ -81,8 +114,19 @@ def run(args) -> dict:
         for i in range(len(left)):
             l, r = left[i, JOINT_INDICES], right[i, JOINT_INDICES]
             start = perf_counter()
+            if scene_data is not None:
+                tracker.set_scene_frame(scene_data["rotation_ground_from_left"][i],
+                  scene_data["translation_ground_from_left_mm"][i]/1000, scene_data["stage"][i], scene_data["pose_status"][i])
             result = tracker.step(float(times[i]), l, r)
             elapsed.append((perf_counter() - start) * 1000)
+            if scene_data is not None:
+                R, t = tracker.camera_rotation, tracker.camera_translation
+                for key in ("vertices_m", "joints_m", "coco_m", "translation_m", "root_rotation"):
+                    result["world_"+key] = result[key].copy()
+                for key in ("vertices_m", "joints_m", "coco_m"):
+                    result[key] = (result[key]-t) @ R
+                result["translation_m"] = R.T @ (result["translation_m"]+tracker.pelvis_offset-t)-tracker.pelvis_offset
+                result["root_rotation"] = R.T @ result["root_rotation"]
             outputs.append(result)
             status = result["joint_status"].tolist()
             states.append(np.c_[result["position_mm"], result["velocity_mm_s"], result["acceleration_mm_s2"]])
@@ -109,8 +153,15 @@ def run(args) -> dict:
                       "translation_m": _json_array(result["translation_m"]), "root_rotation": _json_array(result["root_rotation"]),
                       "vposer_latent": _json_array(result["vposer_latent"]), "generalized_velocity": _json_array(result["generalized_velocity"]),
                       "generalized_acceleration": _json_array(result["generalized_acceleration"]), "state_covariance_diag": _json_array(result["covariance_diag"]),
-                      "coordinate_frame": "current_left_camera", "derivative_definition": "derivative_of_model_point_camera_coordinate_signal",
-                      "world_state_available": False}
+                      "coordinate_frame": parameters["coordinate_frame"],
+                      "derivative_definition": "derivative_of_model_point_"+parameters["coordinate_frame"]+"_signal",
+                      "world_state_available": scene_data is not None, "world_pose_certified": False}
+            record["model_storage_frame"] = "current_left_camera"
+            if scene_data is not None:
+                record.update(ground_constraint=result["ground_constraint"],
+                  state_translation_world_m=_json_array(result["world_translation_m"]),
+                  state_root_rotation_world=_json_array(result["world_root_rotation"]),
+                  scene_pose_status=scene_data["pose_status"][i], stage=scene_data["stage"][i])
             stream.write(json.dumps(record, allow_nan=False) + "\n")
             records.append(record)
             if i % 64 == 0:
@@ -129,6 +180,8 @@ def run(args) -> dict:
     with np.load(effective_initial_fit, allow_pickle=False) as init:
         frozen = {key: init[key].copy() for key in ("left_hand_pose", "right_hand_pose")}
     frozen["betas"] = model.betas.detach().cpu().numpy().copy()
+    world_arrays = {} if scene_data is None else {"world_"+key: array("world_"+name) for key, name in
+         (("vertices", "vertices_m"), ("predicted_coco", "coco_m"), ("transl", "translation_m"), ("root_rotation", "root_rotation"))}
     np.savez_compressed(args.output / "result.npz", pair_id=np.arange(len(outputs)), timestamp_s=times,
                         pose_available=available, vertices=array("vertices_m"), faces=model.faces,
                         predicted_coco=array("coco_m"), smplh_joints=array("joints_m"),
@@ -141,7 +194,7 @@ def run(args) -> dict:
                         derivative_valid=np.array([o["derivative_valid"] for o in outputs]),
                         raw_joint_velocity_mm_s=np.array([o["raw_velocity_mm_s"] for o in outputs]),
                         raw_joint_acceleration_mm_s2=np.array([o["raw_acceleration_mm_s2"] for o in outputs]),
-                        segment_id=np.array([o["segment_id"] for o in outputs]), **frozen)
+                        segment_id=np.array([o["segment_id"] for o in outputs]), **frozen, **world_arrays)
     joints = array("joints_m")
     limb_pairs = ((16, 18), (18, 20), (17, 19), (19, 21), (1, 4), (4, 7), (2, 5), (5, 8))
     lengths = np.stack([np.linalg.norm(joints[:, a]-joints[:, b], axis=1) for a, b in limb_pairs], axis=1)
@@ -172,8 +225,31 @@ def run(args) -> dict:
                           "All derivatives include camera motion. No world, Stage or heel contact constraint is estimated.",
                           "Host-return timestamps do not prove exposure times or stereo synchronization.",
                           "Combined model and conservative parameter changes; comparison to free-point tracker is not a single-variable ablation."]}
+    if scene_data is not None:
+        constraint_rows = [r["ground_constraint"] for r in records]
+        moving = np.array([c["stage2"] for c in constraint_rows])
+        summary.update(status="completed_stage_conditioned_world_engineering_candidate",
+            coordinate_frame=parameters["coordinate_frame"], world_state_available=True, world_pose_certified=False,
+            scene_role="stage_conditioned_world_estimation;fixed_lag_not_independent_visual_odometry",
+            ground_constraint_policy=args.ground_constraint_policy,
+            model_storage_frame="current_left_camera",
+            observation_term="raw_fisheye_stereo_2d_body_data_plus_explicit_stage_conditioned_ground_priors;no_3d_body_measurements",
+            ground_configuration=asdict(tracker.ground_config),
+            constraint_status_counts=dict(Counter(c["status"] for c in constraint_rows)),
+            constraint_satisfied_frames=sum(c.get("constraint_satisfied") is True for c in constraint_rows),
+            stage2_frames=int(moving.sum()), stage2_constraint_satisfied_frames=sum(c.get("constraint_satisfied") is True and c["stage2"] for c in constraint_rows),
+            sole_height_mm=_stats(np.array([c.get("sole_min_m", [np.nan]*2) for c in constraint_rows])*1000),
+            stage2_sole_max_displacement_mm=_stats(np.array([c.get("sole_max_displacement_m") or [np.nan]*2 for c in constraint_rows])[moving]*1000))
+        summary["limits"] = ["Stage camera transforms already use triangulated ankle anchors and stop-support assumptions; contact agreement is circular engineering consistency, not independent world accuracy.",
+             "Scene uses fixed-lag output nominally0.5s and is not immediate causal output.",
+             "Controlled walking assumption: at least one candidate sole within5mm of ground; both only during all declared Stage2 frames.",
+             "Whole54-point sole surface and heel ball use episode anchors after feasible contact; transitions retain anchors until Stage1.",
+             "Solver uses0.2mm interior margin; output physical5/10mm bounds allow only1micrometre numerical tolerance; active-set covariance and derivative conditioning are local approximations.",
+             "No independent metric position/velocity/acceleration or physical contact truth; rejected/failed output remains recorded."]
     (args.output / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, allow_nan=False)+"\n", encoding="utf-8")
-    _plot_curves(args.output, times, np.array(states), np.array(joint_states), np.array(segments))
+    _plot_curves(args.output, times, np.array(states), np.array(joint_states), np.array(segments),
+                 "Stage-conditioned fixed ground (not independently certified)" if scene_data is not None
+                 else "current left-camera coordinates (includes camera motion)")
     print(json.dumps({k: summary[k] for k in ("frames", "pose_available_frames", "frame_status_counts", "all_valid_raw_view_reprojection_px", "reported_acceleration_norm_m_s2")}, indent=2))
     return summary
 
@@ -197,6 +273,10 @@ def main():
                         help="explicit pre-calibrated shared beta only; requires fixed-shape frame0 refinement")
     parser.add_argument("--max-latent-correction-norm", type=float, default=.4,
                         help="single-frame latent correction bound; recorded in run parameters")
+    parser.add_argument("--world-scene", type=Path)
+    parser.add_argument("--ground-constraint-policy", choices=("none", "contact"), default="none")
+    parser.add_argument("--surface-sets", type=Path, default=Path("research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/contact_surface_sets_smplh_v1/contact_vertex_sets.json"))
+    parser.add_argument("--max-foot-displacement-mm", type=float, default=10.)
     run(parser.parse_args())
 
 

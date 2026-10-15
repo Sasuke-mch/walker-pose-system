@@ -592,5 +592,115 @@
     "checks": "58 targeted tests including new failed-then-passed support regression; compile/Ruff/JS;actual all448;exact beta;raw/public derivatives,masks,time,segment/mesh faces/currentR/t unchanged in export;original renderer statement extraction unchanged.",
     "mainline_promoted": false,
     "retained": "All original baseline/candidate logs,model outputs and failed states; prior local workspace changes preserved."
+  },
+  "world_contact_20261015": {
+    "status": "completed_engineering_candidate_failed_whole_sequence_gate",
+    "user_authorized_fixed_shape": "original full-sequence shared beta; no future poses consumed",
+    "user_confirmed_maximum_whole_foot_displacement_mm": 10,
+    "ground_tolerance_mm": 5,
+    "model": "complete SMPLH, frozen beta/hands/local feet/neck/head",
+    "coordinate_frame": "stage_conditioned_fixed_ground q/v/a; inverse current camera transform for original stereo pixels",
+    "camera_transform": "new replay world_contact_20261015/scene, Stage ankle anchors and nominal0.5s lag; not independent",
+    "data_term": "current raw fisheye stereo pixels only; no 3D body observations",
+    "priors": "world ground/whole sole/heel geometric assumptions plus zero-heel v/a local conditioning",
+    "scope": "all115 operational Stage2 frames, no post-hoc subset; transitions keep episode anchors",
+    "other_stage_assumption": "at least one candidate sole near plane, other foot may swing",
+    "constraints": "every54 sole point and actual heel within 10mm of first feasible episode stance; ground min plus/minus5mm in Stage2, nonpenetration all frames",
+    "estimator": "SLSQP pose MAP with joint Gaussian q/v/a conditional correction; covariance once at converged solution, no per-iteration pixel reuse",
+    "finite_budget": "same current pixels/prior, best feasible improving current-frame iterate only; retain optimizer last cost/slack/geometry, no posterior information shrink or published derivative on feasible_unconverged",
+    "reference": "world_contact_20261015/run_world_unconstrained (original EKF, not pure loss ablation)",
+    "failed_complete": "world_contact_20261015/run_contact_v2:409 available,60/115 Stage2 satisfied,109 iteration limits",
+    "debug_partial": [
+      "run_contact_v1",
+      "run_contact_v3",
+      "run_contact_v4",
+      "run_contact_v5"
+    ],
+    "current": "world_contact_20261015/run_contact_v7",
+    "geometry_detail": "ground_constraints_geometry_20261015.json",
+    "sources": [
+      "realtime_app/pose_app/smplh_world_motion_tracker.py",
+      "realtime_app/pose_app/smplh_ground_constraints.py",
+      "realtime_app/tools/run_smplh_motion_baseline.py"
+    ],
+    "limitations": "engineering consistency only; no independent world pose/contact/derivative truth; local Laplace and derivative-prior approximations; no promotion",
+    "complete_runs": [
+      "run_world_unconstrained",
+      "run_contact_v2",
+      "run_contact_v6",
+      "run_contact_v7"
+    ],
+    "frame_count": 448,
+    "model_available": 441,
+    "stage2_satisfied": 101,
+    "stage2_total": 115,
+    "all_constraint_satisfied": 434,
+    "failed_stage2_frames": [
+      76,
+      77,
+      78,
+      79,
+      139,
+      140,
+      275,
+      436,
+      437,
+      438,
+      439,
+      440,
+      441,
+      442
+    ],
+    "optimizer_status_counts": {
+      "constrained": 390,
+      "feasible_unconverged": 43,
+      "constraint_conflict": 15
+    },
+    "all_raw_pixel_slots": 10752,
+    "computed_raw_pixel_slots": 10584,
+    "raw_reprojection_px": {
+      "count": 10584,
+      "min": 0.2525677148850531,
+      "median": 41.39733487489205,
+      "p95": 156.79069678715274,
+      "max": 284.73991155779925
+    },
+    "derivative_available_joint_samples": 635,
+    "all_joint_samples": 5376,
+    "step_ms": {
+      "count": 448,
+      "min": 142.06189999822527,
+      "median": 204.18085000164865,
+      "p95": 1383.6569800003415,
+      "max": 3144.214200001443
+    },
+    "strict_recomputed": "world_contact_20261015/first_instance_strict.jsonl;448/max_matches1/score0.25/reprojection10px;accepted coordinates andmask match newscene exactly",
+    "body_beta_matches_original_mainline": true,
+    "world_camera_mesh_transform_difference_max_m": 3.1086244689504383e-15,
+    "frame188_camera_model_parameters_regenerate_mesh_max_m": 3.791750833315177e-07,
+    "viewer": "world_contact_20261015/run_contact_v7/view/body.html",
+    "browser": "world_contact_20261015/run_contact_v7/view/body_browser.html",
+    "browser_checked_frames": [
+      0,
+      22,
+      68,
+      77,
+      188,
+      335,
+      391
+    ],
+    "browser_errors": [],
+    "tests": "48 relevant tests passed; Ruff E9/F, Python compilation and JS syntax passed",
+    "decision": "Stop this solver revision; whole115-frame10mm requirement still fails, raw projection and derivative coverage worsen, runtime not realtime. Keep candidate only, no promotion.",
+    "solver_tolerance": "0.2mm interior margin; physical10/5mm bound with1micrometre numerical tolerance",
+    "satisfied_stage2_max_abs_sole_height_mm": 4.958808422088623,
+    "satisfied_stage2_max_whole_sole_displacement_mm": 9.974844190115773,
+    "all_stage2_whole_sole_displacement_mm": {
+      "count": 216,
+      "min": 0.0,
+      "median": 6.472674858068196,
+      "p95": 9.918182399693716,
+      "max": 40.48725185889167
+    }
   }
 }

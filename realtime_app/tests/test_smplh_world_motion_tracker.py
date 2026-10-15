@@ -1,0 +1,214 @@
+"""Known camera motion and actual-model contact conditions, not accuracy tests."""
+import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
+
+import numpy as np
+from scipy.spatial.transform import Rotation
+
+from pose_app.smplh_motion_tracker import MotionPose, SMPLHMotionConfig
+from pose_app.smplh_world_motion_tracker import SMPLHWorldMotionTracker
+from tests.test_smplh_motion_tracker import AnalyticBodyMap, tracker
+
+
+class SurfaceBodyMap(AnalyticBodyMap):
+    def __init__(self):
+        super().__init__()
+        self.base[0] = [.02, .03, .04]
+        self.pelvis = self.base[0].copy()
+        self.mesh = np.repeat(self.pelvis[None], 6890, axis=0)
+        for side, indices in enumerate((np.arange(54), np.arange(54, 108))):
+            self.mesh[indices] = np.array([(-.12, .12)[side], 0, -.04]) + np.c_[np.linspace(-.02, .02, 54), np.linspace(-.07, .07, 54), np.zeros(54)]
+        self.mesh[[3387, 6787]] = [[-.12, 0, -.01], [.12, 0, -.01]]
+
+    def evaluate_batch(self, translations, roots, latents, mesh=False):
+        data = super().evaluate_batch(translations, roots, latents, mesh=False)
+        correction = self.pelvis-np.einsum("bij,j->bi", roots, self.pelvis)
+        data["coco_m"] += correction[:, None]
+        data["joints_m"] = data["coco_m"].copy()
+        if mesh:
+            data["vertices_m"] = np.einsum("bij,vj->bvi", roots, self.mesh-self.pelvis) + self.pelvis + translations[:, None]
+        return data
+
+
+def world_tracker(contact=False, rotation=None):
+    model = SurfaceBodyMap()
+    return SMPLHWorldMotionTracker(model, tracker().cal, SMPLHMotionConfig(pixel_sigma_px=.2),
+        np.eye(3) if rotation is None else rotation, [0, 0, -1.96],
+        [np.arange(54), np.arange(54, 108)], constrain_ground=contact)
+
+
+def observe(tr, pose=None):
+    p = tr._pixels(tr.model.evaluate(pose or tr.pose)["coco_m"])[0]
+    return np.concatenate((p, np.ones((2, 12, 1))), axis=-1)
+
+
+class WorldMotionTests(unittest.TestCase):
+    def test_shaped_pelvis_transform_preserves_every_mesh_vertex(self):
+        rotation = Rotation.from_rotvec([.13, .05, -.08]).as_matrix()
+        tr = world_tracker(rotation=rotation)
+        expected = tr.model.evaluate(tr.model.initial_pose, mesh=True)["vertices_m"][0] @ rotation.T + [0, 0, -1.96]
+        actual = tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0]
+        np.testing.assert_allclose(actual, expected, atol=1e-12)
+
+    def test_camera_motion_does_not_create_world_body_velocity(self):
+        tr = world_tracker()
+        fixed = tr.pose.copy()
+        px = observe(tr)
+        tr.step(0., px[0], px[1])
+        for i in range(1, 21):
+            R = Rotation.from_rotvec([0, .003*i, .001*i]).as_matrix()
+            tr.set_scene_frame(R, [.003*i, 0, -1.96], "transition", "updated")
+            px = observe(tr, fixed)
+            output = tr.step(i*.03, px[0], px[1])
+        np.testing.assert_allclose(tr.pose.translation_m, fixed.translation_m, atol=1e-8)
+        np.testing.assert_allclose(output["generalized_velocity"], 0, atol=1e-7)
+        np.testing.assert_allclose(output["generalized_acceleration"], 0, atol=1e-6)
+
+    def test_contact_changes_complete_model_and_retains_episode_anchors(self):
+        tr = world_tracker(contact=True)
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+        tr.pose.translation_m[2] += .025
+        px = observe(tr)
+        out = tr.step(0., px[0], px[1])
+        self.assertTrue(out["ground_constraint"]["constraint_satisfied"])
+        self.assertLessEqual(max(abs(np.array(out["ground_constraint"]["sole_min_m"]))), .0052)
+        anchor = tr.sole_anchors.copy()
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "transition", "held")
+        self.assertIsNotNone(tr.sole_anchors)
+        tr._conditions(tr._geometry(tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0]))
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+        np.testing.assert_array_equal(tr.sole_anchors, anchor)
+        np.testing.assert_allclose(out["vertices_m"], tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0])
+        self.assertFalse(out["used_views"].any())
+
+    def test_expired_frame_and_missing_support_do_not_hide_violation(self):
+        tr = world_tracker(contact=True)
+        px = observe(tr)
+        tr.step(0., px[0], px[1])
+        missing = np.full((12, 3), np.nan)
+        expired = tr.step(.2, missing, missing)
+        self.assertFalse(expired["pose_available"])
+        self.assertFalse(expired["ground_constraint"]["constraint_satisfied"])
+        self.assertTrue(np.isnan(expired["vertices_m"]).all())
+
+    def test_feasible_but_failed_optimizer_keeps_prediction_and_records_conflict(self):
+        tr = world_tracker(contact=True)
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+        px = observe(tr)
+        tr.step(0., px[0], px[1])
+        prior = tr.pose.copy()
+        failed = SimpleNamespace(x=np.zeros(tr.n), success=False, message="Iteration limit reached",
+                                 nit=35, fun=0.)
+        with patch("pose_app.smplh_world_motion_tracker.minimize", return_value=failed):
+            output = tr.step(.03, px[0], px[1])
+        self.assertEqual(output["status"], "predicted")
+        self.assertTrue(output["pose_available"])
+        self.assertTrue(output["ground_constraint"]["constraint_satisfied"])
+        self.assertEqual(output["ground_constraint"]["status"], "constraint_conflict")
+        self.assertFalse(output["ground_constraint"]["optimizer_success"])
+        self.assertFalse(output["used_views"].any())
+        self.assertFalse(output["derivative_valid"].any())
+        self.assertEqual(tr.last_support, 0.)
+        np.testing.assert_allclose(tr.pose.translation_m, prior.translation_m, atol=1e-10)
+        self.assertTrue(np.isfinite(output["raw_velocity_mm_s"]).all())
+
+    def test_short_missing_observation_cannot_certify_prediction_outside_whole_foot_bound(self):
+        tr = world_tracker(contact=True)
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+        px = observe(tr)
+        tr.step(0., px[0], px[1])
+        anchor = tr.sole_anchors.copy()
+        tr.velocity[:] = 0.
+        tr.acceleration[:] = 0.
+        tr.velocity[0] = 1.
+        missing = np.full((12, 3), np.nan)
+        output = tr.step(.03, missing, missing)
+        self.assertEqual(output["status"], "predicted")
+        self.assertTrue(output["pose_available"])
+        self.assertFalse(output["ground_constraint"]["constraint_satisfied"])
+        self.assertGreater(min(output["ground_constraint"]["sole_max_displacement_m"]), .029)
+        self.assertFalse(output["derivative_valid"].any())
+        self.assertTrue(np.isnan(output["velocity_mm_s"]).all())
+        self.assertTrue(np.isnan(output["acceleration_mm_s2"]).all())
+        self.assertTrue(np.isfinite(output["vertices_m"]).all())
+        self.assertTrue(np.isfinite(output["raw_velocity_mm_s"]).all())
+        np.testing.assert_array_equal(tr.sole_anchors, anchor)
+
+    def test_improved_feasible_budget_result_keeps_failure_and_suppresses_derivatives(self):
+        tr = world_tracker(contact=True)
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+        px = observe(tr); tr.step(0., px[0], px[1])
+        true = tr.pose.copy(); true.translation_m[0] += .005
+        px = observe(tr, true)
+        def budget_result(fun, x0, **kwargs):
+            candidate = x0.copy(); candidate[0] += .001
+            return SimpleNamespace(x=candidate, fun=fun(candidate), success=False,
+                                   status=9, message="Iteration limit reached", nit=30)
+        with patch("pose_app.smplh_world_motion_tracker.minimize", side_effect=budget_result):
+            out = tr.step(.03, px[0], px[1])
+        self.assertEqual(out["status"], "feasible_unconverged")
+        self.assertTrue(out["ground_constraint"]["constraint_satisfied"])
+        self.assertFalse(out["ground_constraint"]["optimizer_success"])
+        self.assertLess(out["ground_constraint"]["objective"], out["ground_constraint"]["feasible_start_objective"])
+        self.assertFalse(out["derivative_valid"].any())
+        self.assertTrue(np.isfinite(out["raw_velocity_mm_s"]).all())
+
+    def test_earlier_feasible_improvement_survives_an_infeasible_last_iterate(self):
+        tr = world_tracker(contact=True)
+        tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "stage2_feet_static_walker_moving", "updated")
+        px = observe(tr)
+        tr.step(0., px[0], px[1])
+        prior = tr.pose.copy()
+        anchors = tr.sole_anchors.copy()
+        target = prior.copy()
+        target.translation_m[0] += .006
+        px = observe(tr, target)
+        captured = {}
+
+        def failed_last_iterate(fun, x0, **kwargs):
+            captured["covariance"] = tr.covariance.copy()
+            earlier = x0.copy()
+            earlier[0] += .002
+            captured["earlier_cost"] = fun(earlier)
+            last = x0.copy()
+            last[0] += .020
+            # This evaluation also overwrites the model cache. The incumbent
+            # must own its delta rather than aliasing that mutable cache.
+            return SimpleNamespace(x=last, fun=fun(last), success=False,
+                                   status=9, message="Iteration limit reached", nit=30)
+
+        with patch("pose_app.smplh_world_motion_tracker.minimize", side_effect=failed_last_iterate):
+            output = tr.step(.03, px[0], px[1])
+        diagnostic = output["ground_constraint"]
+        self.assertEqual(output["status"], "feasible_unconverged")
+        self.assertTrue(diagnostic["constraint_satisfied"])
+        self.assertFalse(diagnostic["optimizer_success"])
+        self.assertEqual(diagnostic["selected_estimate"], "best_feasible_improving_current_frame_iterate")
+        self.assertLess(diagnostic["optimizer_last_minimum_slack_m"], -.009)
+        self.assertAlmostEqual(diagnostic["objective"], captured["earlier_cost"])
+        self.assertLess(diagnostic["objective"], diagnostic["feasible_start_objective"])
+        self.assertNotEqual(diagnostic["objective"], diagnostic["optimizer_last_objective"])
+        self.assertAlmostEqual(tr.pose.translation_m[0] - prior.translation_m[0], .002)
+        self.assertFalse(output["derivative_valid"].any())
+        self.assertTrue(np.isnan(output["velocity_mm_s"]).all())
+        self.assertTrue(np.isfinite(output["raw_velocity_mm_s"]).all())
+        np.testing.assert_array_equal(tr.sole_anchors, anchors)
+        np.testing.assert_allclose(tr.covariance, captured["covariance"], rtol=1e-10, atol=1e-12)
+
+    def test_position_velocity_acceleration_are_jointly_corrected(self):
+        tr = world_tracker()
+        px = observe(tr); tr.step(0., px[0], px[1])
+        origin = tr.pose.translation_m.copy()
+        for i in range(1, 65):
+            now = i*.035
+            true = MotionPose(origin+[.1*now**2, 0, 0], np.eye(3), np.zeros(1))
+            tr.set_scene_frame(np.eye(3), [.01*now, 0, -1.96], "transition", "updated")
+            px = observe(tr, true)
+            out = tr.step(now, px[0], px[1])
+        self.assertAlmostEqual(out["generalized_velocity"][0], .2*now, delta=.04)
+        self.assertAlmostEqual(out["generalized_acceleration"][0], .2, delta=.08)
+
+
+if __name__ == "__main__":
+    unittest.main()

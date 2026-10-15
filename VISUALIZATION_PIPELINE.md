@@ -1,5 +1,7 @@
 # Walker Pose 可视化固定实现规范
 
+2026-10-15 Stage条件世界q/v/a及10mm整sole约束检查页：`research_records/engineering_validation/G20261014_smplh_motion448_v1/world_contact_20261015/run_contact_v7/view/body.html`及`body_browser.html`+GZ。全448保留、441可解码，全部115移动帧中101满足/14失败，页面保留冲突、失效网格和NaN，不作为整段约束成功。显示固定原主线beta、真实sole高度/全部sole最大位移、optimizer收敛与未收敛可行状态；v/a由Stage条件固定地面系状态直接估计，不旋转旧相机系导数。场景本轮新重放、strict重新计算且同源一致，Stage含脚踝锚和0.5s固定延迟，不是独立世界轨迹。浏览器失败帧NaN污染全片中心缺陷已修，只用有限pelvis确定一个固定中心，不改变任何失败输出或动态数据。详细身份、结果与停止决定见算法5.7和实验protocol。
+
 2026-10-15用户指定固定原主线体型后的检查页：`research_records/engineering_validation/G20261014_smplh_motion448_v1/run_calibrated_beta12/view/body.html`及同目录`body_browser.html`+`body_data.json.gz`。beta只从原主线全片共享体型读取并冻结，首帧二维仅细化姿态；页面显示beta、左右脚底及助步器四脚高度。场景来自本任务新重放并修复停止歧义计时的`run_latent_cap12/view_v2/scene`，同源输入/真实时基/strict保持，380/391支撑恢复0mm。人体脚部仍有浮空/穿地和像素拟合不足，明确作为检查候选保留，不吸附/平滑/补点，不晋升主线；v/a保持原相机系。原view及旧beta结果保留，详细比较见当前算法第5.6节与实验protocol的`calibrated_shape_20261015`。
 
 2026-10-15完整SMPL-H因果跟踪1.2候选页面：`research_records/engineering_validation/G20261014_smplh_motion448_v1/run_latent_cap12/view/body.html`及同目录`body_browser.html`（配套`body_data.json.gz`）。全部448帧保存网格与本轮同源strict/Stage/地面重放统一显示；人体跟踪仍只用二维，重三角化和Stage只用于显示参考。速度/加速度曲线保持当前左相机系及真实非均匀时间、NaN和重启段，不转换成世界导数；原始估计开关明确区分未通过发布门的值。无平滑/插值，完整17点含右膝按实际strict门显示；真实面、实体拓扑、相机/踝拖尾、同源双目叠点和浏览器交互已核对。页面来源/逐关节拒绝计数见同目录`metadata.json`，证据边界见实验根protocol的`visualization_20261015`。

@@ -96,7 +96,8 @@ def _stats(values: np.ndarray) -> dict:
 
 
 def _plot_curves(output: Path, times: np.ndarray, states: np.ndarray,
-                 statuses: np.ndarray, segments: np.ndarray) -> None:
+                 statuses: np.ndarray, segments: np.ndarray,
+                 coordinate_label: str = "current left-camera coordinates (includes camera motion)") -> None:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -123,7 +124,7 @@ def _plot_curves(output: Path, times: np.ndarray, states: np.ndarray,
             ax.set_xlabel("Host-return midpoint time (s)")
         for ax in axes[:, 0]:
             ax.set_ylabel(label)
-        fig.suptitle(label + " in current left-camera coordinates (includes camera motion)\n"
+        fig.suptitle(label + " in " + coordinate_label + "\n"
                      "Zero start states are priors; grey spans are predictions; gaps mark resets/unavailable", fontsize=11)
         fig.savefig(output / filename, dpi=150)
         plt.close(fig)
