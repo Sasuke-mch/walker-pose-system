@@ -1,0 +1,273 @@
+{
+  "status": "targeted_fixes_compiled_cpu_diagnostic_completed_no_promotion",
+  "source_manifest": "input_primary/manifest.json",
+  "frame_range_full_cpu": "0..447",
+  "independent_truth_available": false,
+  "world_pose_certified": false,
+  "stage_used": false,
+  "native_sources": {
+    "version": "official v17.0.1",
+    "repository": "https://github.com/nvidia-isaac/cuVSLAM/tree/v17.0.1",
+    "secondary_matching": "https://github.com/nvidia-isaac/cuVSLAM/blob/v17.0.1/libs/sof/sof_multicamera_base.cpp",
+    "pnp_solver": "https://github.com/nvidia-isaac/cuVSLAM/blob/v17.0.1/libs/pnp/multicam_pnp.cpp",
+    "wsl_source": "/home/itachi/walker_cuvslam_src_v17"
+  },
+  "located_causes": [
+    "primary mask passed only to mono tracker; primary-to-secondary LK has no mask input; secondary matches enter geometry without exclusion",
+    "PNP checks raw observation count before map association but omits the same minimum after association; zero associated3D gives zero cost and early success with identity information",
+    "low-cost early return precedes geometric rank check; sparse3D is insufficient to constrain full camera pose",
+    "raw relative camera orientation is strongly rotated while cross-camera LK uses translational patch search; rectification is a diagnostic hypothesis, not proven sole cause"
+  ],
+  "native_patch": {
+    "path": "realtime_app/walker_tools/scene/cuvslam_geometry_contract.patch",
+    "mask_fix": "filter current-camera observations against current mask before solver/triangulation for primary and secondary, never only at JSON export",
+    "pnp_fix": "recheck existing default minimum13 after association; require finite positive Hessian diagonal and normalized rank6 threshold1e-6 before low-cost success",
+    "cpu_compatibility_included": [
+      "support_depth_ member available outside USE_CUDA",
+      "guard CUDA synchronization in MultiSOF",
+      "guard RGBD include/creation and GPU ICP types in CPU build",
+      "select OriginalCPU SBA when use_gpu false",
+      "CPU diagnostic rejects nonempty native image debug dump instead of compiling GPU dump code"
+    ],
+    "marker": "CUVSLAMWalkerGeometryContractVersion=1",
+    "apply_check": "git apply --check --reverse passes on the patched v17 source tree"
+  },
+  "build": {
+    "gpu_source_build": "not_completed; CUDA12.1 toolkit lacks libcudadevrt.a and libcudart_static.a; original GPU wheel unchanged",
+    "cpu_build": "cmake --build /home/itachi/walker_cuvslam_src_v17/build_cpu --target cuvslam pnp_test -j4",
+    "cpu_cmake_options": {
+      "USE_CUDA": false,
+      "ENFORCE_GPU": false,
+      "USE_CUNLS": false,
+      "USE_LMDB": true,
+      "CMAKE_BUILD_TYPE": "Release"
+    },
+    "cpu_native_library": "/home/itachi/walker_cuvslam_cpu_pkg/cuvslam/libcuvslam.so",
+    "abi_check": "existing official Python binding loads isolated CPU library; /proc/self/maps confirms CPU path; marker1 and use_gpuFalse",
+    "logs": [
+      "/home/itachi/walker_cuvslam_src_v17/configure_v2.log",
+      "/home/itachi/walker_cuvslam_src_v17/configure_cpu.log",
+      "/home/itachi/walker_cuvslam_src_v17/build_cpu.log"
+    ],
+    "timing_scope": "CPU diagnostic only; not an equal GPU runtime or overall accuracy comparison"
+  },
+  "native_tests": {
+    "command": "/home/itachi/walker_cuvslam_src_v17/build_cpu/bin/pnp_test --gtest_output=json:<experiment>/cuvslam_pnp_contract_test.json",
+    "result": "5/5 passed",
+    "result_path": "cuvslam_pnp_contract_test.json",
+    "cases": [
+      "reject zero associated3D despite enough raw tracks",
+      "reject one associated3D despite enough raw tracks",
+      "reject rank-deficient zero-cost geometry",
+      "reject all associated points behind camera",
+      "accept exact nondegenerate known pose"
+    ]
+  },
+  "cpu_full448": {
+    "rows": "cuvslam_contract_cpu_v1.jsonl",
+    "metadata": "cuvslam_contract_cpu_v1.metadata.json",
+    "summary": "cuvslam_contract_cpu_summary.json",
+    "result": {
+      "all_frames": 448,
+      "left_right_exported_observations": [
+        71223,
+        21
+      ],
+      "deep_mask_center_count_gt_3px": [
+        0,
+        0
+      ],
+      "status_counts": {
+        "tracked": 9,
+        "initializing": 42,
+        "lost": 397
+      },
+      "native_pose_count": 224,
+      "nonempty_3d_frames": 16,
+      "maximum_exported_3d": 1,
+      "native_cpu_diagnostic": true,
+      "world_pose_certified": false,
+      "decision": "no world trajectory; native gates expose sparse metric support; no promotion"
+    },
+    "interpretation": "low supported fraction exposes failure; unchanged proposal or a bootstrap pose is not a measured world trajectory"
+  },
+  "prediction_only_control": {
+    "summary": "cuvslam_no_motion_comparison.json",
+    "result": "401/448 with nonempty export but jumpP952.358787m/max29.206497m; no-motion worsens tail and does not fix mask/geometry; retained only"
+  },
+  "rectification": {
+    "scope": "four-frame diagnostic only, not complete448 evaluation",
+    "input": "input_cuvslam_rectified_deploy4_v2/manifest.json",
+    "output": "cuvslam_rectified_contract_cpu_deploy4_v2.jsonl",
+    "metadata": "cuvslam_rectified_contract_cpu_deploy4_v2.metadata.json",
+    "original_partial_retained": "input_cuvslam_rectified_v1:43 left images,43 left masks,43 right images,42 right masks; interrupted; no manifest, not accepted as complete input",
+    "method": "OpenCV fisheye stereoRectify full fixed R/t, ZERO_DISPARITY, balance0, fov_scale1, same960x540; bilinear images, all4sourcepixel conservative mask and border exclusion",
+    "raw_source_calibration_refit": false,
+    "active_model": "opencv_pinhole",
+    "active_distortion_coefficients": [
+      [],
+      []
+    ],
+    "R2_R01_R1T_max_abs_identity_error": 1.8318679906315083e-15,
+    "baseline_raw_m": 0.2962664770619531,
+    "baseline_rectified_m": 0.2962664770619531,
+    "rectified_right_from_left_translation_m": [
+      0.2962664770619531,
+      2.389078400765714e-16,
+      1.2114837853605923e-17
+    ],
+    "left_right_excluded_fraction_median": [
+      0.8625752314814815,
+      0.7624180169753086
+    ],
+    "pose_frame": "world_from_left_camera_m is rectified left; explicit world_from_original_left_camera_m = native_pose @ Rrectified_from_original",
+    "landmark_frame": "native last-frame points are current rectified rig; original_left=R1.T@native; neither is world",
+    "legacy_raw_mesh_comparator_compatible": false,
+    "raw_first4": [
+      {
+        "frame_id": 0,
+        "status": "initializing",
+        "native_pose_returned": true,
+        "observations_left_right": [
+          145,
+          0
+        ],
+        "finite_3d": 0,
+        "reason": "native_pose_proposal_without_any_exported_3d_landmarks"
+      },
+      {
+        "frame_id": 1,
+        "status": "lost",
+        "native_pose_returned": false,
+        "observations_left_right": [
+          102,
+          0
+        ],
+        "finite_3d": 0,
+        "reason": "native_odometry_pose_unavailable"
+      },
+      {
+        "frame_id": 2,
+        "status": "initializing",
+        "native_pose_returned": true,
+        "observations_left_right": [
+          162,
+          0
+        ],
+        "finite_3d": 0,
+        "reason": "native_pose_proposal_without_any_exported_3d_landmarks"
+      },
+      {
+        "frame_id": 3,
+        "status": "lost",
+        "native_pose_returned": false,
+        "observations_left_right": [
+          162,
+          0
+        ],
+        "finite_3d": 0,
+        "reason": "native_odometry_pose_unavailable"
+      }
+    ],
+    "rectified_first4": [
+      {
+        "frame_id": 0,
+        "status": "initializing",
+        "native_pose_returned": true,
+        "observations_left_right": [
+          219,
+          1
+        ],
+        "finite_3d": 0,
+        "reason": "native_pose_proposal_without_any_exported_3d_landmarks"
+      },
+      {
+        "frame_id": 1,
+        "status": "lost",
+        "native_pose_returned": false,
+        "observations_left_right": [
+          288,
+          1
+        ],
+        "finite_3d": 1,
+        "reason": "native_odometry_pose_unavailable"
+      },
+      {
+        "frame_id": 2,
+        "status": "tracked",
+        "native_pose_returned": true,
+        "observations_left_right": [
+          290,
+          3
+        ],
+        "finite_3d": 2,
+        "reason": "native_visual_pose_and_3d_support_available_not_external_accuracy_certified"
+      },
+      {
+        "frame_id": 3,
+        "status": "lost",
+        "native_pose_returned": false,
+        "observations_left_right": [
+          278,
+          0
+        ],
+        "finite_3d": 2,
+        "reason": "native_odometry_pose_unavailable"
+      }
+    ],
+    "decision": "stop: right observations improve0to5 but at most2 exported3D and only1of4 supported proposal; insufficient for reliable6DoF; do not run448 or change mainline based on this"
+  },
+  "python_validation": {
+    "tests": "From realtime_app: ..\\.venv-cuda\\Scripts\\python.exe -m unittest tests.test_cuvslam_backend tests.test_cuvslam_rectification tests.test_visual_rig_comparison",
+    "result": "15 passed (6 SDK/rectification +9 common geometry; final raw/rectified comparator rejection included)",
+    "compile": "py_compile four changed Python files passed",
+    "lint": "uvx --offline ruff check --select E9,F four changed Python files passed",
+    "geometric_cases": [
+      "rectified stereo axes",
+      "baseline unit and direction",
+      "known raw rays project to matching rectified epipolar rows",
+      "no reused fisheye D",
+      "conservative mask samples and bounds",
+      "explicit original-camera pose/landmark bridge"
+    ],
+    "raw_mesh_frame_guard": "compare_visual_rig_poses rejects rectified manifest before raw-fisheye diagnostics or frozen raw-camera mesh export; targeted regression passed"
+  },
+  "final_decision": "No reliable independent visual world trajectory. Stop this bounded repair round; preserve failed source/image/pose records; no Stage fusion, mainline promotion, synthetic fill, or GPU performance claim.",
+  "replay_invocations_from_saved_configuration": {
+    "scope": "CLI arguments reconstructed from saved input paths and metadata; choose a new output since runners refuse overwrite",
+    "wsl_python": "/home/itachi/walker_cuvslam_env/bin/python",
+    "cpu_pythonpath": "/home/itachi/walker_cuvslam_cpu_pkg:/mnt/d/my_works/walker_pose_system/realtime_app",
+    "cpu_full448_argv": [
+      "-m",
+      "walker_tools.scene.cuvslam_backend",
+      "--manifest",
+      "/mnt/d/my_works/walker_pose_system/research_records/engineering_validation/G20261014_visual_rig_compare448_v1/input_primary/manifest.json",
+      "--output",
+      "<new_nonexisting_output.jsonl>",
+      "--slam",
+      "--cpu",
+      "--require-geometry-contract"
+    ],
+    "rectify4_argv": [
+      "-m",
+      "walker_tools.scene.prepare_cuvslam_rectified",
+      "--manifest",
+      "/mnt/d/my_works/walker_pose_system/research_records/engineering_validation/G20261014_visual_rig_compare448_v1/input_primary/manifest.json",
+      "--output-dir",
+      "<new_nonexisting_input_directory>",
+      "--max-frames",
+      "4"
+    ],
+    "rectified4_backend_argv": [
+      "-m",
+      "walker_tools.scene.cuvslam_backend",
+      "--manifest",
+      "<new_rectified_input_directory>/manifest.json",
+      "--output",
+      "<new_nonexisting_output.jsonl>",
+      "--slam",
+      "--cpu",
+      "--require-geometry-contract"
+    ]
+  }
+}

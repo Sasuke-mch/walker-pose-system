@@ -226,6 +226,8 @@ def compare(args: argparse.Namespace) -> dict:
     manifest = json.loads(args.manifest.read_text(encoding='utf-8'))
     frames = manifest['frames']
     calibration = manifest['calibration']
+    if calibration['model'] != 'opencv_fisheye':
+        raise ValueError('raw-fisheye diagnostics and frozen raw-camera mesh export cannot consume rectified poses; use the explicit original-camera pose bridge')
     size = tuple(calibration['image_size'])
     cal = StereoCalibration('fisheye', size, size, np.array(calibration['left_K']), np.array(calibration['left_D']),
                             np.array(calibration['right_K']), np.array(calibration['right_D']),

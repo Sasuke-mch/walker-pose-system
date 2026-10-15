@@ -1,0 +1,72 @@
+{
+  "tests": 5,
+  "failures": 0,
+  "disabled": 0,
+  "errors": 0,
+  "timestamp": "2026-10-15T15:31:42Z",
+  "time": "0s",
+  "name": "AllTests",
+  "testsuites": [
+    {
+      "name": "PnpGeometryContract",
+      "tests": 5,
+      "failures": 0,
+      "disabled": 0,
+      "errors": 0,
+      "timestamp": "2026-10-15T15:31:42Z",
+      "time": "0s",
+      "testsuite": [
+        {
+          "name": "RejectsZeroAssociated3DDespiteEnoughRawTracks",
+          "file": "\/home\/itachi\/walker_cuvslam_src_v17\/libs\/pnp\/test\/multicam_contract_test.cpp",
+          "line": 35,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-10-15T15:31:42Z",
+          "time": "0s",
+          "classname": "PnpGeometryContract"
+        },
+        {
+          "name": "RejectsOneAssociated3DDespiteEnoughRawTracks",
+          "file": "\/home\/itachi\/walker_cuvslam_src_v17\/libs\/pnp\/test\/multicam_contract_test.cpp",
+          "line": 39,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-10-15T15:31:42Z",
+          "time": "0s",
+          "classname": "PnpGeometryContract"
+        },
+        {
+          "name": "RejectsRankDeficientLowCostBeforeIdentityInformationExit",
+          "file": "\/home\/itachi\/walker_cuvslam_src_v17\/libs\/pnp\/test\/multicam_contract_test.cpp",
+          "line": 45,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-10-15T15:31:42Z",
+          "time": "0s",
+          "classname": "PnpGeometryContract"
+        },
+        {
+          "name": "RejectsAllAssociatedPointsBehindCamera",
+          "file": "\/home\/itachi\/walker_cuvslam_src_v17\/libs\/pnp\/test\/multicam_contract_test.cpp",
+          "line": 52,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-10-15T15:31:42Z",
+          "time": "0s",
+          "classname": "PnpGeometryContract"
+        },
+        {
+          "name": "AcceptsNondegenerateExactObservedPose",
+          "file": "\/home\/itachi\/walker_cuvslam_src_v17\/libs\/pnp\/test\/multicam_contract_test.cpp",
+          "line": 56,
+          "status": "RUN",
+          "result": "COMPLETED",
+          "timestamp": "2026-10-15T15:31:42Z",
+          "time": "0s",
+          "classname": "PnpGeometryContract"
+        }
+      ]
+    }
+  ]
+}

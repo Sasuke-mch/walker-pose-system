@@ -1,14 +1,16 @@
 """Stage-independent cuVSLAM stereo runner for the common scene manifest.
 
-Run in the isolated Linux cuVSLAM environment. Manifest images are unrectified
-OpenCV-fisheye pixels; mask PNG values != 0 mean EXCLUDED. Translation is in
-metres. Rig origin is the left optical centre, with OpenCV x-right/y-down/z-forward.
+Run in the isolated Linux cuVSLAM environment. Manifest images explicitly use
+raw OpenCV-fisheye or prepared rectified-pinhole pixels; mask PNG values != 0
+mean EXCLUDED. Translation is in metres. Rig origin is the left optical centre,
+with the manifest's raw or rectified OpenCV x-right/y-down/z-forward axes.
 The emitted world is a visual map gauge, not an independently certified ground.
 """
 
 from __future__ import annotations
 
 import argparse
+import ctypes
 import importlib.metadata
 import json
 from pathlib import Path
@@ -18,6 +20,22 @@ from typing import Any
 
 import cv2
 import numpy as np
+
+
+def native_geometry_contract_version(module_path: str) -> int:
+    """Read the local source patch marker from the loaded SDK's sibling library.
+
+    The official v17 wheel has no marker. This does not certify the semantic
+    masks or pose accuracy; it identifies pre-geometry mask/3D association gates.
+    """
+    library = ctypes.CDLL(str(Path(module_path).resolve().parent / "libcuvslam.so"))
+    try:
+        marker = library.CUVSLAMWalkerGeometryContractVersion
+    except AttributeError:
+        return 0
+    marker.restype = ctypes.c_int
+    marker.argtypes = []
+    return int(marker())
 
 
 def quaternion_xyzw(rotation: np.ndarray) -> list[float]:
@@ -55,8 +73,12 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
     if manifest.get("schema_version") != 1:
         raise ValueError("Expected common scene manifest schema_version=1")
     calibration = manifest["calibration"]
-    if calibration["model"] != "opencv_fisheye":
-        raise ValueError("This backend requires OpenCV fisheye calibration")
+    if calibration["model"] not in {"opencv_fisheye", "opencv_pinhole"}:
+        raise ValueError("This backend requires explicit OpenCV fisheye or pinhole calibration")
+    if calibration["model"] == "opencv_pinhole":
+        for side in ("left", "right"):
+            if np.asarray(calibration[f"{side}_D"]).size:
+                raise ValueError("Rectified pinhole input must not reuse raw fisheye distortion")
     rotation = np.asarray(calibration["R_right_from_left"], dtype=np.float64)
     translation = np.asarray(calibration["translation_right_from_left_m"], dtype=np.float64)
     if rotation.shape != (3, 3) or not np.isfinite(rotation).all():
@@ -83,13 +105,16 @@ def build_rig(cuvslam: Any, calibration: dict[str, Any]) -> Any:
     ):
         k = np.asarray(calibration[f"{side}_K"], dtype=np.float64)
         d = np.asarray(calibration[f"{side}_D"], dtype=np.float64).reshape(-1)
-        if k.shape != (3, 3) or d.shape != (4,) or not np.isfinite(k).all() or not np.isfinite(d).all():
-            raise ValueError(f"Invalid {side} fisheye intrinsics")
+        pinhole = calibration.get("model", "opencv_fisheye") == "opencv_pinhole"
+        expected_distortion_size = 0 if pinhole else 4
+        if k.shape != (3, 3) or d.shape != (expected_distortion_size,) or not np.isfinite(k).all() or not np.isfinite(d).all():
+            raise ValueError(f"Invalid {side} intrinsics/distortion")
+        distortion_model = cuvslam.Distortion.Model.Pinhole if pinhole else cuvslam.Distortion.Model.Fisheye
         cameras.append(cuvslam.Camera(
             size=calibration["image_size"],
             focal=[float(k[0, 0]), float(k[1, 1])],
             principal=[float(k[0, 2]), float(k[1, 2])],
-            distortion=cuvslam.Distortion(cuvslam.Distortion.Model.Fisheye, d.tolist()),
+            distortion=cuvslam.Distortion(distortion_model, d.tolist()),
             rig_from_camera=pose,
         ))
     return cuvslam.Rig(cameras=cameras)
@@ -123,7 +148,12 @@ def base_record(frame: dict[str, Any], timestamp_source: str) -> dict[str, Any]:
     }
 
 
-def run(manifest_path: Path, output_path: Path, max_frames: int | None, use_slam: bool) -> int:
+def run(
+    manifest_path: Path, output_path: Path, max_frames: int | None,
+    use_slam: bool, use_motion_model: bool = True,
+    require_geometry_contract: bool = False,
+    use_gpu: bool = True,
+) -> int:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
     validate_manifest(manifest)
     frames = manifest["frames"][:max_frames] if max_frames is not None else manifest["frames"]
@@ -131,14 +161,29 @@ def run(manifest_path: Path, output_path: Path, max_frames: int | None, use_slam
     if output_path.exists():
         raise FileExistsError(f"Refusing to overwrite existing run: {output_path}")
     timestamp_source = manifest.get("timestamp_source", "manifest_nominal_not_exposure_verified")
+    rectified = manifest["calibration"]["model"] == "opencv_pinhole"
+    rectified_from_original = np.eye(4)
+    if rectified:
+        r1 = np.asarray(manifest["rectification"]["R_rectified_left_from_original_left"], dtype=float)
+        if r1.shape != (3, 3) or not np.allclose(r1.T @ r1, np.eye(3), atol=1e-8) or not np.isclose(np.linalg.det(r1), 1):
+            raise ValueError("Invalid original-left to rectified-left frame transform")
+        rectified_from_original[:3, :3] = r1
     metadata: dict[str, Any] = {
         "backend": "cuvslam", "manifest_path": str(manifest_path), "frame_count": len(frames),
-        "use_slam": use_slam, "multicamera_mode": "Precision", "use_gpu": True,
-        "rig_origin": "left_optical_center", "image_coordinates": "raw_opencv_fisheye",
+        "use_slam": use_slam, "multicamera_mode": "Precision", "use_gpu": use_gpu,
+        "implementation_scope": "native_gpu" if use_gpu else "native_cpu_diagnostic_not_gpu_runtime_comparison",
+        "requested_use_motion_model": use_motion_model,
+        "rig_origin": "left_optical_center",
+        "rig_axes": "rectified_left_camera" if rectified else "original_left_camera",
+        "image_coordinates": "rectified_pinhole" if rectified else "raw_opencv_fisheye",
+        "rectified_stereo_camera": rectified,
+        "world_from_left_camera_field_frame": "rectified_left_camera" if rectified else "original_left_camera",
+        "original_left_pose_field": "world_from_original_left_camera_m" if rectified else "world_from_left_camera_m",
+        "legacy_frozen_raw_mesh_export_compatible": not rectified,
         "mask_nonzero_excluded": True, "mask_effectiveness_certified": False,
         "timestamp_source": timestamp_source,
         "world_pose_certified": False, "stage_used": False,
-        "track_timing": "native_tracker_call_including_cpu_to_gpu_transfer_and_bundle_adjustment",
+        "track_timing": "native_tracker_call_including_cpu_to_gpu_transfer_and_bundle_adjustment" if use_gpu else "native_cpu_tracker_call_including_bundle_adjustment",
         "frame_total_timing": "image_and_mask_load_plus_tracking_and_diagnostics_excluding_json_write",
         "confidence_interpretation": "native_covariance_is_uncalibrated_solver_approximation; observation_count_is_not_probability",
         "native_pose_availability_is_not_metric_support": True,
@@ -152,15 +197,25 @@ def run(manifest_path: Path, output_path: Path, max_frames: int | None, use_slam
     try:
         import cuvslam
         metadata["cuvslam_version"] = importlib.metadata.version("cuvslam")
+        metadata["version_field_scope"] = "installed_python_distribution; local_native_build_identified_separately"
+        metadata["native_library_version"] = list(cuvslam.get_version()) if hasattr(cuvslam, "get_version") else None
+        metadata["native_module_path"] = str(Path(cuvslam.__file__).resolve())
+        contract = native_geometry_contract_version(cuvslam.__file__)
+        metadata["native_geometry_contract_version"] = contract
+        metadata["native_secondary_mask_filter_before_geometry"] = contract >= 1
+        metadata["native_associated_3d_pnp_gate"] = contract >= 1
+        if require_geometry_contract and contract < 1:
+            raise ValueError("Loaded cuVSLAM lacks the requested pre-geometry contract patch")
         rig = build_rig(cuvslam, manifest["calibration"])
         config = cuvslam.Tracker.OdometryConfig(
-            use_gpu=True, multicam_mode=cuvslam.Tracker.MulticameraMode.Precision,
+            use_gpu=use_gpu, multicam_mode=cuvslam.Tracker.MulticameraMode.Precision,
             odometry_mode=cuvslam.Tracker.OdometryMode.Multicamera,
-            rectified_stereo_camera=False, async_sba=False,
+            rectified_stereo_camera=rectified, async_sba=False,
+            use_motion_model=use_motion_model,
             enable_observations_export=True, enable_landmarks_export=True,
         )
         metadata["native_use_motion_model"] = bool(config.use_motion_model)
-        slam_config = cuvslam.Tracker.SlamConfig(sync_mode=True) if use_slam else None
+        slam_config = cuvslam.Tracker.SlamConfig(sync_mode=True, use_gpu=use_gpu) if use_slam else None
         tracker = cuvslam.Tracker(rig, config, slam_config)
         # The installed wheel may select a subset despite the requested mode;
         # report the native rig decision instead of assuming both are primary.
@@ -186,6 +241,11 @@ def run(manifest_path: Path, output_path: Path, max_frames: int | None, use_slam
         for frame in frames:
             frame_start = time.perf_counter()
             row = base_record(frame, timestamp_source)
+            if rectified:
+                row.update(world_from_original_left_camera_m=None,
+                           native_world_from_original_left_camera_proposal_m=None,
+                           map_world_from_original_left_camera_m=None,
+                           pose_camera_frame="rectified_left_camera")
             try:
                 images, masks = load_inputs(frame, manifest["calibration"]["image_size"])
                 row["excluded_pixel_fraction"] = [float(np.count_nonzero(m)/m.size) for m in masks]
@@ -199,9 +259,15 @@ def run(manifest_path: Path, output_path: Path, max_frames: int | None, use_slam
                 else:
                     row["native_pose_returned"] = True
                     row["native_world_from_left_camera_proposal_m"] = matrix_from_pose(estimate.world_from_rig.pose).tolist()
+                    if rectified:
+                        row["native_world_from_original_left_camera_proposal_m"] = (
+                            np.asarray(row["native_world_from_left_camera_proposal_m"]) @ rectified_from_original
+                        ).tolist()
                     covariance = np.asarray(estimate.world_from_rig.covariance_xyz_rpy, dtype=np.float64)
                     row["covariance_xyz_rpy_uncalibrated"] = covariance.reshape(6, 6).tolist() if covariance.size == 36 and np.isfinite(covariance).all() else None
                 row["map_world_from_left_camera_m"] = matrix_from_pose(map_pose).tolist() if map_pose is not None else None
+                if rectified and map_pose is not None:
+                    row["map_world_from_original_left_camera_m"] = (matrix_from_pose(map_pose) @ rectified_from_original).tolist()
                 # Preserve the native proposal separately. The primary pose
                 # channel requires exported 3D support; missing diagnostics keep
                 # that support unknown. These fields are not extra pose factors.
@@ -215,13 +281,18 @@ def run(manifest_path: Path, output_path: Path, max_frames: int | None, use_slam
                         coords = np.asarray(point.coords, dtype=float)
                         finite = coords.shape == (3,) and np.isfinite(coords).all()
                         row["landmarks"].append({"id": int(point.id), "coords_m_native": coords.tolist() if finite else None, "finite": bool(finite)})
+                        if rectified:
+                            row["landmarks"][-1]["coords_m_original_left"] = (r1.T @ coords).tolist() if finite else None
                     row["finite_landmark_count"] = sum(point["finite"] for point in row["landmarks"])
                     row["has_exported_3d_landmarks"] = row["finite_landmark_count"] > 0
                     # v17.0.1 GetLastLandmarks exports stat.tracks3d in the
                     # current rig frame. GetFinalLandmarks separately multiplies
                     # by the world pose. The Python coords doc calls it world;
                     # retain the native values and never consume them as world.
-                    row["landmark_coordinate_frame"] = "current_rig_per_v17_source_and_reprojection; not_consumed_as_world"
+                    row["landmark_coordinate_frame"] = (
+                        "current_rectified_left_rig; original_left_coords_separately_exported; not_world"
+                        if rectified else "current_rig_per_v17_source_and_reprojection; not_consumed_as_world"
+                    )
                     row["observations"] = [[{"id": int(o.id), "u": float(o.u), "v": float(o.v)} for o in view] for view in observations]
                     # Subpixel/pyramid selection can straddle a one-pixel mask
                     # boundary. Preserve the actual overlap for common evaluation.
@@ -247,6 +318,8 @@ def run(manifest_path: Path, output_path: Path, max_frames: int | None, use_slam
                         was_lost = False
                         row["status"] = "tracked"
                         row["world_from_left_camera_m"] = row["native_world_from_left_camera_proposal_m"]
+                        if rectified:
+                            row["world_from_original_left_camera_m"] = row["native_world_from_original_left_camera_proposal_m"]
                         row["reason"] = "native_visual_pose_and_3d_support_available_not_external_accuracy_certified"
                         tracked_count += 1
                     elif support == 0:
@@ -279,10 +352,27 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--max-frames", type=int)
     parser.add_argument("--slam", action="store_true", help="Enable synchronous native SLAM; keep its map pose separate from VO")
+    parser.add_argument(
+        "--no-motion-model", action="store_true",
+        help="Disable native constant-motion prediction for a controlled diagnostic; this does not certify visual updates",
+    )
+    parser.add_argument(
+        "--require-geometry-contract", action="store_true",
+        help="Require the local source patch for secondary masks and associated-3D PnP gates",
+    )
+    parser.add_argument(
+        "--cpu", action="store_true",
+        help="Run an explicitly labelled CPU source-build diagnostic; not a GPU speed comparison",
+    )
     arguments = parser.parse_args()
     if arguments.max_frames is not None and arguments.max_frames <= 0:
         parser.error("--max-frames must be positive")
-    return run(arguments.manifest, arguments.output, arguments.max_frames, arguments.slam)
+    return run(
+        arguments.manifest, arguments.output, arguments.max_frames,
+        arguments.slam, use_motion_model=not arguments.no_motion_model,
+        require_geometry_contract=arguments.require_geometry_contract,
+        use_gpu=not arguments.cpu,
+    )
 
 
 if __name__ == "__main__":

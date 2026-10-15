@@ -1,0 +1,90 @@
+{
+  "cuvslam_primary": {
+    "all_frame_count": 448,
+    "status_counts": {
+      "initializing": 13,
+      "lost": 62,
+      "tracked": 373
+    },
+    "pose_with_exported3d_count": 373,
+    "fraction": 0.8325892857142857,
+    "native_pose_count": 448,
+    "exported_3d_support_per_tracked_frame": {
+      "median": 1.0,
+      "p95": 3.0,
+      "maximum": 6.0
+    },
+    "track_ms": {
+      "median": 3.8010470000244823,
+      "p95": 21.994912299885527,
+      "maximum": 40.671755000175835
+    },
+    "continuous_tracked_edges": 367,
+    "unchanged_translation_edges": 300,
+    "translation_jump_m": {
+      "median": 0.0,
+      "p95": 0.38421822648132214,
+      "maximum": 19.476368606398726
+    },
+    "largest_jump_frame_id": 297,
+    "observation_count_per_camera": [
+      49004,
+      89
+    ],
+    "deep_mask_center_count_per_camera_gt_3px": [
+      0,
+      76
+    ],
+    "deep_mask_center_with_exported3d_per_camera": [
+      0,
+      29
+    ],
+    "metric_pose_usable_count": 0
+  },
+  "cuvslam_no_motion_v1": {
+    "all_frame_count": 448,
+    "status_counts": {
+      "initializing": 13,
+      "lost": 34,
+      "tracked": 401
+    },
+    "pose_with_exported3d_count": 401,
+    "fraction": 0.8950892857142857,
+    "native_pose_count": 448,
+    "exported_3d_support_per_tracked_frame": {
+      "median": 3.0,
+      "p95": 4.0,
+      "maximum": 6.0
+    },
+    "track_ms": {
+      "median": 2.5181149999866648,
+      "p95": 20.37063210002827,
+      "maximum": 50.534517000016876
+    },
+    "continuous_tracked_edges": 397,
+    "unchanged_translation_edges": 333,
+    "translation_jump_m": {
+      "median": 0.0,
+      "p95": 2.35878695570685,
+      "maximum": 29.20649655976908
+    },
+    "largest_jump_frame_id": 191,
+    "observation_count_per_camera": [
+      48182,
+      113
+    ],
+    "deep_mask_center_count_per_camera_gt_3px": [
+      0,
+      100
+    ],
+    "deep_mask_center_with_exported3d_per_camera": [
+      0,
+      54
+    ],
+    "metric_pose_usable_count": 0
+  },
+  "input": "/mnt/d/my_works/walker_pose_system/research_records/engineering_validation/G20261014_visual_rig_compare448_v1/input_primary/manifest.json",
+  "variable": "native use_motion_model True -> False; all other rig/images/masks/SLAM settings unchanged",
+  "world_pose_certified": false,
+  "decision": "Retain as diagnostic; coverage gate still fails; no promotion or stage fusion"
+}

@@ -63,5 +63,40 @@
     "native_match_diagnostic": "32 Lowe candidates on4 fixed frames, all rejected by depth/reprojection,18/18 synthetic KB contract passed",
     "promotion": false,
     "decision": "static background stereo correspondences insufficient; stop after two bounded changes, no relaxed gates or Stage fill"
+  },
+  "cuvslam_repair_20261015": {
+    "status": "completed_native_cpu_fixes_and_rectification_diagnostic_no_world_trajectory",
+    "details": "cuvslam_repair_20261015.json",
+    "native_patch": "realtime_app/walker_tools/scene/cuvslam_geometry_contract.patch",
+    "causes": [
+      "secondary LK observations bypass mask before geometry",
+      "PnP lacks associated3D minimum and pre-early-exit rank check",
+      "strong relative rotation and translational LK patch alignment remains a tested hypothesis"
+    ],
+    "native_cpu_build_completed": true,
+    "gpu_source_build_completed": false,
+    "original_gpu_wheel_preserved": true,
+    "gpu_build_limitation": "localCUDA toolkit lacks libcudadevrt.a and libcudart_static.a",
+    "cpu_full448": "cuvslam_contract_cpu_v1.jsonl",
+    "cpu_summary": "cuvslam_contract_cpu_summary.json",
+    "cpu_last_frame_nonempty3d_frames": 16,
+    "cpu_max_exported3d": 1,
+    "cpu_supported_native_proposals": 9,
+    "cpu_deep_mask_violations": [
+      0,
+      0
+    ],
+    "cpu_gpu_result_comparison": "not a single-variable accuracy or GPU runtime benchmark",
+    "native_pnp_tests": "5 passed, cuvslam_pnp_contract_test.json",
+    "python_tests": "15 passed:6 SDK/rectification and9 common geometry; Ruff/compilation passed",
+    "rectification_scope": "only first4 same-source frames; not full448; correctpinholeK/noD/fullRt and conservative4-source mask; original-pose bridge retained",
+    "rectification_input": "input_cuvslam_rectified_deploy4_v2/manifest.json",
+    "rectification_output": "cuvslam_rectified_contract_cpu_deploy4_v2.jsonl",
+    "rectification_result": "right observations0to5, max2 exported3D, only1/4 proposal withsupport; insufficient, stop",
+    "rectification_partial": "input_cuvslam_rectified_v1 preserved interrupted/no manifest; never used as fullinput",
+    "raw_comparator": "reject rectified manifest explicitly, no raw frozen-mesh coordinate mixing",
+    "no_motion_control": "cuvslam_no_motion_comparison.json:401/448 with nonempty export, P95/max jumps2.359/29.206m, rejected",
+    "promotion": false,
+    "decision": "Stop bounded repairs. No independently qualified world trajectory, Stage fusion or world acceleration."
   }
 }

@@ -1,0 +1,349 @@
+diff --git a/libs/cuvslam/cuvslam2.cpp b/libs/cuvslam/cuvslam2.cpp
+index daa4f6f..93e521e 100644
+--- a/libs/cuvslam/cuvslam2.cpp
++++ b/libs/cuvslam/cuvslam2.cpp
+@@ -34,7 +34,9 @@
+ #include "odometry/increment_pose.h"
+ #include "odometry/mono_visual_odometry.h"
+ #include "odometry/multi_visual_odometry.h"
++#ifdef USE_CUDA
+ #include "odometry/rgbd_odometry.h"
++#endif
+ #include "odometry/stereo_inertial_odometry.h"
+ #include "odometry/svo_config.h"
+ #include "slam/async_slam/async_slam.h"
+@@ -491,7 +493,7 @@ Odometry::Odometry(const Rig& rig, const Config& cfg) {
+   // otherwise the standard GPU bundler.
+   svo_settings.sba_settings.mode = (cfg.odometry_mode == OdometryMode::Inertial || multisensor_with_imu)
+                                        ? sba::Mode::InertialCPU
+-                                       : sba::Mode::OriginalGPU;
++                                       : (cfg.use_gpu ? sba::Mode::OriginalGPU : sba::Mode::OriginalCPU);
+ 
+   // Use only first camera border settings. Other camera border settings are ignored now.
+   svo_settings.sof_settings.multicam_mode = ToMulticamMode(cfg.multicam_mode);
+@@ -572,10 +574,14 @@ Odometry::Odometry(const Rig& rig, const Config& cfg) {
+       break;
+     }
+     case OdometryMode::RGBD: {
++#ifdef USE_CUDA
+       tracker->rgbd_settings = cfg.rgbd_settings;
+       tracker->visual_odometry =
+           std::make_unique<odom::RGBDOdometry>(tracker->rig, tracker->fig, svo_settings, cfg.use_gpu);
+       break;
++#else
++      throw std::invalid_argument("RGBD mode requires USE_CUDA");
++#endif
+     }
+     case OdometryMode::Multisensor: {
+ #ifdef USE_CUNLS
+@@ -1336,3 +1342,6 @@ std::shared_ptr<const Slam::PoseGraph> Slam::ReadPoseGraph() {
+ }
+ 
+ }  // namespace cuvslam
++
++// Identifies the local pre-geometry mask and associated-3D PnP contract fix.
++extern "C" CUVSLAM_API int CUVSLAMWalkerGeometryContractVersion() { return 1; }
+diff --git a/libs/cuvslam/debug_dump.cpp b/libs/cuvslam/debug_dump.cpp
+index 6c8760d..ef4c1f2 100644
+--- a/libs/cuvslam/debug_dump.cpp
++++ b/libs/cuvslam/debug_dump.cpp
+@@ -29,7 +29,9 @@
+ #include "common/isometry.h"
+ #include "common/tga.h"
+ #include "common/unaligned_types.h"
++#ifdef USE_CUDA
+ #include "cuda_modules/cuda_kernels/cuda_kernels.h"
++#endif
+ #include "sof/image_manager.h"
+ 
+ #include "cuvslam/internal.h"
+@@ -217,6 +219,13 @@ void DumpConfiguration(const std::string& input_dump_root_dir, const Rig& rig, c
+ 
+ void DumpTrackCall(const std::string& input_dump_root_dir, size_t frame_id, const std::vector<Image>& images,
+                    const std::vector<Image>& masks, const std::vector<Image>& depths) {
++#ifndef USE_CUDA
++  (void)frame_id; (void)images; (void)masks; (void)depths;
++  if (!input_dump_root_dir.empty()) {
++    throw std::invalid_argument("Native input debug dump is unavailable in this CPU diagnostic build");
++  }
++#else
++
+   if (input_dump_root_dir.empty()) {
+     return;
+   }
+@@ -380,6 +389,7 @@ void DumpTrackCall(const std::string& input_dump_root_dir, size_t frame_id, cons
+   } catch (...) {
+   }
+   frame_id++;
++#endif
+ }
+ 
+ void DumpRegisterImuMeasurementCall(const std::string& input_dump_root_dir, const ImuMeasurement& data) {
+diff --git a/libs/pnp/multicam_pnp.cpp b/libs/pnp/multicam_pnp.cpp
+index b06a0f5..4f13386 100644
+--- a/libs/pnp/multicam_pnp.cpp
++++ b/libs/pnp/multicam_pnp.cpp
+@@ -17,6 +17,8 @@
+ 
+ #include "pnp/multicam_pnp.h"
+ 
++#include "Eigen/LU"
++
+ #include "common/log.h"
+ #include "common/rerun.h"
+ #include "common/rotation_utils.h"
+@@ -214,6 +216,13 @@ bool PNPSolver::solve(Isometry3T& rig_from_world, Matrix6T& static_info_exp,
+     }
+   }
+ 
++  // Raw tracks may all be new or lack 3D landmarks. The same minimum must
++  // hold after map association; otherwise zero cost can mean zero constraints.
++  if (observations_.size() < min_observations) {
++    static_info_exp.setZero();
++    return false;
++  }
++
+   // log observations
+   RERUN(logObservations, observations_, rig_, "world/camera_0/images/observations_pnp", Color(255, 0, 0));
+ 
+@@ -225,6 +234,20 @@ bool PNPSolver::solve(Isometry3T& rig_from_world, Matrix6T& static_info_exp,
+   Matrix6T H;
+   Vector6T rhs;
+ 
++  // Check the actual visible 3D constraints before the low-cost early exit.
++  // Normalize columns to reduce unit-dependent scaling of the rank test.
++  build_hessian(rig_from_world, H, rhs, settings);
++  if (!H.allFinite() || (H.diagonal().array() <= 0.f).any()) {
++    static_info_exp.setZero();
++    return false;
++  }
++  const Matrix6T scale = H.diagonal().cwiseSqrt().cwiseInverse().asDiagonal();
++  Eigen::FullPivLU<Matrix6T> rank_test(scale * H * scale);
++  rank_test.setThreshold(1e-6f);
++  if (rank_test.rank() < 6) {
++    static_info_exp.setZero();
++    return false;
++  }
+   auto initial_cost = evaluate_cost(rig_from_world, settings);
+   if (initial_cost < 5e-3f) {
+     // Nothing to minimize. We have a "pendulum" effect on still frames otherwise.
+diff --git a/libs/pnp/test/CMakeLists.txt b/libs/pnp/test/CMakeLists.txt
+index 08dd769..0eee494 100644
+--- a/libs/pnp/test/CMakeLists.txt
++++ b/libs/pnp/test/CMakeLists.txt
+@@ -12,7 +12,7 @@
+ # By using, reproducing, modifying, distributing, performing, or displaying any portion or element
+ # of the software or derivative works thereof, you agree to be bound by this License.
+ 
+-set(SOURCES)
++set(SOURCES multicam_contract_test.cpp)
+ 
+ set(LIBS
+     testing
+diff --git a/libs/pnp/test/multicam_contract_test.cpp b/libs/pnp/test/multicam_contract_test.cpp
+new file mode 100644
+index 0000000..aa76dc4
+--- /dev/null
++++ b/libs/pnp/test/multicam_contract_test.cpp
+@@ -0,0 +1,60 @@
++#include "common/include_gtest.h"
++#include "camera/camera.h"
++#include "camera/observation.h"
++#include "camera/rig.h"
++#include "pnp/multicam_pnp.h"
++
++namespace test::pnp {
++using namespace cuvslam;
++
++class PnpGeometryContract : public ::testing::Test {
++protected:
++  camera::PinholeCameraModel camera{Vector2T(640, 480), Vector2T(320, 320), Vector2T(320, 240)};
++  camera::Rig rig;
++  std::unordered_map<TrackId, Vector3T> landmarks;
++  std::vector<camera::Observation> observations;
++  cuvslam::pnp::PNPSettings settings;
++  Isometry3T pose = Isometry3T::Identity();
++  Matrix6T information;
++
++  void SetUp() override {
++    rig.num_cameras = 1;
++    rig.camera_from_rig[0] = Isometry3T::Identity();
++    rig.intrinsics[0] = &camera;
++    settings.filter_new_observations = false;
++    for (int i = 0; i < 20; ++i) {
++      Vector3T point(-.7f + .17f * (i % 5), -.6f + .19f * (i / 5), 2.f + .13f * (i % 3));
++      landmarks[i] = point;
++      observations.push_back({CameraId(0), TrackId(i), point.head<2>() / point.z(), Matrix2T::Identity()});
++    }
++  }
++
++  bool Solve() { return cuvslam::pnp::PNPSolver(rig).solve(pose, information, observations, landmarks, settings); }
++};
++
++TEST_F(PnpGeometryContract, RejectsZeroAssociated3DDespiteEnoughRawTracks) {
++  landmarks.clear();
++  EXPECT_FALSE(Solve());
++}
++TEST_F(PnpGeometryContract, RejectsOneAssociated3DDespiteEnoughRawTracks) {
++  auto point = landmarks.at(0);
++  landmarks.clear();
++  landmarks[0] = point;
++  EXPECT_FALSE(Solve());
++}
++TEST_F(PnpGeometryContract, RejectsRankDeficientLowCostBeforeIdentityInformationExit) {
++  for (auto& [id, point] : landmarks) {
++    point = Vector3T(0, 0, 2.f + .1f * id);
++  }
++  for (auto& observation : observations) observation.xy.setZero();
++  EXPECT_FALSE(Solve());
++}
++TEST_F(PnpGeometryContract, RejectsAllAssociatedPointsBehindCamera) {
++  for (auto& [id, point] : landmarks) point.z() = -point.z();
++  EXPECT_FALSE(Solve());
++}
++TEST_F(PnpGeometryContract, AcceptsNondegenerateExactObservedPose) {
++  EXPECT_TRUE(Solve());
++  EXPECT_LT((pose.matrix() - Isometry3T::Identity().matrix()).norm(), 1e-6f);
++}
++}  // namespace test::pnp
+diff --git a/libs/pnp/visual_icp.h b/libs/pnp/visual_icp.h
+index bb0efc7..5c0f7fb 100644
+--- a/libs/pnp/visual_icp.h
++++ b/libs/pnp/visual_icp.h
+@@ -27,15 +27,18 @@
+ #include "common/isometry.h"
+ #include "common/types.h"
+ #include "common/vector_3t.h"
++#ifdef USE_CUDA
+ #include "cuda_modules/gradient_pyramid.h"
+ #include "cuda_modules/icp_tools.h"
+ #include "cuda_modules/image_pyramid.h"
++#endif
+ #include "pipelines/track.h"
+ #include "profiler/profiler.h"
+ #include "profiler/profiler_enable.h"
+ 
+ namespace cuvslam::pnp {
+ 
++#ifdef USE_CUDA
+ struct IcpInfo {
+   CameraId depth_id;
+   const cuda::GaussianGPUImagePyramid& curr_image;
+@@ -47,6 +50,8 @@ struct IcpInfo {
+   }
+ };
+ 
++#endif
++
+ struct ICPSettings {
+   float lambda = 1e-2;
+   float huber_vis = 1e-2;
+@@ -64,6 +69,7 @@ struct ICPSettings {
+   float blending_alpha = 0.8f;
+ };
+ 
++#ifdef USE_CUDA
+ class VisualICP {
+ public:
+   explicit VisualICP(const camera::Rig& rig);
+@@ -109,4 +115,6 @@ private:
+   profiler::PnPProfiler::DomainHelper profiler_domain_ = profiler::PnPProfiler::DomainHelper("VisualICP");
+ };
+ 
++#endif
++
+ }  // namespace cuvslam::pnp
+diff --git a/libs/sof/image_context.h b/libs/sof/image_context.h
+index e4ca23b..d5518c1 100644
+--- a/libs/sof/image_context.h
++++ b/libs/sof/image_context.h
+@@ -73,6 +73,7 @@ public:
+   bool process_mask_gpu(const ImageSource& mask_source, ImageMatrix<uint8_t>& mask_resized, cudaStream_t s);
+ #endif
+ private:
++  const bool support_depth_;
+   ImageMeta meta_;
+   ImagePyramidT cpu_image_pyramid_;
+   ImagePyramidU8 cpu_image_pyramid_u8_;
+@@ -97,7 +98,6 @@ private:
+   cuda::GaussianGPUImagePyramid gpu_image_pyramid_;
+   cuda::GPUGradientPyramid gpu_gradient_pyramid_;
+ 
+-  const bool support_depth_;
+ 
+   // despite these fields are present, no GPU allocations occur until .init method is called.
+   cuda::GPUImageT gpu_depth_;
+diff --git a/libs/sof/sof_multicamera_base.cpp b/libs/sof/sof_multicamera_base.cpp
+index bb418b4..e071a9a 100644
+--- a/libs/sof/sof_multicamera_base.cpp
++++ b/libs/sof/sof_multicamera_base.cpp
+@@ -17,6 +17,9 @@
+ 
+ #include "sof/internal/sof_multicamera_base.h"
+ 
++#include <algorithm>
++#include <cmath>
++
+ namespace cuvslam::sof {
+ 
+ MultiSOFBase::MultiSOFBase(const camera::Rig& rig, const camera::FrustumIntersectionGraph& fid,
+@@ -81,7 +84,9 @@ bool MultiSOFBase::trackNextFrame(const Sources& curr_sources, Images& curr_imag
+   // Ensure all mono-stream GPU work (pyramid builds, LK tracking) is complete
+   // before reading results. Required for cross-stream memory visibility on
+   // architectures like Blackwell (sm_121).
++#ifdef USE_CUDA
+   cudaDeviceSynchronize();
++#endif
+ 
+   MulticamTracksVector primary_tracks;
+   for (auto& sof : mono_sof_) {
+@@ -102,7 +107,9 @@ bool MultiSOFBase::trackNextFrame(const Sources& curr_sources, Images& curr_imag
+     // visible before launching stereo tracking on separate streams. Without this,
+     // cross-stream memory visibility is not guaranteed on some GPU architectures
+     // (e.g. Blackwell sm_121), leading to CUDA error 700 after ~200 frames.
+-    cudaDeviceSynchronize();
++  #ifdef USE_CUDA
++  cudaDeviceSynchronize();
++#endif
+     StartKeyframe();
+     const auto& primary_cams = fid_.primary_cameras();
+     for (CameraId primary_cam_id : primary_cams) {
+@@ -127,6 +134,38 @@ bool MultiSOFBase::trackNextFrame(const Sources& curr_sources, Images& curr_imag
+     GetTrackingResults(observations);
+     state = FrameState::Key;
+   }
++  // The mono trackers check their primary mask, but primary-to-secondary LK
++  // matching has no mask input. Reject excluded current-camera correspondences
++  // here, before triangulation/PnP consume observations (not during export).
++  for (CameraId cam_id = 0; cam_id < observations.size(); ++cam_id) {
++    if (cam_id >= masks_sources.size() || !masks_sources[cam_id].data ||
++        cam_id >= curr_images.size() || !curr_images[cam_id]) {
++      continue;
++    }
++    ImageMatrix<uint8_t> mask;
++#ifdef USE_CUDA
++    const bool loaded = curr_images[cam_id]->process_mask_gpu(masks_sources[cam_id], mask, nullptr);
++#else
++    const bool loaded = curr_images[cam_id]->process_mask_cpu(masks_sources[cam_id], mask);
++#endif
++    if (!loaded) {
++      return false;
++    }
++    auto& camera_observations = observations[cam_id];
++    camera_observations.erase(
++        std::remove_if(camera_observations.begin(), camera_observations.end(),
++                       [&](const camera::Observation& observation) {
++                         Vector2T uv;
++                         if (!rig_.intrinsics[cam_id]->denormalizePoint(observation.xy, uv) ||
++                             !std::isfinite(uv.x()) || !std::isfinite(uv.y())) {
++                           return true;
++                         }
++                         const int x = static_cast<int>(std::floor(uv.x()));
++                         const int y = static_cast<int>(std::floor(uv.y()));
++                         return x < 0 || y < 0 || x >= mask.cols() || y >= mask.rows() || mask(y, x) != 0;
++                       }),
++        camera_observations.end());
++  }
+   return true;
+ }
+ 

@@ -470,3 +470,15 @@ last landmark的Python文档称world，17.0.1源码与584点回投却显示为�
 原分辨率0/34/86/156四帧深入原生匹配：静态左/右角点172/420、366/540、457/850、507/1411；Lowe0.7只保留3/3/15/11对，共32对，全部被原生几何拒绝：左负深度11、右负深度1、左回投过大19、右回投过大1，视差门拒绝0。因此恢复分辨率解决了角点数量瓶颈，剩余是静态背景中稀少且错误的跨目对应，不能再靠降低初始化或几何门制造成功。同标定精确投影的native KannalaBrandt8接口18/18通过，最大三维重建差约0.0105mm，只排除矩阵方向/单位/接口契约错误，不证明实物标定精度。
 
 v5调用median/P95为18.36/34.74ms，v6为126.28/194.36ms，完整v6 replay450.41s另初始化19.20s；机器有并发负载，不能视为严格性能消融，更不能把无定位调用称成功实时。实际构建、准备、回放命令、参数、诊断逐对像素与停止决定均在G20261014_visual_rig_compare448_v1/orb_repair_20261015.json及orb_fullres4_native_stereo_diagnostics.jsonl。停止此轮ORB扩展：不换网络、放门、引入动态对象或Stage填补；独立视觉轨迹未晋升。
+
+## 2026-10-15 cuVSLAM次相机mask与PnP支持门源码修复
+
+在官方v17.0.1源码定位两处具体缺陷：MultiSOFBase的primary→secondary LK路径不接收次相机mask，原生MonoSOF已排primary，不代表右目对应被排除；PnP只在原始二维观察上检查最小13条，关联地图3D后未再次核对数量，0条有效残差仍可产生0cost并从低cost分支返回成功，且该分支位于几何秩核对前。补丁在进入几何前按当前视图mask过滤对应，保留原13门并在3D关联后复查、要求归一化Hessian满秩6，再允许低cost成功。不是导出时删除坏点或以包装层降覆盖冒充已修原生。
+
+GPU源码构建因本机CUDA12.1缺libcudadevrt.a/libcudart_static.a未完成；原17.0.1+cu12 GPU wheel保持。隔离CPU源码构建实际完成，补充原库USE_CUDA=OFF路径的成员/类型/同步和SBA条件编译兼容，实际加载/home/itachi/walker_cuvslam_cpu_pkg/cuvslam/libcuvslam.so，由进程maps及marker1确认，use_gpu=False。5项原生PnP测试覆盖空/单3D关联、秩亏、相机后点及正常已知姿态，全部通过；GPU补丁运行和GPU性能未获验证，不能拿CPU/GPU的差异当单变量精度或速度结论。
+
+CPU修复版完整同源448保留：左/右导出观察71223/21，深入mask>3px违规0/0，16帧含非空导出3D、每帧最多1点；224个原生proposal，包装tracked9（2.01%）/initializing42/lost397。该tracked仍只是proposal+非空last-frame支持，不是可用米制位姿。原GPU关闭运动预测的独立对照有401/448非空支持（89.51%，仍低90%门），平移P95/最大却由0.384/19.476m恶化到2.359/29.206m，不能采用关闭预测作为修复。
+
+另定位强相对旋转下平移型LK图块匹配的适配风险，进行4帧定因对照：用固定完整鱼眼R/t作stereoRectify，pinhole新K及空D、R2R01R1^T误差1.83e−15、baseline保持0.296266477m；不重新标定，不黑填图像，图像双线性重采样而mask要求四个源采样全在界内且未排除。raw修复CPU前4帧右观察全0，校正后1/1/3/0，共5个，导出3D0/1/2/2、仅1/4 proposal附非空支持，仍不足稳健6DoF，停止扩展，不运行校正全448。input_cuvslam_rectified_v1是43帧准备中断目录，无manifest，完整失败证据保留；实际4帧输入为input_cuvslam_rectified_deploy4_v2。
+
+校正后位姿明确为rectified-left，另导出world_from_original_left_camera_m=native_pose·R_rectified_from_original；last landmarks另以R1^T返回原左系，不当world。原raw-fisheye比较器显式拒绝校正manifest，避免将校正相机位姿直接作用到原相机人体mesh。15项Python针对性测试（6新SDK/校正、9共同几何）、编译/Ruff与原生5测试通过。具体修改、实际命令、环境/构建边界、完整448与4帧记录见cuvslam_repair_20261015.json，相关native patch保存在walker_tools/scene/cuvslam_geometry_contract.patch。停止本轮：左右静态有效对应仍不足，独立世界轨迹未获得，未接Stage融合或身体加速度，未升级主线。

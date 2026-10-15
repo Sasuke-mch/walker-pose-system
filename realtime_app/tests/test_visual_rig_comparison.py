@@ -3,12 +3,14 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 import numpy as np
 
 from walker_tools.scene.compare_visual_rig_poses import (
     export_world_geometry, measured_pose, projected_errors, read_rows, support_summary,
     observation_mask_diagnostics,
+    compare,
 )
 from walker_tools.scene.prepare_visual_rig_comparison import raw_points, scaled_K
 from walker_tools.scene.cuvslam_backend import quaternion_xyzw, matrix_from_pose, build_rig
@@ -22,6 +24,14 @@ def calibration():
 
 
 class VisualRigComparisonTests(unittest.TestCase):
+    def test_raw_mesh_comparator_rejects_rectified_coordinate_frame(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            source = folder/'manifest.json'
+            source.write_text(json.dumps({'frames': [], 'calibration': {'model': 'opencv_pinhole'}}))
+            with self.assertRaisesRegex(ValueError, 'cannot consume rectified poses'):
+                compare(SimpleNamespace(output=folder/'output', manifest=source))
+
     def test_raw_inverse_rotation_and_pixel_center_resize(self):
         upright = np.array([[120., 700., .8]])
         np.testing.assert_array_equal(raw_points(upright, 'left', (1920, 1080)), [[1219, 120, .8]])

@@ -1,0 +1,22 @@
+{
+  "all_frames": 448,
+  "left_right_exported_observations": [
+    71223,
+    21
+  ],
+  "deep_mask_center_count_gt_3px": [
+    0,
+    0
+  ],
+  "status_counts": {
+    "tracked": 9,
+    "initializing": 42,
+    "lost": 397
+  },
+  "native_pose_count": 224,
+  "nonempty_3d_frames": 16,
+  "maximum_exported_3d": 1,
+  "native_cpu_diagnostic": true,
+  "world_pose_certified": false,
+  "decision": "no world trajectory; native gates expose sparse metric support; no promotion"
+}
