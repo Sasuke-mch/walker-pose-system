@@ -3,6 +3,7 @@
 import ast
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 import numpy as np
@@ -13,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'realtime_app'))
 from learning_phc.physics import PHCBody
 from learning_phc.policy import FrozenPHC, observation_v7, recovery_reference
-from learning_phc.reference import retarget
+from learning_phc.reference import retarget, matched_body_xml, PixelReferenceFeedback
 
 
 def author_function(path, name, namespace):
@@ -148,6 +149,55 @@ class PHCPretrainedTests(unittest.TestCase):
         np.testing.assert_allclose(recovered[0], [3, 0, 0])
         np.testing.assert_array_equal(recovered[1:], position[1:])
         np.testing.assert_array_equal(recovered_velocity, velocity)
+
+    def test_matched_rest_offsets_reproduce_actual_smplh_joints(self):
+        from learning_phc.analyze import load_model
+        from learning_phc.contract import SMPL_INDICES
+        from learning_phc.reference import SMPLHHeelSurface
+        model=load_model()
+        beta=torch.tensor([[.3,-.2,.1,0,0,0,0,0,0,0]],dtype=torch.float32)
+        body=Rotation.random(21,random_state=10).as_matrix()[None]
+        root=Rotation.from_euler('xyz',[[.2,-.1,.3]]).as_matrix()
+        pelvis=np.array([[.1,.2,1.]])
+        rest=model.v_template+torch.einsum('bl,vcl->bvc',beta,model.shapedirs)[0]
+        j0=(model.J_regressor[0]@rest).detach().numpy()
+        with tempfile.TemporaryDirectory() as folder:
+            source,xml=Path(folder)/'shape.npz',Path(folder)/'matched.xml'
+            np.savez(source,betas=beta.numpy())
+            matched_body_xml(source,self.phc/'phc/data/assets/mjcf/smpl_0_humanoid.xml',xml)
+            actual=retarget(np.array([0.]),pelvis,root,body,np.tile(np.eye(3),(2,1,1)),
+                np.ones(1,bool),np.zeros(1,int),xml)
+            with torch.inference_mode():
+                output=model(betas=beta,global_orient=torch.tensor(root,dtype=torch.float32),
+                    body_pose=torch.tensor(body,dtype=torch.float32),
+                    transl=torch.tensor(pelvis-j0,dtype=torch.float32),
+                    left_hand_pose=torch.eye(3).expand(1,15,3,3),
+                    right_hand_pose=torch.eye(3).expand(1,15,3,3))
+                expected=output.joints[:,:22].numpy()
+            np.testing.assert_allclose(actual['reference_position_m'][:,np.argsort(SMPL_INDICES)[:22]],
+                                       expected,atol=2e-6,rtol=0)
+            surface=SMPLHHeelSurface(dict(heel_rest_joints_m=(model.J_regressor@rest).detach().numpy(),
+                heel_rest_vertices_m=rest[[3387,6787]].detach().numpy(),
+                heel_skin_weights=model.lbs_weights[[3387,6787]].detach().numpy(),
+                heel_pose_dirs=model.posedirs.reshape(-1,6890,3)[:,[3387,6787]].detach().numpy(),
+                heel_smpl_parents=model.parents.numpy(),heel_hand_rotation=np.tile(np.eye(3),(30,1,1))))
+            np.testing.assert_allclose(surface.points(pelvis[0],actual['reference_rotation'][0]),
+                output.vertices[0,[3387,6787]].numpy(),atol=2e-6,rtol=0)
+
+    def test_pixel_reference_fk_has_finite_jacobian_and_preserves_bones(self):
+        xml=self.phc/'phc/data/assets/mjcf/smpl_0_humanoid.xml'
+        feedback=PixelReferenceFeedback({},xml)
+        q=torch.zeros(75,dtype=torch.float64,requires_grad=True)
+        root=torch.tensor([0.,0.,1.],dtype=torch.float64)
+        local=torch.eye(3,dtype=torch.float64).expand(24,3,3)
+        p,_=feedback.fk(q,root,local)
+        jac=torch.autograd.functional.jacobian(lambda d:feedback.fk(d,root,local)[0],q,vectorize=True)
+        self.assertTrue(torch.isfinite(jac).all())
+        trial=torch.tensor(np.random.default_rng(5).normal(size=75)*.2,dtype=torch.float64)
+        moved,_=feedback.fk(trial,root,local)
+        for j in range(1,24):
+            self.assertAlmostEqual(float(torch.linalg.norm(p[j]-p[feedback.parents[j]]).detach()),
+                float(torch.linalg.norm(moved[j]-moved[feedback.parents[j]])),places=12)
 
 
 if __name__ == '__main__':

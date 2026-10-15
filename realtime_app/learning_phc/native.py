@@ -19,6 +19,7 @@ import torch
 
 from .contract import NAMES, COLLISION_FILTERS
 from .policy import FrozenPHC, observation_v7, recovery_reference
+from .reference import PixelReferenceFeedback, SMPLHHeelSurface
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -94,6 +95,30 @@ class PhysXBody:
                               for name in ('L_Wrist', 'R_Wrist')]
         self.max_support_force = 0.
         self.support_saturation_substeps = 0
+        self.heel_attractors=[]
+        self.heel_surface=None
+
+    def set_heel_anchors(self,offsets,targets):
+        """PhysX positional attractor at a rigid heel proxy; not a hard skin weld."""
+        for handle in self.heel_attractors:
+            properties=self.gym.get_attractor_properties(self.env,handle)
+            properties.axes=gymapi.AXIS_NONE
+            self.gym.set_attractor_properties(self.env,handle,properties)
+        if targets is None:
+            return
+        for side,name in enumerate(('L_Ankle','R_Ankle')):
+            properties=gymapi.AttractorProperties()
+            properties.stiffness=1e5
+            properties.damping=1e3
+            properties.axes=gymapi.AXIS_TRANSLATION
+            properties.rigid_handle=self.gym.find_actor_rigid_body_handle(self.env,self.actor,name)
+            properties.offset.p=gymapi.Vec3(*offsets[side])
+            properties.target.p=gymapi.Vec3(*targets[side])
+            if len(self.heel_attractors)>side:
+                self.gym.set_attractor_properties(self.env,self.heel_attractors[side],properties)
+                self.gym.set_attractor_target(self.env,self.heel_attractors[side],properties.target)
+            else:
+                self.heel_attractors.append(self.gym.create_rigid_body_attractor(self.env,properties))
 
     def reset_joints(self, rotations):
         local = np.stack([rotations[self.parents[i]].T @ rotations[i] for i in range(1, 24)])
@@ -110,7 +135,7 @@ class PhysXBody:
         quaternion = np.column_stack([state['pose']['r'][k] for k in 'xyzw'])
         return position, Rotation.from_quat(quaternion).as_matrix(), xyz(state['vel']['linear']), xyz(state['vel']['angular'])
 
-    def advance(self, action, dt, wrist_target=None):
+    def advance(self, action, dt, wrist_target=None, wrist_velocity=None):
         if np.shape(action) != (69,) or not np.isfinite(action).all() or not np.isfinite(dt) or dt <= 0:
             raise ValueError('finite69D action and positive dt required')
         target = (np.clip(action, -1, 1) * self.scale).astype(np.float32)
@@ -123,10 +148,21 @@ class PhysXBody:
             if abs(self.params.dt - h) > 1e-10:
                 self.params.dt = h
                 self.gym.set_sim_params(self.sim, self.params)
+            if self.heel_surface is not None and self.heel_attractors:
+                p,r,_,_=self.state()
+                heel=self.heel_surface.points(p[0],r)
+                for side,handle in enumerate(self.heel_attractors):
+                    properties=self.gym.get_attractor_properties(self.env,handle)
+                    if properties.axes==gymapi.AXIS_NONE:
+                        continue
+                    index=(3,7)[side]
+                    properties.offset.p=gymapi.Vec3(*(r[index].T@(heel[side]-p[index])))
+                    self.gym.set_attractor_properties(self.env,handle,properties)
             if wrist_target is not None:
                 p, _, v, _ = self.state()
                 for side, index in enumerate((17, 22)):
-                    force = 900*(wrist_target[side]-p[index])-45*v[index]
+                    target_velocity = np.zeros(3) if wrist_velocity is None else wrist_velocity[side]
+                    force = 900*(wrist_target[side]-p[index])+45*(target_velocity-v[index])
                     magnitude = np.linalg.norm(force)
                     self.support_saturation_substeps += int(magnitude > 300)
                     force *= min(1., 300/max(magnitude, 1e-12))
@@ -144,18 +180,18 @@ class PhysXBody:
 
 def replay_reference(args, policy):
     with np.load(args.reference, allow_pickle=False) as z:
-        reference = {k: z[k] for k in ('timestamp_s', 'pair_id', 'reference_position_m',
-                      'reference_rotation', 'reference_velocity_m_s', 'available', 'segment_id',
-                      'camera_rotation', 'camera_translation_m')}
+        reference = {k: z[k] for k in z.files}
     count = len(reference['timestamp_s'])
-    if reference['pair_id'].tolist() != list(range(448)):
-        raise ValueError('all448 reference IDs are required')
+    if reference['pair_id'].tolist() != list(range(count)):
+        raise ValueError('complete ordered reference IDs are required')
     if not reference['available'][0]:
         raise ValueError('frame0 unavailable; cannot initialize from a future frame')
     body = PhysXBody(args.xml, reference['reference_position_m'][0, 0],
                      reference['reference_rotation'][0, 0])
     try:
         body.reset_joints(reference['reference_rotation'][0])
+        if args.exact_heel_surface:
+            body.heel_surface=SMPLHHeelSurface(reference)
         positions = np.full((count, 24, 3), np.nan)
         rotations = np.full((count, 24, 3, 3), np.nan)
         velocity = np.full_like(positions, np.nan)
@@ -170,10 +206,18 @@ def replay_reference(args, policy):
         available = np.zeros(count, bool)
         statuses = []
         failed = False
+        control_time = float(reference['timestamp_s'][0])
+        held_action = None
+        control_calls = 0
+        last_wrist_target = wrist_camera @ reference['camera_rotation'][0].T + reference['camera_translation_m'][0]
+        feedback=PixelReferenceFeedback(reference,args.xml,args.pixel_feedback_gain) if args.pixel_feedback else None
+        feedback_rows=[]
+        heel_active=False
         with (args.output / 'trajectory.jsonl').open('w', encoding='utf-8') as stream:
             for i in range(count):
                 start = time.perf_counter()
                 reason = 'tracked_reference'
+                feedback_info=dict(status='disabled')
                 if not reference['available'][i]:
                     failed, reason = True, 'source_reference_unavailable'
                 if failed:
@@ -181,15 +225,55 @@ def replay_reference(args, policy):
                 else:
                     if i:
                         p, r, v, w = body.state()
+                        if args.stage_heel_anchor:
+                            stage=reference['stage'][i]
+                            if 'stage1' in stage and heel_active:
+                                body.set_heel_anchors(None,None)
+                                heel_active=False
+                            if 'stage2' in stage and not heel_active:
+                                local_heel=reference['heel_local_m'][i]
+                                heel=p[[3,7]]+np.einsum('nij,nj->ni',r[[3,7]],local_heel)
+                                if body.heel_surface is not None:
+                                    heel=body.heel_surface.points(p[0],r)
+                                    local_heel=np.einsum('nji,nj->ni',r[[3,7]],heel-p[[3,7]])
+                                body.set_heel_anchors(local_heel,heel)
+                                heel_active=True
                         target, target_velocity = reference['reference_position_m'][i], reference['reference_velocity_m_s'][i]
+                        if feedback is not None:
+                            target,_,feedback_info=feedback.correct(i,p,r)
                         if not args.disable_far_recovery:
                             target, target_velocity = recovery_reference(p, v, target, target_velocity)
-                        observation = observation_v7(p, r, v, w, target, target_velocity)
-                        action, _ = policy.act(observation)
                         wrist_target = (wrist_camera @ reference['camera_rotation'][i].T +
                                         reference['camera_translation_m'][i]) if args.wrist_support else None
-                        body.advance(action, reference['timestamp_s'][i]-reference['timestamp_s'][i-1], wrist_target)
-                        support_force[i], saturation[i] = body.max_support_force, body.support_saturation_substeps
+                        dt = reference['timestamp_s'][i]-reference['timestamp_s'][i-1]
+                        wrist_velocity = ((wrist_target-last_wrist_target)/dt
+                                          if wrist_target is not None and args.moving_support_damping else None)
+                        if args.control_hz is None:
+                            observation = observation_v7(p, r, v, w, target, target_velocity)
+                            action, _ = policy.act(observation)
+                            control_calls += 1
+                            body.advance(action, dt, wrist_target, wrist_velocity)
+                            support_force[i], saturation[i] = body.max_support_force, body.support_saturation_substeps
+                        else:
+                            now = float(reference['timestamp_s'][i-1])
+                            stop = float(reference['timestamp_s'][i])
+                            while now < stop-1e-10:
+                                if held_action is None or now >= control_time-1e-10:
+                                    p, r, v, w = body.state()
+                                    target, target_velocity = reference['reference_position_m'][i], reference['reference_velocity_m_s'][i]
+                                    if not args.disable_far_recovery:
+                                        target, target_velocity = recovery_reference(p, v, target, target_velocity)
+                                    held_action, _ = policy.act(observation_v7(p,r,v,w,target,target_velocity))
+                                    control_time += 1/args.control_hz
+                                    control_calls += 1
+                                end = min(stop,control_time)
+                                body.advance(held_action,end-now,wrist_target,wrist_velocity)
+                                support_force[i] = max(support_force[i],body.max_support_force)
+                                saturation[i] += body.support_saturation_substeps
+                                now = end
+                            action = held_action
+                        if wrist_target is not None:
+                            last_wrist_target = wrist_target.copy()
                         actions[i] = action
                     p, r, v, w = body.state()
                     if not all(np.isfinite(a).all() for a in (p, r, v, w)):
@@ -206,6 +290,7 @@ def replay_reference(args, policy):
                             reason = 'poor_reference_tracking'
                 timings[i] = (time.perf_counter()-start)*1000
                 statuses.append(reason)
+                feedback_rows.append(feedback_info)
                 row = dict(pair_id=i, timestamp_s=float(reference['timestamp_s'][i]),
                            status=reason, available=bool(available[i]),
                            reference_mean_error_m=float(np.mean(error[i])) if available[i] else None,
@@ -227,7 +312,9 @@ def replay_reference(args, policy):
             status=np.asarray(statuses))
         np.savez_compressed(args.output/'support_diagnostic.npz', maximum_force_n=support_force,
                             saturated_side_substeps=saturation)
-        summary = dict(status='complete448_native_replay;research_candidate',
+        if feedback is not None:
+            (args.output/'pixel_feedback.jsonl').write_text(''.join(json.dumps(row)+'\n' for row in feedback_rows),encoding='utf-8')
+        summary = dict(status='complete_native_replay;research_candidate',
             backend='IsaacGym Preview4 PhysX CPU', frames=count, finite_frames=int(available.sum()),
             full_sequence_reference_tracking_fraction=float(successful.mean()),
             joint_error_mean_m=float(np.nanmean(error)), joint_error_p95_m=float(np.nanpercentile(error,95)),
@@ -239,10 +326,16 @@ def replay_reference(args, policy):
             support_saturated_side_substeps=int(saturation.sum()), author_far_recovery=not args.disable_far_recovery,
             reference=str(args.reference.resolve()), primitive=str(args.primitive.resolve()),
             composer=str(args.composer.resolve()), xml=str(args.xml.resolve()),
-            time='actual capture dt;one policy update per incoming frame, not original uniform30Hz',
+            time='actual capture dt;fixed30Hz policy ticks in current-arrival batch' if args.control_hz else 'actual capture dt;one policy update per incoming frame',
             conditioning='at observation_i arrival, advance previous state to time_i using current reference_i; no reference_i+1',
-            contact='author ground/self collision; optional assumed camera-rigid wrists K900,D45,300N; no added heel hard anchor',
-            scope='3D-reference imitation,not raw2D-driven RL or independent human3D accuracy',
+            contact='ground/self collision;optional assumed wrist force;Stage2 heel attractor is soft and requires decoded-surface gate' if args.stage_heel_anchor else 'ground/self collision;optional assumed wrist force;no heel constraint',
+            scope='frozen PHC reference tracking;optional raw2D reference servo;not independently validated human3D',
+            control_hz=args.control_hz,policy_calls=control_calls,
+            moving_support_damping=args.moving_support_damping,
+            pixel_reference_feedback=args.pixel_feedback,
+            pixel_feedback_gain=args.pixel_feedback_gain,
+            stage_heel_anchor=args.stage_heel_anchor,
+            exact_heel_surface=args.exact_heel_surface,
             properties=body.properties)
         (args.output/'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
         print(json.dumps({k:v for k,v in summary.items() if k != 'properties'}), flush=True)
@@ -257,10 +350,20 @@ def main():
     parser.add_argument('--reference', type=Path, help='prepared same-source causal448 reference; omission runs standing')
     parser.add_argument('--wrist-support', action='store_true', help='explicit assumed camera-rigid wrist support contrast')
     parser.add_argument('--disable-far-recovery', action='store_true', help='reproduce the initial adapter without author zero_out_far')
+    parser.add_argument('--control-hz',type=float,choices=[30.],help='fixed author policy cadence, hold action between ticks; current-arrival batch replay')
+    parser.add_argument('--moving-support-damping',action='store_true',help='use relative target/wrist velocity in assumed spring-damper')
+    parser.add_argument('--pixel-feedback',action='store_true',help='bounded raw2D GN correction to reference; no simulated-state reset or mesh post-fit')
+    parser.add_argument('--pixel-feedback-gain',type=float,choices=[1.,.25],default=1.)
+    parser.add_argument('--stage-heel-anchor',action='store_true',help='Stage2 fixed rigid heel proxy attractor; validate decoded skin separately')
+    parser.add_argument('--exact-heel-surface',action='store_true',help='update attractor offsets from exact frozen-shape SMPL-H skin vertices')
     parser.add_argument('--primitive', type=Path, default=ROOT / 'models/phc/phc_kp_2.pth')
     parser.add_argument('--composer', type=Path, default=ROOT / 'models/phc/phc_comp_kp_2.pth')
     parser.add_argument('--xml', type=Path, default=ROOT / 'third_party/PHC/phc/data/assets/mjcf/smpl_0_humanoid.xml')
     args = parser.parse_args()
+    if args.pixel_feedback and args.control_hz:
+        parser.error('pixel feedback and fixed-cadence diagnostic must be tested separately')
+    if args.exact_heel_surface and not args.stage_heel_anchor:
+        parser.error('exact heel surface requires Stage2 anchor experiment')
     args.output.mkdir(parents=True, exist_ok=False)
     torch.set_num_threads(1)
     policy = FrozenPHC(args.primitive, args.composer)

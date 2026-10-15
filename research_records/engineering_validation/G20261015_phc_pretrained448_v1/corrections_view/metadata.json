@@ -1,0 +1,29 @@
+{
+  "frames": 448,
+  "vertices": 6890,
+  "faces": 13776,
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261015_phc_pretrained448_v1\\corrections_view\\scene",
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\world_contact_20261015\\run_world_unconstrained\\result.npz",
+  "methods": {
+    "source_smplh": "输入 SMPL-H",
+    "replay448_physx_recovery": "PHC+ 无腕支撑",
+    "replay448_physx_support": "PHC+ 假设腕支撑",
+    "corrections_v1/matched_body": "PHC+ 修正骨架（保留）",
+    "corrections_v1/stage_heel_v2": "脚跟约束诊断（未通过）"
+  },
+  "display_map": "X,-Y,Z",
+  "smoothing": false,
+  "interpolation": false,
+  "scene_replayed_matches_controller_conditioning": true,
+  "browser_status": "passed actual in-app browser reload, frame change, method navigation and same-frame raw images",
+  "browser_checked_frames": [
+    143,
+    447
+  ],
+  "browser_checked_methods": [
+    "corrections_v1/matched_body",
+    "corrections_v1/stage_heel_v2"
+  ],
+  "browser_screenshot": "matched_frame143.jpg",
+  "browser_comparison_link": "corrections_v1/comparison_all/comparison.png"
+}

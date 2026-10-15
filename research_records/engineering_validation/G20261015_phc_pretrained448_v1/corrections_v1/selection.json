@@ -1,0 +1,193 @@
+{
+  "status": "one-factor corrections evaluated; bone offset match retained as research candidate only",
+  "selected_run": "corrections_v1/matched_body",
+  "formal_mainline_changed": false,
+  "source_estimator_changed": false,
+  "weights_frozen": true,
+  "reset_after_frame0": false,
+  "denominator": 10752,
+  "selected": {
+    "reference": "corrections_v1/reference_matched.npz",
+    "xml": "corrections_v1/reference_matched.xml",
+    "wrist_support": true,
+    "control_hz": null,
+    "pixel_feedback": false,
+    "moving_support_damping": false,
+    "stage_heel_anchor": false
+  },
+  "rejected": [
+    "fixed cadence batch replay",
+    "relative damping as accuracy improvement",
+    "both pixel reference servo revisions",
+    "rigid heel proxy as full hard-skin constraint",
+    "dynamic exact-skin attractor due to falling"
+  ],
+  "unresolved": [
+    "reliable raw2D physical closed loop",
+    "hard10mm complete Stage2 heel guarantee",
+    "collision skin/inertia alignment",
+    "independent held-out accuracy"
+  ],
+  "cases": [
+    {
+      "run": "replay448_physx_support",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 0,
+      "median_px": 74.53361261154204,
+      "p95_px": 190.44486002977393,
+      "all_slots_within25_fraction": 0.08947172619047619,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 89.62583541870117,
+        "mean": 129.86781011214075,
+        "p95": 363.5121956467628,
+        "max": 458.118200302124
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 11,
+        "failed_frames": 104
+      },
+      "adopted": false
+    },
+    {
+      "run": "corrections_v1/clock30",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 73,
+      "median_px": 287.01616006961433,
+      "p95_px": 1182.748635420313,
+      "all_slots_within25_fraction": 0.05078125,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 223.03850948810577,
+        "mean": 287.39499802012807,
+        "p95": 772.855612635612,
+        "max": 958.4141969680786
+      },
+      "heel10mm": null,
+      "adopted": false
+    },
+    {
+      "run": "corrections_v1/relative_damping",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 0,
+      "median_px": 74.0640936411924,
+      "p95_px": 197.64173315375763,
+      "all_slots_within25_fraction": 0.09254092261904762,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 116.59695580601692,
+        "mean": 130.73489213585043,
+        "p95": 330.7185530662532,
+        "max": 462.1184468269348
+      },
+      "heel10mm": null,
+      "adopted": false
+    },
+    {
+      "run": "corrections_v1/matched_body",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 0,
+      "median_px": 60.55434246590386,
+      "p95_px": 159.30229115241445,
+      "all_slots_within25_fraction": 0.13764880952380953,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 107.93589428067207,
+        "mean": 112.51424662363918,
+        "p95": 266.0777866840362,
+        "max": 423.2197701931
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 8,
+        "failed_frames": 107
+      },
+      "adopted": true
+    },
+    {
+      "run": "corrections_v1/pixel_feedback",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 0,
+      "median_px": 68.43031859045834,
+      "p95_px": 191.07137922018035,
+      "all_slots_within25_fraction": 0.11281622023809523,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 134.7196027636528,
+        "mean": 156.7992090829648,
+        "p95": 456.7155182361603,
+        "max": 578.4313082695007
+      },
+      "heel10mm": null,
+      "adopted": false
+    },
+    {
+      "run": "corrections_v1/pixel_feedback_quarter",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 0,
+      "median_px": 75.34672138782437,
+      "p95_px": 374.36647944595245,
+      "all_slots_within25_fraction": 0.10416666666666667,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 110.23438721895218,
+        "mean": 137.21942764747402,
+        "p95": 384.8562270402908,
+        "max": 439.08196687698364
+      },
+      "heel10mm": null,
+      "adopted": false
+    },
+    {
+      "run": "corrections_v1/stage_heel_v2",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 0,
+      "median_px": 70.50417435036611,
+      "p95_px": 176.24717710237076,
+      "all_slots_within25_fraction": 0.08900669642857142,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 6.955350982025266,
+        "mean": 8.567550564286016,
+        "p95": 24.242576397955407,
+        "max": 31.18736296892166
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 64,
+        "failed_frames": 51
+      },
+      "adopted": false
+    },
+    {
+      "run": "corrections_v1/stage_heel_exact",
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_frames": 179,
+      "median_px": 370.5018192605196,
+      "p95_px": 1207.4649329774243,
+      "all_slots_within25_fraction": 0.026041666666666668,
+      "heel_displacement_mm": {
+        "count": 230,
+        "median": 1.973120728507638,
+        "mean": 4.490017486893086,
+        "p95": 13.978661783039568,
+        "max": 28.378359973430634
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 87,
+        "failed_frames": 28
+      },
+      "adopted": false
+    }
+  ]
+}

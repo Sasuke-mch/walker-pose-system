@@ -57,8 +57,11 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--reference', type=Path, required=True)
+    parser.add_argument('--output', type=Path, help='separate analysis directory; keep old comparisons unchanged')
     parser.add_argument('--runs', nargs='+', default=['replay448_physx_recovery', 'replay448_physx_support'])
     args = parser.parse_args()
+    destination = args.root if args.output is None else args.output
+    destination.mkdir(parents=True,exist_ok=True)
     torch.set_num_threads(1)
     model = load_model()
     with np.load(args.source, allow_pickle=False) as z:
@@ -172,6 +175,10 @@ def main():
             heel_position_world_m=heels, stage2_heel_episode_displacement_m=heel_displacement,
             reprojection_error_px=all_errors[run])
         result.setdefault('stage2_heel_episode_displacement_mm', {})[run] = stats(heel_displacement*1000)
+        stage2=np.array(['stage2' in stage for stage in reference['stage']])
+        pass_heel=np.isfinite(heel_displacement).all(1)&(heel_displacement<=.01).all(1)
+        result.setdefault('stage2_both_heels_within10mm',{})[run]=dict(total_frames=int(stage2.sum()),
+            passed_frames=int((stage2&pass_heel).sum()),failed_frames=int((stage2&~pass_heel).sum()))
     derivatives = {}
     for name, error in all_errors.items():
         within = valid & np.isfinite(error) & (error <= 25)
@@ -195,7 +202,7 @@ def main():
         result['methods'][name] = method
     result['derivatives'] = 'offline irregular-time centered3point; NaN endpoints/segment boundaries;not simulation instantaneous dynamics or causal deployment'
     result['decision'] = 'pretrained integration completed; not promoted: support needed for stability, worse raw2D fit, heel-fixed requirement unmet'
-    (args.root/'analysis.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
+    (destination/'analysis.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
@@ -217,7 +224,7 @@ def main():
     axes[1].legend(fontsize=8)
     figure.suptitle('Frozen PHC+ complete448: detector consistency and decoded surface geometry')
     figure.tight_layout()
-    figure.savefig(args.root/'comparison.png', dpi=150)
+    figure.savefig(destination/'comparison.png', dpi=150)
     plt.close(figure)
     figure, axes = plt.subplots(4, 2, figsize=(13, 10), sharex=True)
     for row, (label, indices) in enumerate((('Left arm',[0,2,4]), ('Right arm',[1,3,5]),
@@ -232,7 +239,7 @@ def main():
     axes[-1,1].set_xlabel('Capture time (s)')
     figure.suptitle('Raw sampled derivatives, offline3point: no smoothing; gaps retained')
     figure.tight_layout()
-    figure.savefig(args.root/'motion_curves.png', dpi=150)
+    figure.savefig(destination/'motion_curves.png', dpi=150)
     plt.close(figure)
     print(json.dumps({name:{k:v for k,v in value.items() if k != 'per_joint_median_px'}
                       for name,value in result['methods'].items()}), flush=True)

@@ -108,12 +108,12 @@ def page_for(data, vertices, coco, label):
     page = page.replace('<div><dt>地面状态</dt>', '<div><dt>脚跟段内位移 L/R</dt><dd id="heel">—</dd></div><div><dt>腕力最大值</dt><dd id="force">—</dd></div><div><dt>地面状态</dt>')
     note = ('本轮官方冻结权重的三维参考模仿实验；未训练二维反馈。腕支撑是显式外力假设，不能解释为测得的抓握力。'
             '地面、相机、观测骨架和助步器已从同源448图像重新计算；与控制器条件场景核对一致。'
-            'Stage含脚踝锚与约0.5秒发布延迟。固定体型来自全片预校准。脚跟硬固定未实现，当前结果未晋升主线。')
+            'Stage含脚踝锚与约0.5秒发布延迟。固定体型来自全片预校准。当前配置：'+data['configuration']+'。脚跟10毫米要求尚未全片通过，当前结果未晋升主线。')
     page = page.replace('<section><h2>参考来源</h2><p>', '<section><h2>实验说明</h2><p>'+note+'</p></section><section><h2>参考来源</h2><p>')
-    navigation = ''.join(f'<a href="{name}.html">{title}</a>　' for name,title in LABELS.items())
+    navigation = ''.join(f'<a href="{name.replace("/","__")}.html">{title}</a>　' for name,title in LABELS.items())
     page = page.replace('<header class="top">', '<header class="top">')
     page = page.replace('<div class="main">', '<nav style="background:white;padding:8px">'+navigation+
-        '<a href="../comparison.png">全片对比曲线</a>　播放按30帧/秒逐帧，采集时间跨度16.035秒</nav><div class="main">',1)
+        '<a href="'+data['comparisonPlot']+'">全片对比曲线</a>　播放按30帧/秒逐帧，采集时间跨度16.035秒</nav><div class="main">',1)
     page = page.replace('.app{height:100%;', '.app{height:auto;min-height:100%;')
     page = page.replace('grid-template-rows:auto 1fr auto', 'grid-template-rows:auto auto 65vh auto')
     page = page.replace('270px}', '340px}')
@@ -154,9 +154,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--view-dir', default='view', help='new output directory name within this experiment')
+    parser.add_argument('--candidate',action='append',default=[],help='extra saved run, rendered independently with unchanged states')
     parser.add_argument('--skip-replay', action='store_true', help='resume pages using this experiment own completed scene')
     args = parser.parse_args()
     root = args.root.resolve()
+    for candidate in args.candidate:
+        LABELS[candidate]={'matched_body':'PHC+ 修正骨架（保留）',
+            'stage_heel_v2':'脚跟约束诊断（未通过）'}.get(Path(candidate).name,candidate)
     destination = root/args.view_dir
     metadata = read(root/'reference448.json')
     source = Path(metadata['source'])
@@ -207,9 +211,14 @@ def main():
                 status = np.where(z['pose_available'],'source_estimate','unavailable').tolist()
             reference_error = [None]*448
             heel, force = [[None,None]]*448, [None]*448
+            support=False
+            configuration='原始二维反馈估计，无物理仿真'
             records = [json.loads(line) for line in (source.parent/'trajectory.jsonl').read_text(encoding='utf-8').splitlines()]
             used[:,5:17] = np.any(np.asarray([row['used_views'] for row in records]),axis=1)
         else:
+            summary=read(root/method/'summary.json')
+            support=summary['assumed_wrist_support']
+            configuration=('原始中性骨架' if not method.startswith('corrections_v1') else '固定主线体型骨架')+('；Stage2脚跟软约束' if summary.get('stage_heel_anchor') else '；未加脚跟约束')
             with np.load(root/method/'decoded_smplh.npz',allow_pickle=False) as z:
                 vertices,coco,faces = z['world_vertices'],z['world_predicted_coco'],z['faces']
                 heel = finite(z['stage2_heel_episode_displacement_m']*1000)
@@ -235,11 +244,13 @@ def main():
             pose=[row['pose_audit']['status'] for row in ground],ground_reasons=[row['pose_audit'].get('reason') for row in ground],
             rotation_missing=[row['pose_audit'].get('missing_rotation_edges',0) for row in ground],
             e3=reference_error,hm=[None]*448,fm=finite(vertices[:,soles,2].min(1)),
-            hand_state=[['假设K900 D45, 300N上限' if method.endswith('support') else '无外部支撑'] for _ in range(448)],
+            hand_state=[['假设K900 D45, 300N上限' if support else '无外部支撑'] for _ in range(448)],
             wrist_mm=[[None,None]]*448,reprojection=finite(np.nanmedian(errors,axis=2)),reject_reasons=reasons.tolist(),
-            status=status,heel=heel,force=force,time=scene['pair_timestamp_sec'].tolist(),observed=finite(obs),projected=finite(projected),
+            status=status,heel=heel,force=force,configuration=configuration,
+            comparisonPlot='../corrections_v1/comparison_all/comparison.png' if args.candidate else '../comparison.png',
+            time=scene['pair_timestamp_sec'].tolist(),observed=finite(obs),projected=finite(projected),
             imageRoot=os.path.relpath(parameters['inputs']['input_pairs'],destination).replace('\\','/'))
-        (destination/(method+'.html')).write_text(page_for(data,vertices,coco,label),encoding='utf-8')
+        (destination/(method.replace('/','__')+'.html')).write_text(page_for(data,vertices,coco,label),encoding='utf-8')
         print('Exported',method,flush=True)
     (destination/'metadata.json').write_text(json.dumps(dict(frames=448,vertices=6890,faces=13776,
         scene=str(scene_dir),source=str(source),methods=LABELS,display_map='X,-Y,Z',smoothing=False,
