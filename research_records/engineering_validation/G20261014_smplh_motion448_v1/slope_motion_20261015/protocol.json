@@ -1,0 +1,239 @@
+{
+  "date": "2026-10-15",
+  "question": "Why does the body rise during walker-static episodes, and can existing model-level contact constraints reduce the failure?",
+  "source_run": "../first_frame_sapiens_20261015/replay_selected_init/map_sigma075",
+  "input_policy": "same448 ordered stereo images;Sapiens2 frame0 only;PMPose1..447 unchanged;original full-sequence calibrated beta frozen",
+  "diagnostic_variables": [
+    "raw-fisheye projection parity, image rotations and resolution",
+    "within-Stage1 scene R/t constancy",
+    "pelvis, root-rotation and local-pose contributions to ankle height",
+    "unconverged v/a feedback removed in a0..61 prefix control",
+    "frame1 detector-domain motion-history reset in a separate0..61 control",
+    "same-frame identical-P SLSQP with versus without ground assumptions"
+  ],
+  "rejected_controls": {
+    "retain_predicted_va_if_unconverged": "did not reduce early foot rise;not adopted",
+    "frame1_motion_history_reset": "increased early foot rise;not adopted"
+  },
+  "repair_candidate": {
+    "name": "run_contact80",
+    "implementation": "existing Stage-conditioned whole-SMPLH world q/v/a constrained MAP;no new local anatomical prior",
+    "whole_vposer_sigma": 0.75,
+    "map_iterations_per_support_branch": 80,
+    "bootstrap_iterations": 80,
+    "reason_for_budget": "same-frame61 and188 contact solutions required58 and63 iterations;previous default30 cannot reach these diagnosed solutions",
+    "support_assumption": "at least one sole within5mm and both nonpenetrating;Stage2 both soles near ground and entire54-point sole plus heel stay within10mm of episode anchors",
+    "stage_source": "fresh same-image scene replay in scene/;fixed-lag and ankle-anchor conditioned,not independent VO",
+    "comparison_limit": "previous camera-only iterated MAP differs in coordinate frame and solver;full-run comparison is a route comparison,not a pure foot-term causal ablation",
+    "solver_matched_contact_diagnostic": "same_frame_contact_diagnostic.json;identical explicit diagonal diagnostic P,not actual recursive P"
+  },
+  "pre_run_engineering_checks": {
+    "all_frames_retained": 448,
+    "required_decodable_frames_for_complete_success": 448,
+    "required_stage2_constraint_satisfied": "all declared Stage2 frames;not just accepted solver frames",
+    "previous_all_raw_reprojection_median_px": 18.131929348178826,
+    "previous_all_raw_reprojection_p95_px": 93.57651070066689,
+    "maximum_allowed_median_and_p95_regression_fraction": 0.05,
+    "criterion_meaning": "internal engineering stop criterion only;not physical contact,anatomical accuracy or world trajectory truth"
+  },
+  "stop_conditions": [
+    "if complete coverage, declared contact conditions or5percent pixel-regression limit fail,retain candidate and failures without promoting default",
+    "do not tilt the floor from moving ankle trajectories,flatten displayed motion,clip derivatives,interpolate failed frames or change beta to hide conflict",
+    "do not blindly sweep additional priors or iteration counts after this bounded candidate"
+  ],
+  "records": {
+    "fisheye": "fisheye_diagnostic.json",
+    "scene": "ground_diagnostic.json",
+    "height_decomposition": "stage1_height_motion_diagnostic.json",
+    "detector_switch": "detector_switch_diagnostic.json",
+    "prefix_controls": "prefix_derivative_feedback.json",
+    "contact_controls": "same_frame_contact_diagnostic.json",
+    "strict_recomputed": "strict_recompute_comparison.json",
+    "commands": "contact_replay_command.json;scene_replay_command.json",
+    "network_input_domain": "network_input_domain_diagnostic.json",
+    "false_conflicts": "contact_failure_diagnostic.json",
+    "real_gate_fix": "gate_fix_frame75_diagnostic.json",
+    "revised_command": "contact_feasible_replay_command.json"
+  },
+  "diagnostic_findings": {
+    "fish_eye_projection_max_numpy_torch64_vs_opencv_px": 6.83e-13,
+    "fish_eye_projection_max_torch32_vs_opencv_px": 0.000274,
+    "long_stage1_scene_rotation_translation_change": "zero within each long episode",
+    "stage1_35_61_mean_ankle_rise_mm": {
+      "map075": 67.813,
+      "free_triangulation_diagnostic": 10.227,
+      "offline_diagnostic": -3.79
+    },
+    "map075_rise_decomposition_mm": {
+      "pelvis_translation": 8.281,
+      "root_rotation": 11.092,
+      "local_pose_and_blend": 48.44
+    },
+    "detector_0_to_1_delta_median_px": {
+      "same_pmpose": 2.71,
+      "same_sapiens": 3.43,
+      "sapiens_to_pmpose": 29.0
+    },
+    "sole_tip_freeze_counterfactual_max_height_change_mm": 0.00361,
+    "native_hip_substitution_reprojection_median_p95_px": [
+      74.79238140089484,
+      184.18255369055038
+    ],
+    "native_hip_substitution_adopted": false,
+    "fresh_strict_whole_records_equal_to_scene_input": true,
+    "fresh_strict_accepted_points": 5286,
+    "ground_installation_validity": "User explicitly confirmed unchanged camera-to-walker mounting position/orientation between September8 and14;static reference retained;not independent dynamic/physical truth",
+    "ground_has_independent_contact_truth": false,
+    "network_input_domain": "Both current detectors read only-rotated raw fisheye PNG;local training configs do not establish explicit fisheye augmentation;not proof that training data never contained fisheye",
+    "default_virtual_perspective": "0/35/61 both views:three rejected for virtual-camera behind support,three generated with both ankles out of frame;not adopted;original camera points remain positive depth"
+  },
+  "source_files": [
+    "realtime_app/pose_app/fisheye_camera.py",
+    "realtime_app/pose_app/body_observations.py",
+    "realtime_app/pose_app/smplh_motion_tracker.py",
+    "realtime_app/pose_app/smplh_iterated_motion_tracker.py",
+    "realtime_app/pose_app/smplh_world_motion_tracker.py",
+    "realtime_app/pose_app/smplh_ground_constraints.py",
+    "realtime_app/tools/run_smplh_motion_baseline.py",
+    "realtime_app/tools/build_smplh_motion_viewer.py",
+    "realtime_app/walker_tools/scene/replay_fitted_body_scene.py"
+  ],
+  "checks": {
+    "world_and_iterated_tests": 22,
+    "viewer_frame_mapping_tests": 16,
+    "ruff_E9_F": "passed for changed runner/viewer and summarizer",
+    "compile": "passed",
+    "browser": "pending final candidate",
+    "contact_fix_regressions": {
+      "command": [
+        ".venv-cuda/Scripts/python.exe",
+        "-m",
+        "pytest",
+        "realtime_app/tests/test_smplh_world_motion_tracker.py",
+        "realtime_app/tests/test_smplh_ground_constraints.py",
+        "realtime_app/tests/test_smplh_motion_tracker.py",
+        "-q"
+      ],
+      "result": "42 passed,4 subtests passed",
+      "before_fix_regression": "test_budget_can_find_first_feasible_pose_without_a_feasible_start:feasible_last True andFalse failed at accepted assertion;original raw tool output not saved as file",
+      "after_fix_guards": "known feasible start without improvement rejected;nonbudget failures and bad geometry rejected;P information not shrunk and unconverged derivatives withheld"
+    },
+    "changed_viewer_javascript": "standalone and4 generated scripts passed Node syntax using UTF8 stdin;initial GBK stdin attempt failed on Unicode and was corrected"
+  },
+  "repair_revision_reason": "During full run_contact80 found actual current-frame physical feasible optimizer-last iterates discarded solely for missing feasible-start objective when budget expires;preserve control and correct this gate with identical80 budget,not an iteration sweep",
+  "repair_revision_controls": "run_contact80 before gate fix vs run_contact80_feasible after gate fix;identical initialized model,observations,configuration,scene and iteration budgets;only feasibility acceptance gate changes",
+  "static_installation_confirmation": {
+    "answer": "一直保持同一安装姿态",
+    "source": "direct user reply in this session",
+    "scope": "camera-to-walker mounting position/orientation between September8 and14;not independent dynamic-ground truth"
+  },
+  "completed_runs": {
+    "camera_map075": {
+      "frames": 448,
+      "available": 448,
+      "raw_error_px": {
+        "count": 10752,
+        "median": 18.131929348178826,
+        "p95": 93.57651070066689,
+        "max": 287.31264186766344
+      },
+      "hip_error_px": {
+        "count": 1792,
+        "median": 59.57057229886644,
+        "p95": 165.4378456236971,
+        "max": 201.72243761651947
+      },
+      "constraint_satisfied": null,
+      "stage2_frames": null,
+      "stage2_satisfied": null,
+      "stage2_entire_sole_displacement_mm": null,
+      "solver_status_counts": null,
+      "published_derivative_joint_samples": 0
+    },
+    "world_contact80_before": {
+      "frames": 448,
+      "available": 447,
+      "raw_error_px": {
+        "count": 10728,
+        "median": 24.56733860813588,
+        "p95": 109.67918961205909,
+        "max": 473.78836178264106
+      },
+      "hip_error_px": {
+        "count": 1788,
+        "median": 80.37831564112165,
+        "p95": 154.57965435306915,
+        "max": 192.0855224840179
+      },
+      "constraint_satisfied": 440,
+      "stage2_frames": 115,
+      "stage2_satisfied": 107,
+      "stage2_entire_sole_displacement_mm": {
+        "count": 228,
+        "median": 9.806493184686449,
+        "p95": 12.021602264738037,
+        "max": 64.06373339229832
+      },
+      "solver_status_counts": {
+        "constrained": 436,
+        "constraint_conflict": 9,
+        "feasible_unconverged": 3
+      },
+      "published_derivative_joint_samples": 1732
+    },
+    "world_contact80_fixed": {
+      "frames": 448,
+      "available": 448,
+      "raw_error_px": {
+        "count": 10752,
+        "median": 23.36424454338048,
+        "p95": 112.97312406094582,
+        "max": 242.92257603638308
+      },
+      "hip_error_px": {
+        "count": 1792,
+        "median": 81.57440073081001,
+        "p95": 160.54878964257134,
+        "max": 204.2254919911093
+      },
+      "constraint_satisfied": 448,
+      "stage2_frames": 115,
+      "stage2_satisfied": 115,
+      "stage2_entire_sole_displacement_mm": {
+        "count": 230,
+        "median": 9.802158018011298,
+        "p95": 9.85664276968847,
+        "max": 9.98400523479587
+      },
+      "solver_status_counts": {
+        "constrained": 438,
+        "feasible_unconverged": 10
+      },
+      "published_derivative_joint_samples": 1798
+    }
+  },
+  "engineering_result": {
+    "complete_pose": true,
+    "all_declared_contact": true,
+    "all_stage2": true,
+    "median_and_p95_within5percent": false,
+    "passed": false
+  },
+  "decision": "retain validated feasible-iterate bug fix;contact candidate passes declared geometry but fails pixel regression gate;do not promote tracking route or sweep weights/iterations",
+  "visualization": {
+    "entry": "visualization/index.html",
+    "variants": [
+      "camera_map075",
+      "world_contact80_before",
+      "world_contact80_fixed"
+    ],
+    "same_current_scene": "scene",
+    "newly_recomputed_strict": "first_instance_strict.jsonl;whole records equal to consumed scene strict input",
+    "body_source": "Sapiens0/PMPose1..447 unchanged",
+    "black_skeleton_source": "same-image PMPose detector-only finite points;not current body frame0 Sapiens;strict masks unchanged",
+    "raw_reprojection_vs_saved_records_max_difference_px": 0,
+    "browser": "Actual IAB checked variant/frame/view controls, before147 unavailable versus fixed147 recovered, fixed75 feasible_unconverged without derivatives, original61 versus fixed61 foot heights; final fixed61 side-view screenshot saved.",
+    "physical_or_independent_world_truth": false,
+    "screenshot": "visualization/preview_fixed_frame61.png"
+  }
+}

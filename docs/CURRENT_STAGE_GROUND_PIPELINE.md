@@ -482,3 +482,11 @@ CPU修复版完整同源448保留：左/右导出观察71223/21，深入mask>3px
 另定位强相对旋转下平移型LK图块匹配的适配风险，进行4帧定因对照：用固定完整鱼眼R/t作stereoRectify，pinhole新K及空D、R2R01R1^T误差1.83e−15、baseline保持0.296266477m；不重新标定，不黑填图像，图像双线性重采样而mask要求四个源采样全在界内且未排除。raw修复CPU前4帧右观察全0，校正后1/1/3/0，共5个，导出3D0/1/2/2、仅1/4 proposal附非空支持，仍不足稳健6DoF，停止扩展，不运行校正全448。input_cuvslam_rectified_v1是43帧准备中断目录，无manifest，完整失败证据保留；实际4帧输入为input_cuvslam_rectified_deploy4_v2。
 
 校正后位姿明确为rectified-left，另导出world_from_original_left_camera_m=native_pose·R_rectified_from_original；last landmarks另以R1^T返回原左系，不当world。原raw-fisheye比较器显式拒绝校正manifest，避免将校正相机位姿直接作用到原相机人体mesh。15项Python针对性测试（6新SDK/校正、9共同几何）、编译/Ruff与原生5测试通过。具体修改、实际命令、环境/构建边界、完整448与4帧记录见cuvslam_repair_20261015.json，相关native patch保存在walker_tools/scene/cuvslam_geometry_contract.patch。停止本轮：左右静态有效对应仍不足，独立世界轨迹未获得，未接Stage融合或身体加速度，未升级主线。
+
+## 2026-10-15 助步器静止但人体斜上运动的坐标隔离
+
+对当前Sapiens首帧初始化的全部11个连续Stage1段检查，长段相机到地面R/t完全恒定，35..61/86..123/156..194/229..263/391..422等均无段内累计pitch或平移漂移。35..61的原始髋中点首尾5帧中位高度差−0.8mm，MAP1.5却+45.6mm；同一地面下EKF约+4.4mm、强先验MAP约+0.4mm。因此不能为修一个模型分支而直接旋转地面，或把原始运动全部压成水平。模型下肢局部形变贡献及修补对照见身体算法5.11。
+
+当前Stage2相机高度703.046..753.834mm，法向相对初值最大7.234°；支撑停止恢复会恢复高度/roll/pitch，这些仍是显式协议估计。用户本轮明确确认9月8日人体采集至9月14日静态参考测量之间，相机相对助步器的安装位置/倾角始终不变，故沿用原静态参考；此为采集条件确认，仍非独立动态真值。助步器四脚零高度源于同参考构造，不能当独立地面检查。原始踝、髋在不同静止段升降方向不一，摆动脚不提供真实平面法向。
+
+新`G20261014_smplh_motion448_v1/slope_motion_20261015/scene`从原448有序图像重新重放Stage/背景旋转/地面/助步器，旧动态输入标志均false。strict另从原PMPose重新计算，448条完整记录与场景所消费输入完全相同（5286通过点、XYZ差0、所有拒绝原因相同）；新显示使用新strict，不为同值输入重复运行已通过的场景估计。详细路径、跨采集边界和各段数值保留ground_diagnostic及strict_recompute_comparison，未升级独立世界精度或接触真值。

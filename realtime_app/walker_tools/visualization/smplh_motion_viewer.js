@@ -43,9 +43,13 @@ function drawMotion() {
   if(d.motion.world) {
     const c=d.motion.groundConstraint[fi];
     const mm=values=>values ? values.map(x=>x===null?'—':(x*1000).toFixed(2)).join(' / ') : '未设锚';
-    document.getElementById('qa').textContent += `\n固定地面约束：${c.status}；实际满足：${c.constraint_satisfied?'是':'否'}\n整脚底最大位移 L/R：${mm(c.sole_max_displacement_m)} mm（上限${d.motion.footLimitMm}mm）\n优化收敛：${c.optimizer_success===undefined?'未执行':c.optimizer_success?'是':'否'}；世界轨迹未经独立认证`;
-    document.getElementById('motion-status').style.color=c.constraint_satisfied?'#000000':'#990000';
-    if(!c.constraint_satisfied) document.getElementById('motion-status').textContent += ' · 保留的失败估计';
+    document.getElementById('qa').textContent += `\n固定地面约束：${c.status}；实际满足：${c.constraint_satisfied===null?'未启用':c.constraint_satisfied?'是':'否'}\n整脚底最大位移 L/R：${mm(c.sole_max_displacement_m)} mm（上限${d.motion.footLimitMm}mm）\n优化收敛：${c.optimizer_success===undefined?'未执行':c.optimizer_success?'是':'否'}；迭代 ${c.iterations??0} 次\n优化停止：${c.optimizer_message||'未执行'}；世界轨迹未经独立认证`;
+    document.getElementById('motion-status').style.color=c.constraint_satisfied===false?'#990000':'#000000';
+    if(c.constraint_satisfied===false) document.getElementById('motion-status').textContent += ' · 保留的失败估计';
+    if(d.motion.groundConstraintPolicy==='contact') window.viewerAudit.optimizerStatus=c.status;
+    if(c.budget_acceptance_reference==='first_feasible_current_frame_estimate') {
+      document.getElementById('qa').textContent += '\n本帧首次找到可行姿态：预算未收敛，保留当前模型；P不收缩，导数不发布。';
+    }
     window.viewerAudit.constraintSatisfied=c.constraint_satisfied;
     window.viewerAudit.constraintStatus=c.status;
   }

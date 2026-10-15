@@ -1,0 +1,170 @@
+{
+  "scope": "read-only numerical fish-eye and inverse-rotation audit;no model rerun",
+  "current_run": "research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "opencv_version": "4.11.0",
+  "calibration_image_size": [
+    1920,
+    1080
+  ],
+  "observations_shape": [
+    2,
+    448,
+    17,
+    3
+  ],
+  "projection_checks": {
+    "left": {
+      "actual_model_points": {
+        "point_count": 7616,
+        "numpy_cv_max_abs_px": 6.821210263296962e-13,
+        "torch64_cv_max_abs_px": 6.821210263296962e-13,
+        "torch32_cv_max_abs_px": 0.000273169548563601,
+        "nonpositive_camera_z_count": 0,
+        "theta_deg_min_max": [
+          1.9552011809734715,
+          78.15624361419272
+        ],
+        "stored_points_units": "meters;converted to mm before right-camera R/T"
+      },
+      "positive_depth_random": {
+        "point_count": 10000,
+        "numpy_cv_max_abs_px": 5.684341886080801e-13,
+        "torch64_cv_max_abs_px": 6.821210263296962e-13,
+        "torch32_cv_max_abs_px": 0.00022830558543773805,
+        "nonpositive_camera_z_count": 0,
+        "theta_deg_min_max": [
+          0.6957129457678667,
+          86.52032242461924
+        ]
+      },
+      "observed_raw_pixel_inverse_roundtrip": {
+        "count": 7616,
+        "max_abs_px": 4.547473508864641e-13,
+        "theta_deg_min_max": [
+          0.30999208944650614,
+          79.28402756368962
+        ],
+        "input_contiguous": true
+      },
+      "K_skew": 0.0,
+      "K": [
+        [
+          755.5721333515272,
+          0.0,
+          995.9446644121314
+        ],
+        [
+          0.0,
+          755.132226469427,
+          537.0915590087372
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "D": [
+        -0.016635373037049376,
+        -0.010626903834433418,
+        0.005399771605657706,
+        -0.0015048843954588353
+      ]
+    },
+    "right": {
+      "actual_model_points": {
+        "point_count": 7616,
+        "numpy_cv_max_abs_px": 6.821210263296962e-13,
+        "torch64_cv_max_abs_px": 5.684341886080801e-13,
+        "torch32_cv_max_abs_px": 0.00020575788539645146,
+        "nonpositive_camera_z_count": 0,
+        "theta_deg_min_max": [
+          3.4758926239022148,
+          79.07277043551235
+        ],
+        "stored_points_units": "meters;converted to mm before right-camera R/T"
+      },
+      "positive_depth_random": {
+        "point_count": 10000,
+        "numpy_cv_max_abs_px": 5.684341886080801e-13,
+        "torch64_cv_max_abs_px": 5.684341886080801e-13,
+        "torch32_cv_max_abs_px": 0.00027806283537756826,
+        "nonpositive_camera_z_count": 0,
+        "theta_deg_min_max": [
+          0.6957129457678667,
+          86.52032242461924
+        ]
+      },
+      "observed_raw_pixel_inverse_roundtrip": {
+        "count": 7616,
+        "max_abs_px": 4.547473508864641e-13,
+        "theta_deg_min_max": [
+          2.216536076949492,
+          80.20306037535826
+        ],
+        "input_contiguous": true
+      },
+      "K_skew": 0.0,
+      "K": [
+        [
+          762.7327659437377,
+          0.0,
+          972.9626840992721
+        ],
+        [
+          0.0,
+          762.0325101509444,
+          495.8971484224165
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "D": [
+        -0.026326251876287197,
+        -0.00479360238212584,
+        0.0025517511939939677,
+        -0.0012032694326123802
+      ]
+    }
+  },
+  "inverse_rotation_checks": {
+    "left": {
+      "full448_observation_roundtrip_max_abs_px": 0.0,
+      "source_image_count": 448,
+      "source_image_h_w_counts": {
+        "[1920, 1080]": 448
+      },
+      "cv2_rotate_corner_center_identity": true,
+      "source_declared_box": [
+        0,
+        0,
+        1079,
+        1919
+      ]
+    },
+    "right": {
+      "full448_observation_roundtrip_max_abs_px": 1.1368683772161603e-13,
+      "source_image_count": 448,
+      "source_image_h_w_counts": {
+        "[1920, 1080]": 448
+      },
+      "cv2_rotate_corner_center_identity": true,
+      "source_declared_box": [
+        0,
+        0,
+        1079,
+        1919
+      ]
+    }
+  },
+  "limits": [
+    "Parity confirms the implemented OpenCV model, not real calibration accuracy or static-ground installation validity.",
+    "Host return timestamps do not establish simultaneous exposures."
+  ],
+  "confirmed_source_defect": null,
+  "conclusion": "Actual points and all observed rays are in positive-Z less-than-90-degree branch; no pinhole substitution, resolution scaling error, side rotation error, nonzero-skew mismatch, or model/OpenCV projection inconsistency found in this scope.",
+  "diagnostic_implementation_note": "Batched cv2 audit must use contiguous N,1,2 input; original sliced N,3->N,2 view was noncontiguous and produced invalid audit results. Recomputed with contiguous arrays. Production tracker creates contiguous 5-point samples per joint, raw_triangulate uses one contiguous xy pair; no corresponding production defect identified."
+}

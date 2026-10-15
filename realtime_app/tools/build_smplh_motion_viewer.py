@@ -81,10 +81,14 @@ def motion_page(page, data):
     if world:
         page = page.replace('SMPL-H 二维运动跟踪 · 固定主线体型','SMPL-H 世界运动 · Stage条件约束候选')
     method = data['motion'].get('updateMethod', 'ekf')
-    method_label = '迭代MAP' if method == 'iterated-map' else 'EKF'
+    contact_map = world and data['motion'].get('groundConstraintPolicy') == 'contact'
+    method_label = '接触约束MAP' if contact_map else ('迭代MAP' if method == 'iterated-map' else 'EKF')
     sigma = data['motion'].get('latentPriorSigma', 1.5)
     weight = (1.5/sigma)**2
     method_section = f'<section><h2>求解方法</h2><p>{method_label}；整体VPoser权重 ×{weight:g}（相对本次EKF），σ={sigma:g}。</p><p>收敛状态逐帧保留；未收敛不发布导数，可勾选原始估计检查。</p></section>'
+    if contact_map:
+        budget = data['motion']['groundMapIterations']
+        method_section = method_section.replace('</section>', f'<p>每个支撑分支MAP预算 {budget} 次；5mm近地/10mm整足位移为采集假设。</p></section>')
     if 'updateMethod' in data['motion']:
         page = re.sub(r'<title>.*?</title>', '<title>SMPL-H · '+method_label+f' · VPoser ×{weight:g}</title>', page, count=1)
         page = re.sub(r'<h1>.*?</h1>', '<h1>SMPL-H · '+method_label+f' · VPoser ×{weight:g}</h1>', page, count=1)
@@ -265,7 +269,9 @@ def run(args):
         'updateMethod':p.get('update_method', 'ekf'),
         'latentPriorSigma':p['configuration']['latent_prior_sigma'],
         'iteratedUpdate':[row.get('iterated_update') for row in records],
-        'world':world,'groundConstraint':[row.get('ground_constraint') for row in records],
+        'world':world,'groundConstraintPolicy':p.get('ground_constraint_policy', 'none'),
+        'groundMapIterations':p.get('ground_configuration', {}).get('maximum_iterations'),
+        'groundConstraint':[row.get('ground_constraint') for row in records],
         'footLimitMm':p.get('ground_configuration',{}).get('max_heel_displacement_m',.01)*1000,
         'beta':r['betas'].tolist(),'shapeCalibrated':p.get('shape_fit') is not None,
         'soleHeight':json_array(np.stack([vg[:,indices,2].min(1)*1000 for indices in side_soles],axis=1)),
@@ -292,7 +298,10 @@ def run(args):
         'world_state_available':world,'world_pose_certified':False,
         'derivative_coordinate_frame':p.get('coordinate_frame','current_left_camera'),
         'update_method':data['motion']['updateMethod'],'latent_prior_sigma':data['motion']['latentPriorSigma'],
-        'optimizer_status_counts':dict(Counter(row['status'] for row in data['motion']['iteratedUpdate'] if row is not None)),
+        'pose_solver':'contact_constrained_MAP' if world and p.get('ground_constraint_policy') == 'contact' else data['motion']['updateMethod'],
+        'optimizer_status_counts':dict(Counter(row['status'] for row in
+            (data['motion']['groundConstraint'] if world and p.get('ground_constraint_policy') == 'contact'
+             else data['motion']['iteratedUpdate']) if row is not None)),
         'fixed_view_center_ground_m':center.tolist(),'framing_result':str(framing_source/'result.npz'),
         'scene_role':'stage_conditioned_world_estimation' if world else 'display_reference_only',
         'stage_counts':dict(Counter(data['stage'])),'derivative_available_samples':int(r['derivative_valid'].sum()),

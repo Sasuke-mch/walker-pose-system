@@ -1,0 +1,108 @@
+{
+  "prefix_before_first_change": [
+    0,
+    74
+  ],
+  "compared_recorded_fields": [
+    "translation_m",
+    "root_rotation",
+    "vposer_latent",
+    "generalized_velocity",
+    "generalized_acceleration",
+    "state_covariance_diag"
+  ],
+  "max_abs_difference": {
+    "translation_m": 0.0,
+    "root_rotation": 0.0,
+    "vposer_latent": 0.0,
+    "generalized_velocity": 0.0,
+    "generalized_acceleration": 0.0,
+    "state_covariance_diag": 0.0
+  },
+  "frames": {
+    "75": {
+      "before": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "iterations": 80,
+        "constraint_satisfied": false,
+        "feasible_start_available": null,
+        "budget_acceptance_reference": null,
+        "sole_min_m": [
+          0.0037637948989868164,
+          -0.005395412445068359
+        ],
+        "sole_max_displacement_m": [
+          0.010822734209369142,
+          0.011825701267866905
+        ],
+        "optimizer_last_minimum_slack_m": 0.0001861921597432377,
+        "model_status": "predicted",
+        "used_views": 0,
+        "published_derivative_samples": 0
+      },
+      "after": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "iterations": 80,
+        "constraint_satisfied": true,
+        "feasible_start_available": false,
+        "budget_acceptance_reference": "first_feasible_current_frame_estimate",
+        "sole_min_m": [
+          0.003755629062652588,
+          -0.004789829254150391
+        ],
+        "sole_max_displacement_m": [
+          0.00998400523479587,
+          0.009905825596135552
+        ],
+        "optimizer_last_minimum_slack_m": 0.0001861921597432377,
+        "model_status": "feasible_unconverged",
+        "used_views": 24,
+        "published_derivative_samples": 0
+      }
+    },
+    "78": {
+      "before": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "iterations": 80,
+        "constraint_satisfied": false,
+        "feasible_start_available": null,
+        "budget_acceptance_reference": null,
+        "sole_min_m": [
+          0.0037273764610290527,
+          -0.013417601585388184
+        ],
+        "sole_max_displacement_m": [
+          0.028878198904488606,
+          0.018955666220091434
+        ],
+        "optimizer_last_minimum_slack_m": 0.0001492219086032861,
+        "model_status": "predicted",
+        "used_views": 0,
+        "published_derivative_samples": 0
+      },
+      "after": {
+        "status": "constrained",
+        "optimizer_success": true,
+        "iterations": 62,
+        "constraint_satisfied": true,
+        "feasible_start_available": false,
+        "budget_acceptance_reference": "no_feasible_start_found",
+        "sole_min_m": [
+          0.004797041416168213,
+          -0.0031821131706237793
+        ],
+        "sole_max_displacement_m": [
+          0.009820559999854015,
+          0.008233042839869815
+        ],
+        "optimizer_last_minimum_slack_m": 0.00017944000014598512,
+        "model_status": "updated",
+        "used_views": 24,
+        "published_derivative_samples": 3
+      }
+    }
+  }
+}

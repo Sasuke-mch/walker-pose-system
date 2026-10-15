@@ -821,5 +821,11 @@
     "frames_each": 448,
     "accepted_for_mainline": false,
     "decision": "first-frame tilt/sole geometry improved,full-sequence lower limbs and nonlinear convergence unresolved"
+  },
+  "slope_motion_20261015": {
+    "protocol": "slope_motion_20261015/protocol.json",
+    "comparison": "slope_motion_20261015/repair_comparison.json",
+    "view": "slope_motion_20261015/visualization/index.html",
+    "status": "completed448 before/after feasible-iterate gate correction;geometry met,pixel regression gate failed;not promoted"
   }
 }

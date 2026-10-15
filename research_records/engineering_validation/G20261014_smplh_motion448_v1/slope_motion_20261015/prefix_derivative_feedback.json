@@ -1,0 +1,255 @@
+{
+  "question": "Does an unconverged accepted pose correction feed v/a and amplify subsequent motion?",
+  "frames": [
+    0,
+    61
+  ],
+  "parameters_source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075\\run_parameters.json",
+  "single_variable": "Retain-v/a control: after accepted unconverged _update restore pre-update predicted velocity/acceleration only, keep pose/covariance. Detector-switch control: replace first prediction only by zero-v/a and initial derivative covariance with q-derivative cross covariances zero, preserve q and Pqq; subsequent predictions unchanged.",
+  "observations": "frame0 Sapiens, frames1..61 unchanged PMPose; frozen calibrated beta; actual capture times",
+  "ground_role": "constant existing Stage1 display transform; not estimator input or independent contact truth",
+  "results": {
+    "baseline": {
+      "raw_error_all_62": {
+        "n": 1488,
+        "median": 16.181020525626906,
+        "p95": 128.0411414652906,
+        "max": 201.72243761651947
+      },
+      "raw_error_stage1_35_61": {
+        "n": 648,
+        "median": 17.611471904070026,
+        "p95": 138.1872984821038,
+        "max": 201.72243761651947
+      },
+      "solver_status_counts": {
+        "not_run": 1,
+        "feasible_unconverged": 61
+      },
+      "seconds": 36.72829330000059,
+      "native_pelvis_stage1_endpoint_delta_xyz_mm": [
+        94.31139290362609,
+        -98.44873029513519,
+        -7.618924445922403
+      ],
+      "native_pelvis_stage1_z_range_mm": [
+        913.1784694185906,
+        942.9898898914473
+      ],
+      "coco_hip_midpoint_stage1_endpoint_delta_xyz_mm": [
+        91.99181625181772,
+        -90.69372523432935,
+        0.42024502586093604
+      ],
+      "coco_hip_midpoint_stage1_z_range_mm": [
+        823.9188314061735,
+        861.7369711775243
+      ],
+      "left_ankle_stage1_endpoint_delta_xyz_mm": [
+        -1.0756584918349859,
+        -237.56346633961982,
+        20.08163746264836
+      ],
+      "left_ankle_stage1_z_range_mm": [
+        100.76451169968163,
+        158.603577902133
+      ],
+      "right_ankle_stage1_endpoint_delta_xyz_mm": [
+        26.622152953103182,
+        -253.87741605995484,
+        50.29273500118802
+      ],
+      "right_ankle_stage1_z_range_mm": [
+        82.11915334884691,
+        164.78001252791626
+      ],
+      "sole_stage1_35_61_abs_height_mm": {
+        "n": 54,
+        "median": 61.18235160386615,
+        "p95": 89.46765718487296,
+        "max": 101.93827709334403
+      },
+      "sole_stage1_endpoint_delta_mm": [
+        14.413853312734204,
+        68.82578894236701
+      ],
+      "final_generalized_velocity_norm": 2.6043730690570728,
+      "final_generalized_acceleration_norm": 1.2001893723857258,
+      "saved_baseline_coco_max_abs_difference_m": 0.0,
+      "saved_baseline_velocity_max_abs_difference": 0.0,
+      "saved_baseline_acceleration_max_abs_difference": 0.0,
+      "same_timestamps_as_control": true,
+      "same_raw_pixels_as_control": true,
+      "frame1_coco_hip_midpoint_delta_xyz_mm": [
+        -5.827402116233216,
+        64.24699376741773,
+        -3.6750510428546477
+      ],
+      "frame1_generalized_velocity_norm": 0.7738936057813613,
+      "frame1_generalized_acceleration_norm": 0.08934897519953243
+    },
+    "retain_predicted_va_if_unconverged": {
+      "raw_error_all_62": {
+        "n": 1488,
+        "median": 16.264571214158153,
+        "p95": 128.97515350093084,
+        "max": 201.40671241474945
+      },
+      "raw_error_stage1_35_61": {
+        "n": 648,
+        "median": 17.442444774008223,
+        "p95": 138.01926599435586,
+        "max": 201.40671241474945
+      },
+      "solver_status_counts": {
+        "not_run": 1,
+        "feasible_unconverged": 61
+      },
+      "seconds": 43.00776910000059,
+      "native_pelvis_stage1_endpoint_delta_xyz_mm": [
+        93.7178877821384,
+        -99.53773236608413,
+        -8.80588871100042
+      ],
+      "native_pelvis_stage1_z_range_mm": [
+        908.9101807196837,
+        942.9387873594388
+      ],
+      "coco_hip_midpoint_stage1_endpoint_delta_xyz_mm": [
+        92.2275905218762,
+        -93.40494864348199,
+        0.5177317362368967
+      ],
+      "coco_hip_midpoint_stage1_z_range_mm": [
+        819.5308960008643,
+        861.5842164363934
+      ],
+      "left_ankle_stage1_endpoint_delta_xyz_mm": [
+        -0.05630703411560489,
+        -237.21154776630908,
+        21.825133216154768
+      ],
+      "left_ankle_stage1_z_range_mm": [
+        91.21485874594248,
+        157.1336164657107
+      ],
+      "right_ankle_stage1_endpoint_delta_xyz_mm": [
+        27.190753351694156,
+        -252.06846712440682,
+        51.028163893761416
+      ],
+      "right_ankle_stage1_z_range_mm": [
+        75.75854875511754,
+        166.532044551103
+      ],
+      "sole_stage1_35_61_abs_height_mm": {
+        "n": 54,
+        "median": 60.65479390414339,
+        "p95": 89.0561852787892,
+        "max": 103.99235339385348
+      },
+      "sole_stage1_endpoint_delta_mm": [
+        16.046645097700207,
+        73.16990006001845
+      ],
+      "final_generalized_velocity_norm": 0.0,
+      "final_generalized_acceleration_norm": 0.0,
+      "same_timestamps_as_control": true,
+      "same_raw_pixels_as_control": true,
+      "frame1_coco_hip_midpoint_delta_xyz_mm": [
+        -5.827402116233216,
+        64.24699376741773,
+        -3.6750510428546477
+      ],
+      "frame1_generalized_velocity_norm": 0.0,
+      "frame1_generalized_acceleration_norm": 0.0
+    },
+    "reset_va_cross_covariance_at_detector_switch_frame1_only": {
+      "raw_error_all_62": {
+        "n": 1488,
+        "median": 16.520603705961314,
+        "p95": 126.1841904441378,
+        "max": 201.94894707004568
+      },
+      "raw_error_stage1_35_61": {
+        "n": 648,
+        "median": 17.991418630972863,
+        "p95": 138.46667658367122,
+        "max": 201.94894707004568
+      },
+      "solver_status_counts": {
+        "not_run": 1,
+        "feasible_unconverged": 61
+      },
+      "seconds": 36.84869139999955,
+      "native_pelvis_stage1_endpoint_delta_xyz_mm": [
+        86.80428023040929,
+        -28.299395112339198,
+        13.968256622049012
+      ],
+      "native_pelvis_stage1_z_range_mm": [
+        895.7599510467567,
+        942.5730060918577
+      ],
+      "coco_hip_midpoint_stage1_endpoint_delta_xyz_mm": [
+        85.8640336609328,
+        -19.161471463400233,
+        29.105701019035678
+      ],
+      "coco_hip_midpoint_stage1_z_range_mm": [
+        802.9011261987071,
+        861.6049938811113
+      ],
+      "left_ankle_stage1_endpoint_delta_xyz_mm": [
+        -5.503643335239246,
+        -273.816693355178,
+        70.09272502842191
+      ],
+      "left_ankle_stage1_z_range_mm": [
+        74.03453919601452,
+        158.24474271532142
+      ],
+      "right_ankle_stage1_endpoint_delta_xyz_mm": [
+        30.749512954670877,
+        -287.6415331078731,
+        82.59858757372535
+      ],
+      "right_ankle_stage1_z_range_mm": [
+        62.27026568873407,
+        166.5596034008861
+      ],
+      "sole_stage1_35_61_abs_height_mm": {
+        "n": 54,
+        "median": 55.92849853079616,
+        "p95": 87.53903139758357,
+        "max": 103.64032884886342
+      },
+      "sole_stage1_endpoint_delta_mm": [
+        67.2555102360185,
+        119.43997604658568
+      ],
+      "final_generalized_velocity_norm": 2.5219032646541715,
+      "final_generalized_acceleration_norm": 0.9640663045589792,
+      "same_timestamps_as_control": true,
+      "same_raw_pixels_as_control": true,
+      "frame1_coco_hip_midpoint_delta_xyz_mm": [
+        -7.7325607955624065,
+        85.88900176377592,
+        2.270813602358885
+      ],
+      "frame1_generalized_velocity_norm": 0.0,
+      "frame1_generalized_acceleration_norm": 0.0
+    }
+  },
+  "interpretation": [
+    "Baseline prefix exactly reproduced saved sigma0.75 coco/v/a arrays; all three have identical input pixels and timestamps.",
+    "Retaining predicted v/a after all unconverged updates leaves zero derivatives throughout this prefix but does not remove right ankle/sole upward movement in the stationary segment. The proposed v/a feedback is not the dominant cause in this tested sigma0.75 prefix.",
+    "Resetting detector-switch derivative prediction/cross covariance on frame1 only worsens Stage1 endpoint upward displacement despite a small absolute-height median reduction; do not promote this control to a fix.",
+    "All 61 post-initialization updates remain unconverged in all controls; no derivatives are certified.",
+    "These bounded controls do not rule out derivative feedback effects in other priors or later frames and are not physical contact validation."
+  ],
+  "reproduction_commands": [
+    ".venv-cuda/Scripts/python.exe research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\slope_motion_20261015\\prefix_derivative_feedback.py",
+    ".venv-cuda/Scripts/python.exe research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\slope_motion_20261015\\prefix_derivative_feedback.py --only-detector-switch-reset"
+  ]
+}

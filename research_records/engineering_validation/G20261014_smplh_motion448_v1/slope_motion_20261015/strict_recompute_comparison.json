@@ -1,0 +1,36 @@
+{
+  "sources": {
+    "left": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json"
+  },
+  "calibration": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results\\stereo_fisheye.json",
+  "previous": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\visualization\\first_instance_strict.jsonl",
+  "output": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\slope_motion_20261015\\first_instance_strict.jsonl",
+  "implementation": [
+    "walker_tools.stereo.evaluate_offline_stereo_predictions._records/_result",
+    "pose_app.triangulation.triangulate_matches/TriangulatedPerson.to_dict"
+  ],
+  "parameters": {
+    "keypoint_threshold": 0.25,
+    "max_association_cost": 0.05,
+    "max_reprojection_error_px": 10.0,
+    "max_matches": 1,
+    "left_instance": 0,
+    "right_instance": 0,
+    "score_source": "raw point third channel"
+  },
+  "frames": 448,
+  "pair_outcomes": {
+    "associated": 447,
+    "association_rejected": 1
+  },
+  "accepted_points": 5286,
+  "comparison": {
+    "whole_records_equal": true,
+    "changed_valid": [],
+    "changed_reasons": [],
+    "changed_presence": [],
+    "max_abs_xyz_difference_mm": 0.0
+  },
+  "scene_replayed": false
+}

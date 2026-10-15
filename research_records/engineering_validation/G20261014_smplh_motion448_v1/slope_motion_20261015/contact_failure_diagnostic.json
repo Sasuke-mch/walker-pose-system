@@ -1,0 +1,1254 @@
+{
+  "scope": "read-only contact80 before acceptance repair; no optimizer rerun",
+  "trajectory_rows_read": 448,
+  "through_frame": 447,
+  "expected_total": 448,
+  "final_complete": true,
+  "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\slope_motion_20261015\\run_contact80",
+  "ground_tolerance_mm": 5,
+  "whole_sole_and_heel_episode_displacement_limit_mm": 10,
+  "constraint_conflict_frames": [
+    75,
+    78,
+    146,
+    147,
+    202,
+    224,
+    274,
+    360,
+    363
+  ],
+  "physical_output_unsatisfied_frames": [
+    75,
+    78,
+    146,
+    147,
+    224,
+    274,
+    360,
+    363
+  ],
+  "rejected_optimizer_but_satisfied_prediction_frames": [
+    202
+  ],
+  "solver_status_counts": {
+    "constrained": 436,
+    "feasible_unconverged": 3,
+    "constraint_conflict": 9
+  },
+  "failure_details": [
+    {
+      "frame": 75,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "held",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 0.0,
+      "scene_step_translation_mm": 0.0,
+      "nearest_stage_boundary_frames": 7,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          3.7637948989868164,
+          -5.395412445068359
+        ],
+        "sole_lower_bound_excess_mm": [
+          0.0,
+          0.3954124450683594
+        ],
+        "sole_upper_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "heel_displacement_mm": [
+          9.79725961465054,
+          11.709170497006237
+        ],
+        "heel_10mm_excess_mm": [
+          0.0,
+          1.7091704970062374
+        ],
+        "sole_max_displacement_mm": [
+          10.822734209369143,
+          11.825701267866904
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          0.822734209369143,
+          1.8257012678669042
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 335.2532980402684,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 0.0001861921597432377,
+        "optimizer_last_minimum_slack_m": 0.0001861921597432377,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            0.0038992762565612793,
+            -0.004797935485839844
+          ],
+          "heel_m": [
+            [
+              0.18292203545570374,
+              0.1324361264705658,
+              0.08341944217681885
+            ],
+            [
+              0.01698094606399536,
+              0.14030879735946655,
+              0.07371091842651367
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": true,
+          "iterations": 77,
+          "message": "Optimization terminated successfully"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 27.553281414398384,
+          "p95": 118.42592142656824
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 73,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 74,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted_rotation_held"
+        },
+        {
+          "frame": 75,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "held"
+        },
+        {
+          "frame": 76,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 77,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        }
+      ]
+    },
+    {
+      "frame": 78,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "protocol_support_window_reestimated",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 1.0934265467117565,
+      "scene_step_translation_mm": 8.542536136470652,
+      "nearest_stage_boundary_frames": 4,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          3.7273764610290527,
+          -13.417601585388184
+        ],
+        "sole_lower_bound_excess_mm": [
+          0.0,
+          8.417601585388184
+        ],
+        "sole_upper_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "heel_displacement_mm": [
+          11.126779806789997,
+          11.373881993075232
+        ],
+        "heel_10mm_excess_mm": [
+          1.1267798067899975,
+          1.3738819930752317
+        ],
+        "sole_max_displacement_mm": [
+          28.878198904488606,
+          18.955666220091434
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          18.878198904488606,
+          8.955666220091434
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 493.6061637589307,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 0.0001492219086032861,
+        "optimizer_last_minimum_slack_m": 0.0001492219086032861,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            0.004801273345947266,
+            -0.004816949367523193
+          ],
+          "heel_m": [
+            [
+              0.1811414361000061,
+              0.1280289888381958,
+              0.08079522848129272
+            ],
+            [
+              0.020836934447288513,
+              0.14891493320465088,
+              0.07884401082992554
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": true,
+          "iterations": 31,
+          "message": "Optimization terminated successfully"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 44.82293077144031,
+          "p95": 117.62253947826021
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 76,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 77,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 78,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 79,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 80,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        }
+      ]
+    },
+    {
+      "frame": 146,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "accepted",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 0.41436078034180657,
+      "scene_step_translation_mm": 2.9408309502253,
+      "nearest_stage_boundary_frames": 1,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          -11.207520961761475,
+          6.950736045837402
+        ],
+        "sole_lower_bound_excess_mm": [
+          6.207520961761475,
+          0.0
+        ],
+        "sole_upper_bound_excess_mm": [
+          0.0,
+          1.9507360458374023
+        ],
+        "heel_displacement_mm": [
+          28.518057238559056,
+          24.023123193032774
+        ],
+        "heel_10mm_excess_mm": [
+          18.518057238559056,
+          14.023123193032774
+        ],
+        "sole_max_displacement_mm": [
+          46.845176638731864,
+          35.39301626954065
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          36.845176638731864,
+          25.393016269540652
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 468.58044594014996,
+        "feasible_start_objective": null,
+        "minimum_slack_m": -2.7442641852424426e-05,
+        "optimizer_last_minimum_slack_m": -2.7442641852424426e-05,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            0.004518330097198486,
+            0.004136204719543457
+          ],
+          "heel_m": [
+            [
+              0.17754290997982025,
+              0.05524933338165283,
+              0.027287065982818604
+            ],
+            [
+              0.03202950954437256,
+              0.021672457456588745,
+              0.10143417119979858
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": true,
+          "iterations": 34,
+          "message": "Optimization terminated successfully"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 44.17322951906647,
+          "p95": 135.44277477174055
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 144,
+          "stage": "transition",
+          "scene_pose_status": "held"
+        },
+        {
+          "frame": 145,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 146,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 147,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 148,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        }
+      ]
+    },
+    {
+      "frame": 147,
+      "model_status": "expired",
+      "pose_available": false,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "protocol_support_window_reestimated",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 0.9994861107598949,
+      "scene_step_translation_mm": 8.894053418119332,
+      "nearest_stage_boundary_frames": 2,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": null,
+        "sole_lower_bound_excess_mm": null,
+        "sole_upper_bound_excess_mm": null,
+        "heel_displacement_mm": null,
+        "heel_10mm_excess_mm": null,
+        "sole_max_displacement_mm": null,
+        "sole_vertex_10mm_excess_mm": null
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 287.01088055858435,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 0.00013593018055986852,
+        "optimizer_last_minimum_slack_m": 0.00013593018055986852,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            0.004816889762878418,
+            0.004853487014770508
+          ],
+          "heel_m": [
+            [
+              0.18641263246536255,
+              0.07023382186889648,
+              0.029443323612213135
+            ],
+            [
+              0.0401967391371727,
+              0.025471478700637817,
+              0.10144692659378052
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": true,
+          "iterations": 1,
+          "message": "Optimization terminated successfully"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 0,
+          "median": null,
+          "p95": null
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 145,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 146,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 147,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 148,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 149,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        }
+      ]
+    },
+    {
+      "frame": 202,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "rejected",
+      "scene_pose_reason": "stage2_vote_confidence_below_gate",
+      "scene_step_rotation_deg": 0.0,
+      "scene_step_translation_mm": 0.0,
+      "nearest_stage_boundary_frames": 4,
+      "output_constraint_satisfied": true,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          -1.8813014030456543,
+          -1.8799304962158203
+        ],
+        "sole_lower_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "sole_upper_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "heel_displacement_mm": [
+          9.854539853718942,
+          8.94208810396136
+        ],
+        "heel_10mm_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "sole_max_displacement_mm": [
+          9.746130381647001,
+          7.158805767144576
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          0.0,
+          0.0
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 275.18514299095693,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 9.179623038468691e-05,
+        "optimizer_last_minimum_slack_m": 9.179623038468691e-05,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            -0.002380549907684326,
+            0.0004443526268005371
+          ],
+          "heel_m": [
+            [
+              0.1882219910621643,
+              0.032010920345783234,
+              0.03747040033340454
+            ],
+            [
+              0.007897034287452698,
+              0.007762432098388672,
+              0.030251264572143555
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": true,
+          "iterations": 1,
+          "message": "Optimization terminated successfully"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 27.68356802753491,
+          "p95": 116.89465644692783
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 200,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 201,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "held"
+        },
+        {
+          "frame": 202,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "rejected"
+        },
+        {
+          "frame": 203,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 204,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "held"
+        }
+      ]
+    },
+    {
+      "frame": 224,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "protocol_support_window_reestimated",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 0.38576810115247,
+      "scene_step_translation_mm": 1.5885368958984878,
+      "nearest_stage_boundary_frames": 1,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          7.319033145904541,
+          -0.2638101577758789
+        ],
+        "sole_lower_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "sole_upper_bound_excess_mm": [
+          2.319033145904541,
+          0.0
+        ],
+        "heel_displacement_mm": [
+          9.448088642775911,
+          14.55819291722254
+        ],
+        "heel_10mm_excess_mm": [
+          0.0,
+          4.55819291722254
+        ],
+        "sole_max_displacement_mm": [
+          17.93567720464309,
+          15.815602809393898
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          7.935677204643088,
+          5.815602809393898
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 308.364842264045,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 1.4779729715762996e-06,
+        "optimizer_last_minimum_slack_m": 1.4779729715762996e-06,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            0.0041702985763549805,
+            -0.00189208984375
+          ],
+          "heel_m": [
+            [
+              0.20269587635993958,
+              0.15558838844299316,
+              0.04011029005050659
+            ],
+            [
+              0.002858765423297882,
+              0.15275341272354126,
+              0.026234984397888184
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": true,
+          "iterations": 31,
+          "message": "Optimization terminated successfully"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 37.080726723255054,
+          "p95": 107.85235983916529
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 222,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 223,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 224,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "protocol_support_window_reestimated"
+        },
+        {
+          "frame": 225,
+          "stage": "transition",
+          "scene_pose_status": "protocol_support_restored"
+        },
+        {
+          "frame": 226,
+          "stage": "transition",
+          "scene_pose_status": "protocol_support_restored"
+        }
+      ]
+    },
+    {
+      "frame": 274,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "held",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 0.0,
+      "scene_step_translation_mm": 0.0,
+      "nearest_stage_boundary_frames": 5,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          -4.052460193634033,
+          -2.4878382682800293
+        ],
+        "sole_lower_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "sole_upper_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "heel_displacement_mm": [
+          8.653610727581409,
+          13.152697040858152
+        ],
+        "heel_10mm_excess_mm": [
+          0.0,
+          3.1526970408581523
+        ],
+        "sole_max_displacement_mm": [
+          17.637315556106813,
+          12.127087416899426
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          7.637315556106813,
+          2.1270874168994265
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 735.0828322551351,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 9.556609124144674e-05,
+        "optimizer_last_minimum_slack_m": 9.556609124144674e-05,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            -0.0028270483016967773,
+            -0.00041931867599487305
+          ],
+          "heel_m": [
+            [
+              0.1818535327911377,
+              -0.049951568245887756,
+              0.029071807861328125
+            ],
+            [
+              0.06751412898302078,
+              -0.052198462188243866,
+              0.012665212154388428
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": false,
+          "iterations": 80,
+          "message": "Iteration limit reached"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 57.223663586402694,
+          "p95": 271.6883937158584
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 272,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 273,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 274,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "held"
+        },
+        {
+          "frame": 275,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 276,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        }
+      ]
+    },
+    {
+      "frame": 360,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "accepted",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 0.44418338608301217,
+      "scene_step_translation_mm": 12.932786887484587,
+      "nearest_stage_boundary_frames": 8,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          -5.569756031036377,
+          -2.449154853820801
+        ],
+        "sole_lower_bound_excess_mm": [
+          0.569756031036377,
+          0.0
+        ],
+        "sole_upper_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "heel_displacement_mm": [
+          11.737877282703545,
+          21.994249412393117
+        ],
+        "heel_10mm_excess_mm": [
+          1.7378772827035451,
+          11.994249412393117
+        ],
+        "sole_max_displacement_mm": [
+          15.774891276333188,
+          15.825298041975788
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          5.774891276333188,
+          5.825298041975788
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 259.8440175753318,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 3.6010341608019164e-05,
+        "optimizer_last_minimum_slack_m": 3.6010341608019164e-05,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            -0.004799306392669678,
+            -0.000565648078918457
+          ],
+          "heel_m": [
+            [
+              0.2099708914756775,
+              -0.10573647916316986,
+              0.023615121841430664
+            ],
+            [
+              0.030785977840423584,
+              -0.14027301967144012,
+              0.007416129112243652
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": true,
+          "iterations": 73,
+          "message": "Optimization terminated successfully"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 24.16359658285831,
+          "p95": 88.01698537864078
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 358,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "unavailable"
+        },
+        {
+          "frame": 359,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 360,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 361,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "held"
+        },
+        {
+          "frame": 362,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "unavailable"
+        }
+      ]
+    },
+    {
+      "frame": 363,
+      "model_status": "predicted",
+      "pose_available": true,
+      "stage": "stage2_feet_static_walker_moving",
+      "scene_pose_status": "accepted",
+      "scene_pose_reason": null,
+      "scene_step_rotation_deg": 1.1007593119762442,
+      "scene_step_translation_mm": 8.011783484624688,
+      "nearest_stage_boundary_frames": 5,
+      "output_constraint_satisfied": false,
+      "output_geometry": {
+        "sole_min_height_mm": [
+          -9.260773658752441,
+          0.460207462310791
+        ],
+        "sole_lower_bound_excess_mm": [
+          4.260773658752441,
+          0.0
+        ],
+        "sole_upper_bound_excess_mm": [
+          0.0,
+          0.0
+        ],
+        "heel_displacement_mm": [
+          33.96829599068879,
+          50.17507476104678
+        ],
+        "heel_10mm_excess_mm": [
+          23.968295990688787,
+          40.17507476104678
+        ],
+        "sole_max_displacement_mm": [
+          64.06373339229832,
+          49.72084339816539
+        ],
+        "sole_vertex_10mm_excess_mm": [
+          54.06373339229832,
+          39.72084339816539
+        ]
+      },
+      "optimizer": {
+        "status": "constraint_conflict",
+        "optimizer_success": false,
+        "optimizer_message": "Iteration limit reached",
+        "iterations": 80,
+        "selected_estimate": "optimizer_last_iterate",
+        "objective": 443.2627454819837,
+        "feasible_start_objective": null,
+        "minimum_slack_m": 0.00011759809523315991,
+        "optimizer_last_minimum_slack_m": 0.00011759809523315991,
+        "optimizer_last_geometry": {
+          "sole_min_m": [
+            -0.004739880561828613,
+            -0.0017278194427490234
+          ],
+          "heel_m": [
+            [
+              0.20954158902168274,
+              -0.10551318526268005,
+              0.025360703468322754
+            ],
+            [
+              0.031713321805000305,
+              -0.14672952890396118,
+              0.0026424527168273926
+            ]
+          ]
+        },
+        "feasibility_bootstrap": {
+          "optimizer_success": false,
+          "iterations": 80,
+          "message": "Iteration limit reached"
+        }
+      },
+      "observations": {
+        "pre_optimizer_valid_views": 24,
+        "pre_optimizer_distinct_joint_support": 12,
+        "pre_optimizer_reason_counts": {
+          "available": 24
+        },
+        "used_views_after_failed_update": 0,
+        "output_reprojection_px": {
+          "n": 24,
+          "median": 48.51202045005513,
+          "p95": 100.8422354443781
+        },
+        "pre_optimizer_ankle_views": [
+          [
+            true,
+            true
+          ],
+          [
+            true,
+            true
+          ]
+        ],
+        "pre_optimizer_ankle_reasons": [
+          [
+            "available",
+            "available"
+          ],
+          [
+            "available",
+            "available"
+          ]
+        ]
+      },
+      "local_scene_context": [
+        {
+          "frame": 361,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "held"
+        },
+        {
+          "frame": 362,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "unavailable"
+        },
+        {
+          "frame": 363,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        },
+        {
+          "frame": 364,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "held"
+        },
+        {
+          "frame": 365,
+          "stage": "stage2_feet_static_walker_moving",
+          "scene_pose_status": "accepted"
+        }
+      ]
+    }
+  ],
+  "interpretation": [
+    "Rejected optimizer geometry and returned predicted output differ; positive last-iterate slack can coexist with output constraint violations.",
+    "Most conflicts have finite positive final physical slack but feasible_start_objective=null and hit the80-iteration budget. The old acceptance rule then rejected a current-frame feasible estimate solely for lacking a feasible baseline. This is not physical infeasibility.",
+    "Bootstrap success is insufficient: its physical and0.2mm interior-margin checks did not establish a feasible start; bootstrap geometry was not saved, so its exact rejection check is unavailable.",
+    "Whole-sole10mm balls are commonly exceeded by predictions; some frames also exceed5mm height or heel10mm. Heel-only stationarity would miss sole rotation.",
+    "Zero used_views follows optimizer rejection; pre-optimizer gate support is separately reconstructed and recorded.",
+    "Scene statuses at conflict frames include held, accepted, rejected, and fixed-lag support-window reestimation. Association with stage closures is not alone proof of causation.",
+    "Hard contact cannot resolve biased2D/model targets, detector semantics, prior/optimizer error, or uncertain camera poses. More weight cannot manufacture consistent observations.",
+    "No independent contact truth; an80-step optimization failure is not proof of physical infeasibility."
+  ]
+}

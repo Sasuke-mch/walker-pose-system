@@ -1,0 +1,1184 @@
+{
+  "virtual_view_geometry_only_precheck": [
+    {
+      "side": "left",
+      "frame": 0,
+      "support_points": 17,
+      "full_raw_C3_box": [
+        0,
+        0,
+        1919,
+        1079
+      ],
+      "builder": "LocalPerspectiveModelInput(default maxHFOV130,margin1.35)",
+      "test_is_geometry_only": true,
+      "focal_px": 447.65535182879864,
+      "hfov_deg": 130.0,
+      "all_support_inside": false,
+      "support_outside_count": 2,
+      "support_outside_coco17_indices": [
+        15,
+        16
+      ],
+      "raw_virtual_raw_max_abs_px": 4.547473508864641e-13,
+      "parameters": {
+        "source_size_wh": [
+          1920,
+          1080
+        ],
+        "output_size_wh": [
+          1920,
+          1080
+        ],
+        "margin": 1.35,
+        "min_horizontal_fov_deg": 35,
+        "max_horizontal_fov_deg": 130,
+        "support_score_min": 0.25,
+        "support_filter": "finite/raw-in-bounds;all17joints",
+        "aim": "existing support mean camera-ray direction,not modified",
+        "implementation": "realtime_app/pose_app/local_perspective.py:LocalPerspectiveModelInput.build"
+      },
+      "raw_bounds_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "selected_support_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "virtual_forward_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "feet": [
+        {
+          "coco17_index": 15,
+          "raw_xy_px": [
+            348.74794166807123,
+            803.6156273065728
+          ],
+          "confidence": 0.9211506843566895,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            -1.6252606756262264,
+            0.5287448148095688,
+            0.010836530405411215
+          ],
+          "virtual_forward": true,
+          "virtual_xy_px": [
+            -66179.76066203481,
+            22381.864414262778
+          ],
+          "inside_virtual_image": false,
+          "unavailable_reason": null
+        },
+        {
+          "coco17_index": 16,
+          "raw_xy_px": [
+            366.24080243186336,
+            613.6279981745051
+          ],
+          "confidence": 0.9167619347572327,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            -1.5101506433371514,
+            0.14223713281921682,
+            0.11076847606595464
+          ],
+          "virtual_forward": true,
+          "virtual_xy_px": [
+            -5143.563268244783,
+            1114.3315404952693
+          ],
+          "inside_virtual_image": false,
+          "unavailable_reason": null
+        }
+      ],
+      "virtual_image_contains_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "camera_from_virtual": [
+        [
+          0.7992467508891182,
+          0.020703155009670744,
+          0.6006463273556523
+        ],
+        [
+          -3.469446951953614e-18,
+          0.9994065028232617,
+          -0.034447672121320626
+        ],
+        [
+          -0.6010030209517984,
+          0.027532190018659166,
+          0.7987724001989482
+        ]
+      ],
+      "forward_coordinates_note": "virtual_ray_xyz uses existing support-mean aimed camera basis;negative z means behind that virtual camera,not behind original calibrated camera"
+    },
+    {
+      "side": "left",
+      "frame": 35,
+      "support_points": 17,
+      "full_raw_C3_box": [
+        0,
+        0,
+        1919,
+        1079
+      ],
+      "builder": "LocalPerspectiveModelInput(default maxHFOV130,margin1.35)",
+      "test_is_geometry_only": true,
+      "focal_px": 447.65535182879864,
+      "hfov_deg": 130.0,
+      "all_support_inside": false,
+      "support_outside_count": 2,
+      "support_outside_coco17_indices": [
+        15,
+        16
+      ],
+      "raw_virtual_raw_max_abs_px": 4.547473508864641e-13,
+      "parameters": {
+        "source_size_wh": [
+          1920,
+          1080
+        ],
+        "output_size_wh": [
+          1920,
+          1080
+        ],
+        "margin": 1.35,
+        "min_horizontal_fov_deg": 35,
+        "max_horizontal_fov_deg": 130,
+        "support_score_min": 0.25,
+        "support_filter": "finite/raw-in-bounds;all17joints",
+        "aim": "existing support mean camera-ray direction,not modified",
+        "implementation": "realtime_app/pose_app/local_perspective.py:LocalPerspectiveModelInput.build"
+      },
+      "raw_bounds_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "selected_support_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "virtual_forward_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "feet": [
+        {
+          "coco17_index": 15,
+          "raw_xy_px": [
+            397.8289269038605,
+            818.2026761947793
+          ],
+          "confidence": 0.9295634627342224,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            -1.4920098245929083,
+            0.5358710828238404,
+            0.12154959031723789
+          ],
+          "virtual_forward": true,
+          "virtual_xy_px": [
+            -4535.427471305854,
+            2513.0612229567964
+          ],
+          "inside_virtual_image": false,
+          "unavailable_reason": null
+        },
+        {
+          "coco17_index": 16,
+          "raw_xy_px": [
+            418.09380971817745,
+            654.4164231787336
+          ],
+          "confidence": 0.9226544499397278,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            -1.3885384196443051,
+            0.21718695703992616,
+            0.21850504914143576
+          ],
+          "virtual_forward": true,
+          "virtual_xy_px": [
+            -1885.2244455725586,
+            984.4549520633814
+          ],
+          "inside_virtual_image": false,
+          "unavailable_reason": null
+        }
+      ],
+      "virtual_image_contains_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "camera_from_virtual": [
+        [
+          0.8118620627018666,
+          0.040866659214784565,
+          0.5824172965409706
+        ],
+        [
+          0.0,
+          0.9975473268034694,
+          -0.06999521974572566
+        ],
+        [
+          -0.5838492880405612,
+          0.05682646348203527,
+          0.8098708303813977
+        ]
+      ],
+      "forward_coordinates_note": "virtual_ray_xyz uses existing support-mean aimed camera basis;negative z means behind that virtual camera,not behind original calibrated camera"
+    },
+    {
+      "side": "left",
+      "frame": 61,
+      "support_points": 16,
+      "full_raw_C3_box": [
+        0,
+        0,
+        1919,
+        1079
+      ],
+      "builder": "LocalPerspectiveModelInput(default maxHFOV130,margin1.35)",
+      "test_is_geometry_only": true,
+      "status": "view_rejected",
+      "reason": "subject support spans directions behind the local virtual camera",
+      "parameters": {
+        "source_size_wh": [
+          1920,
+          1080
+        ],
+        "output_size_wh": [
+          1920,
+          1080
+        ],
+        "margin": 1.35,
+        "min_horizontal_fov_deg": 35,
+        "max_horizontal_fov_deg": 130,
+        "support_score_min": 0.25,
+        "support_filter": "finite/raw-in-bounds;all17joints",
+        "aim": "existing support mean camera-ray direction,not modified",
+        "implementation": "realtime_app/pose_app/local_perspective.py:LocalPerspectiveModelInput.build"
+      },
+      "raw_bounds_mask_coco17": [
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "selected_support_mask_coco17": [
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "virtual_forward_mask_coco17": [
+        true,
+        true,
+        true,
+        null,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "feet": [
+        {
+          "coco17_index": 15,
+          "raw_xy_px": [
+            236.0357966650099,
+            766.971431975669
+          ],
+          "confidence": 0.8847324848175049,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            -1.9882238451137684,
+            0.49172877448397556,
+            -0.5724452420578177
+          ],
+          "virtual_forward": false,
+          "virtual_xy_px": null,
+          "inside_virtual_image": null,
+          "unavailable_reason": "whole_view_builder_rejected_before_focal_or_image_exists"
+        },
+        {
+          "coco17_index": 16,
+          "raw_xy_px": [
+            299.87393214210624,
+            582.423875451088
+          ],
+          "confidence": 0.8871248960494995,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            -1.6829707413034827,
+            0.06728467027543729,
+            -0.23750604191631597
+          ],
+          "virtual_forward": false,
+          "virtual_xy_px": null,
+          "inside_virtual_image": null,
+          "unavailable_reason": "whole_view_builder_rejected_before_focal_or_image_exists"
+        }
+      ],
+      "virtual_image_contains_mask_coco17": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "camera_from_virtual": [
+        [
+          0.7211571630159521,
+          0.0656071712070524,
+          0.6896579190562464
+        ],
+        [
+          0.0,
+          0.9955056214572984,
+          -0.09470246906452964
+        ],
+        [
+          -0.6927714964046829,
+          0.06829536392118217,
+          0.7179160097365775
+        ]
+      ],
+      "forward_coordinates_note": "virtual_ray_xyz uses existing support-mean aimed camera basis;negative z means behind that virtual camera,not behind original calibrated camera"
+    },
+    {
+      "side": "right",
+      "frame": 0,
+      "support_points": 17,
+      "full_raw_C3_box": [
+        0,
+        0,
+        1919,
+        1079
+      ],
+      "builder": "LocalPerspectiveModelInput(default maxHFOV130,margin1.35)",
+      "test_is_geometry_only": true,
+      "status": "view_rejected",
+      "reason": "subject support spans directions behind the local virtual camera",
+      "parameters": {
+        "source_size_wh": [
+          1920,
+          1080
+        ],
+        "output_size_wh": [
+          1920,
+          1080
+        ],
+        "margin": 1.35,
+        "min_horizontal_fov_deg": 35,
+        "max_horizontal_fov_deg": 130,
+        "support_score_min": 0.25,
+        "support_filter": "finite/raw-in-bounds;all17joints",
+        "aim": "existing support mean camera-ray direction,not modified",
+        "implementation": "realtime_app/pose_app/local_perspective.py:LocalPerspectiveModelInput.build"
+      },
+      "raw_bounds_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "selected_support_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "virtual_forward_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false
+      ],
+      "feet": [
+        {
+          "coco17_index": 15,
+          "raw_xy_px": [
+            1574.5019595736549,
+            433.84452069566623
+          ],
+          "confidence": 0.9301992654800415,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            1.4431841361752942,
+            -0.10850008507466985,
+            0.009386431173569965
+          ],
+          "virtual_forward": true,
+          "virtual_xy_px": null,
+          "inside_virtual_image": null,
+          "unavailable_reason": "whole_view_builder_rejected_before_focal_or_image_exists"
+        },
+        {
+          "coco17_index": 16,
+          "raw_xy_px": [
+            1628.94702897753,
+            625.8742943266602
+          ],
+          "confidence": 0.9282166361808777,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            1.581841739117202,
+            0.2520129320852087,
+            -0.09316008763402461
+          ],
+          "virtual_forward": false,
+          "virtual_xy_px": null,
+          "inside_virtual_image": null,
+          "unavailable_reason": "whole_view_builder_rejected_before_focal_or_image_exists"
+        }
+      ],
+      "virtual_image_contains_mask_coco17": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "camera_from_virtual": [
+        [
+          0.7295204519540507,
+          0.05265769268884882,
+          -0.6819289388062691
+        ],
+        [
+          -6.938893903907228e-18,
+          0.9970319000955972,
+          0.07698954599011115
+        ],
+        [
+          0.6839589974411899,
+          -0.05616544838644305,
+          0.7273551623703459
+        ]
+      ],
+      "forward_coordinates_note": "virtual_ray_xyz uses existing support-mean aimed camera basis;negative z means behind that virtual camera,not behind original calibrated camera"
+    },
+    {
+      "side": "right",
+      "frame": 35,
+      "support_points": 17,
+      "full_raw_C3_box": [
+        0,
+        0,
+        1919,
+        1079
+      ],
+      "builder": "LocalPerspectiveModelInput(default maxHFOV130,margin1.35)",
+      "test_is_geometry_only": true,
+      "focal_px": 447.65535182879864,
+      "hfov_deg": 130.0,
+      "all_support_inside": false,
+      "support_outside_count": 2,
+      "support_outside_coco17_indices": [
+        15,
+        16
+      ],
+      "raw_virtual_raw_max_abs_px": 4.547473508864641e-13,
+      "parameters": {
+        "source_size_wh": [
+          1920,
+          1080
+        ],
+        "output_size_wh": [
+          1920,
+          1080
+        ],
+        "margin": 1.35,
+        "min_horizontal_fov_deg": 35,
+        "max_horizontal_fov_deg": 130,
+        "support_score_min": 0.25,
+        "support_filter": "finite/raw-in-bounds;all17joints",
+        "aim": "existing support mean camera-ray direction,not modified",
+        "implementation": "realtime_app/pose_app/local_perspective.py:LocalPerspectiveModelInput.build"
+      },
+      "raw_bounds_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "selected_support_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "virtual_forward_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "feet": [
+        {
+          "coco17_index": 15,
+          "raw_xy_px": [
+            1532.195107762776,
+            456.38418592544303
+          ],
+          "confidence": 0.9442285895347595,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            1.3581817321861533,
+            -0.07570457199293411,
+            0.08147421252750642
+          ],
+          "virtual_forward": true,
+          "virtual_xy_px": [
+            8421.951029692056,
+            123.54560462484841
+          ],
+          "inside_virtual_image": false,
+          "unavailable_reason": null
+        },
+        {
+          "coco17_index": 16,
+          "raw_xy_px": [
+            1570.6968019273545,
+            641.4728147349458
+          ],
+          "confidence": 0.9441357851028442,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            1.4476420672579362,
+            0.2526736081198425,
+            0.03595691024873715
+          ],
+          "virtual_forward": true,
+          "virtual_xy_px": [
+            18982.314375806414,
+            3685.2289338344267
+          ],
+          "inside_virtual_image": false,
+          "unavailable_reason": null
+        }
+      ],
+      "virtual_image_contains_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "camera_from_virtual": [
+        [
+          0.725531881475689,
+          0.08314112860206241,
+          -0.6831478915265143
+        ],
+        [
+          6.938893903907228e-18,
+          0.9926754598225775,
+          0.12081155352876781
+        ],
+        [
+          0.6881885562564571,
+          -0.08765263373572783,
+          0.7202176940598193
+        ]
+      ],
+      "forward_coordinates_note": "virtual_ray_xyz uses existing support-mean aimed camera basis;negative z means behind that virtual camera,not behind original calibrated camera"
+    },
+    {
+      "side": "right",
+      "frame": 61,
+      "support_points": 17,
+      "full_raw_C3_box": [
+        0,
+        0,
+        1919,
+        1079
+      ],
+      "builder": "LocalPerspectiveModelInput(default maxHFOV130,margin1.35)",
+      "test_is_geometry_only": true,
+      "status": "view_rejected",
+      "reason": "subject support spans directions behind the local virtual camera",
+      "parameters": {
+        "source_size_wh": [
+          1920,
+          1080
+        ],
+        "output_size_wh": [
+          1920,
+          1080
+        ],
+        "margin": 1.35,
+        "min_horizontal_fov_deg": 35,
+        "max_horizontal_fov_deg": 130,
+        "support_score_min": 0.25,
+        "support_filter": "finite/raw-in-bounds;all17joints",
+        "aim": "existing support mean camera-ray direction,not modified",
+        "implementation": "realtime_app/pose_app/local_perspective.py:LocalPerspectiveModelInput.build"
+      },
+      "raw_bounds_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "selected_support_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "virtual_forward_mask_coco17": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "feet": [
+        {
+          "coco17_index": 15,
+          "raw_xy_px": [
+            1673.6748429858499,
+            355.25922875962374
+          ],
+          "confidence": 0.9100964069366455,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            1.6464636372410644,
+            -0.29881170896986503,
+            -0.519978888617079
+          ],
+          "virtual_forward": false,
+          "virtual_xy_px": null,
+          "inside_virtual_image": null,
+          "unavailable_reason": "whole_view_builder_rejected_before_focal_or_image_exists"
+        },
+        {
+          "coco17_index": 16,
+          "raw_xy_px": [
+            1708.6824966763693,
+            564.7271393638975
+          ],
+          "confidence": 0.9130768179893494,
+          "raw_in_bounds": true,
+          "selected_support": true,
+          "virtual_ray_xyz": [
+            1.7271808854493067,
+            0.12594712290739646,
+            -0.6401249100506806
+          ],
+          "virtual_forward": false,
+          "virtual_xy_px": null,
+          "inside_virtual_image": null,
+          "unavailable_reason": "whole_view_builder_rejected_before_focal_or_image_exists"
+        }
+      ],
+      "virtual_image_contains_mask_coco17": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "camera_from_virtual": [
+        [
+          0.6000288484088515,
+          -0.023503045039633078,
+          -0.7996330333040353
+        ],
+        [
+          0.0,
+          0.9995683263540588,
+          -0.029379600911956898
+        ],
+        [
+          0.7999783628806142,
+          0.01762860810191314,
+          0.5997698317681889
+        ]
+      ],
+      "forward_coordinates_note": "virtual_ray_xyz uses existing support-mean aimed camera basis;negative z means behind that virtual camera,not behind original calibrated camera"
+    }
+  ],
+  "scope": "read-only network input-domain audit and geometry-only virtual-view feasibility;no inference,observations,fit,scene or current80 replay altered",
+  "current_input_domain": {
+    "sequence": "people1/input_448pairs,original selected capture PNG",
+    "left": "raw fisheye rotated CCW90 only",
+    "right": "raw fisheye rotated CW90 only",
+    "C3": "changes top-1 person prompt bbox/mask;does not geometrically rectify pixels",
+    "PMPose": "benchmark predict_once passes saved PNG path to PMPose.predict;MaskBackground+TopdownAffine produce network crop,not calibrated lens rectification",
+    "Sapiens2": "compare_sapiens2_mainline.infer cv2.imread(saved same PNG),then runner.infer_image;PoseTopdownAffine is crop affine,not fish-eye inversion",
+    "calibrated_perspective_before_current_detection": false,
+    "inverse_rotation_after_detection": true
+  },
+  "evidence": [
+    {
+      "file": "realtime_app/walker_tools/stereo/prepare_continuous_stereo_segment.py",
+      "symbols": [
+        "upright_pair",
+        "main sequential frame export"
+      ],
+      "finding": "cv2.rotate only,then cv2.imwrite"
+    },
+    {
+      "file": "realtime_app/walker_tools/pose2d/build_continuous_foot_inclusive_roi.py",
+      "symbols": [
+        "main",
+        "foot_inclusive_box"
+      ],
+      "finding": "reads original image identity;only prompt bbox extension"
+    },
+    {
+      "file": "third_party/bboxmaskpose/tools/benchmark_from_yolo26_bboxes.py",
+      "symbols": [
+        "predict_once"
+      ],
+      "finding": "image=str(record.image_path),bboxes,prompt_masks directly passed to model.predict"
+    },
+    {
+      "file": "third_party/bboxmaskpose/pmpose/api.py",
+      "symbols": [
+        "PMPose.predict",
+        "DEFAULT_CONFIGS"
+      ],
+      "finding": "cv2.imread for string images;standard MMPose topdown path"
+    },
+    {
+      "file": "realtime_app/walker_tools/pose2d/compare_sapiens2_mainline.py",
+      "symbols": [
+        "prepare_frozen",
+        "infer"
+      ],
+      "finding": "frozen C3 same original PNG,cv2.imread then infer_image;no rectification"
+    },
+    {
+      "file": "research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2/protocol.json",
+      "finding": "transport original PNG exactly as frozen sequence PMPose input"
+    }
+  ],
+  "local_training_configuration": {
+    "PMPose": {
+      "file": "third_party/bboxmaskpose/mmpose/configs/ProbMaskPose/PMPose-b-1.0.0.py",
+      "base": "../_base_/default_runtime.py",
+      "train_datasets": [
+        "COCO",
+        "MPII",
+        "AIC"
+      ],
+      "input_size": [
+        192,
+        256
+      ],
+      "training_transforms": [
+        "LoadImage",
+        "GetBBoxCenterScale",
+        "MaskBackground",
+        "RandomFlip",
+        "RandomHalfBody",
+        "RandomBBoxTransform",
+        "RandomEdgesBlackout",
+        "TopdownAffine",
+        "RandomPatchesBlackout",
+        "GenerateTarget",
+        "PackPoseInputs"
+      ],
+      "explicit_fisheye_or_lens_distortion_augmentation_found": false
+    },
+    "Sapiens2": {
+      "file": "third_party/sapiens2/repo/sapiens/pose/configs/keypoints308/shutterstock_goliath_3po/sapiens2_0.4b_keypoints308_shutterstock_goliath_3po-1024x768.py",
+      "input_size_hw": [
+        1024,
+        768
+      ],
+      "training_transforms": [
+        "PoseGetBBoxCenterScale",
+        "PoseRandomFlip",
+        "PoseRandomHalfBody",
+        "PoseRandomBBoxTransform",
+        "PoseTopdownAffine",
+        "RandomPhotoMetricDistortion",
+        "PoseAlbumentation Blur/MedianBlur/CoarseDropout",
+        "PoseGenerateTarget",
+        "PosePackInputs"
+      ],
+      "explicit_fisheye_or_lens_distortion_augmentation_found": false
+    },
+    "boundary": "Inspected local fine-tuning configs do not demonstrate fish-eye augmentation. This does not prove pretrained data contain no fish-eye images or that distortion necessarily causes present motion errors."
+  },
+  "available_resources": {
+    "PMPose_model_source": "third_party/bboxmaskpose/pmpose/api.py",
+    "PMPose_existing_batch_entry": "third_party/bboxmaskpose/tools/benchmark_from_yolo26_bboxes.py",
+    "PMPose_checkpoint": "models/pmpose/PMPose-b-1.0.0.pth",
+    "checkpoint_exists": true,
+    "checkpoint_bytes": 617696116,
+    "PMPose_runtime": "historical bboxmaskpose:latest Docker CUDA;native .venv-cuda site-packages listing did not show pmpose/mmpose",
+    "docker_observation": "docker image ls listed bboxmaskpose:latest,but image inspect returned No such image;runtime availability not established,do not claim ready",
+    "existing_container_command_example": "realtime_app/experiment_repositioned_capture.py:pmpose",
+    "virtual_view_builder": "realtime_app/pose_app/local_perspective.py:LocalPerspectiveModelInput/LocalPerspectiveView",
+    "existing_remap_and_inverse_example": "realtime_app/walker_tools/pose2d/run_yolo_bright_local_perspective.py",
+    "fixed_axis_whole_image_helper": "realtime_app/pose_app/model_undistort.py:FisheyeModelInput;uses original K therefore crops field of view,not safe blindly for these near field full-body inputs",
+    "existing_geometry_tests": "realtime_app/tests/test_local_perspective.py"
+  },
+  "important_feasibility_limit": "All six selected C3 prompt boxes are full 1080x1920 upright image. Existing default person-centred virtual view (mean support-ray aiming,maxHFOV130) either clips both ankles or rejects support behind virtual camera. This is a candidate-input geometry failure,not a failure of current production projection. It does not rule out a different single whole-body virtual view;never silently crop feet,ignore failed views,or claim rectification solved the problem.",
+  "bounded_three_frame_plan": {
+    "frame_ids": [
+      0,
+      35,
+      61
+    ],
+    "sides": [
+      "left",
+      "right"
+    ],
+    "purpose": "test whether calibrated virtual-perspective network input changes coherent lower-body 2D observations after exact raw mapping;isolate from current tracker max80 bugfix replay",
+    "phase1_geometry_only": "Independent future frontend experiment must first design and verify one whole-body framing rule with complete point coverage. Current default support-mean virtual camera fails and must not be substituted. Preserve original raw targets and failures; do not add a new view, run a detector, or alter the active full448 tracking-control replay in this task.",
+    "phase2_same_runtime_baseline": "Only after all6 geometry checks pass and Docker runtime is confirmed,run PMPose-b original rotated raw input and candidate virtual input with same local checkpoint,flip test,mask policy,confidence source;6 images per condition. Existing saved raw predictions remain comparison but same-runtime raw rerun avoids confounding runtime revisions.",
+    "point_mapping": "raw image -> calibrated virtual image -> same leftCCW90/rightCW90 upright -> PMPose -> inverse upright rotation -> LocalPerspectiveView.virtual_to_raw -> unchanged strict stereo(.25,.05,10,maxmatches1)",
+    "evaluation": "Keep all raw xy/score,failures and original reasons;compare same-image hips/knees/ankles,raw mapped stereo epipolar/reprojection diagnostics,all17 complete finite black skeleton,and visual joint-on-image review. These are detector/view consistency diagnostics,not physical/world accuracy.",
+    "no_full448_without_evidence": "Do not alter current frame0 Sapiens policy,PMPose448 observations,ground reference,thresholds,body priors or tracker parameters in this experiment;full replay requires first demonstrating six-view full-body coverage and a meaningful observation improvement.",
+    "stop_conditions": [
+      "runtime unavailable",
+      "mapping not reversible",
+      "any target discarded by framing",
+      "camera identity/image mismatch",
+      "candidate only improves accepted-point count by losing hard joints"
+    ]
+  },
+  "conclusion": "Current projection parity excludes specific geometry implementation errors only. Fish-eye-dependent neural prediction bias/domain mismatch remains an untested plausible contributor. Existing raw-rotated detections have no calibrated rectification and local configs do not certify fish-eye training;do not expand numeric projection pass into all fish-eye effects excluded."
+}

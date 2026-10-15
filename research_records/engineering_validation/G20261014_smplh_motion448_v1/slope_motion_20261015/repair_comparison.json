@@ -1,0 +1,673 @@
+{
+  "results": {
+    "camera_map075": {
+      "frames": 448,
+      "available": 448,
+      "unavailable_frames": [],
+      "raw_error_px": {
+        "count": 10752,
+        "median": 18.131929348178826,
+        "p95": 93.57651070066689,
+        "max": 287.31264186766344
+      },
+      "whole_raw_view_slots": 10752,
+      "hip_error_px": {
+        "count": 1792,
+        "median": 59.57057229886644,
+        "p95": 165.4378456236971,
+        "max": 201.72243761651947
+      },
+      "ankle_error_px": {
+        "count": 1792,
+        "median": 8.970270718944299,
+        "p95": 20.45140371064043,
+        "max": 49.98830266600522
+      },
+      "sole_abs_height_mm": {
+        "count": 896,
+        "median": 30.476968738044263,
+        "p95": 74.73214732441812,
+        "max": 113.51661328209377
+      },
+      "stage1_episodes": [
+        {
+          "range": [
+            35,
+            61
+          ],
+          "frames": 27,
+          "pelvis_delta_z_mm": 8.281150492259144,
+          "ankle_mean_delta_z_mm": 67.81334123217573,
+          "sole_endpoint_delta_mm": [
+            49.44205474499779,
+            94.84553301066126
+          ]
+        },
+        {
+          "range": [
+            86,
+            123
+          ],
+          "frames": 38,
+          "pelvis_delta_z_mm": 3.0664833500115947,
+          "ankle_mean_delta_z_mm": -9.345547203021624,
+          "sole_endpoint_delta_mm": [
+            -10.529569371135608,
+            5.921004299845322
+          ]
+        },
+        {
+          "range": [
+            125,
+            125
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            156,
+            194
+          ],
+          "frames": 39,
+          "pelvis_delta_z_mm": -0.8258367984319648,
+          "ankle_mean_delta_z_mm": 34.729808426013165,
+          "sole_endpoint_delta_mm": [
+            42.91003521731932,
+            83.57067200678887
+          ]
+        },
+        {
+          "range": [
+            217,
+            217
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            229,
+            263
+          ],
+          "frames": 35,
+          "pelvis_delta_z_mm": -22.940845726892007,
+          "ankle_mean_delta_z_mm": -48.58149478578326,
+          "sole_endpoint_delta_mm": [
+            -32.98303803606143,
+            -33.15059436674551
+          ]
+        },
+        {
+          "range": [
+            265,
+            265
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            302,
+            309
+          ],
+          "frames": 8,
+          "pelvis_delta_z_mm": 3.9240519484073957,
+          "ankle_mean_delta_z_mm": 6.670804346886882,
+          "sole_endpoint_delta_mm": [
+            4.585752920636992,
+            8.345040868346928
+          ]
+        },
+        {
+          "range": [
+            316,
+            325
+          ],
+          "frames": 10,
+          "pelvis_delta_z_mm": -26.478386587307796,
+          "ankle_mean_delta_z_mm": -13.315814087590638,
+          "sole_endpoint_delta_mm": [
+            -22.0080047542001,
+            -11.95123659430135
+          ]
+        },
+        {
+          "range": [
+            327,
+            348
+          ],
+          "frames": 22,
+          "pelvis_delta_z_mm": -2.018209815946193,
+          "ankle_mean_delta_z_mm": -23.037728555534443,
+          "sole_endpoint_delta_mm": [
+            -4.168029200087062,
+            -18.698960539279255
+          ]
+        },
+        {
+          "range": [
+            391,
+            422
+          ],
+          "frames": 32,
+          "pelvis_delta_z_mm": -15.860875827329437,
+          "ankle_mean_delta_z_mm": 18.894338669619685,
+          "sole_endpoint_delta_mm": [
+            3.9340866965296755,
+            43.568966202405136
+          ]
+        }
+      ],
+      "published_derivative_joint_samples": 0,
+      "ground_configuration": null
+    },
+    "world_contact80_before": {
+      "frames": 448,
+      "available": 447,
+      "unavailable_frames": [
+        147
+      ],
+      "raw_error_px": {
+        "count": 10728,
+        "median": 24.56733860813588,
+        "p95": 109.67918961205909,
+        "max": 473.78836178264106
+      },
+      "whole_raw_view_slots": 10752,
+      "hip_error_px": {
+        "count": 1788,
+        "median": 80.37831564112165,
+        "p95": 154.57965435306915,
+        "max": 192.0855224840179
+      },
+      "ankle_error_px": {
+        "count": 1788,
+        "median": 16.068746236814512,
+        "p95": 56.27208112124567,
+        "max": 102.08586120248985
+      },
+      "sole_abs_height_mm": {
+        "count": 894,
+        "median": 4.797875881193818,
+        "p95": 33.99536609649734,
+        "max": 65.00405073165973
+      },
+      "stage1_episodes": [
+        {
+          "range": [
+            35,
+            61
+          ],
+          "frames": 27,
+          "pelvis_delta_z_mm": 27.007102966308594,
+          "ankle_mean_delta_z_mm": 42.448729276656934,
+          "sole_endpoint_delta_mm": [
+            6.85727596282959,
+            -7.518589496612435
+          ]
+        },
+        {
+          "range": [
+            86,
+            123
+          ],
+          "frames": 38,
+          "pelvis_delta_z_mm": -33.39821100235031,
+          "ankle_mean_delta_z_mm": -24.35071393847403,
+          "sole_endpoint_delta_mm": [
+            2.7744770050057923,
+            4.115521907807192
+          ]
+        },
+        {
+          "range": [
+            125,
+            125
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            156,
+            194
+          ],
+          "frames": 39,
+          "pelvis_delta_z_mm": 3.598392009735221,
+          "ankle_mean_delta_z_mm": -23.709353059530258,
+          "sole_endpoint_delta_mm": [
+            -35.3999137878418,
+            27.56959199905384
+          ]
+        },
+        {
+          "range": [
+            217,
+            217
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            229,
+            263
+          ],
+          "frames": 35,
+          "pelvis_delta_z_mm": -30.278265476226807,
+          "ankle_mean_delta_z_mm": -30.24642914533615,
+          "sole_endpoint_delta_mm": [
+            -23.9374041557312,
+            -5.629837512970084
+          ]
+        },
+        {
+          "range": [
+            265,
+            265
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            302,
+            309
+          ],
+          "frames": 8,
+          "pelvis_delta_z_mm": -6.15382194519043,
+          "ankle_mean_delta_z_mm": 7.642049342393875,
+          "sole_endpoint_delta_mm": [
+            3.9351582527160645,
+            2.2284984588623047
+          ]
+        },
+        {
+          "range": [
+            316,
+            325
+          ],
+          "frames": 10,
+          "pelvis_delta_z_mm": -3.420233726501465,
+          "ankle_mean_delta_z_mm": -6.938178092241287,
+          "sole_endpoint_delta_mm": [
+            0.03653764724731445,
+            -1.1261701583861168
+          ]
+        },
+        {
+          "range": [
+            327,
+            348
+          ],
+          "frames": 22,
+          "pelvis_delta_z_mm": 10.442197322845459,
+          "ankle_mean_delta_z_mm": -14.226587489247265,
+          "sole_endpoint_delta_mm": [
+            -0.025987625122070312,
+            0.005662441253662109
+          ]
+        },
+        {
+          "range": [
+            391,
+            422
+          ],
+          "frames": 32,
+          "pelvis_delta_z_mm": 7.626235485076791,
+          "ankle_mean_delta_z_mm": -19.924230873584747,
+          "sole_endpoint_delta_mm": [
+            -29.498398303985596,
+            4.063606262206918
+          ]
+        }
+      ],
+      "published_derivative_joint_samples": 1732,
+      "ground_configuration": {
+        "ground_tolerance_m": 0.005,
+        "max_heel_displacement_m": 0.01,
+        "maximum_iterations": 80,
+        "bootstrap_iterations": 80,
+        "optimizer_objective_tolerance": 0.01,
+        "feasibility_tolerance_m": 0.0002,
+        "heel_velocity_sigma_m_s": 0.02,
+        "heel_acceleration_sigma_m_s2": 0.2
+      },
+      "constraint_satisfied": 440,
+      "constraint_failed_frames": [
+        75,
+        78,
+        146,
+        147,
+        224,
+        274,
+        360,
+        363
+      ],
+      "stage2_frames": 115,
+      "stage2_satisfied": 107,
+      "stage2_failed_frames": [
+        75,
+        78,
+        146,
+        147,
+        224,
+        274,
+        360,
+        363
+      ],
+      "stage2_entire_sole_displacement_mm": {
+        "count": 228,
+        "median": 9.806493184686449,
+        "p95": 12.021602264738037,
+        "max": 64.06373339229832
+      },
+      "first_feasible_budget_kept_frames": [],
+      "optimizer_unconverged_frames": [
+        1,
+        68,
+        372
+      ],
+      "solver_status_counts": {
+        "constrained": 436,
+        "constraint_conflict": 9,
+        "feasible_unconverged": 3
+      }
+    },
+    "world_contact80_fixed": {
+      "frames": 448,
+      "available": 448,
+      "unavailable_frames": [],
+      "raw_error_px": {
+        "count": 10752,
+        "median": 23.36424454338048,
+        "p95": 112.97312406094582,
+        "max": 242.92257603638308
+      },
+      "whole_raw_view_slots": 10752,
+      "hip_error_px": {
+        "count": 1792,
+        "median": 81.57440073081001,
+        "p95": 160.54878964257134,
+        "max": 204.2254919911093
+      },
+      "ankle_error_px": {
+        "count": 1792,
+        "median": 15.296607874120394,
+        "p95": 62.65616007605037,
+        "max": 128.79900202660366
+      },
+      "sole_abs_height_mm": {
+        "count": 896,
+        "median": 4.801541566848584,
+        "p95": 40.55693745613192,
+        "max": 72.1287727355965
+      },
+      "stage1_episodes": [
+        {
+          "range": [
+            35,
+            61
+          ],
+          "frames": 27,
+          "pelvis_delta_z_mm": 27.007102966308594,
+          "ankle_mean_delta_z_mm": 42.448729276656934,
+          "sole_endpoint_delta_mm": [
+            6.85727596282959,
+            -7.518589496612435
+          ]
+        },
+        {
+          "range": [
+            86,
+            123
+          ],
+          "frames": 38,
+          "pelvis_delta_z_mm": -8.980512619019123,
+          "ankle_mean_delta_z_mm": 11.067546904087692,
+          "sole_endpoint_delta_mm": [
+            43.73294115066619,
+            -3.5671591758718932
+          ]
+        },
+        {
+          "range": [
+            125,
+            125
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            156,
+            194
+          ],
+          "frames": 39,
+          "pelvis_delta_z_mm": 7.576704025268668,
+          "ankle_mean_delta_z_mm": -10.886382311582395,
+          "sole_endpoint_delta_mm": [
+            15.543878078460693,
+            -2.226352691650277
+          ]
+        },
+        {
+          "range": [
+            217,
+            217
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            229,
+            263
+          ],
+          "frames": 35,
+          "pelvis_delta_z_mm": -14.313817024230957,
+          "ankle_mean_delta_z_mm": -34.30144116282463,
+          "sole_endpoint_delta_mm": [
+            12.966632843017692,
+            -18.829941749572868
+          ]
+        },
+        {
+          "range": [
+            265,
+            265
+          ],
+          "frames": 1,
+          "pelvis_delta_z_mm": 0.0,
+          "ankle_mean_delta_z_mm": 0.0,
+          "sole_endpoint_delta_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "range": [
+            302,
+            309
+          ],
+          "frames": 8,
+          "pelvis_delta_z_mm": 11.87831163406372,
+          "ankle_mean_delta_z_mm": 10.547555983066502,
+          "sole_endpoint_delta_mm": [
+            11.739492416381722,
+            -0.17577409744251327
+          ]
+        },
+        {
+          "range": [
+            316,
+            325
+          ],
+          "frames": 10,
+          "pelvis_delta_z_mm": -16.52538776397705,
+          "ankle_mean_delta_z_mm": -15.059992671012765,
+          "sole_endpoint_delta_mm": [
+            -17.1607732772826,
+            0.0049471855165847956
+          ]
+        },
+        {
+          "range": [
+            327,
+            348
+          ],
+          "frames": 22,
+          "pelvis_delta_z_mm": 1.2369155883789062,
+          "ankle_mean_delta_z_mm": -14.860514551401195,
+          "sole_endpoint_delta_mm": [
+            -5.293130874633789,
+            0.05328655242919922
+          ]
+        },
+        {
+          "range": [
+            391,
+            422
+          ],
+          "frames": 32,
+          "pelvis_delta_z_mm": -9.847581386566048,
+          "ankle_mean_delta_z_mm": -3.0321478843689533,
+          "sole_endpoint_delta_mm": [
+            -41.62698984146107,
+            11.428296566009408
+          ]
+        }
+      ],
+      "published_derivative_joint_samples": 1798,
+      "ground_configuration": {
+        "ground_tolerance_m": 0.005,
+        "max_heel_displacement_m": 0.01,
+        "maximum_iterations": 80,
+        "bootstrap_iterations": 80,
+        "optimizer_objective_tolerance": 0.01,
+        "feasibility_tolerance_m": 0.0002,
+        "heel_velocity_sigma_m_s": 0.02,
+        "heel_acceleration_sigma_m_s2": 0.2
+      },
+      "constraint_satisfied": 448,
+      "constraint_failed_frames": [],
+      "stage2_frames": 115,
+      "stage2_satisfied": 115,
+      "stage2_failed_frames": [],
+      "stage2_entire_sole_displacement_mm": {
+        "count": 230,
+        "median": 9.802158018011298,
+        "p95": 9.85664276968847,
+        "max": 9.98400523479587
+      },
+      "first_feasible_budget_kept_frames": [
+        75,
+        76,
+        118,
+        206,
+        224,
+        286,
+        373,
+        377
+      ],
+      "optimizer_unconverged_frames": [
+        1,
+        68,
+        75,
+        76,
+        118,
+        206,
+        224,
+        286,
+        373,
+        377
+      ],
+      "solver_status_counts": {
+        "constrained": 438,
+        "feasible_unconverged": 10
+      }
+    }
+  },
+  "same_input_time_beta": true,
+  "engineering_criteria": {
+    "complete_pose": true,
+    "all_declared_contact": true,
+    "all_stage2": true,
+    "median_and_p95_within5percent": false,
+    "passed": false
+  },
+  "comparison_limit": "Camera versus world differs in state coordinates and solver;before versus fixed contact80 changes only the feasibility acceptance gate",
+  "gate_fix_before_after": {
+    "result_keys": [
+      "world_contact80_before",
+      "world_contact80_fixed"
+    ],
+    "available": [
+      447,
+      448
+    ],
+    "all_contact_satisfied": [
+      440,
+      448
+    ],
+    "stage2_satisfied": [
+      107,
+      115
+    ],
+    "same_finite_view_slots": 10728,
+    "same_slots_before_raw_px": {
+      "count": 10728,
+      "median": 24.56733860813588,
+      "p95": 109.67918961205909,
+      "max": 473.78836178264106
+    },
+    "same_slots_after_raw_px": {
+      "count": 10728,
+      "median": 23.366442860185796,
+      "p95": 112.97702234711979,
+      "max": 242.92257603638308
+    }
+  },
+  "stop": "retain candidate;do not promote or sweep more parameters"
+}
