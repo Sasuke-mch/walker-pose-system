@@ -1,0 +1,1865 @@
+{
+  "frames_retained": 448,
+  "primary_window": [
+    35,
+    61
+  ],
+  "configurations": {
+    "pva_frozen_sigma4": {
+      "configuration": {
+        "min_score": 0.2,
+        "max_reprojection_px": 25.0,
+        "min_ray_angle_deg": 1.0,
+        "pixel_sigma_px": 4.0,
+        "innovation_gate_squared": 64.0,
+        "jerk_spectral_density_mm2_s5": 100000000.0,
+        "initial_position_sigma_mm": 100.0,
+        "initial_velocity_sigma_mm_s": 1000.0,
+        "initial_acceleration_sigma_mm_s2": 5000.0,
+        "max_prediction_s": 0.5
+      },
+      "runtime_seconds": 3.846247699999367,
+      "status_counts": {
+        "initialized": 12,
+        "updated": 5024,
+        "predicted": 310,
+        "reinitialized": 13,
+        "expired": 17
+      },
+      "reason_counts": {
+        "stereo_restart_zero_v_a_prior": 25,
+        "updated": 5024,
+        "stereo_reprojection_rejected": 265,
+        "nonlinear_update_rejected": 20,
+        "update_out_of_domain": 10,
+        "innovation_rejected": 32
+      },
+      "raw_reprojection_px": {
+        "all_raw_slots": {
+          "count": 10668,
+          "min": 0.033322159087492524,
+          "median": 5.556046101229587,
+          "p95": 22.344255678266958,
+          "max": 1345.7308304939152
+        },
+        "hip_raw_slots": {
+          "count": 1788,
+          "min": 0.038388109160363636,
+          "median": 6.402271287558692,
+          "p95": 16.53172866288372,
+          "max": 43.84170054678948
+        },
+        "hip_slots_total": 1792,
+        "all_slots_total": 10752
+      },
+      "static_segments": [
+        {
+          "frames": [
+            35,
+            61
+          ],
+          "frame_count": 27,
+          "available_ankle_slots": 54,
+          "total_ankle_slots": 54,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 27,
+              "min": 105.72309860787789,
+              "median": 113.98740908393313,
+              "p95": 128.05373746538726,
+              "max": 129.37203068262875
+            },
+            {
+              "count": 27,
+              "min": 83.2787204913177,
+              "median": 116.23134013831964,
+              "p95": 132.2067450083878,
+              "max": 133.25763040656
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 54
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -13.550866463905777,
+            28.122190890096476
+          ],
+          "endpoint_mean_ankle_height_change_mm": 7.28566221309535,
+          "median5_height_change_each_ankle_mm": [
+            -13.66815984929508,
+            26.05412115348895
+          ],
+          "median5_mean_ankle_height_change_mm": 6.192980652096935,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            86,
+            123
+          ],
+          "frame_count": 38,
+          "available_ankle_slots": 76,
+          "total_ankle_slots": 76,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 38,
+              "min": 103.49633939522084,
+              "median": 118.87356954991293,
+              "p95": 141.41831058575877,
+              "max": 142.49812493967738
+            },
+            {
+              "count": 38,
+              "min": 69.19288358915708,
+              "median": 107.25319497734876,
+              "p95": 161.41279271272242,
+              "max": 181.82533862652735
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 76
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -5.928591550057263,
+            68.81007970105395
+          ],
+          "endpoint_mean_ankle_height_change_mm": 31.440744075498344,
+          "median5_height_change_each_ankle_mm": [
+            -0.3478462273532159,
+            66.90550892518706
+          ],
+          "median5_mean_ankle_height_change_mm": 33.278831348916924,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": true
+        },
+        {
+          "frames": [
+            125,
+            125
+          ],
+          "frame_count": 1,
+          "available_ankle_slots": 2,
+          "total_ankle_slots": 2,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 1,
+              "min": 105.11701783769809,
+              "median": 105.11701783769809,
+              "p95": 105.11701783769809,
+              "max": 105.11701783769809
+            },
+            {
+              "count": 1,
+              "min": 115.55400379474418,
+              "median": 115.55400379474418,
+              "p95": 115.55400379474418,
+              "max": 115.55400379474418
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 2
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "endpoint_mean_ankle_height_change_mm": 0.0,
+          "median5_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "median5_mean_ankle_height_change_mm": 0.0,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            156,
+            194
+          ],
+          "frame_count": 39,
+          "available_ankle_slots": 78,
+          "total_ankle_slots": 78,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 39,
+              "min": 110.00386761136235,
+              "median": 122.896352398065,
+              "p95": 156.51123300846126,
+              "max": 159.5892467502456
+            },
+            {
+              "count": 39,
+              "min": 86.3823254697121,
+              "median": 126.84078720446303,
+              "p95": 183.2540495134473,
+              "max": 200.354003172462
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 78
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -25.95141673804426,
+            42.73903931228381
+          ],
+          "endpoint_mean_ankle_height_change_mm": 8.393811287119775,
+          "median5_height_change_each_ankle_mm": [
+            -26.033174041466964,
+            33.61362502646102
+          ],
+          "median5_mean_ankle_height_change_mm": 3.7902254924970293,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            217,
+            217
+          ],
+          "frame_count": 1,
+          "available_ankle_slots": 2,
+          "total_ankle_slots": 2,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 1,
+              "min": 103.61781304347528,
+              "median": 103.61781304347528,
+              "p95": 103.61781304347528,
+              "max": 103.61781304347528
+            },
+            {
+              "count": 1,
+              "min": 59.89440335976349,
+              "median": 59.89440335976349,
+              "p95": 59.89440335976349,
+              "max": 59.89440335976349
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 2
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "endpoint_mean_ankle_height_change_mm": 0.0,
+          "median5_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "median5_mean_ankle_height_change_mm": 0.0,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            229,
+            263
+          ],
+          "frame_count": 35,
+          "available_ankle_slots": 70,
+          "total_ankle_slots": 70,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 35,
+              "min": 91.3634639974764,
+              "median": 110.18535508128798,
+              "p95": 138.12564791640426,
+              "max": 161.49504016851859
+            },
+            {
+              "count": 35,
+              "min": 71.7526259941535,
+              "median": 123.28829669295135,
+              "p95": 225.1023837699603,
+              "max": 243.14527683174686
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 70
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -47.76461114147958,
+            -45.30469474815766
+          ],
+          "endpoint_mean_ankle_height_change_mm": -46.53465294481862,
+          "median5_height_change_each_ankle_mm": [
+            -10.272049426554986,
+            -22.672571496297905
+          ],
+          "median5_mean_ankle_height_change_mm": -16.472310461426446,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            265,
+            265
+          ],
+          "frame_count": 1,
+          "available_ankle_slots": 2,
+          "total_ankle_slots": 2,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 1,
+              "min": 98.5784489314292,
+              "median": 98.5784489314292,
+              "p95": 98.5784489314292,
+              "max": 98.5784489314292
+            },
+            {
+              "count": 1,
+              "min": 103.62077590222589,
+              "median": 103.62077590222589,
+              "p95": 103.62077590222589,
+              "max": 103.62077590222589
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 2
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "endpoint_mean_ankle_height_change_mm": 0.0,
+          "median5_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "median5_mean_ankle_height_change_mm": 0.0,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            302,
+            309
+          ],
+          "frame_count": 8,
+          "available_ankle_slots": 16,
+          "total_ankle_slots": 16,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 8,
+              "min": 126.24081722707388,
+              "median": 137.6018196996722,
+              "p95": 145.3120170770636,
+              "max": 145.46293777009146
+            },
+            {
+              "count": 8,
+              "min": 98.06594910687693,
+              "median": 108.81457597978851,
+              "p95": 117.49990301985517,
+              "max": 117.84000354149293
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 16
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            9.066774536779803,
+            10.029645053984382
+          ],
+          "endpoint_mean_ankle_height_change_mm": 9.548209795382093,
+          "median5_height_change_each_ankle_mm": [
+            1.9987906768037647,
+            -5.12476334435371
+          ],
+          "median5_mean_ankle_height_change_mm": -1.5629863337749725,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            316,
+            325
+          ],
+          "frame_count": 10,
+          "available_ankle_slots": 20,
+          "total_ankle_slots": 20,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 10,
+              "min": 95.05436826571099,
+              "median": 99.65799789436107,
+              "p95": 102.94606928473667,
+              "max": 103.09134450891315
+            },
+            {
+              "count": 10,
+              "min": 53.87363585723699,
+              "median": 111.1477440769138,
+              "p95": 146.0729846992871,
+              "max": 151.50098685710373
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 20
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -7.014288207782101,
+            47.59709187636793
+          ],
+          "endpoint_mean_ankle_height_change_mm": 20.291401834292913,
+          "median5_height_change_each_ankle_mm": [
+            -1.1382315028238281,
+            73.0429973560008
+          ],
+          "median5_mean_ankle_height_change_mm": 35.952382926588484,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            327,
+            348
+          ],
+          "frame_count": 22,
+          "available_ankle_slots": 44,
+          "total_ankle_slots": 44,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 22,
+              "min": 82.73453589127689,
+              "median": 93.77095397692148,
+              "p95": 98.97982139013222,
+              "max": 101.4234681731649
+            },
+            {
+              "count": 22,
+              "min": 74.2255686703229,
+              "median": 104.20994642901542,
+              "p95": 123.35526663983084,
+              "max": 124.77715263992025
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 44
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            1.228357486903633,
+            25.356336499950885
+          ],
+          "endpoint_mean_ankle_height_change_mm": 13.292346993427259,
+          "median5_height_change_each_ankle_mm": [
+            4.681137122514997,
+            -4.605764058892532
+          ],
+          "median5_mean_ankle_height_change_mm": 0.03768653181123227,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            391,
+            422
+          ],
+          "frame_count": 32,
+          "available_ankle_slots": 64,
+          "total_ankle_slots": 64,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 32,
+              "min": 93.34353543517113,
+              "median": 104.24971499283765,
+              "p95": 114.04438630863737,
+              "max": 114.83465663941377
+            },
+            {
+              "count": 32,
+              "min": -15.90225258514306,
+              "median": 120.22528809820517,
+              "p95": 140.47164779591833,
+              "max": 148.632365248062
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 64
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -5.009590494008421,
+            93.3440568937624
+          ],
+          "endpoint_mean_ankle_height_change_mm": 44.16723319987699,
+          "median5_height_change_each_ankle_mm": [
+            -0.40797347844352316,
+            53.67723428752049
+          ],
+          "median5_mean_ankle_height_change_mm": 26.634630404538484,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        }
+      ],
+      "bone_lengths_mm": {
+        "hip_width": {
+          "count": 448,
+          "min": 176.66315631054897,
+          "median": 197.56359236136583,
+          "p95": 209.07107753445777,
+          "max": 215.09705900251393
+        },
+        "left_thigh": {
+          "count": 448,
+          "min": 227.88152995322534,
+          "median": 264.9812515429526,
+          "p95": 304.18498570905416,
+          "max": 323.1702792792367
+        },
+        "right_thigh": {
+          "count": 441,
+          "min": 129.0993731432076,
+          "median": 266.3519400827523,
+          "p95": 314.79855203486795,
+          "max": 699.7692118245272
+        },
+        "left_shank": {
+          "count": 448,
+          "min": 350.76154787612353,
+          "median": 409.80463646161246,
+          "p95": 440.4236835225747,
+          "max": 460.4937144298616
+        },
+        "right_shank": {
+          "count": 441,
+          "min": 216.5958963764183,
+          "median": 432.04037716992525,
+          "p95": 528.9233210418039,
+          "max": 1261.054843765093
+        }
+      },
+      "events": [
+        {
+          "frame": 37,
+          "ankle_height_change_from_previous_mm": [
+            0.6176467160432821,
+            0.6543898471811644
+          ],
+          "ankle_status": [
+            "updated",
+            "updated"
+          ],
+          "hip_raw_residual_px": [
+            [
+              9.335197779300819,
+              9.97764259215602
+            ],
+            [
+              7.779912290149854,
+              6.779087140634421
+            ]
+          ]
+        },
+        {
+          "frame": 59,
+          "ankle_height_change_from_previous_mm": [
+            -2.9680003364541108,
+            3.6231632644826277
+          ],
+          "ankle_status": [
+            "updated",
+            "updated"
+          ],
+          "hip_raw_residual_px": [
+            [
+              6.041458850072686,
+              7.120600127736556
+            ],
+            [
+              19.247283804384097,
+              14.470704465035446
+            ]
+          ]
+        }
+      ],
+      "no_smplh_tracker_input": true,
+      "same_finite_slots_comparison": {
+        "total_all_slots": 10752,
+        "total_hip_slots": 1792,
+        "pva_all_px": {
+          "count": 10668,
+          "min": 0.033322159087492524,
+          "median": 5.556046101229587,
+          "p95": 22.344255678266958,
+          "max": 1345.7308304939152
+        },
+        "smplh_all_px": {
+          "count": 10668,
+          "min": 0.03324344350862546,
+          "median": 18.085446116946635,
+          "p95": 93.7463446787979,
+          "max": 287.31264186766344
+        },
+        "pva_hips_px": {
+          "count": 1788,
+          "min": 0.038388109160363636,
+          "median": 6.402271287558692,
+          "p95": 16.53172866288372,
+          "max": 43.84170054678948
+        },
+        "smplh_hips_px": {
+          "count": 1788,
+          "min": 9.047419260899478,
+          "median": 59.599107238408706,
+          "p95": 165.48123979958555,
+          "max": 201.72243761651947
+        }
+      },
+      "per_joint_status_counts": {
+        "left_shoulder": {
+          "initialized": 1,
+          "updated": 385,
+          "predicted": 52,
+          "expired": 8,
+          "reinitialized": 2
+        },
+        "right_shoulder": {
+          "initialized": 1,
+          "updated": 447
+        },
+        "left_elbow": {
+          "initialized": 1,
+          "predicted": 92,
+          "updated": 349,
+          "reinitialized": 4,
+          "expired": 2
+        },
+        "right_elbow": {
+          "initialized": 1,
+          "updated": 447
+        },
+        "left_wrist": {
+          "initialized": 1,
+          "predicted": 44,
+          "updated": 401,
+          "reinitialized": 2
+        },
+        "right_wrist": {
+          "initialized": 1,
+          "updated": 447
+        },
+        "left_hip": {
+          "initialized": 1,
+          "updated": 443,
+          "predicted": 4
+        },
+        "right_hip": {
+          "initialized": 1,
+          "updated": 445,
+          "predicted": 2
+        },
+        "left_knee": {
+          "initialized": 1,
+          "updated": 443,
+          "predicted": 4
+        },
+        "right_knee": {
+          "initialized": 1,
+          "updated": 325,
+          "predicted": 110,
+          "expired": 7,
+          "reinitialized": 5
+        },
+        "left_ankle": {
+          "initialized": 1,
+          "updated": 445,
+          "predicted": 2
+        },
+        "right_ankle": {
+          "initialized": 1,
+          "updated": 447
+        }
+      }
+    },
+    "pva_matched_pixel_sigma8": {
+      "configuration": {
+        "min_score": 0.2,
+        "max_reprojection_px": 25.0,
+        "min_ray_angle_deg": 1.0,
+        "pixel_sigma_px": 8.0,
+        "innovation_gate_squared": 64.0,
+        "jerk_spectral_density_mm2_s5": 100000000.0,
+        "initial_position_sigma_mm": 100.0,
+        "initial_velocity_sigma_mm_s": 1000.0,
+        "initial_acceleration_sigma_mm_s2": 5000.0,
+        "max_prediction_s": 0.5
+      },
+      "runtime_seconds": 3.80702349999774,
+      "status_counts": {
+        "initialized": 12,
+        "updated": 5068,
+        "predicted": 275,
+        "reinitialized": 8,
+        "expired": 13
+      },
+      "reason_counts": {
+        "stereo_restart_zero_v_a_prior": 20,
+        "updated": 5068,
+        "stereo_reprojection_rejected": 265,
+        "nonlinear_update_rejected": 14,
+        "update_out_of_domain": 8,
+        "innovation_rejected": 1
+      },
+      "raw_reprojection_px": {
+        "all_raw_slots": {
+          "count": 10686,
+          "min": 0.0721740992389733,
+          "median": 5.638248931283548,
+          "p95": 19.907296677149947,
+          "max": 1006.2101538820667
+        },
+        "hip_raw_slots": {
+          "count": 1788,
+          "min": 0.11433666125958555,
+          "median": 6.515935874188877,
+          "p95": 16.783511947677667,
+          "max": 56.88571001944223
+        },
+        "hip_slots_total": 1792,
+        "all_slots_total": 10752
+      },
+      "static_segments": [
+        {
+          "frames": [
+            35,
+            61
+          ],
+          "frame_count": 27,
+          "available_ankle_slots": 54,
+          "total_ankle_slots": 54,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 27,
+              "min": 104.07740868662711,
+              "median": 112.75953220935196,
+              "p95": 127.11334650653166,
+              "max": 129.2522468060356
+            },
+            {
+              "count": 27,
+              "min": 83.50854815367938,
+              "median": 116.00547297363266,
+              "p95": 131.5115204190101,
+              "max": 132.2586681111294
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 54
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -11.741021348782851,
+            25.403218338709962
+          ],
+          "endpoint_mean_ankle_height_change_mm": 6.831098494963555,
+          "median5_height_change_each_ankle_mm": [
+            -12.851723965974088,
+            25.358603040959338
+          ],
+          "median5_mean_ankle_height_change_mm": 6.253439537492625,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            86,
+            123
+          ],
+          "frame_count": 38,
+          "available_ankle_slots": 76,
+          "total_ankle_slots": 76,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 38,
+              "min": 103.07425466793109,
+              "median": 119.06370653915218,
+              "p95": 142.27930216588211,
+              "max": 142.71338699906698
+            },
+            {
+              "count": 38,
+              "min": 68.97202777637654,
+              "median": 107.01162235137599,
+              "p95": 162.95914802321516,
+              "max": 179.35572921154017
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 76
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -7.59612647824315,
+            65.76774960147247
+          ],
+          "endpoint_mean_ankle_height_change_mm": 29.085811561614662,
+          "median5_height_change_each_ankle_mm": [
+            -3.4821417474423697,
+            63.43999416723307
+          ],
+          "median5_mean_ankle_height_change_mm": 29.97892620989535,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            125,
+            125
+          ],
+          "frame_count": 1,
+          "available_ankle_slots": 2,
+          "total_ankle_slots": 2,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 1,
+              "min": 106.77241609583098,
+              "median": 106.77241609583098,
+              "p95": 106.77241609583098,
+              "max": 106.77241609583098
+            },
+            {
+              "count": 1,
+              "min": 118.87612795792006,
+              "median": 118.87612795792006,
+              "p95": 118.87612795792006,
+              "max": 118.87612795792006
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 2
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "endpoint_mean_ankle_height_change_mm": 0.0,
+          "median5_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "median5_mean_ankle_height_change_mm": 0.0,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            156,
+            194
+          ],
+          "frame_count": 39,
+          "available_ankle_slots": 78,
+          "total_ankle_slots": 78,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 39,
+              "min": 109.24443471865823,
+              "median": 123.07532113249442,
+              "p95": 154.99420507549166,
+              "max": 158.3378871901151
+            },
+            {
+              "count": 39,
+              "min": 88.44957494888718,
+              "median": 122.46355005178202,
+              "p95": 185.67009730265707,
+              "max": 201.38407639314937
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 78
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -26.23656691861663,
+            43.120937859145215
+          ],
+          "endpoint_mean_ankle_height_change_mm": 8.442185470264292,
+          "median5_height_change_each_ankle_mm": [
+            -26.173042844898532,
+            34.563175076511584
+          ],
+          "median5_mean_ankle_height_change_mm": 4.195066115806526,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            217,
+            217
+          ],
+          "frame_count": 1,
+          "available_ankle_slots": 2,
+          "total_ankle_slots": 2,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 1,
+              "min": 106.88717228295945,
+              "median": 106.88717228295945,
+              "p95": 106.88717228295945,
+              "max": 106.88717228295945
+            },
+            {
+              "count": 1,
+              "min": 62.149150845223176,
+              "median": 62.149150845223176,
+              "p95": 62.149150845223176,
+              "max": 62.149150845223176
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 2
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "endpoint_mean_ankle_height_change_mm": 0.0,
+          "median5_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "median5_mean_ankle_height_change_mm": 0.0,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            229,
+            263
+          ],
+          "frame_count": 35,
+          "available_ankle_slots": 70,
+          "total_ankle_slots": 70,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 35,
+              "min": 93.12931956455407,
+              "median": 109.78425244311416,
+              "p95": 136.2695354570026,
+              "max": 160.22996327198655
+            },
+            {
+              "count": 35,
+              "min": 65.26335810596413,
+              "median": 125.97164141851147,
+              "p95": 222.50661700679527,
+              "max": 239.03463175649586
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 70
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -46.409110571930796,
+            -41.88929869419292
+          ],
+          "endpoint_mean_ankle_height_change_mm": -44.149204633061856,
+          "median5_height_change_each_ankle_mm": [
+            -15.867403231698518,
+            -24.84425708357321
+          ],
+          "median5_mean_ankle_height_change_mm": -20.355830157635864,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            265,
+            265
+          ],
+          "frame_count": 1,
+          "available_ankle_slots": 2,
+          "total_ankle_slots": 2,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 1,
+              "min": 100.35166495961244,
+              "median": 100.35166495961244,
+              "p95": 100.35166495961244,
+              "max": 100.35166495961244
+            },
+            {
+              "count": 1,
+              "min": 104.60684527556282,
+              "median": 104.60684527556282,
+              "p95": 104.60684527556282,
+              "max": 104.60684527556282
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 2
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "endpoint_mean_ankle_height_change_mm": 0.0,
+          "median5_height_change_each_ankle_mm": [
+            0.0,
+            0.0
+          ],
+          "median5_mean_ankle_height_change_mm": 0.0,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            302,
+            309
+          ],
+          "frame_count": 8,
+          "available_ankle_slots": 16,
+          "total_ankle_slots": 16,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 8,
+              "min": 124.3914866695518,
+              "median": 138.02781939861808,
+              "p95": 144.92102051625866,
+              "max": 144.9276870148425
+            },
+            {
+              "count": 8,
+              "min": 94.98323141211881,
+              "median": 112.31413673703753,
+              "p95": 117.0892301648174,
+              "max": 118.0123230175667
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 16
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            12.60669807034617,
+            15.649818613434036
+          ],
+          "endpoint_mean_ankle_height_change_mm": 14.128258341890103,
+          "median5_height_change_each_ankle_mm": [
+            5.4627728081570694,
+            -1.7741212293514081
+          ],
+          "median5_mean_ankle_height_change_mm": 1.8443257894028307,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            316,
+            325
+          ],
+          "frame_count": 10,
+          "available_ankle_slots": 20,
+          "total_ankle_slots": 20,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 10,
+              "min": 94.82405830690959,
+              "median": 98.66371886810765,
+              "p95": 103.11264148221863,
+              "max": 104.14697495048165
+            },
+            {
+              "count": 10,
+              "min": 50.97013228517051,
+              "median": 110.78424718392188,
+              "p95": 147.0370796119194,
+              "max": 149.9349884977895
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 20
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -9.322916643572057,
+            61.218994214955615
+          ],
+          "endpoint_mean_ankle_height_change_mm": 25.94803878569178,
+          "median5_height_change_each_ankle_mm": [
+            -2.472538861840121,
+            74.52543812881026
+          ],
+          "median5_mean_ankle_height_change_mm": 36.02644963348507,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            327,
+            348
+          ],
+          "frame_count": 22,
+          "available_ankle_slots": 44,
+          "total_ankle_slots": 44,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 22,
+              "min": 85.99546721163517,
+              "median": 93.4458868017046,
+              "p95": 98.66294475292698,
+              "max": 99.56786055716111
+            },
+            {
+              "count": 22,
+              "min": 84.01620125972954,
+              "median": 103.44456999342265,
+              "p95": 119.5454010296234,
+              "max": 120.90511291786106
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 44
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            1.4882296967715547,
+            14.161908763377141
+          ],
+          "endpoint_mean_ankle_height_change_mm": 7.825069230074348,
+          "median5_height_change_each_ankle_mm": [
+            4.582678812293807,
+            -3.0829488532513096
+          ],
+          "median5_mean_ankle_height_change_mm": 0.7498649795212486,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": false
+        },
+        {
+          "frames": [
+            391,
+            422
+          ],
+          "frame_count": 32,
+          "available_ankle_slots": 64,
+          "total_ankle_slots": 64,
+          "height_range_each_ankle_mm": [
+            {
+              "count": 32,
+              "min": 90.36753526949246,
+              "median": 103.69989806655195,
+              "p95": 114.57348425265464,
+              "max": 115.39505390989757
+            },
+            {
+              "count": 32,
+              "min": -20.7728602726919,
+              "median": 118.0204919858727,
+              "p95": 141.25393966238093,
+              "max": 147.489758644454
+            }
+          ],
+          "ankle_status_counts": {
+            "updated": 64
+          },
+          "both_ankles_available_without_restart": true,
+          "endpoint_height_change_each_ankle_mm": [
+            -8.442721278318459,
+            96.15471751880375
+          ],
+          "endpoint_mean_ankle_height_change_mm": 43.855998120242646,
+          "median5_height_change_each_ankle_mm": [
+            -3.980702217595308,
+            66.58925653424888
+          ],
+          "median5_mean_ankle_height_change_mm": 31.304277158326784,
+          "both_ankles_rise20mm": false,
+          "persistent_rise_30mm": true
+        }
+      ],
+      "bone_lengths_mm": {
+        "hip_width": {
+          "count": 448,
+          "min": 176.66315631054897,
+          "median": 197.73447918553364,
+          "p95": 208.91281861634022,
+          "max": 213.3190495192692
+        },
+        "left_thigh": {
+          "count": 448,
+          "min": 226.8946816335076,
+          "median": 265.4213169996202,
+          "p95": 304.2122354466384,
+          "max": 323.96248408850624
+        },
+        "right_thigh": {
+          "count": 445,
+          "min": 121.64389850582695,
+          "median": 264.257449071394,
+          "p95": 312.0593220370142,
+          "max": 515.2544118069411
+        },
+        "left_shank": {
+          "count": 448,
+          "min": 350.2022833761865,
+          "median": 410.55751892623357,
+          "p95": 440.1104734512697,
+          "max": 464.44487860164924
+        },
+        "right_shank": {
+          "count": 445,
+          "min": 161.03161809179957,
+          "median": 430.5495254170773,
+          "p95": 522.3813150719086,
+          "max": 1035.3869770019537
+        }
+      },
+      "events": [
+        {
+          "frame": 37,
+          "ankle_height_change_from_previous_mm": [
+            1.7228587758061167,
+            0.6238549795522204
+          ],
+          "ankle_status": [
+            "updated",
+            "updated"
+          ],
+          "hip_raw_residual_px": [
+            [
+              8.686503908923301,
+              10.738900498777758
+            ],
+            [
+              7.390172390222187,
+              7.459590694351049
+            ]
+          ]
+        },
+        {
+          "frame": 59,
+          "ankle_height_change_from_previous_mm": [
+            -1.418559032498365,
+            5.732488112802002
+          ],
+          "ankle_status": [
+            "updated",
+            "updated"
+          ],
+          "hip_raw_residual_px": [
+            [
+              6.840663866712481,
+              6.574607317271224
+            ],
+            [
+              20.061951320186807,
+              13.515012826784154
+            ]
+          ]
+        }
+      ],
+      "no_smplh_tracker_input": true,
+      "same_finite_slots_comparison": {
+        "total_all_slots": 10752,
+        "total_hip_slots": 1792,
+        "pva_all_px": {
+          "count": 10686,
+          "min": 0.0721740992389733,
+          "median": 5.638248931283548,
+          "p95": 19.907296677149947,
+          "max": 1006.2101538820667
+        },
+        "smplh_all_px": {
+          "count": 10686,
+          "min": 0.03324344350862546,
+          "median": 18.095763033834544,
+          "p95": 93.84736076313817,
+          "max": 287.31264186766344
+        },
+        "pva_hips_px": {
+          "count": 1788,
+          "min": 0.11433666125958555,
+          "median": 6.515935874188877,
+          "p95": 16.783511947677667,
+          "max": 56.88571001944223
+        },
+        "smplh_hips_px": {
+          "count": 1788,
+          "min": 9.047419260899478,
+          "median": 59.599107238408706,
+          "p95": 165.48123979958555,
+          "max": 201.72243761651947
+        }
+      },
+      "per_joint_status_counts": {
+        "left_shoulder": {
+          "initialized": 1,
+          "updated": 385,
+          "predicted": 52,
+          "expired": 8,
+          "reinitialized": 2
+        },
+        "right_shoulder": {
+          "initialized": 1,
+          "updated": 447
+        },
+        "left_elbow": {
+          "initialized": 1,
+          "predicted": 81,
+          "updated": 361,
+          "reinitialized": 3,
+          "expired": 2
+        },
+        "right_elbow": {
+          "initialized": 1,
+          "updated": 447
+        },
+        "left_wrist": {
+          "initialized": 1,
+          "predicted": 23,
+          "updated": 424
+        },
+        "right_wrist": {
+          "initialized": 1,
+          "updated": 447
+        },
+        "left_hip": {
+          "initialized": 1,
+          "updated": 443,
+          "predicted": 4
+        },
+        "right_hip": {
+          "initialized": 1,
+          "updated": 445,
+          "predicted": 2
+        },
+        "left_knee": {
+          "initialized": 1,
+          "updated": 443,
+          "predicted": 4
+        },
+        "right_knee": {
+          "initialized": 1,
+          "updated": 334,
+          "predicted": 107,
+          "reinitialized": 3,
+          "expired": 3
+        },
+        "left_ankle": {
+          "initialized": 1,
+          "updated": 445,
+          "predicted": 2
+        },
+        "right_ankle": {
+          "initialized": 1,
+          "updated": 447
+        }
+      }
+    }
+  },
+  "smplh_comparison": {
+    "raw_reprojection_px": {
+      "all_raw_slots": {
+        "count": 10752,
+        "min": 0.03324344350862546,
+        "median": 18.131929348178826,
+        "p95": 93.57651070066689,
+        "max": 287.31264186766344
+      },
+      "hip_raw_slots": {
+        "count": 1792,
+        "min": 9.047419260899478,
+        "median": 59.57057229886644,
+        "p95": 165.4378456236971,
+        "max": 201.72243761651947
+      },
+      "hip_slots_total": 1792,
+      "all_slots_total": 10752
+    },
+    "events": [
+      {
+        "frame": 37,
+        "ankle_height_change_from_previous_mm": [
+          35.75231716331041,
+          28.840054903727946
+        ]
+      },
+      {
+        "frame": 59,
+        "ankle_height_change_from_previous_mm": [
+          7.350121511412453,
+          38.34332594487137
+        ]
+      }
+    ],
+    "static_segments": [
+      {
+        "frames": [
+          35,
+          61
+        ],
+        "frame_count": 27,
+        "available_ankle_slots": 54,
+        "total_ankle_slots": 54,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 27,
+            "min": 100.76451169968163,
+            "median": 147.6820367828259,
+            "p95": 157.8132398044194,
+            "max": 158.603577902133
+          },
+          {
+            "count": 27,
+            "min": 82.11915334884691,
+            "median": 118.79625882308153,
+            "p95": 163.6507534925564,
+            "max": 164.78001252791626
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 54
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          54.77425614219669,
+          80.852426322155
+        ],
+        "endpoint_mean_ankle_height_change_mm": 67.81334123217584,
+        "median5_height_change_each_ankle_mm": [
+          20.08163746264836,
+          50.29273500118802
+        ],
+        "median5_mean_ankle_height_change_mm": 35.18718623191819,
+        "both_ankles_rise20mm": true,
+        "persistent_rise_30mm": true
+      },
+      {
+        "frames": [
+          86,
+          123
+        ],
+        "frame_count": 38,
+        "available_ankle_slots": 76,
+        "total_ankle_slots": 76,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 38,
+            "min": 54.22509844823446,
+            "median": 85.61524704226412,
+            "p95": 142.66659765443382,
+            "max": 149.13733000505454
+          },
+          {
+            "count": 38,
+            "min": 56.004226947589245,
+            "median": 88.41090986064773,
+            "p95": 126.17007236689003,
+            "max": 147.6633149111051
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 76
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          -9.975150094907917,
+          -8.715944311135331
+        ],
+        "endpoint_mean_ankle_height_change_mm": -9.345547203021624,
+        "median5_height_change_each_ankle_mm": [
+          -15.299154598920609,
+          -13.600264331375115
+        ],
+        "median5_mean_ankle_height_change_mm": -14.449709465147862,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          125,
+          125
+        ],
+        "frame_count": 1,
+        "available_ankle_slots": 2,
+        "total_ankle_slots": 2,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 1,
+            "min": 148.42122801017263,
+            "median": 148.42122801017263,
+            "p95": 148.42122801017263,
+            "max": 148.42122801017263
+          },
+          {
+            "count": 1,
+            "min": 160.77675904892772,
+            "median": 160.77675904892772,
+            "p95": 160.77675904892772,
+            "max": 160.77675904892772
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 2
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          0.0,
+          0.0
+        ],
+        "endpoint_mean_ankle_height_change_mm": 0.0,
+        "median5_height_change_each_ankle_mm": [
+          0.0,
+          0.0
+        ],
+        "median5_mean_ankle_height_change_mm": 0.0,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          156,
+          194
+        ],
+        "frame_count": 39,
+        "available_ankle_slots": 78,
+        "total_ankle_slots": 78,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 39,
+            "min": 70.1751643916034,
+            "median": 134.00397241880592,
+            "p95": 156.8724759488191,
+            "max": 160.01191271491064
+          },
+          {
+            "count": 39,
+            "min": 78.35111016231838,
+            "median": 117.22706202523784,
+            "p95": 169.9582841700488,
+            "max": 173.22833251890688
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 78
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          30.96392096767829,
+          38.49569588434758
+        ],
+        "endpoint_mean_ankle_height_change_mm": 34.72980842601294,
+        "median5_height_change_each_ankle_mm": [
+          36.960677278929666,
+          37.40832522244705
+        ],
+        "median5_mean_ankle_height_change_mm": 37.184501250688356,
+        "both_ankles_rise20mm": true,
+        "persistent_rise_30mm": true
+      },
+      {
+        "frames": [
+          217,
+          217
+        ],
+        "frame_count": 1,
+        "available_ankle_slots": 2,
+        "total_ankle_slots": 2,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 1,
+            "min": 36.66210916373325,
+            "median": 36.66210916373325,
+            "p95": 36.66210916373325,
+            "max": 36.66210916373325
+          },
+          {
+            "count": 1,
+            "min": 31.68957646234969,
+            "median": 31.68957646234969,
+            "p95": 31.68957646234969,
+            "max": 31.68957646234969
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 2
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          0.0,
+          0.0
+        ],
+        "endpoint_mean_ankle_height_change_mm": 0.0,
+        "median5_height_change_each_ankle_mm": [
+          0.0,
+          0.0
+        ],
+        "median5_mean_ankle_height_change_mm": 0.0,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          229,
+          263
+        ],
+        "frame_count": 35,
+        "available_ankle_slots": 70,
+        "total_ankle_slots": 70,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 35,
+            "min": 52.49073680445258,
+            "median": 102.72654875656849,
+            "p95": 113.78580898601082,
+            "max": 115.58207787349363
+          },
+          {
+            "count": 35,
+            "min": 47.22067841086198,
+            "median": 109.00994833540994,
+            "p95": 122.73445505549876,
+            "max": 129.7080342662623
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 70
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          -48.1232546835696,
+          -49.039734887997156
+        ],
+        "endpoint_mean_ankle_height_change_mm": -48.58149478578338,
+        "median5_height_change_each_ankle_mm": [
+          -41.56453601606438,
+          -49.43996754705131
+        ],
+        "median5_mean_ankle_height_change_mm": -45.502251781557845,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          265,
+          265
+        ],
+        "frame_count": 1,
+        "available_ankle_slots": 2,
+        "total_ankle_slots": 2,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 1,
+            "min": 46.0359805238719,
+            "median": 46.0359805238719,
+            "p95": 46.0359805238719,
+            "max": 46.0359805238719
+          },
+          {
+            "count": 1,
+            "min": 34.36165802431913,
+            "median": 34.36165802431913,
+            "p95": 34.36165802431913,
+            "max": 34.36165802431913
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 2
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          0.0,
+          0.0
+        ],
+        "endpoint_mean_ankle_height_change_mm": 0.0,
+        "median5_height_change_each_ankle_mm": [
+          0.0,
+          0.0
+        ],
+        "median5_mean_ankle_height_change_mm": 0.0,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          302,
+          309
+        ],
+        "frame_count": 8,
+        "available_ankle_slots": 16,
+        "total_ankle_slots": 16,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 8,
+            "min": 101.4149765973109,
+            "median": 105.48245896983167,
+            "p95": 108.07790013297333,
+            "max": 109.07941318854523
+          },
+          {
+            "count": 8,
+            "min": 89.95467754017795,
+            "median": 96.10724973434844,
+            "p95": 100.1983615363965,
+            "max": 100.75671225090923
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 16
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          4.134861738793234,
+          9.206746954980645
+        ],
+        "endpoint_mean_ankle_height_change_mm": 6.670804346886939,
+        "median5_height_change_each_ankle_mm": [
+          4.077218513161029,
+          8.79718708589246
+        ],
+        "median5_mean_ankle_height_change_mm": 6.4372027995267445,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          316,
+          325
+        ],
+        "frame_count": 10,
+        "available_ankle_slots": 20,
+        "total_ankle_slots": 20,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 10,
+            "min": 53.21395721215356,
+            "median": 67.50114427562823,
+            "p95": 71.41783847192303,
+            "max": 71.97059818459286
+          },
+          {
+            "count": 10,
+            "min": 76.61492624854066,
+            "median": 89.87509524073192,
+            "p95": 99.28446446026108,
+            "max": 99.44610408233541
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 20
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          -13.96262627036208,
+          -12.66900190481897
+        ],
+        "endpoint_mean_ankle_height_change_mm": -13.315814087590525,
+        "median5_height_change_each_ankle_mm": [
+          -13.649855294575673,
+          0.21341856600031406
+        ],
+        "median5_mean_ankle_height_change_mm": -6.718218364287679,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          327,
+          348
+        ],
+        "frame_count": 22,
+        "available_ankle_slots": 44,
+        "total_ankle_slots": 44,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 22,
+            "min": 45.2600475000462,
+            "median": 54.7287814908604,
+            "p95": 63.42923294779267,
+            "max": 63.703757576124985
+          },
+          {
+            "count": 22,
+            "min": 28.06536250082695,
+            "median": 40.69897658173642,
+            "p95": 76.55735498371648,
+            "max": 77.46189300448066
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 44
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          -8.475493419514692,
+          -37.59996369155442
+        ],
+        "endpoint_mean_ankle_height_change_mm": -23.037728555534557,
+        "median5_height_change_each_ankle_mm": [
+          -1.434232532811393,
+          -31.321544683877278
+        ],
+        "median5_mean_ankle_height_change_mm": -16.377888608344335,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      },
+      {
+        "frames": [
+          391,
+          422
+        ],
+        "frame_count": 32,
+        "available_ankle_slots": 64,
+        "total_ankle_slots": 64,
+        "height_range_each_ankle_mm": [
+          {
+            "count": 32,
+            "min": 75.93564434339828,
+            "median": 113.48500509822719,
+            "p95": 131.35976835509092,
+            "max": 133.51125024719443
+          },
+          {
+            "count": 32,
+            "min": 69.8361658878872,
+            "median": 121.35227967256577,
+            "p95": 133.93252840390153,
+            "max": 140.78482906254874
+          }
+        ],
+        "ankle_status_counts": {
+          "model": 64
+        },
+        "both_ankles_available_without_restart": true,
+        "endpoint_height_change_each_ankle_mm": [
+          4.916646035939152,
+          32.87203130330022
+        ],
+        "endpoint_mean_ankle_height_change_mm": 18.894338669619685,
+        "median5_height_change_each_ankle_mm": [
+          7.784038928342966,
+          32.617995507969
+        ],
+        "median5_mean_ankle_height_change_mm": 20.201017218155982,
+        "both_ankles_rise20mm": false,
+        "persistent_rise_30mm": false
+      }
+    ]
+  },
+  "limitations": [
+    "Route comparison,not single-variable SMPL-H ablation:Cartesian state,initialization,process/gates differ.",
+    "Free endpoints have no fixed-bone/anatomical coupling and cannot establish a valid rigid skeleton.",
+    "Same biased2D/fisheye calibration and host-time can affect both;neither comparison establishes actual3D/physical accuracy.",
+    "COCO ankle height is not sole/heel height. Only static-camera episodes support motion attribution;full moving-stage world values are reference-conditioned.",
+    "Do not rotate camera-relative v/a into purported world derivatives;archive those as camera-relative only.",
+    "SMPL-H results are loaded for comparison only AFTER independent tracking finishes."
+  ]
+}

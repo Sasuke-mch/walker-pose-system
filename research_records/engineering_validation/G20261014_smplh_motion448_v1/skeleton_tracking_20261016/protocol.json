@@ -1,0 +1,186 @@
+{
+  "question": "Does causal stereo skeleton tracking without SMPL-H reproduce the diagnosed ankle rise and hip image residual?",
+  "source_run_for_paths_and_later_comparison": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "tracking_inputs": {
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results"
+  },
+  "first_frame_observations": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\first_frame_observations.json",
+  "capture_times": "D:\\my_works\\walker_pose_system\\realtime_app\\outputs\\people_1\\20260908_203954_366\\stereo_pairs.csv",
+  "frames": [
+    0,
+    447
+  ],
+  "joint_names": [
+    "left_shoulder",
+    "right_shoulder",
+    "left_elbow",
+    "right_elbow",
+    "left_wrist",
+    "right_wrist",
+    "left_hip",
+    "right_hip",
+    "left_knee",
+    "right_knee",
+    "left_ankle",
+    "right_ankle"
+  ],
+  "method": "Existing independent9-state Cartesian[p,v,a] pixel-feedback EKF per joint;triangulation only initializes/restarts and gates,not a3D observation update",
+  "initialization": "No initial_points_mm supplied: first valid stereo pair per joint initializes3D,zero v/a and frozen P0. No SMPL-H pose,shape,mesh or pretrained model read by tracker.",
+  "configurations_frozen_before_run": {
+    "pva_frozen_sigma4": {
+      "min_score": 0.2,
+      "max_reprojection_px": 25.0,
+      "min_ray_angle_deg": 1.0,
+      "pixel_sigma_px": 4.0,
+      "innovation_gate_squared": 64.0,
+      "jerk_spectral_density_mm2_s5": 100000000.0,
+      "initial_position_sigma_mm": 100.0,
+      "initial_velocity_sigma_mm_s": 1000.0,
+      "initial_acceleration_sigma_mm_s2": 5000.0,
+      "max_prediction_s": 0.5
+    },
+    "pva_matched_pixel_sigma8": {
+      "min_score": 0.2,
+      "max_reprojection_px": 25.0,
+      "min_ray_angle_deg": 1.0,
+      "pixel_sigma_px": 8.0,
+      "innovation_gate_squared": 64.0,
+      "jerk_spectral_density_mm2_s5": 100000000.0,
+      "initial_position_sigma_mm": 100.0,
+      "initial_velocity_sigma_mm_s": 1000.0,
+      "initial_acceleration_sigma_mm_s2": 5000.0,
+      "max_prediction_s": 0.5
+    }
+  },
+  "control_variable": "The second pass changes only pixel_sigma_px4->8,matching the SMPL-H pixel scale;no parameter search",
+  "primary_window": [
+    35,
+    61
+  ],
+  "decision": "Both ankle tracks must be finite and uninterrupted. A persistent rise is defined diagnostically as mean endpoint AND median5-endpoint rise>=30mm. If both PVA passes avoid that rise while SMPL-H shows it,prioritize the coupled SMPL-H route;do not claim SMPL-H asset is intrinsically wrong.",
+  "stop": "One full448 pass per predeclared configuration;no retries or parameter sweeps. Missing/rejected/predicted/restarted points remain in all output rows. If ankles missing/restarted in primary window,conclusion is inconclusive.",
+  "reference": {
+    "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\slope_motion_20261015\\scene",
+    "role": "Existing same-source Stage/R/t reused ONLY posthoc for numerical comparison;never fed into tracker. No fresh3D scene/viewer is produced.",
+    "static_episode_transform_check": [
+      {
+        "frames": [
+          35,
+          61
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          86,
+          123
+        ],
+        "max_rotation_entry_change": 6.661338147750939e-16,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          125,
+          125
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          156,
+          194
+        ],
+        "max_rotation_entry_change": 1.5543122344752192e-15,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          217,
+          217
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          229,
+          263
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          265,
+          265
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          302,
+          309
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          316,
+          325
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          327,
+          348
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      },
+      {
+        "frames": [
+          391,
+          422
+        ],
+        "max_rotation_entry_change": 0.0,
+        "max_translation_change_mm": 0.0
+      }
+    ],
+    "world_truth": false
+  },
+  "limitations": [
+    "Route comparison,not single-variable SMPL-H ablation:Cartesian state,initialization,process/gates differ.",
+    "Free endpoints have no fixed-bone/anatomical coupling and cannot establish a valid rigid skeleton.",
+    "Same biased2D/fisheye calibration and host-time can affect both;neither comparison establishes actual3D/physical accuracy.",
+    "COCO ankle height is not sole/heel height. Only static-camera episodes support motion attribution;full moving-stage world values are reference-conditioned.",
+    "Do not rotate camera-relative v/a into purported world derivatives;archive those as camera-relative only.",
+    "SMPL-H results are loaded for comparison only AFTER independent tracking finishes."
+  ],
+  "actual_results": {
+    "record": "summary.json",
+    "tracking_arrays": [
+      "pva_frozen_sigma4.npz",
+      "pva_matched_pixel_sigma8.npz"
+    ],
+    "plot": "comparison.png",
+    "status": "completed_once_per_predeclared_configuration",
+    "decision": "Prioritize coupled SMPL-H route:primary bilateral rise and event jumps not reproduced by independent pixel-feedback tracking. Free PVA still has unilateral rises,bone drift and failure slots;do not promote as physically correct or call SMPL-H asset wrong.",
+    "validation": "Existing PVA8 tests passed from realtime_app after correcting first root-CWD import failure;runner compile/Ruff passed;plot inspected;read-only review found no blocking input/coordinate/statistical error.",
+    "analysis_only": "Later summary/common-slot fields and model-status string correction read saved arrays;no repeated tracking."
+  },
+  "next_strategy": {
+    "first": "Resolve hip observation/model definition and frozen-shape expressibility using existing evidence before weights or new contact conditions.",
+    "candidate": "Retain SMPL-H model/shape;evaluate explicit root/local joint rotations as motion state instead of whole-body32 latent derivatives. Disclose corresponding prior/process changes;not strict one-variable ablation.",
+    "scope": "Only35..61,no new contact constraints;require concurrent ankle-rise and hip-residual improvement without deleting data or changing bones before448.",
+    "do_not_adopt": "No independent-PVA production replacement;no correlated triangulation3D+raw2D double counting."
+  }
+}
