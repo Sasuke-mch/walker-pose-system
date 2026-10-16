@@ -1,10 +1,11 @@
-"""One bounded soft-contact experiment on the frozen direction-only prefix.
+"""Bounded soft-contact experiments and a matched derivative-only control.
 
 Contact is an engineering regularizer in the current MAP, never a pixel,
 independent measurement, output correction, or contact truth label.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from collections import Counter
@@ -109,8 +110,18 @@ def summarize(arrays, vertices, rows, body, toes, cal, rotation, translation, la
     return result, sole, ball
 
 
-def run():
-    proto, model, tr, body, toes, times = load(62, ContactPointMap, ContactTracker)
+def run(jacobian='finite', contact=True):
+    tracker_class = ContactTracker
+    if jacobian == 'autograd':
+        from smplh_contact_autograd import AutogradContactTracker
+        tracker_class = AutogradContactTracker
+    elif not contact:
+        raise ValueError('The contact-free numerical control is only defined for autograd')
+    dest = DEST if jacobian == 'finite' else OUT / ('soft_contact_autograd_prefix' if contact else 'toe_direction_autograd_prefix')
+    reference_dir = OUT / ('toe_direction_autograd_prefix' if jacobian == 'autograd' and contact else 'toe_direction_prefix')
+    if not (reference_dir / 'result.npz').exists():
+        raise ValueError('Run the matching contact-free control first')
+    proto, model, tr, body, toes, times = load(62, ContactPointMap, tracker_class)
     tr.observation_mode = 'direction'
     labels = support_labels()
     scene_path = REPAIR / 'view/scene/scene_transforms.npz'
@@ -120,12 +131,16 @@ def run():
     if not (np.allclose(rotation[35:], rotation[35], atol=1e-12, rtol=0) and
             np.allclose(translation[35:], translation[35], atol=1e-12, rtol=0)):
         raise ValueError('The preregistered contact window requires one fixed ground frame')
-    DEST.mkdir(exist_ok=False)
-    protocol = {'code': str(Path(__file__).relative_to(APP.parent)), 'command': [sys.executable, str(Path(__file__).resolve())],
-        'baseline': str(OUT / 'toe_direction_prefix'), 'input_frames': [0, 61], 'contact_frames': [35, 61],
+    dest.mkdir(exist_ok=False)
+    protocol = {'code': str(Path(__file__).relative_to(APP.parent)), 'command': [sys.executable, str(Path(__file__).resolve()), *sys.argv[1:]],
+        'baseline': str(reference_dir), 'input_frames': [0, 61], 'contact_frames': [35, 61] if contact else [],
         'source_body_run': proto['source_run'], 'surface_sets': str(SURFACE_PATH), 'fixed_ground': str(scene_path),
         'configuration': proto['configuration'], 'iterated_map_configuration': proto['iterated_map_configuration'],
-        'single_change': 'Add normalized unilateral sole and support-ball height regularization to the same current-frame direction MAP from35; all earlier frames unchanged.',
+        'single_change': ('Add normalized unilateral sole and support-ball height regularization to the matching direction MAP from35; all earlier frames unchanged.' if contact else
+            'Change only the pixel/direction MAP Jacobian from central finite differences to automatic differentiation, including the one final pixel/pose information update.'),
+        'jacobian': jacobian, 'contact_enabled': contact,
+        'jacobian_code': 'realtime_app/tools/smplh_contact_autograd.py' if jacobian == 'autograd' else 'realtime_app/pose_app/smplh_iterated_motion_tracker.py',
+        'numerical_control': 'Same float32 assets, forward objective, parameters,15 iteration budget, pixel gates, q/v/a/P process and covariance policy. Derivative publication still uses the original point finite differences.',
         'contact': {'tolerance_m': .005, 'penetration_scale_m': .005, 'height_scale_m': .010, 'height_target_m': 0.,
             'penetration_normalization': 'sqrt(108), independent of vertex count', 'support_height': 'true minimum of18 fixed ball vertices perfoot',
             'support_penalty': 'pseudo-Huber sqrt(1+(h/.010)^2)-1', 'slip': 'not introduced in this stage'},
@@ -137,18 +152,23 @@ def run():
             'no_more_unconverged': True, 'direction_median_max_deg': 'max(3, baseline*1.1)', 'direction_max_max_deg': 'baseline+2'},
         'stop': 'One62-frame experiment. No weight search, no smoothing, no448 on failure. A pass permits further contact-label validation, not automatic promotion.',
         'limits': 'Stage/ankle-anchored reference ground and assistant support hypotheses are not independent contact/3D truth. Bare-model surface target0 is an engineering convention despite slippers. Source image review is offline; no causal contact classifier is claimed.'}
-    save(DEST / 'protocol.json', protocol)
+    if not contact:
+        del protocol['success']['support_abs_median_and_p95_max_ratio']
+        protocol['contact']['enabled'] = False
+        protocol['information_policy'] = 'Original single pixel/pose local information update, using automatic derivatives; no engineering residual is active.'
+        protocol['stop'] = 'One62-frame solver-only control. Same body/direction/availability/ground and non-increasing unconverged gates; no contact improvement is required or claimed.'
+    save(dest / 'protocol.json', protocol)
     archive = {k: [] for k in ['predicted_coco', 'smplh_joints', 'transl', 'root_rotation', 'vposer_latent', 'body_rotations',
         'pose_available', 'segment_id', 'toe_m', 'velocity', 'acceleration', 'covariance']}
     rows, vertices, started = [], [], perf_counter()
     original = model.regressor.clone()
-    with (DEST / 'trajectory.jsonl').open('w', encoding='utf-8') as stream:
+    with (dest / 'trajectory.jsonl').open('w', encoding='utf-8') as stream:
         for i in range(62):
             if i == 11:
                 a, b = proto['hip_calibration_result']['alpha'], proto['hip_calibration_result']['thigh_fraction']
                 model.regressor[11:13] = original[11:13] + a*(original[11:13]-original[[12, 11]]) + b*(original[13:15]-original[11:13])
                 tr.last_point_jacobian = None
-            tr.contact_rotation = rotation[i] if i >= 35 else None
+            tr.contact_rotation = rotation[i] if contact and i >= 35 else None
             tr.contact_translation, tr.support = translation[i], labels[i]
             tr.extra_pixels = None if i in HELDOUT or i == 0 else toes[i]
             result = tr.step(float(times[i]), *body[i])
@@ -158,9 +178,9 @@ def run():
                 ('body_rotations', result['body_rotations']), ('pose_available', result['pose_available']), ('segment_id', result['segment_id']),
                 ('toe_m', result['toe_m']), ('velocity', tr.velocity.copy()), ('acceleration', tr.acceleration.copy()), ('covariance', tr.covariance.copy())]:
                 archive[key].append(value)
-            residual = contact_residuals(result['vertices_m'][None, SURFACE], rotation[i], translation[i], labels[i])[0] if i >= 35 else np.empty(0)
+            residual = contact_residuals(result['vertices_m'][None, SURFACE], rotation[i], translation[i], labels[i])[0] if contact and i >= 35 else np.empty(0)
             row = {'frame': i, 'status': result['status'], 'optimizer': result['iterated_update'], 'support_ball': labels[i].tolist(),
-                'contact_active': i >= 35, 'contact_final_cost': {'penetration': float(.5*sum(residual[:108]**2)), 'attachment': float(.5*sum(residual[108:]**2))},
+                'contact_active': contact and i >= 35, 'contact_final_cost': {'penetration': float(.5*sum(residual[:108]**2)), 'attachment': float(.5*sum(residual[108:]**2))},
                 'body_used': result['used_views'].tolist(), 'body_reason': result['view_reason'].tolist(),
                 'toe_used': getattr(tr, 'foot_used', np.zeros((2, 4), bool)).tolist(),
                 'toe_reason': getattr(tr, 'foot_reason', np.full((2, 4), 'initial_not_reused', dtype=object)).tolist(),
@@ -171,33 +191,40 @@ def run():
                 print('frame', i, 'support', labels[i], 'optimizer', row['optimizer']['status'], flush=True)
     arrays = {k: np.asarray(v) for k, v in archive.items()}
     arrays.update(betas=model.betas.cpu().numpy(), timestamp_s=times, regressor=model.regressor.cpu().numpy(), support_ball=labels)
-    reference = np.load(OUT / 'toe_direction_prefix/result.npz')
-    baseline_rows = [json.loads(line) for line in (OUT / 'toe_direction_prefix/trajectory.jsonl').read_text().splitlines()]
+    reference = np.load(reference_dir / 'result.npz')
+    baseline_rows = [json.loads(line) for line in (reference_dir / 'trajectory.jsonl').read_text().splitlines()]
     baseline_vertices = np.concatenate([model.evaluate_batch(reference['transl'][s:s+16], reference['root_rotation'][s:s+16],
         reference['vposer_latent'][s:s+16], True)['vertices_m'] for s in range(0, 62, 16)])
     a, base_sole, base_ball = summarize(reference, baseline_vertices, baseline_rows, body, toes, tr.cal, rotation, translation, labels)
     b, new_sole, new_ball = summarize(arrays, np.asarray(vertices), rows, body, toes, tr.cal, rotation, translation, labels)
     arrays.update(sole_min_m=new_sole, support_ball_height_m=new_ball)
-    np.savez_compressed(DEST / 'result.npz', **arrays)
+    np.savez_compressed(dest / 'result.npz', **arrays)
     gates = {f'{window}_{part}_{stat}': b[window][part][stat] <= a[window][part][stat]*1.05
         for window in ['primary35_61', 'context11_61'] for part in ['hip', 'nonhip'] for stat in ['median_px', 'p95_px']}
-    gates.update({f'support_{stat}_halved': b['support_ball_abs_height_mm'][stat] <= .5*a['support_ball_abs_height_mm'][stat] for stat in ['median', 'p95']})
+    if contact:
+        gates.update({f'support_{stat}_halved': b['support_ball_abs_height_mm'][stat] <= .5*a['support_ball_abs_height_mm'][stat] for stat in ['median', 'p95']})
     gates.update(no_missing=b['available'] == 62, no_restarts=b['segments'] == a['segments'],
         no_penetrating_foot_frames=b['penetrating_foot_frames35_61'] <= a['penetrating_foot_frames35_61'],
         sole_above_minus5mm=b['sole_min35_61_mm'] >= -5., no_more_unconverged=b['primary_unconverged'] <= a['primary_unconverged'],
         direction_median_retained=b['withheld_direction_median_deg'] <= max(3., a['withheld_direction_median_deg']*1.1),
         direction_max_retained=b['withheld_direction_max_deg'] <= a['withheld_direction_max_deg']+2.)
     max_prefix_delta = max(float(np.max(abs(arrays[k][:35]-reference[k][:35]))) for k in ['transl', 'root_rotation', 'vposer_latent', 'covariance'])
-    gates['inactive_prefix_unchanged'] = max_prefix_delta == 0.
-    report = {'variants': {'direction_baseline': a, 'soft_contact': b}, 'gates': gates, 'passed': all(gates.values()),
-        'inactive_prefix_max_difference': max_prefix_delta, 'runtime_s': perf_counter()-started,
+    if contact:
+        gates['inactive_prefix_unchanged'] = max_prefix_delta == 0.
+    report = {'variants': {'direction_baseline': a, 'soft_contact' if contact else 'autograd_direction': b},
+        'jacobian': jacobian, 'contact_enabled': contact, 'gates': gates, 'passed': all(gates.values()),
+        'prefix0_34_max_difference': max_prefix_delta, 'runtime_s': perf_counter()-started,
         'decision': 'Continue label validation only if all gates pass; otherwise keep direction baseline and stop this contact candidate without weight search.',
         'limits': protocol['limits']}
-    save(DEST / 'comparison.json', report)
-    np.savez_compressed(DEST / 'contact_comparison.npz', baseline_sole_m=base_sole, candidate_sole_m=new_sole,
+    save(dest / 'comparison.json', report)
+    np.savez_compressed(dest / 'contact_comparison.npz', baseline_sole_m=base_sole, candidate_sole_m=new_sole,
         baseline_ball_m=base_ball, candidate_ball_m=new_ball, support_ball=labels, timestamps_s=times)
     print(json.dumps(report, indent=2), flush=True)
 
 
 if __name__ == '__main__':
-    run()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--jacobian', choices=['finite', 'autograd'], default='finite')
+    parser.add_argument('--without-contact', action='store_true')
+    args = parser.parse_args()
+    run(args.jacobian, not args.without_contact)

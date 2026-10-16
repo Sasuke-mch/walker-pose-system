@@ -50,6 +50,22 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
         """Return normalized residuals (batch, terms), empty in the pixel baseline."""
         return np.empty((len(data["coco_m"]), 0))
 
+    def _objective_jacobians(self, prior, delta, selected, engineering_count):
+        """Differentiate in the one fixed prediction tangent (default: central FD)."""
+        n, eps = self.n, 1e-3
+        offsets = np.r_[delta[None]+np.eye(n)*eps,
+                        delta[None]-np.eye(n)*eps]
+        data = self.model.evaluate_batch(prior.translation_m+offsets[:, :3],
+                prior.root_rotation @ Rotation.from_rotvec(offsets[:, 3:6]).as_matrix(),
+                prior.latent+offsets[:, 6:])
+        projected = self._pixels(data["coco_m"])
+        pixel_jacobian = None if projected is None else ((projected[:n]-projected[n:])/(2*eps)).reshape(n, -1).T[selected]
+        engineering = np.asarray(self._engineering_residuals(data), dtype=float)
+        if engineering.shape != (2*n, engineering_count):
+            raise ValueError("engineering residuals must have stable shape (batch, terms)")
+        engineering_jacobian = ((engineering[:n]-engineering[n:])/(2*eps)).T
+        return pixel_jacobian, engineering_jacobian
+
     def _update(self, pixels, valid, reasons):
         self.update_scale = 0.
         used = valid.copy()
@@ -104,16 +120,8 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
             if jacobian and np.isfinite(cache["cost"]) and "J" not in cache:
                 # Perturb the fixed prediction's delta, not the repeatedly
                 # retracted current root. Thus the prior remains exactly y'y/2.
-                eps = 1e-3
-                offsets = np.r_[cache["delta"][None]+np.eye(n)*eps,
-                                cache["delta"][None]-np.eye(n)*eps]
-                data = self.model.evaluate_batch(prior.translation_m+offsets[:, :3],
-                        prior.root_rotation @ Rotation.from_rotvec(offsets[:, 3:6]).as_matrix(),
-                        prior.latent+offsets[:, 6:])
-                projected = self._pixels(data["coco_m"])
-                cache["J"] = None if projected is None else ((projected[:n]-projected[n:])/(2*eps)).reshape(n, -1).T[selected]
-                engineering = engineering_residuals(data, 2*n, len(cache["engineering"]))
-                cache["J_engineering"] = ((engineering[:n]-engineering[n:])/(2*eps)).T
+                cache["J"], cache["J_engineering"] = self._objective_jacobians(
+                    prior, cache["delta"], selected, len(cache["engineering"]))
             return cache
 
         def valid_linearization(val):

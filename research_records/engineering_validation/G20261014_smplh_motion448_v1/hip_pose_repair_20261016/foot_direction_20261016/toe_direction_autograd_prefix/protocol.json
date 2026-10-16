@@ -1,0 +1,335 @@
+{
+  "code": "realtime_app\\tools\\probe_smplh_soft_contact.py",
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\probe_smplh_soft_contact.py",
+    "--jacobian",
+    "autograd",
+    "--without-contact"
+  ],
+  "baseline": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\toe_direction_prefix",
+  "input_frames": [
+    0,
+    61
+  ],
+  "contact_frames": [],
+  "source_body_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "surface_sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260927_wilor_smplh_full448_v1\\contact_surface_sets_smplh_v1\\contact_vertex_sets.json",
+  "fixed_ground": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\view\\scene\\scene_transforms.npz",
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 0.75,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "iterated_map_configuration": {
+    "maximum_iterations": 15,
+    "gradient_tolerance": 0.05,
+    "objective_tolerance": 0.001,
+    "step_tolerance": 0.001,
+    "maximum_line_search_steps": 12,
+    "condition_accepted_iterate": true
+  },
+  "single_change": "Change only the pixel/direction MAP Jacobian from central finite differences to automatic differentiation, including the one final pixel/pose information update.",
+  "jacobian": "autograd",
+  "contact_enabled": false,
+  "numerical_control": "Same float32 assets, forward objective, parameters,15 iteration budget, pixel gates, q/v/a/P process and covariance policy. Derivative publication still uses the original point finite differences.",
+  "contact": {
+    "tolerance_m": 0.005,
+    "penetration_scale_m": 0.005,
+    "height_scale_m": 0.01,
+    "height_target_m": 0.0,
+    "penetration_normalization": "sqrt(108), independent of vertex count",
+    "support_height": "true minimum of18 fixed ball vertices perfoot",
+    "support_penalty": "pseudo-Huber sqrt(1+(h/.010)^2)-1",
+    "slip": "not introduced in this stage",
+    "enabled": false
+  },
+  "support_labels": [
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      true
+    ],
+    [
+      false,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ]
+  ],
+  "support_intervals_inclusive": {
+    "right_ball": [
+      35,
+      47
+    ],
+    "left_ball": [
+      49,
+      61
+    ]
+  },
+  "label_evidence": "Source stereo crops contact_source_review.jpg at35,39,43,47,51,55,59,61; right stationary during left swing, left stationary during right swing. Landing/lift uncertainty excluded. These labels assume the visible slipper front approximates model ball support; heels not labeled.",
+  "information_policy": "Original single pixel/pose local information update, using automatic derivatives; no engineering residual is active.",
+  "success": {
+    "body_hip_nonhip_median_p95_max_ratio": 1.05,
+    "no_new_missing_restarts_or_penetrating_foot_frames": true,
+    "sole_min_must_stay_above_minus5mm": true,
+    "no_more_unconverged": true,
+    "direction_median_max_deg": "max(3, baseline*1.1)",
+    "direction_max_max_deg": "baseline+2"
+  },
+  "stop": "One62-frame solver-only control. Same body/direction/availability/ground and non-increasing unconverged gates; no contact improvement is required or claimed.",
+  "limits": "Stage/ankle-anchored reference ground and assistant support hypotheses are not independent contact/3D truth. Bare-model surface target0 is an engineering convention despite slippers. Source image review is offline; no causal contact classifier is claimed.",
+  "jacobian_code": "realtime_app/tools/smplh_contact_autograd.py"
+}

@@ -1,0 +1,116 @@
+{
+  "variants": {
+    "direction_baseline": {
+      "primary35_61": {
+        "hip": {
+          "slots": 108,
+          "median_px": 32.279901170907124,
+          "p95_px": 74.13968216758953
+        },
+        "nonhip": {
+          "slots": 540,
+          "median_px": 17.54295226076553,
+          "p95_px": 70.43047597741108
+        }
+      },
+      "context11_61": {
+        "hip": {
+          "slots": 204,
+          "median_px": 35.41816366950736,
+          "p95_px": 67.89834392487316
+        },
+        "nonhip": {
+          "slots": 1020,
+          "median_px": 16.3155990488171,
+          "p95_px": 65.3049309376
+        }
+      },
+      "support_ball_abs_height_mm": {
+        "slots": 26,
+        "median": 27.72594425290137,
+        "p95": 56.567936123347764,
+        "max": 57.526784864810224
+      },
+      "sole_min35_61_mm": 0.7101315987203538,
+      "penetrating_foot_frames35_61": 0,
+      "withheld_direction_median_deg": 2.730710770407006,
+      "withheld_direction_max_deg": 6.3527907000048005,
+      "available": 62,
+      "segments": 1,
+      "primary_solver_status": {
+        "feasible_unconverged": 21,
+        "converged": 6
+      },
+      "primary_unconverged": 21,
+      "primary_max_posterior_updates": 1
+    },
+    "autograd_direction": {
+      "primary35_61": {
+        "hip": {
+          "slots": 108,
+          "median_px": 43.911711165047066,
+          "p95_px": 75.06187414906638
+        },
+        "nonhip": {
+          "slots": 540,
+          "median_px": 19.420264374309355,
+          "p95_px": 72.48644095144198
+        }
+      },
+      "context11_61": {
+        "hip": {
+          "slots": 204,
+          "median_px": 42.313334384128886,
+          "p95_px": 77.253700814114
+        },
+        "nonhip": {
+          "slots": 1020,
+          "median_px": 17.059700840465098,
+          "p95_px": 60.402064897952755
+        }
+      },
+      "support_ball_abs_height_mm": {
+        "slots": 26,
+        "median": 7.809695518978254,
+        "p95": 18.222629649259527,
+        "max": 19.59313689819342
+      },
+      "sole_min35_61_mm": -47.653419048159115,
+      "penetrating_foot_frames35_61": 28,
+      "withheld_direction_median_deg": 3.7540973193100253,
+      "withheld_direction_max_deg": 10.73820933558546,
+      "available": 62,
+      "segments": 1,
+      "primary_solver_status": {
+        "feasible_unconverged": 26,
+        "converged": 1
+      },
+      "primary_unconverged": 26,
+      "primary_max_posterior_updates": 1
+    }
+  },
+  "gates": {
+    "primary35_61_hip_median_px": false,
+    "primary35_61_hip_p95_px": true,
+    "primary35_61_nonhip_median_px": false,
+    "primary35_61_nonhip_p95_px": true,
+    "context11_61_hip_median_px": false,
+    "context11_61_hip_p95_px": false,
+    "context11_61_nonhip_median_px": true,
+    "context11_61_nonhip_p95_px": true,
+    "no_missing": true,
+    "no_restarts": true,
+    "no_penetrating_foot_frames": false,
+    "sole_above_minus5mm": false,
+    "no_more_unconverged": false,
+    "direction_median_retained": false,
+    "direction_max_retained": false
+  },
+  "passed": false,
+  "prefix0_34_max_difference": 1.866872955134805,
+  "runtime_s": 98.98378819999925,
+  "decision": "Continue label validation only if all gates pass; otherwise keep direction baseline and stop this contact candidate without weight search.",
+  "limits": "Stage/ankle-anchored reference ground and assistant support hypotheses are not independent contact/3D truth. Bare-model surface target0 is an engineering convention despite slippers. Source image review is offline; no causal contact classifier is claimed.",
+  "jacobian": "autograd",
+  "contact_enabled": false
+}
