@@ -1,5 +1,9 @@
 # Walker Pose 可视化固定实现规范
 
+2026-10-16接触研究的本次可视化位于`G20261014_smplh_motion448_v1/hip_pose_repair_20261016/foot_direction_20261016/contact_visualization_20261016/`：`sequences/index.html`为四组真实62帧同帧切换；`matched/index.html`为40/55/61三个独立帧的同预测先验原方向/FD软接触/自动软接触/几何接触；`expressibility/index.html`为35/40/47/55/61五个独立帧的局部latent/SO(3)及无接触对照。两页静态结果禁播，不补全帧、不拼回时序，不用solver成功退出冒称整体通过。三页保留同帧双目原图回投与下肢放大、真实网格、同源有限观测黑色18边/拒绝橙叉、地面/助步器/双相机/轨迹和折叠状态。
+
+本任务新计算同源448 strict及mainline Stage/地面，人体不重跑、网格由各组保存参数重新生成；COCO/native最大重建差≤2.54e−7m，新R/t与实验参考在导出后数值比较均差0，旧动态没有进入新场景。Canvas沿用真实13776三角面的逐面渲染，无WebGL索引缓冲；6890顶点/41328三角索引项均核对。当前根规范的完整17点/右膝实际门优先于技能历史排除说明；首帧黑色场景点为PMPose，人体初值/回投首帧Sapiens2，两者同图但非同检测点。浏览器核对55同帧切换、35→40播放、61未收敛、静态禁播、原图加载及各页无console error，截图/逐关节计数/原因/来源保存在各页metadata。入口`realtime_app/tools/build_contact_experiment_viewers.py`；三页互相导航，不改旧页面，不提升接触/精度结论。
+
 2026-10-16独立骨架跟踪与SMPL-H本次结果入口：`research_records/engineering_validation/G20261014_smplh_motion448_v1/skeleton_tracking_20261016/view/index.html`。三组完整448同帧/同视角切换，独立骨架σ8/σ4及原SMPL-H；网格始终为原SMPL-H同参数真实表面，PVA仅生成12点骨架。可选模型叠加、同源原始黑线、真实助步器/双相机、关键帧/35..61循环、两条可点曲线与左右原图回投，预测虚线、失效留空。场景本任务从同图新重放strict/Stage/地面，旧动态不输入；新R/t与数值对照参考一致。三组保存结果只读，不重跑人体。实际浏览器核对37同帧切换、55右膝失效、循环播放、59左右图与61脚高，截图保留view；纯数值实验先前“无新网页”说明不代表后续本次可视化状态。导数没有旋转冒称世界量，不改变原物理边界。
 
 2026-10-15仅首帧Sapiens2重初始化的新三组448入口：`research_records/engineering_validation/G20261014_smplh_motion448_v1/first_frame_sapiens_20261015/replay_selected_init/visualization/index.html`。人体及双目叠点为首帧Sapiens2、后447帧PMPose，停用人工覆盖、固定原主线beta；首帧整体VPoser sigma0.75与后续跟踪权重分开显示。黑色三角化/Stage/地面始终为本轮重放的同图PMPose，不能冒称首帧黑点即Sapiens2，页面/协议明确区分。真实网格、有限18边连接及拒绝状态保持，帧/视角切换、原始导数开关及实际首帧叠点实测，preview_selected_frame0.jpg保留。首帧前倾/sole高度改善但整段下肢/接触和MAP收敛未解决，不替换主线；数值与来源见该次protocol.json及initialization_replay_comparison.json。

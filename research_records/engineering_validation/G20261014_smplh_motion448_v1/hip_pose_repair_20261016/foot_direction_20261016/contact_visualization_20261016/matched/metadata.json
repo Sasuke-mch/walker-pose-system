@@ -1,0 +1,230 @@
+{
+  "frames": 3,
+  "source_result": [
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz"
+  ],
+  "fresh_shared_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_visualization_20261016\\scene",
+  "raw_inputs": {
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results",
+    "initial_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\initialization_double_sigma075\\result.npz",
+    "smplh_model": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+    "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+    "vposer_dir": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05",
+    "mano_left": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+    "mano_right": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+  },
+  "tracking_rerun": false,
+  "fitting_rerun": false,
+  "old_dynamic_inputs_consumed": false,
+  "geometry_max_difference_m": {
+    "coco": 1.1920928955078125e-07
+  },
+  "real_topology": {
+    "vertices": 6890,
+    "faces": 13776,
+    "index_entries": 41328
+  },
+  "frame_ids": [
+    40,
+    55,
+    61
+  ],
+  "same_task_scene_prefix": false,
+  "smoothing": false,
+  "interpolation": false,
+  "coordinate_map": "X,-Y,Z",
+  "rejection": "40通过；55/61未通过，非连续轨迹",
+  "payload_bytes": 1081740,
+  "page": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_visualization_20261016\\matched\\index.html",
+  "browser_status": "passed",
+  "geometry_checks_per_variant_m": [
+    {
+      "coco": 1.1920928955078125e-07
+    },
+    {
+      "coco": 1.1920928955078125e-07
+    },
+    {
+      "coco": 1.1920928955078125e-07
+    },
+    {
+      "coco": 1.1920928955078125e-07
+    }
+  ],
+  "static_independent_samples": true,
+  "variants": [
+    {
+      "name": "baseline",
+      "label": "原方向版（对应帧）",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz"
+    },
+    {
+      "name": "finite_soft_contact",
+      "label": "同先验·差分软接触",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz"
+    },
+    {
+      "name": "autograd_soft_contact",
+      "label": "同先验·自动软接触",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz"
+    },
+    {
+      "name": "constrained_original_map",
+      "label": "同先验·几何接触",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz"
+    }
+  ],
+  "per_joint_raw_finite": [
+    3,
+    2,
+    2,
+    1,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "per_joint_strict_accepted": [
+    1,
+    1,
+    1,
+    0,
+    2,
+    1,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    1,
+    1,
+    0,
+    2,
+    3
+  ],
+  "per_joint_raw_finite_rejected": [
+    2,
+    1,
+    1,
+    1,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    2,
+    3,
+    1,
+    0
+  ],
+  "per_frame_rejection_reasons": [
+    [
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted"
+    ],
+    [
+      "high_reprojection_error",
+      "out_of_raw_image_bounds",
+      "out_of_raw_image_bounds",
+      "out_of_raw_image_bounds",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "accepted"
+    ],
+    [
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "out_of_raw_image_bounds",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "accepted"
+    ]
+  ],
+  "original_images_reprojection": true,
+  "no_static_interpolation": true,
+  "source_results": [
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_matched_prior_feasibility\\candidates.npz"
+  ],
+  "ground_after_export_comparison_to_experiment_reference": {
+    "rotation_max_abs": 0.0,
+    "translation_max_abs_mm": 0.0,
+    "old_dynamic_values_used_as_input": false
+  },
+  "native_joints_saved_in_static_archives": false,
+  "browser_checks": {
+    "console_errors": 0,
+    "frame_indexed": true,
+    "variant_switch_same_frame_and_view": true,
+    "static_playback_disabled": true,
+    "real_mesh_visible": true,
+    "canvas_renderer": "real saved-model triangle faces drawn directly; no WebGL index buffer",
+    "screenshots": [
+      "research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_visualization_20261016\\matched\\preview_frame55.png"
+    ],
+    "frame55_constrained_sole_mm": [
+      9.96843216734533,
+      13.624111289677664
+    ],
+    "frame61_unconverged_shown": true,
+    "original_images_loaded": true
+  }
+}

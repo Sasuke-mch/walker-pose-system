@@ -1,5 +1,13 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-16 接触试验可视化完成：四组62帧、同先验三帧与局部旋转五帧分别查看
+
+按根规范及walker-visualization技能，新增build_contact_experiment_viewers.py。foot_direction_20261016/contact_visualization_20261016下sequences为原方向/FD软接触/自动无接触/自动软接触四组真实62帧同帧切换；matched为40/55/61独立同prior原方向及三解；expressibility为35/40/47/55/61独立latent/SO(3)四诊断+基线。静态页禁播，不造连续轨迹或回填原序列。三页共享同frame0取景，保留原图双目回投/下肢放大、接触标签、足底小标记、未收敛及未通过原因。
+
+本任务从同源448原图新计算strict并重放mainline Stage/地面，未消费旧动态；人体求解不重跑，按各自保存参数再生真实6890/13776网格，COCO/native最大差2.5332e−7m；新R/t导出后比较原参考差均0。所有对象同帧R/t+[X,−Y,Z]，纯黑有限raw18边/橙叉与右膝实际门、灰绿XY地面/浅色背景/0.5m轴、实体助步器/双相机/轨迹保持。当前Canvas直接按真实faces逐面绘制，不伪称WebGL缓冲。静态无已存native时不伪造一致性比较；首帧场景PMPose与人体Sapiens2身份分开。
+
+浏览器实看55四组切换、35→40播放、61上限与未收敛、静态禁播、左右图加载、局部SO(3)扭脚及足底下穿，三页console error0；每页metadata存输入/逐关节计数/原因/重建/浏览器结果，截图保留。扩展旧导出器和共享JS时保留历史repaired-only默认；只新页启用多模型。Ruff/编译/JS语法通过。详算法5.26与VISUALIZATION_PIPELINE新增入口；原实验/正式选择保持，其他改动保留，不推送。
+
 ## 2026-10-16 同预测先验接触定位完成：可贴地但仍有局部残差折中，停止62推广
 
 新增probe_smplh_contact_feasibility.py，只检查40/55/61，每帧由原方向版前一帧q/v/a/P恢复并_predict真实dt；原FD软接触、自动软接触与SLSQP几何条件共享逐值相同prior，raw门/权重/姿态与P先验/标签/地面不变，61脚方向仍留出。第三组不加软contact权重，直接要求108sole>=−5mm、支撑ball min<=10mm，latent原域/双目正深度保留，SLSQP60预算，仅静态定位。

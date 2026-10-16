@@ -1,0 +1,279 @@
+{
+  "frames": 5,
+  "source_result": [
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz"
+  ],
+  "fresh_shared_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_visualization_20261016\\scene",
+  "raw_inputs": {
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results",
+    "initial_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\initialization_double_sigma075\\result.npz",
+    "smplh_model": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+    "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+    "vposer_dir": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05",
+    "mano_left": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+    "mano_right": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+  },
+  "tracking_rerun": false,
+  "fitting_rerun": false,
+  "old_dynamic_inputs_consumed": false,
+  "geometry_max_difference_m": {
+    "coco": 2.384185791015625e-07
+  },
+  "real_topology": {
+    "vertices": 6890,
+    "faces": 13776,
+    "index_entries": 41328
+  },
+  "frame_ids": [
+    35,
+    40,
+    47,
+    55,
+    61
+  ],
+  "same_task_scene_prefix": false,
+  "smoothing": false,
+  "interpolation": false,
+  "coordinate_map": "X,-Y,Z",
+  "rejection": "未通过：大幅扭脚/下穿/方向退化",
+  "payload_bytes": 2171703,
+  "page": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_visualization_20261016\\expressibility\\index.html",
+  "browser_status": "passed",
+  "geometry_checks_per_variant_m": [
+    {
+      "coco": 1.1920928955078125e-07
+    },
+    {
+      "coco": 1.1920928955078125e-07
+    },
+    {
+      "coco": 1.1920928955078125e-07
+    },
+    {
+      "coco": 1.7881393432617188e-07
+    },
+    {
+      "coco": 2.384185791015625e-07
+    }
+  ],
+  "static_independent_samples": true,
+  "variants": [
+    {
+      "name": "baseline",
+      "label": "原方向版（对应帧）",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz"
+    },
+    {
+      "name": "latent_data_only",
+      "label": "局部latent·无接触",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz"
+    },
+    {
+      "name": "latent_contact",
+      "label": "局部latent＋接触",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz"
+    },
+    {
+      "name": "so3_data_only",
+      "label": "局部SO(3)·无接触",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz"
+    },
+    {
+      "name": "so3_contact",
+      "label": "局部SO(3)＋接触",
+      "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz"
+    }
+  ],
+  "per_joint_raw_finite": [
+    5,
+    4,
+    4,
+    3,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+  ],
+  "per_joint_strict_accepted": [
+    1,
+    1,
+    1,
+    2,
+    3,
+    2,
+    5,
+    4,
+    5,
+    4,
+    5,
+    3,
+    2,
+    3,
+    0,
+    3,
+    5
+  ],
+  "per_joint_raw_finite_rejected": [
+    4,
+    3,
+    3,
+    1,
+    2,
+    3,
+    0,
+    1,
+    0,
+    1,
+    0,
+    2,
+    3,
+    2,
+    5,
+    2,
+    0
+  ],
+  "per_frame_rejection_reasons": [
+    [
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted"
+    ],
+    [
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted"
+    ],
+    [
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "accepted"
+    ],
+    [
+      "high_reprojection_error",
+      "out_of_raw_image_bounds",
+      "out_of_raw_image_bounds",
+      "out_of_raw_image_bounds",
+      "accepted",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "accepted"
+    ],
+    [
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "out_of_raw_image_bounds",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "accepted",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "high_reprojection_error",
+      "accepted",
+      "accepted"
+    ]
+  ],
+  "original_images_reprojection": true,
+  "no_static_interpolation": true,
+  "source_results": [
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete\\static_poses.npz"
+  ],
+  "ground_after_export_comparison_to_experiment_reference": {
+    "rotation_max_abs": 0.0,
+    "translation_max_abs_mm": 0.0,
+    "old_dynamic_values_used_as_input": false
+  },
+  "native_joints_saved_in_static_archives": false,
+  "browser_checks": {
+    "console_errors": 0,
+    "frame_indexed": true,
+    "variant_switch_same_frame_and_view": true,
+    "static_playback_disabled": true,
+    "real_mesh_visible": true,
+    "canvas_renderer": "real saved-model triangle faces drawn directly; no WebGL index buffer",
+    "screenshots": [
+      "research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_visualization_20261016\\expressibility\\preview_frame55.png"
+    ],
+    "frame55_so3_contact_sole_mm": [
+      -11.163997857218778,
+      235.12840621142306
+    ],
+    "original_images_loaded": true
+  }
+}

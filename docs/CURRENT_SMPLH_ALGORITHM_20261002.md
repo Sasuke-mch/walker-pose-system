@@ -1182,6 +1182,20 @@ SO(3)五帧支撑sole分别−12.68/−10.32/−19.50/−11.16/−12.61mm；35/4
 
 `foot_direction_20261016/contact_matched_prior_feasibility/`保存运行前protocol、全部9组结果及分项cost/几何margin/原梯度/KKT/域/完整角改变量、同prior/candidate参数NPZ，完整53.04s。恢复/预测同源与三组q/P相等已在真实运行核对，最终域和角改变量从保存候选追加，无重优化。工具Ruff/编译通过，沿用已通过25项相关数学/MAP测试，不为纯诊断重复运行整套模型。命令`.venv-cuda/Scripts/python.exe realtime_app/tools/probe_smplh_contact_feasibility.py`，已有目录拒绝覆盖。失败、输出/输入路径与物理边界保留，不推送。
 
+### 5.26 接触试验可视化：完整序列与静态解分开显示（2026-10-16）
+
+用户要求按相关文件可视化5.22–5.25。新入口统一在`foot_direction_20261016/contact_visualization_20261016/`，三页互相导航：`sequences/index.html`可同帧同视角切换原方向、FD软接触、自动无接触、自动软接触四组真实0..61序列；`matched/index.html`仅40/55/61，含对应原方向及同prior三组解；`expressibility/index.html`仅35/40/47/55/61，含对应原方向和局部latent/SO(3)各data-only/contact。静态页按原帧号索引、禁播，不插值成连续动作、不把40成功姿态拼回原轨迹。网页状态保留未通过原因，区分SLSQP成功退出与整体通过，未收敛按原记录显示；所有失败变形保留。
+
+新增`realtime_app/tools/build_contact_experiment_viewers.py`，扩展已有`build_foot_observation_viewers.export`以接收明确原帧ID/保存参数字典和只返回payload；旧入口默认行为保留。共享`smplh_minimal_view.js`只在新payload显式comparison时启用多模型切换，历史修正页仍只取repaired；帧输入/视角/拖动/显示控制保持。三页都用原frame0的同源髋中点固定取景，不按当前结果漂移取景。折叠原图面板开启时与三维分栏，提供左右原图、全身/下肢裁切、raw身体/模型回投及原toe/模型toe；35/47/61明确脚方向未用于拟合，原始坐标不改。显示裁切不改变观测或三维坐标。
+
+本任务先由同源有序448双目原图/PMPose重新生成strict并重放mainline Stage/地面，保存于本次`scene/`与`strict.jsonl`，仅读取历史命令的静态配置，不读旧动态地面/助步器/旧HTML顶点作为输入。人体求解和跟踪没有重跑；四组序列、静态原方向与所有候选均用各自保存的translation/root/body rotations、冻结beta/手姿解码真实SMPL-H。网格6890顶点/13776面；当前Canvas直接画真实三角面，41328索引项而非伪称WebGL index buffer。生成COCO/native与保存值最大差2.5332e−7m；静态档案没有保存native时不虚构native一致性比较。导出完成后单独比较新R/t与原实验参考，差均0，旧数值没有进入当前场景计算。
+
+同帧网格、模型COCO、raw三角化/accepted-only strict、实体助步器/双相机/轨迹统一新R/t及[X,−Y,Z]，XY灰绿地面/浅色背景/Z高度/0.5m刻度保持。有限raw点连纯黑18边，严格拒绝点橙叉，真正非有限不补点；右膝按实际逐帧门，不采用技能历史永久排除规则。源raw有限/accepted/rejected逐关节计数和逐帧拒绝原因写入已有metadata，strict与人体二维门不混称。首帧场景PMPose和人体Sapiens2的身份继续区分。接触标签/ball及sole高度放折叠帧信息，地面下sole用小红点保留；不做显示吸附、平滑或网格插值。
+
+实际浏览器检查：55帧四组切换均保帧/视角（原方向sole30.71/35.89mm、自动无接触−10.41/−33.92mm），播放35→40且可暂停、帧上限61；同prior页55几何接触9.97/13.62mm与原图回投可见，61实际切帧显示未收敛；局部SO(3)+接触55足部扭曲及sole−11.16/235.13mm原样显示。两静态页禁播，三页控制台error0；截图`sequences/preview_frame55.png`/`preview_frame61.png`、`matched/preview_frame55.png`、`expressibility/preview_frame55.png`保留。本地8765旧服务已停，本次仅在127.0.0.1重启以显示页面。Ruff、Python编译及JS语法通过；未因显示任务重复模型/跟踪测试。
+
+复现：`.venv-cuda/Scripts/python.exe realtime_app/tools/build_contact_experiment_viewers.py`先新重放场景再导出；同任务场景已完成时`--export-only`仅使用本任务新场景，拒绝覆盖已填充页面。大型GZ/场景/截图留本地，源码和已有记录/小metadata及场景命令提交。当前正式身体/原方向研究选择不变；页面用于检查既有失败，不构成独立触地/三维准确性证据。
+
 ## 6. 研究依据与未实施改进
 
 本节研究设计仍未整体完成；已实现第4节估计器、第5节对照、5.7的Stage条件约束及5.9的迭代MAP与已知刚体运动检查。完整关节运动held-out、短窗和独立世界融合仍未实施；5.9的固定局部姿态刚体/相机clip不能替代完整研究门。保留同一SMPL-H/回归器/观测契约，先处理已定位问题，不以新网络或物理模块替代诊断。下方原步骤以5.9最新实施/停止决定为准。
