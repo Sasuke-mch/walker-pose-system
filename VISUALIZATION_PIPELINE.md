@@ -1,5 +1,7 @@
 # Walker Pose 可视化固定实现规范
 
+2026-10-16独立骨架跟踪与SMPL-H本次结果入口：`research_records/engineering_validation/G20261014_smplh_motion448_v1/skeleton_tracking_20261016/view/index.html`。三组完整448同帧/同视角切换，独立骨架σ8/σ4及原SMPL-H；网格始终为原SMPL-H同参数真实表面，PVA仅生成12点骨架。可选模型叠加、同源原始黑线、真实助步器/双相机、关键帧/35..61循环、两条可点曲线与左右原图回投，预测虚线、失效留空。场景本任务从同图新重放strict/Stage/地面，旧动态不输入；新R/t与数值对照参考一致。三组保存结果只读，不重跑人体。实际浏览器核对37同帧切换、55右膝失效、循环播放、59左右图与61脚高，截图保留view；纯数值实验先前“无新网页”说明不代表后续本次可视化状态。导数没有旋转冒称世界量，不改变原物理边界。
+
 2026-10-15仅首帧Sapiens2重初始化的新三组448入口：`research_records/engineering_validation/G20261014_smplh_motion448_v1/first_frame_sapiens_20261015/replay_selected_init/visualization/index.html`。人体及双目叠点为首帧Sapiens2、后447帧PMPose，停用人工覆盖、固定原主线beta；首帧整体VPoser sigma0.75与后续跟踪权重分开显示。黑色三角化/Stage/地面始终为本轮重放的同图PMPose，不能冒称首帧黑点即Sapiens2，页面/协议明确区分。真实网格、有限18边连接及拒绝状态保持，帧/视角切换、原始导数开关及实际首帧叠点实测，preview_selected_frame0.jpg保留。首帧前倾/sole高度改善但整段下肢/接触和MAP收敛未解决，不替换主线；数值与来源见该次protocol.json及initialization_replay_comparison.json。
 
 2026-10-15二维优先三组完整448检查入口：`research_records/engineering_validation/G20261014_smplh_motion448_v1/motion_observation_20261015/visualization/index.html`。可在同帧同视角切换`ekf_sigma15`、`map_sigma15`和`map_sigma075`的view/body_browser.html（各配GZ及完整离线body.html）；显示实际保存网格、同源双目叠点、固定主线beta、整体VPoser相对权重及逐帧未收敛状态。三角化黑线保留全部有限原始点及18边，误差只统计，strict与Stage不回填；本轮场景重新重放，仅为显示参考。共享固定取景中心不改变模型/轨迹。16项显示测试、生成JS语法和数组核对通过，实际浏览器检查切换、帧同步/播放、视角、原始导数开关及双目叠点；335帧预览留visualization/preview_frame335.jpg。两个MAP无收敛更新，发布v/a空缺保持，页面不代表姿态或物理正确。来源/命令与限制见该实验protocol.json的visualization_20261015。

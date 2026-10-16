@@ -1,0 +1,42 @@
+{
+  "frames": 448,
+  "source_tracking": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\skeleton_tracking_20261016",
+  "smplh_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075\\result.npz",
+  "scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\skeleton_tracking_20261016\\view\\scene",
+  "new_scene_replayed": true,
+  "old_dynamic_inputs_consumed": false,
+  "same_ground_map": "X,-Y,Z;all skeletons,mesh,raw points,walker and both camera centers",
+  "mesh_vertices": 6890,
+  "mesh_faces": 13776,
+  "mesh_index_entries": 41328,
+  "raw_observation_source": "new_scene.detector_only_triangulated_points_mm;finite rejected retained",
+  "frame0_body": "Sapiens2",
+  "frame0_raw_scene": "PMPose;explicitly separate",
+  "body_rerun": false,
+  "tracking_rerun": false,
+  "interpolation": false,
+  "display_smoothing": false,
+  "reference_comparison_only": {
+    "max_rotation_entry_difference": 0.0,
+    "max_translation_mm_difference": 5.684341886080802e-14
+  },
+  "page": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\skeleton_tracking_20261016\\view\\index.html",
+  "payload_bytes": 37647200,
+  "browser_status": "passed_visible_display_and_interactions",
+  "browser_url": "http://127.0.0.1:8778/research_records/engineering_validation/G20261014_smplh_motion448_v1/skeleton_tracking_20261016/view/index.html",
+  "browser_checks": [
+    "37frame SMPL-H switch retains frame/view;real13776mesh visible",
+    "sigma4 frame55 right knee expired/null and model edge count10",
+    "key35..61 loop advances actual displayed frame",
+    "frame59 two original upright images/projected points visually inspected",
+    "frame61 sigma8 ankle heights112.918995/119.072370mm and no smoothing",
+    "narrow-panel height adapts to header;feet visible"
+  ],
+  "screenshots": [
+    "preview_frame61.png",
+    "preview_inputs_frame59.png"
+  ],
+  "final_frame": 61,
+  "final_variant": "pva_matched_pixel_sigma8",
+  "checks": "Python compile/Ruff E9,F;JavaScript node --check;actual browser and same-source time/transform checks"
+}

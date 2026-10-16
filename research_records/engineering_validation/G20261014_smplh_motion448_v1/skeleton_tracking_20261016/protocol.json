@@ -182,5 +182,20 @@
     "candidate": "Retain SMPL-H model/shape;evaluate explicit root/local joint rotations as motion state instead of whole-body32 latent derivatives. Disclose corresponding prior/process changes;not strict one-variable ablation.",
     "scope": "Only35..61,no new contact constraints;require concurrent ankle-rise and hip-residual improvement without deleting data or changing bones before448.",
     "do_not_adopt": "No independent-PVA production replacement;no correlated triangulation3D+raw2D double counting."
+  },
+  "visualization_20261016": {
+    "page": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\skeleton_tracking_20261016\\view\\index.html",
+    "exporter": "realtime_app/tools/build_free_skeleton_comparison_viewer.py",
+    "new_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\skeleton_tracking_20261016\\view\\scene",
+    "scene_replay_command": "view/scene_replay_command.json",
+    "body_tracking_rerun": false,
+    "old_dynamic_inputs_consumed": false,
+    "source_limits": "PVA has no mesh;mesh overlay belongs to original SMPL-H;raw black diagnostics use all finite PMPose points,not filtered PVA",
+    "metadata": "view/metadata.json",
+    "browser_status": "passed_visible_display_and_interactions",
+    "screenshots": [
+      "preview_frame61.png",
+      "preview_inputs_frame59.png"
+    ]
   }
 }

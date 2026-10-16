@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>骨架跟踪与 SMPL-H · 448帧对照</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fff;color:#172326;font:14px system-ui,"Microsoft YaHei",sans-serif}header{padding:16px 22px;border-bottom:1px solid #000}h1{font-size:21px;margin:0 0 8px}p{margin:7px 0;line-height:1.65}button,select,input{font:inherit;color:inherit;background:#fff;border:1px solid #000;border-radius:4px;padding:5px 9px}button{cursor:pointer}button:hover{background:#f1f4f3}button:disabled{opacity:.45}.controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.controls label{display:flex;align-items:center;gap:5px}#seek{flex:1;min-width:140px;padding:0}#frame{width:70px}.stage{font-weight:600;margin-left:auto}.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.workspace{display:grid;grid-template-columns:minmax(400px,1fr) 340px;border-bottom:1px solid #000}.scene{height:650px;position:relative;background:#f5f7f6}.scene canvas{display:block;width:100%;height:100%;touch-action:none}.hint{position:absolute;left:14px;bottom:10px;font-size:12px;background:#fff;padding:5px 9px;border:1px solid #ddd;pointer-events:none}.side{padding:16px;border-left:1px solid #000;overflow:auto;max-height:650px}.side h2{font-size:15px;margin:0 0 9px}.checks{display:grid;gap:6px;margin:10px 0 16px}.viewButtons{display:flex;gap:5px;flex-wrap:wrap}.muted{color:#596467;font-size:12px}.metric{margin:10px 0;font-variant-numeric:tabular-nums}.metric strong{font-size:23px;font-weight:650}table{border-collapse:collapse;background:#fff;width:100%;font-size:12px;margin-top:8px}td,th{border-bottom:1px solid #000;text-align:right;padding:5px 3px;background:#fff;color:#000}th:first-child,td:first-child{text-align:left}#quality{font:12px/1.6 system-ui;white-space:pre-wrap;overflow-wrap:anywhere}.charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px 22px;border-bottom:1px solid #000}.chart{height:220px;width:100%;display:block}.charts h2,.inputs h2{font-size:15px;margin:0 0 8px}.inputs{padding:18px 22px}.imageRow{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}.imageRow figure{margin:0;text-align:center}.imageRow canvas{width:270px;height:480px;border:1px solid #000;display:block}.imageRow figcaption{margin:8px 0}.notes{max-width:1000px;margin:14px auto;font-size:12px;color:#596467}.statusLine{font-size:12px;color:#596467}a{color:inherit}#loading{padding:30px}#app[hidden]{display:none}@media(max-width:900px){.workspace{grid-template-columns:1fr}.side{max-height:none;border-left:0;border-top:1px solid #000}.scene{height:520px}.charts{grid-template-columns:1fr}}
+.scene{height:clamp(340px,calc(100vh - var(--header-height,190px) - 8px),650px)}.side{max-height:clamp(340px,calc(100vh - var(--header-height,190px) - 8px),650px)}
+</style>
+<div id="loading">正在加载三组448帧结果与真实网格…</div>
+<div id="app" hidden>
+<header><h1>骨架跟踪与 SMPL-H · 同帧空间运动对照</h1>
+<div class="legend"><span><i class="dot" style="background:#00786d"></i>独立跟踪 σ8</span><span><i class="dot" style="background:#245cb0"></i>独立跟踪 σ4</span><span><i class="dot" style="background:#bd6527"></i>原 SMPL-H</span><span>黑线：同源原始三角化诊断（含有限拒绝点）</span></div>
+<p class="muted">关键35–61帧：双踝均升 SMPL-H +67.8 mm；独立跟踪 +6.8 / +7.3 mm。髋部同槽回投中位：59.6 → 6.5 / 6.4 px。踝高不等于鞋底高度，独立骨架仍有骨长漂移。</p>
+<div class="controls"><button id="play">播放</button><select id="rate" aria-label="播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+<label>帧 <input id="frame" type="number" min="0" max="447" value="61" aria-label="帧号"></label><input id="seek" type="range" min="0" max="447" value="61" aria-label="帧进度"><span id="clock"></span>
+<label><input id="loopKey" type="checkbox">仅循环35–61</label><span class="stage" id="stage"></span></div>
+<div class="controls" style="margin-top:9px"><span>关键帧</span><button data-frame="35">35 · 段起点</button><button data-frame="37">37 · 首次跳升</button><button data-frame="59">59 · 再次跳升</button><button data-frame="61">61 · 段终点</button><button data-frame="188">188</button><button data-frame="412">412 · 后段</button></div>
+</header>
+<div class="workspace"><div class="scene"><canvas id="scene" aria-label="三维骨架空间对照"></canvas><div class="hint">拖动旋转 · 右键 / Shift 拖动平移 · 滚轮缩放 · 固定地面，不吸附或平滑</div></div>
+<aside class="side"><h2>当前骨架</h2><select id="variant" aria-label="跟踪结果"></select>
+<div class="checks"><label><input id="reference" type="checkbox" checked>叠加原 SMPL-H 骨架</label><label><input id="mesh" type="checkbox" checked>显示原 SMPL-H 半透明真实网格</label><label><input id="raw" type="checkbox" checked>显示原始三角化黑线</label><label><input id="walker" type="checkbox" checked>显示助步器与双相机</label></div>
+<div class="viewButtons"><button data-view="recommended">推荐视角</button><button data-view="side">侧视</button><button data-view="front">正视</button><button data-view="top">俯视</button></div>
+<p class="muted">网格始终来自原SMPL-H，独立跟踪只生成骨架。虚线关节连接表示包含仅预测点；真正缺失不补。</p>
+<div class="metric">当前双踝高度 L / R<br><strong id="ankles">—</strong> mm</div>
+<div class="metric">当前髋回投中位 <strong id="hips">—</strong> px</div>
+<table><thead><tr><th>关节</th><th>高度mm</th><th>双目px</th><th>状态</th></tr></thead><tbody id="jointRows"></tbody></table>
+<p id="pose" class="statusLine"></p><pre id="quality"></pre></aside></div>
+<div class="charts"><div><h2>关键段双踝平均高度 · 点击曲线定位</h2><canvas id="heightChart" class="chart" aria-label="双踝高度曲线"></canvas></div><div><h2>全片髋部回投残差 · 点击曲线定位</h2><canvas id="hipChart" class="chart" aria-label="髋部回投残差曲线"></canvas></div></div>
+<section class="inputs"><h2>同帧左右图像与二维回投</h2><p class="muted">黑点 / 黑线为检测观测；彩色点为当前骨架回投；橙色小点为原SMPL-H回投。人体首帧用Sapiens2，此后PMPose；场景黑色三角化始终为PMPose。</p>
+<div class="imageRow"><figure><canvas id="leftImage" width="540" height="960" aria-label="左目原图与投影"></canvas><figcaption>左目 · 转正视图</figcaption></figure><figure><canvas id="rightImage" width="540" height="960" aria-label="右目原图与投影"></canvas><figcaption>右目 · 转正视图</figcaption></figure></div>
+<div class="notes">场景由本次从同源448对图像重新计算strict、Stage和动态地面；三组结果都经过同一帧变换。场景含阶段与脚踝假设，不是独立世界真值。播放按30 FPS逐帧，时间标签为原始主机返回时间；不插值。<a href="../comparison.png" target="_blank">打开静态总结图</a>。</div></section>
+</div><script src="viewer.js"></script></html>

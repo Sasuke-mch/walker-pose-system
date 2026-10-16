@@ -1,5 +1,13 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-16 独立骨架与SMPL-H完整448交互对照已交付
+
+本次结果可视化入口为G20261014_smplh_motion448_v1/skeleton_tracking_20261016/view/index.html。新增专用导出入口build_free_skeleton_comparison_viewer.py及本地Canvas模板/JS，三组同帧/同视角切换、原SMPL-H真实6890顶点/13776面可选半透明叠加、独立跟踪12点骨架、原始有限黑线、助步器拓扑和双相机统一[X,−Y,Z]；支持30FPS逐帧/0.5×/2×、关键35..61循环、关键帧、侧/正/俯视、可点击高度/髋误差曲线及同帧原图回投。PVA只显示骨架，网格明确来自原SMPL-H；预测虚线/失效留空，不插值/吸附/换旧点。
+
+本轮从同源原448图/原始PMPose新计算strict并重放Stage/地面；新R与数值对照参考最大差0、t差5.68e−14mm，旧动态不进入显示。保存人体/跟踪结果只读，无重拟合或跟踪重跑。frame0人体Sapiens/场景PMPose分开标注。metadata保留来源及浏览器实测：37帧原SMPL-H未收敛/同帧切换；55帧sigma4右膝失效、仅10条模型边且空值未补；35..61循环实际推进；59帧左右原图实看；61帧sigma8双踝112.9/119.1mm。窄栏画布按实际页头高度自适应，脚部完整可见。
+
+Python编译/Ruff、JS语法及实际页面显示/切换/循环/原图检查通过；截图preview_frame61.png、preview_inputs_frame59.png留view本地。仅提交导出入口/模板、既有文档增量和小metadata/protocol/命令，PNG/压缩网格/strict/场景日志本地保留；既有未提交改动保留，不推送。网页是同源工程对照，不改变物理结论或正式主线。
+
 ## 2026-10-16 无SMPL-H骨架跟踪对照完成：关键双脚同步抬升未复现，优先改人体耦合路线
 
 新增diagnose_free_skeleton_motion.py，复用现有独立点[p,v,a]双目像素EKF，完整448、12肩至踝点。纯双目首个合格点初始化，后续仅pixel反馈；不加载SMPL-H姿态/beta/网格，三角化只作几何门和重启。同Sapiens0/PMPose1..447与host dt，固定PVA默认及仅sigma4→8两组，不扫参数；SMPL-H只在跟踪后读作比较。既有同源slope scene仅作高度参考、从当前scene识别全部11个Stage1段并确认段内R/t恒定，无新场景网页或动态输入替换。
