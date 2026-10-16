@@ -21,9 +21,14 @@ class IteratedMAPConfig:
     objective_tolerance: float = 1e-3
     step_tolerance: float = 1e-3
     maximum_line_search_steps: int = 12
+    condition_accepted_iterate: bool = False  # Opt-in approximate information feedback.
 
     def __post_init__(self):
         for name in self.__dataclass_fields__:
+            if name == "condition_accepted_iterate":
+                if not isinstance(self.condition_accepted_iterate, bool):
+                    raise ValueError("condition_accepted_iterate must be boolean")
+                continue
             value = getattr(self, name)
             if not np.isfinite(value) or value <= 0:
                 raise ValueError(f"{name} must be positive and finite")
@@ -159,6 +164,7 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
                 converged, termination = True, "scaled_gradient"
         improvement = bool(np.isfinite(val["cost"]) and val["cost"] < initial_cost-opt.objective_tolerance)
         accepted = bool(valid_final_jacobian and (converged or improvement))
+        condition_posterior = accepted and (converged or opt.condition_accepted_iterate)
         self.optimizer_diagnostic = {
             "status": "converged" if converged else ("feasible_unconverged" if accepted else "rejected"),
             "optimizer_success": converged, "termination": termination,
@@ -168,9 +174,11 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
             "scaled_step_inf": last_step if np.isfinite(last_step) else None,
             "pixel_error_median_initial_px": initial_pixel_median,
             "pixel_error_median_px": float(np.median(np.linalg.norm(val["residual"], axis=1))) if "residual" in val else None,
-            "posterior_updates": int(converged and accepted),
+            "posterior_updates": int(condition_posterior),
             "fixed_prior_each_iteration": True,
-            "covariance_approximation": "one_final_IRLS_Gauss_Newton_posterior" if converged else "transported_prediction_no_information_update",
+            "covariance_approximation": ("one_final_IRLS_Gauss_Newton_posterior" if converged else
+                "one_accepted_iterate_linearized_posterior_not_converged" if condition_posterior else
+                "transported_prediction_no_information_update"),
             "history": history,
         }
         if not accepted:
@@ -186,7 +194,9 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
         self.velocity += correction[n:2*n]
         self.acceleration += correction[2*n:]
         posterior = P
-        if converged:
+        if condition_posterior:
+            # Information feedback and optimizer certification are separate:
+            # this local approximation never enables unconverged derivatives.
             Hprior = np.zeros((n-6, n)); Hprior[:, 6:] = np.eye(n-6)
             Hq = np.r_[val["J"], Hprior]
             H = np.c_[Hq, np.zeros((len(Hq), 2*n))]

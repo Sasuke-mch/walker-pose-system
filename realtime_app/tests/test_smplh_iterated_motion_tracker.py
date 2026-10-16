@@ -2,10 +2,13 @@
 import unittest
 
 import numpy as np
+from pose_app.smplh_iterated_motion_tracker import (
+    IteratedMAPConfig,
+    SMPLHIteratedMotionTracker,
+)
+from pose_app.smplh_motion_tracker import SMPLHMotionConfig, right_jacobian
 from scipy.spatial.transform import Rotation
 
-from pose_app.smplh_iterated_motion_tracker import IteratedMAPConfig, SMPLHIteratedMotionTracker
-from pose_app.smplh_motion_tracker import SMPLHMotionConfig, right_jacobian
 from tests.test_smplh_motion_tracker import AnalyticBodyMap, observation, tracker
 
 
@@ -121,6 +124,49 @@ class IteratedMotionTests(unittest.TestCase):
         self.assertEqual(restored["status"], "reinitialized")
         self.assertFalse(restored["derivative_valid"].any())
 
+    def test_accepted_iterate_information_does_not_claim_optimizer_convergence(self):
+        # Both policies accept exactly the same first nonlinear iterate. Only
+        # information feedback may differ; approximate information must not
+        # make an unconverged derivative publishable.
+        from dataclasses import replace
+        opt = IteratedMAPConfig(maximum_iterations=1, gradient_tolerance=1e-8)
+        old = iterated(optimizer=opt)
+        tr = iterated(optimizer=replace(opt, condition_accepted_iterate=True))
+        target = tr.pose.copy(); target.translation_m += [.2, .1, .15]
+        target.root_rotation = Rotation.from_rotvec([.2, -.1, .5]).as_matrix()
+        pixels = observation(tr, target)
+        for instance in (old, tr):
+            instance.last_joint_support[:] = .2
+            accepted, used, status = instance._update(pixels, np.ones((2, 12), bool),
+                np.full((2, 12), 'available', dtype=object))
+            self.assertTrue(accepted)
+            self.assertEqual(instance.optimizer_diagnostic['status'], 'feasible_unconverged')
+            self.assertFalse(instance.optimizer_diagnostic['optimizer_success'])
+        np.testing.assert_allclose(tr.pose.translation_m, old.pose.translation_m)
+        np.testing.assert_allclose(tr.velocity, old.velocity)
+        np.testing.assert_allclose(tr.acceleration, old.acceleration)
+        # Positive information, once, with a positive covariance; the existing
+        # exact-posterior test covers the same final linearization equations.
+        self.assertEqual(tr.optimizer_diagnostic['posterior_updates'], 1)
+        self.assertEqual(old.optimizer_diagnostic['posterior_updates'], 0)
+        self.assertGreater(np.linalg.eigvalsh(tr.covariance).min(), 0)
+        self.assertLess(np.trace(tr.covariance), np.trace(old.covariance))
+        result = tr._output(.2, status, used, np.full((2,12), 'available', object), pixels)
+        self.assertFalse(result['derivative_valid'].any())
+        self.assertTrue(np.isnan(result['velocity_mm_s']).all())
+        self.assertTrue(np.isnan(result['acceleration_mm_s2']).all())
+
+    def test_approximate_policy_still_requires_accepted_pixels(self):
+        tr = iterated(optimizer=IteratedMAPConfig(condition_accepted_iterate=True))
+        pixels = observation(tr)
+        P = tr.covariance.copy()
+        accepted, used, _ = tr._update(pixels, np.zeros((2,12), bool),
+            np.full((2,12), 'missing', dtype=object))
+        self.assertFalse(accepted)
+        self.assertFalse(used.any())
+        self.assertEqual(tr.optimizer_diagnostic['posterior_updates'], 0)
+        np.testing.assert_array_equal(tr.covariance, P)
+
     def test_line_search_failure_does_not_consume_observations(self):
         tr = iterated()
         pixels = observation(tr)
@@ -175,7 +221,8 @@ class IteratedMotionTests(unittest.TestCase):
         np.testing.assert_array_equal(P, tr.covariance)
 
     def test_invalid_optimizer_parameters_are_rejected(self):
-        for values in ({"maximum_iterations": 0}, {"maximum_iterations": 1.5}, {"gradient_tolerance": np.nan}):
+        for values in ({"maximum_iterations": 0}, {"maximum_iterations": 1.5}, {"gradient_tolerance": np.nan},
+                       {"condition_accepted_iterate": 1}):
             with self.assertRaises(ValueError):
                 IteratedMAPConfig(**values)
 

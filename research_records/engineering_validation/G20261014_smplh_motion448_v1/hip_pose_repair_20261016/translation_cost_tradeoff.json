@@ -1,0 +1,110 @@
+[
+  {
+    "frame": 35,
+    "direction": "negative current reference groundY, whole body only; all rotations/shape held fixed; no ground constraint/optimization",
+    "rows": [
+      {
+        "forward_shift_mm": 0,
+        "total_data_cost": 147.81136395096055,
+        "hip_cost": 101.33160749465061,
+        "knees_cost": 13.895465561040027,
+        "ankles_cost": 2.455135900311613,
+        "upper_cost": 30.12915499495831
+      },
+      {
+        "forward_shift_mm": -25,
+        "total_data_cost": 226.81606490058817,
+        "hip_cost": 100.77141344758972,
+        "knees_cost": 19.16417008860506,
+        "ankles_cost": 7.344462014886715,
+        "upper_cost": 99.53601934950672
+      },
+      {
+        "forward_shift_mm": -50,
+        "total_data_cost": 379.9776276641276,
+        "hip_cost": 101.37183754723007,
+        "knees_cost": 27.470609169296477,
+        "ankles_cost": 24.386739575411784,
+        "upper_cost": 226.74844137218935
+      },
+      {
+        "forward_shift_mm": -100,
+        "total_data_cost": 751.1769090917827,
+        "hip_cost": 105.86455496968998,
+        "knees_cost": 49.938272841663206,
+        "ankles_cost": 73.08474478856216,
+        "upper_cost": 522.2893364918673
+      },
+      {
+        "forward_shift_mm": -150,
+        "total_data_cost": 1170.271248839419,
+        "hip_cost": 117.29325270547722,
+        "knees_cost": 78.40823009848373,
+        "ankles_cost": 125.93534845928184,
+        "upper_cost": 848.6344175761762
+      },
+      {
+        "forward_shift_mm": -200,
+        "total_data_cost": 2147.649142783474,
+        "hip_cost": 140.131693631872,
+        "knees_cost": 112.92500383926394,
+        "ankles_cost": 182.79655846408815,
+        "upper_cost": 1711.7958868482501
+      }
+    ]
+  },
+  {
+    "frame": 61,
+    "direction": "negative current reference groundY, whole body only; all rotations/shape held fixed; no ground constraint/optimization",
+    "rows": [
+      {
+        "forward_shift_mm": 0,
+        "total_data_cost": 209.40014877724613,
+        "hip_cost": 150.452232384514,
+        "knees_cost": 15.842915739241553,
+        "ankles_cost": 6.140035370082018,
+        "upper_cost": 36.96496528340859
+      },
+      {
+        "forward_shift_mm": -25,
+        "total_data_cost": 309.7637320104328,
+        "hip_cost": 148.68156237538466,
+        "knees_cost": 41.429673374099316,
+        "ankles_cost": 20.8163571521654,
+        "upper_cost": 98.83613910878348
+      },
+      {
+        "forward_shift_mm": -50,
+        "total_data_cost": 517.5998138751521,
+        "hip_cost": 147.94617552248795,
+        "knees_cost": 84.69527153313635,
+        "ankles_cost": 54.42274046911723,
+        "upper_cost": 230.5356263504106
+      },
+      {
+        "forward_shift_mm": -100,
+        "total_data_cost": 1014.9131357373212,
+        "hip_cost": 149.75874216993753,
+        "knees_cost": 190.51792967986538,
+        "ankles_cost": 130.046602368992,
+        "upper_cost": 544.5898615185263
+      },
+      {
+        "forward_shift_mm": -150,
+        "total_data_cost": 1581.43475096356,
+        "hip_cost": 158.4863800216237,
+        "knees_cost": 323.69863788985487,
+        "ankles_cost": 211.5323124971609,
+        "upper_cost": 887.7174205549205
+      },
+      {
+        "forward_shift_mm": -200,
+        "total_data_cost": 3181.696108798892,
+        "hip_cost": 180.55403442121064,
+        "knees_cost": 490.82784669538273,
+        "ankles_cost": 297.28875423348626,
+        "upper_cost": 2213.0254734488117
+      }
+    ]
+  }
+]

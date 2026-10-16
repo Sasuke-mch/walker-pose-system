@@ -1,0 +1,140 @@
+{
+  "PMPose": {
+    "source": [
+      "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+      "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json"
+    ],
+    "rows": [
+      {
+        "frame": 0,
+        "width_mm": 191.5307063348407,
+        "lengths_mm": [
+          255.78650388507282,
+          418.2871043665731,
+          250.4628901240363,
+          434.40427164120115
+        ],
+        "hip_camera_mm": [
+          31.5117506318047,
+          26.68760094074553,
+          475.1833818637089
+        ]
+      },
+      {
+        "frame": 1,
+        "width_mm": 194.98570865231852,
+        "lengths_mm": [
+          257.8134868132439,
+          421.43248865208716,
+          249.6415929047333,
+          440.4517970770719
+        ],
+        "hip_camera_mm": [
+          33.53806343422664,
+          28.913466481906006,
+          478.4284384596284
+        ]
+      },
+      {
+        "frame": 35,
+        "width_mm": 192.31903793059408,
+        "lengths_mm": [
+          260.6263413767004,
+          412.75471484609096,
+          265.8729426171562,
+          458.6344200703699
+        ],
+        "hip_camera_mm": [
+          33.84499623165937,
+          20.68774453063955,
+          514.1611352511237
+        ]
+      },
+      {
+        "frame": 61,
+        "width_mm": 193.04620676320837,
+        "lengths_mm": [
+          228.29683448820222,
+          445.7889865554701,
+          217.26345670049702,
+          454.6337958996656
+        ],
+        "hip_camera_mm": [
+          49.44401833443519,
+          17.724386022375455,
+          371.4269373644993
+        ]
+      }
+    ],
+    "limits": "Unfiltered same-frame triangulation for observation-definition diagnosis ONLY, no tracking or independent truth."
+  },
+  "Sapiens2": {
+    "source": [
+      "research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\left_sapiens_coco17_model_input.json",
+      "research_records\\engineering_validation\\G20261002_sapiens2_body_mainline448_v2\\right_sapiens_coco17_model_input.json"
+    ],
+    "rows": [
+      {
+        "frame": 0,
+        "width_mm": 176.66315631054897,
+        "lengths_mm": [
+          300.11112757568543,
+          394.9772438365704,
+          295.2798422018577,
+          406.5339479919382
+        ],
+        "hip_camera_mm": [
+          57.07240638677045,
+          22.997434608326127,
+          482.08586010407726
+        ]
+      },
+      {
+        "frame": 1,
+        "width_mm": 175.06259598514734,
+        "lengths_mm": [
+          300.4712352376947,
+          391.3342129245952,
+          294.5423367560094,
+          408.98170688013704
+        ],
+        "hip_camera_mm": [
+          54.609412559532316,
+          21.538272278054475,
+          478.58467926405103
+        ]
+      },
+      {
+        "frame": 35,
+        "width_mm": 173.46587306239758,
+        "lengths_mm": [
+          300.5408296327359,
+          405.4424615215819,
+          311.0218840875118,
+          421.23276322069927
+        ],
+        "hip_camera_mm": [
+          57.66765336348678,
+          20.21372880701237,
+          528.0617423576599
+        ]
+      },
+      {
+        "frame": 61,
+        "width_mm": 175.07688237613644,
+        "lengths_mm": [
+          268.5782078061724,
+          432.1402676734888,
+          267.6178435531426,
+          451.4111396357587
+        ],
+        "hip_camera_mm": [
+          57.493405761656156,
+          10.992194081476306,
+          365.0264631245245
+        ]
+      }
+    ],
+    "limits": "Unfiltered same-frame triangulation for observation-definition diagnosis ONLY, no tracking or independent truth."
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "source_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "frames": [
+    0,
+    35,
+    61
+  ],
+  "purpose": "Separate decoder/pose capacity from frozen shape incompatibility; static probes do not establish correct anatomy or motion.",
+  "variants": [
+    "latent_pixels_only",
+    "rotations_pixels_only",
+    "rotations_and_shape_pixels_only"
+  ],
+  "data": "same raw fish-eye pixels, same original stereo gates, equal Huber25/sigma8; no 3D/contact target",
+  "regularization": "numerical anchor delta/100 (intentionally negligible); shape bounded[-3,3], no shape prior",
+  "stop": "One least_squares TRF call per frame/variant, max60 evaluations; no retries/sweeps. Do not adopt these unregularized static poses as tracking.",
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\diagnose_smplh_pose_capacity.py",
+    "--source-run",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+    "--output",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\capacity"
+  ]
+}

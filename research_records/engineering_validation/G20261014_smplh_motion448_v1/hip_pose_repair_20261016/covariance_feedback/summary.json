@@ -1,0 +1,30 @@
+{
+  "runtime_s": 220.68452210000032,
+  "available": 62,
+  "segments": 1,
+  "variants": {
+    "original": {
+      "ankle35_61_change_mm": [
+        54.77425614219658,
+        80.85242632215488
+      ],
+      "mean_ankle35_61_change_mm": 67.81334123217573,
+      "median5_ankle35_61_change_mm": 35.18718623191813,
+      "hip35_61_median_px": 81.02227902103337,
+      "all_frames_median_px": 16.181020525626906,
+      "all_frames_p95_px": 128.0411414652906
+    },
+    "conditioned": {
+      "ankle35_61_change_mm": [
+        10.501981621255709,
+        17.173958114246034
+      ],
+      "mean_ankle35_61_change_mm": 13.837969867750871,
+      "median5_ankle35_61_change_mm": 7.186518230133572,
+      "hip35_61_median_px": 79.39793103994296,
+      "all_frames_median_px": 18.90233566712527,
+      "all_frames_p95_px": 124.55825021758629
+    }
+  },
+  "passed": false
+}
