@@ -1,0 +1,25 @@
+{
+  "frames": 448,
+  "withheld_toe_frames": [
+    35,
+    47,
+    61,
+    267,
+    335,
+    412
+  ],
+  "withheld_toe_used_slots": 0,
+  "toe_used_slots": 3528,
+  "toe_reason_counts": {
+    "initial_not_reused": 8,
+    "used_2d_feasible_unconverged": 2816,
+    "used_2d_iterated_map": 712,
+    "withheld_or_absent": 48
+  },
+  "source_raw_body": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075\\run_parameters.json",
+  "detector_vs_assistant6_toe_median_px": 6.524713831089501,
+  "detector_vs_assistant6_toe_p95_px": 9.155625105858785,
+  "limits": "Assistant references are operational image readings; image-toe direction is not independent3D truth. No heel inferred.",
+  "full_prefix_coco_max_difference_m": 0.0,
+  "beta_unchanged": true
+}

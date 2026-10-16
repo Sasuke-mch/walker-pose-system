@@ -1,0 +1,80 @@
+{
+  "heldout_frames": [
+    35,
+    47,
+    61
+  ],
+  "input_frames": [
+    0,
+    61
+  ],
+  "single_change": "Relative to the point-toe candidate, replace only the foot residual with observed-length times(unit predicted big-to-small toe vector minus unit observed vector). One vector residual perfoot/view. Do not fit toe midpoint or projected width.",
+  "foot_pixel_scale_px": 8,
+  "success": {
+    "body_hip_nonhip_median_p95_max_ratio": 1.05,
+    "no_new_missing_restarts": true,
+    "sole_min_degradation_max_mm": 5,
+    "no_more_sole_below_minus5mm": true,
+    "manual_visible_big_toe_median_improvement_fraction": 0.25,
+    "heldout_detector_transverse_direction_improvement_fraction": 0.3
+  },
+  "stop": "One direction-only prefix. Reject on any original prefix gate; no adjusting weights/thresholds. Full448 only after passing. All earlier six detector withheld frames are now development diagnostics, not fresh independent holdout.",
+  "limits": "Assistant image-read toe references are operational2D evidence with uncertainty, not independent human/3D/contact truth. Bare toe skin points must not be replaced by slipper edges; heel remains unavailable.",
+  "superseded_plan": "Initial consideration of manual fit seeds plus LK was not executed. Existing Sapiens2 full308 points discovered before any fitting; reuse them directly.",
+  "source_predictions": "G20261002_sapiens2_body_mainline448_v2/{left,right}_sapiens_raw.jsonl",
+  "foot_indices_sapiens308": [
+    15,
+    16,
+    18,
+    19
+  ],
+  "model_vertex_indices": [
+    3216,
+    3226,
+    6617,
+    6624
+  ],
+  "score_gate": 0.2,
+  "epipolar_gate_px": 35,
+  "fit_frames": "1..61 excluding35,47,61",
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 0.75,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "reference_review": "Six assistant-read left-view big-toe references usable, uncertainty8px; all original uncertain entries preserved with unusable masks. No fitted pose inspected before this decision.",
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\probe_smplh_foot_observations.py",
+    "--observation-mode",
+    "direction"
+  ],
+  "code": "realtime_app/tools/probe_smplh_foot_observations.py",
+  "source_body_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "iterated_map_configuration": {
+    "maximum_iterations": 15,
+    "gradient_tolerance": 0.05,
+    "objective_tolerance": 0.001,
+    "step_tolerance": 0.001,
+    "maximum_line_search_steps": 12,
+    "condition_accepted_iterate": true
+  },
+  "rationale": "Point-toe full448 improved direction but moved ankles: medians10.82/10.86 to16.98/16.42px; failed nonhip aggregate+9.32%. Test whether absolute toe location/width conflict causes this tradeoff; no weight sweep.",
+  "direction_pair_minimum_length_px": 16,
+  "observation_mode": "direction"
+}

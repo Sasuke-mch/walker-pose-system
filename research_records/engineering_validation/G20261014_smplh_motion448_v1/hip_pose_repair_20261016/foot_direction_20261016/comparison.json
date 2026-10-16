@@ -1,0 +1,273 @@
+{
+  "variants": {
+    "baseline": {
+      "available": 62,
+      "segments": 1,
+      "optimizer_statuses": {
+        "feasible_unconverged": 47,
+        "converged": 14
+      },
+      "primary": {
+        "hip": {
+          "finite_slots": 108,
+          "median_px": 29.947685323859112,
+          "p95_px": 68.9502868200111
+        },
+        "nonhip": {
+          "finite_slots": 540,
+          "median_px": 20.113733188698312,
+          "p95_px": 83.50724208520438
+        }
+      },
+      "heldout": {
+        "hip": {
+          "finite_slots": 204,
+          "median_px": 36.08920400160619,
+          "p95_px": 67.79584097288145
+        },
+        "nonhip": {
+          "finite_slots": 1020,
+          "median_px": 17.282118226852706,
+          "p95_px": 66.26340329121507
+        }
+      },
+      "mean_ankle_rise35_61_mm": -5.535767525955249,
+      "sole_min35_61_mm": -11.048561337506646,
+      "penetrating_foot_frames35_61": 2,
+      "direction_range35_61_deg_pelvis_left_right": [
+        20.280059287667825,
+        24.53826976255916,
+        27.613530329483936
+      ],
+      "heldout_detector_toe": {
+        "slots": 24,
+        "median_px": 28.892340553578507,
+        "p95_px": 57.539377047081615
+      },
+      "heldout_transverse_detector_direction": {
+        "foot_view_slots": 12,
+        "median_deg": 11.149401253186316,
+        "max_deg": 30.36128614854256
+      },
+      "heldout_manual_visible_big_toe": {
+        "slots": 6,
+        "median_px": 41.86415672783009,
+        "p95_px": 57.75444513614591
+      },
+      "heldout_toe_errors_px": [
+        [
+          [
+            20.37174751408366,
+            16.64874929533095,
+            20.55643256547267,
+            17.652833690242407
+          ],
+          [
+            16.269744339524923,
+            22.276188332454634,
+            23.160978380669576,
+            19.602621790062276
+          ]
+        ],
+        [
+          [
+            59.58617221148207,
+            42.23387447469593,
+            54.320962201561414,
+            31.433111908772318
+          ],
+          [
+            42.92945311597322,
+            28.055408816960277,
+            58.01014220235184,
+            38.57452018874011
+          ]
+        ],
+        [
+          [
+            54.87170783388375,
+            53.90209548998485,
+            29.729272290196736,
+            27.667476278039484
+          ],
+          [
+            51.76805976198651,
+            35.78146412755763,
+            25.385429795528264,
+            23.478476189188182
+          ]
+        ]
+      ],
+      "heldout_direction_errors_deg": [
+        [
+          3.918520469016436,
+          2.9216667367991302
+        ],
+        [
+          11.96192670131297,
+          3.180747599252323
+        ],
+        [
+          10.336875805059663,
+          30.36128614854256
+        ],
+        [
+          15.250376316678903,
+          21.24529346977741
+        ],
+        [
+          12.987772349571038,
+          0.4320105931298185
+        ],
+        [
+          15.37677546426827,
+          0.8635328929232277
+        ]
+      ]
+    },
+    "toe_pixels": {
+      "available": 62,
+      "segments": 1,
+      "optimizer_statuses": {
+        "feasible_unconverged": 49,
+        "converged": 12
+      },
+      "primary": {
+        "hip": {
+          "finite_slots": 108,
+          "median_px": 31.421506899501736,
+          "p95_px": 71.33082644649441
+        },
+        "nonhip": {
+          "finite_slots": 540,
+          "median_px": 18.275982365700262,
+          "p95_px": 77.35516047751682
+        }
+      },
+      "heldout": {
+        "hip": {
+          "finite_slots": 204,
+          "median_px": 32.375608134129365,
+          "p95_px": 66.88156923622947
+        },
+        "nonhip": {
+          "finite_slots": 1020,
+          "median_px": 17.77108629569998,
+          "p95_px": 69.07750759754518
+        }
+      },
+      "mean_ankle_rise35_61_mm": -4.585079282206584,
+      "sole_min35_61_mm": 1.0038253473885206,
+      "penetrating_foot_frames35_61": 0,
+      "direction_range35_61_deg_pelvis_left_right": [
+        12.65909127945352,
+        11.895540984331113,
+        11.340060982740269
+      ],
+      "heldout_detector_toe": {
+        "slots": 24,
+        "median_px": 12.921344819101616,
+        "p95_px": 22.99732350059648
+      },
+      "heldout_transverse_detector_direction": {
+        "foot_view_slots": 12,
+        "median_deg": 3.0103239786057827,
+        "max_deg": 10.965686714775453
+      },
+      "heldout_manual_visible_big_toe": {
+        "slots": 6,
+        "median_px": 15.465454768938617,
+        "p95_px": 21.987521952168784
+      },
+      "heldout_toe_errors_px": [
+        [
+          [
+            17.485585759887364,
+            12.96678528307034,
+            8.865140947429587,
+            7.310113580244804
+          ],
+          [
+            15.176811843566906,
+            18.57306090052106,
+            8.787775645538568,
+            8.998560169947531
+          ]
+        ],
+        [
+          [
+            28.280437898621035,
+            13.671153581743761,
+            6.606332180702275,
+            8.76647042771906
+          ],
+          [
+            18.0932920047518,
+            23.289844273380226,
+            2.965779970417963,
+            3.9534341437278893
+          ]
+        ],
+        [
+          [
+            9.736627783761286,
+            4.302676685421586,
+            14.856541897911496,
+            21.339705788155282
+          ],
+          [
+            12.875904355132892,
+            14.177054666571886,
+            19.03882806357818,
+            11.128872126631878
+          ]
+        ]
+      ],
+      "heldout_direction_errors_deg": [
+        [
+          1.7133167174219597,
+          6.444401598557605
+        ],
+        [
+          8.93509999440074,
+          1.9074873622673871
+        ],
+        [
+          3.447125682783574,
+          1.8920466707322492
+        ],
+        [
+          3.5686472972173653,
+          0.5124169863563708
+        ],
+        [
+          2.573522274427991,
+          10.965686714775453
+        ],
+        [
+          0.9851672554770763,
+          4.78698416085419
+        ]
+      ]
+    }
+  },
+  "gates": {
+    "primary_hip_median_px": true,
+    "primary_hip_p95_px": true,
+    "primary_nonhip_median_px": true,
+    "primary_nonhip_p95_px": true,
+    "heldout_hip_median_px": true,
+    "heldout_hip_p95_px": true,
+    "heldout_nonhip_median_px": true,
+    "heldout_nonhip_p95_px": true,
+    "manual_toe_median_improves25pct": true,
+    "detector_direction_improves30pct": true,
+    "no_missing": true,
+    "no_restarts": true,
+    "sole_min_within5mm": true,
+    "no_more_penetrating_foot_frames": true
+  },
+  "passed": true,
+  "decision": "Proceed only if all gates pass. A failed body/ground gate rejects this whole-latent foot candidate; do not tune weights or claim independent3D direction.",
+  "limits": "Detector-heldout is same-source2D consistency, not independent truth. Manual6 visible big-toe references are assistant image readings with8px uncertainty; no heel or contact truth."
+}

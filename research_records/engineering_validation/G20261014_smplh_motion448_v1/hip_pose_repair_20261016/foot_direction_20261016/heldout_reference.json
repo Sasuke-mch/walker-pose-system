@@ -1,0 +1,141 @@
+{
+  "kind": "assistant_image_read_operational_reference_not_human_or3D_truth",
+  "point_order": [
+    "left_big_toe",
+    "left_small_toe",
+    "right_big_toe",
+    "right_small_toe"
+  ],
+  "coordinate_space": "upright_pixel",
+  "uncertainty_px": [
+    8,
+    12,
+    8,
+    12
+  ],
+  "unavailable": "Right small toe in left view not reliably distinguishable in this review; null, not guessed. All heels unavailable.",
+  "references": {
+    "35": {
+      "left": [
+        [
+          815,
+          1652
+        ],
+        [
+          875,
+          1625
+        ],
+        [
+          571,
+          1614
+        ],
+        null
+      ],
+      "right": [
+        [
+          750,
+          1644
+        ],
+        [
+          782,
+          1616
+        ],
+        [
+          446,
+          1720
+        ],
+        [
+          396,
+          1706
+        ]
+      ]
+    },
+    "47": {
+      "left": [
+        [
+          694,
+          1847
+        ],
+        [
+          778,
+          1816
+        ],
+        [
+          571,
+          1618
+        ],
+        null
+      ],
+      "right": [
+        [
+          776,
+          1814
+        ],
+        [
+          835,
+          1783
+        ],
+        [
+          442,
+          1718
+        ],
+        [
+          397,
+          1705
+        ]
+      ]
+    },
+    "61": {
+      "left": [
+        [
+          703,
+          1854
+        ],
+        [
+          785,
+          1825
+        ],
+        [
+          488,
+          1757
+        ],
+        null
+      ],
+      "right": [
+        [
+          779,
+          1816
+        ],
+        [
+          835,
+          1789
+        ],
+        [
+          520,
+          1880
+        ],
+        [
+          470,
+          1863
+        ]
+      ]
+    }
+  },
+  "frozen_before_detector_overlay_or_fitting": false,
+  "usable_mask": {
+    "left": [
+      true,
+      false,
+      true,
+      false
+    ],
+    "right": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "review_note": "Before optimization, source overlays exposed unreliable image-read coordinates/semantics in the right-view and small-toe reference entries. Their original coordinates are retained, but marked unusable. Six clearly visible big-toe tips in the left view are the only assistant-read evaluation points. Detector-heldout direction is reported separately and is not independent truth.",
+  "frozen_before_fitting": true
+}
