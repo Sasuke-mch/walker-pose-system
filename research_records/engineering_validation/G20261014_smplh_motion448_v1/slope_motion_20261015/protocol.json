@@ -307,5 +307,158 @@
       "errata": "older support_score_min0.25 description did not match left61 low-score point;new record preserves full17 original comparison plus explicit16-point threshold subset",
       "decision": "retain helper correctness repairs;do not substitute failed FOV views or claim current448 pose improvement"
     }
+  },
+  "motion_chain_review_20261016": {
+    "source_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+    "question": "Where does Stage1 foot lift arise,why is it accepted,and what roles do data freshness,numerical derivatives and priors play?",
+    "inputs": "Same source frame0 Sapiens/post0 PMPose,frozen mainline beta,actual predicted P and original host-return dt;no new physical constraint or body3D term",
+    "scope": "Exact0..61 trace;event37/59 fixed-prior counterfactuals;raw PNG35..61 and selected originalAVI checks;one repeated-stereo62 control;two numerical same-frame references only",
+    "trace": {
+      "record": "motion_chain_trace.json",
+      "snapshot": "motion_chain_snapshots.npz",
+      "snapshot_recovery": "event_snapshot_recovery.json",
+      "saved_baseline_max_coco_difference_m": 0.0,
+      "stage1_35_61": {
+        "prediction_height_sum_mm": 36.27113816767209,
+        "update_height_sum_mm": 31.542203064503653
+      }
+    },
+    "event_fixed_prior_controls": [
+      {
+        "frame": 37,
+        "baseline_update_height_mm": 32.150609468436116,
+        "leave_right_knee_update_height_mm": -15.644368446452575,
+        "objective_before_after": [
+          208.92412730774444,
+          186.65601306084687
+        ],
+        "pair_data_cost_changes": {
+          "shoulders": -2.7680909629931705,
+          "elbows": -5.780590795299899,
+          "wrists": -0.6052669045892474,
+          "hips": 17.333473369147868,
+          "knees": -32.48440273777968,
+          "ankles": -0.43240006596513414
+        },
+        "temporal_cost": 0.04736310549207315
+      },
+      {
+        "frame": 59,
+        "baseline_update_height_mm": 22.125254720072547,
+        "leave_right_knee_update_height_mm": 0.4818983828576222,
+        "objective_before_after": [
+          292.25914421905526,
+          226.6581903875736
+        ],
+        "pair_data_cost_changes": {
+          "shoulders": -2.70737066847155,
+          "elbows": -5.66261369115324,
+          "wrists": -28.19249949026455,
+          "hips": 7.905238856538972,
+          "knees": -37.292230622715614,
+          "ankles": 1.724429559001849
+        },
+        "temporal_cost": 0.030010597202215838
+      }
+    ],
+    "observation_records": {
+      "hip_direction": "hip_height_coupling_diagnostic.json",
+      "leave_pair": "leave_pair_fixed_prior_diagnostic.json",
+      "ankle_depth": "ankle_observability_diagnostic.json",
+      "time_and_semantics": "data_timing_diagnostic.json"
+    },
+    "repeated_stereo_control": {
+      "single_variable": "Only suppress _update when BOTH decoded input views exactly equal their preceding selected image;retain all62 rows,original host dt,prediction,raw residuals,beta,VPoser,gates,solver budget;single-side repeats unchanged",
+      "limits": [
+        "Diagnostic only;no production input gate adopted",
+        "Repeated content does not identify hardware exposure time or the upstream duplication stage",
+        "This control isolates repeated updates,not host-time errors or one-side pairing errors",
+        "All-MAP-unconverged baseline already adds no Gaussian posterior information,so mean reuse and covariance reuse must be distinguished",
+        "No contact,height,3D observation,interpolation or derivative accuracy claim"
+      ],
+      "predeclared_stop": "One62-prefix control;no448 or additional parameter sweep. Causal repair eligibility requires all62 finite,>=20percent smaller35..61 height rise,and median/P95 raw residual each no>5percent worse.",
+      "repeated_views_count": [
+        17,
+        17
+      ],
+      "repeated_both_count": 17,
+      "baseline": {
+        "raw_error": {
+          "n": 1488,
+          "median": 16.181020525626906,
+          "p95": 128.0411414652906,
+          "max": 201.72243761651947
+        },
+        "mean_ankle_rise_35_61_mm": 67.81334123217574,
+        "mean_ankle_height_35_61_mm": [
+          93.61443282384447,
+          161.4277740560202
+        ]
+      },
+      "control": {
+        "raw_error": {
+          "n": 1488,
+          "median": 16.692635930601035,
+          "p95": 124.72075497128962,
+          "max": 201.90578749160548
+        },
+        "mean_ankle_rise_35_61_mm": 95.18105155548301,
+        "mean_ankle_height_35_61_mm": [
+          66.77142510356904,
+          161.95247665905205
+        ]
+      },
+      "checks": {
+        "all62_finite": true,
+        "height_rise_reduction20percent": false,
+        "raw_median_no5percent_regression": true,
+        "raw_p95_no5percent_regression": true
+      },
+      "full_replay_eligible": false,
+      "interpretation": "Skipping repeated updates does not eliminate the rise. Endpoint differences include a changed frame35 start;do not call the27.37mm rise difference extra final-frame floating. Original host-time errors and hardware duplication causes remain unresolved."
+    },
+    "numerical_reference": {
+      "record": "solver_numerical_probe.json",
+      "protocol": {
+        "question": "Does more reliable same-frame exact-AD double-precision MAP still allow ankle rise?",
+        "frames": [
+          37,
+          59
+        ],
+        "input": "actual saved prior and full Pqq from motion_chain_snapshots.npz;all original valid pixels",
+        "objective": "unchanged raw-fisheye Huber + wholeVPoser + full predicted temporal quadratic",
+        "state": "same fixed-prediction tangent delta;t3,root rotvec3,latent32",
+        "parameterization": "delta=Sx,S=diag(sqrt(diag(Pqq)));full Pqq inverse retained in objective;diagonal scales only permit exact box representation of latent bounds",
+        "initialization": "same prior delta0 per event",
+        "bounds": "latent remains in original [-6,6];translation/root no extra bounds",
+        "solver": "scipy L-BFGS-B;one call per event;double real SMPL-H/VPoser;exact autograd gradient",
+        "maximum_iterations": 80,
+        "maximum_line_search_steps": 20,
+        "maximum_function_evaluations": 2000,
+        "ftol": 1e-12,
+        "gtol": 1e-05,
+        "controls": "existing MAP15 and MAP80 same-event all-observation policies",
+        "stopping": "stop after these two calls,including unsuccessful/budget endings;no continuation/sweep/trajectory feedback/sequence replay",
+        "evidence_boundary": "engineering objective/height diagnostics only;not physical or independent3D truth"
+      },
+      "status": "completed_one_call_per_event",
+      "interpretation": "FD can mispredict a descent direction near VPoser kinks;FP32 has an objective floor. ExactAD/double reference still lifts ankles and both80 calls remain unconverged with worse objectives than originalMAP;no numerical repair adopted."
+    },
+    "reproduction": [
+      "trace_motion_chain.py then recover_event_snapshots.py: actual prediction/update states and P",
+      "diagnose_hip_height_coupling.py;diagnose_ankle_observability.py: local objective and weak-depth diagnostics",
+      "diagnose_leave_pair_fixed_prior.py --probe leave-pair;then --probe event-budget: mask probes with actualP and all-observation80 control",
+      "diagnose_data_timing.py: original content and capture records;--append-semantics-only updates source semantic evidence without image decoding",
+      "diagnose_repeated_stereo_frames.py: one0..61 duplicate-update control,all rows retained",
+      "solver_numerical_probe.py then --numerical-reference-only: derivative validation and two bounded doubleAD references"
+    ],
+    "validation": {
+      "scripts": "8 diagnostic scripts compile and Ruff E9,F passed",
+      "real_runs": "trace/recovery equality checks;one62 repeated-frame control;actual-P event probes;two80-step numerical references",
+      "independent_review": "no blocking coordinate/control problem in repeated-frame control;endpoint difference corrected to disclose changed frame35 start",
+      "scope": "No production source modification;no full suite or new448"
+    },
+    "decision": "Current mechanism supported: recovered knee observations act through shared latent anatomy,weak ankle depth and diffuse prediction prior. Main cause is not established as fish-eye formula,large hip residual,duplicates alone or FD alone. Do not promote any diagnostic deletion/skipping/numerical reference;preserve failures and next address observation/model semantics and recovery gate before more physical constraints.",
+    "unchanged_full448": "run_contact80_feasible remains latest complete scene/body comparison;none of this diagnostic output replaces it"
   }
 }

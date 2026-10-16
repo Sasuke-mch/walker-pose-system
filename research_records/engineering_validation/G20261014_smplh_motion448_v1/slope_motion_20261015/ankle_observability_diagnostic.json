@@ -1,0 +1,809 @@
+{
+  "question": "Can stereo pixels distinguish the model ankle height from a lower-height alternative?",
+  "frames": [
+    35,
+    37,
+    48,
+    59,
+    61
+  ],
+  "pixel_sigma_for_sensitivity_only": 8,
+  "scope": "Independent XYZ and fixed-height XY optimization of ankle observations only;diagnostic,not an anatomical/body optimization or truth",
+  "limits": [
+    "sigma8 local linearization is sensitivity scale,not calibrated uncertainty",
+    "frame35 model ankle height is a counterfactual reference,not ground contact truth",
+    "No diagnostic point,profile or height is fed back to the tracker"
+  ],
+  "rows": [
+    {
+      "frame": 35,
+      "joint": 15,
+      "strict_accepted": false,
+      "raw_view_targets_px": [
+        [
+          397.8289269038605,
+          818.2026761947793
+        ],
+        [
+          1532.195107762776,
+          456.38418592544303
+        ]
+      ],
+      "free_point_world_mm": [
+        186.97017811103288,
+        248.4179011185168,
+        128.97286437653955
+      ],
+      "model_point_world_mm": [
+        188.82716935965425,
+        275.08430174587505,
+        103.40247694637594
+      ],
+      "model_minus_free_world_mm": [
+        1.856991248621348,
+        26.666400627358257,
+        -25.5703874301636
+      ],
+      "model_view_error_px": [
+        9.494420890158976,
+        12.32898922769649
+      ],
+      "singular_values_px_per_m": [
+        1329.5968469853585,
+        1203.5220669129624,
+        227.87401441650107
+      ],
+      "weak_direction_world": [
+        -0.08597603999223319,
+        -0.7208636317538522,
+        0.6877235963393289
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9993538402190809,
+      "linearized_sigma8_world_height_std_mm": 24.61146863519685,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 128.97286437653955,
+          "view_error_px": [
+            9.109799870158238,
+            9.543281559542523
+          ],
+          "squared_pixel_cost": 174.06267659903938,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 103.40247694637594,
+          "view_error_px": [
+            9.06008695600802,
+            12.479862428492883
+          ],
+          "squared_pixel_cost": 237.83214188453493,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 103.40247694637594,
+          "view_error_px": [
+            9.06008695600802,
+            12.479862428492883
+          ],
+          "squared_pixel_cost": 237.83214188453493,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 35,
+      "joint": 16,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          418.09380971817745,
+          654.4164231787336
+        ],
+        [
+          1570.6968019273545,
+          641.4728147349458
+        ]
+      ],
+      "free_point_world_mm": [
+        -12.159611416074158,
+        307.15338230011815,
+        83.05619549247362
+      ],
+      "model_point_world_mm": [
+        -12.530093929000785,
+        310.88654786102086,
+        83.82638870131298
+      ],
+      "model_minus_free_world_mm": [
+        -0.3704825129266266,
+        3.7331655609027514,
+        0.7701932088393648
+      ],
+      "model_view_error_px": [
+        7.954202172621488,
+        2.973223775772243
+      ],
+      "singular_values_px_per_m": [
+        1215.1136791411475,
+        1109.3193474274217,
+        190.81572858217967
+      ],
+      "weak_direction_world": [
+        -0.12038346261916347,
+        0.7240510661585126,
+        -0.6791596833753766
+      ],
+      "model_error_weak_direction_abs_cosine": 0.5808521919468022,
+      "linearized_sigma8_world_height_std_mm": 28.957691394867485,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 83.05619549247362,
+          "view_error_px": [
+            5.59280673190734,
+            5.356506544866565
+          ],
+          "squared_pixel_cost": 59.971649505666406,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 83.82638870131298,
+          "view_error_px": [
+            5.637511467324988,
+            5.313706915804553
+          ],
+          "squared_pixel_cost": 60.01701673128988,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 83.82638870131298,
+          "view_error_px": [
+            5.637511467324988,
+            5.313706915804553
+          ],
+          "squared_pixel_cost": 60.01701673128988,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 37,
+      "joint": 15,
+      "strict_accepted": false,
+      "raw_view_targets_px": [
+        [
+          395.6240909213111,
+          817.3153935772309
+        ],
+        [
+          1532.294165611267,
+          459.2286301597635
+        ]
+      ],
+      "free_point_world_mm": [
+        185.6316944530839,
+        252.63593269523793,
+        123.8125767144583
+      ],
+      "model_point_world_mm": [
+        183.70619225206414,
+        240.94003158307154,
+        136.51682886299199
+      ],
+      "model_minus_free_world_mm": [
+        -1.925502201019752,
+        -11.695901112166396,
+        12.704252148533685
+      ],
+      "model_view_error_px": [
+        12.210884217490314,
+        10.058382507888576
+      ],
+      "singular_values_px_per_m": [
+        1320.1564884931522,
+        1194.815219890078,
+        224.63404604573455
+      ],
+      "weak_direction_world": [
+        -0.08401633944505521,
+        -0.7202486922684057,
+        0.6886095235994817
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9976253278628802,
+      "linearized_sigma8_world_height_std_mm": 24.99005901019347,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 123.8125767144583,
+          "view_error_px": [
+            10.530808863432313,
+            11.019251622832767
+          ],
+          "squared_pixel_cost": 232.32184164544714,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 136.51682886299199,
+          "view_error_px": [
+            11.745205445644482,
+            10.564339632204517
+          ],
+          "squared_pixel_cost": 249.55512282496386,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 103.40247694637594,
+          "view_error_px": [
+            10.074433194850798,
+            13.072458335313916
+          ],
+          "squared_pixel_cost": 272.38337112602994,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 37,
+      "joint": 16,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          423.8502036352006,
+          652.771595556685
+        ],
+        [
+          1570.4890999869694,
+          642.1188744636293
+        ]
+      ],
+      "free_point_world_mm": [
+        -12.778230485319726,
+        303.3690613184207,
+        91.3388955914316
+      ],
+      "model_point_world_mm": [
+        -10.254725482143733,
+        283.68298959888426,
+        110.95920825257488
+      ],
+      "model_minus_free_world_mm": [
+        2.523505003175993,
+        -19.6860717195364,
+        19.62031266114328
+      ],
+      "model_view_error_px": [
+        6.175253997208666,
+        3.3010888897132338
+      ],
+      "singular_values_px_per_m": [
+        1224.620725766909,
+        1119.2424168804296,
+        193.98627119005647
+      ],
+      "weak_direction_world": [
+        -0.12194640991938714,
+        0.7266427438767283,
+        -0.6761060537216574
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9989147225575777,
+      "linearized_sigma8_world_height_std_mm": 28.371374393855568,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 91.3388955914316,
+          "view_error_px": [
+            2.8426383834016113,
+            2.719420371675599
+          ],
+          "squared_pixel_cost": 15.475840136672382,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 110.95920825257488,
+          "view_error_px": [
+            5.648974935349425,
+            4.009030427036818
+          ],
+          "squared_pixel_cost": 47.98324278511305,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 83.82638870131298,
+          "view_error_px": [
+            2.8310109091270057,
+            3.4420129474003835
+          ],
+          "squared_pixel_cost": 19.862075897667992,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 48,
+      "joint": 15,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          240.04734903668577,
+          759.1766618464856
+        ],
+        [
+          1669.5072962897166,
+          363.4029835766935
+        ]
+      ],
+      "free_point_world_mm": [
+        181.32869575091664,
+        23.49526154031633,
+        120.62170104610567
+      ],
+      "model_point_world_mm": [
+        179.86627945981732,
+        14.024171986908307,
+        139.78822027680516
+      ],
+      "model_minus_free_world_mm": [
+        -1.4624162910993332,
+        -9.471089553408023,
+        19.166519230699482
+      ],
+      "model_view_error_px": [
+        8.484336870951262,
+        5.959646304393776
+      ],
+      "singular_values_px_per_m": [
+        1656.06482540572,
+        1396.926499396907,
+        338.55933523125816
+      ],
+      "weak_direction_world": [
+        -0.09309601262706806,
+        -0.5318605252736774,
+        0.8416991826588335
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9942617684964017,
+      "linearized_sigma8_world_height_std_mm": 20.119837613928148,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 120.62170104610567,
+          "view_error_px": [
+            4.386388241699064,
+            4.633027125540857
+          ],
+          "squared_pixel_cost": 40.70534215291317,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 139.78822027680516,
+          "view_error_px": [
+            7.942209914767613,
+            6.274070568027108
+          ],
+          "squared_pixel_cost": 102.44265982281696,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 103.40247694637594,
+          "view_error_px": [
+            5.171210923270201,
+            7.6424300504283496
+          ],
+          "squared_pixel_cost": 85.14815948863932,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 48,
+      "joint": 16,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          433.7799540928436,
+          646.2397411452962
+        ],
+        [
+          1575.3454037469528,
+          637.205345280627
+        ]
+      ],
+      "free_point_world_mm": [
+        -9.545767309971419,
+        274.0319368117937,
+        120.19596593409177
+      ],
+      "model_point_world_mm": [
+        -10.18690596711619,
+        284.3797738979736,
+        110.86912231416058
+      ],
+      "model_minus_free_world_mm": [
+        -0.6411386571447704,
+        10.347837086179979,
+        -9.326843619931205
+      ],
+      "model_view_error_px": [
+        5.7632786111109295,
+        4.609075065253732
+      ],
+      "singular_values_px_per_m": [
+        1278.714535291081,
+        1169.885950962706,
+        211.99153852066755
+      ],
+      "weak_direction_world": [
+        -0.12335523888331304,
+        0.7277263944070663,
+        -0.6746834664665587
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9968867133699618,
+      "linearized_sigma8_world_height_std_mm": 25.951776956087677,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 120.19596593409177,
+          "view_error_px": [
+            4.808038218550619,
+            4.587331930010576
+          ],
+          "squared_pixel_cost": 44.16084574713796,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 110.86912231416058,
+          "view_error_px": [
+            5.736359281307538,
+            4.391408439185016
+          ],
+          "squared_pixel_cost": 52.19028588398851,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 83.82638870131298,
+          "view_error_px": [
+            10.141684530619656,
+            7.328558183261797
+          ],
+          "squared_pixel_cost": 156.56153016406353,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 59,
+      "joint": 15,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          238.56191704765206,
+          766.7762049766297
+        ],
+        [
+          1671.9207056893242,
+          360.0974853038788
+        ]
+      ],
+      "free_point_world_mm": [
+        186.95175930582232,
+        28.502578465353903,
+        109.49493994596592
+      ],
+      "model_point_world_mm": [
+        181.4382428314943,
+        3.376565243451757,
+        156.59846632564035
+      ],
+      "model_minus_free_world_mm": [
+        -5.513516474328018,
+        -25.126013221902145,
+        47.103526379674406
+      ],
+      "model_view_error_px": [
+        15.37778266425504,
+        13.12726112795963
+      ],
+      "singular_values_px_per_m": [
+        1631.7703636892275,
+        1372.99404950178,
+        327.3364756963167
+      ],
+      "weak_direction_world": [
+        -0.09884634548412406,
+        -0.5290721717695704,
+        0.8428001168981074
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9975298653518309,
+      "linearized_sigma8_world_height_std_mm": 20.826349059148782,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 109.49493994596592,
+          "view_error_px": [
+            3.162611471801274,
+            3.346320000425369
+          ],
+          "squared_pixel_cost": 21.199968866815862,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 156.59846632564035,
+          "view_error_px": [
+            14.536058340781592,
+            13.803824396999214
+          ],
+          "squared_pixel_cost": 401.84256006979683,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 103.40247694637594,
+          "view_error_px": [
+            3.034498430725015,
+            4.167418991062426
+          ],
+          "squared_pixel_cost": 26.57556177314035,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 59,
+      "joint": 16,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          299.7247643849205,
+          581.8709026422907
+        ],
+        [
+          1706.3935631948807,
+          568.4969770959083
+        ]
+      ],
+      "free_point_world_mm": [
+        8.202176255324455,
+        60.45428269203083,
+        115.31965877901054
+      ],
+      "model_point_world_mm": [
+        15.737484658457673,
+        29.805573538929487,
+        161.2519432537628
+      ],
+      "model_minus_free_world_mm": [
+        7.535308403133219,
+        -30.648709153101347,
+        45.93228447475226
+      ],
+      "model_view_error_px": [
+        12.207952730154771,
+        14.324682466880722
+      ],
+      "singular_values_px_per_m": [
+        1574.3547170680781,
+        1355.0386454312343,
+        309.4589049739479
+      ],
+      "weak_direction_world": [
+        -0.11905919922079772,
+        0.5664002355764233,
+        -0.8154849356179886
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9996963401931015,
+      "linearized_sigma8_world_height_std_mm": 21.35245596198804,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 115.31965877901054,
+          "view_error_px": [
+            1.4049106582650717,
+            1.3411626285638236
+          ],
+          "squared_pixel_cost": 3.7724911539630215,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 161.2519432537628,
+          "view_error_px": [
+            13.334276244496793,
+            13.018473307839429
+          ],
+          "squared_pixel_cost": 347.2835702314792,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 83.82638870131298,
+          "view_error_px": [
+            8.761623802181557,
+            7.314152349353893
+          ],
+          "squared_pixel_cost": 130.2628762405135,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 61,
+      "joint": 15,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          236.0357966650099,
+          766.971431975669
+        ],
+        [
+          1673.6748429858499,
+          355.25922875962374
+        ]
+      ],
+      "free_point_world_mm": [
+        188.4174456460664,
+        22.74126595109386,
+        112.60046985909612
+      ],
+      "model_point_world_mm": [
+        182.63053376022916,
+        -0.8845866696352567,
+        158.1767330885725
+      ],
+      "model_minus_free_world_mm": [
+        -5.786911885837243,
+        -23.62585262072912,
+        45.576263229476375
+      ],
+      "model_view_error_px": [
+        15.20619012873886,
+        12.554061812750742
+      ],
+      "singular_values_px_per_m": [
+        1645.6619866980955,
+        1382.306704524211,
+        332.4889625525591
+      ],
+      "weak_direction_world": [
+        -0.10125855583150437,
+        -0.5248308448143029,
+        0.8451622857193899
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9969770305969092,
+      "linearized_sigma8_world_height_std_mm": 20.560267531693647,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 112.60046985909612,
+          "view_error_px": [
+            2.617545461690495,
+            2.7736090404752045
+          ],
+          "squared_pixel_cost": 14.54445135342229,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 158.1767330885725,
+          "view_error_px": [
+            13.95835633449769,
+            13.55511143100885
+          ],
+          "squared_pixel_cost": 378.57675746787856,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 103.40247694637594,
+          "view_error_px": [
+            2.9042399603161293,
+            4.308285379602092
+          ],
+          "squared_pixel_cost": 26.995932659190167,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    },
+    {
+      "frame": 61,
+      "joint": 16,
+      "strict_accepted": true,
+      "raw_view_targets_px": [
+        [
+          299.87393214210624,
+          582.423875451088
+        ],
+        [
+          1708.6824966763693,
+          564.7271393638975
+        ]
+      ],
+      "free_point_world_mm": [
+        10.450838427004635,
+        56.56301848993193,
+        118.10101258230289
+      ],
+      "model_point_world_mm": [
+        19.03937589200777,
+        26.402796183466805,
+        164.67881502346793
+      ],
+      "model_minus_free_world_mm": [
+        8.588537465003135,
+        -30.160222306465126,
+        46.57780244116503
+      ],
+      "model_view_error_px": [
+        10.957908723105822,
+        16.643799973469996
+      ],
+      "singular_values_px_per_m": [
+        1584.465899026531,
+        1363.220198102407,
+        313.605729846113
+      ],
+      "weak_direction_world": [
+        -0.11688204852398051,
+        0.5646580940712166,
+        -0.8170066239221679
+      ],
+      "model_error_weak_direction_abs_cosine": 0.9988922460373385,
+      "linearized_sigma8_world_height_std_mm": 21.110500176529026,
+      "height_profiles": [
+        {
+          "name": "free_optimum",
+          "height_mm": 118.10101258230289,
+          "view_error_px": [
+            3.061739588133119,
+            2.9249195891999484
+          ],
+          "squared_pixel_cost": 17.929403908827155,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_height",
+          "height_mm": 164.67881502346793,
+          "view_error_px": [
+            13.469393034167926,
+            14.103722176850434
+          ],
+          "squared_pixel_cost": 380.3395279506742,
+          "optimizer_success": true
+        },
+        {
+          "name": "model_frame35_height",
+          "height_mm": 83.82638870131298,
+          "view_error_px": [
+            10.339580250185016,
+            7.935971091341772
+          ],
+          "squared_pixel_cost": 169.88655691262832,
+          "optimizer_success": true
+        }
+      ],
+      "free_optimizer_success": true
+    }
+  ]
+}

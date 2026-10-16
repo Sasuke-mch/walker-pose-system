@@ -1,0 +1,1175 @@
+{
+  "source_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "fixed_beta": [
+    [
+      1.1298097372055054,
+      -0.31224068999290466,
+      0.6401214599609375,
+      -0.022837277501821518,
+      0.2672803997993469,
+      -0.23431605100631714,
+      -0.11013275384902954,
+      -0.0018150045070797205,
+      -0.2465878129005432,
+      0.2786286175251007
+    ]
+  ],
+  "method": "Fixed saved q; raw fisheye Huber residual/Jacobian; single unit-norm whole-latent steepest descent probe of length0.002 for each observation pair; root/translation/beta unchanged",
+  "limits": [
+    "Local directional sensitivity does not identify causal temporal posterior coupling",
+    "Probe omits temporal P prior and VPoser penalty; production path unchanged",
+    "Geometry and heights are model estimates in operational Stage ground, not independent truth",
+    "Excluded observations remain in raw residual statistics but not used data gradient"
+  ],
+  "frames": [
+    {
+      "frame_index": 35,
+      "ankle_height_mm": [
+        103.40247694637594,
+        83.82638870131298
+      ],
+      "used_mask": [
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true
+        ],
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true
+        ]
+      ],
+      "residual_model_minus_detector_raw_xy_px": [
+        [
+          [
+            6.295056946199793,
+            21.11962993401187
+          ],
+          [
+            16.393241634593778,
+            20.51876602664862
+          ],
+          [
+            5.690869909792582,
+            13.38568667540369
+          ],
+          [
+            7.109584688941368,
+            2.6235493454884136
+          ],
+          [
+            -3.093883856869752,
+            -1.810453730911604
+          ],
+          [
+            -11.147274470016782,
+            -14.479182969617568
+          ],
+          [
+            40.64923790145963,
+            -25.288363729378943
+          ],
+          [
+            59.232861742402065,
+            101.02754039478293
+          ],
+          [
+            -13.501107034856659,
+            22.281280396437978
+          ],
+          [
+            -0.21739239894895945,
+            21.803506214543745
+          ],
+          [
+            8.481069130957849,
+            4.268006017459811
+          ],
+          [
+            7.853258167691706,
+            1.2629532805431154
+          ]
+        ],
+        [
+          [
+            -3.113314876485447,
+            27.05085210768914
+          ],
+          [
+            -6.3693024273884475,
+            12.623765383048749
+          ],
+          [
+            -6.5857203548753205,
+            19.03667394743013
+          ],
+          [
+            5.532591416002333,
+            17.790821296440527
+          ],
+          [
+            1.7744633596963695,
+            -18.227001478852003
+          ],
+          [
+            -0.9820502663703223,
+            -6.429111110959639
+          ],
+          [
+            -12.31902617810806,
+            126.13756741862153
+          ],
+          [
+            -14.301227590807457,
+            -7.402206777844867
+          ],
+          [
+            34.08478333535868,
+            5.463102373541744
+          ],
+          [
+            57.645926712345954,
+            17.384217217847777
+          ],
+          [
+            11.773543099168364,
+            3.6588431417007996
+          ],
+          [
+            2.9712791806589394,
+            0.10871533819147317
+          ]
+        ]
+      ],
+      "per_joint": [
+        {
+          "name": "left_shoulder",
+          "left_right_error_px": [
+            22.037842691731612,
+            27.22942028894878
+          ],
+          "raw_huber_cost": 9.547949413694901,
+          "used_huber_cost": 9.547949413694901
+        },
+        {
+          "name": "right_shoulder",
+          "left_right_error_px": [
+            26.26324676323414,
+            14.13957092198332
+          ],
+          "raw_huber_cost": 6.938201593902369,
+          "used_huber_cost": 6.938201593902369
+        },
+        {
+          "name": "left_elbow",
+          "left_right_error_px": [
+            14.5451919238717,
+            20.143650800522337
+          ],
+          "raw_huber_cost": 4.82288496621599,
+          "used_huber_cost": 4.82288496621599
+        },
+        {
+          "name": "right_elbow",
+          "left_right_error_px": [
+            7.578205962986372,
+            18.631234263416488
+          ],
+          "raw_huber_cost": 3.1605632484042716,
+          "used_huber_cost": 3.1605632484042716
+        },
+        {
+          "name": "left_wrist",
+          "left_right_error_px": [
+            3.5846701426450664,
+            18.313172939853377
+          ],
+          "raw_huber_cost": 2.7204856496605387,
+          "used_huber_cost": 2.7204856496605387
+        },
+        {
+          "name": "right_wrist",
+          "left_right_error_px": [
+            18.27316249524289,
+            6.503682987565022
+          ],
+          "raw_huber_cost": 2.939112187346047,
+          "used_huber_cost": 2.939112187346047
+        },
+        {
+          "name": "left_hip",
+          "left_right_error_px": [
+            47.87339430287799,
+            126.73769889130938
+          ],
+          "raw_huber_cost": 58.44183327897944,
+          "used_huber_cost": 58.44183327897944
+        },
+        {
+          "name": "right_hip",
+          "left_right_error_px": [
+            117.11146753590792,
+            16.10334672625678
+          ],
+          "raw_huber_cost": 42.88977462954251,
+          "used_huber_cost": 42.88977462954251
+        },
+        {
+          "name": "left_knee",
+          "left_right_error_px": [
+            26.052549726876013,
+            34.519819561552495
+          ],
+          "raw_huber_cost": 13.895456753292386,
+          "used_huber_cost": 13.895456753292386
+        },
+        {
+          "name": "right_knee",
+          "left_right_error_px": [
+            21.804589945760696,
+            60.210164215043264
+          ],
+          "raw_huber_cost": 22.35115901136665,
+          "used_huber_cost": 0.0
+        },
+        {
+          "name": "left_ankle",
+          "left_right_error_px": [
+            9.494440950849043,
+            12.32896793099674
+          ],
+          "raw_huber_cost": 1.8917801500992604,
+          "used_huber_cost": 1.8917801500992604
+        },
+        {
+          "name": "right_ankle",
+          "left_right_error_px": [
+            7.954163365008988,
+            2.973267393655563
+          ],
+          "raw_huber_cost": 0.5633518268080191,
+          "used_huber_cost": 0.5633518268080191
+        }
+      ],
+      "pair_gradient_probes": {
+        "shoulders": {
+          "used_cost": 16.48615100759727,
+          "used_cost_fraction": 0.11153504878850483,
+          "latent_gradient_norm": 37.79712808294615,
+          "translation_gradient_norm_per_m": 320.3398120177753,
+          "root_gradient_norm_per_rad": 158.17101949155628,
+          "predicted_mean_ankle_height_change_mm": 0.03876576952608316,
+          "actual_left_right_ankle_height_change_mm": [
+            0.05954742455394069,
+            0.01821190847439702
+          ],
+          "pair_used_cost_change": -0.07544647694424289,
+          "all_used_cost_change": 0.009672636032213924,
+          "vposer_penalty_change": -0.001345987486284154
+        },
+        "elbows": {
+          "used_cost": 7.983448214620261,
+          "used_cost_fraction": 0.054011047557907,
+          "latent_gradient_norm": 67.00760601563256,
+          "translation_gradient_norm_per_m": 377.4007273163357,
+          "root_gradient_norm_per_rad": 150.37601774165014,
+          "predicted_mean_ankle_height_change_mm": 0.012344724907644326,
+          "actual_left_right_ankle_height_change_mm": [
+            0.031959683457594146,
+            -0.007444864488670433
+          ],
+          "pair_used_cost_change": -0.12288260466497047,
+          "all_used_cost_change": 0.10303855048265015,
+          "vposer_penalty_change": 0.0036610380131302613
+        },
+        "wrists": {
+          "used_cost": 5.6595978370065865,
+          "used_cost_fraction": 0.038289320568697424,
+          "latent_gradient_norm": 121.84543686283027,
+          "translation_gradient_norm_per_m": 646.7177538878103,
+          "root_gradient_norm_per_rad": 170.47654397951774,
+          "predicted_mean_ankle_height_change_mm": -0.023035392698476247,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.04795413332736587,
+            0.0017024845710977843
+          ],
+          "pair_used_cost_change": -0.19179525755001153,
+          "all_used_cost_change": -0.0005681511979281906,
+          "vposer_penalty_change": -0.0003331720406518141
+        },
+        "hips": {
+          "used_cost": 101.33160790852195,
+          "used_cost_fraction": 0.6855466643903936,
+          "latent_gradient_norm": 4.05288541027874,
+          "translation_gradient_norm_per_m": 887.551831165672,
+          "root_gradient_norm_per_rad": 21.80395914132998,
+          "predicted_mean_ankle_height_change_mm": -0.060099463984009525,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.08192874933210526,
+            -0.03794083688779537
+          ],
+          "pair_used_cost_change": -0.00809829882965829,
+          "all_used_cost_change": -0.003928360027179764,
+          "vposer_penalty_change": 0.0012198225877126686
+        },
+        "knees": {
+          "used_cost": 13.895456753292386,
+          "used_cost_fraction": 0.09400802201816669,
+          "latent_gradient_norm": 7.7189462953986485,
+          "translation_gradient_norm_per_m": 729.4766999368348,
+          "root_gradient_norm_per_rad": 27.06436807753235,
+          "predicted_mean_ankle_height_change_mm": 0.002302537374280566,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.013534235644541148,
+            0.018181460190724863
+          ],
+          "pair_used_cost_change": -0.015507782806773562,
+          "all_used_cost_change": 0.017539177407691703,
+          "vposer_penalty_change": -0.0014515475047321364
+        },
+        "ankles": {
+          "used_cost": 2.4551319769072792,
+          "used_cost_fraction": 0.016609896676330442,
+          "latent_gradient_norm": 18.131116637281085,
+          "translation_gradient_norm_per_m": 71.94512619006859,
+          "root_gradient_norm_per_rad": 61.31815219200122,
+          "predicted_mean_ankle_height_change_mm": 0.005256851035613541,
+          "actual_left_right_ankle_height_change_mm": [
+            0.03459087744150935,
+            -0.02404077863327192
+          ],
+          "pair_used_cost_change": -0.03367806918073407,
+          "all_used_cost_change": 0.04857906233096056,
+          "vposer_penalty_change": 0.002852511752065665
+        }
+      },
+      "unfiltered_triangulation_diagnostic": {
+        "not_used_in_fit": true,
+        "positive_left_right_camera_depth": true,
+        "hip_width_mm": 191.83275236437368,
+        "model_hip_width_mm": 132.26781988442144,
+        "hip_midpoint_model_minus_triangulation_ground_mm": [
+          -24.97765177518214,
+          170.8829301940222,
+          52.110215241353295
+        ],
+        "tri_raw_reprojection_error_px": [
+          [
+            2.4524307124607247,
+            1.3466727474861013,
+            1.7782368733052651,
+            3.9191395576109733,
+            7.280317414416854,
+            0.35080539872644445,
+            14.656688604294029,
+            12.709351151579726,
+            9.53093045705677,
+            23.57247514818687,
+            10.697719708951151,
+            5.523640083415227
+          ],
+          [
+            1.5990364261503005,
+            1.8314589524661276,
+            1.0411250489298327,
+            5.799204013041148,
+            3.9925026376558446,
+            0.6005652638161048,
+            13.628079631738819,
+            15.011169535092877,
+            9.333747658028779,
+            30.29679030828765,
+            10.138859087418114,
+            6.686021379229786
+          ]
+        ]
+      },
+      "used_data_cost": 147.81139369794573
+    },
+    {
+      "frame_index": 48,
+      "ankle_height_mm": [
+        139.78822027680516,
+        110.86912231416058
+      ],
+      "used_mask": [
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true
+        ],
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true
+        ]
+      ],
+      "residual_model_minus_detector_raw_xy_px": [
+        [
+          [
+            9.253889798839964,
+            2.7516231272192044
+          ],
+          [
+            8.82762563565575,
+            13.53871072934328
+          ],
+          [
+            3.7185805236954366,
+            10.869676619169809
+          ],
+          [
+            2.22547246396266,
+            9.006223644014653
+          ],
+          [
+            -7.334072845351557,
+            -4.208062596506579
+          ],
+          [
+            -13.518142305852962,
+            -14.878550456988819
+          ],
+          [
+            28.214159898422167,
+            -14.993400571732309
+          ],
+          [
+            56.88256581849828,
+            116.7917141260333
+          ],
+          [
+            -22.748956569445795,
+            5.831319340160917
+          ],
+          [
+            -12.455758245341485,
+            38.14658082391509
+          ],
+          [
+            7.761727321260423,
+            -3.426242731496245
+          ],
+          [
+            -5.170779131005929,
+            2.545428117399183
+          ]
+        ],
+        [
+          [
+            12.464429926755997,
+            25.411909562572305
+          ],
+          [
+            -1.0237635429978127,
+            -0.5986641330437124
+          ],
+          [
+            1.0024539272844777,
+            11.628414093037634
+          ],
+          [
+            3.046186341885914,
+            29.892368860716942
+          ],
+          [
+            3.2384490959536834,
+            -12.702805291529671
+          ],
+          [
+            5.0249772840512605,
+            -6.045493732706518
+          ],
+          [
+            -18.67007047943457,
+            169.21379402597017
+          ],
+          [
+            -21.446745185230156,
+            -2.4662234577883737
+          ],
+          [
+            8.880303684923547,
+            -2.877393388135431
+          ],
+          [
+            77.0977280120087,
+            25.186460402964258
+          ],
+          [
+            -0.6543930971524787,
+            -5.923594379881592
+          ],
+          [
+            -4.2479320314942015,
+            1.788299663085354
+          ]
+        ]
+      ],
+      "per_joint": [
+        {
+          "name": "left_shoulder",
+          "left_right_error_px": [
+            9.654320599779249,
+            28.30418981379549
+          ],
+          "raw_huber_cost": 6.901682788539815,
+          "used_huber_cost": 6.901682788539815
+        },
+        {
+          "name": "right_shoulder",
+          "left_right_error_px": [
+            16.162415122008262,
+            1.1859555371785293
+          ],
+          "raw_huber_cost": 2.0517980711897326,
+          "used_huber_cost": 2.0517980711897326
+        },
+        {
+          "name": "left_elbow",
+          "left_right_error_px": [
+            11.488155244273722,
+            11.671543522408864
+          ],
+          "raw_huber_cost": 2.0953331180626416,
+          "used_huber_cost": 2.0953331180626416
+        },
+        {
+          "name": "right_elbow",
+          "left_right_error_px": [
+            9.27711118904288,
+            30.047179024571545
+          ],
+          "raw_huber_cost": 7.5267479940815765,
+          "used_huber_cost": 7.5267479940815765
+        },
+        {
+          "name": "left_wrist",
+          "left_right_error_px": [
+            8.455555293240106,
+            13.109111900567385
+          ],
+          "raw_huber_cost": 1.901134610458111,
+          "used_huber_cost": 1.901134610458111
+        },
+        {
+          "name": "right_wrist",
+          "left_right_error_px": [
+            20.10252310289566,
+            7.861195276637324
+          ],
+          "raw_huber_cost": 3.639920517811553,
+          "used_huber_cost": 3.639920517811553
+        },
+        {
+          "name": "left_hip",
+          "left_right_error_px": [
+            31.950600612166216,
+            170.24065207925665
+          ],
+          "raw_huber_cost": 69.21533308258705,
+          "used_huber_cost": 69.21533308258705
+        },
+        {
+          "name": "right_hip",
+          "left_right_error_px": [
+            129.90739310213593,
+            21.588078589442336
+          ],
+          "raw_huber_cost": 49.50324056477137,
+          "used_huber_cost": 49.50324056477137
+        },
+        {
+          "name": "left_knee",
+          "left_right_error_px": [
+            23.484448263594903,
+            9.334837237282299
+          ],
+          "raw_huber_cost": 4.989519503843889,
+          "used_huber_cost": 4.989519503843889
+        },
+        {
+          "name": "right_knee",
+          "left_right_error_px": [
+            40.12863743041718,
+            81.10744387689552
+          ],
+          "raw_huber_cost": 37.59221926066902,
+          "used_huber_cost": 0.0
+        },
+        {
+          "name": "left_ankle",
+          "left_right_error_px": [
+            8.484312008921604,
+            5.959630920028991
+          ],
+          "raw_huber_cost": 0.8398496169351324,
+          "used_huber_cost": 0.8398496169351324
+        },
+        {
+          "name": "right_ankle",
+          "left_right_error_px": [
+            5.763346347608548,
+            4.609006642345577
+          ],
+          "raw_huber_cost": 0.4254617449349878,
+          "used_huber_cost": 0.4254617449349878
+        }
+      ],
+      "pair_gradient_probes": {
+        "shoulders": {
+          "used_cost": 8.953480859729547,
+          "used_cost_fraction": 0.06005419251301442,
+          "latent_gradient_norm": 43.11015783633547,
+          "translation_gradient_norm_per_m": 298.74942821952095,
+          "root_gradient_norm_per_rad": 149.96209699297864,
+          "predicted_mean_ankle_height_change_mm": 0.09882289391039974,
+          "actual_left_right_ankle_height_change_mm": [
+            0.19216505618213642,
+            0.005886095372220623
+          ],
+          "pair_used_cost_change": -0.08595777102389301,
+          "all_used_cost_change": 0.05101320854203606,
+          "vposer_penalty_change": -0.0011466216754361842
+        },
+        "elbows": {
+          "used_cost": 9.622081112144219,
+          "used_cost_fraction": 0.06453873309581225,
+          "latent_gradient_norm": 61.11915026050857,
+          "translation_gradient_norm_per_m": 468.26898795738146,
+          "root_gradient_norm_per_rad": 126.43260954935626,
+          "predicted_mean_ankle_height_change_mm": 0.015614610479836888,
+          "actual_left_right_ankle_height_change_mm": [
+            0.052109832623825625,
+            -0.021300349436592647
+          ],
+          "pair_used_cost_change": -0.11060649791215327,
+          "all_used_cost_change": -0.10420496183293601,
+          "vposer_penalty_change": 0.003406499323347134
+        },
+        "wrists": {
+          "used_cost": 5.541055128269663,
+          "used_cost_fraction": 0.03716583489835972,
+          "latent_gradient_norm": 99.39117971931672,
+          "translation_gradient_norm_per_m": 748.6711551169466,
+          "root_gradient_norm_per_rad": 231.35609183939084,
+          "predicted_mean_ankle_height_change_mm": -0.09000831923687155,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.15518314539153533,
+            -0.02610730017837959
+          ],
+          "pair_used_cost_change": -0.18504200254629494,
+          "all_used_cost_change": -0.0778158643200037,
+          "vposer_penalty_change": -0.00027699205216435985
+        },
+        "hips": {
+          "used_cost": 118.71857364735843,
+          "used_cost_fraction": 0.7962878559059434,
+          "latent_gradient_norm": 8.826861590310955,
+          "translation_gradient_norm_per_m": 1136.5467309746564,
+          "root_gradient_norm_per_rad": 33.45193831490213,
+          "predicted_mean_ankle_height_change_mm": -0.13112567643424872,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.22299966287453454,
+            -0.04544264032502188
+          ],
+          "pair_used_cost_change": -0.01793924300589822,
+          "all_used_cost_change": -0.015768500896757118,
+          "vposer_penalty_change": -0.0008930328770115162
+        },
+        "knees": {
+          "used_cost": 4.989519503843889,
+          "used_cost_fraction": 0.03346648856747902,
+          "latent_gradient_norm": 19.67970243395713,
+          "translation_gradient_norm_per_m": 852.90394599811,
+          "root_gradient_norm_per_rad": 38.59754039206198,
+          "predicted_mean_ankle_height_change_mm": 0.1313719424810676,
+          "actual_left_right_ankle_height_change_mm": [
+            0.23511039088386365,
+            0.0282603124127645
+          ],
+          "pair_used_cost_change": -0.03835519352032324,
+          "all_used_cost_change": 0.021098508143548134,
+          "vposer_penalty_change": 0.0031872027220711313
+        },
+        "ankles": {
+          "used_cost": 1.2653113618701202,
+          "used_cost_fraction": 0.008486895019391146,
+          "latent_gradient_norm": 8.06927691633833,
+          "translation_gradient_norm_per_m": 101.0029633941956,
+          "root_gradient_norm_per_rad": 57.92575541150629,
+          "predicted_mean_ankle_height_change_mm": 0.07407274031112769,
+          "actual_left_right_ankle_height_change_mm": [
+            0.18688897751961697,
+            -0.03778871197446243
+          ],
+          "pair_used_cost_change": -0.011167285847934305,
+          "all_used_cost_change": -0.01259695744843288,
+          "vposer_penalty_change": 0.006325011173642123
+        }
+      },
+      "unfiltered_triangulation_diagnostic": {
+        "not_used_in_fit": true,
+        "positive_left_right_camera_depth": true,
+        "hip_width_mm": 193.0102052928441,
+        "model_hip_width_mm": 133.54534382158727,
+        "hip_midpoint_model_minus_triangulation_ground_mm": [
+          -19.666722707047683,
+          169.93384431416183,
+          57.7317772895551
+        ],
+        "tri_raw_reprojection_error_px": [
+          [
+            29.702805158415817,
+            0.7459055033878682,
+            6.415754359398994,
+            1.8426203022308554,
+            6.438143578460161,
+            0.8242977512853249,
+            6.114764781685847,
+            5.023047780440975,
+            6.404145856945947,
+            25.42668200559702,
+            6.884699750941475,
+            4.992564259562814
+          ],
+          [
+            11.959547483636403,
+            1.0664723280847892,
+            3.1923407979481917,
+            3.0296346356821013,
+            3.438627228549344,
+            1.421960506557083,
+            5.31324187660222,
+            5.98619160179829,
+            5.659913805264278,
+            32.93799198545258,
+            5.411430577728244,
+            5.387730771220743
+          ]
+        ]
+      },
+      "used_data_cost": 149.09002161321587
+    },
+    {
+      "frame_index": 61,
+      "ankle_height_mm": [
+        158.1767330885725,
+        164.67881502346793
+      ],
+      "used_mask": [
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      ],
+      "residual_model_minus_detector_raw_xy_px": [
+        [
+          [
+            4.7289255097266505,
+            -9.491738353520304
+          ],
+          [
+            18.03675298926896,
+            32.31535137787478
+          ],
+          [
+            7.724957598432411,
+            23.104015192842212
+          ],
+          [
+            7.367384223571662,
+            17.44653814972463
+          ],
+          [
+            0.7187467740732245,
+            -10.266738578460718
+          ],
+          [
+            -18.683686732741535,
+            -14.393939416125932
+          ],
+          [
+            22.9854189281898,
+            0.5440964660308509
+          ],
+          [
+            42.87761148678055,
+            196.86399418115434
+          ],
+          [
+            -24.907274237035836,
+            3.8377481098996213
+          ],
+          [
+            -0.0638212605406352,
+            -4.031621664983277
+          ],
+          [
+            9.751754515418156,
+            -11.667544504297211
+          ],
+          [
+            2.582802336089344,
+            -10.649275184351382
+          ]
+        ],
+        [
+          [
+            16.142714172226192,
+            10.744026326774701
+          ],
+          [
+            -5.3917595453118565,
+            -2.5337361552751645
+          ],
+          [
+            -3.883720366633611,
+            16.617949659403678
+          ],
+          [
+            13.081939192419213,
+            21.513330317683995
+          ],
+          [
+            13.30072860696123,
+            -9.098610145957934
+          ],
+          [
+            -0.7147729593405074,
+            -13.507283202750841
+          ],
+          [
+            -31.987935132348866,
+            172.0538098302453
+          ],
+          [
+            -34.37482552077961,
+            9.273525147627879
+          ],
+          [
+            -18.68281692130131,
+            5.896587651380457
+          ],
+          [
+            32.33569638626386,
+            -1.1220421592321372
+          ],
+          [
+            -7.75759786384242,
+            -9.87045763795436
+          ],
+          [
+            -9.94380614029069,
+            -13.346738040481796
+          ]
+        ]
+      ],
+      "per_joint": [
+        {
+          "name": "left_shoulder",
+          "left_right_error_px": [
+            10.604519482193986,
+            19.39126923531877
+          ],
+          "raw_huber_cost": 3.816227781287906,
+          "used_huber_cost": 3.816227781287906
+        },
+        {
+          "name": "right_shoulder",
+          "left_right_error_px": [
+            37.00819359373565,
+            5.957423092160745
+          ],
+          "raw_huber_cost": 9.850785699889004,
+          "used_huber_cost": 9.850785699889004
+        },
+        {
+          "name": "left_elbow",
+          "left_right_error_px": [
+            24.36124972017368,
+            17.065741553436215
+          ],
+          "raw_huber_cost": 6.911797052322982,
+          "used_huber_cost": 6.911797052322982
+        },
+        {
+          "name": "right_elbow",
+          "left_right_error_px": [
+            18.938322093246,
+            25.178572524905682
+          ],
+          "raw_huber_cost": 7.754598984006357,
+          "used_huber_cost": 7.754598984006357
+        },
+        {
+          "name": "left_wrist",
+          "left_right_error_px": [
+            10.291866592785501,
+            16.115026778263992
+          ],
+          "raw_huber_cost": 2.8563797345926547,
+          "used_huber_cost": 2.8563797345926547
+        },
+        {
+          "name": "right_wrist",
+          "left_right_error_px": [
+            23.58528443420443,
+            13.526182014992974
+          ],
+          "raw_huber_cost": 5.775181576133165,
+          "used_huber_cost": 5.775181576133165
+        },
+        {
+          "name": "left_hip",
+          "left_right_error_px": [
+            22.99185778202217,
+            175.0021184761304
+          ],
+          "raw_huber_cost": 67.60727693808792,
+          "used_huber_cost": 67.60727693808792
+        },
+        {
+          "name": "right_hip",
+          "left_right_error_px": [
+            201.47933336143652,
+            35.60374837355932
+          ],
+          "raw_huber_cost": 82.84495380273275,
+          "used_huber_cost": 82.84495380273275
+        },
+        {
+          "name": "left_knee",
+          "left_right_error_px": [
+            25.201202758478555,
+            19.59125810266597
+          ],
+          "raw_huber_cost": 7.959980718509398,
+          "used_huber_cost": 7.959980718509398
+        },
+        {
+          "name": "right_knee",
+          "left_right_error_px": [
+            4.032126784075561,
+            32.355157848351354
+          ],
+          "raw_huber_cost": 7.8829370220345885,
+          "used_huber_cost": 7.8829370220345885
+        },
+        {
+          "name": "left_ankle",
+          "left_right_error_px": [
+            15.20619317543791,
+            12.554133128167155
+          ],
+          "raw_huber_cost": 3.037770074128739,
+          "used_huber_cost": 3.037770074128739
+        },
+        {
+          "name": "right_ankle",
+          "left_right_error_px": [
+            10.95800756795462,
+            16.64375849611279
+          ],
+          "raw_huber_cost": 3.1022861463771667,
+          "used_huber_cost": 3.1022861463771667
+        }
+      ],
+      "pair_gradient_probes": {
+        "shoulders": {
+          "used_cost": 13.667013481176909,
+          "used_cost_fraction": 0.06526744042395603,
+          "latent_gradient_norm": 40.36610469487484,
+          "translation_gradient_norm_per_m": 329.7063363254275,
+          "root_gradient_norm_per_rad": 180.357603922224,
+          "predicted_mean_ankle_height_change_mm": 0.16246169254033083,
+          "actual_left_right_ankle_height_change_mm": [
+            0.15617299231374115,
+            0.16880515767681015
+          ],
+          "pair_used_cost_change": -0.08043211851699977,
+          "all_used_cost_change": 0.026102103083178063,
+          "vposer_penalty_change": -0.0032763018962529917
+        },
+        "elbows": {
+          "used_cost": 14.666396036329338,
+          "used_cost_fraction": 0.07004003697323047,
+          "latent_gradient_norm": 129.72623113668155,
+          "translation_gradient_norm_per_m": 522.7235209392355,
+          "root_gradient_norm_per_rad": 114.18725903000593,
+          "predicted_mean_ankle_height_change_mm": 0.07531112938851063,
+          "actual_left_right_ankle_height_change_mm": [
+            0.08299195526484393,
+            0.06604892579875621
+          ],
+          "pair_used_cost_change": -0.24790521787256736,
+          "all_used_cost_change": 0.018089011006501565,
+          "vposer_penalty_change": 0.0027288945344013074
+        },
+        "wrists": {
+          "used_cost": 8.63156131072582,
+          "used_cost_fraction": 0.041220411056842585,
+          "latent_gradient_norm": 134.26107414730868,
+          "translation_gradient_norm_per_m": 531.2959866681983,
+          "root_gradient_norm_per_rad": 155.45373851274857,
+          "predicted_mean_ankle_height_change_mm": -0.13162565405395601,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.1359921966451738,
+            -0.12710589171849307
+          ],
+          "pair_used_cost_change": -0.24103657719109706,
+          "all_used_cost_change": 0.026837718341135533,
+          "vposer_penalty_change": -0.0016818081602170626
+        },
+        "hips": {
+          "used_cost": 150.45223074082065,
+          "used_cost_fraction": 0.7184914260933472,
+          "latent_gradient_norm": 9.260540250776263,
+          "translation_gradient_norm_per_m": 1101.9500031630207,
+          "root_gradient_norm_per_rad": 36.56641015435792,
+          "predicted_mean_ankle_height_change_mm": -0.2611306545892018,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.2582938669249968,
+            -0.26351547306913137
+          ],
+          "pair_used_cost_change": -0.01850760914789884,
+          "all_used_cost_change": 0.024760227433249377,
+          "vposer_penalty_change": -0.0014712197679563764
+        },
+        "knees": {
+          "used_cost": 15.842917740543985,
+          "used_cost_fraction": 0.07565856953289164,
+          "latent_gradient_norm": 58.64891884742297,
+          "translation_gradient_norm_per_m": 1056.4205119496899,
+          "root_gradient_norm_per_rad": 23.43678694511012,
+          "predicted_mean_ankle_height_change_mm": 0.2678350868854149,
+          "actual_left_right_ankle_height_change_mm": [
+            0.2531823755761442,
+            0.2830141029372957
+          ],
+          "pair_used_cost_change": -0.11429806248836197,
+          "all_used_cost_change": -0.024738325331050165,
+          "vposer_penalty_change": 0.004604174079860159
+        },
+        "ankles": {
+          "used_cost": 6.1400562205059055,
+          "used_cost_fraction": 0.02932211591973204,
+          "latent_gradient_norm": 31.945201365685406,
+          "translation_gradient_norm_per_m": 291.713135733429,
+          "root_gradient_norm_per_rad": 60.02840408573387,
+          "predicted_mean_ankle_height_change_mm": -0.2514030957727149,
+          "actual_left_right_ankle_height_change_mm": [
+            -0.23105271882484235,
+            -0.27130857485890836
+          ],
+          "pair_used_cost_change": -0.06314231992600094,
+          "all_used_cost_change": 0.024432150020940527,
+          "vposer_penalty_change": -0.0035500875826844297
+        }
+      },
+      "unfiltered_triangulation_diagnostic": {
+        "not_used_in_fit": true,
+        "positive_left_right_camera_depth": true,
+        "hip_width_mm": 192.81065012888257,
+        "model_hip_width_mm": 137.19804449139906,
+        "hip_midpoint_model_minus_triangulation_ground_mm": [
+          3.3231332920011374,
+          213.29820330216668,
+          65.18626105336652
+        ],
+        "tri_raw_reprojection_error_px": [
+          [
+            30.10271580258561,
+            4.693549889538723,
+            6.012036644443036,
+            2.516451898787599,
+            9.869332576050446,
+            3.1900872758924863,
+            5.61248149984177,
+            16.5054514671355,
+            25.701109424460938,
+            13.181630418278765,
+            4.280334467714654,
+            3.6375767134633037
+          ],
+          [
+            10.625183048913364,
+            6.6250368011200695,
+            3.0981208000692146,
+            3.9516908738109002,
+            5.011850169544861,
+            5.5755644599078,
+            4.526354708739723,
+            19.636643892989643,
+            20.35419474065366,
+            16.496331456751427,
+            3.1815185984215,
+            4.0524113051762685
+          ]
+        ]
+      },
+      "used_data_cost": 209.40017553010262
+    }
+  ]
+}

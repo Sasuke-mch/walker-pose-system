@@ -1,0 +1,106 @@
+{
+  "method": "restore actual35 prior P;repeat identical35 update;initialize saved35 v/a;repeat actual36..59 predict/update",
+  "purpose": "pre-update full-P for two traced upward-jump events,without resetting diagnostic covariance",
+  "event_frames": [
+    37,
+    59
+  ],
+  "checks": [
+    {
+      "frame": 36,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 37,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 38,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 39,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 40,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 41,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 42,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 43,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 44,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 45,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 46,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 47,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 48,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 49,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 50,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 51,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 52,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 53,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 54,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 55,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 56,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 57,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 58,
+      "maximum_pose_difference": 0.0
+    },
+    {
+      "frame": 59,
+      "maximum_pose_difference": 0.0
+    }
+  ]
+}

@@ -1,0 +1,2987 @@
+{
+  "question": "Are distinct host-return records always new image evidence with a known exposure time?",
+  "source_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "inputs": {
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results",
+    "initial_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\initialization_double_sigma075\\result.npz",
+    "smplh_model": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+    "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+    "vposer_dir": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05",
+    "mano_left": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+    "mano_right": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+  },
+  "scope": "All448 saved PMPose keypoints; raw upright PNG frames35..61 only; source AVI verification at35,36,58,59,60,61; no network/model/optimization or observation changes",
+  "timestamp_definition": "host_read_return_perf_counter_ns",
+  "timestamp_warning": "host_return_timestamp_ns is recorded after VideoCapture.read() returns; it is not a sensor exposure timestamp or hardware synchronization error.",
+  "capture_csv_columns": [
+    "pair_id",
+    "left_frame_id",
+    "right_frame_id",
+    "left_host_return_timestamp_ns",
+    "right_host_return_timestamp_ns",
+    "signed_host_delta_ms_right_minus_left",
+    "abs_host_delta_ms",
+    "left_read_duration_ms",
+    "right_read_duration_ms"
+  ],
+  "frame_csv_columns": {
+    "left": [
+      "frame_id",
+      "host_return_timestamp_ns",
+      "read_duration_ms"
+    ],
+    "right": [
+      "frame_id",
+      "host_return_timestamp_ns",
+      "read_duration_ms"
+    ]
+  },
+  "selection_identity": "Existing _read_capture_times verifies sequence order and selected frame IDs against source CSV; all448 retained",
+  "whole448_host_timing": {
+    "span_s": 16.035239,
+    "dt_ms": {
+      "min": 6.981600000000005,
+      "median": 39.76310000000005,
+      "p95": 61.4030649999998,
+      "max": 69.50539999999972
+    },
+    "absolute_host_skew_ms": {
+      "min": 0.094,
+      "median": 3.5254,
+      "p95": 5.974509999999996,
+      "max": 9.2775
+    }
+  },
+  "whole448_keypoint_adjacent_comparison": {
+    "left": {
+      "denominator_adjacent_pairs": 447,
+      "exact_all17_xy_score_count": 111,
+      "exact_frames": [
+        6,
+        9,
+        12,
+        15,
+        20,
+        23,
+        30,
+        36,
+        41,
+        50,
+        53,
+        56,
+        61,
+        64,
+        67,
+        70,
+        75,
+        82,
+        85,
+        87,
+        91,
+        96,
+        98,
+        102,
+        112,
+        122,
+        125,
+        128,
+        130,
+        134,
+        140,
+        150,
+        154,
+        157,
+        159,
+        162,
+        166,
+        171,
+        177,
+        180,
+        182,
+        189,
+        192,
+        199,
+        201,
+        204,
+        210,
+        212,
+        215,
+        218,
+        225,
+        232,
+        235,
+        238,
+        242,
+        244,
+        247,
+        250,
+        253,
+        256,
+        259,
+        262,
+        265,
+        268,
+        271,
+        274,
+        277,
+        280,
+        287,
+        291,
+        297,
+        299,
+        303,
+        306,
+        309,
+        314,
+        317,
+        320,
+        322,
+        326,
+        329,
+        332,
+        338,
+        341,
+        344,
+        346,
+        350,
+        357,
+        361,
+        364,
+        366,
+        369,
+        376,
+        380,
+        386,
+        390,
+        396,
+        398,
+        401,
+        407,
+        410,
+        413,
+        419,
+        422,
+        425,
+        429,
+        431,
+        434,
+        437,
+        444,
+        447
+      ],
+      "xy_tolerance_0p001px_same_score_count": 125,
+      "tolerance_frames": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        20,
+        23,
+        30,
+        33,
+        36,
+        41,
+        44,
+        47,
+        50,
+        53,
+        56,
+        61,
+        64,
+        67,
+        70,
+        75,
+        82,
+        85,
+        87,
+        91,
+        96,
+        98,
+        102,
+        107,
+        112,
+        115,
+        122,
+        125,
+        128,
+        130,
+        134,
+        140,
+        144,
+        150,
+        154,
+        157,
+        159,
+        162,
+        166,
+        169,
+        171,
+        177,
+        180,
+        182,
+        185,
+        189,
+        192,
+        199,
+        201,
+        204,
+        210,
+        212,
+        215,
+        218,
+        225,
+        232,
+        235,
+        238,
+        242,
+        244,
+        247,
+        250,
+        253,
+        256,
+        259,
+        262,
+        265,
+        268,
+        271,
+        274,
+        277,
+        280,
+        287,
+        291,
+        294,
+        297,
+        299,
+        303,
+        306,
+        309,
+        314,
+        317,
+        320,
+        322,
+        326,
+        329,
+        332,
+        334,
+        338,
+        341,
+        344,
+        346,
+        350,
+        357,
+        361,
+        364,
+        366,
+        369,
+        373,
+        376,
+        380,
+        386,
+        390,
+        396,
+        398,
+        401,
+        405,
+        407,
+        410,
+        413,
+        417,
+        419,
+        422,
+        425,
+        429,
+        431,
+        434,
+        437,
+        444,
+        447
+      ],
+      "exact_dt_ms": {
+        "min": 6.981600000000005,
+        "median": 9.375300000000308,
+        "p95": 10.459875000000451,
+        "max": 11.123000000001326
+      }
+    },
+    "right": {
+      "denominator_adjacent_pairs": 447,
+      "exact_all17_xy_score_count": 127,
+      "exact_frames": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        20,
+        23,
+        30,
+        33,
+        36,
+        41,
+        44,
+        47,
+        50,
+        53,
+        56,
+        61,
+        64,
+        67,
+        70,
+        75,
+        82,
+        85,
+        87,
+        91,
+        96,
+        98,
+        102,
+        107,
+        112,
+        115,
+        122,
+        125,
+        128,
+        130,
+        134,
+        140,
+        144,
+        150,
+        154,
+        157,
+        159,
+        162,
+        166,
+        169,
+        171,
+        177,
+        180,
+        182,
+        185,
+        189,
+        192,
+        199,
+        201,
+        204,
+        210,
+        212,
+        215,
+        218,
+        225,
+        232,
+        235,
+        238,
+        242,
+        244,
+        247,
+        250,
+        253,
+        256,
+        259,
+        262,
+        265,
+        268,
+        271,
+        274,
+        277,
+        280,
+        285,
+        287,
+        291,
+        294,
+        297,
+        299,
+        303,
+        306,
+        309,
+        314,
+        317,
+        320,
+        322,
+        326,
+        329,
+        332,
+        334,
+        338,
+        341,
+        344,
+        346,
+        350,
+        354,
+        357,
+        361,
+        364,
+        366,
+        369,
+        373,
+        376,
+        380,
+        386,
+        390,
+        396,
+        398,
+        401,
+        405,
+        407,
+        410,
+        413,
+        417,
+        419,
+        422,
+        425,
+        429,
+        431,
+        434,
+        437,
+        444,
+        447
+      ],
+      "xy_tolerance_0p001px_same_score_count": 127,
+      "tolerance_frames": [
+        3,
+        6,
+        9,
+        12,
+        15,
+        20,
+        23,
+        30,
+        33,
+        36,
+        41,
+        44,
+        47,
+        50,
+        53,
+        56,
+        61,
+        64,
+        67,
+        70,
+        75,
+        82,
+        85,
+        87,
+        91,
+        96,
+        98,
+        102,
+        107,
+        112,
+        115,
+        122,
+        125,
+        128,
+        130,
+        134,
+        140,
+        144,
+        150,
+        154,
+        157,
+        159,
+        162,
+        166,
+        169,
+        171,
+        177,
+        180,
+        182,
+        185,
+        189,
+        192,
+        199,
+        201,
+        204,
+        210,
+        212,
+        215,
+        218,
+        225,
+        232,
+        235,
+        238,
+        242,
+        244,
+        247,
+        250,
+        253,
+        256,
+        259,
+        262,
+        265,
+        268,
+        271,
+        274,
+        277,
+        280,
+        285,
+        287,
+        291,
+        294,
+        297,
+        299,
+        303,
+        306,
+        309,
+        314,
+        317,
+        320,
+        322,
+        326,
+        329,
+        332,
+        334,
+        338,
+        341,
+        344,
+        346,
+        350,
+        354,
+        357,
+        361,
+        364,
+        366,
+        369,
+        373,
+        376,
+        380,
+        386,
+        390,
+        396,
+        398,
+        401,
+        405,
+        407,
+        410,
+        413,
+        417,
+        419,
+        422,
+        425,
+        429,
+        431,
+        434,
+        437,
+        444,
+        447
+      ],
+      "exact_dt_ms": {
+        "min": 6.981600000000005,
+        "median": 9.359699999999972,
+        "p95": 10.467925000000733,
+        "max": 11.123000000001326
+      }
+    }
+  },
+  "png_window": {
+    "frame_range_inclusive": [
+      35,
+      61
+    ],
+    "decoded_images": 54,
+    "adjacent_rows": [
+      {
+        "side": "left",
+        "previous_frame": 35,
+        "frame": 36,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 9.563250000000023,
+        "signed_host_skew_ms": 1.0417,
+        "capture_pair_id": 1807,
+        "capture_frame_id": 2474,
+        "read_duration_ms": 6.5551,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 36,
+        "frame": 37,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 174,
+        "image_mean_abs_channel_difference": 4.860060763888889,
+        "keypoint_max_abs_xy_difference_px": 18.317826618539584,
+        "keypoint_max_abs_score_difference": 0.02731037139892578,
+        "host_midpoint_dt_ms": 38.17890000000013,
+        "signed_host_skew_ms": -2.8937,
+        "capture_pair_id": 1808,
+        "capture_frame_id": 2475,
+        "read_duration_ms": 40.0519,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 37,
+        "frame": 38,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 191,
+        "image_mean_abs_channel_difference": 4.826561053240741,
+        "keypoint_max_abs_xy_difference_px": 13.728408340423812,
+        "keypoint_max_abs_score_difference": 0.03100353479385376,
+        "host_midpoint_dt_ms": 56.39119999999998,
+        "signed_host_skew_ms": -3.6389,
+        "capture_pair_id": 1809,
+        "capture_frame_id": 2477,
+        "read_duration_ms": 7.7996,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 38,
+        "frame": 39,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 187,
+        "image_mean_abs_channel_difference": 4.80129452803498,
+        "keypoint_max_abs_xy_difference_px": 20.752038274492406,
+        "keypoint_max_abs_score_difference": 0.04084712266921997,
+        "host_midpoint_dt_ms": 39.454149999999856,
+        "signed_host_skew_ms": -2.5138,
+        "capture_pair_id": 1810,
+        "capture_frame_id": 2478,
+        "read_duration_ms": 38.824,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 39,
+        "frame": 40,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 170,
+        "image_mean_abs_channel_difference": 4.889337545010288,
+        "keypoint_max_abs_xy_difference_px": 36.12038080864386,
+        "keypoint_max_abs_score_difference": 0.04486227035522461,
+        "host_midpoint_dt_ms": 49.16319999999996,
+        "signed_host_skew_ms": -4.145,
+        "capture_pair_id": 1811,
+        "capture_frame_id": 2479,
+        "read_duration_ms": 49.9251,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 40,
+        "frame": 41,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 7.83810000000007,
+        "signed_host_skew_ms": -1.5852,
+        "capture_pair_id": 1812,
+        "capture_frame_id": 2480,
+        "read_duration_ms": 6.3641,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 41,
+        "frame": 42,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 169,
+        "image_mean_abs_channel_difference": 4.920411683384773,
+        "keypoint_max_abs_xy_difference_px": 40.112186403294345,
+        "keypoint_max_abs_score_difference": 0.035382628440856934,
+        "host_midpoint_dt_ms": 38.973399999999934,
+        "signed_host_skew_ms": -3.4102,
+        "capture_pair_id": 1813,
+        "capture_frame_id": 2481,
+        "read_duration_ms": 39.8359,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 42,
+        "frame": 43,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 170,
+        "image_mean_abs_channel_difference": 4.978772183641976,
+        "keypoint_max_abs_xy_difference_px": 34.061956254262896,
+        "keypoint_max_abs_score_difference": 0.016151130199432373,
+        "host_midpoint_dt_ms": 64.41045000000001,
+        "signed_host_skew_ms": -4.7151,
+        "capture_pair_id": 1814,
+        "capture_frame_id": 2482,
+        "read_duration_ms": 64.9975,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 43,
+        "frame": 44,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 7.262305598487728e-05,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.197650000000056,
+        "signed_host_skew_ms": -0.6112,
+        "capture_pair_id": 1815,
+        "capture_frame_id": 2483,
+        "read_duration_ms": 5.9771,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 44,
+        "frame": 45,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 153,
+        "image_mean_abs_channel_difference": 5.026034272119341,
+        "keypoint_max_abs_xy_difference_px": 17.80942466523925,
+        "keypoint_max_abs_score_difference": 0.03547382354736328,
+        "host_midpoint_dt_ms": 39.296949999999995,
+        "signed_host_skew_ms": -4.3443,
+        "capture_pair_id": 1816,
+        "capture_frame_id": 2484,
+        "read_duration_ms": 41.1098,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 45,
+        "frame": 46,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 224,
+        "image_mean_abs_channel_difference": 5.128557098765432,
+        "keypoint_max_abs_xy_difference_px": 16.560471502561313,
+        "keypoint_max_abs_score_difference": 0.032311201095581055,
+        "host_midpoint_dt_ms": 48.05750000000009,
+        "signed_host_skew_ms": -4.0889,
+        "capture_pair_id": 1817,
+        "capture_frame_id": 2485,
+        "read_duration_ms": 47.8763,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 46,
+        "frame": 47,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 7.300934908016643e-05,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.370049999999907,
+        "signed_host_skew_ms": -1.1844,
+        "capture_pair_id": 1818,
+        "capture_frame_id": 2486,
+        "read_duration_ms": 6.7683,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 47,
+        "frame": 48,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 209,
+        "image_mean_abs_channel_difference": 5.181626639660494,
+        "keypoint_max_abs_xy_difference_px": 33.848813379064495,
+        "keypoint_max_abs_score_difference": 0.08413779735565186,
+        "host_midpoint_dt_ms": 40.61004999999995,
+        "signed_host_skew_ms": -6.6251,
+        "capture_pair_id": 1819,
+        "capture_frame_id": 2487,
+        "read_duration_ms": 43.2561,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 48,
+        "frame": 49,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 234,
+        "image_mean_abs_channel_difference": 5.36449893904321,
+        "keypoint_max_abs_xy_difference_px": 53.37917926463638,
+        "keypoint_max_abs_score_difference": 0.06113773584365845,
+        "host_midpoint_dt_ms": 48.1488000000001,
+        "signed_host_skew_ms": -4.8067,
+        "capture_pair_id": 1820,
+        "capture_frame_id": 2488,
+        "read_duration_ms": 47.1591,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 49,
+        "frame": 50,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.68234999999995,
+        "signed_host_skew_ms": -1.5096,
+        "capture_pair_id": 1821,
+        "capture_frame_id": 2489,
+        "read_duration_ms": 6.8371,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 50,
+        "frame": 51,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 227,
+        "image_mean_abs_channel_difference": 5.363193319187243,
+        "keypoint_max_abs_xy_difference_px": 29.704681824124236,
+        "keypoint_max_abs_score_difference": 0.03421133756637573,
+        "host_midpoint_dt_ms": 39.444049999999955,
+        "signed_host_skew_ms": -4.3807,
+        "capture_pair_id": 1822,
+        "capture_frame_id": 2490,
+        "read_duration_ms": 40.7982,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 51,
+        "frame": 52,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 159,
+        "image_mean_abs_channel_difference": 4.975846354166666,
+        "keypoint_max_abs_xy_difference_px": 24.04999649713909,
+        "keypoint_max_abs_score_difference": 0.040077030658721924,
+        "host_midpoint_dt_ms": 47.46745000000008,
+        "signed_host_skew_ms": -4.9282,
+        "capture_pair_id": 1823,
+        "capture_frame_id": 2491,
+        "read_duration_ms": 47.6663,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 52,
+        "frame": 53,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.714349999999982,
+        "signed_host_skew_ms": -1.0867,
+        "capture_pair_id": 1824,
+        "capture_frame_id": 2492,
+        "read_duration_ms": 6.6894,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 53,
+        "frame": 54,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 169,
+        "image_mean_abs_channel_difference": 4.806349826388889,
+        "keypoint_max_abs_xy_difference_px": 37.337256083412285,
+        "keypoint_max_abs_score_difference": 0.0781165361404419,
+        "host_midpoint_dt_ms": 39.65394999999994,
+        "signed_host_skew_ms": -4.179,
+        "capture_pair_id": 1825,
+        "capture_frame_id": 2493,
+        "read_duration_ms": 41.1598,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 54,
+        "frame": 55,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 156,
+        "image_mean_abs_channel_difference": 4.804068287037037,
+        "keypoint_max_abs_xy_difference_px": 49.36643942873525,
+        "keypoint_max_abs_score_difference": 0.1236107349395752,
+        "host_midpoint_dt_ms": 64.29525000000002,
+        "signed_host_skew_ms": -4.7977,
+        "capture_pair_id": 1826,
+        "capture_frame_id": 2494,
+        "read_duration_ms": 64.5158,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 55,
+        "frame": 56,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 9.764150000000082,
+        "signed_host_skew_ms": -2.0788,
+        "capture_pair_id": 1827,
+        "capture_frame_id": 2495,
+        "read_duration_ms": 8.2672,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 56,
+        "frame": 57,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 168,
+        "image_mean_abs_channel_difference": 4.683916859567901,
+        "keypoint_max_abs_xy_difference_px": 42.60998044695134,
+        "keypoint_max_abs_score_difference": 0.02482682466506958,
+        "host_midpoint_dt_ms": 37.138399999999905,
+        "signed_host_skew_ms": -4.201,
+        "capture_pair_id": 1828,
+        "capture_frame_id": 2496,
+        "read_duration_ms": 38.1334,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 57,
+        "frame": 58,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 193,
+        "image_mean_abs_channel_difference": 4.475107060185185,
+        "keypoint_max_abs_xy_difference_px": 27.19718925536631,
+        "keypoint_max_abs_score_difference": 0.05558609962463379,
+        "host_midpoint_dt_ms": 51.66005000000018,
+        "signed_host_skew_ms": -1.8635,
+        "capture_pair_id": 1829,
+        "capture_frame_id": 2497,
+        "read_duration_ms": 50.4198,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 58,
+        "frame": 59,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 216,
+        "image_mean_abs_channel_difference": 4.2100761959876545,
+        "keypoint_max_abs_xy_difference_px": 20.921685733492495,
+        "keypoint_max_abs_score_difference": 0.04153174161911011,
+        "host_midpoint_dt_ms": 43.90029999999978,
+        "signed_host_skew_ms": -4.1323,
+        "capture_pair_id": 1830,
+        "capture_frame_id": 2499,
+        "read_duration_ms": 39.3067,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 59,
+        "frame": 60,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 236,
+        "image_mean_abs_channel_difference": 4.631784818672839,
+        "keypoint_max_abs_xy_difference_px": 22.444046546542268,
+        "keypoint_max_abs_score_difference": 0.05787169933319092,
+        "host_midpoint_dt_ms": 48.33990000000021,
+        "signed_host_skew_ms": -3.8063,
+        "capture_pair_id": 1831,
+        "capture_frame_id": 2500,
+        "read_duration_ms": 48.1052,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "left",
+        "previous_frame": 60,
+        "frame": 61,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 7.910299999999815,
+        "signed_host_skew_ms": -2.0451,
+        "capture_pair_id": 1832,
+        "capture_frame_id": 2501,
+        "read_duration_ms": 6.7934,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 35,
+        "frame": 36,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 9.563250000000023,
+        "signed_host_skew_ms": 1.0417,
+        "capture_pair_id": 1807,
+        "capture_frame_id": 2474,
+        "read_duration_ms": 12.3352,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 36,
+        "frame": 37,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 206,
+        "image_mean_abs_channel_difference": 5.937650302211934,
+        "keypoint_max_abs_xy_difference_px": 10.520066968978426,
+        "keypoint_max_abs_score_difference": 0.01952826976776123,
+        "host_midpoint_dt_ms": 38.17890000000013,
+        "signed_host_skew_ms": -2.8937,
+        "capture_pair_id": 1808,
+        "capture_frame_id": 2475,
+        "read_duration_ms": 36.1684,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 37,
+        "frame": 38,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 232,
+        "image_mean_abs_channel_difference": 6.32922952031893,
+        "keypoint_max_abs_xy_difference_px": 13.739991717868179,
+        "keypoint_max_abs_score_difference": 0.009036123752593994,
+        "host_midpoint_dt_ms": 56.39119999999998,
+        "signed_host_skew_ms": -3.6389,
+        "capture_pair_id": 1809,
+        "capture_frame_id": 2477,
+        "read_duration_ms": 8.8491,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 38,
+        "frame": 39,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 189,
+        "image_mean_abs_channel_difference": 6.628065522119342,
+        "keypoint_max_abs_xy_difference_px": 21.780344437039048,
+        "keypoint_max_abs_score_difference": 0.02330869436264038,
+        "host_midpoint_dt_ms": 39.454149999999856,
+        "signed_host_skew_ms": -2.5138,
+        "capture_pair_id": 1810,
+        "capture_frame_id": 2478,
+        "read_duration_ms": 39.8862,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 39,
+        "frame": 40,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 213,
+        "image_mean_abs_channel_difference": 6.652819573045267,
+        "keypoint_max_abs_xy_difference_px": 19.12905821724553,
+        "keypoint_max_abs_score_difference": 0.008687496185302734,
+        "host_midpoint_dt_ms": 49.16319999999996,
+        "signed_host_skew_ms": -4.145,
+        "capture_pair_id": 1811,
+        "capture_frame_id": 2479,
+        "read_duration_ms": 48.2018,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 40,
+        "frame": 41,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 7.83810000000007,
+        "signed_host_skew_ms": -1.5852,
+        "capture_pair_id": 1812,
+        "capture_frame_id": 2480,
+        "read_duration_ms": 9.0268,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 41,
+        "frame": 42,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 201,
+        "image_mean_abs_channel_difference": 6.90022360468107,
+        "keypoint_max_abs_xy_difference_px": 31.850874688890144,
+        "keypoint_max_abs_score_difference": 0.01171410083770752,
+        "host_midpoint_dt_ms": 38.973399999999934,
+        "signed_host_skew_ms": -3.4102,
+        "capture_pair_id": 1813,
+        "capture_frame_id": 2481,
+        "read_duration_ms": 37.8292,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 42,
+        "frame": 43,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 200,
+        "image_mean_abs_channel_difference": 7.145317161779835,
+        "keypoint_max_abs_xy_difference_px": 31.28426960536399,
+        "keypoint_max_abs_score_difference": 0.014014244079589844,
+        "host_midpoint_dt_ms": 64.41045000000001,
+        "signed_host_skew_ms": -4.7151,
+        "capture_pair_id": 1814,
+        "capture_frame_id": 2482,
+        "read_duration_ms": 63.6557,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 43,
+        "frame": 44,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.197650000000056,
+        "signed_host_skew_ms": -0.6112,
+        "capture_pair_id": 1815,
+        "capture_frame_id": 2483,
+        "read_duration_ms": 10.1275,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 44,
+        "frame": 45,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 225,
+        "image_mean_abs_channel_difference": 7.4197535686728395,
+        "keypoint_max_abs_xy_difference_px": 25.904593112620887,
+        "keypoint_max_abs_score_difference": 0.016566574573516846,
+        "host_midpoint_dt_ms": 39.296949999999995,
+        "signed_host_skew_ms": -4.3443,
+        "capture_pair_id": 1816,
+        "capture_frame_id": 2484,
+        "read_duration_ms": 37.3446,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 45,
+        "frame": 46,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 200,
+        "image_mean_abs_channel_difference": 7.516070119598766,
+        "keypoint_max_abs_xy_difference_px": 29.990218403491554,
+        "keypoint_max_abs_score_difference": 0.010461151599884033,
+        "host_midpoint_dt_ms": 48.05750000000009,
+        "signed_host_skew_ms": -4.0889,
+        "capture_pair_id": 1817,
+        "capture_frame_id": 2485,
+        "read_duration_ms": 48.1029,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 46,
+        "frame": 47,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.370049999999907,
+        "signed_host_skew_ms": -1.1844,
+        "capture_pair_id": 1818,
+        "capture_frame_id": 2486,
+        "read_duration_ms": 9.614,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 47,
+        "frame": 48,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 198,
+        "image_mean_abs_channel_difference": 7.830647665895062,
+        "keypoint_max_abs_xy_difference_px": 16.555514978983865,
+        "keypoint_max_abs_score_difference": 0.02512204647064209,
+        "host_midpoint_dt_ms": 40.61004999999995,
+        "signed_host_skew_ms": -6.6251,
+        "capture_pair_id": 1819,
+        "capture_frame_id": 2487,
+        "read_duration_ms": 37.824,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 48,
+        "frame": 49,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 255,
+        "image_mean_abs_channel_difference": 7.770958236882716,
+        "keypoint_max_abs_xy_difference_px": 30.636548044833944,
+        "keypoint_max_abs_score_difference": 0.07798004150390625,
+        "host_midpoint_dt_ms": 48.1488000000001,
+        "signed_host_skew_ms": -4.8067,
+        "capture_pair_id": 1820,
+        "capture_frame_id": 2488,
+        "read_duration_ms": 48.9496,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 49,
+        "frame": 50,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.68234999999995,
+        "signed_host_skew_ms": -1.5096,
+        "capture_pair_id": 1821,
+        "capture_frame_id": 2489,
+        "read_duration_ms": 10.2061,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 50,
+        "frame": 51,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 222,
+        "image_mean_abs_channel_difference": 7.380816454475308,
+        "keypoint_max_abs_xy_difference_px": 24.900057480690293,
+        "keypoint_max_abs_score_difference": 0.06892585754394531,
+        "host_midpoint_dt_ms": 39.444049999999955,
+        "signed_host_skew_ms": -4.3807,
+        "capture_pair_id": 1822,
+        "capture_frame_id": 2490,
+        "read_duration_ms": 37.8887,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 51,
+        "frame": 52,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 229,
+        "image_mean_abs_channel_difference": 7.109069573045267,
+        "keypoint_max_abs_xy_difference_px": 19.149476112203274,
+        "keypoint_max_abs_score_difference": 0.04355752468109131,
+        "host_midpoint_dt_ms": 47.46745000000008,
+        "signed_host_skew_ms": -4.9282,
+        "capture_pair_id": 1823,
+        "capture_frame_id": 2491,
+        "read_duration_ms": 47.1162,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 52,
+        "frame": 53,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 8.714349999999982,
+        "signed_host_skew_ms": -1.0867,
+        "capture_pair_id": 1824,
+        "capture_frame_id": 2492,
+        "read_duration_ms": 10.5165,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 53,
+        "frame": 54,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 251,
+        "image_mean_abs_channel_difference": 7.088636188271605,
+        "keypoint_max_abs_xy_difference_px": 33.33311126345643,
+        "keypoint_max_abs_score_difference": 0.028145194053649902,
+        "host_midpoint_dt_ms": 39.65394999999994,
+        "signed_host_skew_ms": -4.179,
+        "capture_pair_id": 1825,
+        "capture_frame_id": 2493,
+        "read_duration_ms": 38.0307,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 54,
+        "frame": 55,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 255,
+        "image_mean_abs_channel_difference": 6.945855195473251,
+        "keypoint_max_abs_xy_difference_px": 38.83576022254147,
+        "keypoint_max_abs_score_difference": 0.043379127979278564,
+        "host_midpoint_dt_ms": 64.29525000000002,
+        "signed_host_skew_ms": -4.7977,
+        "capture_pair_id": 1826,
+        "capture_frame_id": 2494,
+        "read_duration_ms": 63.8492,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 55,
+        "frame": 56,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 9.764150000000082,
+        "signed_host_skew_ms": -2.0788,
+        "capture_pair_id": 1827,
+        "capture_frame_id": 2495,
+        "read_duration_ms": 10.9159,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 56,
+        "frame": 57,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 253,
+        "image_mean_abs_channel_difference": 6.526835133744856,
+        "keypoint_max_abs_xy_difference_px": 27.548103862338394,
+        "keypoint_max_abs_score_difference": 0.05579656362533569,
+        "host_midpoint_dt_ms": 37.138399999999905,
+        "signed_host_skew_ms": -4.201,
+        "capture_pair_id": 1828,
+        "capture_frame_id": 2496,
+        "read_duration_ms": 36.0226,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 57,
+        "frame": 58,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 250,
+        "image_mean_abs_channel_difference": 6.3992396476337445,
+        "keypoint_max_abs_xy_difference_px": 12.885000478653637,
+        "keypoint_max_abs_score_difference": 0.0329013466835022,
+        "host_midpoint_dt_ms": 51.66005000000018,
+        "signed_host_skew_ms": -1.8635,
+        "capture_pair_id": 1829,
+        "capture_frame_id": 2498,
+        "read_duration_ms": 5.0719,
+        "right_knee_used_lr": [
+          false,
+          false
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 58,
+        "frame": 59,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 254,
+        "image_mean_abs_channel_difference": 5.941824684927983,
+        "keypoint_max_abs_xy_difference_px": 14.022785898238908,
+        "keypoint_max_abs_score_difference": 0.024273037910461426,
+        "host_midpoint_dt_ms": 43.90029999999978,
+        "signed_host_skew_ms": -4.1323,
+        "capture_pair_id": 1830,
+        "capture_frame_id": 2499,
+        "read_duration_ms": 42.6401,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 59,
+        "frame": 60,
+        "image_equal": false,
+        "image_max_abs_channel_difference": 252,
+        "image_mean_abs_channel_difference": 6.1827248906893,
+        "keypoint_max_abs_xy_difference_px": 25.3548327151766,
+        "keypoint_max_abs_score_difference": 0.027769088745117188,
+        "host_midpoint_dt_ms": 48.33990000000021,
+        "signed_host_skew_ms": -3.8063,
+        "capture_pair_id": 1831,
+        "capture_frame_id": 2500,
+        "read_duration_ms": 48.4015,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      },
+      {
+        "side": "right",
+        "previous_frame": 60,
+        "frame": 61,
+        "image_equal": true,
+        "image_max_abs_channel_difference": 0,
+        "image_mean_abs_channel_difference": 0.0,
+        "keypoint_max_abs_xy_difference_px": 0.0,
+        "keypoint_max_abs_score_difference": 0.0,
+        "host_midpoint_dt_ms": 7.910299999999815,
+        "signed_host_skew_ms": -2.0451,
+        "capture_pair_id": 1832,
+        "capture_frame_id": 2501,
+        "read_duration_ms": 8.6623,
+        "right_knee_used_lr": [
+          true,
+          true
+        ]
+      }
+    ],
+    "summary": {
+      "left": {
+        "adjacent_pairs": 26,
+        "pixel_identical_count": 8,
+        "pixel_identical_frames": [
+          36,
+          41,
+          44,
+          47,
+          50,
+          53,
+          56,
+          61
+        ]
+      },
+      "right": {
+        "adjacent_pairs": 26,
+        "pixel_identical_count": 8,
+        "pixel_identical_frames": [
+          36,
+          41,
+          44,
+          47,
+          50,
+          53,
+          56,
+          61
+        ]
+      }
+    }
+  },
+  "source_avi_selected_verification": [
+    {
+      "side": "left",
+      "frame": 35,
+      "capture_frame_id": 2473,
+      "avi_position": 39,
+      "equals_saved_png": true
+    },
+    {
+      "side": "left",
+      "frame": 36,
+      "capture_frame_id": 2474,
+      "avi_position": 40,
+      "equals_saved_png": true
+    },
+    {
+      "side": "left",
+      "frame": 58,
+      "capture_frame_id": 2497,
+      "avi_position": 63,
+      "equals_saved_png": true
+    },
+    {
+      "side": "left",
+      "frame": 59,
+      "capture_frame_id": 2499,
+      "avi_position": 65,
+      "equals_saved_png": true
+    },
+    {
+      "side": "left",
+      "frame": 60,
+      "capture_frame_id": 2500,
+      "avi_position": 66,
+      "equals_saved_png": true
+    },
+    {
+      "side": "left",
+      "frame": 61,
+      "capture_frame_id": 2501,
+      "avi_position": 67,
+      "equals_saved_png": true
+    },
+    {
+      "side": "right",
+      "frame": 35,
+      "capture_frame_id": 2473,
+      "avi_position": 39,
+      "equals_saved_png": true
+    },
+    {
+      "side": "right",
+      "frame": 36,
+      "capture_frame_id": 2474,
+      "avi_position": 40,
+      "equals_saved_png": true
+    },
+    {
+      "side": "right",
+      "frame": 58,
+      "capture_frame_id": 2498,
+      "avi_position": 64,
+      "equals_saved_png": true
+    },
+    {
+      "side": "right",
+      "frame": 59,
+      "capture_frame_id": 2499,
+      "avi_position": 65,
+      "equals_saved_png": true
+    },
+    {
+      "side": "right",
+      "frame": 60,
+      "capture_frame_id": 2500,
+      "avi_position": 66,
+      "equals_saved_png": true
+    },
+    {
+      "side": "right",
+      "frame": 61,
+      "capture_frame_id": 2501,
+      "avi_position": 67,
+      "equals_saved_png": true
+    }
+  ],
+  "code_evidence": {
+    "frame_id": "realtime_app/pose_app/stereo_camera.py:_capture_loop; frame_id=self.captured_count; increment once per successful validated read",
+    "timestamp": "realtime_app/pose_app/stereo_camera.py:_capture_loop; perf_counter_ns immediately after VideoCapture.read",
+    "estimator_time": "realtime_app/tools/run_stereo_pva_baseline.py:_read_capture_times; mean left/right host-return ns minus first pair",
+    "pixel_gate": "realtime_app/pose_app/smplh_motion_tracker.py:_supported_pixels; finite/bounds/score/epipolar only; no image-content or exposure-ID input",
+    "extraction": "realtime_app/walker_tools/stereo/prepare_continuous_stereo_segment.py:main; frame-ID to CSV AVI-position mapping and sequential decoding"
+  },
+  "limits": [
+    "Exact saved image equality proves repeated image content, not a specific hardware/driver cause or actual exposure ID.",
+    "Whole448 keypoint equality is a cheap screen; only frames35..61 are verified against image pixels.",
+    "Host skew cannot certify exposure synchronization; no sensor timestamp/exposure counter is stored in the inspected CSV schemas.",
+    "No frame is deleted/replaced and no nominal30fps is substituted.",
+    "This identifies a data-time and independence problem; it does not yet measure its causal effect on ankle height or justify blaming events37/59 on duplicates alone."
+  ],
+  "existing_trace_on_repeated_content": {
+    "source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\slope_motion_20261015\\motion_chain_trace.json",
+    "scope": "Reads existing exact-baseline trace only; no counterfactual replay",
+    "rows": [
+      {
+        "frame": 36,
+        "prediction_height_increment_mm": 0.02723850084639423,
+        "update_height_increment_mm": -2.199838800426562
+      },
+      {
+        "frame": 41,
+        "prediction_height_increment_mm": 0.5070228601060194,
+        "update_height_increment_mm": -1.1480383739949644
+      },
+      {
+        "frame": 44,
+        "prediction_height_increment_mm": 0.5100405210077241,
+        "update_height_increment_mm": -0.8021786158868736
+      },
+      {
+        "frame": 47,
+        "prediction_height_increment_mm": 0.47516283114934765,
+        "update_height_increment_mm": -0.5201872125066842
+      },
+      {
+        "frame": 50,
+        "prediction_height_increment_mm": 0.3825361436396406,
+        "update_height_increment_mm": -0.056090800916337
+      },
+      {
+        "frame": 53,
+        "prediction_height_increment_mm": 0.44153279689535907,
+        "update_height_increment_mm": -0.3600845273075777
+      },
+      {
+        "frame": 56,
+        "prediction_height_increment_mm": 0.252712623494034,
+        "update_height_increment_mm": -0.24013589984895134
+      },
+      {
+        "frame": 61,
+        "prediction_height_increment_mm": 0.1639425979478517,
+        "update_height_increment_mm": -0.4279637569522663
+      }
+    ],
+    "prediction_mean_ankle_height_increment_sum_mm": 2.760188875086371,
+    "update_mean_ankle_height_increment_sum_mm": -5.754517987840217,
+    "interpretation": "All8 repeated-content updates lower mean ankle height locally; they are not the two direct rise steps. Their counterfactual influence on covariance/history is unmeasured."
+  },
+  "conclusion": "Distinct read counters and host-return times demonstrably include repeated image content. Current update treats every valid supplied pixel record as another measurement; independence and physical derivative time are not established. The inspected local image repeats occur before37 and after59, while35->37 and58->59 contain new image content; duplicate content alone is not a demonstrated source of the two rise events.",
+  "observation_semantics": {
+    "source_scope": "Existing raw export fields plus inspected local current source/config; no historical Docker runtime revision is independently certified by these checks",
+    "raw_exports": {
+      "left": {
+        "frames": 448,
+        "keypoint_channels_all_frames": [
+          23
+        ]
+      },
+      "right": {
+        "frames": 448,
+        "keypoint_channels_all_frames": [
+          23
+        ]
+      }
+    },
+    "coco17_lower_body_names": {
+      "11": "left_hip",
+      "12": "right_hip",
+      "13": "left_knee",
+      "14": "right_knee",
+      "15": "left_ankle",
+      "16": "right_ankle"
+    },
+    "extra_channels17_22": {
+      "17": "thorax_mpii",
+      "18": "pelvis_mpii",
+      "19": "neck_mpii",
+      "20": "head_top_mpii",
+      "21": "neck_aic",
+      "22": "head_top_aic"
+    },
+    "extra_channel_conclusion": "PMPose23 merges COCO/AIC/MPII; channels17..22 are torso/head landmarks, not toe/heel landmarks. Current first17 selection matches this schema.",
+    "score_contract": "Local PMPose-b config has freeze_oks=False. MultiHead.predict preserves heatmap score as keypoints_conf, exports predicted OKS as keypoint_scores, and exports visibility/presence separately. api concatenates keypoint_scores as xy third channel. Do not interpret it as visibility probability, pixel standard deviation, or calibrated confidence.",
+    "current_tracker_score_use": {
+      "min_score": 0.2,
+      "max_score": 1.0,
+      "pixel_sigma_px": 8.0,
+      "huber_px": 25.0,
+      "epipolar_gate_px": 35.0,
+      "interpretation": "Finite/bounds/score and stereo gate decide support; admitted points use uniform pixel_sigma8 before residual-dependent Huber downweighting. No score-to-variance calibration and no separate visibility/presence field enter this tracker."
+    },
+    "gate_event_rows": [
+      {
+        "frame": 35,
+        "right_knee_sampson_raw_px": 36.71301168389424,
+        "right_knee_gate_pass": false,
+        "right_knee_used_lr": [
+          false,
+          false
+        ],
+        "right_knee_view_reason_lr": [
+          "stereo_epipolar_rejected",
+          "stereo_epipolar_rejected"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.878390371799469,
+              "separate_visibility": 0.9258851408958435,
+              "separate_presence": 0.9999974370002747,
+              "raw_fisheye_xy_px": [
+                1056.5421229468452,
+                708.2814796605007
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8898378610610962,
+              "separate_visibility": 0.8892824053764343,
+              "separate_presence": 0.9999968409538269,
+              "raw_fisheye_xy_px": [
+                1009.6640128710915,
+                446.84054985198554
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.8820461630821228,
+              "separate_visibility": 0.9638469219207764,
+              "separate_presence": 0.9999243021011353,
+              "raw_fisheye_xy_px": [
+                671.2813130787445,
+                533.6772123854212
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9295634627342224,
+              "separate_visibility": 0.9697710275650024,
+              "separate_presence": 0.9997735023498535,
+              "raw_fisheye_xy_px": [
+                397.8289269038605,
+                818.2026761947793
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9226544499397278,
+              "separate_visibility": 0.9592875242233276,
+              "separate_presence": 0.9997948408126831,
+              "raw_fisheye_xy_px": [
+                418.09380971817745,
+                654.4164231787336
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.8757544755935669,
+              "separate_visibility": 0.6115887761116028,
+              "separate_presence": 0.9999971985816956,
+              "raw_fisheye_xy_px": [
+                886.6100541901969,
+                480.55254371115507
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8672608733177185,
+              "separate_visibility": 0.6709933876991272,
+              "separate_presence": 0.9999977350234985,
+              "raw_fisheye_xy_px": [
+                895.1158117642481,
+                764.1777292388551
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.8659154176712036,
+              "separate_visibility": 0.9560945630073547,
+              "separate_presence": 0.9999430179595947,
+              "raw_fisheye_xy_px": [
+                1268.6794438589186,
+                714.4063069516042
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9442285895347595,
+              "separate_visibility": 0.9741554260253906,
+              "separate_presence": 0.9997900724411011,
+              "raw_fisheye_xy_px": [
+                1532.195107762776,
+                456.38418592544303
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9441357851028442,
+              "separate_visibility": 0.9826282262802124,
+              "separate_presence": 0.9997852444648743,
+              "raw_fisheye_xy_px": [
+                1570.6968019273545,
+                641.4728147349458
+              ]
+            }
+          }
+        }
+      },
+      {
+        "frame": 36,
+        "right_knee_sampson_raw_px": 36.71301168389424,
+        "right_knee_gate_pass": false,
+        "right_knee_used_lr": [
+          false,
+          false
+        ],
+        "right_knee_view_reason_lr": [
+          "stereo_epipolar_rejected",
+          "stereo_epipolar_rejected"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.878390371799469,
+              "separate_visibility": 0.9258851408958435,
+              "separate_presence": 0.9999974370002747,
+              "raw_fisheye_xy_px": [
+                1056.5421229468452,
+                708.2814796605007
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8898378610610962,
+              "separate_visibility": 0.8892824053764343,
+              "separate_presence": 0.9999968409538269,
+              "raw_fisheye_xy_px": [
+                1009.6640128710915,
+                446.84054985198554
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.8820461630821228,
+              "separate_visibility": 0.9638469219207764,
+              "separate_presence": 0.9999243021011353,
+              "raw_fisheye_xy_px": [
+                671.2813130787445,
+                533.6772123854212
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9295634627342224,
+              "separate_visibility": 0.9697710275650024,
+              "separate_presence": 0.9997735023498535,
+              "raw_fisheye_xy_px": [
+                397.8289269038605,
+                818.2026761947793
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9226544499397278,
+              "separate_visibility": 0.9592875242233276,
+              "separate_presence": 0.9997948408126831,
+              "raw_fisheye_xy_px": [
+                418.09380971817745,
+                654.4164231787336
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.8757544755935669,
+              "separate_visibility": 0.6115887761116028,
+              "separate_presence": 0.9999971985816956,
+              "raw_fisheye_xy_px": [
+                886.6100541901969,
+                480.55254371115507
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8672608733177185,
+              "separate_visibility": 0.6709933876991272,
+              "separate_presence": 0.9999977350234985,
+              "raw_fisheye_xy_px": [
+                895.1158117642481,
+                764.1777292388551
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.8659154176712036,
+              "separate_visibility": 0.9560945630073547,
+              "separate_presence": 0.9999430179595947,
+              "raw_fisheye_xy_px": [
+                1268.6794438589186,
+                714.4063069516042
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9442285895347595,
+              "separate_visibility": 0.9741554260253906,
+              "separate_presence": 0.9997900724411011,
+              "raw_fisheye_xy_px": [
+                1532.195107762776,
+                456.38418592544303
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9441357851028442,
+              "separate_visibility": 0.9826282262802124,
+              "separate_presence": 0.9997852444648743,
+              "raw_fisheye_xy_px": [
+                1570.6968019273545,
+                641.4728147349458
+              ]
+            }
+          }
+        }
+      },
+      {
+        "frame": 37,
+        "right_knee_sampson_raw_px": 30.31091331506583,
+        "right_knee_gate_pass": true,
+        "right_knee_used_lr": [
+          true,
+          true
+        ],
+        "right_knee_view_reason_lr": [
+          "used_2d_feasible_unconverged",
+          "used_2d_feasible_unconverged"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.8762300610542297,
+              "separate_visibility": 0.8902822732925415,
+              "separate_presence": 0.9999973773956299,
+              "raw_fisheye_xy_px": [
+                1070.7767502996655,
+                698.3012476804408
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8859574794769287,
+              "separate_visibility": 0.8460447788238525,
+              "separate_presence": 0.9999967813491821,
+              "raw_fisheye_xy_px": [
+                1024.5153552161323,
+                436.1667290570888
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.8767650127410889,
+              "separate_visibility": 0.9547507166862488,
+              "separate_presence": 0.9999240040779114,
+              "raw_fisheye_xy_px": [
+                683.3830738975885,
+                519.813467117066
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.928534746170044,
+              "separate_visibility": 0.9582515358924866,
+              "separate_presence": 0.9997739195823669,
+              "raw_fisheye_xy_px": [
+                395.6240909213111,
+                817.3153935772309
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9194687604904175,
+              "separate_visibility": 0.9298614263534546,
+              "separate_presence": 0.9998111724853516,
+              "raw_fisheye_xy_px": [
+                423.8502036352006,
+                652.771595556685
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.8756707906723022,
+              "separate_visibility": 0.3902057707309723,
+              "separate_presence": 0.9999974370002747,
+              "raw_fisheye_xy_px": [
+                880.4936677841915,
+                480.84961875195177
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8685208559036255,
+              "separate_visibility": 0.47760581970214844,
+              "separate_presence": 0.999998152256012,
+              "raw_fisheye_xy_px": [
+                889.4398115703038,
+                767.3347264959457
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.8684389591217041,
+              "separate_visibility": 0.9668899178504944,
+              "separate_presence": 0.9999538660049438,
+              "raw_fisheye_xy_px": [
+                1265.3628941339157,
+                717.4770801676082
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9444987773895264,
+              "separate_visibility": 0.9743729829788208,
+              "separate_presence": 0.9998209476470947,
+              "raw_fisheye_xy_px": [
+                1532.294165611267,
+                459.2286301597635
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9442526698112488,
+              "separate_visibility": 0.98396235704422,
+              "separate_presence": 0.9998211860656738,
+              "raw_fisheye_xy_px": [
+                1570.4890999869694,
+                642.1188744636293
+              ]
+            }
+          }
+        }
+      },
+      {
+        "frame": 38,
+        "right_knee_sampson_raw_px": 29.554144771421907,
+        "right_knee_gate_pass": true,
+        "right_knee_used_lr": [
+          true,
+          true
+        ],
+        "right_knee_view_reason_lr": [
+          "used_2d_feasible_unconverged",
+          "used_2d_feasible_unconverged"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.873508632183075,
+              "separate_visibility": 0.9511595964431763,
+              "separate_presence": 0.9999971389770508,
+              "raw_fisheye_xy_px": [
+                1077.2985186047024,
+                691.514079575843
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8838170766830444,
+              "separate_visibility": 0.9117316007614136,
+              "separate_presence": 0.9999967217445374,
+              "raw_fisheye_xy_px": [
+                1028.9185637292408,
+                432.3763756980288
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.8765571117401123,
+              "separate_visibility": 0.9525653719902039,
+              "separate_presence": 0.9999131560325623,
+              "raw_fisheye_xy_px": [
+                684.2205629802884,
+                510.97685357864884
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9219009280204773,
+              "separate_visibility": 0.9566802978515625,
+              "separate_presence": 0.9997560381889343,
+              "raw_fisheye_xy_px": [
+                385.6121311641873,
+                810.1520813069446
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9129468202590942,
+              "separate_visibility": 0.8337031006813049,
+              "separate_presence": 0.9997805953025818,
+              "raw_fisheye_xy_px": [
+                423.69014241960303,
+                651.2666538471872
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.8757911920547485,
+              "separate_visibility": 0.42344605922698975,
+              "separate_presence": 0.9999974966049194,
+              "raw_fisheye_xy_px": [
+                878.8345940680729,
+                471.7560123053004
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.8665401339530945,
+              "separate_visibility": 0.4743064045906067,
+              "separate_presence": 0.9999979138374329,
+              "raw_fisheye_xy_px": [
+                884.0586609840393,
+                763.5159725001517
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.863131582736969,
+              "separate_visibility": 0.9678840637207031,
+              "separate_presence": 0.9999539852142334,
+              "raw_fisheye_xy_px": [
+                1265.9935527529033,
+                718.8484877779129
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9399055242538452,
+              "separate_visibility": 0.9755467176437378,
+              "separate_presence": 0.9997879266738892,
+              "raw_fisheye_xy_px": [
+                1546.0341573291353,
+                455.27072034490857
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9418350458145142,
+              "separate_visibility": 0.9854692816734314,
+              "separate_presence": 0.9998012781143188,
+              "raw_fisheye_xy_px": [
+                1572.0855000056918,
+                639.1165110075726
+              ]
+            }
+          }
+        }
+      },
+      {
+        "frame": 58,
+        "right_knee_sampson_raw_px": 35.86801972885112,
+        "right_knee_gate_pass": false,
+        "right_knee_used_lr": [
+          false,
+          false
+        ],
+        "right_knee_view_reason_lr": [
+          "stereo_epipolar_rejected",
+          "stereo_epipolar_rejected"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7766636610031128,
+              "separate_visibility": 0.9809780716896057,
+              "separate_presence": 0.999992847442627,
+              "raw_fisheye_xy_px": [
+                1136.796845496647,
+                766.2198007284326
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.7848855257034302,
+              "separate_visibility": 0.9012311697006226,
+              "separate_presence": 0.9999921321868896,
+              "raw_fisheye_xy_px": [
+                1062.0774522811648,
+                407.96343659340073
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.781109094619751,
+              "separate_visibility": 0.941501259803772,
+              "separate_presence": 0.9998064041137695,
+              "raw_fisheye_xy_px": [
+                645.8006423768543,
+                457.5148087029761
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.8825768828392029,
+              "separate_visibility": 0.9195915460586548,
+              "separate_presence": 0.9992350339889526,
+              "raw_fisheye_xy_px": [
+                242.88269839211125,
+                771.1347900984135
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.8917733430862427,
+              "separate_visibility": 0.9008241295814514,
+              "separate_presence": 0.9996238946914673,
+              "raw_fisheye_xy_px": [
+                297.1183229022554,
+                582.7743933353017
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7857723236083984,
+              "separate_visibility": 0.2746778130531311,
+              "separate_presence": 0.9999952912330627,
+              "raw_fisheye_xy_px": [
+                858.6437141479009,
+                304.18539269680673
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.781366229057312,
+              "separate_visibility": 0.4212913513183594,
+              "separate_presence": 0.9999942183494568,
+              "raw_fisheye_xy_px": [
+                863.3058964789861,
+                646.1540281696523
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.762856662273407,
+              "separate_visibility": 0.8242050409317017,
+              "separate_presence": 0.9998416900634766,
+              "raw_fisheye_xy_px": [
+                1288.3716212529985,
+                604.1746746656743
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.915947675704956,
+              "separate_visibility": 0.9004770517349243,
+              "separate_presence": 0.9994369745254517,
+              "raw_fisheye_xy_px": [
+                1665.8186260253665,
+                357.4324250398797
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9127501249313354,
+              "separate_visibility": 0.9134878516197205,
+              "separate_presence": 0.9994755983352661,
+              "raw_fisheye_xy_px": [
+                1702.6125164031982,
+                569.1496076659953
+              ]
+            }
+          }
+        }
+      },
+      {
+        "frame": 59,
+        "right_knee_sampson_raw_px": 23.222916544377888,
+        "right_knee_gate_pass": true,
+        "right_knee_used_lr": [
+          true,
+          true
+        ],
+        "right_knee_view_reason_lr": [
+          "used_2d_feasible_unconverged",
+          "used_2d_feasible_unconverged"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7618260383605957,
+              "separate_visibility": 0.9573960900306702,
+              "separate_presence": 0.999993085861206,
+              "raw_fisheye_xy_px": [
+                1145.2271477154322,
+                768.3864261672852
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.7645868062973022,
+              "separate_visibility": 0.8949884176254272,
+              "separate_presence": 0.9999927282333374,
+              "raw_fisheye_xy_px": [
+                1081.520024231502,
+                409.10165234322244
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.7668359279632568,
+              "separate_visibility": 0.9493242502212524,
+              "separate_presence": 0.9998078346252441,
+              "raw_fisheye_xy_px": [
+                656.7911251915825,
+                461.23682531143754
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.8842925429344177,
+              "separate_visibility": 0.9271700382232666,
+              "separate_presence": 0.9992448091506958,
+              "raw_fisheye_xy_px": [
+                238.56191704765206,
+                766.7762049766297
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.8937450647354126,
+              "separate_visibility": 0.9232441782951355,
+              "separate_presence": 0.9996130466461182,
+              "raw_fisheye_xy_px": [
+                299.7247643849205,
+                581.8709026422907
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7871633768081665,
+              "separate_visibility": 0.21329398453235626,
+              "separate_presence": 0.9999949336051941,
+              "raw_fisheye_xy_px": [
+                858.3936003427657,
+                303.3406745296845
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.7816839218139648,
+              "separate_visibility": 0.30916863679885864,
+              "separate_presence": 0.9999932050704956,
+              "raw_fisheye_xy_px": [
+                864.579850128719,
+                642.5777382216554
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.7609323263168335,
+              "separate_visibility": 0.8270484805107117,
+              "separate_presence": 0.9998518228530884,
+              "raw_fisheye_xy_px": [
+                1294.427076914954,
+                600.9571526583204
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9144289493560791,
+              "separate_visibility": 0.8661856055259705,
+              "separate_presence": 0.9994806051254272,
+              "raw_fisheye_xy_px": [
+                1671.9207056893242,
+                360.0974853038788
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9133158326148987,
+              "separate_visibility": 0.8974877595901489,
+              "separate_presence": 0.9995121955871582,
+              "raw_fisheye_xy_px": [
+                1706.3935631948807,
+                568.4969770959083
+              ]
+            }
+          }
+        }
+      },
+      {
+        "frame": 60,
+        "right_knee_sampson_raw_px": 20.476861757250177,
+        "right_knee_gate_pass": true,
+        "right_knee_used_lr": [
+          true,
+          true
+        ],
+        "right_knee_view_reason_lr": [
+          "used_2d_feasible_unconverged",
+          "used_2d_feasible_unconverged"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7687264680862427,
+              "separate_visibility": 0.8775258660316467,
+              "separate_presence": 0.9999923706054688,
+              "raw_fisheye_xy_px": [
+                1135.123101923201,
+                764.9429402249923
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.7735512256622314,
+              "separate_visibility": 0.8870952129364014,
+              "separate_presence": 0.9999929070472717,
+              "raw_fisheye_xy_px": [
+                1079.1264409262037,
+                402.42071284131816
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.7652576565742493,
+              "separate_visibility": 0.9328272342681885,
+              "separate_presence": 0.9997739195823669,
+              "raw_fisheye_xy_px": [
+                659.6078830446513,
+                460.1234327402519
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.8847324848175049,
+              "separate_visibility": 0.9177391529083252,
+              "separate_presence": 0.99908447265625,
+              "raw_fisheye_xy_px": [
+                236.0357966650099,
+                766.971431975669
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.8871248960494995,
+              "separate_visibility": 0.8917163610458374,
+              "separate_presence": 0.9994678497314453,
+              "raw_fisheye_xy_px": [
+                299.87393214210624,
+                582.423875451088
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7861152291297913,
+              "separate_visibility": 0.22185096144676208,
+              "separate_presence": 0.9999956488609314,
+              "raw_fisheye_xy_px": [
+                863.2615237917216,
+                300.117457793114
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.7760524749755859,
+              "separate_visibility": 0.25708824396133423,
+              "separate_presence": 0.9999954104423523,
+              "raw_fisheye_xy_px": [
+                867.0601453629752,
+                632.4963152839782
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.7485987544059753,
+              "separate_visibility": 0.7914870977401733,
+              "separate_presence": 0.999882161617279,
+              "raw_fisheye_xy_px": [
+                1293.9439883459181,
+                591.7595078894433
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9100964069366455,
+              "separate_visibility": 0.8712207078933716,
+              "separate_presence": 0.9995354413986206,
+              "raw_fisheye_xy_px": [
+                1673.6748429858499,
+                355.25922875962374
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9130768179893494,
+              "separate_visibility": 0.9066994190216064,
+              "separate_presence": 0.9995914697647095,
+              "raw_fisheye_xy_px": [
+                1708.6824966763693,
+                564.7271393638975
+              ]
+            }
+          }
+        }
+      },
+      {
+        "frame": 61,
+        "right_knee_sampson_raw_px": 20.476861757250177,
+        "right_knee_gate_pass": true,
+        "right_knee_used_lr": [
+          true,
+          true
+        ],
+        "right_knee_view_reason_lr": [
+          "used_2d_feasible_unconverged",
+          "used_2d_feasible_unconverged"
+        ],
+        "per_view": {
+          "left": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7687264680862427,
+              "separate_visibility": 0.8775258660316467,
+              "separate_presence": 0.9999923706054688,
+              "raw_fisheye_xy_px": [
+                1135.123101923201,
+                764.9429402249923
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.7735512256622314,
+              "separate_visibility": 0.8870952129364014,
+              "separate_presence": 0.9999929070472717,
+              "raw_fisheye_xy_px": [
+                1079.1264409262037,
+                402.42071284131816
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.7652576565742493,
+              "separate_visibility": 0.9328272342681885,
+              "separate_presence": 0.9997739195823669,
+              "raw_fisheye_xy_px": [
+                659.6078830446513,
+                460.1234327402519
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.8847324848175049,
+              "separate_visibility": 0.9177391529083252,
+              "separate_presence": 0.99908447265625,
+              "raw_fisheye_xy_px": [
+                236.0357966650099,
+                766.971431975669
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.8871248960494995,
+              "separate_visibility": 0.8917163610458374,
+              "separate_presence": 0.9994678497314453,
+              "raw_fisheye_xy_px": [
+                299.87393214210624,
+                582.423875451088
+              ]
+            }
+          },
+          "right": {
+            "left_hip": {
+              "coco17_index": 11,
+              "keypoint_score": 0.7861152291297913,
+              "separate_visibility": 0.22185096144676208,
+              "separate_presence": 0.9999956488609314,
+              "raw_fisheye_xy_px": [
+                863.2615237917216,
+                300.117457793114
+              ]
+            },
+            "right_hip": {
+              "coco17_index": 12,
+              "keypoint_score": 0.7760524749755859,
+              "separate_visibility": 0.25708824396133423,
+              "separate_presence": 0.9999954104423523,
+              "raw_fisheye_xy_px": [
+                867.0601453629752,
+                632.4963152839782
+              ]
+            },
+            "right_knee": {
+              "coco17_index": 14,
+              "keypoint_score": 0.7485987544059753,
+              "separate_visibility": 0.7914870977401733,
+              "separate_presence": 0.999882161617279,
+              "raw_fisheye_xy_px": [
+                1293.9439883459181,
+                591.7595078894433
+              ]
+            },
+            "left_ankle": {
+              "coco17_index": 15,
+              "keypoint_score": 0.9100964069366455,
+              "separate_visibility": 0.8712207078933716,
+              "separate_presence": 0.9995354413986206,
+              "raw_fisheye_xy_px": [
+                1673.6748429858499,
+                355.25922875962374
+              ]
+            },
+            "right_ankle": {
+              "coco17_index": 16,
+              "keypoint_score": 0.9130768179893494,
+              "separate_visibility": 0.9066994190216064,
+              "separate_presence": 0.9995914697647095,
+              "raw_fisheye_xy_px": [
+                1708.6824966763693,
+                564.7271393638975
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "event_interpretation": "Right knee crosses35px support gate36->37 and58->59 while raw scores remain high. Right-knee visibility is also high at these events; low predicted visibility is not supported as its cause. Right-view hip scores remain high while their separate visibility can be low, exposing different scalar meanings without establishing true anatomical visibility.",
+    "source_references_1based": {
+      "third_party/bboxmaskpose/mmpose/configs/_base_/datasets/merged_COCO_AIC_MPII_mergable.py": {
+        "extra23_channels": [
+          {
+            "line": 50,
+            "text": "0: dict(name=\"nose\", id=0, color=[51, 153, 255], type=\"upper\", swap=\"\"),"
+          },
+          {
+            "line": 51,
+            "text": "1: dict(name=\"left_eye\", id=1, color=[51, 153, 255], type=\"upper\", swap=\"right_eye\"),"
+          },
+          {
+            "line": 52,
+            "text": "2: dict(name=\"right_eye\", id=2, color=[51, 153, 255], type=\"upper\", swap=\"left_eye\"),"
+          },
+          {
+            "line": 53,
+            "text": "3: dict(name=\"left_ear\", id=3, color=[51, 153, 255], type=\"upper\", swap=\"right_ear\"),"
+          },
+          {
+            "line": 54,
+            "text": "4: dict(name=\"right_ear\", id=4, color=[51, 153, 255], type=\"upper\", swap=\"left_ear\"),"
+          },
+          {
+            "line": 55,
+            "text": "5: dict(name=\"left_shoulder\", id=5, color=[0, 255, 0], type=\"upper\", swap=\"right_shoulder\"),"
+          },
+          {
+            "line": 56,
+            "text": "6: dict(name=\"right_shoulder\", id=6, color=[255, 128, 0], type=\"upper\", swap=\"left_shoulder\"),"
+          },
+          {
+            "line": 57,
+            "text": "7: dict(name=\"left_elbow\", id=7, color=[0, 255, 0], type=\"upper\", swap=\"right_elbow\"),"
+          },
+          {
+            "line": 58,
+            "text": "8: dict(name=\"right_elbow\", id=8, color=[255, 128, 0], type=\"upper\", swap=\"left_elbow\"),"
+          },
+          {
+            "line": 59,
+            "text": "9: dict(name=\"left_wrist\", id=9, color=[0, 255, 0], type=\"upper\", swap=\"right_wrist\"),"
+          },
+          {
+            "line": 60,
+            "text": "10: dict(name=\"right_wrist\", id=10, color=[255, 128, 0], type=\"upper\", swap=\"left_wrist\"),"
+          },
+          {
+            "line": 61,
+            "text": "11: dict(name=\"left_hip\", id=11, color=[0, 255, 0], type=\"lower\", swap=\"right_hip\"),"
+          },
+          {
+            "line": 62,
+            "text": "12: dict(name=\"right_hip\", id=12, color=[255, 128, 0], type=\"lower\", swap=\"left_hip\"),"
+          },
+          {
+            "line": 63,
+            "text": "13: dict(name=\"left_knee\", id=13, color=[0, 255, 0], type=\"lower\", swap=\"right_knee\"),"
+          },
+          {
+            "line": 64,
+            "text": "14: dict(name=\"right_knee\", id=14, color=[255, 128, 0], type=\"lower\", swap=\"left_knee\"),"
+          },
+          {
+            "line": 65,
+            "text": "15: dict(name=\"left_ankle\", id=15, color=[0, 255, 0], type=\"lower\", swap=\"right_ankle\"),"
+          },
+          {
+            "line": 66,
+            "text": "16: dict(name=\"right_ankle\", id=16, color=[255, 128, 0], type=\"lower\", swap=\"left_ankle\"),"
+          },
+          {
+            "line": 67,
+            "text": "17: dict(name=\"thorax_mpii\", id=17, color=[51, 153, 255], type=\"upper\", swap=\"\"),"
+          },
+          {
+            "line": 68,
+            "text": "18: dict(name=\"pelvis_mpii\", id=18, color=[51, 153, 255], type=\"lower\", swap=\"\"),"
+          },
+          {
+            "line": 69,
+            "text": "19: dict(name=\"neck_mpii\", id=19, color=[51, 153, 255], type=\"upper\", swap=\"\"),"
+          },
+          {
+            "line": 70,
+            "text": "20: dict(name=\"head_top_mpii\", id=20, color=[51, 153, 255], type=\"upper\", swap=\"\"),"
+          },
+          {
+            "line": 71,
+            "text": "21: dict(name=\"neck_aic\", id=21, color=[51, 153, 255], type=\"upper\", swap=\"\"),"
+          },
+          {
+            "line": 72,
+            "text": "22: dict(name=\"head_top_aic\", id=22, color=[51, 153, 255], type=\"upper\", swap=\"\"),"
+          }
+        ],
+        "ankles": [
+          {
+            "line": 65,
+            "text": "15: dict(name=\"left_ankle\", id=15, color=[0, 255, 0], type=\"lower\", swap=\"right_ankle\"),"
+          }
+        ]
+      },
+      "third_party/bboxmaskpose/mmpose/configs/ProbMaskPose/PMPose-b-1.0.0.py": {
+        "head_channels": [
+          {
+            "line": 82,
+            "text": "out_channels=23,"
+          }
+        ],
+        "predicted_oks_enabled": [
+          {
+            "line": 94,
+            "text": "freeze_oks=False,"
+          }
+        ],
+        "dataset_definition": [
+          {
+            "line": 217,
+            "text": "metainfo=dict(from_file=\"mmpose/configs/_base_/datasets/merged_COCO_AIC_MPII_mergable.py\"),"
+          },
+          {
+            "line": 284,
+            "text": "metainfo=dict(from_file=\"mmpose/configs/_base_/datasets/merged_COCO_AIC_MPII_mergable.py\"),"
+          }
+        ]
+      },
+      "third_party/bboxmaskpose/mmpose/models/heads/hybrid_heads/multi_head.py": {
+        "preserve_heatmap_confidence": [
+          {
+            "line": 855,
+            "text": "p.set_field(p[\"keypoint_scores\"], \"keypoints_conf\")"
+          }
+        ],
+        "visibility_field": [
+          {
+            "line": 857,
+            "text": "p.set_field(visibilities[pi], \"keypoints_visible\")"
+          }
+        ],
+        "oks_field": [
+          {
+            "line": 858,
+            "text": "p.set_field(oks[pi], \"keypoints_oks\")"
+          }
+        ],
+        "score_switch": [
+          {
+            "line": 862,
+            "text": "if not self.freeze_oks:"
+          }
+        ],
+        "score_is_oks": [
+          {
+            "line": 863,
+            "text": "p.set_field(oks[pi], \"keypoint_scores\")"
+          }
+        ]
+      },
+      "third_party/bboxmaskpose/pmpose/api.py": {
+        "get_keypoint_scores": [
+          {
+            "line": 251,
+            "text": "kpt_scores = pred_instances.keypoint_scores.reshape(K, 1)  # (K, 1)"
+          }
+        ],
+        "get_separate_visibility": [
+          {
+            "line": 255,
+            "text": "kpt_visibiliteies = pred_instances.keypoints_visible.reshape(K, 1)  # (K, 1)"
+          }
+        ],
+        "concatenate_xy_score": [
+          {
+            "line": 266,
+            "text": "kpts_with_scores = np.concatenate([kpts, kpt_scores], axis=1)"
+          }
+        ]
+      },
+      "realtime_app/pose_app/body_observations.py": {
+        "use_first17": [
+          {
+            "line": 33,
+            "text": "if kp.shape == (23,3): kp=kp[:17]"
+          }
+        ]
+      },
+      "realtime_app/pose_app/smplh_motion_tracker.py": {
+        "score_gate": [
+          {
+            "line": 227,
+            "text": "score = (pixels[..., 2] >= self.config.min_score) & (pixels[..., 2] <= 1)"
+          }
+        ],
+        "reject_epipolar": [
+          {
+            "line": 248,
+            "text": "if not np.isfinite(distance) or distance > self.config.max_stereo_epipolar_px:"
+          }
+        ]
+      },
+      "realtime_app/pose_app/smplh_iterated_motion_tracker.py": {
+        "uniform_pixel_sigma": [
+          {
+            "line": 75,
+            "text": "config.huber_px*(norms-.5*config.huber_px))) / config.pixel_sigma_px**2"
+          },
+          {
+            "line": 93,
+            "text": "weights = np.repeat(val[\"robust\"], 2) / config.pixel_sigma_px**2"
+          },
+          {
+            "line": 193,
+            "text": "variance = np.r_[config.pixel_sigma_px**2/np.repeat(val[\"robust\"], 2),"
+          }
+        ],
+        "huber": [
+          {
+            "line": 74,
+            "text": "cost = np.sum(np.where(norms <= config.huber_px, .5*norms**2,"
+          },
+          {
+            "line": 75,
+            "text": "config.huber_px*(norms-.5*config.huber_px))) / config.pixel_sigma_px**2"
+          },
+          {
+            "line": 76,
+            "text": "cache.update(residual=residual, robust=np.minimum(1., config.huber_px/np.maximum(norms, 1e-12)),"
+          }
+        ]
+      }
+    }
+  }
+}

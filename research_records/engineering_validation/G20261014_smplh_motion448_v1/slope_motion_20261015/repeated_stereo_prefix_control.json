@@ -1,0 +1,3379 @@
+{
+  "question": "Does reuse of an exactly repeated stereo image pair materially cause the Stage1 ankle rise?",
+  "source_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "parameters_source": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075\\run_parameters.json",
+  "frames": [
+    0,
+    61
+  ],
+  "decoded_image_comparison": "np.array_equal;no image hash or keypoint proxy",
+  "single_variable": "Only suppress _update when BOTH decoded input views exactly equal their preceding selected image;retain all62 rows,original host dt,prediction,raw residuals,beta,VPoser,gates,solver budget;single-side repeats unchanged",
+  "limits": [
+    "Diagnostic only;no production input gate adopted",
+    "Repeated content does not identify hardware exposure time or the upstream duplication stage",
+    "This control isolates repeated updates,not host-time errors or one-side pairing errors",
+    "All-MAP-unconverged baseline already adds no Gaussian posterior information,so mean reuse and covariance reuse must be distinguished",
+    "No contact,height,3D observation,interpolation or derivative accuracy claim"
+  ],
+  "predeclared_stop": "One62-prefix control;no448 or additional parameter sweep. Causal repair eligibility requires all62 finite,>=20percent smaller35..61 height rise,and median/P95 raw residual each no>5percent worse.",
+  "repeated_views_count": [
+    17,
+    17
+  ],
+  "repeated_both_count": 17,
+  "repeated_either_count": 17,
+  "elapsed_seconds": 62.81842770000003,
+  "baseline": {
+    "raw_error": {
+      "n": 1488,
+      "median": 16.181020525626906,
+      "p95": 128.0411414652906,
+      "max": 201.72243761651947
+    },
+    "mean_ankle_rise_35_61_mm": 67.81334123217574,
+    "mean_ankle_height_35_61_mm": [
+      93.61443282384447,
+      161.4277740560202
+    ]
+  },
+  "control": {
+    "raw_error": {
+      "n": 1488,
+      "median": 16.692635930601035,
+      "p95": 124.72075497128962,
+      "max": 201.90578749160548
+    },
+    "mean_ankle_rise_35_61_mm": 95.18105155548301,
+    "mean_ankle_height_35_61_mm": [
+      66.77142510356904,
+      161.95247665905205
+    ]
+  },
+  "rows": [
+    {
+      "frame": 0,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "initialized",
+      "baseline_mean_ankle_height_mm": 81.92294884238311,
+      "control_mean_ankle_height_mm": 81.92294884238311,
+      "control_raw_error_px": [
+        [
+          24.952298933508448,
+          11.976213906430269,
+          7.844550124764613,
+          14.3656745125877,
+          11.175805785514935,
+          17.99639912876913,
+          21.32784680018105,
+          70.38299412318672,
+          35.31163988147263,
+          26.003486822498175,
+          6.204603294349306,
+          9.032312850989703
+        ],
+        [
+          5.731492167837488,
+          28.025751814659518,
+          9.84356017800127,
+          22.418910400023552,
+          16.450892562243673,
+          13.552890719644811,
+          58.478971705819305,
+          43.03798094713079,
+          18.16446194519655,
+          41.29188225717722,
+          8.453423344072153,
+          14.935522548291294
+        ]
+      ],
+      "optimizer": {
+        "status": "not_run"
+      }
+    },
+    {
+      "frame": 1,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 69.98686358291228,
+      "control_mean_ankle_height_mm": 69.98686358291228,
+      "control_raw_error_px": [
+        [
+          27.91983267115533,
+          28.22350635245625,
+          17.073488760651223,
+          16.961676237995466,
+          13.576391905869466,
+          11.416558903578414,
+          44.7114756493109,
+          113.14242851387758,
+          43.568987317457264,
+          43.98728794128103,
+          17.177140157013763,
+          6.328277515199534
+        ],
+        [
+          16.83586901280717,
+          23.953972758108534,
+          23.33242994728245,
+          22.71259558724109,
+          35.953379569007076,
+          8.710253226734784,
+          110.72604674394847,
+          43.62958137359876,
+          39.30341163378121,
+          62.500222102266996,
+          8.488245988366048,
+          12.626334993116513
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 366.47042539970437,
+        "objective": 221.5501287472219,
+        "scaled_gradient_inf": 39.351224068352494,
+        "scaled_step_inf": 0.1762658534820792,
+        "pixel_error_median_initial_px": 42.37427835805116,
+        "pixel_error_median_px": 23.643201352695492,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 2,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 95.47028531213758,
+      "control_mean_ankle_height_mm": 95.47028531213758,
+      "control_raw_error_px": [
+        [
+          10.881285253047738,
+          26.649515033145068,
+          15.211642944184597,
+          15.14446335144188,
+          12.009493895948005,
+          20.043431456166395,
+          44.166702539517125,
+          134.15669395352128,
+          38.94981766885809,
+          15.165519739517254,
+          6.2681678389904425,
+          4.24474591729405
+        ],
+        [
+          29.27818874432113,
+          12.683154410953215,
+          22.14010576592494,
+          16.97882792004221,
+          39.32733897944733,
+          7.826263243096267,
+          136.18828452677425,
+          41.65098268189408,
+          15.468143016728364,
+          51.34198267734092,
+          10.564892120269162,
+          4.127460459034629
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 221.1420659607303,
+        "objective": 206.12340417232545,
+        "scaled_gradient_inf": 7.458228910160613,
+        "scaled_step_inf": 0.044686491549754064,
+        "pixel_error_median_initial_px": 25.71900438299523,
+        "pixel_error_median_px": 16.223485468385288,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 3,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 111.89499707647977,
+      "control_mean_ankle_height_mm": 96.22190761291199,
+      "control_raw_error_px": [
+        [
+          10.485042364384894,
+          26.697991564121857,
+          14.109086350109825,
+          14.933383512905625,
+          9.113533521400043,
+          21.01468917165108,
+          43.85736241011565,
+          134.80775044029784,
+          38.668409413671235,
+          14.643867013352557,
+          6.915594290330188,
+          4.883611320324879
+        ],
+        [
+          29.746922110614094,
+          12.121167783390723,
+          23.410613858389183,
+          18.231123887954137,
+          40.70287780886907,
+          5.997437786598517,
+          136.9663949729714,
+          41.31079466642404,
+          14.461091161466522,
+          50.81842517454089,
+          9.964131881716389,
+          3.814585258198519
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 4,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 118.38426023786708,
+      "control_mean_ankle_height_mm": 112.68708133832756,
+      "control_raw_error_px": [
+        [
+          4.232134304392041,
+          29.447357608737192,
+          15.155663182065569,
+          12.129626713000295,
+          12.617267118040735,
+          20.120627002092828,
+          46.54787649452865,
+          141.05156215033256,
+          20.299934479601806,
+          7.968040636566117,
+          11.790284171836788,
+          4.898477163109698
+        ],
+        [
+          32.746957531398536,
+          7.981609943611201,
+          21.330336378646603,
+          15.010904075521696,
+          43.028268520533736,
+          5.651304499857987,
+          139.20406832611067,
+          35.357890433013274,
+          12.168769707219285,
+          43.852084872252014,
+          11.302325100327234,
+          6.697242033035123
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 216.26669588313672,
+        "objective": 199.46252634573295,
+        "scaled_gradient_inf": 17.27475189145565,
+        "scaled_step_inf": 0.004822827092003832,
+        "pixel_error_median_initial_px": 21.299169089294764,
+        "pixel_error_median_px": 15.083283628793632,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 5,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 119.81014235301235,
+      "control_mean_ankle_height_mm": 118.6916924616862,
+      "control_raw_error_px": [
+        [
+          7.347212493922481,
+          24.349113778267643,
+          16.168702556151786,
+          11.058177142528157,
+          8.406509746660625,
+          18.995264869950397,
+          46.06415755361195,
+          144.1461193615491,
+          11.364726097735018,
+          8.034596856350241,
+          13.266405896663812,
+          7.65493730056937
+        ],
+        [
+          32.2205817680541,
+          10.624992639188003,
+          14.971951100434023,
+          11.337915811578988,
+          34.055892277281394,
+          5.091404289343694,
+          138.00314736365985,
+          36.17646235008473,
+          12.482877817884654,
+          42.121328981384124,
+          9.516064091895949,
+          8.57822620888816
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 223.11201692723753,
+        "objective": 190.4543049012438,
+        "scaled_gradient_inf": 21.540384897182093,
+        "scaled_step_inf": 0.0043743652077173605,
+        "pixel_error_median_initial_px": 24.5038460826339,
+        "pixel_error_median_px": 12.874641857274234,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 6,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 120.57804136819111,
+      "control_mean_ankle_height_mm": 119.59524698917984,
+      "control_raw_error_px": [
+        [
+          7.96575172516024,
+          24.47281271747472,
+          16.135032969842097,
+          10.914154998996661,
+          6.542760334142936,
+          19.297949713650997,
+          45.934984927429205,
+          144.58394016192813,
+          10.240877848388273,
+          8.685859866753354,
+          13.407157295748002,
+          7.965941928285844
+        ],
+        [
+          32.41222577392993,
+          10.444837996241086,
+          15.51395688423217,
+          11.898088393507365,
+          34.89736149245791,
+          5.046615431983675,
+          138.43460872448136,
+          35.98683715858912,
+          11.46648851258829,
+          41.031491721441235,
+          9.499178215779398,
+          8.54042668944121
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 7,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 117.44135488580926,
+      "control_mean_ankle_height_mm": 117.24953301443209,
+      "control_raw_error_px": [
+        [
+          6.880637417132491,
+          23.590024515570164,
+          17.5980109889331,
+          8.425407535895808,
+          10.726824145166836,
+          18.268153994997505,
+          43.20463753683615,
+          143.4597570710357,
+          9.913679094023347,
+          5.640666640413804,
+          11.480551482670707,
+          7.708698183082137
+        ],
+        [
+          31.76385685655566,
+          8.771715798378835,
+          18.27316983746955,
+          11.838293093079692,
+          37.73335697860708,
+          6.00306579472541,
+          138.91151522798074,
+          38.001753159075406,
+          8.182545151563092,
+          41.67438462031803,
+          8.686915586865043,
+          6.709738931442689
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 199.957420257886,
+        "objective": 190.026478468785,
+        "scaled_gradient_inf": 1.3803972197779708,
+        "scaled_step_inf": 0.00697229957052163,
+        "pixel_error_median_initial_px": 16.430877101176627,
+        "pixel_error_median_px": 11.659422287875199,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 8,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 112.11322698963205,
+      "control_mean_ankle_height_mm": 112.23784805938136,
+      "control_raw_error_px": [
+        [
+          10.655838825962011,
+          27.079051015075162,
+          17.681064485226614,
+          18.415953517643718,
+          9.336573266516213,
+          19.659843627823665,
+          39.45299679133288,
+          145.86318906836425,
+          12.961322394942641,
+          6.923299739068868,
+          12.024371243338342,
+          8.437419900470228
+        ],
+        [
+          30.309732081113616,
+          14.538970362456835,
+          20.314186290492746,
+          18.790344063845218,
+          44.51159844871214,
+          6.808771238045556,
+          136.89517186668664,
+          45.023490178422335,
+          7.5121672323533195,
+          40.12859771021166,
+          9.090935783576192,
+          6.0957526800486
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 214.90942508756763,
+        "objective": 201.47306038453624,
+        "scaled_gradient_inf": 10.449654471926879,
+        "scaled_step_inf": 0.009351029388318634,
+        "pixel_error_median_initial_px": 18.027506446861658,
+        "pixel_error_median_px": 18.048509001435164,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 9,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 111.78913901521254,
+      "control_mean_ankle_height_mm": 113.12459562807403,
+      "control_raw_error_px": [
+        [
+          11.63956076808608,
+          27.35060642829324,
+          17.153087838185115,
+          18.313459530520095,
+          7.758219361343807,
+          19.44820856934515,
+          39.21009055852558,
+          146.31594210610044,
+          11.675597507762244,
+          7.052899740376147,
+          12.504439539258719,
+          9.172580975677722
+        ],
+        [
+          30.518201213865,
+          14.153289082596116,
+          21.147098099019132,
+          19.310550600833913,
+          45.083965758049516,
+          6.786115460203141,
+          137.16031980241692,
+          44.74481472086459,
+          6.842806628414171,
+          39.242741855570465,
+          8.906376079105367,
+          5.643229796432553
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 10,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 116.62304180487831,
+      "control_mean_ankle_height_mm": 117.2869760429261,
+      "control_raw_error_px": [
+        [
+          8.805565488976772,
+          21.97175483390542,
+          16.10181211906669,
+          13.514584490832211,
+          7.628604921342549,
+          17.836397207075287,
+          36.08394606484384,
+          141.7300604915456,
+          12.643624365101239,
+          4.487468042373382,
+          11.200747887208259,
+          9.130201315447664
+        ],
+        [
+          31.492133434350876,
+          12.140696977228599,
+          17.88495335216517,
+          16.594826964816175,
+          42.11977521631933,
+          4.2883665645696265,
+          136.63061016736594,
+          46.03895970856855,
+          2.919008000703628,
+          29.383066512690377,
+          8.050003665148038,
+          5.509444486102157
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 197.4856851328151,
+        "objective": 187.64890289697547,
+        "scaled_gradient_inf": 38.76149323057661,
+        "scaled_step_inf": 0.008168058849681158,
+        "pixel_error_median_initial_px": 16.55587183687678,
+        "pixel_error_median_px": 14.80819830494945,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 11,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 110.32465715726542,
+      "control_mean_ankle_height_mm": 110.57243013865758,
+      "control_raw_error_px": [
+        [
+          9.346273390661267,
+          26.451872329569166,
+          15.427614751642208,
+          11.24556004993688,
+          4.854304860557855,
+          18.66595188832245,
+          40.023103249283224,
+          142.0204134111035,
+          10.601751838583796,
+          6.029697785710817,
+          12.08530409201815,
+          8.618789440629383
+        ],
+        [
+          31.518532882966024,
+          11.952690085257037,
+          16.075389215040975,
+          15.854878059297773,
+          35.16965076221045,
+          4.0262423041449855,
+          132.56425517192926,
+          44.174175077487895,
+          7.1052146569832155,
+          30.98843724175577,
+          8.68790866033123,
+          6.202258621546651
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 202.9843270969013,
+        "objective": 185.53459840246606,
+        "scaled_gradient_inf": 70.32244737978446,
+        "scaled_step_inf": 0.017877338000414893,
+        "pixel_error_median_initial_px": 16.68190873698371,
+        "pixel_error_median_px": 13.75645942183018,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 12,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 110.61038234124243,
+      "control_mean_ankle_height_mm": 111.41998163948507,
+      "control_raw_error_px": [
+        [
+          10.32177598216219,
+          27.005350223449764,
+          15.179150971073122,
+          11.326385017760513,
+          3.6610535761869025,
+          18.587602437071965,
+          39.621343398118704,
+          142.52549079226387,
+          9.52908326255242,
+          6.710758380064955,
+          11.939660764333965,
+          9.338624764693678
+        ],
+        [
+          31.813580679156015,
+          11.427887114481624,
+          16.89031112568629,
+          16.611168743782244,
+          35.61682181989106,
+          2.8077813719833546,
+          132.72461266810834,
+          43.832728747691476,
+          6.588221123851615,
+          29.881847087757667,
+          8.88177469540174,
+          5.949013552168273
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 13,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 109.71472734076832,
+      "control_mean_ankle_height_mm": 109.59123071647691,
+      "control_raw_error_px": [
+        [
+          8.762845516807923,
+          23.696351572129544,
+          15.782065649579446,
+          6.60858902203931,
+          5.4668029059346175,
+          16.03368737395665,
+          44.3794317548025,
+          138.81858149916192,
+          10.774609057284266,
+          6.96713538947144,
+          11.623634335731179,
+          8.798534070859876
+        ],
+        [
+          30.06000542936947,
+          11.642151657198799,
+          16.75972660904113,
+          11.236897327999754,
+          32.064200038607524,
+          4.23381733939213,
+          131.01095956541607,
+          36.775930524747494,
+          10.720717486317385,
+          37.183799730615945,
+          8.768126236351529,
+          7.337112649012896
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 185.165180696592,
+        "objective": 179.95338524105532,
+        "scaled_gradient_inf": 49.61109359057036,
+        "scaled_step_inf": 0.007255377410372128,
+        "pixel_error_median_initial_px": 14.489241509504343,
+        "pixel_error_median_px": 11.632892996464989,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 14,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 105.07143378542317,
+      "control_mean_ankle_height_mm": 104.94985645078953,
+      "control_raw_error_px": [
+        [
+          8.394720761218592,
+          26.39581601905212,
+          15.541400137594382,
+          6.573705732748145,
+          8.719190907453296,
+          16.237370858729935,
+          40.255630669756044,
+          138.71992864448615,
+          11.106996413996718,
+          6.186663652097433,
+          12.712467499124463,
+          11.803668211282373
+        ],
+        [
+          32.29694147495804,
+          10.557308517110812,
+          17.56482295939788,
+          13.25488588423482,
+          37.834300236336944,
+          5.541370350300222,
+          130.9633138011925,
+          42.01951700491029,
+          9.36030073929042,
+          33.708488849833465,
+          9.90965127985707,
+          7.951803516637436
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 190.18803005961203,
+        "objective": 184.76012767840686,
+        "scaled_gradient_inf": 28.96234862234292,
+        "scaled_step_inf": 0.019157206553046584,
+        "pixel_error_median_initial_px": 15.094744240432009,
+        "pixel_error_median_px": 12.98367669167964,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 15,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 105.34043306150731,
+      "control_mean_ankle_height_mm": 105.65849689626494,
+      "control_raw_error_px": [
+        [
+          9.281260840726627,
+          26.772568489313585,
+          15.110386472185269,
+          6.664548918532576,
+          7.832090331414032,
+          16.1558664529161,
+          39.81839013309153,
+          139.06070754530384,
+          10.221377520661274,
+          6.606760435055023,
+          12.603941155494674,
+          12.467138911423527
+        ],
+        [
+          32.579935731208145,
+          10.168112247356536,
+          18.497439905679254,
+          14.048003272194327,
+          38.01475071090938,
+          4.583929094747376,
+          131.12039458693363,
+          41.60167529310807,
+          9.03951251832189,
+          32.90691703666974,
+          10.091331918347972,
+          7.562710333765712
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 16,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 103.3386133733592,
+      "control_mean_ankle_height_mm": 104.0737721281313,
+      "control_raw_error_px": [
+        [
+          5.294408843283521,
+          28.09797672431003,
+          17.203570258024886,
+          8.741409039832504,
+          6.101061989180321,
+          17.125529748511504,
+          40.087002232669455,
+          134.32067053174194,
+          9.718726318592406,
+          6.905742184042327,
+          13.552342044150665,
+          7.282995123941418
+        ],
+        [
+          33.643816522964144,
+          8.51915272909334,
+          24.812877326505557,
+          16.971657765656506,
+          38.40353056940191,
+          3.373882216980264,
+          129.28850971679148,
+          36.9154210933118,
+          12.90995695405729,
+          37.557969512243496,
+          9.320785771438121,
+          4.856434818365041
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 192.27728851855272,
+        "objective": 187.01415518080748,
+        "scaled_gradient_inf": 112.55529135898469,
+        "scaled_step_inf": 0.002090417741070972,
+        "pixel_error_median_initial_px": 17.33959549925995,
+        "pixel_error_median_px": 15.261999904903586,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 17,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 105.16332243413423,
+      "control_mean_ankle_height_mm": 103.44445782170669,
+      "control_raw_error_px": [
+        [
+          7.424996172158941,
+          25.363625158799888,
+          15.552028875938406,
+          9.92907004577912,
+          2.4213380807004983,
+          17.392291762096363,
+          38.50337191184423,
+          134.46174037941512,
+          13.01353294182066,
+          1.843381431899955,
+          12.92378770412516,
+          4.195565376213857
+        ],
+        [
+          32.227617080508615,
+          12.387728089971175,
+          15.868737642612293,
+          18.558268852519667,
+          36.67441806671839,
+          1.1200197228408468,
+          126.0396468920543,
+          42.95081796083286,
+          5.973633449429822,
+          30.307106826386804,
+          4.451436137967675,
+          4.127830079614568
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 214.70452380026762,
+        "objective": 178.66331605152078,
+        "scaled_gradient_inf": 192.5259700858382,
+        "scaled_step_inf": 0.01732110359664476,
+        "pixel_error_median_initial_px": 26.000921300576096,
+        "pixel_error_median_px": 14.282780908879534,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 18,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 107.15363537200979,
+      "control_mean_ankle_height_mm": 105.4474187037312,
+      "control_raw_error_px": [
+        [
+          5.7113939600181,
+          24.269084255654818,
+          13.877843142308413,
+          12.22363817106003,
+          7.160630510212855,
+          17.870665892401835,
+          40.057961207045274,
+          134.0297375505911,
+          12.644336821669514,
+          0.8694368771547877,
+          12.60139006051354,
+          4.224190711707278
+        ],
+        [
+          27.142882097878207,
+          10.43712128398662,
+          17.98292930748236,
+          17.466261307584002,
+          34.22418316577056,
+          1.7721422169321717,
+          125.39658783272203,
+          41.0735525979194,
+          4.9393767700139435,
+          32.5184569581593,
+          7.4790753993845245,
+          5.449369910942304
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 179.21410287787884,
+        "objective": 175.47053132260206,
+        "scaled_gradient_inf": 125.14968145906052,
+        "scaled_step_inf": 0.018176680480295613,
+        "pixel_error_median_initial_px": 14.330951371953795,
+        "pixel_error_median_px": 13.261089981988963,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 19,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 102.60021686355047,
+      "control_mean_ankle_height_mm": 102.06215140200275,
+      "control_raw_error_px": [
+        [
+          8.440655461640013,
+          27.375214348058716,
+          15.283353139246016,
+          12.464958883617594,
+          6.733478078672349,
+          17.488744466534982,
+          40.84414245903571,
+          133.81967745896074,
+          13.016880004366126,
+          1.323703696841647,
+          7.89781221987745,
+          2.249183030674328
+        ],
+        [
+          27.67287581592698,
+          13.40032159049074,
+          16.689106480744478,
+          19.196444461853886,
+          34.3951699867615,
+          2.7528229779010718,
+          123.365235790145,
+          43.01878837218054,
+          3.6888902269201203,
+          31.341226973136607,
+          2.0499139395353443,
+          5.093831251127813
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 179.6145398804301,
+        "objective": 176.17295549926422,
+        "scaled_gradient_inf": 131.11140260724363,
+        "scaled_step_inf": 0.0027627175820597186,
+        "pixel_error_median_initial_px": 14.155098895180046,
+        "pixel_error_median_px": 14.341837364868379,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 20,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 102.35456836134522,
+      "control_mean_ankle_height_mm": 102.23440808031248,
+      "control_raw_error_px": [
+        [
+          8.953247847188976,
+          27.567703092352556,
+          15.020347467409204,
+          12.387211207422272,
+          5.996539861238951,
+          17.265715849534324,
+          40.548296250782975,
+          134.08543830447363,
+          12.39735098791282,
+          1.1545264022209156,
+          8.36395417160883,
+          2.175618246316162
+        ],
+        [
+          28.054914388553254,
+          13.267652783811812,
+          17.263796237137697,
+          19.929391117426995,
+          34.36222794104853,
+          2.9966413092882944,
+          123.5262413260654,
+          42.738341830836795,
+          4.078369485811083,
+          30.852292903692533,
+          2.0539754101080914,
+          5.151981677700179
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 21,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 96.72309706373933,
+      "control_mean_ankle_height_mm": 96.43364885824424,
+      "control_raw_error_px": [
+        [
+          10.464688764255692,
+          30.102893488985497,
+          16.03396852173229,
+          9.711777647800053,
+          7.917637164192637,
+          17.139730746257772,
+          37.809139022246285,
+          129.68279795483394,
+          13.839087171365486,
+          5.551422350983654,
+          8.828196146988777,
+          4.254713728085174
+        ],
+        [
+          28.24449619688066,
+          8.691475060457133,
+          15.486111568750978,
+          14.154753690656154,
+          27.411795096846326,
+          3.4077437070304857,
+          122.65195951243562,
+          44.27623528485438,
+          4.622142803123183,
+          34.87118437013967,
+          4.987208579122643,
+          5.8976044144454365
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 181.8506675970772,
+        "objective": 172.05793912169605,
+        "scaled_gradient_inf": 142.64108332958963,
+        "scaled_step_inf": 0.1359446444518082,
+        "pixel_error_median_initial_px": 17.25992422473475,
+        "pixel_error_median_px": 13.996920431010821,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 22,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 97.45516804989957,
+      "control_mean_ankle_height_mm": 95.24353426157633,
+      "control_raw_error_px": [
+        [
+          11.630586683881143,
+          31.420366033756082,
+          13.541527643570955,
+          13.205491684295337,
+          7.238090272268586,
+          17.15761018519759,
+          43.482881443515474,
+          124.58187835723763,
+          11.32708256873103,
+          5.289762265942445,
+          10.525304495121546,
+          4.316258173657444
+        ],
+        [
+          28.720883259573917,
+          11.439105944110624,
+          12.736010787096433,
+          17.428039298342256,
+          20.99304549509341,
+          2.8979990936311624,
+          118.92427450895907,
+          35.5638020938595,
+          11.517494952697737,
+          41.261006509263346,
+          8.386766034613578,
+          4.732514092639537
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 183.67472617601007,
+        "objective": 169.03588526662972,
+        "scaled_gradient_inf": 52.21030842564776,
+        "scaled_step_inf": 0.005102945230376514,
+        "pixel_error_median_initial_px": 16.651451974632835,
+        "pixel_error_median_px": 12.970751235695886,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 23,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 97.49449058976062,
+      "control_mean_ankle_height_mm": 95.28405584687371,
+      "control_raw_error_px": [
+        [
+          11.663830009930315,
+          31.531177956467367,
+          13.268215778457877,
+          13.184192985835693,
+          7.631411312393029,
+          16.840249742312093,
+          43.313158174880435,
+          124.73803806826402,
+          10.9511260418283,
+          5.349163588483977,
+          10.780935020949297,
+          4.704498236039243
+        ],
+        [
+          28.95338413286221,
+          11.48274713393158,
+          13.128568405617356,
+          17.77399224705355,
+          20.636840454560012,
+          2.7395716904521654,
+          119.07799312038034,
+          35.38857873769374,
+          11.469895947678198,
+          41.060886141580404,
+          8.360472483441436,
+          4.248693670568831
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 24,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 95.37653289886988,
+      "control_mean_ankle_height_mm": 94.3019269885918,
+      "control_raw_error_px": [
+        [
+          11.282485591204393,
+          31.94874317127663,
+          13.324381966989346,
+          12.335507380587874,
+          6.689657324855226,
+          18.00396747384698,
+          42.03832719821961,
+          121.18928097438933,
+          13.242948985699961,
+          9.565776861366748,
+          12.627109755653871,
+          8.332759111037674
+        ],
+        [
+          28.8893686480586,
+          11.14645884301272,
+          15.032123010403671,
+          16.1380617357927,
+          23.92842609357147,
+          2.9995070187494246,
+          119.98256741777618,
+          40.24609853354523,
+          7.89641037934656,
+          37.80402839634006,
+          9.950186349113205,
+          7.4275752480811965
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 176.32705469705604,
+        "objective": 170.7778101702695,
+        "scaled_gradient_inf": 104.01740092941239,
+        "scaled_step_inf": 0.00041317348524140394,
+        "pixel_error_median_initial_px": 16.02830242046954,
+        "pixel_error_median_px": 13.283665476344654,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 25,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 94.48630678089582,
+      "control_mean_ankle_height_mm": 95.574522437471,
+      "control_raw_error_px": [
+        [
+          7.24898496142974,
+          40.60484520511115,
+          16.43442548138443,
+          21.316749559585144,
+          13.080639071413671,
+          20.146667533231586,
+          39.907258061270504,
+          123.32419018371024,
+          11.541459177607175,
+          10.215626006187112,
+          9.870724330277506,
+          7.433156134392352
+        ],
+        [
+          28.463956185758427,
+          14.344297460654857,
+          22.729274488474324,
+          20.65964267149863,
+          30.10501299518765,
+          5.461337989547717,
+          118.97455325792201,
+          26.66342293903567,
+          13.522519108313988,
+          41.09462403689908,
+          9.790845847080625,
+          6.974711775042043
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 194.56503704321142,
+        "objective": 179.70231560697667,
+        "scaled_gradient_inf": 45.12388786672912,
+        "scaled_step_inf": 0.008955002347482987,
+        "pixel_error_median_initial_px": 20.96203398920347,
+        "pixel_error_median_px": 18.290546507308008,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 26,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 102.73462730855954,
+      "control_mean_ankle_height_mm": 104.73925514375327,
+      "control_raw_error_px": [
+        [
+          9.770866990242087,
+          39.811560778701086,
+          16.756298779640357,
+          18.034270797160968,
+          10.026526481972141,
+          19.125199579247624,
+          39.53381288749681,
+          120.59048659823829,
+          9.752379214896663,
+          9.229727025865493,
+          10.129240864708363,
+          7.66026763152426
+        ],
+        [
+          28.1396950933061,
+          12.21997685076405,
+          23.203793574271188,
+          18.58497418699409,
+          32.34395792837485,
+          6.383049131193691,
+          116.27755902508258,
+          24.233552407464057,
+          15.14686594606879,
+          40.60945863514294,
+          9.504416288726398,
+          6.78374961954581
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 178.04282080713426,
+        "objective": 174.57271656374408,
+        "scaled_gradient_inf": 133.31759762078224,
+        "scaled_step_inf": 0.0014366059222654275,
+        "pixel_error_median_initial_px": 19.518853833464256,
+        "pixel_error_median_px": 17.395284788400662,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 27,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 94.68312579151555,
+      "control_mean_ankle_height_mm": 96.20995386905167,
+      "control_raw_error_px": [
+        [
+          11.877239837199165,
+          32.96944112272876,
+          15.71218816518724,
+          12.648952887286462,
+          10.34275225184026,
+          19.788126456156885,
+          47.33693925271925,
+          117.08095092714325,
+          8.184756129986352,
+          10.352971892391578,
+          12.095874947310858,
+          7.986696173726797
+        ],
+        [
+          26.87814961135464,
+          10.202867415520961,
+          20.80019442036459,
+          18.457936781282637,
+          24.777965308529712,
+          2.2455031891881605,
+          114.34950813723057,
+          26.458932480369775,
+          18.308120341215595,
+          42.23320265823422,
+          11.229616373454087,
+          6.617737291691469
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 182.9464216122565,
+        "objective": 169.232781177168,
+        "scaled_gradient_inf": 224.70823655338103,
+        "scaled_step_inf": 0.011125313410712314,
+        "pixel_error_median_initial_px": 18.865640013199855,
+        "pixel_error_median_px": 17.010154253201417,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 28,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 88.60918291185222,
+      "control_mean_ankle_height_mm": 92.16960916697614,
+      "control_raw_error_px": [
+        [
+          15.57933796934898,
+          33.32878484576926,
+          15.134011839464925,
+          8.120828062129723,
+          9.659725954475812,
+          19.154614867979074,
+          46.68946407145293,
+          116.49260914585581,
+          9.8722937172608,
+          11.011154241600218,
+          10.966473620145218,
+          7.39430876625039
+        ],
+        [
+          29.903397676209668,
+          11.550439500638738,
+          19.51597089845391,
+          15.44340575633107,
+          22.22215741110724,
+          3.270105179698869,
+          112.5994455578564,
+          24.318698752963833,
+          20.096930873239817,
+          41.20110088012568,
+          9.914184945799843,
+          7.7787194351824835
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 170.13124045371546,
+        "objective": 165.8978084873983,
+        "scaled_gradient_inf": 196.87249340127048,
+        "scaled_step_inf": 0.0010867225759576364,
+        "pixel_error_median_initial_px": 16.680348942333385,
+        "pixel_error_median_px": 15.511371862840026,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 29,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 93.5847704493995,
+      "control_mean_ankle_height_mm": 93.87327819545227,
+      "control_raw_error_px": [
+        [
+          13.766311429009876,
+          36.85620734135931,
+          17.636557242955295,
+          15.171733721543006,
+          10.552182367559055,
+          21.463953243739788,
+          47.524917617544915,
+          115.3681341599752,
+          11.485921185184605,
+          12.323285878351507,
+          10.605958162357625,
+          6.2432642193990375
+        ],
+        [
+          26.097154507122596,
+          11.659556622307159,
+          24.742353560377417,
+          20.584094608786785,
+          22.2954172211844,
+          4.142674472494006,
+          111.7556624673942,
+          23.53287791269139,
+          22.07547284362309,
+          41.95243482111946,
+          10.612783959916714,
+          7.502522837856788
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 178.0992326613916,
+        "objective": 170.9621477023173,
+        "scaled_gradient_inf": 206.09011399183703,
+        "scaled_step_inf": 0.0011743688845965564,
+        "pixel_error_median_initial_px": 21.360117616638554,
+        "pixel_error_median_px": 19.110325925871038,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 30,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 93.43154672911025,
+      "control_mean_ankle_height_mm": 93.83039537522036,
+      "control_raw_error_px": [
+        [
+          13.632105521738506,
+          36.85237615485996,
+          17.296199912596173,
+          15.14017600592999,
+          10.407966813478088,
+          21.339760989995227,
+          47.52818997263882,
+          115.35719055347336,
+          11.363254675822464,
+          12.800513579632131,
+          11.033014402562316,
+          6.644748018296879
+        ],
+        [
+          26.35702034052391,
+          11.735123468618704,
+          25.067633900587932,
+          20.729021126860143,
+          22.270022626196305,
+          4.088696888169834,
+          112.08524580571283,
+          23.325703957257765,
+          21.871124475627816,
+          41.71910955390873,
+          10.271198149959158,
+          6.966375217217763
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 31,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 95.77474302525013,
+      "control_mean_ankle_height_mm": 95.02265662434273,
+      "control_raw_error_px": [
+        [
+          12.974251088697212,
+          28.94412213198146,
+          17.520300809529772,
+          13.108640493970428,
+          10.187389981632363,
+          20.305540097383286,
+          48.262098235693855,
+          115.7745078422782,
+          13.537534516281656,
+          13.726529459269907,
+          11.189059719857664,
+          6.634560679248487
+        ],
+        [
+          26.415139141414745,
+          10.529751975209182,
+          24.019018329220227,
+          18.409449432332632,
+          20.869995078704058,
+          5.104445129649087,
+          115.86687344622138,
+          26.420263868984314,
+          20.68492012801721,
+          43.812513786658954,
+          10.719461019244362,
+          8.106168204122447
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 174.73545122652015,
+        "objective": 169.40846473411582,
+        "scaled_gradient_inf": 127.46653052758866,
+        "scaled_step_inf": 0.0027688921236275377,
+        "pixel_error_median_initial_px": 18.49699514306913,
+        "pixel_error_median_px": 17.964875120931204,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 32,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 101.23248032433423,
+      "control_mean_ankle_height_mm": 99.8674166965688,
+      "control_raw_error_px": [
+        [
+          13.12679108226043,
+          31.69277517485156,
+          15.307340196174035,
+          13.670501968622737,
+          8.189245846536537,
+          22.53446792312087,
+          48.83076969598085,
+          124.68865779119432,
+          15.267612951127123,
+          13.89474737378898,
+          12.040473910261102,
+          8.496145872208835
+        ],
+        [
+          25.38804868807039,
+          14.353478912611784,
+          19.527613996888224,
+          16.65131511726887,
+          17.621663657284113,
+          5.5174816056663865,
+          115.71137227447792,
+          24.426754229444423,
+          23.58448228781104,
+          46.66041267974227,
+          10.735907285981753,
+          9.854019062174364
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 190.9784350345045,
+        "objective": 174.47036516348473,
+        "scaled_gradient_inf": 200.7094889699301,
+        "scaled_step_inf": 0.007376983137627328,
+        "pixel_error_median_initial_px": 21.074063713191315,
+        "pixel_error_median_px": 15.979327656721452,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 33,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 101.33918916268814,
+      "control_mean_ankle_height_mm": 99.90270121126882,
+      "control_raw_error_px": [
+        [
+          12.904882368483348,
+          31.559951035414592,
+          15.11818317930836,
+          13.631983386382679,
+          7.710920828956617,
+          22.115496878498536,
+          48.949353740522824,
+          124.59336484965311,
+          14.866518345591777,
+          14.156426588547863,
+          12.476351405556734,
+          9.063248784389712
+        ],
+        [
+          25.644017100195086,
+          14.53453462005108,
+          19.750988134450196,
+          16.79700572363637,
+          17.724086992517517,
+          6.055881975872672,
+          116.05173650257507,
+          24.318543640153226,
+          23.488304972204666,
+          46.54289284815704,
+          10.384997787568615,
+          9.26390804243682
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 34,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 98.84612042987229,
+      "control_mean_ankle_height_mm": 95.77482069334653,
+      "control_raw_error_px": [
+        [
+          15.358965592313059,
+          27.977856577822408,
+          14.718223137214439,
+          13.41001654832845,
+          5.785443413695623,
+          22.74990304760865,
+          55.11654956401236,
+          125.00617216095736,
+          16.642719726784804,
+          14.230878918764892,
+          11.4645772180057,
+          7.944114548331635
+        ],
+        [
+          29.777013026987994,
+          13.940994076667145,
+          17.211437537181514,
+          17.149979479856945,
+          16.280689505892866,
+          5.110460923373747,
+          120.66437461761406,
+          23.897442372875407,
+          24.242622128125195,
+          50.92430356525449,
+          9.919484123367583,
+          10.843928944585722
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 214.7185159387285,
+        "objective": 180.55008677674212,
+        "scaled_gradient_inf": 270.13286628686814,
+        "scaled_step_inf": 0.00030929916426529627,
+        "pixel_error_median_initial_px": 21.205436236891423,
+        "pixel_error_median_px": 16.461704616338835,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 35,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 93.61443282384447,
+      "control_mean_ankle_height_mm": 66.77142510356904,
+      "control_raw_error_px": [
+        [
+          32.21930761413788,
+          25.099584226041728,
+          16.506313301585188,
+          12.204903276910436,
+          3.49711589019665,
+          13.950685582788939,
+          48.81676739983261,
+          75.55255591502768,
+          42.270259939919896,
+          39.219873243472975,
+          15.687067522102671,
+          3.3968119714284253
+        ],
+        [
+          18.1599451454133,
+          19.706005970932214,
+          18.170639496030343,
+          16.30981734247724,
+          18.311517470600986,
+          11.58795128451909,
+          82.31232085024993,
+          26.12519163699253,
+          57.622701284827336,
+          84.0826635201024,
+          16.69099735874837,
+          14.219748013448738
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 176.3906382019003,
+        "objective": 155.2363024101119,
+        "scaled_gradient_inf": 553.1593869125713,
+        "scaled_step_inf": 0.1085107024968728,
+        "pixel_error_median_initial_px": 18.76343087099613,
+        "pixel_error_median_px": 18.16529232072182,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 36,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 91.4418325242643,
+      "control_mean_ankle_height_mm": 67.21876299999269,
+      "control_raw_error_px": [
+        [
+          31.85974897363995,
+          24.540307602400553,
+          15.509747418495568,
+          12.018412090735735,
+          2.291343544531604,
+          13.93147752885642,
+          49.495177300271955,
+          74.47908649505938,
+          41.8110483916951,
+          39.03996908417402,
+          16.366893334265693,
+          3.3667835090558578
+        ],
+        [
+          18.178947631326974,
+          20.35816653525071,
+          18.30233172627507,
+          16.437265032217834,
+          18.458409833464074,
+          12.72462738009888,
+          82.20537780152128,
+          25.769962223558906,
+          57.6300522094021,
+          83.66882656934344,
+          16.940734306745544,
+          13.117407617836905
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 37,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 123.73801855778343,
+      "control_mean_ankle_height_mm": 81.20017107898886,
+      "control_raw_error_px": [
+        [
+          39.04391064824887,
+          26.117959345501,
+          14.49798189611436,
+          8.797296098828554,
+          7.532679979813545,
+          12.407915746326388,
+          53.658973832531046,
+          74.40504004790769,
+          44.94028954523784,
+          43.52892225962823,
+          17.264122267511947,
+          6.429463238316106
+        ],
+        [
+          16.57012435034935,
+          28.33720693291593,
+          20.934915098688776,
+          15.2405699455974,
+          15.83823103713401,
+          5.10680081887931,
+          86.98385767868143,
+          28.021598481722396,
+          49.91244820012706,
+          66.97532482822551,
+          11.811292721692219,
+          10.910213688974626
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 210.90067130256915,
+        "objective": 196.51311504313676,
+        "scaled_gradient_inf": 89.37678647360941,
+        "scaled_step_inf": 0.019460954011085736,
+        "pixel_error_median_initial_px": 20.808585459642963,
+        "pixel_error_median_px": 19.099518683100364,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 38,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 136.42480630030607,
+      "control_mean_ankle_height_mm": 81.81951653673359,
+      "control_raw_error_px": [
+        [
+          38.214741228969295,
+          25.834137972266927,
+          14.638531354936315,
+          10.550678569555023,
+          6.800664462904664,
+          14.230848946262082,
+          50.00355028482678,
+          71.99915692095134,
+          54.680596719906816,
+          49.014108600289994,
+          16.339846024784208,
+          4.875462881455073
+        ],
+        [
+          14.727577737151265,
+          28.871832869851787,
+          20.749396929669356,
+          16.053643699325285,
+          14.126349391547764,
+          8.710556432609613,
+          94.301883418221,
+          24.379277575919755,
+          58.16637926286178,
+          66.8317566328439,
+          10.20082519275131,
+          11.900184826771145
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 216.0883820495564,
+        "objective": 203.89896221913997,
+        "scaled_gradient_inf": 188.31435827516472,
+        "scaled_step_inf": 0.018942478863604343,
+        "pixel_error_median_initial_px": 22.25262077052392,
+        "pixel_error_median_px": 18.544621477226784,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 39,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 138.57558411771836,
+      "control_mean_ankle_height_mm": 88.35267000309271,
+      "control_raw_error_px": [
+        [
+          39.054428459173764,
+          30.124315022160587,
+          14.344922265897795,
+          11.231163870026254,
+          8.775672238777883,
+          16.25633079928984,
+          44.998880684758014,
+          84.10660356719703,
+          58.53730608126876,
+          43.936068003917335,
+          15.526806635405139,
+          4.701489969551296
+        ],
+        [
+          10.894658097102674,
+          23.06912327221625,
+          22.983986986604318,
+          17.85857641000812,
+          16.117804892078738,
+          6.648952733582662,
+          107.42601800490527,
+          19.7036910282029,
+          62.40064093661686,
+          65.5538983070303,
+          9.336706190790151,
+          6.004862381196485
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 227.51641639064871,
+        "objective": 208.99338024307607,
+        "scaled_gradient_inf": 292.122276049013,
+        "scaled_step_inf": 0.015540385454346337,
+        "pixel_error_median_initial_px": 20.271684992018493,
+        "pixel_error_median_px": 18.78113371910551,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 40,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 124.20906286591187,
+      "control_mean_ankle_height_mm": 83.51083156287525,
+      "control_raw_error_px": [
+        [
+          21.41564603152598,
+          33.770733522114995,
+          11.582657296082573,
+          12.578429258039884,
+          7.664248790957483,
+          17.618317481360258,
+          40.74016833621512,
+          86.84749293399653,
+          65.2948800009015,
+          46.26960452949625,
+          20.185945699606577,
+          1.043930830079913
+        ],
+        [
+          15.967460184108395,
+          17.894579424267103,
+          18.781343223173753,
+          20.30651203176711,
+          15.778879704906052,
+          11.603252122464493,
+          106.86429576895502,
+          19.324574564941486,
+          66.36141710765158,
+          92.86902684994043,
+          16.053092318077955,
+          5.3507870308379
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 197.28445331889574,
+        "objective": 173.28612709679197,
+        "scaled_gradient_inf": 156.61986387032488,
+        "scaled_step_inf": 0.014245743722853081,
+        "pixel_error_median_initial_px": 20.734751791373817,
+        "pixel_error_median_px": 18.337961323720428,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 41,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 123.56804735202293,
+      "control_mean_ankle_height_mm": 83.83623816350544,
+      "control_raw_error_px": [
+        [
+          21.341916835981827,
+          33.575850961623274,
+          10.874351713820843,
+          12.502316851592509,
+          8.89405098203781,
+          16.83000996769616,
+          41.54082512034784,
+          86.00786673789824,
+          65.12443857297812,
+          46.18494020763778,
+          19.038429132567135,
+          2.5044727997271323
+        ],
+        [
+          15.690055120484574,
+          18.173858083988154,
+          18.806304779611274,
+          20.619783580491774,
+          15.619581212631147,
+          12.912698565594589,
+          106.89893416708593,
+          19.11039449061919,
+          66.8657452094241,
+          92.54350349069153,
+          16.982498711684148,
+          4.2332527674408365
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 42,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 122.99948240597536,
+      "control_mean_ankle_height_mm": 95.86275324672245,
+      "control_raw_error_px": [
+        [
+          20.672561210136937,
+          29.728264602588705,
+          13.580214179176615,
+          6.584087681481296,
+          10.604225992510713,
+          16.974151983872808,
+          42.1353192787403,
+          97.20488917367288,
+          53.53664637037096,
+          30.503176571449764,
+          18.75735179063677,
+          6.449910860745135
+        ],
+        [
+          17.468728754188614,
+          12.262588695055706,
+          19.774093391292595,
+          20.885541428721716,
+          17.308653497738966,
+          9.822899283678574,
+          125.10770522788125,
+          16.225716440682138,
+          55.70851163112808,
+          96.5825887986528,
+          16.359257098337157,
+          3.436179188429573
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 200.94620123319535,
+        "objective": 173.5112075165095,
+        "scaled_gradient_inf": 178.53626495819225,
+        "scaled_step_inf": 0.0017435023867031095,
+        "pixel_error_median_initial_px": 21.61840251560946,
+        "pixel_error_median_px": 17.38869112596379,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 43,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 119.08660764499257,
+      "control_mean_ankle_height_mm": 118.10021404280124,
+      "control_raw_error_px": [
+        [
+          18.451317270064347,
+          20.71985218318255,
+          17.415552884095533,
+          1.110765502568019,
+          8.825682789560053,
+          17.43672106360863,
+          42.545773906760445,
+          112.09547153595881,
+          18.533897972183723,
+          12.141493187940176,
+          21.499911040555972,
+          5.042560950162135
+        ],
+        [
+          21.203144376220457,
+          8.030189164218696,
+          19.337604364418198,
+          25.771926126607248,
+          19.261140480628235,
+          7.768445150481287,
+          142.50741010139035,
+          11.986553314342178,
+          22.485181410775255,
+          81.73993529042619,
+          10.75132021742006,
+          3.058640538774047
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 184.51175428604355,
+        "objective": 161.55630041994422,
+        "scaled_gradient_inf": 615.9155147858849,
+        "scaled_step_inf": 0.021049342853375567,
+        "pixel_error_median_initial_px": 16.734380269930643,
+        "pixel_error_median_px": 18.492607621124037,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 44,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 118.79446955011342,
+      "control_mean_ankle_height_mm": 118.50769876382915,
+      "control_raw_error_px": [
+        [
+          18.757764796134623,
+          20.312809587244367,
+          16.458242943113135,
+          0.7020910669788494,
+          7.6852280375982245,
+          16.922982946580497,
+          43.191052576255004,
+          111.4939300103021,
+          17.552796727875776,
+          12.090197498318895,
+          20.13797090569826,
+          5.720443089309766
+        ],
+        [
+          20.762109019786703,
+          7.338058214233636,
+          19.649172278276723,
+          26.15512523446695,
+          19.740839961928074,
+          8.670868387731481,
+          142.75768653902995,
+          12.201047750174293,
+          22.719661613676184,
+          81.66713876341638,
+          12.112308464826203,
+          4.010687237222934
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 45,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 120.8637150167386,
+      "control_mean_ankle_height_mm": 121.75233216831683,
+      "control_raw_error_px": [
+        [
+          19.570030279148575,
+          22.2537652978938,
+          18.215834209894894,
+          5.7420623349247455,
+          10.695019756271156,
+          23.065638610149293,
+          43.084500170464594,
+          119.7993134237673,
+          12.62454218272546,
+          26.007104073502543,
+          9.489441683420461,
+          2.7716205186776914
+        ],
+        [
+          25.135962431424296,
+          11.375721973632244,
+          20.916639604396668,
+          25.060293260446144,
+          18.389562197097877,
+          3.3790307755504188,
+          147.9309735213153,
+          13.34126974896298,
+          21.358368829070496,
+          78.33870416257766,
+          9.386438704585263,
+          2.2742380252467744
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 191.2210632174507,
+        "objective": 169.31985903473063,
+        "scaled_gradient_inf": 1297.4302086829437,
+        "scaled_step_inf": 0.004443680440676977,
+        "pixel_error_median_initial_px": 17.44411306551974,
+        "pixel_error_median_px": 18.302698203496384,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 46,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 124.65510238359661,
+      "control_mean_ankle_height_mm": 124.6302891323141,
+      "control_raw_error_px": [
+        [
+          19.044138981912063,
+          16.985371189135236,
+          19.28782112397274,
+          3.7271660558967836,
+          13.225390957751884,
+          17.88419161747098,
+          39.8532180601801,
+          125.87543219844305,
+          19.719622792663678,
+          31.108143358762298,
+          10.305488404395291,
+          8.427573868233512
+        ],
+        [
+          31.995520804628114,
+          6.822399640237359,
+          20.1381042951515,
+          26.89870869525786,
+          20.827563774128592,
+          6.808342607832445,
+          164.9611731318428,
+          14.264202324094802,
+          12.418718032877932,
+          77.97231850658733,
+          5.188601861195694,
+          7.3749752798336665
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 196.31649024154927,
+        "objective": 175.84855266881578,
+        "scaled_gradient_inf": 808.4572245070212,
+        "scaled_step_inf": 0.011738176455877119,
+        "pixel_error_median_initial_px": 16.368910287590584,
+        "pixel_error_median_px": 17.434781403303106,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 47,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 124.61007800223928,
+      "control_mean_ankle_height_mm": 125.17320639408868,
+      "control_raw_error_px": [
+        [
+          19.624998119039052,
+          16.694274502453702,
+          18.14296151782336,
+          3.904609604400993,
+          12.949746166153256,
+          17.340874068290983,
+          40.53953353221277,
+          125.41700474305006,
+          19.58232823881374,
+          31.171191678237196,
+          9.015073054797407,
+          7.975630245537408
+        ],
+        [
+          31.280251353670405,
+          6.097315318228779,
+          20.38363550901017,
+          27.02010261236815,
+          21.46652259858696,
+          7.073355191927198,
+          164.84609969084,
+          14.81287142602163,
+          12.80777780138343,
+          77.69074777765763,
+          5.806396229638464,
+          8.821760639545134
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 48,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 125.32867129548286,
+      "control_mean_ankle_height_mm": 125.44005842401396,
+      "control_raw_error_px": [
+        [
+          9.710278652132464,
+          15.862446469895772,
+          11.635295993596653,
+          8.50701670410743,
+          10.41997829595673,
+          20.376739012527192,
+          32.025271277187734,
+          129.48534714253654,
+          23.844398509624952,
+          41.906098886878695,
+          6.944809030480158,
+          5.747657452050964
+        ],
+        [
+          28.179998145125065,
+          1.335462034788785,
+          11.262628612187566,
+          31.565956269634295,
+          12.4478493470048,
+          6.84633282434645,
+          170.30378767231855,
+          21.384471763529216,
+          9.313050658229944,
+          80.81061322840348,
+          8.798936706184936,
+          5.888632725720229
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 211.22226278622676,
+        "objective": 172.27381539946924,
+        "scaled_gradient_inf": 1028.7714600402442,
+        "scaled_step_inf": 0.006488448538748881,
+        "pixel_error_median_initial_px": 18.71873152947152,
+        "pixel_error_median_px": 11.44896230289211,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 49,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 131.34172173669356,
+      "control_mean_ankle_height_mm": 131.4440327205223,
+      "control_raw_error_px": [
+        [
+          7.75924608575884,
+          10.376194856116259,
+          45.279294268430625,
+          10.629885704927899,
+          5.497749770692038,
+          17.96944685234874,
+          33.773193098808896,
+          133.27724789239423,
+          21.32882628874128,
+          44.0502934213742,
+          10.110840726867202,
+          3.443111798840219
+        ],
+        [
+          29.306361800335527,
+          8.311640198388913,
+          31.96190630667215,
+          32.026850815932434,
+          19.814216542110838,
+          5.411270018895518,
+          177.4734543918883,
+          15.322210852858268,
+          10.869556239469494,
+          92.31925074445178,
+          8.785980181274663,
+          5.156901966853962
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 220.7218345661944,
+        "objective": 170.39808812731565,
+        "scaled_gradient_inf": 584.24213451135,
+        "scaled_step_inf": 0.011073210769712943,
+        "pixel_error_median_initial_px": 18.23219462223636,
+        "pixel_error_median_px": 10.749720972198697,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 50,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 131.66816707941686,
+      "control_mean_ankle_height_mm": 131.91273221744098,
+      "control_raw_error_px": [
+        [
+          8.840029569711074,
+          10.688244511631593,
+          45.59902003396483,
+          10.672870761855377,
+          6.945137303860685,
+          16.978387992077952,
+          34.44497430961954,
+          133.08886234367415,
+          21.431514991322093,
+          44.33354116877257,
+          10.393976768110331,
+          3.273464411999975
+        ],
+        [
+          28.177514008798802,
+          9.031955382116433,
+          31.606097986561092,
+          31.673666010603355,
+          18.83056749993359,
+          6.723603156870652,
+          176.98659779513218,
+          15.98948955037871,
+          11.203979924822635,
+          92.01245467735274,
+          8.431345900540636,
+          5.987052331861915
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 51,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 144.4204700436694,
+      "control_mean_ankle_height_mm": 144.2676125947886,
+      "control_raw_error_px": [
+        [
+          2.6878554259106244,
+          9.439446566639013,
+          60.267796848650825,
+          15.270799669261852,
+          7.8791987432412,
+          14.88015727753329,
+          34.45311460433967,
+          154.230714576905,
+          21.10856472635492,
+          21.973591352445577,
+          15.884139005005224,
+          7.610978128036568
+        ],
+        [
+          19.628185707818517,
+          15.043873168515153,
+          28.676161628443303,
+          27.66315337065082,
+          12.401663079009793,
+          4.625382696205167,
+          178.41304823627124,
+          42.46913759627228,
+          2.0901185116718155,
+          81.59959969411602,
+          11.130519499134738,
+          5.64418787892195
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 238.5226936499123,
+        "objective": 213.58049648574197,
+        "scaled_gradient_inf": 415.9465070292477,
+        "scaled_step_inf": 0.0010094288325830196,
+        "pixel_error_median_initial_px": 19.238224359665473,
+        "pixel_error_median_px": 15.157336418888502,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 52,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 147.77880250570536,
+      "control_mean_ankle_height_mm": 146.56406234920667,
+      "control_raw_error_px": [
+        [
+          7.545896652175125,
+          14.859148160769596,
+          39.12529666372661,
+          19.60775482730289,
+          9.20411264635877,
+          15.748444262598516,
+          38.393232925943586,
+          166.2169206426024,
+          21.15620365445401,
+          19.475685715865016,
+          12.0811711894219,
+          6.963076605578858
+        ],
+        [
+          19.69386946604252,
+          11.30704508212221,
+          23.742152559954203,
+          17.701219937613736,
+          18.028008473340616,
+          5.644437028884714,
+          180.26952003283643,
+          40.07063192736384,
+          4.018915035018708,
+          77.46561979181602,
+          13.197772699564384,
+          8.259684903194238
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 258.28062255876796,
+        "objective": 233.13669811478235,
+        "scaled_gradient_inf": 725.1540815339911,
+        "scaled_step_inf": 0.0014656388911372547,
+        "pixel_error_median_initial_px": 19.643631676046265,
+        "pixel_error_median_px": 17.864614205477174,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 53,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 147.86025077529314,
+      "control_mean_ankle_height_mm": 147.0542777727848,
+      "control_raw_error_px": [
+        [
+          8.411429300183418,
+          14.368235291733459,
+          40.08115258219208,
+          19.404676540038263,
+          9.106482522724152,
+          14.888038659226897,
+          39.26404994803559,
+          166.33216325951247,
+          21.31253040406476,
+          19.55437478428102,
+          12.478823025782413,
+          6.582307108860154
+        ],
+        [
+          18.379124064662257,
+          12.608808856952628,
+          22.534252538409735,
+          17.08155108566898,
+          18.52699020544011,
+          7.740939825728054,
+          179.64038493088782,
+          40.96498806791476,
+          3.815495762617851,
+          77.12623958485754,
+          11.709013768168607,
+          8.939192308540282
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 54,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 132.39540959354161,
+      "control_mean_ankle_height_mm": 130.93375750948033,
+      "control_raw_error_px": [
+        [
+          0.4669223281908552,
+          12.354345167598584,
+          80.57278828755774,
+          11.750667208458038,
+          11.0089677253024,
+          16.10251581131279,
+          22.85380352301186,
+          185.5557928400878,
+          33.39326254941318,
+          50.67929979111773,
+          11.00257554854397,
+          4.89224077502089
+        ],
+        [
+          20.701910820008525,
+          12.066219303536915,
+          23.232418501333886,
+          38.60099057776577,
+          16.303298105906652,
+          7.484471290818532,
+          189.39214481584213,
+          20.012100387931767,
+          8.241578130896766,
+          91.18509441565075,
+          10.669840396297976,
+          6.144683480053665
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 254.407725071206,
+        "objective": 198.03882860613163,
+        "scaled_gradient_inf": 646.8527936550028,
+        "scaled_step_inf": 0.009694596958165887,
+        "pixel_error_median_initial_px": 20.31365096902193,
+        "pixel_error_median_px": 12.21028223556775,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 55,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 139.24452696059518,
+      "control_mean_ankle_height_mm": 138.89964975077,
+      "control_raw_error_px": [
+        [
+          6.013394443866762,
+          13.089711616507277,
+          39.84232383377674,
+          12.922809262565426,
+          6.311879840223647,
+          28.743238586944564,
+          26.0744961461035,
+          176.24828535502138,
+          32.86547888075135,
+          42.09782745433203,
+          15.881008295075098,
+          9.35943960068281
+        ],
+        [
+          22.20170414014789,
+          7.3130360124957825,
+          15.372087098900359,
+          26.63608073452371,
+          22.31692066465008,
+          5.237086763732155,
+          187.63043644593736,
+          24.248936065062104,
+          7.40352586242732,
+          97.28208357403251,
+          11.578541896970613,
+          8.976320255069538
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 282.08033339438316,
+        "objective": 216.7114966332532,
+        "scaled_gradient_inf": 1178.487777495546,
+        "scaled_step_inf": 0.013064620794179055,
+        "pixel_error_median_initial_px": 25.599406526331506,
+        "pixel_error_median_px": 15.626547696987728,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 56,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 139.25710368424026,
+      "control_mean_ankle_height_mm": 139.25984417776888,
+      "control_raw_error_px": [
+        [
+          6.566286683290765,
+          13.023394790015752,
+          40.45705105675666,
+          12.648695497087948,
+          10.119414730314308,
+          28.962988153768585,
+          26.781130862594186,
+          176.18600731301436,
+          33.36093669435916,
+          42.27743157118168,
+          16.506254179212497,
+          9.2570463881224
+        ],
+        [
+          20.46762641914064,
+          8.887771032405889,
+          14.479624376506942,
+          26.409575338370573,
+          24.27550719233188,
+          2.5742279329753033,
+          186.7143371262185,
+          25.035224914160885,
+          8.147406234224427,
+          97.65172549440561,
+          11.032096269153108,
+          8.904781099541015
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    },
+    {
+      "frame": 57,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 135.0292616108698,
+      "control_mean_ankle_height_mm": 133.56124905652322,
+      "control_raw_error_px": [
+        [
+          6.155461496354552,
+          10.429069751000263,
+          47.34299775869988,
+          13.12931976497504,
+          7.5380404246999495,
+          25.637140290312587,
+          29.842343667047647,
+          174.70207410112496,
+          34.870714108194406,
+          46.64484249864084,
+          15.598853287056023,
+          9.363696379364413
+        ],
+        [
+          18.39421214343383,
+          9.440044268741774,
+          19.5215118212365,
+          29.132382974321153,
+          13.72810365521677,
+          4.063874147608901,
+          186.66950091669028,
+          21.907640940119744,
+          7.445125753303337,
+          89.12303822038798,
+          9.265106589208456,
+          12.553204138099307
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 274.2029309629993,
+        "objective": 218.09577619370623,
+        "scaled_gradient_inf": 1750.4804921517505,
+        "scaled_step_inf": 0.003211903832031039,
+        "pixel_error_median_initial_px": 29.060104082014004,
+        "pixel_error_median_px": 14.663478471136397,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 58,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 136.07848106155978,
+      "control_mean_ankle_height_mm": 136.4059356983382,
+      "control_raw_error_px": [
+        [
+          1.8868328186285819,
+          15.649188215720265,
+          43.708741595949036,
+          14.629499197843044,
+          6.89488659486855,
+          23.78543983929675,
+          23.78825863180386,
+          184.86554861556735,
+          31.760347441091252,
+          41.03558046624544,
+          10.00829818899432,
+          7.092513161388056
+        ],
+        [
+          18.20058420957658,
+          5.935686962028345,
+          20.76038192927259,
+          36.370063724893825,
+          14.769160783072216,
+          7.366935049951697,
+          173.16137861505865,
+          33.418526396635976,
+          6.085264619612723,
+          78.60478114226892,
+          11.050016973527429,
+          6.767540031926651
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 234.21382253380267,
+        "objective": 219.37780788320242,
+        "scaled_gradient_inf": 944.0177484847131,
+        "scaled_step_inf": 0.00017468618205787625,
+        "pixel_error_median_initial_px": 17.274353469070263,
+        "pixel_error_median_px": 15.20917449939624,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 59,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 158.92520478970158,
+      "control_mean_ankle_height_mm": 158.06733922919796,
+      "control_raw_error_px": [
+        [
+          7.809787617278812,
+          19.092069187877968,
+          37.02266936573046,
+          18.154197279521238,
+          11.480643365183903,
+          20.543405780959286,
+          20.40583128532942,
+          193.48631660579437,
+          23.27342331948876,
+          3.8286869967985777,
+          15.13973619216165,
+          12.181973121788083
+        ],
+        [
+          18.884459748022742,
+          9.497700367021274,
+          20.188619193239656,
+          24.578565270998887,
+          14.682374464083733,
+          9.32089164776049,
+          169.73863786412676,
+          40.365568541910996,
+          13.473608496615574,
+          34.3665376257386,
+          13.174928175427457,
+          13.925518946762475
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 286.1564725944753,
+        "objective": 227.08270587986405,
+        "scaled_gradient_inf": 805.9016874560979,
+        "scaled_step_inf": 0.006758420678377477,
+        "pixel_error_median_initial_px": 23.941504770232264,
+        "pixel_error_median_px": 18.51932851377199,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 60,
+      "repeated_decoded_views": [
+        false,
+        false
+      ],
+      "skipped_update": false,
+      "status": "updated",
+      "baseline_mean_ankle_height_mm": 161.69179521502463,
+      "control_mean_ankle_height_mm": 161.56418705189003,
+      "control_raw_error_px": [
+        [
+          9.859030512523066,
+          37.2567702294793,
+          29.184029148508735,
+          19.21021084155132,
+          14.188167668438359,
+          22.316992857960024,
+          22.602909869257378,
+          201.8235485464666,
+          25.862693368030417,
+          6.240726375205627,
+          12.624495276254128,
+          9.737658564324514
+        ],
+        [
+          20.015371559443448,
+          4.624102638929148,
+          13.650433143148007,
+          26.645137178714794,
+          13.99997969175933,
+          12.538391943789014,
+          174.88877970200124,
+          34.95975913784799,
+          19.569654360915997,
+          31.154791665847323,
+          14.551847751625905,
+          18.871802561843133
+        ]
+      ],
+      "optimizer": {
+        "status": "feasible_unconverged",
+        "optimizer_success": false,
+        "termination": "iteration_budget",
+        "iterations": 15,
+        "linearization_iterations": 15,
+        "objective_initial": 282.98833271644355,
+        "objective": 238.95800556948512,
+        "scaled_gradient_inf": 1401.3159966396931,
+        "scaled_step_inf": 0.008415538304687959,
+        "pixel_error_median_initial_px": 25.219871333728353,
+        "pixel_error_median_px": 19.38993260123366,
+        "posterior_updates": 0,
+        "fixed_prior_each_iteration": true,
+        "covariance_approximation": "transported_prediction_no_information_update"
+      }
+    },
+    {
+      "frame": 61,
+      "repeated_decoded_views": [
+        true,
+        true
+      ],
+      "skipped_update": true,
+      "status": "predicted",
+      "baseline_mean_ankle_height_mm": 161.4277740560202,
+      "control_mean_ankle_height_mm": 161.95247665905205,
+      "control_raw_error_px": [
+        [
+          10.387061200380442,
+          37.36777913432201,
+          29.86220926120252,
+          19.39460733920475,
+          16.63592281465089,
+          21.354894597376823,
+          23.17021421040412,
+          201.90578749160548,
+          26.247135779259377,
+          6.9084865381589875,
+          12.22979182715498,
+          9.872541039953495
+        ],
+        [
+          18.975697920165995,
+          5.706082785172654,
+          12.733121547148311,
+          26.017573504074218,
+          13.947623299104178,
+          14.399541165490458,
+          174.11163244335216,
+          35.235893231611406,
+          19.205809819493563,
+          31.296570625710775,
+          14.861810110916677,
+          19.176133729038487
+        ]
+      ],
+      "optimizer": {
+        "status": "repeated_decoded_stereo_pair_no_new_update",
+        "posterior_updates": 0
+      }
+    }
+  ],
+  "checks": {
+    "all62_finite": true,
+    "height_rise_reduction20percent": false,
+    "raw_median_no5percent_regression": true,
+    "raw_p95_no5percent_regression": true
+  },
+  "full_replay_eligible": false,
+  "interpretation": "Skipping repeated updates does not eliminate the rise. Endpoint differences include a changed frame35 start;do not call the27.37mm rise difference extra final-frame floating. Original host-time errors and hardware duplication causes remain unresolved."
+}
