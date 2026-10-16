@@ -3,8 +3,10 @@
   const response=await fetch('data.json.gz');if(!response.ok)throw Error(`数据请求 ${response.status}`);
   const json=await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).text();
   const d=JSON.parse(json),unpack=s=>new Float32Array(Uint8Array.from(atob(s),c=>c.charCodeAt(0)).buffer);
-  for(const m of d.models)m.xyz=unpack(m.points);
+  const refIndex=d.referenceIndex??2;
+  for(const m of d.models){m.xyz=unpack(m.points);if(m.mesh)m.meshXYZ=unpack(m.mesh);if(m.native)m.nativeXYZ=unpack(m.native);if(m.sole)m.soleXYZ=unpack(m.sole);}
   const vertices=unpack(d.mesh),raw=unpack(d.raw),walker=unpack(d.walker),cameras=unpack(d.cameras);
+  const strict=d.strict?unpack(d.strict):null;
   const $=id=>document.getElementById(id),canvas=$('scene'),ctx=canvas.getContext('2d');
   const E=[[0,1],[0,2],[1,3],[2,4],[3,5],[4,6],[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];
   const valid=p=>p.every(Number.isFinite),point=(a,j,frame=fi,n=17)=>Array.from(a.subarray((frame*n+j)*3,(frame*n+j)*3+3));
@@ -40,19 +42,39 @@
     for(const [end,color,label] of [[[2,0,0],'#9b3030','X'],[[0,2,0],'#18643e','Y'],[[0,0,2.2],'#34589b','Z']]){
       line([0,0,0],end,color,2);const p=project(end);ctx.fillStyle=color;ctx.font=`${12*devicePixelRatio}px sans-serif`;ctx.fillText(label,p[0]+5,p[1]);}
     for(let u=.5;u<=2;u+=.5)for(const p of [[u,0,0],[0,u,0]]){const q=project(p);ctx.fillStyle='#283c32';ctx.font=`${10*devicePixelRatio}px sans-serif`;ctx.fillText(u.toFixed(1)+'m',q[0]+4,q[1]-4);}
+    if(d.repairView){
+      const plane=d.center[0]+.8,start=Math.max(0,fi-40);
+      for(let i=start+1;i<=fi;i++){
+        for(let s=0;s<2;s++){const A=point(cameras,s,i-1,2),B=point(cameras,s,i,2);line([plane,A[1],A[2]],[plane,B[1],B[2]],'#897b96',.8);}
+        for(const j of [15,16])if(d.accepted[i-1][j]&&d.accepted[i][j]){const A=point(strict,j,i-1),B=point(strict,j,i);line([A[0],A[1],.002],[B[0],B[1],.002],'#263b30',1);}
+      }
+      if($('walker').checked)for(let s=0;s<2;s++){const C=point(cameras,s,fi,2);line(C,[plane,C[1],C[2]],'#897b96',.7,[3,3]);}
+    }
     if($('walker').checked){const n=d.walkerNames.length;for(const [a,b] of d.walkerEdges){const A=point(walker,a,fi,n),B=point(walker,b,fi,n);line(A,B,'#173a42',8);line(A,B,'#65909a',4);}
       const left=point(cameras,0,fi,2),right=point(cameras,1,fi,2);line(left,right,'#444',2);dot(left,'#7c3f93',5);dot(right,'#7c3f93',5);}
-    if($('mesh').checked){const tris=[];for(const face of d.faces){const P=face.map(j=>point(vertices,j,fi,6890));if(P.every(valid)){const q=P.map(project);tris.push([q.reduce((s,x)=>s+x[2],0),q]);}}
-      tris.sort((a,b)=>b[0]-a[0]);ctx.fillStyle='#c08b65';ctx.globalAlpha=.16;
+    const meshJobs=[];
+    if(d.repairView&&$('referenceMesh').checked&&selected!==refIndex)meshJobs.push([vertices,d.models[refIndex].color,.08]);
+    if($('mesh').checked)meshJobs.push([d.models[selected].meshXYZ||vertices,d.repairView?d.models[selected].color:'#c08b65',.16]);
+    for(const [mesh,color,alpha] of meshJobs){const tris=[];for(const face of d.faces){const P=face.map(j=>point(mesh,j,fi,6890));if(P.every(valid)){const q=P.map(project);tris.push([q.reduce((s,x)=>s+x[2],0),q]);}}
+      tris.sort((a,b)=>b[0]-a[0]);ctx.fillStyle=color;ctx.globalAlpha=alpha;
       for(const [,q] of tris){ctx.beginPath();ctx.moveTo(q[0][0],q[0][1]);ctx.lineTo(q[1][0],q[1][1]);ctx.lineTo(q[2][0],q[2][1]);ctx.closePath();ctx.fill();}ctx.globalAlpha=1;}
     let rawEdges=0;if($('raw').checked){for(const [a,b] of E){const A=point(raw,a),B=point(raw,b);if(valid(A)&&valid(B)){line(A,B,'#141414',1);rawEdges++;}}
-      for(let j=0;j<17;j++){const p=point(raw,j);if(valid(p))dot(p,d.accepted[fi][j]?'#222':'#b47e24',1.8);}}
-    if($('reference').checked&&selected!==2)skeleton(d.models[2],true);
+      for(let j=0;j<17;j++){const p=point(raw,j);if(valid(p)){if(d.repairView&&!d.accepted[fi][j]){const q=project(p),r=3*devicePixelRatio;ctx.strokeStyle='#b47e24';ctx.lineWidth=1.4*devicePixelRatio;ctx.beginPath();ctx.moveTo(q[0]-r,q[1]-r);ctx.lineTo(q[0]+r,q[1]+r);ctx.moveTo(q[0]+r,q[1]-r);ctx.lineTo(q[0]-r,q[1]+r);ctx.stroke();}else dot(p,d.accepted[fi][j]?'#222':'#b47e24',1.8);}}}
+    if($('reference').checked&&selected!==refIndex)skeleton(d.models[refIndex],true);
     const edges=skeleton(d.models[selected]);
+    if(d.repairView){const m=d.models[selected];
+      if($('native').checked){
+        if($('reference').checked&&selected!==refIndex)for(let j=0;j<3;j++)dot(point(d.models[refIndex].nativeXYZ,j,fi,3),'#84543a',3);
+        for(let j=0;j<3;j++)dot(point(m.nativeXYZ,j,fi,3),'#9c2189',4);
+        for(let j=1;j<3;j++)line(point(m.nativeXYZ,j,fi,3),point(m.xyz,j+10),'#9c2189',1,[2,3]);
+      }
+      if($('sole').checked)for(let j=0;j<d.soleCount;j++){const P=point(m.soleXYZ,j,fi,d.soleCount);dot(P,P[2]<0?'#d31425':'#6f7526',1.3);}
+    }
     const audit={frame:fi,variant:d.models[selected].name,frames:448,modelEdges:edges,rawEdges,displayMap:'X,-Y,Z',sceneFresh:true,
-      meshVertices:6890,meshFaces:d.faces.length,meshIndexEntries:d.faces.length*3,meshVisible:$('mesh').checked,
+      meshVertices:6890,meshFaces:d.faces.length,meshIndexEntries:d.faces.length*3,meshVisible:$('mesh').checked,meshVariant:d.repairView?d.models[selected].name:'original',
       ankleHeightMm:[15,16].map(j=>point(d.models[selected].xyz,j)[2]*1000),hipMedianPx:median(d.models[selected].errors[fi].flatMap(view=>view.slice(6,8))),
       ankleStatus:d.models[selected].status[fi].slice(10,12),interpolation:false,view:{yaw,pitch,zoom,panX,panY}};
+    if(d.repairView){const m=d.models[selected];audit.nativePelvisGroundMm=point(m.nativeXYZ,0,fi,3).map(v=>v*1000);audit.soleMinMm=m.soleHeight[fi];audit.landmarkDefinition=m.landmarkDefinition[fi];audit.posteriorUpdates=m.informationUpdates[fi];}
     window.viewerAudit=audit;
     canvas.dataset.audit=JSON.stringify(audit);
   }
@@ -60,12 +82,13 @@
     const c=$(id),g=c.getContext('2d'),s=devicePixelRatio;c.width=c.clientWidth*s;c.height=c.clientHeight*s;
     const W=c.width,H=c.height,L=48*s,T=20*s,B=H-30*s,R=W-14*s;
     const values=d.models.flatMap((m,k)=>Array.from({length:to-from+1},(_,j)=>getValue(k,from+j))).filter(x=>x!==null&&Number.isFinite(x));
-    let lo=Math.min(...values),hi=Math.max(...values);const pad=Math.max(2,(hi-lo)*.08);lo-=pad;hi+=pad;
+    let lo=Math.min(...values),hi=Math.max(...values);if(id==='soleChart'){lo=Math.min(lo,0);hi=Math.max(hi,0);}const pad=Math.max(2,(hi-lo)*.08);lo-=pad;hi+=pad;
     const x=i=>L+(R-L)*(d.time[i]-d.time[from])/(d.time[to]-d.time[from]),y=v=>B-(B-T)*(v-lo)/(hi-lo);
     g.fillStyle='#fff';g.fillRect(0,0,W,H);g.font=`${10*s}px sans-serif`;
     for(let k=0;k<=4;k++){const val=lo+(hi-lo)*k/4,yy=y(val);g.strokeStyle='#ddd';g.lineWidth=s;g.beginPath();g.moveTo(L,yy);g.lineTo(R,yy);g.stroke();g.fillStyle='#222';g.fillText(val.toFixed(0),3*s,yy+3*s);}
     g.fillText(label,L,11*s);for(let k=0;k<=4;k++){const i=Math.round(from+(to-from)*k/4);g.fillText(d.time[i].toFixed(1)+'s',x(i)-10*s,H-10*s);}
-    for(let m=0;m<3;m++){g.strokeStyle=d.models[m].color;g.lineWidth=(m===selected?2:1.2)*s;g.beginPath();let prev=false;
+    if(id==='soleChart'){g.strokeStyle='#111';g.lineWidth=s;g.beginPath();g.moveTo(L,y(0));g.lineTo(R,y(0));g.stroke();}
+    for(let m=0;m<d.models.length;m++){g.strokeStyle=d.models[m].color;g.lineWidth=(m===selected?2:1.2)*s;g.beginPath();let prev=false;
       for(let i=from;i<=to;i++){const v=getValue(m,i);const broken=i>from&&d.models[m].segments[i].some((value,j)=>value!==d.models[m].segments[i-1][j]);
         if(v===null||!Number.isFinite(v)){prev=false;continue;}if(prev&&!broken)g.lineTo(x(i),y(v));else g.moveTo(x(i),y(v));prev=true;}g.stroke();}
     if(fi>=from&&fi<=to){g.strokeStyle='#333';g.setLineDash([3*s,3*s]);g.beginPath();g.moveTo(x(fi),T);g.lineTo(x(fi),B);g.stroke();g.setLineDash([]);}
@@ -85,6 +108,15 @@
       labels.map((name,k)=>`${name}：${m.reason[fi][k+6]||'—'}`).join('\n');
     chart('heightChart',35,61,(k,i)=>{const z=[15,16].map(j=>point(d.models[k].xyz,j,i)[2]);return z.every(Number.isFinite)?(z[0]+z[1])*500:null;},'踝高度 mm');
     chart('hipChart',0,447,(k,i)=>median(d.models[k].errors[i].flatMap(view=>view.slice(6,8))),'髋回投中位 px');
+    if(d.repairView){
+      $('soleHeights').textContent=m.soleHeight[fi].map(v=>number(v)).join(' / ');
+      const change=(point(m.nativeXYZ,0,fi,3)[1]-point(d.models[refIndex].nativeXYZ,0,fi,3)[1])*1000;
+      $('pelvisShift').textContent=number(-change);
+      $('landmark').textContent=m.landmarkDefinition[fi];
+      $('quality').textContent+='\n严格场景门（与人体二维门分开）：\n'+labels.map((name,k)=>`${name}：${d.accepted[fi][k+11]?'accepted':d.rawReasons[fi][k+11]}`).join('\n');
+      chart('soleChart',0,447,(k,i)=>Math.min(...d.models[k].soleHeight[i]),'双足表面最低点 mm');
+      chart('pelvisChart',35,61,(k,i)=>point(d.models[k].nativeXYZ,0,i,3)[1]*1000,'原生骨盆 groundY mm');
+    }
   }
   function upright(xy,side){return side===0?[xy[1],1919-xy[0]]:[1079-xy[1],xy[0]];}
   let imageCache=new Map();
@@ -94,10 +126,10 @@
       g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.fillStyle='#222';g.fillText('加载当前图像…',10,20);
       const paint=img=>{if(serial!==drawSerial)return;g.drawImage(img,0,0,c.width,c.height);const scale=c.width/1080;
         const xy=points=>points.map(p=>p&&p.slice(0,2).every(x=>x!==null&&Number.isFinite(x))?upright(p,side).map(x=>x*scale):null);
-        const observed=xy(d.observed[current][side]),projected=xy(d.models[selected].pixels[current][side]),reference=xy(d.models[2].pixels[current][side]);
+        const observed=xy(d.observed[current][side]),projected=xy(d.models[selected].pixels[current][side]),reference=xy(d.models[refIndex].pixels[current][side]);
         g.strokeStyle='#111';g.lineWidth=1.5;for(const [a,b] of E)if(observed[a]&&observed[b]){g.beginPath();g.moveTo(...observed[a]);g.lineTo(...observed[b]);g.stroke();}
         const dots=(points,color,r)=>{g.fillStyle=color;for(let j=5;j<17;j++)if(points[j]){g.beginPath();g.arc(points[j][0],points[j][1],r,0,Math.PI*2);g.fill();}};
-        dots(observed,'#000',2.8);if($('reference').checked&&selected!==2)dots(reference,d.models[2].color,3);dots(projected,d.models[selected].color,4);
+        dots(observed,'#000',2.8);if($('reference').checked&&selected!==refIndex)dots(reference,d.models[refIndex].color,3);dots(projected,d.models[selected].color,4);
       };
       if(imageCache.has(url))paint(imageCache.get(url));else{const image=new Image();image.onload=()=>{imageCache.set(url,image);if(imageCache.size>8)imageCache.delete(imageCache.keys().next().value);paint(image);};image.onerror=()=>{if(serial===drawSerial){g.fillStyle='#b00';g.fillText('当前图像读取失败；未使用上一帧替代',10,40);}};image.src=url;}
     }
@@ -106,8 +138,10 @@
   function setFrame(frame,stop=true){fi=Math.max(0,Math.min(447,Math.round(frame)));if(stop){playing=false;$('play').textContent='播放';}draw();}
   $('frame').oninput=e=>{if(e.target.value!==''&&Number.isFinite(e.target.valueAsNumber))setFrame(e.target.valueAsNumber);};$('seek').oninput=e=>setFrame(+e.target.value);
   document.querySelectorAll('[data-frame]').forEach(b=>b.onclick=()=>setFrame(+b.dataset.frame));
+  if(d.repairView)$('worstSole').onclick=()=>{let worst=0;for(let i=1;i<448;i++)if(Math.min(...d.models[selected].soleHeight[i])<Math.min(...d.models[selected].soleHeight[worst]))worst=i;setFrame(worst);};
   $('variant').onchange=e=>{selected=+e.target.value;draw();};
   for(const id of ['reference','mesh','raw','walker'])$(id).onchange=draw;
+  if(d.repairView)for(const id of ['native','sole','referenceMesh'])$(id).onchange=draw;
   document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{const v=b.dataset.view;[yaw,pitch]=({recommended:[.65,.12],side:[Math.PI/2,0],front:[0,0],top:[0,Math.PI/2]}[v]);zoom=.85;panX=panY=0;drawScene();});
   $('play').onclick=()=>{playing=!playing;if(playing&&$('loopKey').checked&&(fi<35||fi>61))fi=35;lastTime=0;$('play').textContent=playing?'暂停':'播放';};
   let drag=null;canvas.oncontextmenu=e=>e.preventDefault();canvas.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,pan:e.button===2||e.shiftKey};canvas.setPointerCapture(e.pointerId);};

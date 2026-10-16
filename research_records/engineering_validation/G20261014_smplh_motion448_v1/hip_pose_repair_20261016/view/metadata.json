@@ -1,0 +1,237 @@
+{
+  "frames": 448,
+  "source_original": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "source_candidate": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\hip_operator_feedback_full448",
+  "new_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\view\\scene",
+  "old_dynamic_inputs_consumed": false,
+  "tracking_rerun": false,
+  "fitting_rerun": false,
+  "candidate_geometry": "Regenerated only from saved body/root rotations,translation,unchanged beta and frozen hand poses; no optimization.",
+  "geometry_max_difference_m": {
+    "coco": 1.7881393432617188e-07,
+    "native": 2.60770320892334e-07
+  },
+  "real_topology": {
+    "vertices": 6890,
+    "faces": 13776,
+    "index_entries": 41328
+  },
+  "fresh_vs_previous_reference_only": {
+    "max_R_entry_difference": 0.0,
+    "max_translation_mm_difference": 5.684341886080802e-14
+  },
+  "coordinate_map": "X,-Y,Z for all scene objects",
+  "smoothing": false,
+  "interpolation": false,
+  "hip_definition": "Display virtual observation hips separately from native pelvis0 and native hip centers1/2; adaptation begins frame11.",
+  "sole_points_per_foot": [
+    54,
+    54
+  ],
+  "payload_bytes": 74581167,
+  "page": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\view\\index.html",
+  "raw_joint_counts": [
+    {
+      "index": 0,
+      "finite": 448,
+      "accepted": 256,
+      "reason_counts": {
+        "high_reprojection_error": 191,
+        "accepted": 256,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 1,
+      "finite": 433,
+      "accepted": 244,
+      "reason_counts": {
+        "high_reprojection_error": 186,
+        "accepted": 244,
+        "out_of_raw_image_bounds": 17,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 2,
+      "finite": 439,
+      "accepted": 234,
+      "reason_counts": {
+        "high_reprojection_error": 204,
+        "accepted": 234,
+        "out_of_raw_image_bounds": 9,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 3,
+      "finite": 390,
+      "accepted": 295,
+      "reason_counts": {
+        "high_reprojection_error": 95,
+        "accepted": 295,
+        "out_of_raw_image_bounds": 57,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 4,
+      "finite": 448,
+      "accepted": 356,
+      "reason_counts": {
+        "accepted": 356,
+        "high_reprojection_error": 91,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 5,
+      "finite": 448,
+      "accepted": 300,
+      "reason_counts": {
+        "accepted": 300,
+        "high_reprojection_error": 147,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 6,
+      "finite": 448,
+      "accepted": 414,
+      "reason_counts": {
+        "accepted": 414,
+        "high_reprojection_error": 33,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 7,
+      "finite": 448,
+      "accepted": 265,
+      "reason_counts": {
+        "high_reprojection_error": 182,
+        "accepted": 265,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 8,
+      "finite": 448,
+      "accepted": 377,
+      "reason_counts": {
+        "accepted": 377,
+        "high_reprojection_error": 70,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 9,
+      "finite": 448,
+      "accepted": 278,
+      "reason_counts": {
+        "high_reprojection_error": 167,
+        "accepted": 278,
+        "association_rejected": 1,
+        "low_2d_score": 2
+      }
+    },
+    {
+      "index": 10,
+      "finite": 448,
+      "accepted": 430,
+      "reason_counts": {
+        "accepted": 430,
+        "high_reprojection_error": 17,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 11,
+      "finite": 448,
+      "accepted": 326,
+      "reason_counts": {
+        "accepted": 326,
+        "high_reprojection_error": 121,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 12,
+      "finite": 448,
+      "accepted": 325,
+      "reason_counts": {
+        "accepted": 325,
+        "high_reprojection_error": 122,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 13,
+      "finite": 448,
+      "accepted": 356,
+      "reason_counts": {
+        "accepted": 356,
+        "high_reprojection_error": 91,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 14,
+      "finite": 448,
+      "accepted": 84,
+      "reason_counts": {
+        "high_reprojection_error": 363,
+        "accepted": 84,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 15,
+      "finite": 448,
+      "accepted": 317,
+      "reason_counts": {
+        "high_reprojection_error": 130,
+        "accepted": 317,
+        "association_rejected": 1
+      }
+    },
+    {
+      "index": 16,
+      "finite": 448,
+      "accepted": 429,
+      "reason_counts": {
+        "accepted": 429,
+        "high_reprojection_error": 18,
+        "association_rejected": 1
+      }
+    }
+  ],
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\build_smplh_repair_viewer.py",
+    "--root",
+    "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016",
+    "--export-only"
+  ],
+  "browser_status": "passed_visible_geometry_and_frame_controls",
+  "browser_url": "http://127.0.0.1:8778/research_records/engineering_validation/G20261014_smplh_motion448_v1/hip_pose_repair_20261016/view/index.html",
+  "browser_checks": [
+    "frame61 same frame+view: candidate mesh/ankles90.649,87.340/sole9.335,-2.595; original mesh/ankles158.177,164.679/sole81.123,99.429",
+    "native pelvis61 groundY5.732 candidate vs153.438 original;virtual observed hips displayed separately",
+    "frame10 original mapping;frame11 frozen calibrated mapping;status not falsely converged",
+    "lowest sole jump frame267: right-72.6828mm,red below-ground sole points visible",
+    "height chart click changes frame59->47;key playback advances47->53 and remains within35..61",
+    "frame59 left/right images and raw/model projections visibly loaded",
+    "console errors:0"
+  ],
+  "screenshots": [
+    "preview_repair_frame61.png",
+    "preview_original_frame61.png",
+    "preview_lowest_sole.png",
+    "preview_inputs_frame59.png"
+  ],
+  "export_failures_corrected": [
+    "First export: candidate trajectory lacks segment_id;read segment_id from its same-run NPZ instead. No tracking rerun.",
+    "Second export: WindowsGBK could not read UTF8 static topology;made all JSON/text reads explicit UTF8. Scene not rerun."
+  ]
+}
