@@ -1,0 +1,1669 @@
+{
+  "reference_geometry": {
+    "direction": {
+      "left": {
+        "support_sole_median_mm": 27.228440072659122,
+        "ball_minus_sole_median_mm": 13.207228157743444
+      },
+      "right": {
+        "support_sole_median_mm": 12.230639665286924,
+        "ball_minus_sole_median_mm": 0.8481650690452813
+      }
+    },
+    "previous_contact": {
+      "left": {
+        "support_sole_median_mm": 26.9733811219377,
+        "ball_minus_sole_median_mm": 2.2655416182094656
+      },
+      "right": {
+        "support_sole_median_mm": 10.353750156027575,
+        "ball_minus_sole_median_mm": 0.8529168396436138
+      }
+    }
+  },
+  "35": {
+    "baseline": {
+      "costs": {
+        "body": 88.49300748987466,
+        "direction": 0.0,
+        "contact": 0.026953679316412193
+      },
+      "sole_min_mm": [
+        21.53381761708517,
+        1.5047723568697435
+      ],
+      "ball_min_mm": [
+        23.42203615745364,
+        2.3373887024095152
+      ],
+      "support_ball_abs_mm": 2.3373887024095152,
+      "support_sole_min_mm": 1.5047723568697435,
+      "direction_errors_deg_view_foot": [
+        [
+          1.4397067587133117,
+          1.2368203199235652
+        ],
+        [
+          3.5927782199841047,
+          1.1866044839942769
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        1.0034325581892191e-13,
+        1.2380746759398028e-14,
+        3.4886567577494555e-15,
+        7.956820516896114e-15,
+        3.3322382393093943e-15,
+        9.93923337957349e-17
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 28.72562531088459,
+        "p95_px": 45.375922728534874
+      },
+      "nonhip": {
+        "median_px": 13.530870699305444,
+        "p95_px": 41.04198845876942
+      }
+    },
+    "baseline_coco_max_difference_m": 0.0,
+    "latent_lower_chart_spectrum": {
+      "singular_values": [
+        0.25466370834546453,
+        0.19755122821357896,
+        0.13723270838717533,
+        0.09829237027877737,
+        0.07905955018120783,
+        0.06573874727615578,
+        0.053931300529576155,
+        0.04797824830750884,
+        0.03868895128534356,
+        0.031760068230979835,
+        0.027536683881233263,
+        0.019594316611947663,
+        0.015490642376876354,
+        0.01266219610338435,
+        0.010704699819828965,
+        0.008701706899286163,
+        0.005878747841510131,
+        0.004446915092958959
+      ],
+      "rank_at_relative_tolerance1e_4": 18,
+      "condition_number": 57.26749960859098
+    },
+    "direction_fit_slots": 0,
+    "latent_data_only": {
+      "costs": {
+        "body": 83.8742051721153,
+        "direction": 0.0,
+        "contact": 0.025494363582937045
+      },
+      "sole_min_mm": [
+        24.020988235239127,
+        1.493074235589753
+      ],
+      "ball_min_mm": [
+        25.34324985429248,
+        2.27241478916973
+      ],
+      "support_ball_abs_mm": 2.27241478916973,
+      "support_sole_min_mm": 1.493074235589753,
+      "direction_errors_deg_view_foot": [
+        [
+          1.6878317477725224,
+          1.4421834671005564
+        ],
+        [
+          3.328350700406904,
+          0.9102305585739243
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        2.1668627831410254,
+        2.244508474081102,
+        4.1048685818718,
+        2.6358618153331705,
+        0.7748986530552647,
+        0.40846755852932115
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 27.661330288677796,
+        "p95_px": 43.18856409136039
+      },
+      "nonhip": {
+        "median_px": 13.47187373766528,
+        "p95_px": 41.09929449315249
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 12,
+        "njev": 11,
+        "optimality": 0.7316862341359076,
+        "objective": 83.8742051721153
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "latent_contact": {
+      "costs": {
+        "body": 83.75216705983502,
+        "direction": 0.0,
+        "contact": 0.00017284028756277804
+      },
+      "sole_min_mm": [
+        28.65263200664636,
+        -0.5142987815723865
+      ],
+      "ball_min_mm": [
+        29.271874836446553,
+        0.18593290426671683
+      ],
+      "support_ball_abs_mm": 0.18593290426671683,
+      "support_sole_min_mm": -0.5142987815723865,
+      "direction_errors_deg_view_foot": [
+        [
+          4.290179077325056,
+          2.037915738790733
+        ],
+        [
+          1.019239356025496,
+          0.36043754223486824
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        2.5077451403917443,
+        2.237983246514953,
+        5.346546936653053,
+        2.668489113726176,
+        1.6004688640392968,
+        1.3253537934474027
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 27.714962300063263,
+        "p95_px": 43.06779716589741
+      },
+      "nonhip": {
+        "median_px": 13.46812762914799,
+        "p95_px": 41.123062179674726
+      },
+      "solver": {
+        "success": true,
+        "message": "Both `ftol` and `xtol` termination conditions are satisfied.",
+        "nfev": 13,
+        "njev": 13,
+        "optimality": 0.22961035454007206,
+        "objective": 83.7523399001226
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_data_only": {
+      "costs": {
+        "body": 72.55022287326362,
+        "direction": 0.0,
+        "contact": 25.236827722971388
+      },
+      "sole_min_mm": [
+        -56.2463017467697,
+        -87.10563510594615
+      ],
+      "ball_min_mm": [
+        -33.224159674718145,
+        -61.397091104801184
+      ],
+      "support_ball_abs_mm": 61.397091104801184,
+      "support_sole_min_mm": -87.10563510594615,
+      "direction_errors_deg_view_foot": [
+        [
+          30.06848035922432,
+          28.188713334651293
+        ],
+        [
+          7.030079617902339,
+          1.8899570304590958
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        29.022699232904355,
+        46.561105333687,
+        8.087487391045707,
+        20.482991110334886,
+        83.51678307861513,
+        86.54046187007748
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 20.136218458093353,
+        "p95_px": 28.95923285823163
+      },
+      "nonhip": {
+        "median_px": 14.70545815493265,
+        "p95_px": 42.74666246190823
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 45,
+        "njev": 41,
+        "optimality": 4.380249881418578,
+        "objective": 72.5502228732636
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": false,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": false,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_contact": {
+      "costs": {
+        "body": 72.32741089755984,
+        "direction": 0.0,
+        "contact": 0.019719740484310074
+      },
+      "sole_min_mm": [
+        -10.943483506647421,
+        -12.677443309071723
+      ],
+      "ball_min_mm": [
+        4.862472233758353,
+        0.33538264066768075
+      ],
+      "support_ball_abs_mm": 0.33538264066768075,
+      "support_sole_min_mm": -12.677443309071723,
+      "direction_errors_deg_view_foot": [
+        [
+          43.13109562024996,
+          17.393115186518312
+        ],
+        [
+          18.205905426069883,
+          46.87324645316498
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        45.082474812376894,
+        36.18165781246121,
+        27.8237347755849,
+        25.758539493978592,
+        82.85114698171907,
+        91.84609417497246
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 18.93440626203468,
+        "p95_px": 29.126863502496473
+      },
+      "nonhip": {
+        "median_px": 14.706537140544587,
+        "p95_px": 42.52255125749553
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 22,
+        "njev": 21,
+        "optimality": 1.109502755620852,
+        "objective": 72.34713063804415
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": false,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": false,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    }
+  },
+  "40": {
+    "baseline": {
+      "costs": {
+        "body": 115.55533145653384,
+        "direction": 1.5339299156446085,
+        "contact": 0.5472868218583221
+      },
+      "sole_min_mm": [
+        32.11469064223627,
+        10.761870325388557
+      ],
+      "ball_min_mm": [
+        33.88275172932542,
+        11.807186409540705
+      ],
+      "support_ball_abs_mm": 11.807186409540705,
+      "support_sole_min_mm": 10.761870325388557,
+      "direction_errors_deg_view_foot": [
+        [
+          8.095847485878041,
+          5.961216047779492
+        ],
+        [
+          0.631766101346871,
+          3.355794095177213
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        1.987846675914698e-16,
+        7.328237589221027e-15,
+        8.014229207736402e-16,
+        0.0,
+        1.2816601940323667e-14,
+        6.3611093629270335e-15
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 24.317909861909758,
+        "p95_px": 51.96355886357595
+      },
+      "nonhip": {
+        "median_px": 16.78821331762916,
+        "p95_px": 52.43139748956172
+      }
+    },
+    "baseline_coco_max_difference_m": 0.0,
+    "latent_lower_chart_spectrum": {
+      "singular_values": [
+        0.2557070000011605,
+        0.18929862847766746,
+        0.13614382907203262,
+        0.11235641250956462,
+        0.08615286569159451,
+        0.06494567173065874,
+        0.046119544757919885,
+        0.0431865167146246,
+        0.04229838683535452,
+        0.03425243104255945,
+        0.02994396294860965,
+        0.021377282728886247,
+        0.015075061708878557,
+        0.01378126146807705,
+        0.009585522610860485,
+        0.0076728749519619135,
+        0.003602992672266082,
+        0.002989115333670108
+      ],
+      "rank_at_relative_tolerance1e_4": 18,
+      "condition_number": 85.54604672520188
+    },
+    "direction_fit_slots": 4,
+    "latent_data_only": {
+      "costs": {
+        "body": 103.08568501486332,
+        "direction": 0.3640950761292683,
+        "contact": 0.6924944988124936
+      },
+      "sole_min_mm": [
+        31.636607242085944,
+        12.856101829520018
+      ],
+      "ball_min_mm": [
+        32.43003147641521,
+        13.654807316511475
+      ],
+      "support_ball_abs_mm": 13.654807316511475,
+      "support_sole_min_mm": 12.856101829520018,
+      "direction_errors_deg_view_foot": [
+        [
+          4.092493022266552,
+          0.29568603909694635
+        ],
+        [
+          2.4491097385333864,
+          0.047143163225593164
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        0.9556161388641385,
+        2.423164163345099,
+        5.003732588522926,
+        4.352521265883642,
+        3.407855118408892,
+        1.0827390774476275
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 23.476747850661724,
+        "p95_px": 51.468748246718334
+      },
+      "nonhip": {
+        "median_px": 15.37115038412406,
+        "p95_px": 48.88574850846474
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 14,
+        "njev": 11,
+        "optimality": 1.8805945621396338,
+        "objective": 103.44978009099259
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "latent_contact": {
+      "costs": {
+        "body": 103.45477174113731,
+        "direction": 0.4343384589862926,
+        "contact": 0.38452202641787914
+      },
+      "sole_min_mm": [
+        26.951528272446403,
+        8.513030730697423
+      ],
+      "ball_min_mm": [
+        28.520305565684858,
+        9.575496027027896
+      ],
+      "support_ball_abs_mm": 9.575496027027896,
+      "support_sole_min_mm": 8.513030730697423,
+      "direction_errors_deg_view_foot": [
+        [
+          4.642105016316825,
+          0.8161957380385846
+        ],
+        [
+          1.9230667319969441,
+          0.3515202259814341
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        1.075747484335565,
+        1.8640120602927706,
+        4.292567504690255,
+        3.218326850364994,
+        4.504262943022862,
+        2.175591101859212
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 23.748537516243097,
+        "p95_px": 51.63933176214603
+      },
+      "nonhip": {
+        "median_px": 15.365198315609145,
+        "p95_px": 48.7607612849475
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 25,
+        "njev": 23,
+        "optimality": 1.902509566375227,
+        "objective": 104.27363222654148
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_data_only": {
+      "costs": {
+        "body": 83.01719860022983,
+        "direction": 0.6554535252636053,
+        "contact": 0.2916165276317342
+      },
+      "sole_min_mm": [
+        90.65869487185284,
+        -18.871778688117956
+      ],
+      "ball_min_mm": [
+        253.3658043165784,
+        -6.934798404467535
+      ],
+      "support_ball_abs_mm": 6.934798404467535,
+      "support_sole_min_mm": -18.871778688117956,
+      "direction_errors_deg_view_foot": [
+        [
+          0.5324942719030185,
+          8.415579286496298
+        ],
+        [
+          0.14380941808748954,
+          4.614844565692604
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        18.154771712155714,
+        75.21150625009035,
+        26.48278142337685,
+        26.477565900704672,
+        109.07901586178461,
+        64.27620453452222
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 17.30067255677954,
+        "p95_px": 22.810100281705303
+      },
+      "nonhip": {
+        "median_px": 15.811216770164483,
+        "p95_px": 45.25560447339433
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 23,
+        "njev": 18,
+        "optimality": 1.3862084629660671,
+        "objective": 83.67265212549343
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": false,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_contact": {
+      "costs": {
+        "body": 83.06328911196586,
+        "direction": 0.6092787120404892,
+        "contact": 0.006186335324438602
+      },
+      "sole_min_mm": [
+        90.34683199468651,
+        -10.320588190680269
+      ],
+      "ball_min_mm": [
+        253.3408115679795,
+        0.20979546712962538
+      ],
+      "support_ball_abs_mm": 0.20979546712962538,
+      "support_sole_min_mm": -10.320588190680269,
+      "direction_errors_deg_view_foot": [
+        [
+          0.5724451941730555,
+          7.962426946065609
+        ],
+        [
+          0.16575867375637304,
+          4.547274788742785
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        17.976564671002087,
+        72.89131487197436,
+        25.62744248640601,
+        27.07482746589747,
+        109.03045978395959,
+        63.3030521099981
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 17.32957907913076,
+        "p95_px": 22.84740511113272
+      },
+      "nonhip": {
+        "median_px": 15.749915091160068,
+        "p95_px": 45.29897939791082
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 18,
+        "njev": 15,
+        "optimality": 1.0370558547356836,
+        "objective": 83.6787541593308
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": false,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    }
+  },
+  "47": {
+    "baseline": {
+      "costs": {
+        "body": 118.55366423239843,
+        "direction": 0.0,
+        "contact": 2.193459928927211
+      },
+      "sole_min_mm": [
+        24.207386498282467,
+        30.00170562663751
+      ],
+      "ball_min_mm": [
+        53.40366667392837,
+        30.32851186204788
+      ],
+      "support_ball_abs_mm": 30.32851186204788,
+      "support_sole_min_mm": 30.00170562663751,
+      "direction_errors_deg_view_foot": [
+        [
+          0.4004466877740556,
+          4.38781087183577
+        ],
+        [
+          2.622224370124741,
+          2.0873858510541456
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        4.94795163274959e-15,
+        6.3611093629270335e-15,
+        3.975693351829396e-16,
+        1.987846675914698e-16,
+        1.5285722521176034e-14,
+        1.9092401306067303e-14
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 27.395323993950555,
+        "p95_px": 60.607820317099886
+      },
+      "nonhip": {
+        "median_px": 14.435618798249404,
+        "p95_px": 67.20114310443775
+      }
+    },
+    "baseline_coco_max_difference_m": 0.0,
+    "latent_lower_chart_spectrum": {
+      "singular_values": [
+        0.46501596113425586,
+        0.34128908515498685,
+        0.26188053418025536,
+        0.12964409034191313,
+        0.12034115942701341,
+        0.09769687840409604,
+        0.08475611139208958,
+        0.06807890840872033,
+        0.05636243119106788,
+        0.04179354606805712,
+        0.03829340085822329,
+        0.030320177622882003,
+        0.021528594093240663,
+        0.019071647938921233,
+        0.01614484093558966,
+        0.012426590235957845,
+        0.008995434752854603,
+        0.005170359962876345
+      ],
+      "rank_at_relative_tolerance1e_4": 18,
+      "condition_number": 89.93879816359264
+    },
+    "direction_fit_slots": 0,
+    "latent_data_only": {
+      "costs": {
+        "body": 107.39578253074879,
+        "direction": 0.0,
+        "contact": 1.6424942512464467
+      },
+      "sole_min_mm": [
+        23.554822750506467,
+        24.316917811699202
+      ],
+      "ball_min_mm": [
+        65.10103454222372,
+        24.45971354670884
+      ],
+      "support_ball_abs_mm": 24.45971354670884,
+      "support_sole_min_mm": 24.316917811699202,
+      "direction_errors_deg_view_foot": [
+        [
+          1.2643396075503361,
+          21.943823103455095
+        ],
+        [
+          5.58023316862277,
+          12.17910094926322
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        5.565118103415543,
+        2.3789347543192405,
+        6.815280411896575,
+        6.362493716892342,
+        2.2021034353224387,
+        4.675123588854899
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 28.416499445754262,
+        "p95_px": 61.908399025924325
+      },
+      "nonhip": {
+        "median_px": 13.950646216457235,
+        "p95_px": 53.01672048220342
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 37,
+        "njev": 34,
+        "optimality": 1.5677312726172727,
+        "objective": 107.39578253074879
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "latent_contact": {
+      "costs": {
+        "body": 107.37670010928775,
+        "direction": 0.0,
+        "contact": 0.45897237424543846
+      },
+      "sole_min_mm": [
+        24.730389123813644,
+        9.790597717909243
+      ],
+      "ball_min_mm": [
+        55.53531878870754,
+        10.62356055572411
+      ],
+      "support_ball_abs_mm": 10.62356055572411,
+      "support_sole_min_mm": 9.790597717909243,
+      "direction_errors_deg_view_foot": [
+        [
+          3.2186111414682297,
+          24.41941315917292
+        ],
+        [
+          8.537353858210718,
+          13.752102650540834
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        5.716462276950882,
+        2.754923409538195,
+        6.584595380168014,
+        7.190094856776167,
+        1.5479399427574054,
+        10.006394362037074
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 28.443928136103697,
+        "p95_px": 62.46719321924445
+      },
+      "nonhip": {
+        "median_px": 13.956688977635615,
+        "p95_px": 53.4296339170428
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 20,
+        "njev": 20,
+        "optimality": 2.0724364070231616,
+        "objective": 107.83567248353317
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": true,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_data_only": {
+      "costs": {
+        "body": 87.22471671876984,
+        "direction": 0.0,
+        "contact": 1.9897386405026776
+      },
+      "sole_min_mm": [
+        69.39081429146576,
+        -39.167831569706934
+      ],
+      "ball_min_mm": [
+        73.75192578350376,
+        -18.91695956217443
+      ],
+      "support_ball_abs_mm": 18.91695956217443,
+      "support_sole_min_mm": -39.167831569706934,
+      "direction_errors_deg_view_foot": [
+        [
+          91.24129054722411,
+          18.24944661631704
+        ],
+        [
+          68.25510074804224,
+          10.234073460294045
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        15.644594899278317,
+        76.55492138434802,
+        50.88583703004427,
+        26.2268459212625,
+        94.98239916601685,
+        85.28988099127177
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 27.446773320374888,
+        "p95_px": 36.38702521738704
+      },
+      "nonhip": {
+        "median_px": 14.08166703973627,
+        "p95_px": 38.31994357191672
+      },
+      "solver": {
+        "success": false,
+        "message": "The maximum number of function evaluations is exceeded.",
+        "nfev": 60,
+        "njev": 57,
+        "optimality": 6.837845864774351,
+        "objective": 87.22471671876983
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": false,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_contact": {
+      "costs": {
+        "body": 84.85115114301627,
+        "direction": 0.0,
+        "contact": 0.0779448812178989
+      },
+      "sole_min_mm": [
+        82.40439750031736,
+        -19.50113983181312
+      ],
+      "ball_min_mm": [
+        83.76333958374627,
+        1.652755686324059
+      ],
+      "support_ball_abs_mm": 1.652755686324059,
+      "support_sole_min_mm": -19.50113983181312,
+      "direction_errors_deg_view_foot": [
+        [
+          92.60259313615136,
+          21.188414787490558
+        ],
+        [
+          75.89750273993775,
+          5.6902054581231
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        12.048174683502923,
+        73.37658689097414,
+        53.616391610086154,
+        34.21927451851455,
+        91.86018140753353,
+        78.94236096963179
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 26.818756344751723,
+        "p95_px": 31.797151527996313
+      },
+      "nonhip": {
+        "median_px": 13.79237771315071,
+        "p95_px": 39.16333845929826
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 23,
+        "njev": 21,
+        "optimality": 0.4653137023330629,
+        "objective": 84.92909602423413
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": false,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    }
+  },
+  "55": {
+    "baseline": {
+      "costs": {
+        "body": 158.90710153687374,
+        "direction": 0.7603557900779148,
+        "contact": 3.2378579443372537
+      },
+      "sole_min_mm": [
+        30.70718636632741,
+        35.893947715562206
+      ],
+      "ball_min_mm": [
+        41.18184060527452,
+        35.893947715562206
+      ],
+      "support_ball_abs_mm": 41.18184060527452,
+      "support_sole_min_mm": 30.70718636632741,
+      "direction_errors_deg_view_foot": [
+        [
+          1.8995454131876055,
+          3.688714110923416
+        ],
+        [
+          1.9647121381577088,
+          5.139684166275323
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        5.107112373430029e-15,
+        1.332298907934331e-14,
+        0.0,
+        1.8485772764042295e-15,
+        5.963540027744094e-16,
+        4.770832022195275e-15
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 44.41461745194697,
+        "p95_px": 64.6701022983181
+      },
+      "nonhip": {
+        "median_px": 18.18750212592449,
+        "p95_px": 66.23350865868764
+      }
+    },
+    "baseline_coco_max_difference_m": 0.0,
+    "latent_lower_chart_spectrum": {
+      "singular_values": [
+        0.45742630805741585,
+        0.3459047898734341,
+        0.23804352701312753,
+        0.129283974771375,
+        0.10996947548602884,
+        0.09808462468144931,
+        0.0880033853468793,
+        0.05756577573201142,
+        0.05361932037664268,
+        0.0432036625158872,
+        0.037575688961700916,
+        0.03478468765646436,
+        0.021384174472917624,
+        0.017856648022325727,
+        0.01685112799252706,
+        0.009578366304813762,
+        0.0088601262708003,
+        0.005256054956054887
+      ],
+      "rank_at_relative_tolerance1e_4": 18,
+      "condition_number": 87.02844850023276
+    },
+    "direction_fit_slots": 4,
+    "latent_data_only": {
+      "costs": {
+        "body": 148.11362266329562,
+        "direction": 0.05705116719906362,
+        "contact": 3.2416652945983992
+      },
+      "sole_min_mm": [
+        29.87564059696668,
+        28.15979170938798
+      ],
+      "ball_min_mm": [
+        41.22101948205614,
+        28.15979170938798
+      ],
+      "support_ball_abs_mm": 41.22101948205614,
+      "support_sole_min_mm": 29.87564059696668,
+      "direction_errors_deg_view_foot": [
+        [
+          0.5616586664088056,
+          2.3950257858593553
+        ],
+        [
+          0.4467588110017531,
+          0.2433743560677332
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        2.391572126197304,
+        1.8688508241793487,
+        3.8926636197816054,
+        2.6477798893871793,
+        1.0786736821997502,
+        3.8866637819708916
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 44.41068012848517,
+        "p95_px": 63.86938817513842
+      },
+      "nonhip": {
+        "median_px": 16.41862118028551,
+        "p95_px": 67.8671106181141
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 31,
+        "njev": 30,
+        "optimality": 1.6345816829196949,
+        "objective": 148.17067383049465
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "latent_contact": {
+      "costs": {
+        "body": 148.25360681222787,
+        "direction": 0.04126555244144359,
+        "contact": 2.635842109444231
+      },
+      "sole_min_mm": [
+        30.85340769048095,
+        23.884691932135826
+      ],
+      "ball_min_mm": [
+        34.956183780281094,
+        23.884691932135826
+      ],
+      "support_ball_abs_mm": 34.956183780281094,
+      "support_sole_min_mm": 30.85340769048095,
+      "direction_errors_deg_view_foot": [
+        [
+          0.6004174913866868,
+          0.6713599742914894
+        ],
+        [
+          0.7044493586234089,
+          1.0864257609868484
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        2.551307710134688,
+        1.4363425245920292,
+        3.996991783827391,
+        2.1617080592118745,
+        3.212046619124663,
+        5.626718809944045
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 44.436312609914054,
+        "p95_px": 64.329265760059
+      },
+      "nonhip": {
+        "median_px": 16.38856705830981,
+        "p95_px": 67.45769412311081
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 31,
+        "njev": 30,
+        "optimality": 3.000963916801865,
+        "objective": 150.93071447411353
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_data_only": {
+      "costs": {
+        "body": 129.01482671127604,
+        "direction": 0.7862912721560091,
+        "contact": 3.343578190214299
+      },
+      "sole_min_mm": [
+        38.08107415087414,
+        234.39459793605255
+      ],
+      "ball_min_mm": [
+        42.26898566857895,
+        276.4714265051136
+      ],
+      "support_ball_abs_mm": 42.26898566857895,
+      "support_sole_min_mm": 38.08107415087414,
+      "direction_errors_deg_view_foot": [
+        [
+          4.245458390567276,
+          0.5367729127806499
+        ],
+        [
+          5.5099865789227405,
+          0.12578844891205354
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        37.17867253110254,
+        45.77730107505609,
+        19.06363376446201,
+        56.22502306253618,
+        59.58530682706686,
+        177.12280087130904
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 38.13623305641758,
+        "p95_px": 53.96562580811774
+      },
+      "nonhip": {
+        "median_px": 16.030648205766852,
+        "p95_px": 48.30075299764647
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 28,
+        "njev": 25,
+        "optimality": 1.1688317591232942,
+        "objective": 129.80111798343208
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_contact": {
+      "costs": {
+        "body": 128.78289272524705,
+        "direction": 1.1171342276720004,
+        "contact": 0.01111260136298066
+      },
+      "sole_min_mm": [
+        -11.16405693040301,
+        235.1281548268742
+      ],
+      "ball_min_mm": [
+        0.8105084816358854,
+        279.5510334261271
+      ],
+      "support_ball_abs_mm": 0.8105084816358854,
+      "support_sole_min_mm": -11.16405693040301,
+      "direction_errors_deg_view_foot": [
+        [
+          4.494748348602287,
+          0.5198476514822219
+        ],
+        [
+          7.405893078809226,
+          0.08990519814929498
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        34.401693251202126,
+        47.96419706707313,
+        18.18998660904696,
+        60.727887434617394,
+        59.38446891925392,
+        176.27841235438905
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 37.735775317079906,
+        "p95_px": 53.98909697863825
+      },
+      "nonhip": {
+        "median_px": 16.084045177726722,
+        "p95_px": 48.230266268948554
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 24,
+        "njev": 22,
+        "optimality": 0.9758969646774425,
+        "objective": 129.91113955428204
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": false,
+        "direction_median_retained": true,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    }
+  },
+  "61": {
+    "baseline": {
+      "costs": {
+        "body": 223.74886805129745,
+        "direction": 0.0,
+        "contact": 2.292580641274974
+      },
+      "sole_min_mm": [
+        18.163278631520896,
+        21.168327191165236
+      ],
+      "ball_min_mm": [
+        31.37050729474855,
+        23.45711473451817
+      ],
+      "support_ball_abs_mm": 31.37050729474855,
+      "support_sole_min_mm": 18.163278631520896,
+      "direction_errors_deg_view_foot": [
+        [
+          5.850853438423286,
+          6.3527907000048005
+        ],
+        [
+          5.235917862577999,
+          2.8391971706892702
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        3.1320415331283916e-15,
+        7.991044738720528e-15,
+        1.639973507629625e-15,
+        7.975683535876244e-16,
+        5.5486184171826654e-15,
+        4.0077164444272894e-16
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 30.417561196333985,
+        "p95_px": 73.6323823636214
+      },
+      "nonhip": {
+        "median_px": 23.406545646946718,
+        "p95_px": 104.36744970532403
+      }
+    },
+    "baseline_coco_max_difference_m": 0.0,
+    "latent_lower_chart_spectrum": {
+      "singular_values": [
+        0.29287157585708357,
+        0.2083702038095421,
+        0.11583674111534112,
+        0.10900004218279942,
+        0.07793641485978164,
+        0.06079959263019795,
+        0.052292787922598304,
+        0.035998871899525046,
+        0.034514958305900414,
+        0.027591915588979728,
+        0.02577592428940151,
+        0.02215186762829982,
+        0.015129157330303088,
+        0.013294185539035224,
+        0.009515899852688975,
+        0.00827452622927392,
+        0.007905496584806257,
+        0.006062219679436412
+      ],
+      "rank_at_relative_tolerance1e_4": 18,
+      "condition_number": 48.31094736644565
+    },
+    "direction_fit_slots": 0,
+    "latent_data_only": {
+      "costs": {
+        "body": 216.38153663559626,
+        "direction": 0.0,
+        "contact": 2.331590997218514
+      },
+      "sole_min_mm": [
+        18.130640911147022,
+        16.72329440605269
+      ],
+      "ball_min_mm": [
+        31.779708262895447,
+        17.80067144752584
+      ],
+      "support_ball_abs_mm": 31.779708262895447,
+      "support_sole_min_mm": 18.130640911147022,
+      "direction_errors_deg_view_foot": [
+        [
+          5.052065220798992,
+          12.527801538296385
+        ],
+        [
+          3.5861357435708516,
+          6.042334937241742
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        2.2826445166657536,
+        2.5898385631874588,
+        3.5649536264021697,
+        3.7906125097010865,
+        1.6763053474331049,
+        3.4723964921657786
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 30.604447508905206,
+        "p95_px": 72.89825578661655
+      },
+      "nonhip": {
+        "median_px": 23.369955147289176,
+        "p95_px": 93.88443658108287
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 17,
+        "njev": 17,
+        "optimality": 2.3323332834402315,
+        "objective": 216.3815366355962
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": false,
+        "no_penetration": true,
+        "direction_median_retained": true,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "latent_contact": {
+      "costs": {
+        "body": 214.4617514146122,
+        "direction": 0.0,
+        "contact": 0.085417481849304
+      },
+      "sole_min_mm": [
+        2.274213152560045,
+        -10.478486858496394
+      ],
+      "ball_min_mm": [
+        3.0211454192354825,
+        -9.668541501494765
+      ],
+      "support_ball_abs_mm": 3.0211454192354825,
+      "support_sole_min_mm": 2.274213152560045,
+      "direction_errors_deg_view_foot": [
+        [
+          6.138290049567247,
+          4.124111621858826
+        ],
+        [
+          3.9513117849579458,
+          0.8658531257792825
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        2.738147713412792,
+        4.60358140819738,
+        4.693052036126276,
+        5.983508029956177,
+        11.892025008292265,
+        14.191342070281348
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 30.510388150430558,
+        "p95_px": 72.34410667401973
+      },
+      "nonhip": {
+        "median_px": 23.33724999997964,
+        "p95_px": 91.24681150843766
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 23,
+        "njev": 21,
+        "optimality": 1.9011242436451141,
+        "objective": 214.54716889646153
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": false,
+        "direction_median_retained": true,
+        "direction_max_retained": true,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_data_only": {
+      "costs": {
+        "body": 192.56273092525785,
+        "direction": 0.0,
+        "contact": 0.03547781045018497
+      },
+      "sole_min_mm": [
+        -10.492718683017156,
+        80.99089819226435
+      ],
+      "ball_min_mm": [
+        2.462257387915945,
+        90.35741275649079
+      ],
+      "support_ball_abs_mm": 2.462257387915945,
+      "support_sole_min_mm": -10.492718683017156,
+      "direction_errors_deg_view_foot": [
+        [
+          42.50994372494282,
+          62.12694289764816
+        ],
+        [
+          24.36531550875223,
+          95.62445279869384
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        6.840561347527997,
+        8.234378600101229,
+        23.278584471266182,
+        37.371494666011486,
+        81.1502364524315,
+        93.74270032041579
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 28.572714227811197,
+        "p95_px": 62.63959099060837
+      },
+      "nonhip": {
+        "median_px": 23.21413735917096,
+        "p95_px": 98.72423655015272
+      },
+      "solver": {
+        "success": false,
+        "message": "The maximum number of function evaluations is exceeded.",
+        "nfev": 60,
+        "njev": 58,
+        "optimality": 12.584171460337757,
+        "objective": 192.56273092525785
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": false,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    },
+    "so3_contact": {
+      "costs": {
+        "body": 189.68185057455162,
+        "direction": 0.0,
+        "contact": 0.014174840193575506
+      },
+      "sole_min_mm": [
+        -12.614643271655623,
+        78.17551758949237
+      ],
+      "ball_min_mm": [
+        0.6816099021851318,
+        87.20988847627353
+      ],
+      "support_ball_abs_mm": 0.6816099021851318,
+      "support_sole_min_mm": -12.614643271655623,
+      "direction_errors_deg_view_foot": [
+        [
+          33.801192446329644,
+          53.93150264359098
+        ],
+        [
+          18.33527470435945,
+          78.63489072532454
+        ]
+      ],
+      "local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR": [
+        29.626089140076775,
+        42.39616097093579,
+        36.50537377711272,
+        43.984042309479015,
+        77.480986347482,
+        98.23572341615555
+      ],
+      "frozen_body_max_rotation_matrix_difference": 0.0,
+      "hip": {
+        "median_px": 29.91623139700622,
+        "p95_px": 59.37165959139347
+      },
+      "nonhip": {
+        "median_px": 23.4483150140177,
+        "p95_px": 106.89819998443272
+      },
+      "solver": {
+        "success": true,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 27,
+        "njev": 27,
+        "optimality": 3.032504317817228,
+        "objective": 189.6960254147452
+      },
+      "gates": {
+        "hip_median_px": true,
+        "hip_p95_px": true,
+        "nonhip_median_px": true,
+        "nonhip_p95_px": true,
+        "support_halved": true,
+        "no_penetration": false,
+        "direction_median_retained": false,
+        "direction_max_retained": false,
+        "gradient_converged": false
+      },
+      "passed": false
+    }
+  },
+  "runtime_s": 7.299274799996056,
+  "all_frames_pass": {
+    "latent": false,
+    "so3": false
+  }
+}

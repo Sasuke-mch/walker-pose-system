@@ -1,0 +1,50 @@
+{
+  "code": "realtime_app\\tools\\probe_smplh_contact_expressibility.py",
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\probe_smplh_contact_expressibility.py"
+  ],
+  "reference": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\toe_direction_prefix\\result.npz",
+  "contact_protocol": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\soft_contact_prefix\\protocol.json",
+  "output_directory": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\contact_expressibility_complete",
+  "frames": [
+    35,
+    40,
+    47,
+    55,
+    61
+  ],
+  "lower_body_indices": [
+    0,
+    1,
+    3,
+    4,
+    6,
+    7
+  ],
+  "frozen": "root,translation,other15 body rotations,beta,hands,regressor,ground,raw pixels,gates,support labels,contact scales",
+  "factorial_controls": "lower chart latent32 vs local SO3_18; each data-only and data+contact from identical saved pose",
+  "static_objective": "same radial25px Huber/sigma8 body and eligible toe-direction; original contact residuals unchanged; no temporal or VPoser prior in EITHER chart",
+  "toe_withheld": [
+    35,
+    47,
+    61
+  ],
+  "fit_direction_only_frames": [
+    40,
+    55
+  ],
+  "solver": {
+    "method": "scipy least_squares trf",
+    "maximum_evaluations": 60,
+    "finite_difference_step": 0.001,
+    "gtol": 0.05,
+    "ftol": 0.0001,
+    "xtol": 0.0001,
+    "x_scale": "jac",
+    "bounds": "none, static mathematical diagnostic"
+  },
+  "candidate_gate": "At every selected frame contact halves support-ball gap, raw hip/nonhip median/P95 <=1.05 saved reference, sole >=-5mm, direction median<=max(3deg,baseline*1.1) and max<=baseline+2deg, gradient optimality<=.05; no claiming feasible from solver success alone.",
+  "stop": "One static factorial study, no parameter grid, no trajectory substitution. A failed or nonphysical chart is not promoted; a local success alone cannot establish temporal tracking.",
+  "limits": "Removing priors makes this a permissive geometry/solver diagnostic. SO3 knees can exploit implausible axes; all joint changes retained. Rank/one optimizer cannot prove global VPoser feasibility. Ground and contact hypotheses remain non-independent."
+}
