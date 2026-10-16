@@ -1,0 +1,55 @@
+{
+  "frames": 448,
+  "source_result": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\toe_pixels_full448\\result.npz",
+  "fresh_shared_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\visualization_20261016\\scene",
+  "raw_inputs": {
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results",
+    "initial_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\initialization_double_sigma075\\result.npz",
+    "smplh_model": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+    "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+    "vposer_dir": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05",
+    "mano_left": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+    "mano_right": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+  },
+  "tracking_rerun": false,
+  "fitting_rerun": false,
+  "old_dynamic_inputs_consumed": false,
+  "geometry_max_difference_m": {
+    "coco": 2.384185791015625e-07,
+    "native": 2.980232238769531e-07
+  },
+  "real_topology": {
+    "vertices": 6890,
+    "faces": 13776,
+    "index_entries": 41328
+  },
+  "same_task_scene_prefix": false,
+  "smoothing": false,
+  "interpolation": false,
+  "coordinate_map": "X,-Y,Z",
+  "rejection": "未通过：全片非髋残差中位数增加9.32%。",
+  "payload_bytes": 36936815,
+  "page": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\toe_pixels_full448\\view\\index.html",
+  "browser_status": "passed",
+  "fixed_center_ground_xy_m": [
+    0.0703621432185173,
+    0.11635467410087585
+  ],
+  "browser_checks": [
+    "frame47 side",
+    "frame267 side",
+    "play47 to52",
+    "range0..447"
+  ],
+  "browser_console_errors": [],
+  "browser_preview": "preview_frame47.png",
+  "frame0_source": "Body uses Sapiens2; scene black observations use PMPose on the same pair0 image. Not identical detector points.",
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\build_foot_observation_viewers.py",
+    "--export-only"
+  ]
+}

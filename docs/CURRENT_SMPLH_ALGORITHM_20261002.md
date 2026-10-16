@@ -1071,6 +1071,16 @@ r_{\mathrm{dir}}=\|d_{\mathrm{obs}}\|\left(\frac{d}{\|d\|}-\frac{d_{\mathrm{obs}
 .venv-cuda/Scripts/python.exe realtime_app/tools/probe_smplh_foot_observations.py --observation-mode direction --inspect-saved
 ```
 
+### 5.21 两个足部候选的独立简约视图（2026-10-16）
+
+用户要求分别可视化5.20的两项修正。入口分别为`foot_direction_20261016/toe_pixels_full448/view/index.html`（真实完成448帧）与`toe_direction_prefix/view/index.html`（真实完成62帧）。新增`realtime_app/tools/build_foot_observation_viewers.py`，共享既有`smplh_repair_comparison.html`和`smplh_minimal_view.js`；共享脚本仅增加由payload决定帧范围/标题/失败原因，仍兼容原简约页。当前两页均停47帧侧视，首帧原始观察髋中点作为固定取景中心，使两页取景一致；保留播放、倍率、帧/视角和折叠显示/帧信息，不增加曲线或常驻诊断面板。
+
+场景由本任务重新从同源有序448双目图与PMPose生成strict，重放当前mainline Stage/地面，保存于`foot_direction_20261016/visualization_20261016/`；读取历史命令仅复用静态配置，不读旧动态地面/助步器姿态。两页共享同一任务的新场景，方向页只读取对应前62帧。人体跟踪/拟合未重跑，网格只由各自保存的旋转/平移/beta和原冻结手姿重建，不读旧网页顶点。COCO与原生关节同保存值的最大差分别保存于两页metadata，均≤2e−6m；真实6890顶点/13776三角面/41328索引、统一同帧R/t与[X,−Y,Z]、XY地面/Z轴/0.5m刻度、实体助步器/双相机/轨迹保持。黑色17点18边仅缺失端点时断开，有限strict拒绝点仍保留橙叉；不按编号静默排除右膝。
+
+页面标题明确448/62帧，状态栏保留数值未收敛与“候选未通过”，帧信息保留原脚底/髋回投/strict/地面原因和各自失败门。方向页不填充62帧以外的数据，不平滑/插值/显示吸附。场景黑点首帧为PMPose，人体首帧Sapiens2，两者同图但不能误称同检测点；metadata说明。初次序列导出因默认GBK读UTF-8场景JSON失败，改显式UTF-8后只导出两页，已完成的场景未重跑。
+
+实际浏览器检查47同帧侧视、位置267和方向61、播放47→52/53、帧上限447/61和console无error；两页分别保存`preview_frame47.png`。入口编译/Ruff与共享JS语法通过，网页只供观察本次未通过门的工程候选，不改变正式身体选择或物理结论。调用`.venv-cuda/Scripts/python.exe realtime_app/tools/build_foot_observation_viewers.py`先新场景再导出，`--export-only`只复用本任务已完成场景；拒绝覆盖已填充的view目录，已有页直接读取。大型GZ/场景/截图留本地，仅源码/既有文档/小metadata与场景命令提交。
+
 ## 6. 研究依据与未实施改进
 
 本节研究设计仍未整体完成；已实现第4节估计器、第5节对照、5.7的Stage条件约束及5.9的迭代MAP与已知刚体运动检查。完整关节运动held-out、短窗和独立世界融合仍未实施；5.9的固定局部姿态刚体/相机clip不能替代完整研究门。保留同一SMPL-H/回归器/观测契约，先处理已定位问题，不以新网络或物理模块替代诊断。下方原步骤以5.9最新实施/停止决定为准。

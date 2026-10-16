@@ -14,7 +14,10 @@
   const median=values=>{const v=values.filter(x=>x!==null&&Number.isFinite(x)).sort((a,b)=>a-b);return v.length?(v[Math.floor((v.length-1)/2)]+v[Math.ceil((v.length-1)/2)])/2:null;};
   const number=x=>x===null||!Number.isFinite(x)?'—':x.toFixed(1);
   const gv=p=>[p[0],-p[1],p[2]];
-  let fi=61,yaw=.65,pitch=.18,zoom=.9,panX=0,panY=0,playing=false,lastTime=0;
+  let fi=Math.min(61,d.frames-1),yaw=.65,pitch=.18,zoom=.9,panX=0,panY=0,playing=false,lastTime=0;
+  for(const id of ['frame','seek'])$(id).max=d.frames-1;
+  if(d.title){document.title=d.title;document.querySelector('h1').textContent=d.title;}
+  if(d.rejection)document.querySelector('.legend').append(document.createElement('br'),document.createTextNode(d.rejection));
   const requested=new URLSearchParams(location.search).get('frame');
   if(requested!==null&&Number.isInteger(+requested)&&+requested>=0&&+requested<d.frames)fi=+requested;
   function project(p){
@@ -97,9 +100,9 @@
     const stage={stage1_walker_static_human_moving:'Stage 1 · 助步器静止',stage2_feet_static_walker_moving:'Stage 2 · 助步器移动',transition:'阶段过渡',warming_up:'准备阶段'}[d.stage[fi]]||d.stage[fi];
     const pose={held:'保持',updated:'更新',rejected:'拒绝',initialized:'初始化'}[d.pose[fi]]||d.pose[fi];
     const state=m.status[fi][0],solver={feasible_unconverged:'求解未收敛',converged:'求解收敛',not_run:'初始化'}[state]||state;
-    $('status').textContent=`${stage} · 地面${pose} · ${solver}`;
+    $('status').textContent=`${stage} · 地面${pose} · ${solver}${d.rejection?' · 候选未通过':''}`;
     const rejected=d.accepted[fi].flatMap((ok,j)=>ok?[]:[`${names[j]}：${d.rawReasons[fi][j]}`]);
-    $('quality').textContent=`修正后 · 第 ${fi} / ${d.frames-1} 帧\n${stage}\n地面变换：${d.pose[fi]}；${d.poseReason[fi]||'无拒绝原因'}\n`+
+    $('quality').textContent=`${m.label||'修正后'} · 第 ${fi} / ${d.frames-1} 帧\n${stage}\n地面变换：${d.pose[fi]}；${d.poseReason[fi]||'无拒绝原因'}\n`+
       `${solver}；${m.reason[fi][0]||'—'}\n回投中位：${number(median(m.errors[fi].flat()))} px；髋 ${number(median(m.errors[fi].flatMap(v=>v.slice(6,8))))} px\n`+
       `足底最低 L / R：${m.soleHeight[fi].map(number).join(' / ')} mm\n严格观测：${d.accepted[fi].filter(Boolean).length}/17\n${rejected.join('\n')}\n${m.landmarkDefinition[fi]}`;
   }
