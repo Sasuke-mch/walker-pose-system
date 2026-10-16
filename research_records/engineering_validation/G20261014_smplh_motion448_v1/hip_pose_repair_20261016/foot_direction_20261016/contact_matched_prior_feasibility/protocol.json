@@ -1,0 +1,75 @@
+{
+  "code": "realtime_app\\tools\\probe_smplh_contact_feasibility.py",
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\probe_smplh_contact_feasibility.py"
+  ],
+  "frames": [
+    40,
+    55,
+    61
+  ],
+  "reference": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\toe_direction_prefix\\result.npz",
+  "ground": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\view\\scene\\scene_transforms.npz",
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 0.75,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "iterated_map_configuration": {
+    "maximum_iterations": 15,
+    "gradient_tolerance": 0.05,
+    "objective_tolerance": 0.001,
+    "step_tolerance": 0.001,
+    "maximum_line_search_steps": 12,
+    "condition_accepted_iterate": true
+  },
+  "prediction": "For each frame independently restore ONLY previous saved q/v/a/P; call original _predict(actual dt). No current posterior as prior, no cross-frame candidate propagation.",
+  "controls": "Original15-step FD soft-contact MAP versus autograd soft-contact MAP from exactly the same prediction and P.",
+  "constrained": {
+    "solver": "SLSQP",
+    "maximum_iterations": 60,
+    "ftol": 1e-06,
+    "objective": "original pixel radial Huber/sigma8 + latent prior + y@y/2; NO soft-contact penalty",
+    "constraints": "108 sole heights >= -5mm; each marked support ball true minimum <=10mm; original abs(latent)<=6 domain",
+    "derivatives": "torch autograd in float64 retraction/projection with original float32 VPoser/SMPLH; same fixed prediction chart; true minimum active vertex"
+  },
+  "support": [
+    [
+      false,
+      true
+    ],
+    [
+      true,
+      false
+    ],
+    [
+      true,
+      false
+    ]
+  ],
+  "withheld_direction_frames": [
+    35,
+    47,
+    61
+  ],
+  "evaluation": "Same eligible original raw-body slots across all three; original-map and soft-contact costs reported separately. Baseline is saved direction candidate at same frame, not an independent truth.",
+  "gate": "Every frame solver certified, contact violation<=1e-6m, abs(latent)<=6, all hip/nonhip median/P95<=1.05 saved baseline, direction median<=max(3,baseline*1.1), max<=baseline+2deg; all candidates and failures retained.",
+  "stop": "One3-frame matched-prior study, no weight/budget/offset sweep. Only an all-frame constrained pass supports considering62-frame validation.",
+  "limits": "Conditional reference ground and image support hypotheses; no physical contact truth or slip constraint. SLSQP is local and its failure does not prove global infeasibility. This study produces no temporal derivative/publishable posterior."
+}
