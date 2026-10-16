@@ -23,7 +23,7 @@
   "coordinate_map": "X,-Y,Z for all scene objects",
   "smoothing": false,
   "interpolation": false,
-  "hip_definition": "Display virtual observation hips separately from native pelvis0 and native hip centers1/2; adaptation begins frame11.",
+  "hip_definition": "Green model points are virtual COCO observation landmarks; not anatomical hip centers. Native pelvis/hips remain in the saved payload but are not drawn in the minimal page.",
   "sole_points_per_foot": [
     54,
     54
@@ -213,9 +213,13 @@
     "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016",
     "--export-only"
   ],
-  "browser_status": "passed_visible_geometry_and_frame_controls",
+  "browser_status": "passed_minimal_scene_and_controls",
   "browser_url": "http://127.0.0.1:8778/research_records/engineering_validation/G20261014_smplh_motion448_v1/hip_pose_repair_20261016/view/index.html",
-  "browser_checks": [
+  "export_failures_corrected": [
+    "First export: candidate trajectory lacks segment_id;read segment_id from its same-run NPZ instead. No tracking rerun.",
+    "Second export: WindowsGBK could not read UTF8 static topology;made all JSON/text reads explicit UTF8. Scene not rerun."
+  ],
+  "comparison_page_browser_checks": [
     "frame61 same frame+view: candidate mesh/ankles90.649,87.340/sole9.335,-2.595; original mesh/ankles158.177,164.679/sole81.123,99.429",
     "native pelvis61 groundY5.732 candidate vs153.438 original;virtual observed hips displayed separately",
     "frame10 original mapping;frame11 frozen calibrated mapping;status not falsely converged",
@@ -224,14 +228,58 @@
     "frame59 left/right images and raw/model projections visibly loaded",
     "console errors:0"
   ],
-  "screenshots": [
+  "comparison_page_screenshots": [
     "preview_repair_frame61.png",
     "preview_original_frame61.png",
     "preview_lowest_sole.png",
     "preview_inputs_frame59.png"
   ],
-  "export_failures_corrected": [
-    "First export: candidate trajectory lacks segment_id;read segment_id from its same-run NPZ instead. No tracking rerun.",
-    "Second export: WindowsGBK could not read UTF8 static topology;made all JSON/text reads explicit UTF8. Scene not rerun."
+  "presentation": {
+    "mode": "minimal_candidate_only",
+    "html_template": "realtime_app/walker_tools/visualization/smplh_repair_comparison.html",
+    "script": "realtime_app/walker_tools/visualization/smplh_minimal_view.js",
+    "same_saved_payload_and_scene": true,
+    "geometry_regenerated": false,
+    "scene_replayed": false,
+    "decoded_model": "repaired",
+    "default_frame": 61,
+    "default_view": {
+      "yaw": 0.65,
+      "pitch": 0.18,
+      "zoom": 0.9
+    },
+    "removed": [
+      "comparison overlays",
+      "charts",
+      "raw image panels",
+      "keyframe shortcuts",
+      "persistent diagnostic sidebar"
+    ],
+    "retained": [
+      "real mesh",
+      "raw finite observation bones and rejection markers",
+      "model COCO points",
+      "XY ground and 0.5m axes",
+      "solid walker",
+      "both optical centers and baseline",
+      "camera YZ and accepted ankle XY trails",
+      "Stage and ground/solver status",
+      "collapsed per-frame quality"
+    ],
+    "sole_markers": "optional; off by default",
+    "contact_or_temporal_algorithm_changes": false
+  },
+  "browser_checks": [
+    "frame61 repaired mesh:6890 vertices/13776 faces/41328 index entries;16 finite observation edges,17 model points;ankles90.6489/87.3395mm",
+    "frame267 side view:18 raw edges;sole-46.4472/-72.6828mm;red below-ground markers visibly preserved",
+    "playback61->67;frame input and slider synchronized",
+    "mesh toggle changes meshVisible only;restored on",
+    "free drag changes yaw0.65->0.405,pitch0.18->0.32;frame61 and saved heights unchanged",
+    "side/front/default view selection;display and quality foldouts;held/unconverged and rejected raw points retained",
+    "final narrow640px viewport:full human,ground and walker visible;panels folded",
+    "console errors:0"
+  ],
+  "screenshots": [
+    "preview_minimal.png"
   ]
 }

@@ -166,7 +166,7 @@ def export(root,output):
     (output/'data.json.gz').write_bytes(compressed)
     templates = APP/'walker_tools/visualization'
     (output/'index.html').write_text((templates/'smplh_repair_comparison.html').read_text(encoding='utf-8'),encoding='utf-8')
-    (output/'viewer.js').write_text((templates/'free_skeleton_comparison.js').read_text(encoding='utf-8'),encoding='utf-8')
+    (output/'viewer.js').write_text((templates/'smplh_minimal_view.js').read_text(encoding='utf-8'),encoding='utf-8')
     # Only a post-export numerical comparison reads the previous reference.
     old = np.load(root.parent/'slope_motion_20261015/scene/scene_transforms.npz')
     metadata = {'frames':448,'source_original':str(source),'source_candidate':str(proposal),'new_scene':str(scene_dir),
