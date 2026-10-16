@@ -1,8 +1,8 @@
 """Current-frame iterated pixel MAP with one predicted prior and one posterior.
 
 The complete SMPL-H observation map, pixel gates and q/v/a process are inherited
-from the baseline. No contact, triangulated body data or part-specific prior is
-introduced. Iteration only solves this frame's nonlinear observation objective.
+from the baseline. Optional engineering residuals regularize the point estimate;
+they are not treated as independent information in the posterior covariance.
 """
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ class IteratedMAPConfig:
 
 
 class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
-    """Solve pixel + whole-VPoser + fixed predicted-Pqq MAP, without step caps."""
+    """Solve pixel + whole-VPoser + optional regularizer + fixed-prior MAP."""
 
     def __init__(self, model, cal, config=None, optimizer_config=None):
         super().__init__(model, cal, config)
@@ -46,10 +46,16 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
         self.optimizer_diagnostic = {"status": "not_run"}
         self.derivative_estimate_converged = True
 
+    def _engineering_residuals(self, data):
+        """Return normalized residuals (batch, terms), empty in the pixel baseline."""
+        return np.empty((len(data["coco_m"]), 0))
+
     def _update(self, pixels, valid, reasons):
         self.update_scale = 0.
         used = valid.copy()
-        self.optimizer_diagnostic = {"status": "not_run", "posterior_updates": 0}
+        self.optimizer_diagnostic = {"status": "not_run", "posterior_updates": 0,
+            "engineering_objective_initial": None, "engineering_objective_final": None,
+            "engineering_residual_count": 0, "engineering_information_update": False}
         if np.any(used, axis=0).sum() < self.config.min_observed_joints:
             reasons[used] = "insufficient_joint_support"
             self.optimizer_diagnostic["status"] = "insufficient_joint_support"
@@ -64,22 +70,37 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
         latent_precision = 1 / config.latent_prior_sigma**2
         cache = {}
 
+        def engineering_residuals(data, batch_size, count=None):
+            residual = np.asarray(self._engineering_residuals(data), dtype=float)
+            if residual.ndim != 2 or residual.shape[0] != batch_size or (count is not None and residual.shape[1] != count):
+                raise ValueError("engineering residuals must have stable shape (batch, terms)")
+            return residual
+
         def evaluate(y, jacobian=False):
             if not cache or not np.array_equal(y, cache["y"]):
                 delta = L @ y
                 pose = retract(prior, delta)
                 projected = None
+                engineering = None
                 if np.isfinite(delta).all() and abs(pose.latent).max(initial=0.) <= config.max_abs_latent:
-                    projected = self._pixels(self.model.evaluate(pose)["coco_m"])
+                    data = self.model.evaluate(pose)
+                    projected = self._pixels(data["coco_m"])
+                    engineering = engineering_residuals(data, 1)[0]
                 cache.clear()
-                cache.update(y=y.copy(), delta=delta, pose=pose, projected=projected, cost=np.inf)
-                if projected is not None:
+                cache.update(y=y.copy(), delta=delta, pose=pose, projected=projected,
+                             engineering=engineering, cost=np.inf, engineering_cost=None)
+                if engineering is not None and np.isfinite(engineering).all():
+                    energy = float(.5*(engineering@engineering))
+                    if np.isfinite(energy):
+                        cache["engineering_cost"] = energy
+                if projected is not None and cache["engineering_cost"] is not None:
                     residual = (projected[0].reshape(-1)[selected]-target).reshape(-1, 2)
                     norms = np.linalg.norm(residual, axis=1)
                     cost = np.sum(np.where(norms <= config.huber_px, .5*norms**2,
                                           config.huber_px*(norms-.5*config.huber_px))) / config.pixel_sigma_px**2
                     cache.update(residual=residual, robust=np.minimum(1., config.huber_px/np.maximum(norms, 1e-12)),
-                                 cost=float(cost+.5*y@y+.5*latent_precision*(pose.latent@pose.latent)))
+                                 cost=float(cost+.5*y@y+.5*latent_precision*(pose.latent@pose.latent)
+                                            +cache["engineering_cost"]))
             if jacobian and np.isfinite(cache["cost"]) and "J" not in cache:
                 # Perturb the fixed prediction's delta, not the repeatedly
                 # retracted current root. Thus the prior remains exactly y'y/2.
@@ -91,7 +112,14 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
                         prior.latent+offsets[:, 6:])
                 projected = self._pixels(data["coco_m"])
                 cache["J"] = None if projected is None else ((projected[:n]-projected[n:])/(2*eps)).reshape(n, -1).T[selected]
+                engineering = engineering_residuals(data, 2*n, len(cache["engineering"]))
+                cache["J_engineering"] = ((engineering[:n]-engineering[n:])/(2*eps)).T
             return cache
+
+        def valid_linearization(val):
+            return (np.isfinite(val["cost"]) and val.get("J") is not None
+                    and np.isfinite(val["J"]).all() and val.get("J_engineering") is not None
+                    and np.isfinite(val["J_engineering"]).all())
 
         def normal_equations(val):
             Jwhite = val["J"] @ L
@@ -99,24 +127,36 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
             Z = L[6:]
             gradient = Jwhite.T @ (weights*val["residual"].ravel())+val["y"]+latent_precision*Z.T @ val["pose"].latent
             hessian = (Jwhite.T*weights) @ Jwhite+np.eye(n)+latent_precision*Z.T @ Z
+            if len(val["engineering"]):
+                Jengineering = val["J_engineering"] @ L
+                gradient += Jengineering.T @ val["engineering"]
+                hessian += Jengineering.T @ Jengineering
             return gradient, hessian
 
         y = np.zeros(n)
         val = evaluate(y)
         initial_cost = val["cost"]
+        initial_engineering_cost = val["engineering_cost"]
+        engineering_count = len(val["engineering"]) if val["engineering"] is not None else 0
+        self.optimizer_diagnostic.update(engineering_objective_initial=initial_engineering_cost,
+            engineering_objective_final=initial_engineering_cost, engineering_residual_count=engineering_count)
         if not np.isfinite(initial_cost):
-            reasons[used] = "model_projection_invalid"
-            self.optimizer_diagnostic["status"] = "model_projection_invalid"
-            return False, np.zeros_like(used), "model_projection_invalid"
+            status = "engineering_residual_invalid" if val["engineering"] is not None and initial_engineering_cost is None else "model_projection_invalid"
+            reasons[used] = status
+            self.optimizer_diagnostic["status"] = status
+            return False, np.zeros_like(used), status
         initial_pixel_median = float(np.median(np.linalg.norm(val["residual"], axis=1)))
         history, converged, termination = [], False, "iteration_budget"
         damping, last_step, gradient_norm = 1e-4, np.inf, np.inf
         for iteration in range(opt.maximum_iterations):
             val = evaluate(y, True)
-            if val.get("J") is None or not np.isfinite(val["J"]).all():
+            if not valid_linearization(val):
                 termination = "jacobian_invalid"
                 break
             gradient, hessian = normal_equations(val)
+            if not np.isfinite(gradient).all() or not np.isfinite(hessian).all():
+                termination = "normal_equations_invalid"
+                break
             gradient_norm = float(np.linalg.norm(gradient, ord=np.inf))
             if gradient_norm <= opt.gradient_tolerance:
                 converged, termination = True, "scaled_gradient"
@@ -151,16 +191,18 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
             # line-search failure alone is never labelled convergence.
             if last_step <= opt.step_tolerance and decrease <= opt.objective_tolerance:
                 final = evaluate(y, True)
-                if final.get("J") is not None:
+                if valid_linearization(final):
                     gradient_norm = float(np.linalg.norm(normal_equations(final)[0], ord=np.inf))
                     if gradient_norm <= opt.gradient_tolerance:
                         converged, termination = True, "scaled_step_objective_and_gradient"
                         break
         val = evaluate(y, True)
-        valid_final_jacobian = val.get("J") is not None and np.isfinite(val["J"]).all()
+        valid_final_jacobian = valid_linearization(val)
         if valid_final_jacobian:
-            gradient_norm = float(np.linalg.norm(normal_equations(val)[0], ord=np.inf))
-            if gradient_norm <= opt.gradient_tolerance:
+            gradient, hessian = normal_equations(val)
+            valid_final_jacobian = bool(np.isfinite(gradient).all() and np.isfinite(hessian).all())
+            gradient_norm = float(np.linalg.norm(gradient, ord=np.inf))
+            if valid_final_jacobian and gradient_norm <= opt.gradient_tolerance:
                 converged, termination = True, "scaled_gradient"
         improvement = bool(np.isfinite(val["cost"]) and val["cost"] < initial_cost-opt.objective_tolerance)
         accepted = bool(valid_final_jacobian and (converged or improvement))
@@ -175,12 +217,18 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
             "pixel_error_median_initial_px": initial_pixel_median,
             "pixel_error_median_px": float(np.median(np.linalg.norm(val["residual"], axis=1))) if "residual" in val else None,
             "posterior_updates": int(condition_posterior),
+            "engineering_objective_initial": initial_engineering_cost,
+            "engineering_objective_final": val["engineering_cost"],
+            "engineering_residual_count": engineering_count,
+            "engineering_information_update": False,
             "fixed_prior_each_iteration": True,
             "covariance_approximation": ("one_final_IRLS_Gauss_Newton_posterior" if converged else
                 "one_accepted_iterate_linearized_posterior_not_converged" if condition_posterior else
                 "transported_prediction_no_information_update"),
             "history": history,
         }
+        if engineering_count:
+            self.optimizer_diagnostic["covariance_approximation"] += ";pixel_and_pose_information_only_engineering_regularizer_omitted"
         if not accepted:
             self.derivative_estimate_converged = False
             reasons[used] = "iterated_map_rejected"

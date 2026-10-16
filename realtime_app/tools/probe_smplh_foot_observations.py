@@ -128,14 +128,14 @@ class FootPixelTracker(SMPLHIteratedMotionTracker):
         return result
 
 
-def load(count):
+def load(count, model_class=FootPointMap, tracker_class=FootPixelTracker):
     proto = json.loads((REPAIR / 'hip_operator_feedback/protocol.json').read_text())
     params = json.loads((Path(proto['source_run']) / 'run_parameters.json').read_text())
     inp = params['inputs']
-    model = FootPointMap(Path(params['effective_initial_fit']),
+    model = model_class(Path(params['effective_initial_fit']),
         *[Path(inp[k]) for k in ('smplh_model', 'regressor', 'vposer_dir', 'mano_left', 'mano_right')], device='cuda')
     model.torch.set_num_threads(2)
-    tracker = FootPixelTracker(model, load_stereo_fisheye(inp['calibration_dir']),
+    tracker = tracker_class(model, load_stereo_fisheye(inp['calibration_dir']),
         SMPLHMotionConfig(**proto['configuration']), IteratedMAPConfig(**proto['iterated_map_configuration']))
     body = np.stack([_load_predictions(Path(inp[f'{s}_predictions']), s) for s in ('left', 'right')], axis=1)[:count, :, 5:17]
     body[0] = np.asarray(json.loads(Path(params['first_frame_observations']).read_text())['keypoints'])[:, 5:17]

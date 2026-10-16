@@ -1,0 +1,264 @@
+{
+  "variants": {
+    "direction_baseline": {
+      "primary35_61": {
+        "hip": {
+          "slots": 108,
+          "median_px": 32.279901170907124,
+          "p95_px": 74.13968216758953
+        },
+        "nonhip": {
+          "slots": 540,
+          "median_px": 17.54295226076553,
+          "p95_px": 70.43047597741108
+        }
+      },
+      "context11_61": {
+        "hip": {
+          "slots": 204,
+          "median_px": 35.41816366950736,
+          "p95_px": 67.89834392487316
+        },
+        "nonhip": {
+          "slots": 1020,
+          "median_px": 16.3155990488171,
+          "p95_px": 65.3049309376
+        }
+      },
+      "support_ball_abs_height_mm": {
+        "slots": 26,
+        "median": 27.72594425290137,
+        "p95": 56.567936123347764,
+        "max": 57.526784864810224
+      },
+      "sole_min35_61_mm": 0.7101315987203538,
+      "penetrating_foot_frames35_61": 0,
+      "withheld_direction_median_deg": 2.730710770407006,
+      "withheld_direction_max_deg": 6.3527907000048005,
+      "available": 62,
+      "segments": 1,
+      "primary_solver_status": {
+        "feasible_unconverged": 21,
+        "converged": 6
+      },
+      "primary_unconverged": 21,
+      "primary_max_posterior_updates": 1
+    },
+    "soft_contact": {
+      "primary35_61": {
+        "hip": {
+          "slots": 108,
+          "median_px": 31.798054616884052,
+          "p95_px": 72.79537583124534
+        },
+        "nonhip": {
+          "slots": 540,
+          "median_px": 17.575476261373034,
+          "p95_px": 71.78992715244337
+        }
+      },
+      "context11_61": {
+        "hip": {
+          "slots": 204,
+          "median_px": 35.15391544307897,
+          "p95_px": 67.61109377576254
+        },
+        "nonhip": {
+          "slots": 1020,
+          "median_px": 16.406817042207948,
+          "p95_px": 64.72481677288032
+        }
+      },
+      "support_ball_abs_height_mm": {
+        "slots": 26,
+        "median": 18.78457227021757,
+        "p95": 52.558013035579606,
+        "max": 54.83630452004318
+      },
+      "sole_min35_61_mm": 0.5454209646933439,
+      "penetrating_foot_frames35_61": 0,
+      "withheld_direction_median_deg": 2.98004924991631,
+      "withheld_direction_max_deg": 10.018253798552907,
+      "available": 62,
+      "segments": 1,
+      "primary_solver_status": {
+        "feasible_unconverged": 23,
+        "converged": 4
+      },
+      "primary_unconverged": 23,
+      "primary_max_posterior_updates": 1
+    }
+  },
+  "gates": {
+    "primary35_61_hip_median_px": true,
+    "primary35_61_hip_p95_px": true,
+    "primary35_61_nonhip_median_px": true,
+    "primary35_61_nonhip_p95_px": true,
+    "context11_61_hip_median_px": true,
+    "context11_61_hip_p95_px": true,
+    "context11_61_nonhip_median_px": true,
+    "context11_61_nonhip_p95_px": true,
+    "support_median_halved": false,
+    "support_p95_halved": false,
+    "no_missing": true,
+    "no_restarts": true,
+    "no_penetrating_foot_frames": true,
+    "sole_above_minus5mm": true,
+    "no_more_unconverged": false,
+    "direction_median_retained": true,
+    "direction_max_retained": false,
+    "inactive_prefix_unchanged": true
+  },
+  "passed": false,
+  "inactive_prefix_max_difference": 0.0,
+  "runtime_s": 36.05490789999749,
+  "decision": "Continue label validation only if all gates pass; otherwise keep direction baseline and stop this contact candidate without weight search.",
+  "limits": "Stage/ankle-anchored reference ground and assistant support hypotheses are not independent contact/3D truth. Bare-model surface target0 is an engineering convention despite slippers. Source image review is offline; no causal contact classifier is claimed.",
+  "diagnosis": {
+    "left": {
+      "frames": [
+        49,
+        61
+      ],
+      "before_median_mm": 41.18184562375959,
+      "after_median_mm": 32.82041026430738,
+      "before_range_mm": [
+        24.980986074890744,
+        57.526784864810224
+      ],
+      "after_range_mm": [
+        13.526137808174798,
+        54.83630452004318
+      ]
+    },
+    "right": {
+      "frames": [
+        35,
+        47
+      ],
+      "before_median_mm": 13.174993338412989,
+      "after_median_mm": 11.36899817629089,
+      "before_range_mm": [
+        1.5582966677656351,
+        30.32851186204788
+      ],
+      "after_range_mm": [
+        1.3983378043370687,
+        25.22425925140892
+      ]
+    },
+    "baseline": {
+      "angles_deg_by_frame_view_foot": [
+        [
+          [
+            1.4397067587133117,
+            1.2368203199235652
+          ],
+          [
+            3.5927782199841047,
+            1.1866044839942769
+          ]
+        ],
+        [
+          [
+            0.4004466877740556,
+            4.38781087183577
+          ],
+          [
+            2.622224370124741,
+            2.0873858510541456
+          ]
+        ],
+        [
+          [
+            5.850853438423286,
+            6.3527907000048005
+          ],
+          [
+            5.235917862577999,
+            2.8391971706892702
+          ]
+        ]
+      ],
+      "worst": [
+        61,
+        "left_view",
+        "right_foot"
+      ],
+      "toe_used_on_withheld": 0
+    },
+    "contact": {
+      "angles_deg_by_frame_view_foot": [
+        [
+          [
+            1.4495988470550423,
+            1.264098327194623
+          ],
+          [
+            3.580164622697309,
+            1.1689858617926494
+          ]
+        ],
+        [
+          [
+            0.6273137139481271,
+            4.557474098798197
+          ],
+          [
+            4.146378217926518,
+            2.0065784514995917
+          ]
+        ],
+        [
+          [
+            8.867938566102739,
+            6.534038962200288
+          ],
+          [
+            10.018253798552907,
+            2.379933877135311
+          ]
+        ]
+      ],
+      "worst": [
+        61,
+        "right_view",
+        "left_foot"
+      ],
+      "toe_used_on_withheld": 0,
+      "engineering_cost_before_after": [
+        [
+          35,
+          0.05567367153643715,
+          0.02407679770769238
+        ],
+        [
+          40,
+          0.8429099396211496,
+          0.43491685447101164
+        ],
+        [
+          47,
+          1.629749838308277,
+          1.713417134873089
+        ],
+        [
+          49,
+          4.551192171236117,
+          4.574065207202826
+        ],
+        [
+          55,
+          3.0543615250249583,
+          2.4310047069589578
+        ],
+        [
+          61,
+          1.0295023605393099,
+          1.2333313706683025
+        ]
+      ],
+      "finite_saved_state": true
+    }
+  }
+}

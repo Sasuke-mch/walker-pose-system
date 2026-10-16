@@ -17,6 +17,95 @@ def iterated(config=None, optimizer=None):
 
 
 class IteratedMotionTests(unittest.TestCase):
+    def test_engineering_regularizer_cannot_bypass_body_support_gate(self):
+        class RegularizedTracker(SMPLHIteratedMotionTracker):
+            def _engineering_residuals(self, data):
+                raise AssertionError("Regularization must not run without body support")
+
+        tr = RegularizedTracker(AnalyticBodyMap(), tracker().cal)
+        valid = np.zeros((2, 12), bool)
+        valid[:, :3] = True
+        accepted, used, status = tr._update(observation(tr), valid,
+            np.full((2, 12), "available", dtype=object))
+        self.assertFalse(accepted)
+        self.assertFalse(used.any())
+        self.assertEqual(status, "insufficient_joint_support")
+
+    def test_engineering_residual_changes_pose_without_adding_covariance_information(self):
+        class HeightRegularizedTracker(SMPLHIteratedMotionTracker):
+            def _engineering_residuals(self, data):
+                # Recover translation from fixed analytic vertices, independently
+                # of root rotation and the single articulated vertex.
+                fixed = np.arange(17) != 9
+                A = np.r_[self.model.base[fixed].T, np.ones((1, fixed.sum()))]
+                weights = np.linalg.lstsq(A, [0., 0., 0., 1.], rcond=None)[0]
+                translation = np.einsum("j,bjk->bk", weights, data["coco_m"][:, fixed])
+                return (translation[:, 2:3]-2.2)/.02
+
+        config = SMPLHMotionConfig(pixel_sigma_px=100.)
+        tr = HeightRegularizedTracker(AnalyticBodyMap(), tracker().cal, config)
+        prior, P = tr.pose.copy(), tr.covariance.copy()
+        pixels = observation(tr)
+        accepted, _, _ = tr._update(pixels, np.ones((2, 12), bool),
+            np.full((2, 12), "available", dtype=object))
+        self.assertTrue(accepted)
+        self.assertGreater(tr.pose.translation_m[2], 2.18)
+        diag = tr.optimizer_diagnostic
+        self.assertEqual(diag["status"], "converged")
+        self.assertEqual(diag["engineering_residual_count"], 1)
+        self.assertFalse(diag["engineering_information_update"])
+        self.assertEqual(diag["posterior_updates"], 1)
+        self.assertAlmostEqual(diag["engineering_objective_initial"], 50.)
+        self.assertLess(diag["engineering_objective_final"], .1)
+        self.assertIn("engineering_regularizer_omitted", diag["covariance_approximation"])
+        # Check the covariance against pixel + latent information at the same
+        # accepted pose. Adding the regularizer's height information would fail.
+        n, eps = tr.n, 1e-3
+        delta = np.r_[tr.pose.translation_m-prior.translation_m,
+            Rotation.from_matrix(prior.root_rotation.T @ tr.pose.root_rotation).as_rotvec(),
+            tr.pose.latent-prior.latent]
+        from pose_app.smplh_motion_tracker import retract
+        samples = [tr._pixels(tr.model.evaluate(retract(prior, delta+sign*np.eye(n)[i]*eps))["coco_m"])[0].ravel()
+            for sign in (1, -1) for i in range(n)]
+        J = (np.array(samples[:n])-np.array(samples[n:])).T/(2*eps)
+        Hprior = np.zeros((n-6, n)); Hprior[:, 6:] = np.eye(n-6)
+        Hq = np.r_[J, Hprior]
+        H = np.c_[Hq, np.zeros((len(Hq), 2*n))]
+        residual = (tr._pixels(tr.model.evaluate(tr.pose)["coco_m"])[0]-pixels[..., :2]).reshape(-1, 2)
+        weights = np.repeat(np.minimum(1., config.huber_px/np.maximum(np.linalg.norm(residual, axis=1), 1e-12)), 2)
+        variance = np.r_[config.pixel_sigma_px**2/weights, [config.latent_prior_sigma**2]]
+        K = np.linalg.solve(H @ P @ H.T+np.diag(variance), H @ P).T
+        B = np.eye(3*n)-K @ H
+        posterior = B @ P @ B.T+(K*variance) @ K.T
+        reset = np.eye(3*n); reset[3:6, 3:6] = right_jacobian(delta[3:6])
+        np.testing.assert_allclose(tr.covariance, reset @ posterior @ reset.T, atol=1e-10)
+
+    def test_nonfinite_engineering_residual_or_jacobian_rejects_update(self):
+        import json
+
+        for invalid_batch_only in (False, True):
+            class InvalidEngineeringTracker(SMPLHIteratedMotionTracker):
+                def _engineering_residuals(self, data):
+                    batch = len(data["coco_m"])
+                    return np.full((batch, 1), np.nan if not self.invalid_batch_only or batch > 1 else 0.)
+
+            tr = InvalidEngineeringTracker(AnalyticBodyMap(), tracker().cal)
+            tr.invalid_batch_only = invalid_batch_only
+            pixels = observation(tr)
+            prior, P = tr.pose.copy(), tr.covariance.copy()
+            accepted, used, _ = tr._update(pixels, np.ones((2, 12), bool),
+                np.full((2, 12), "available", dtype=object))
+            self.assertFalse(accepted)
+            self.assertFalse(used.any())
+            self.assertEqual(tr.optimizer_diagnostic["posterior_updates"], 0)
+            if invalid_batch_only:
+                self.assertEqual(tr.optimizer_diagnostic["termination"], "jacobian_invalid")
+            else:
+                self.assertEqual(tr.optimizer_diagnostic["status"], "engineering_residual_invalid")
+            json.dumps(tr.optimizer_diagnostic, allow_nan=False)
+            np.testing.assert_array_equal(P, tr.covariance)
+            np.testing.assert_array_equal(prior.translation_m, tr.pose.translation_m)
+
     def test_nonlinear_iteration_reduces_pixel_error_beyond_bounded_ekf_step(self):
         config = SMPLHMotionConfig(pixel_sigma_px=.5)
         baseline, tr = tracker(config), iterated(config)
