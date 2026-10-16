@@ -1,0 +1,19 @@
+{
+  "frame": 143,
+  "synthetic_observations": "exact current reference projection, all confidence1;actual state translated30mm worldX",
+  "ideal_reference_cost_before_px": 0.0,
+  "returned_reference_median_px": 30.557809834332353,
+  "returned_reference_max_px": 72.83136096042722,
+  "reference_root_shift_mm": [
+    -26.177764180696464,
+    0.47606629294093605,
+    0.09523931714128242
+  ],
+  "reported_proxy": {
+    "status": "bounded_pixel_feedback",
+    "used": 22,
+    "proxy_cost_before": 12379.586026928697,
+    "proxy_cost_after": 46.98447868756632
+  },
+  "interpretation": "Counterexample: line search scores correction at actual state but publishes correction at another reference; not an executable improvement"
+}

@@ -17,6 +17,29 @@ from .contract import BASE_ROTATION, NAMES, SMPL_INDICES
 BODY_PARENTS = [-1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 12, 13, 14, 16, 17, 18, 19]
 
 
+def reference_pd_action(action, reference_rotation, parents, scale, weight):
+    """Move PD targets toward current reference local rotations on SO(3).
+
+    This changes actuator commands only. It neither overwrites simulation state
+    nor reinterprets a frozen absolute-action checkpoint as a residual policy.
+    Weight 1 is a non-neural reference PD baseline; 0 is exactly original PHC.
+    """
+    if (np.shape(action) != (69,) or np.shape(reference_rotation) != (24, 3, 3)
+            or np.shape(scale) != (69,) or len(parents) != 24
+            or not 0 <= weight <= 1
+            or not all(np.isfinite(x).all() for x in (action, reference_rotation, scale))
+            or np.any(np.asarray(scale) <= 0)):
+        raise ValueError('finite PHC action, reference rotations, positive scale and weight in [0,1] required')
+    if weight == 0:
+        return action.copy()
+    local = np.stack([reference_rotation[parents[j]].T @ reference_rotation[j]
+                      for j in range(1, 24)])
+    policy_target = Rotation.from_rotvec((np.clip(action, -1, 1)*scale).reshape(23, 3))
+    difference = policy_target.inv()*Rotation.from_matrix(local)
+    target = policy_target*Rotation.from_rotvec(weight*difference.as_rotvec())
+    return np.clip(target.as_rotvec().ravel()/scale, -1, 1)
+
+
 def retarget(time_s, root_position, root_rotation, body_rotation, hand_rotation,
              available, segment, xml):
     time_s = np.asarray(time_s)

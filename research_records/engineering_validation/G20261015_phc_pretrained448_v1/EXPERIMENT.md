@@ -191,3 +191,35 @@ $env:PYTHONPATH='realtime_app'
 复现：先按原reference命令加--match-shape，输出corrections_v1/reference_matched.npz及同名XML；native使用该reference、该XML和--wrist-support即为所保留配置。其他对照在相同native入口分别追加--control-hz 30、--moving-support-damping、--pixel-feedback（复验加--pixel-feedback-gain .25）或--stage-heel-anchor（精确皮肤加--exact-heel-surface，reference须由当前prepare导出heel数据）。各实验summary.json保留实际输入路径、flags和参数；selection.json列出选中配置、所有分母和拒绝原因。analyze加--runs指定已有run及--output隔离目录，不覆盖原比较。新可视化corrections_view使用--candidate corrections_v1/matched_body --candidate corrections_v1/stage_heel_v2，当前任务重新strict/Stage重放，只有新R/t/Stage/时间与参考条件场景逐项一致才导出；网格不平滑、不插值、不吸附，失败保留。浏览器已实际重新载入核对：修正骨架143/447帧可切换、方法链接保持同帧、脚跟未通过方案143帧显示10.5/10.1mm未达双10mm；当前全片曲线链接指向comparison_all，左右同源原图与投影实际加载。实际浏览器截图corrections_view/matched_frame143.jpg，metadata记录检查范围。初次本地服务连接失败，重启仅127.0.0.1的8772服务后访问通过。
 
 阶段决定：保留一个实际改善的几何修正和必要诊断工具，失败分支仅显式可复现对照，不作为推荐系统的模块栈。原输入23.24px仍明显优于修正PHC的60.55px，故PHC仍不替换人体估计器；可靠二维物理闭环、全115帧10mm双heel、碰撞表面/惯量统一及独立held-out验证均未完成，不用增加网络或训练步数掩盖这些缺口。
+
+
+## 2026-10-16 继续改进：参考旋转对照失败，二维反馈基点错误已修复
+
+本轮目标：借鉴已有控制研究，定位可复现的缺口，而非叠加网络/脚跟/阻尼模块。固定旧448输入、匹配XML、权重、beta、时间、首帧及原腕外力；先只改PD目标，两个预定权重0.5/1，不网格搜索。protocol在orientation_pd_20261016/protocol.json，运行前门为：448有限、0跌倒、回投median与P95均较matched_body降低至少5%、全10752槽25px比例不降、heel最大位移不增且10mm达标帧不少于8。此门未通过，不能事后改门把次要收益称整体成功。
+
+研究核对：SimPoE（CVPR2021，https://openaccess.thecvf.com/content/CVPR2021/html/Yuan_SimPoE_Simulated_Character_Control_for_3D_Human_Pose_Estimation_CVPR_2021_paper.html）将图像运动学修正和动力学控制联合学习，不是把独立像素优化结果接到冻结控制器就自然成立。PHC官方humanoid_im.py的_action_to_pd_targets提供ref_dof_pos+scale*action残差模式（https://github.com/ZhengyiLuo/PHC/blob/master/phc/env/tasks/humanoid_im.py），但当前权重是绝对目标动作，不能直接改成残差含义冒称复现。PhysHMR（https://arxiv.org/abs/2510.02566，官方https://github.com/fengq1a0/physhmr）把像素提升为空间射线，结合教师蒸馏和RL训练；官方输入还含GVHMR特征，并非现有双鱼眼即插即用。Mimic2DM（https://jiann-li.github.io/mimic2dm/，代码https://github.com/jiann-li/mimic2dm_release）直接以重投影训练并聚合多视图；公开示例为运球/四足及旧IsaacGym栈，未验证本项目人体、视角和助步器。这里只借鉴并核实机制，未宣称复现上述完整方法或完成新策略训练。
+
+旋转对照：上一轮PHC实际关节PD指令相对参考局部旋转差median20.93/P9567.06deg，但该差不等于错误，可能承担平衡补偿。reference_pd_action在SO(3)上将PD指令朝当前参考移动，weight0保持原动作、1为纯参考PD（策略调用0）、0.5保留一半策略目标。只写电机目标，真实p/r仍由PhysX积分，无输出姿态混合/插值/重置。实际单测核对0/1端点、中点旋转距离及共同世界旋转不变性。
+
+| 配置 | 有限/448 | raw回投median/P95 px | 全10752槽≤25px | 跌倒判据帧 | 决定 |
+|---|---:|---:|---:|---:|---|
+| 输入SMPL-H，无重力仿真 | 448 | 23.24 / 84.28 | 53.19% | 不适用 | 图像一致性对照 |
+| 匹配骨架PHC | 448 | 60.55 / 159.30 | 13.76% | 0 | 推荐保持 |
+| 纯参考旋转PD | 448 | 592.91 / 1613.83 | 1.15% | 348 | 拒绝 |
+| 一半PHC/一半参考旋转目标 | 448 | 67.20 / 190.06 | 11.08% | 0 | 拒绝 |
+| 旧有不同基点二维反馈 | 448 | 68.43 / 191.07 | 11.28% | 0 | 含已确认实现错误，仅历史对照 |
+| 修复基点后的二维反馈 | 448 | 61.26 / 161.62 | 12.52% | 0 | 修复正确性，但不默认启用 |
+
+纯PD回投有限10424/10752，一半目标10750/10752；缺失/不可投影槽在完整比例中保留为失败，有限分布不冒称全槽。纯PD平均参考位置误差728.80mm、最低pelvis0.105m，腕力饱和1740侧子步；一半目标为87.95mm，原匹配版71.72mm。两版本停止，不再靠PD权重压姿态或增加外力。
+
+**本轮确认并修复了上一轮自己实现的二维反馈错误。** 旧correct先在当前仿真姿态处线性化和回溯，却把所得增量施加到原始参考姿态；内部显示的下降并不对应返回给控制器的那个目标。143帧反例将观测设为参考精确投影，再令仿真整体X偏30mm：旧代理cost12379.59→46.98，却把原本0px的参考改为median30.56/max72.83px，根另移−26.18mm。原test回归实际失败（最大坐标差28.61mm）后再修；before反例/失败日志均保留。旧两反馈版本不能用来证明正确二维反馈机制必然无效。
+
+修补仅统一计算基点：在当前源参考处线性化、同一基点回溯并直接返回该FK，correct(i)不再接收另一仿真姿态，避免混用；没有新增模块、重置状态或修改像素/评估点。合成回归核对：精确参考不被挪动，有偏移观测时返回姿态的实际代理cost必须与记录cost_after相等且下降；真实143帧精确观测反例修后median约1.31e-5px/max5.56e-5px，仅浮点/FK微差，最大身体坐标差6.38e-8m。
+
+随后固定原gain1单独完整448验证，输出pixel_same_base_v2；447个当前帧代理步骤下降，但这仍不保证低层跟踪后像素更好。较旧错误反馈，median68.43→61.26/P95191.07→161.62；较保留版60.55/159.30仍恶化1.16%/1.46%，25px比例也降低，未过预定门。真实heel max578.43→247.32mm（匹配版423.22mm），双heel≤10mm由8/115变12/115，仍103失败；参考均误差74.21mm，原匹配71.72。CPU每步median14.77/P9518.70ms，原匹配6.24/7.79ms；不把不同批次时延当严格性能认证。部分最大误差/脚滑代理改善保留，但不能用它们替代整体门或10mm完整要求。该分支保持显式开关、默认关闭；修复代码保留，原最优配置不变。
+
+运行与复现：复用既有WSL Ubuntu-22.04 walker-phc Python3.8/torch1.13.1 CPU和原PhysX，无新增模型/依赖。native用corrections_v1/reference_matched.npz/XML及--wrist-support，两个旋转对照分别加--reference-pd-weight 1或.5，输出pd_reference/pd_half。修复反馈用corrections_v1/reference_feedback.npz、reference_matched.xml、--wrist-support --pixel-feedback，输出pixel_same_base_v2。初次误传不存在的reference_feedback.xml，在frame0前加载失败，pixel_same_base目录和日志保留；只纠正XML路径后重试，不是另一次算法调参。reference/policy/physics原始结果未改，分析使用analyze --output隔离：analysis保留旋转对照；analysis_feedback保留旧/修后反馈及匹配版，同完整原图10752槽。所有参数/来源/门在protocol，数值与选择在selection.json，完整NPZ/日志本地保留。
+
+验证：原9项及新增旋转目标和同基点回归共11项通过，Ruff E9/F及编译通过。analysis_feedback/comparison.png实际检查，图上所有曲线为原采样值、缺失保留，无平滑/后吸附；没有新三维页面或替换旧最好结果页面。当前任务没有独立3D/接触/泛化真值，所有改善或退化仅限同检测器/同场景条件下的工程证据。
+
+阶段决定：本轮完成一个被反例证明的实现修复，未获得新的整体姿态精度提升；保留匹配骨架PHC，二维反馈/旋转伺服默认关闭，正式人体主线不变。停止“冻结PHC后再补一个伺服”的局部扩展。后续研究应以Mimic2DM/PhysHMR的直接图像条件与联合训练为机制参考，先落实适合现有双鱼眼的观测/动作/训练数据和独立评价，再训练单一控制策略；该学习路线尚未实现，不能把本轮解析GN修补算作新RL网络或论文级创新。

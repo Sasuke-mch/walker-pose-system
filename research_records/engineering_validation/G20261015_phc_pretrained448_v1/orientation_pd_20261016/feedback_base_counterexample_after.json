@@ -1,0 +1,12 @@
+{
+  "frame": 143,
+  "reference_median_px_after": 1.307897531243114e-05,
+  "reference_max_px_after": 5.563403910935331e-05,
+  "max_body_displacement_m": 6.378955663688402e-08,
+  "reported_proxy": {
+    "status": "bounded_pixel_feedback",
+    "used": 22,
+    "proxy_cost_before": 1.62904545151681e-07,
+    "proxy_cost_after": 3.5492128340001056e-09
+  }
+}

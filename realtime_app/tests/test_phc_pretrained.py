@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'realtime_app'))
 from learning_phc.physics import PHCBody
 from learning_phc.policy import FrozenPHC, observation_v7, recovery_reference
-from learning_phc.reference import retarget, matched_body_xml, PixelReferenceFeedback
+from learning_phc.reference import retarget, matched_body_xml, PixelReferenceFeedback, reference_pd_action
 
 
 def author_function(path, name, namespace):
@@ -27,6 +27,26 @@ def author_function(path, name, namespace):
 
 
 class PHCPretrainedTests(unittest.TestCase):
+    def test_reference_pd_targets_change_commands_without_global_frame_dependence(self):
+        parents=[-1]+[0]*23
+        reference=Rotation.random(24,random_state=15).as_matrix()
+        action=np.linspace(-.1,.1,69)
+        scale=np.full(69,np.pi)
+        original_action,original_reference=action.copy(),reference.copy()
+        np.testing.assert_array_equal(reference_pd_action(action,reference,parents,scale,0),action)
+        full=reference_pd_action(action,reference,parents,scale,1)
+        expected=reference[0].T@reference[1:]
+        np.testing.assert_allclose(Rotation.from_rotvec((full*scale).reshape(23,3)).as_matrix(),expected,atol=2e-14)
+        half=reference_pd_action(action,reference,parents,scale,.5)
+        command=Rotation.from_rotvec((action*scale).reshape(23,3))
+        half_command=Rotation.from_rotvec((half*scale).reshape(23,3))
+        goal=Rotation.from_matrix(expected)
+        np.testing.assert_allclose((half_command.inv()*goal).magnitude(),.5*(command.inv()*goal).magnitude(),atol=2e-14)
+        common=Rotation.from_euler('xyz',[.3,-.6,.9]).as_matrix()
+        np.testing.assert_allclose(reference_pd_action(action,common@reference,parents,scale,.5),half,atol=2e-14)
+        np.testing.assert_array_equal(action,original_action)
+        np.testing.assert_array_equal(reference,original_reference)
+
     @classmethod
     def setUpClass(cls):
         cls.phc = ROOT / 'third_party/PHC'

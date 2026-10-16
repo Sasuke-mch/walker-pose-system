@@ -1,0 +1,101 @@
+{
+  "images": [
+    {
+      "frame": 0,
+      "side": "left",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\left_ccw90\\pair_0000.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    },
+    {
+      "frame": 0,
+      "side": "right",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\right_cw90\\pair_0000.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    },
+    {
+      "frame": 35,
+      "side": "left",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\left_ccw90\\pair_0035.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    },
+    {
+      "frame": 35,
+      "side": "right",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\right_cw90\\pair_0035.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    },
+    {
+      "frame": 47,
+      "side": "left",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\left_ccw90\\pair_0047.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    },
+    {
+      "frame": 47,
+      "side": "right",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\right_cw90\\pair_0047.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    },
+    {
+      "frame": 61,
+      "side": "left",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\left_ccw90\\pair_0061.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    },
+    {
+      "frame": 61,
+      "side": "right",
+      "upright_image": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs\\right_cw90\\pair_0061.png",
+      "crop_xywh": [
+        0,
+        1350,
+        1080,
+        570
+      ],
+      "output_scale": 0.6
+    }
+  ],
+  "purpose": "Visibility review before adding foot landmarks. Original colors; no model overlays or inferred hidden heel points. Not contact or3D truth."
+}

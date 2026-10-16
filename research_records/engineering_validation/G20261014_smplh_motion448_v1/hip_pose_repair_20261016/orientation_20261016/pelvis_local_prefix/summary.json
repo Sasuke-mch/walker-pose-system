@@ -1,0 +1,103 @@
+{
+  "runtime_s": 36.59086799999932,
+  "reference": {
+    "available": 62,
+    "segments": 1,
+    "optimizer_statuses": {
+      "feasible_unconverged": 47,
+      "converged": 14
+    },
+    "primary": {
+      "hip": {
+        "finite_slots": 108,
+        "median_px": 29.947685323859112,
+        "p95_px": 68.9502868200111
+      },
+      "nonhip": {
+        "finite_slots": 540,
+        "median_px": 20.113733188698312,
+        "p95_px": 83.50724208520438
+      }
+    },
+    "heldout": {
+      "hip": {
+        "finite_slots": 204,
+        "median_px": 36.08920400160619,
+        "p95_px": 67.79584097288145
+      },
+      "nonhip": {
+        "finite_slots": 1020,
+        "median_px": 17.282118226852706,
+        "p95_px": 66.26340329121507
+      }
+    },
+    "mean_ankle_rise35_61_mm": -5.535767525955249,
+    "sole_min35_61_mm": -11.048567872444238,
+    "penetrating_foot_frames35_61": 2,
+    "direction_range35_61_deg_pelvis_left_right": [
+      20.280059287667825,
+      24.53826976255916,
+      27.613530329483936
+    ]
+  },
+  "candidate": {
+    "available": 62,
+    "segments": 1,
+    "optimizer_statuses": {
+      "feasible_unconverged": 48,
+      "converged": 13
+    },
+    "primary": {
+      "hip": {
+        "finite_slots": 108,
+        "median_px": 41.26214845208432,
+        "p95_px": 84.38807214400684
+      },
+      "nonhip": {
+        "finite_slots": 540,
+        "median_px": 18.951308259977957,
+        "p95_px": 69.58777020343749
+      }
+    },
+    "heldout": {
+      "hip": {
+        "finite_slots": 204,
+        "median_px": 43.33649071825889,
+        "p95_px": 74.01638225073783
+      },
+      "nonhip": {
+        "finite_slots": 1020,
+        "median_px": 16.455990582121785,
+        "p95_px": 58.55634699125198
+      }
+    },
+    "mean_ankle_rise35_61_mm": 36.59054610046519,
+    "sole_min35_61_mm": -9.110182480063788,
+    "penetrating_foot_frames35_61": 3,
+    "direction_range35_61_deg_pelvis_left_right": [
+      21.095611638120232,
+      32.821348863010456,
+      29.591096110347337
+    ]
+  },
+  "gates": {
+    "primary_hip_median_px": false,
+    "primary_hip_p95_px": false,
+    "primary_nonhip_median_px": true,
+    "primary_nonhip_p95_px": true,
+    "heldout_hip_median_px": false,
+    "heldout_hip_p95_px": false,
+    "heldout_nonhip_median_px": true,
+    "heldout_nonhip_p95_px": true,
+    "all62_available": true,
+    "no_new_segments": true,
+    "no_more_unconverged": false,
+    "ankle_rise_below30mm": false,
+    "sole_min_within5mm": true,
+    "no_more_penetrating_foot_frames": false
+  },
+  "numeric_prefix_passed": false,
+  "orientation_accuracy_validated": false,
+  "decision": "Proceed to unused image direction evidence only if numeric prefix passes; otherwise reject this mapping and stop its expansion.",
+  "pre_switch_coco_max_difference_m": 0.0
+}

@@ -1,0 +1,72 @@
+{
+  "question": "Does explicit reference local orientation in the existing PD target improve frozen keypoint PHC transfer?",
+  "sources": [
+    "https://openaccess.thecvf.com/content/CVPR2021/html/Yuan_SimPoE_Simulated_Character_Control_for_3D_Human_Pose_Estimation_CVPR_2021_paper.html",
+    "https://github.com/ZhengyiLuo/PHC/blob/master/phc/env/tasks/humanoid_im.py",
+    "https://arxiv.org/abs/2510.02566",
+    "https://github.com/fengq1a0/physhmr",
+    "https://jiann-li.github.io/mimic2dm/",
+    "https://github.com/jiann-li/mimic2dm_release"
+  ],
+  "source_scope": "mechanism inspiration only; not paper reproduction, residual-policy checkpoint conversion or new RL training",
+  "reference": "corrections_v1/reference_matched.npz",
+  "xml": "corrections_v1/reference_matched.xml",
+  "comparison": "corrections_v1/matched_body",
+  "unique_variable": "PD target reference-rotation weight on SO3:0,.5,1",
+  "variants": [
+    {
+      "run": "pd_reference",
+      "weight": 1,
+      "scope": "non-neural PD baseline, bypass PHC"
+    },
+    {
+      "run": "pd_half",
+      "weight": 0.5,
+      "scope": "frozen PHC target with reference orientation servo"
+    }
+  ],
+  "control": "unchanged initial state, actual host dt, weights, source SMPLH, shape, scene, wrist K900 D45 cap300N, no reset after0",
+  "observations": "same 12 limb joints x2 cameras x448; all10752 slots retained",
+  "gates": {
+    "finite_frames": 448,
+    "fallen_frames": 0,
+    "median_px_max": 57.526625342604994,
+    "p95_px_max": 151.33717659477998,
+    "fraction25_min": 0.1376488095,
+    "heel_max_mm_max": 423.2197701931,
+    "heel10mm_pass_min": 8
+  },
+  "stopping": "Only these two planned weights; reject if gates fail. No added force, gain grid, state overwrite, smoothing, new pixel feedback or heel attractor.",
+  "interpretation": "same-detector consistency under assumed wrist support; no independent3D or physical accuracy",
+  "baseline_command_reference_rotation_difference_deg": {
+    "median": 20.93218,
+    "p95": 67.06315,
+    "scope": "PD setpoint difference, not proof of an error; balance can require offsets"
+  },
+  "second_stage": {
+    "trigger": "Reproduced reference feedback base mismatch, not hyperparameter failure",
+    "counterexample": "feedback_base_counterexample_before.json; exact-reference observations were moved to30.56px median error while unrelated state proxy cost decreased",
+    "unique_variable": "linearize, backtrack and return around the same source reference; remove simulation-state arguments",
+    "run": "pixel_same_base_v2",
+    "reference": "corrections_v1/reference_feedback.npz",
+    "weight": 1,
+    "comparison": "corrections_v1/pixel_feedback; same reference, xml, flags and gain; only base consistency changed",
+    "overall_gate": "same gates as first stage against matched_body; one gain1 full448, no extra gain search",
+    "note": "Reference refinement inspired by SimPoE; no learned refinement, metaPD, policy training or full-paper claim",
+    "xml": "corrections_v1/reference_matched.xml",
+    "failed_launch": "pixel_same_base used nonexistent reference_feedback.xml and failed before frame0; output/log retained; retry changed only path"
+  },
+  "implementation_files": [
+    "realtime_app/learning_phc/reference.py",
+    "realtime_app/learning_phc/native.py",
+    "realtime_app/tests/test_phc_pretrained.py"
+  ],
+  "runtime": "existing WSL Ubuntu-22.04 walker-phc Py3.8 / torch1.13.1 CPU / original PhysX; unchanged packages and checkpoints",
+  "checks": "11 tests passed including prior9, reference PD SO3 endpoints/global invariance and reproduced same-base bug; Ruff E9/F and compileall passed",
+  "research_distinction": {
+    "SimPoE": "learned refinement and dynamics control jointly trained; cannot claim analytic GN patch reproduces it",
+    "PHC": "official residual-action mode differs from present absolute-action checkpoint; never flip its meaning without retraining",
+    "PhysHMR": "pixel-as-ray inputs with teacher distillation and RL; existing official inference expects GVHMR features; not a drop-in fisheye detector",
+    "Mimic2DM": "direct reprojection objective, multi-view aggregation; released examples dribble/quadruped and old IsaacGym stack; full walker adaptation not validated"
+  }
+}

@@ -19,7 +19,7 @@ import torch
 
 from .contract import NAMES, COLLISION_FILTERS
 from .policy import FrozenPHC, observation_v7, recovery_reference
-from .reference import PixelReferenceFeedback, SMPLHHeelSurface
+from .reference import PixelReferenceFeedback, SMPLHHeelSurface, reference_pd_action
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -249,9 +249,15 @@ def replay_reference(args, policy):
                         wrist_velocity = ((wrist_target-last_wrist_target)/dt
                                           if wrist_target is not None and args.moving_support_damping else None)
                         if args.control_hz is None:
-                            observation = observation_v7(p, r, v, w, target, target_velocity)
-                            action, _ = policy.act(observation)
-                            control_calls += 1
+                            if args.reference_pd_weight == 1:
+                                action = np.zeros(69)
+                            else:
+                                observation = observation_v7(p, r, v, w, target, target_velocity)
+                                action, _ = policy.act(observation)
+                                control_calls += 1
+                            if args.reference_pd_weight:
+                                action = reference_pd_action(action, reference['reference_rotation'][i],
+                                    body.parents, body.scale, args.reference_pd_weight)
                             body.advance(action, dt, wrist_target, wrist_velocity)
                             support_force[i], saturation[i] = body.max_support_force, body.support_saturation_substeps
                         else:
@@ -336,6 +342,8 @@ def replay_reference(args, policy):
             pixel_feedback_gain=args.pixel_feedback_gain,
             stage_heel_anchor=args.stage_heel_anchor,
             exact_heel_surface=args.exact_heel_surface,
+            reference_pd_weight=args.reference_pd_weight,
+            action_semantics='SO3 PD target toward reference;weight1 non-neural baseline' if args.reference_pd_weight else 'original frozen PHC absolute action',
             properties=body.properties)
         (args.output/'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
         print(json.dumps({k:v for k,v in summary.items() if k != 'properties'}), flush=True)
@@ -356,6 +364,8 @@ def main():
     parser.add_argument('--pixel-feedback-gain',type=float,choices=[1.,.25],default=1.)
     parser.add_argument('--stage-heel-anchor',action='store_true',help='Stage2 fixed rigid heel proxy attractor; validate decoded skin separately')
     parser.add_argument('--exact-heel-surface',action='store_true',help='update attractor offsets from exact frozen-shape SMPL-H skin vertices')
+    parser.add_argument('--reference-pd-weight', type=float, choices=[0., .5, 1.], default=0.,
+                        help='isolated reference-rotation PD target contrast;1 bypasses policy,0 original PHC')
     parser.add_argument('--primitive', type=Path, default=ROOT / 'models/phc/phc_kp_2.pth')
     parser.add_argument('--composer', type=Path, default=ROOT / 'models/phc/phc_comp_kp_2.pth')
     parser.add_argument('--xml', type=Path, default=ROOT / 'third_party/PHC/phc/data/assets/mjcf/smpl_0_humanoid.xml')
@@ -364,6 +374,9 @@ def main():
         parser.error('pixel feedback and fixed-cadence diagnostic must be tested separately')
     if args.exact_heel_surface and not args.stage_heel_anchor:
         parser.error('exact heel surface requires Stage2 anchor experiment')
+    if args.reference_pd_weight and (args.control_hz or args.pixel_feedback or args.stage_heel_anchor
+                                    or args.moving_support_damping or args.reference is None):
+        parser.error('reference PD contrast requires a reference and excludes other experimental controls')
     args.output.mkdir(parents=True, exist_ok=False)
     torch.set_num_threads(1)
     policy = FrozenPHC(args.primitive, args.composer)

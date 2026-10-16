@@ -1,0 +1,183 @@
+{
+  "status": "bounded stage completed; no candidate passed overall improvement gate",
+  "selected_run": "corrections_v1/matched_body",
+  "formal_mainline_changed": false,
+  "weights_trained": false,
+  "accepted_code_fix": "Reference GN linearization, line search and returned FK share identical reference base; exact-reference and returned-cost regression passes",
+  "not_adopted": [
+    "pure reference PD",
+    "half reference PD",
+    "fixed-base pixel feedback as default"
+  ],
+  "fixed_feedback_proxy_updates": 447,
+  "primary_decision": "Keep best matched-body PHC configuration. Correctness fix retained independently of full-output efficacy. Do not stack controls or reclassify secondary improvements as overall pass.",
+  "next_research": "Direct image-ray/reprojection-conditioned policy training with a frozen PHC teacher is a different planned learning route, not implemented or validated in this stage.",
+  "rows": [
+    {
+      "run": "source_smplh",
+      "raw_reprojection_px": {
+        "count": 10752,
+        "median": 23.242583725620904,
+        "mean": 31.976489908296145,
+        "p95": 84.27530101456807,
+        "max": 224.77432303778238
+      },
+      "full10752_fraction25": 0.5319010416666666
+    },
+    {
+      "run": "corrections_v1/matched_body",
+      "raw_reprojection_px": {
+        "count": 10752,
+        "median": 60.55434246590386,
+        "mean": 70.97734036014477,
+        "p95": 159.30229115241445,
+        "max": 367.5946278367957
+      },
+      "full10752_fraction25": 0.13764880952380953,
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_finite_frames": 0,
+      "joint_error_mean_m": 0.07172088948546554,
+      "step_median_ms": 6.238370000005489,
+      "step_p95_ms": 7.7871675000011455,
+      "support_saturated_side_substeps": 3,
+      "heel_mm": {
+        "count": 230,
+        "median": 107.93589428067207,
+        "mean": 112.51424662363918,
+        "p95": 266.0777866840362,
+        "max": 423.2197701931
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 8,
+        "failed_frames": 107
+      },
+      "passes_predeclared_overall_gate": false
+    },
+    {
+      "run": "orientation_pd_20261016/pd_reference",
+      "raw_reprojection_px": {
+        "count": 10424,
+        "median": 592.9097806528832,
+        "mean": 705.7146012416059,
+        "p95": 1613.8283985698915,
+        "max": 1848.2622354149119
+      },
+      "full10752_fraction25": 0.011532738095238096,
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_finite_frames": 348,
+      "joint_error_mean_m": 0.7287973474360078,
+      "step_median_ms": 1.55011000000016,
+      "step_p95_ms": 2.1344549999998463,
+      "support_saturated_side_substeps": 1740,
+      "heel_mm": {
+        "count": 230,
+        "median": 11.920427903532982,
+        "mean": 17.830617306753993,
+        "p95": 47.48912509530782,
+        "max": 178.830087184906
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 43,
+        "failed_frames": 72
+      },
+      "passes_predeclared_overall_gate": false
+    },
+    {
+      "run": "orientation_pd_20261016/pd_half",
+      "raw_reprojection_px": {
+        "count": 10750,
+        "median": 67.19615658362306,
+        "mean": 81.96160325160595,
+        "p95": 190.0581487592806,
+        "max": 424.5545252063731
+      },
+      "full10752_fraction25": 0.11077008928571429,
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_finite_frames": 0,
+      "joint_error_mean_m": 0.08795339925306564,
+      "step_median_ms": 8.072249999997894,
+      "step_p95_ms": 13.31052910000139,
+      "support_saturated_side_substeps": 0,
+      "heel_mm": {
+        "count": 230,
+        "median": 53.88267897069454,
+        "mean": 90.97523539549793,
+        "p95": 295.3388050198555,
+        "max": 406.77785873413086
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 12,
+        "failed_frames": 103
+      },
+      "passes_predeclared_overall_gate": false
+    },
+    {
+      "run": "corrections_v1/pixel_feedback",
+      "raw_reprojection_px": {
+        "count": 10752,
+        "median": 68.43031859045834,
+        "mean": 82.60590175956993,
+        "p95": 191.07137922018035,
+        "max": 488.741034475201
+      },
+      "full10752_fraction25": 0.11281622023809523,
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_finite_frames": 0,
+      "joint_error_mean_m": 0.08554885654947941,
+      "step_median_ms": 15.51260500002627,
+      "step_p95_ms": 23.280407000032703,
+      "support_saturated_side_substeps": 5,
+      "heel_mm": {
+        "count": 230,
+        "median": 134.7196027636528,
+        "mean": 156.7992090829648,
+        "p95": 456.7155182361603,
+        "max": 578.4313082695007
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 8,
+        "failed_frames": 107
+      },
+      "passes_predeclared_overall_gate": false
+    },
+    {
+      "run": "orientation_pd_20261016/pixel_same_base_v2",
+      "raw_reprojection_px": {
+        "count": 10752,
+        "median": 61.25534996936175,
+        "mean": 71.71470915655289,
+        "p95": 161.62315158095356,
+        "max": 312.0078126225928
+      },
+      "full10752_fraction25": 0.12518601190476192,
+      "frames": 448,
+      "finite_frames": 448,
+      "fallen_finite_frames": 0,
+      "joint_error_mean_m": 0.0742108484639929,
+      "step_median_ms": 14.772528999998258,
+      "step_p95_ms": 18.69528429999292,
+      "support_saturated_side_substeps": 0,
+      "heel_mm": {
+        "count": 230,
+        "median": 98.30716252326965,
+        "mean": 101.62846086162102,
+        "p95": 224.27825778722763,
+        "max": 247.31725454330444
+      },
+      "heel10mm": {
+        "total_frames": 115,
+        "passed_frames": 12,
+        "failed_frames": 103
+      },
+      "passes_predeclared_overall_gate": false
+    }
+  ]
+}

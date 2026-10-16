@@ -1,0 +1,136 @@
+{
+  "source_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "reference": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\hip_operator_feedback",
+  "inputs": {
+    "left_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\left\\pmpose\\raw_predictions.json",
+    "right_predictions": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\c3_predictions\\right\\pmpose\\raw_predictions.json",
+    "input_pairs": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\V20260908_people0_1_2_pmpose_c3_chain\\people_1\\input_448pairs",
+    "calibration_dir": "D:\\my_works\\walker_pose_system\\realtime_app\\calibration\\results",
+    "initial_fit": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\initialization_double_sigma075\\result.npz",
+    "smplh_model": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\SMPLH_male.pkl",
+    "regressor": "D:\\my_works\\walker_pose_system\\models\\smpl\\J_regressor_coco.npy",
+    "vposer_dir": "D:\\my_works\\walker_pose_system\\models\\VPoser02_05\\V02_05",
+    "mano_left": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_LEFT.pkl",
+    "mano_right": "D:\\my_works\\walker_pose_system\\third_party\\WiLoR\\mano_data\\models\\MANO_RIGHT.pkl"
+  },
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\probe_smplh_orientation.py",
+    "--replay"
+  ],
+  "code": "realtime_app/tools/probe_smplh_orientation.py",
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 0.75,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "iterated_map_configuration": {
+    "maximum_iterations": 15,
+    "gradient_tolerance": 0.05,
+    "objective_tolerance": 0.001,
+    "step_tolerance": 0.001,
+    "maximum_line_search_steps": 12,
+    "condition_accepted_iterate": true
+  },
+  "single_change": "From frame11 replace only COCO hips by J0 + Rroot * fixed pelvis-local offsets. Two shared coefficients calibrated once on the same saved pre-adaptation poses1..10; fixed local basis is their mean original hip/width/thigh geometry.",
+  "unchanged": "beta, initial pose, native skeleton, hand pose, all other COCO points, raw pixels,dt,gates,15-iteration budget,P/q/v/a process and VPoser prior; no contact/smoothing/rotation penalty",
+  "diagnosis": "Saved poses35,47,61; root ground yaw and local hip swing/twist, ankle twist +/-10deg; compare dynamic map and rigid hip map matched at the central pose to isolate observation derivatives. Static probes are not adopted trajectories.",
+  "prefix_gate": {
+    "frames": [
+      0,
+      61
+    ],
+    "primary": [
+      35,
+      61
+    ],
+    "hip_and_nonhip_median_p95_max_ratio": 1.05,
+    "mean_ankle_rise_max_mm": 30,
+    "sole_min_degradation_max_mm": 5,
+    "no_more_penetrating_foot_frames_below_minus5mm": true,
+    "no_new_missing_or_restarts": true,
+    "unconverged_count_must_not_increase": true
+  },
+  "orientation_acceptance": "A smaller orientation range alone NEVER passes. Direction accuracy requires unused image foot/hip direction evidence; passing numeric prefix gate only permits that next stage, not promotion.",
+  "stop": "One calibration, one optional prefix; no parameter search, no448 until pixel/height/solver gates and independent direction review pass.",
+  "limits": "Same-source engineering experiment. Frozen beta used original whole sequence; calibration holdout is not independent subject/shape/3D truth. Saved operational ground is evaluation-only, not tracker input.",
+  "hip_calibration": {
+    "weights": [
+      0.36084842343424767,
+      0.10996582984689837
+    ],
+    "offsets_pelvis_m": [
+      [
+        0.12027841627025218,
+        -0.1296976905998199,
+        0.010280968433872599
+      ],
+      [
+        -0.11781291237462008,
+        -0.12841450790803371,
+        0.0101534499165257
+      ]
+    ],
+    "base_pelvis_m": [
+      [
+        0.06638455070947813,
+        -0.09218631003218294,
+        -0.001374891692107574
+      ],
+      [
+        -0.06584947221927635,
+        -0.09075855619306379,
+        -0.0017463265131984075
+      ]
+    ],
+    "width_basis_m": [
+      [
+        0.13223402292875447,
+        -0.001427753839119145,
+        0.00037143482109083456
+      ],
+      [
+        -0.13223402292875447,
+        0.001427753839119145,
+        -0.00037143482109083456
+      ]
+    ],
+    "thigh_basis_m": [
+      [
+        0.05617587637146426,
+        -0.3364333984224654,
+        0.10477644257695692
+      ],
+      [
+        -0.038621101327998696,
+        -0.3471183229373401,
+        0.10943224923667264
+      ]
+    ],
+    "nfev": 6,
+    "cost": 929.9569217064857,
+    "optimality": 0.0016934364785600828,
+    "success": true,
+    "at_bounds": false,
+    "calibration_frames": [
+      1,
+      10
+    ],
+    "used_hip_slots": 40
+  }
+}
