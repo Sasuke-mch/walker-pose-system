@@ -240,7 +240,7 @@ def replay_reference(args, policy):
                                 heel_active=True
                         target, target_velocity = reference['reference_position_m'][i], reference['reference_velocity_m_s'][i]
                         if feedback is not None:
-                            target,_,feedback_info=feedback.correct(i,p,r)
+                            target,_,feedback_info=feedback.correct(i)
                         if not args.disable_far_recovery:
                             target, target_velocity = recovery_reference(p, v, target, target_velocity)
                         wrist_target = (wrist_camera @ reference['camera_rotation'][i].T +

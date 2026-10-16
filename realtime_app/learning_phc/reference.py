@@ -196,6 +196,8 @@ class PixelReferenceFeedback:
     """One bounded raw-pixel GN step on the controller reference, never on state.
 
     Uses source current-frame COCO-to-body offsets as a local approximation.
+    Linearization, line search and returned target share the source reference
+    base. A correction around simulated state cannot be applied to another base.
     Final evaluation still decodes the real SMPL-H, independently of this proxy.
     """
     def __init__(self,reference,xml,gain=1.):
@@ -228,11 +230,13 @@ class PixelReferenceFeedback:
             r.append(r[a]@q[j])
         return torch.stack(p),torch.stack(r)
 
-    def correct(self,i,position,rotation):
+    def correct(self,i):
         torch=self.torch
         ref=self.reference
         from pose_app.fisheye_camera import fisheye_project_torch
         mapping=ref['feedback_coco_body']
+        position=ref['reference_position_m'][i]
+        rotation=ref['reference_rotation'][i]
         local=np.array([rotation[0]]+[rotation[self.parents[j]].T@rotation[j] for j in range(1,24)])
         root=torch.tensor(position[0],dtype=torch.float64)
         local=torch.tensor(local,dtype=torch.float64)
@@ -275,9 +279,7 @@ class PixelReferenceFeedback:
                 delta=trial;accepted=True;break
         if not accepted:
             return ref['reference_position_m'][i],ref['reference_rotation'][i],dict(status='no_pixel_descent',used=int(valid.sum()))
-        target_rotation=ref['reference_rotation'][i]
-        target_local=np.array([target_rotation[0]]+[target_rotation[self.parents[j]].T@target_rotation[j] for j in range(1,24)])
-        p,r=self.fk(torch.tensor(delta,dtype=torch.float64),torch.tensor(ref['reference_position_m'][i,0],dtype=torch.float64),torch.tensor(target_local,dtype=torch.float64))
+        p,r=self.fk(torch.tensor(delta,dtype=torch.float64),root,local)
         return p.detach().numpy(),r.detach().numpy(),dict(status='bounded_pixel_feedback',used=int(valid.sum()),proxy_cost_before=before,proxy_cost_after=after)
 
 

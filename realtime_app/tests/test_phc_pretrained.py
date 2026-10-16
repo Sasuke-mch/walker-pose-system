@@ -199,6 +199,43 @@ class PHCPretrainedTests(unittest.TestCase):
             self.assertAlmostEqual(float(torch.linalg.norm(p[j]-p[feedback.parents[j]]).detach()),
                 float(torch.linalg.norm(moved[j]-moved[feedback.parents[j]])),places=12)
 
+    def test_pixel_feedback_scores_the_reference_it_returns(self):
+        from learning_phc.contract import NAMES
+        from pose_app.fisheye_camera import fisheye_project_numpy
+        xml=self.phc/'phc/data/assets/mjcf/smpl_0_humanoid.xml'
+        ref=dict(camera_rotation=np.eye(3)[None],camera_translation_m=np.zeros((1,3)),
+            K0=np.array([[500.,0,960.],[0,500.,540.],[0,0,1.]]),D0=np.zeros(4),
+            K1=np.array([[500.,0,960.],[0,500.,540.],[0,0,1.]]),D1=np.zeros(4),
+            R01=np.eye(3),T01_m=np.array([-.1,0,0]),
+            feedback_coco_body=np.array([NAMES.index(n) for n in ('L_Shoulder','R_Shoulder',
+                'L_Elbow','R_Elbow','L_Wrist','R_Wrist','L_Hip','R_Hip','L_Knee','R_Knee','L_Ankle','R_Ankle')]),
+            feedback_coco_local_m=np.zeros((1,12,3)))
+        feedback=PixelReferenceFeedback(ref,xml)
+        p,r=feedback.fk(torch.zeros(75,dtype=torch.float64),torch.tensor([0.,0.,3.],dtype=torch.float64),
+                        torch.eye(3,dtype=torch.float64).expand(24,3,3))
+        p,r=p.numpy(),r.numpy()
+        ref.update(reference_position_m=p[None],reference_rotation=r[None])
+        def project(position,rotation):
+            points=position[ref['feedback_coco_body']]
+            return np.stack([fisheye_project_numpy(points,ref['K0'],ref['D0']),
+                fisheye_project_numpy(points+ref['T01_m'],ref['K1'],ref['D1'])])
+        pixels=project(p,r)
+        ref['feedback_pixels']=np.concatenate([pixels,np.ones((2,12,1))],axis=-1)[None]
+        # Exact reference observations must not move an already correct target.
+        # Simulation state is deliberately absent from this reference-only API.
+        corrected,rotation,_=feedback.correct(0)
+        np.testing.assert_allclose(corrected,p,atol=1e-10,rtol=0)
+        # With a displaced observed target, accepted proxy cost must equal the
+        # cost of the returned reference, rather than that of another base pose.
+        ref['feedback_pixels'][0,:,:,:2]=project(p+np.array([.02,0,0]),r)
+        corrected,rotation,info=feedback.correct(0)
+        self.assertEqual(info['status'],'bounded_pixel_feedback')
+        valid=np.ones((2,12),bool);valid[:,9]=False
+        error=np.linalg.norm(project(corrected,rotation)-ref['feedback_pixels'][0,:,:,:2],axis=-1)[valid]
+        cost=float(np.sum(np.where(error<=25,.5*error**2,25*(error-12.5))))
+        self.assertAlmostEqual(cost,info['proxy_cost_after'],places=8)
+        self.assertLess(cost,info['proxy_cost_before'])
+
 
 if __name__ == '__main__':
     unittest.main()
