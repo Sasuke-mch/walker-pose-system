@@ -103,7 +103,57 @@ def reconstruct(run: Path, output: Path, device: str) -> None:
     print(f"All448 saved/model point agreement: max {center_error:.3g} m", flush=True)
 
 
-def draw(run: Path, output: Path) -> None:
+def draw_joints(output, time, values, valid, segments, available) -> None:
+    """One image per non-head COCO joint, retaining the saved derivative masks."""
+    names = ("左肩", "右肩", "左肘", "右肘", "左腕", "右腕",
+             "左髋", "右髋", "左膝", "右膝", "左踝", "右踝")
+    destination = output / "关节曲线"
+    destination.mkdir(exist_ok=True)
+    breaks = np.flatnonzero(np.diff(segments) != 0) + 1
+    for joint, name in enumerate(names):
+        fig, axes = plt.subplots(2, 1, figsize=(10, 6.4), sharex=True)
+        fig.subplots_adjust(left=.10, right=.97, bottom=.21, top=.79, hspace=.48)
+        fig.text(.10, .945, name, fontsize=22, va="top")
+        fig.text(.10, .865, f"速度与加速度  ·  {len(time)} 帧 / {time[-1]:.2f} s",
+                 fontsize=10, color="#737373")
+        for ax, magnitudes, label, unit in zip(
+            axes, values, ("速度幅值", "加速度幅值"), ("m/s", "m/s²")
+        ):
+            y = magnitudes[:, joint].copy()
+            y[~available] = np.nan
+            plot_time, plot_y = time.copy(), y.copy()
+            for frame in breaks[::-1]:
+                plot_time = np.insert(plot_time, frame, np.nan)
+                plot_y = np.insert(plot_y, frame, np.nan)
+            ax.plot(plot_time, plot_y, color="#292929", lw=1.25, solid_capstyle="round")
+            accepted = valid[:, joint] & available & np.isfinite(y)
+            ax.scatter(time[accepted], y[accepted], s=9, color="#292929", linewidths=0, zorder=3)
+            ax.set_title(label, loc="left", fontsize=10.5, pad=8)
+            ax.set_ylabel(unit, fontsize=10, labelpad=10)
+            ax.set_xlim(time[0], time[-1])
+            ax.set_ylim(bottom=0)
+            ax.margins(y=.10)
+            ax.yaxis.set_major_locator(MaxNLocator(4, min_n_ticks=3))
+            ax.xaxis.set_major_locator(MaxNLocator(5))
+            ax.grid(axis="y", color="#ECECEC", lw=.6)
+            ax.set_axisbelow(True)
+            ax.tick_params(axis="both", length=3, width=.6)
+            ax.spines[["top", "right"]].set_visible(False)
+        axes[-1].set_xlabel("时间 / s", fontsize=10, labelpad=9)
+        count = int(valid[:, joint].sum())
+        fig.text(.10, .115, f"原始帧连续折线，无平滑；小圆点：通过导数有效性门（{count}/{len(time)} 帧）。",
+                 fontsize=8.5, color="#737373")
+        note = "当前左相机系的模型状态导数，含未收敛帧。"
+        if joint in (6, 7):
+            note += "髋为映射观察点。"
+        fig.text(.10, .07, note, fontsize=8.5, color="#737373")
+        path = destination / f"{name}.png"
+        fig.savefig(path, dpi=240)
+        plt.close(fig)
+        print(f"Saved {path}", flush=True)
+
+
+def draw(run: Path, output: Path, per_joint: bool = False) -> None:
     font = Path("C:/Windows/Fonts/msyh.ttc")
     if font.exists():
         font_manager.fontManager.addfont(str(font))
@@ -126,6 +176,9 @@ def draw(run: Path, output: Path) -> None:
         valid = data["derivative_valid"]
         segments, available = data["segment_id"], data["pose_available"]
         converged = int(data["optimizer_converged"].sum())
+    if per_joint:
+        draw_joints(output, time, values, valid, segments, available)
+        return
     colors = ("#202020", "#979797")
     styles = ("-", (0, (4, 2.4)))
     fig, axes = plt.subplots(3, 2, figsize=(11.8, 8.8), sharex=True)
@@ -192,12 +245,13 @@ def main() -> None:
     parser.add_argument("--run", type=Path, default=DEFAULT_RUN)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--render-only", action="store_true", help="Restyle the existing derived data")
+    parser.add_argument("--per-joint", action="store_true", help="One PNG per non-head body joint")
     args = parser.parse_args()
     run = args.run.resolve()
     output = run / "motion_curves"
     if not args.render_only:
         reconstruct(run, output, args.device)
-    draw(run, output)
+    draw(run, output, per_joint=args.per_joint)
 
 
 if __name__ == "__main__":
