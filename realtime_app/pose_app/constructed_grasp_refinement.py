@@ -208,7 +208,7 @@ def foot_terms(vertices_ground, sole_indices, weights, support, frame_ok,
         contact.append((surface.foot_surface_loss(pts[..., 2]) * w).sum()
                        / w.sum().clamp_min(1e-6))
         penetration.append(masked_mean(
-            surface.nonpenetration_loss(pts[..., 2], margin_m=nonpenetration_margin_m), frame_ok))
+            surface.nonpenetration_loss(pts[..., 2]-surface.SHOE_HEIGHT_M, margin_m=nonpenetration_margin_m), frame_ok))
         active = (support[:-1, s] & support[1:, s]
                   & frame_ok[:-1] & frame_ok[1:])
         mask = active[:, None].expand(-1, len(indices))
@@ -238,7 +238,7 @@ def frozen_surface_states(vertices_ground, sole_indices, frame_ok, dt_s=1 / 30):
             finite = bool(np.isfinite(pts[t]).all())
             valid = bool(t > 0 and frame_ok[t] and frame_ok[t - 1] and finite)
             velocity = (pts[t] - pts[t - 1]) / dt_s if t else np.zeros_like(pts[t])
-            min_z = float(pts[t, :, 2].min()) if finite else float("nan")
+            min_z = float(pts[t, :, 2].min()-surface.SHOE_HEIGHT_M) if finite else float("nan")
             continuous = bool(valid and np.linalg.norm(pts[t].mean(0) - pts[t - 1].mean(0)) <= .060)
             decision = machine.update(ContactObservation(
                 t * dt_s, abs(min_z), float(abs(velocity[:, 2].mean())),

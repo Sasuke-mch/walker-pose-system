@@ -17,6 +17,7 @@ from scipy.spatial.transform import Rotation
 
 APP = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(APP), str(APP / 'tools')]
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 from probe_smplh_foot_observations import (
     HELDOUT,
     TOE_VERTICES,
@@ -140,7 +141,7 @@ class StaticProblem:
         errors = np.linalg.norm(data['body_pixels'][0]-self.body[..., :2], axis=-1)
         report = {'costs': {key: float(.5*np.sum(value**2)) for key, value in parts.items()},
             'sole_min_mm': sole, 'ball_min_mm': ball,
-            'support_ball_abs_mm': float(np.max(abs(np.array(ball)[self.support]))),
+            'support_ball_abs_mm': float(np.max(abs(np.array(ball)[self.support]-SHOE_HEIGHT_M*1000))),
             'support_sole_min_mm': float(np.max(np.array(sole)[self.support])),
             'direction_errors_deg_view_foot': direction_error(data['toe_pixels'], self.toes[..., :2]).tolist(),
             'local_change_deg_hipL_hipR_kneeL_kneeR_ankleL_ankleR': angles.tolist(),
@@ -222,7 +223,7 @@ def run():
                 base_direction = np.array(base['direction_errors_deg_view_foot'])
                 gates = {f'{part}_{stat}': values[part][stat] <= 1.05*base[part][stat] for part in ['hip', 'nonhip'] for stat in ['median_px', 'p95_px']}
                 gates.update(support_halved=values['support_ball_abs_mm'] <= .5*base['support_ball_abs_mm'],
-                    no_penetration=min(values['sole_min_mm']) >= -5., direction_median_retained=float(np.median(direction)) <= max(3., float(np.median(base_direction))*1.1),
+                    no_penetration=min(values['sole_min_mm']) >= (SHOE_HEIGHT_M-.005)*1000, direction_median_retained=float(np.median(direction)) <= max(3., float(np.median(base_direction))*1.1),
                     direction_max_retained=float(direction.max()) <= float(base_direction.max())+2., gradient_converged=bool(fit.optimality <= .05))
                 values.update(solver={'success': bool(fit.success), 'message': fit.message, 'nfev': fit.nfev,
                     'njev': fit.njev, 'optimality': float(fit.optimality), 'objective': float(fit.cost)}, gates=gates,

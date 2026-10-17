@@ -63,6 +63,13 @@ class SurfaceContactTests(unittest.TestCase):
         self.assertTrue(np.isfinite(float(loss.detach())))
         self.assertTrue(np.isfinite(sole.grad.detach().numpy()).all())
 
+    def test_foot_loss_uses_shoe_height_without_moving_physical_floor(self):
+        at_shoe = torch.full((1, 4), .025, dtype=torch.float64)
+        self.assertAlmostEqual(float(sc.foot_surface_loss(at_shoe)), 0.)
+        self.assertGreater(float(sc.foot_surface_loss(torch.zeros_like(at_shoe))), 0.)
+        vertices = torch.zeros(1, 4, 3, dtype=torch.float64)
+        np.testing.assert_array_equal(sc.signed_ground_distances(vertices).numpy(), 0.)
+
     def test_hand_loss_differentiable(self):
         p = torch.tensor([[[0.0, 0.0, 0.03]]], requires_grad=True)
         a = torch.zeros(1, 1, 3)

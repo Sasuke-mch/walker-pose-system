@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 
 from pose_app.smplh_ground_constraints import (
     HEEL_VERTEX_IDS, foot_geometry, ground_inequalities, load_sole_vertex_indices,
@@ -16,35 +17,38 @@ class GroundConstraintTests(unittest.TestCase):
         self.soles = ([10, 11, 12], [20, 21, 22])
         self.vertices = np.zeros((6890, 3))
         self.vertices[list(HEEL_VERTEX_IDS), 2] = [.035, .045]
+        self.vertices[:, 2] += SHOE_HEIGHT_M
 
     def test_heel_is_actual_surface_and_not_projected_to_sole(self):
         geometry = foot_geometry(self.vertices, self.soles)
-        np.testing.assert_array_equal(geometry["heel_m"][:, 2], [.035, .045])
-        np.testing.assert_array_equal(geometry["heel_height_above_sole_m"], [.035, .045])
-        np.testing.assert_array_equal(geometry["sole_min_m"], [0., 0.])
+        np.testing.assert_allclose(geometry["heel_m"][:, 2], np.array([.035, .045])+SHOE_HEIGHT_M)
+        np.testing.assert_allclose(geometry["heel_height_above_sole_m"], [.035, .045])
+        np.testing.assert_array_equal(geometry["sole_min_m"], [SHOE_HEIGHT_M, SHOE_HEIGHT_M])
 
     def test_original_surface_loss_matches_closed_form(self):
         self.vertices[self.soles[0], 2] = [-.004, .002, .012]
+        self.vertices[self.soles[0], 2] += SHOE_HEIGHT_M
         geometry = foot_geometry(self.vertices, self.soles)
         z = self.vertices[self.soles[0], 2]
         soft = -.005 * np.log(np.exp(-z / .005).mean())
-        expected = .010**2 * (np.sqrt(1. + (soft / .010)**2) - 1.)
-        expected += np.maximum(-z, 0.).dot(np.maximum(-z, 0.)) / len(z)
+        expected = .010**2 * (np.sqrt(1. + ((soft-SHOE_HEIGHT_M) / .010)**2) - 1.)
+        clearance = z-SHOE_HEIGHT_M
+        expected += np.maximum(-clearance, 0.).dot(np.maximum(-clearance, 0.)) / len(z)
         self.assertAlmostEqual(geometry["sole_softmin_m"][0], soft)
         self.assertAlmostEqual(geometry["sole_surface_loss_m2"][0], expected)
         self.assertAlmostEqual(geometry["sole_penetration_m"][0], .004)
 
     def test_batch_stable_softminimum_and_left_right_order(self):
         v = np.stack([self.vertices, self.vertices.copy()])
-        v[1, self.soles[0], 2] = 10.
-        v[1, self.soles[1], 2] = -10.
+        v[1, self.soles[0], 2] = SHOE_HEIGHT_M+10.
+        v[1, self.soles[1], 2] = SHOE_HEIGHT_M-10.
         geometry = foot_geometry(v, self.soles)
-        np.testing.assert_allclose(geometry["sole_softmin_m"], [[0., 0.], [10., -10.]])
+        np.testing.assert_allclose(geometry["sole_softmin_m"], np.array([[0., 0.], [10., -10.]])+SHOE_HEIGHT_M)
         self.assertTrue(np.isfinite(geometry["sole_surface_loss_m2"]).all())
 
     def test_stage1_permits_swing_but_rejects_penetration(self):
-        self.vertices[self.soles[0], 2] = .15
-        self.vertices[self.soles[1], 2] = -.006
+        self.vertices[self.soles[0], 2] = SHOE_HEIGHT_M+.15
+        self.vertices[self.soles[1], 2] = SHOE_HEIGHT_M-.006
         geometry = foot_geometry(self.vertices, self.soles)
         values = ground_inequalities(geometry, stage2=False)
         self.assertEqual(values.shape, (2,))
@@ -52,7 +56,7 @@ class GroundConstraintTests(unittest.TestCase):
         self.assertLess(values[1], 0.)
 
     def test_stage2_rejects_floating_sole_even_when_heels_do_not_move(self):
-        self.vertices[self.soles[0], 2] = .006
+        self.vertices[self.soles[0], 2] = SHOE_HEIGHT_M+.006
         geometry = foot_geometry(self.vertices, self.soles)
         values = ground_inequalities(geometry, stage2=True, heel_anchors_m=geometry["heel_m"])
         self.assertLess(values[2], 0.)

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import math
 from typing import Any
+from .foot_ground_reference import SHOE_HEIGHT_M
 
 
 def _torch() -> Any:
@@ -68,12 +69,13 @@ def centered_softmin(values: "Any", temperature: float) -> "Any":
 def foot_surface_loss(sole_z: "Any", temperature: float = 0.005,
                       delta: float = 0.010,
                       penetration_weight: float = 1.0) -> "Any":
-    """Sole loss without forcing every surface vertex to z=0.
+    """Sole loss relative to the 25 mm footwear reference.
 
     ``sole_z`` is z_G of one foot surface set, shape [B,K]. Uses the
     log(K)-centered soft minimum and a relu penetration penalty.
     """
     torch = _torch()
+    sole_z = sole_z - SHOE_HEIGHT_M
     foot_base = robust_scalar(centered_softmin(sole_z, temperature), delta)
     foot_penetration = torch.relu(-sole_z).square().mean(dim=-1)
     return foot_base + penetration_weight * foot_penetration

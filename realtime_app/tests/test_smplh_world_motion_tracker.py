@@ -8,6 +8,7 @@ from scipy.optimize import minimize as scipy_minimize
 from scipy.spatial.transform import Rotation
 
 from pose_app.smplh_motion_tracker import MotionPose, SMPLHMotionConfig
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 from pose_app.smplh_world_motion_tracker import SMPLHWorldMotionTracker, _minimize_scaled_pose
 from tests.test_smplh_motion_tracker import AnalyticBodyMap, tracker
 
@@ -34,9 +35,13 @@ class SurfaceBodyMap(AnalyticBodyMap):
 
 def world_tracker(contact=False, rotation=None):
     model = SurfaceBodyMap()
-    return SMPLHWorldMotionTracker(model, tracker().cal, SMPLHMotionConfig(pixel_sigma_px=.2),
+    result = SMPLHWorldMotionTracker(model, tracker().cal, SMPLHMotionConfig(pixel_sigma_px=.2),
         np.eye(3) if rotation is None else rotation, [0, 0, -1.96],
         [np.arange(54), np.arange(54, 108)], constrain_ground=contact)
+    if contact:
+        result.pose.translation_m[2] += SHOE_HEIGHT_M
+    result.last_accepted_pose = result.pose.copy()
+    return result
 
 
 def observe(tr, pose=None):
@@ -116,8 +121,8 @@ class WorldMotionTests(unittest.TestCase):
     def test_current_support_can_switch_feet_without_extra_upper_bound(self):
         tr = world_tracker(contact=True)
         vertices = tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0].copy()
-        vertices[tr.sole_indices[0], 2] = .025
-        vertices[tr.sole_indices[1], 2] = .003
+        vertices[tr.sole_indices[0], 2] = SHOE_HEIGHT_M+.025
+        vertices[tr.sole_indices[1], 2] = SHOE_HEIGHT_M+.003
         # The old solver froze this predicted point as the support point.
         tr.support_vertices = [(0, 0)]
         geometry = tr._geometry(vertices)
@@ -129,8 +134,8 @@ class WorldMotionTests(unittest.TestCase):
         tr.stage2 = True
         vertices = tr.model.evaluate(tr.pose, mesh=True)["vertices_m"][0].copy()
         for indices in tr.sole_indices:
-            vertices[indices, 2] = .020
-            vertices[indices[-1], 2] = .003
+            vertices[indices, 2] = SHOE_HEIGHT_M+.020
+            vertices[indices[-1], 2] = SHOE_HEIGHT_M+.003
         tr.support_vertices = [(0, 0), (1, 0)]
         geometry = tr._geometry(vertices)
         self.assertGreater(tr._conditions(geometry).min(), 0.)
@@ -143,7 +148,7 @@ class WorldMotionTests(unittest.TestCase):
         target = tr.pose.copy()
         target.root_rotation = Rotation.from_rotvec([0., .12, 0.]).as_matrix()
         geometry = tr._geometry(tr.model.evaluate(target, mesh=True)["vertices_m"][0])
-        target.translation_m[2] += .002-geometry["sole_min_m"].min()
+        target.translation_m[2] += SHOE_HEIGHT_M+.002-geometry["sole_min_m"].min()
         px = observe(tr, target)
         initial_error = np.linalg.norm(tr._pixels(tr.model.evaluate(tr.pose)["coco_m"])[0]-px[..., :2], axis=-1).mean()
         priors = []
@@ -160,7 +165,7 @@ class WorldMotionTests(unittest.TestCase):
         self.assertEqual(out["ground_constraint"]["feasibility_solver_calls"], 0)
         self.assertEqual(len(priors), 2)
         np.testing.assert_array_equal(priors[0], priors[1])
-        sole_min = np.array(out["ground_constraint"]["sole_min_m"])
+        sole_min = np.array(out["ground_constraint"]["sole_min_m"])-SHOE_HEIGHT_M
         self.assertEqual(out["ground_constraint"]["selected_support_side"], 1)
         self.assertGreater(sole_min[0], .0055)
         self.assertLess(abs(sole_min[1]), .005)
@@ -173,10 +178,10 @@ class WorldMotionTests(unittest.TestCase):
         target = tr.pose.copy()
         target.root_rotation = Rotation.from_rotvec([0., .12, 0.]).as_matrix()
         geometry = tr._geometry(tr.model.evaluate(target, mesh=True)["vertices_m"][0])
-        target.translation_m[2] += .003-geometry["sole_min_m"].min()
+        target.translation_m[2] += SHOE_HEIGHT_M+.003-geometry["sole_min_m"].min()
         geometry = tr._geometry(tr.model.evaluate(target, mesh=True)["vertices_m"][0])
-        self.assertGreater(geometry["sole_min_m"][0], .005)
-        self.assertLess(geometry["sole_min_m"][1], .005)
+        self.assertGreater(geometry["sole_min_m"][0]-SHOE_HEIGHT_M, .005)
+        self.assertLess(geometry["sole_min_m"][1]-SHOE_HEIGHT_M, .005)
         delta = np.r_[target.translation_m-tr.pose.translation_m,
                       Rotation.from_matrix(tr.pose.root_rotation.T @ target.root_rotation).as_rotvec(),
                       target.latent-tr.pose.latent]
@@ -274,7 +279,7 @@ class WorldMotionTests(unittest.TestCase):
         self.assertTrue(out["ground_constraint"]["constraint_satisfied"])
         self.assertEqual(out["ground_constraint"]["map_solver_calls"], 1)
         self.assertEqual(out["ground_constraint"]["support_extra_solver_calls"], 0)
-        self.assertLessEqual(max(abs(np.array(out["ground_constraint"]["sole_min_m"]))), .0052)
+        self.assertLessEqual(max(abs(np.array(out["ground_constraint"]["sole_min_m"])-SHOE_HEIGHT_M)), .0052)
         anchor = tr.sole_anchors.copy()
         tr.set_scene_frame(np.eye(3), [0, 0, -1.96], "transition", "held")
         self.assertIsNotNone(tr.sole_anchors)

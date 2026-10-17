@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 
 import numpy as np
+from .foot_ground_reference import SHOE_HEIGHT_M
 
 
 HEEL_VERTEX_IDS = (3387, 6787)
@@ -45,8 +46,8 @@ def foot_geometry(vertices_ground_m: np.ndarray, sole_indices) -> dict[str, np.n
 
     Input is [...,6890,3], all in metres. The original surface objective uses
     centered softmin (temperature 5 mm), pseudo-Huber (delta 10 mm), and mean
-    squared negative vertex heights with weight 1. Its zero is not a certificate
-    that the exact minimum vertex height is zero.
+    squared negative clearance relative to the 25 mm footwear reference. Raw
+    height outputs remain ground Z; clearance and penalties subtract shoe height.
     """
     vertices = np.asarray(vertices_ground_m, dtype=float)
     if vertices.shape[-2:] != (6890, 3) or not np.isfinite(vertices).all():
@@ -62,10 +63,11 @@ def foot_geometry(vertices_ground_m: np.ndarray, sole_indices) -> dict[str, np.n
         centered = lowest - temperature * np.log(
             np.exp(-(z - lowest[..., None]) / temperature).mean(axis=-1)
         )
-        robust = delta * delta * (np.hypot(1., centered / delta) - 1.)
+        clearance = z - SHOE_HEIGHT_M
+        robust = delta * delta * (np.hypot(1., (centered-SHOE_HEIGHT_M) / delta) - 1.)
         minimum.append(lowest)
         softminimum.append(centered)
-        surface_loss.append(robust + np.square(np.minimum(z, 0.)).mean(axis=-1))
+        surface_loss.append(robust + np.square(np.minimum(clearance, 0.)).mean(axis=-1))
     sole_min = np.stack(minimum, axis=-1)
     heels = np.take(vertices, HEEL_VERTEX_IDS, axis=-2)
     return {
@@ -74,7 +76,8 @@ def foot_geometry(vertices_ground_m: np.ndarray, sole_indices) -> dict[str, np.n
         "sole_min_m": sole_min,
         "sole_softmin_m": np.stack(softminimum, axis=-1),
         "sole_surface_loss_m2": np.stack(surface_loss, axis=-1),
-        "sole_penetration_m": np.maximum(-sole_min, 0.),
+        "sole_clearance_m": sole_min - SHOE_HEIGHT_M,
+        "sole_penetration_m": np.maximum(SHOE_HEIGHT_M-sole_min, 0.),
         "heel_height_above_sole_m": heels[..., 2] - sole_min,
     }
 
@@ -88,7 +91,7 @@ def ground_inequalities(
     """Return c >= 0: sole lower2, Stage2 upper2, optional heel2 and sole2 balls.
 
     Both feet may rise outside Stage2. During Stage2 the exact selected sole
-    minima stay within the ground tolerance. Heel movement is measured from a
+    minima stay within the tolerance around Z=25 mm. Heel movement is measured from a
     fixed episode anchor in a 3D Euclidean ball, not a per-axis box or a previous
     frame. With sole anchors each selected surface vertex also stays in its own
     ball, which prevents rotating the foot around a fixed heel. The same 10 mm
@@ -104,9 +107,10 @@ def ground_inequalities(
     if (lowest.shape[-1:] != (2,) or heels.shape != lowest.shape + (3,)
             or not np.isfinite(lowest).all() or not np.isfinite(heels).all()):
         raise ValueError("invalid finite left/right foot geometry")
-    terms = [lowest + ground_tolerance_m]
+    clearance = lowest - SHOE_HEIGHT_M
+    terms = [clearance + ground_tolerance_m]
     if stage2:
-        terms.append(ground_tolerance_m - lowest)
+        terms.append(ground_tolerance_m - clearance)
         if heel_anchors_m is not None:
             raw_anchors = np.asarray(heel_anchors_m, dtype=float)
             if raw_anchors.shape[-2:] != (2, 3):

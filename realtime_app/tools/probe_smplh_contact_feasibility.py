@@ -17,6 +17,7 @@ from scipy.spatial.transform import Rotation
 APP = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(APP), str(APP / 'tools')]
 from pose_app.smplh_motion_tracker import MotionPose, retract
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 from probe_smplh_foot_observations import (
     HELDOUT,
     TOE_VERTICES,
@@ -122,7 +123,7 @@ class MatchedProblem:
             heights = (data['vertices_m'][0, SURFACE].astype(float)@self.rotation.T+self.translation)[:, 2]
             ball = np.array([heights[ids].min() for ids in BALL])
             # All constraints are >=0. Latent bounds preserve the original domain.
-            constraints = np.r_[heights+.005, .010-ball[self.support], cfg.max_abs_latent-pose.latent,
+            constraints = np.r_[heights-SHOE_HEIGHT_M+.005, SHOE_HEIGHT_M+.010-ball[self.support], cfg.max_abs_latent-pose.latent,
                                 cfg.max_abs_latent+pose.latent]
             self.cache = {'y': y.copy(), 'delta': delta, 'pose': pose, 'data': data, 'pixel_values': values,
                 'residual': residual, 'pixel': pixel, 'prediction': prediction, 'latent': latent,
@@ -226,7 +227,7 @@ def run():
         'controls': 'Original15-step FD soft-contact MAP versus autograd soft-contact MAP from exactly the same prediction and P.',
         'constrained': {'solver': 'SLSQP', 'maximum_iterations': 60, 'ftol': 1e-6,
             'objective': 'original pixel radial Huber/sigma8 + latent prior + y@y/2; NO soft-contact penalty',
-            'constraints': '108 sole heights >= -5mm; each marked support ball true minimum <=10mm; original abs(latent)<=6 domain',
+            'constraints': '108 sole heights >=20mm; marked support ball minimum <=35mm (25mm shoe reference); abs(latent)<=6',
             'derivatives': 'torch autograd in float64 retraction/projection with original float32 VPoser/SMPLH; same fixed prediction chart; true minimum active vertex'},
         'support': support_labels()[FRAMES].tolist(), 'withheld_direction_frames': HELDOUT,
         'evaluation': 'Same eligible original raw-body slots across all three; original-map and soft-contact costs reported separately. Baseline is saved direction candidate at same frame, not an independent truth.',

@@ -27,6 +27,7 @@ from probe_smplh_foot_observations import (
     project,
     save,
 )
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 
 SURFACE_PATH = APP.parent / 'research_records/engineering_validation/G20260927_wilor_smplh_full448_v1/contact_surface_sets_smplh_v1/contact_vertex_sets.json'
 SETS = json.loads(SURFACE_PATH.read_text())['sets']
@@ -36,7 +37,7 @@ BALL = [np.flatnonzero(np.isin(SURFACE, SETS[f'{side}_sole_surface_candidate']['
 DEST = OUT / 'soft_contact_prefix'
 
 
-def support_labels():
+def support_labels(count=62):
     """Frozen BEFORE solving, from source images, not fitted foot heights.
 
     The subject's right forefoot is stationary through47 while the left steps;
@@ -44,7 +45,7 @@ def support_labels():
     the left landing47..48 and right lift48 onward. This is a support hypothesis
     from visible slipper/floor contact, not independently measured bare skin.
     """
-    mask = np.zeros((62, 2), bool)
+    mask = np.zeros((count, 2), bool)
     mask[35:48, 1] = True
     mask[49:62, 0] = True
     return mask
@@ -57,9 +58,9 @@ def ground_surface(points, rotation, translation):
 def contact_residuals(surface_m, rotation, translation, support):
     """Batch110 residuals:108 normalized unilateral +2 robust support heights."""
     heights = ground_surface(surface_m, rotation, translation)[..., 2]
-    penetration = np.maximum(0., -heights - .005) / (.005 * np.sqrt(len(SURFACE)))
+    penetration = np.maximum(0., (SHOE_HEIGHT_M-.005)-heights) / (.005 * np.sqrt(len(SURFACE)))
     support_height = np.stack([heights[:, ids].min(axis=1) for ids in BALL], axis=1)
-    u = support_height / .010
+    u = (support_height - SHOE_HEIGHT_M) / .010
     # Stable signed square-root encoding: .5*r*r = sqrt(1+u*u)-1.
     attachment = u * np.sqrt(2. / (np.sqrt(1. + u*u) + 1.)) * support
     return np.concatenate((penetration, attachment), axis=1)
@@ -97,11 +98,11 @@ def summarize(arrays, vertices, rows, body, toes, cal, rotation, translation, la
         for part, indices in [('hip', [6, 7]), ('nonhip', [0, 1, 2, 3, 4, 5, 8, 9, 10, 11])]:
             values = body_error[ids][:, :, indices]
             result[window][part] = {'slots': int(values.size), 'median_px': float(np.median(values)), 'p95_px': float(np.percentile(values, 95))}
-    support_error = abs(ball[labels]) * 1000
+    support_error = abs(ball[labels]-SHOE_HEIGHT_M) * 1000
     angle = direction_error(project(arrays['toe_m'][HELDOUT], cal), toes[HELDOUT, ..., :2])
     selected_rows = rows[35:62]
     result.update(support_ball_abs_height_mm={'slots': int(support_error.size), 'median': float(np.median(support_error)), 'p95': float(np.percentile(support_error, 95)), 'max': float(support_error.max())},
-        sole_min35_61_mm=float(1000 * sole[35:].min()), penetrating_foot_frames35_61=int((sole[35:] < -.005).sum()),
+        sole_min35_61_mm=float(1000 * sole[35:].min()), penetrating_foot_frames35_61=int((sole[35:] < SHOE_HEIGHT_M-.005).sum()),
         withheld_direction_median_deg=float(np.median(angle)), withheld_direction_max_deg=float(angle.max()),
         available=int(arrays['pose_available'].sum()), segments=len(np.unique(arrays['segment_id'])),
         primary_solver_status=dict(Counter(row['optimizer']['status'] for row in selected_rows)),
@@ -141,17 +142,17 @@ def run(jacobian='finite', contact=True):
         'jacobian': jacobian, 'contact_enabled': contact,
         'jacobian_code': 'realtime_app/tools/smplh_contact_autograd.py' if jacobian == 'autograd' else 'realtime_app/pose_app/smplh_iterated_motion_tracker.py',
         'numerical_control': 'Same float32 assets, forward objective, parameters,15 iteration budget, pixel gates, q/v/a/P process and covariance policy. Derivative publication still uses the original point finite differences.',
-        'contact': {'tolerance_m': .005, 'penetration_scale_m': .005, 'height_scale_m': .010, 'height_target_m': 0.,
+        'contact': {'tolerance_m': .005, 'penetration_scale_m': .005, 'height_scale_m': .010, 'height_target_m': SHOE_HEIGHT_M,
             'penetration_normalization': 'sqrt(108), independent of vertex count', 'support_height': 'true minimum of18 fixed ball vertices perfoot',
-            'support_penalty': 'pseudo-Huber sqrt(1+(h/.010)^2)-1', 'slip': 'not introduced in this stage'},
+            'support_penalty': 'pseudo-Huber sqrt(1+((h-.025)/.010)^2)-1', 'slip': 'not introduced in this stage'},
         'support_labels': labels.tolist(), 'support_intervals_inclusive': {'right_ball': [35, 47], 'left_ball': [49, 61]},
         'label_evidence': 'Source stereo crops contact_source_review.jpg at35,39,43,47,51,55,59,61; right stationary during left swing, left stationary during right swing. Landing/lift uncertainty excluded. These labels assume the visible slipper front approximates model ball support; heels not labeled.',
         'information_policy': 'Engineering-regularized point estimate. One final original pixel/pose local information update; engineering curvature omitted. Changed pose can indirectly change pixel Jacobian/P. Not a full statistically consistent contact posterior.',
         'success': {'support_abs_median_and_p95_max_ratio': .5, 'body_hip_nonhip_median_p95_max_ratio': 1.05,
-            'no_new_missing_restarts_or_penetrating_foot_frames': True, 'sole_min_must_stay_above_minus5mm': True,
+            'no_new_missing_restarts_or_penetrating_foot_frames': True, 'sole_height_lower_bound_m': SHOE_HEIGHT_M-.005,
             'no_more_unconverged': True, 'direction_median_max_deg': 'max(3, baseline*1.1)', 'direction_max_max_deg': 'baseline+2'},
         'stop': 'One62-frame experiment. No weight search, no smoothing, no448 on failure. A pass permits further contact-label validation, not automatic promotion.',
-        'limits': 'Stage/ankle-anchored reference ground and assistant support hypotheses are not independent contact/3D truth. Bare-model surface target0 is an engineering convention despite slippers. Source image review is offline; no causal contact classifier is claimed.'}
+        'limits': 'Stage/ankle-anchored reference ground and assistant support hypotheses are not independent contact/3D truth. Bare-model surface target25mm is the user-specified shoe thickness. Source image review is offline; no causal contact classifier is claimed.'}
     if not contact:
         del protocol['success']['support_abs_median_and_p95_max_ratio']
         protocol['contact']['enabled'] = False
@@ -205,7 +206,7 @@ def run(jacobian='finite', contact=True):
         gates.update({f'support_{stat}_halved': b['support_ball_abs_height_mm'][stat] <= .5*a['support_ball_abs_height_mm'][stat] for stat in ['median', 'p95']})
     gates.update(no_missing=b['available'] == 62, no_restarts=b['segments'] == a['segments'],
         no_penetrating_foot_frames=b['penetrating_foot_frames35_61'] <= a['penetrating_foot_frames35_61'],
-        sole_above_minus5mm=b['sole_min35_61_mm'] >= -5., no_more_unconverged=b['primary_unconverged'] <= a['primary_unconverged'],
+        sole_above_shoe_lower_bound=b['sole_min35_61_mm'] >= (SHOE_HEIGHT_M-.005)*1000, no_more_unconverged=b['primary_unconverged'] <= a['primary_unconverged'],
         direction_median_retained=b['withheld_direction_median_deg'] <= max(3., a['withheld_direction_median_deg']*1.1),
         direction_max_retained=b['withheld_direction_max_deg'] <= a['withheld_direction_max_deg']+2.)
     max_prefix_delta = max(float(np.max(abs(arrays[k][:35]-reference[k][:35]))) for k in ['transl', 'root_rotation', 'vposer_latent', 'covariance'])

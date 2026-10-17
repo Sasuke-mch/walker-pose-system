@@ -7,21 +7,22 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 from probe_smplh_soft_contact import BALL, SURFACE, contact_residuals, support_labels
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 
 
 class SoftContactTests(unittest.TestCase):
     def test_unilateral_tolerance_and_vertex_count_normalization(self):
         points = np.zeros((1, len(SURFACE), 3))
-        points[..., 2] = -.005
+        points[..., 2] = SHOE_HEIGHT_M-.005
         np.testing.assert_array_equal(contact_residuals(points, np.eye(3), np.zeros(3), [0, 0]), 0.)
-        points[..., 2] = -.010
+        points[..., 2] = SHOE_HEIGHT_M-.010
         r = contact_residuals(points, np.eye(3), np.zeros(3), [0, 0])
         self.assertAlmostEqual((r@r.T).item(), 1.)
 
     def test_true_ball_minimum_and_swing_not_attracted(self):
         points = np.zeros((2, len(SURFACE), 3))
-        points[..., 2] = .030
-        points[:, BALL[0][0], 2] = .010
+        points[..., 2] = SHOE_HEIGHT_M+.030
+        points[:, BALL[0][0], 2] = SHOE_HEIGHT_M+.010
         r = contact_residuals(points, np.eye(3), np.zeros(3), [1, 0])
         self.assertAlmostEqual(.5*r[0, -2]**2, np.sqrt(2.)-1.)
         np.testing.assert_array_equal(r[:, -1], 0.)
@@ -32,6 +33,17 @@ class SoftContactTests(unittest.TestCase):
         camera_points = points @ rotation
         rotated = contact_residuals(camera_points, rotation, np.zeros(3), [1, 0])
         np.testing.assert_allclose(r, rotated, atol=1e-13)
+
+    def test_shoe_target_and_full448_labels(self):
+        points = np.zeros((1, len(SURFACE), 3))
+        points[..., 2] = SHOE_HEIGHT_M
+        np.testing.assert_array_equal(contact_residuals(points, np.eye(3), np.zeros(3), [1, 1]), 0.)
+        points[..., 2] = 0.
+        self.assertGreater(np.linalg.norm(contact_residuals(points, np.eye(3), np.zeros(3), [1, 1])), 0.)
+        labels = support_labels(448)
+        self.assertEqual(labels.shape, (448, 2))
+        self.assertEqual(labels.sum(), 26)
+        self.assertFalse(labels[62:].any())
 
     def test_labels_leave_transitions_and_preexperiment_unconstrained(self):
         mask = support_labels()

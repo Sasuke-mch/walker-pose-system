@@ -106,7 +106,7 @@ def test_penetrating_baseline_cannot_become_support():
 
 def test_static_near_ground_surface_enters_support_with_hysteresis():
     vertices = np.zeros((8, 2, 3))
-    vertices[..., 2] = .001
+    vertices[..., 2] = .026
     support, _, _ = frozen_surface_states(vertices, [np.array([0]), np.array([1])], np.ones(8, bool))
     assert not support[:3].any()
     assert support[-1].all()

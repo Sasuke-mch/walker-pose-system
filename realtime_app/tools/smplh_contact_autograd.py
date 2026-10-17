@@ -9,6 +9,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 from pose_app.fisheye_camera import fisheye_project_torch
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 from probe_smplh_foot_observations import TOE_VERTICES
 from probe_smplh_soft_contact import BALL, SURFACE, ContactTracker
 
@@ -67,9 +68,9 @@ class AutogradContactTracker(ContactTracker):
             return pixel_values
         surface = vertices[:, SURFACE].to(dtype)
         heights = (surface@tensor(self.contact_rotation).T+tensor(self.contact_translation))[..., 2]
-        penetration = torch.relu(-heights-.005)/(.005*np.sqrt(len(SURFACE)))
+        penetration = torch.relu((SHOE_HEIGHT_M-.005)-heights)/(.005*np.sqrt(len(SURFACE)))
         support_height = torch.stack([heights[:, ids].min(dim=1).values for ids in BALL], dim=1)
-        u = support_height/.010
+        u = (support_height-SHOE_HEIGHT_M)/.010
         attachment = u*torch.sqrt(2/(torch.sqrt(1+u*u)+1))*tensor(self.support)
         return torch.cat((pixel_values, penetration.reshape(-1), attachment.reshape(-1)))
 

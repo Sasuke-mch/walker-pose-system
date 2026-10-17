@@ -14,6 +14,7 @@ from scipy.spatial.transform import Rotation
 
 from pose_app.smplh_motion_tracker import MotionPose, SMPLHMotionTracker, retract, right_jacobian
 from pose_app.smplh_ground_constraints import foot_geometry, ground_inequalities
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 
 
 def _minimize_scaled_pose(fun, initial_delta, *, jac, bounds, constraints, covariance, options):
@@ -109,7 +110,7 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             # Controlled walker walking assumption: one supporting foot, while
             # the other can swing. This is not an inferred contact label.
             result = np.concatenate((result, (self.ground_config.ground_tolerance_m
-                                     - np.min(geometry["sole_min_m"], axis=-1))[..., None]), axis=-1)
+                                     + SHOE_HEIGHT_M - np.min(geometry["sole_min_m"], axis=-1))[..., None]), axis=-1)
         return result
 
     def _solver_conditions(self, geometry):
@@ -125,8 +126,8 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
         sole = geometry["sole_points_m"]
         tolerance = self.ground_config.ground_tolerance_m-self.ground_config.feasibility_tolerance_m
         radius = self.ground_config.max_heel_displacement_m-self.ground_config.feasibility_tolerance_m
-        result = [(sole[..., 2]+tolerance).reshape(sole.shape[:-3]+(-1,))]
-        support = geometry["sole_min_m"]
+        result = [(sole[..., 2]-SHOE_HEIGHT_M+tolerance).reshape(sole.shape[:-3]+(-1,))]
+        support = geometry["sole_min_m"]-SHOE_HEIGHT_M
         if not self.stage2:
             side = getattr(self, "_solver_support_side", None)
             support = np.min(support, axis=-1, keepdims=True) if side is None else support[..., side:side+1]
@@ -193,7 +194,7 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
                                       self.config.huber_px*(norm-.5*self.config.huber_px)))/self.config.pixel_sigma_px**2
             cost = data_cost + .5*delta @ precision @ delta + (0. if initialize else .5*np.sum(val["pose"].latent**2)/self.config.latent_prior_sigma**2)
             branch_feasible = (self.stage2 or val["geometry"]["sole_min_m"][self._solver_support_side]
-                               <= self.ground_config.ground_tolerance_m+1e-6)
+                               <= SHOE_HEIGHT_M+self.ground_config.ground_tolerance_m+1e-6)
             if np.isfinite(cost) and branch_feasible and self._conditions(val["geometry"]).min() >= -1e-6:
                 if not incumbent or cost < incumbent["cost"]:
                     incumbent.update(delta=delta.copy(), cost=float(cost))
@@ -224,12 +225,12 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
             self.last_accepted_pose.latent-prior.latent]]
         if not self.stage2:
             vertical = np.zeros(n)
-            vertical[2] = self.ground_config.ground_tolerance_m-self.ground_config.feasibility_tolerance_m-initial_geometry["sole_min_m"].min()
+            vertical[2] = SHOE_HEIGHT_M+self.ground_config.ground_tolerance_m-self.ground_config.feasibility_tolerance_m-initial_geometry["sole_min_m"].min()
             starts.append(vertical)
         def physically_feasible(delta):
             geometry = evaluate(delta)["geometry"]
             branch_feasible = (self.stage2 or geometry["sole_min_m"][self._solver_support_side]
-                               <= self.ground_config.ground_tolerance_m+1e-6)
+                               <= SHOE_HEIGHT_M+self.ground_config.ground_tolerance_m+1e-6)
             return branch_feasible and self._conditions(geometry).min() >= -1e-6
         candidates = []
         branches = (None,) if self.stage2 else (0, 1)
@@ -426,6 +427,7 @@ class SMPLHWorldMotionTracker(SMPLHMotionTracker):
                     np.linalg.norm(geometry["sole_points_m"]-self.sole_anchors, axis=-1).max(axis=-1).tolist())
         output["ground_constraint"]["constraint_satisfied"] = satisfied if self.constrain_ground else None
         output["ground_constraint"]["stage2"] = self.stage2
+        output["ground_constraint"]["foot_ground_reference_m"] = SHOE_HEIGHT_M
         if self.constrain_ground and (not satisfied or self.contact_diagnostic["status"] in ("constraint_conflict", "feasible_unconverged")):
             output["derivative_valid"][:] = False
             output["velocity_mm_s"][:] = output["acceleration_mm_s2"][:] = np.nan
