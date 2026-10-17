@@ -413,3 +413,22 @@ def triangulate_matches(
         )
         for index, match in enumerate(matches)
     ]
+
+
+def strict_first_instances(
+    left_persons: list[PersonPose],
+    right_persons: list[PersonPose],
+    calibration: StereoCalibration,
+) -> list[TriangulatedPerson]:
+    """Strict first left/right prediction association with the original gates.
+
+    Only the current pre-associated first person on each side is considered;
+    the strict thresholds (keypoint_threshold=0.25, max_association_cost=0.05,
+    max_reprojection_error_px=10, max_matches=1) are unchanged. This is the
+    documented mainline strict scope, not a "pick the geometrically best
+    person" heuristic and not a relaxed gate.
+    """
+    return triangulate_matches(
+        left_persons[:1], right_persons[:1], calibration,
+        0.25, 0.05, 10.0, max_matches=1,
+    )

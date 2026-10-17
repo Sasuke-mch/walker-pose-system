@@ -7,11 +7,11 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from check_mainline_regression import fit_arguments
-from evaluate_repositioned_capture import strict_first_instances
 from pose_app.calibration import StereoCalibration
 from pose_app.mainline_regression import observation_snapshot
-from walker_tools.stereo.evaluate_offline_stereo_predictions import _records, _result
+from pose_app.stereo_prediction_records import records as prediction_records, result as prediction_result
+from pose_app.triangulation import strict_first_instances
+from walker_tools.body._fit_arguments import resolve_saved_fit_command as fit_arguments
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -114,7 +114,7 @@ def main():
         np.testing.assert_array_equal(observed["pair_id"], np.arange(sel["frames"]))
         calibration_path = options.calibration_dir / "stereo_fisheye.json"
         calibration = StereoCalibration.load(calibration_path)
-        records = {s: _records(Path(sel["detector_inputs"][s]), "pmpose", "raw_keypoint")
+        records = {s: prediction_records(Path(sel["detector_inputs"][s]), "pmpose", "raw_keypoint")
                    for s in ("left", "right")}
         strict = []
         for i, frame in enumerate(frames):
@@ -124,7 +124,7 @@ def main():
                 record = records[s][i]
                 if record["id"] != i or record["name"] != Path(frame[s + "_image"]).name:
                     raise ValueError("detector image/frame identity mismatch")
-                views[s] = _result(record, "pmpose", size, rotation, i / 30)
+                views[s] = prediction_result(record, "pmpose", size, rotation, i / 30)
                 np.testing.assert_allclose(views[s].persons[0].keypoints,
                                            observed[s + "_raw_pixels"][i],
                                            atol=2e-4, rtol=0)

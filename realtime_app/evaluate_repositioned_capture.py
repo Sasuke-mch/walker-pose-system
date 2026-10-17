@@ -36,10 +36,9 @@ def host_time_diagnostics(joints, times):
 
 
 def strict_first_instances(left, right, calibration):
-    from pose_app.triangulation import triangulate_matches
+    from pose_app.triangulation import strict_first_instances as _strict
     # Keep the original geometric gates, restrict only the diagnostic scope.
-    return triangulate_matches(left[:1], right[:1], calibration,
-                               .25, .05, 10., max_matches=1)
+    return _strict(left, right, calibration)
 
 
 def first_instance_diagnostics(out, method, observed, frames):

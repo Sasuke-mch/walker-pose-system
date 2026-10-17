@@ -14,7 +14,7 @@ from pose_app.fisheye_camera import load_stereo_fisheye
 from pose_app.wrist_processing import (CausalPointFilter, epipolar_select,
     heatmap_candidates, perspective_view, raw_to_upright, upright_to_raw, upper_box, refine_forearm)
 from walker_tools.hands.solve_annotated_wrist_targets import solve_point
-from walker_tools.stereo.evaluate_offline_stereo_predictions import SAPIENS_TO_COCO17
+from pose_app.stereo_prediction_records import SAPIENS_TO_COCO17
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT/'research_records/engineering_validation/G20261002_sapiens2_body_mainline448_v2'
