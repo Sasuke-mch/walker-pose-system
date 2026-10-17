@@ -17,11 +17,9 @@ from pose_app.mainline_regression import (
 
 
 def fit_arguments(path):
-    from walker_tools.body.fit_smplh_wilor_sequence import build_parser
+    from walker_tools.body._fit_arguments import parse_fit_argv, read_argv_list
 
-    values = read_json(path)
-    if not isinstance(values, list):
-        raise ValueError("command JSON must be an argv list")
+    values = read_argv_list(path)
     if "--left-raw" not in values:
         raise ValueError("command has no --left-raw")
     # Accept both historical fit_command.json and an options-only argv list.
@@ -30,10 +28,7 @@ def fit_arguments(path):
         values.extend(["--fit-policy", "legacy"])
     if any(value.startswith("--") and values.count(value) != 1 for value in values):
         raise ValueError("duplicate options in command")
-    try:
-        return build_parser().parse_args(values)
-    except SystemExit as error:
-        raise ValueError("invalid saved fit command") from error
+    return parse_fit_argv(values)
 
 
 def main(argv=None):

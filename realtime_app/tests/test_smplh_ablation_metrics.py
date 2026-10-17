@@ -85,3 +85,27 @@ def test_saved_command_policy_is_explicit_and_survives_before_left_raw(tmp_path)
         assert fit_arguments(path).fit_policy == expected
         values = modified_options(["python", "script", *prefix, *required], {}, "new")
         assert values[values.index("--fit-policy") + 1] == expected
+
+
+def test_preflight_and_regression_share_one_argv_reader(tmp_path):
+    import json
+    from pathlib import Path
+    from preflight_smplh import fit_arguments as preflight_fit_arguments
+    from check_mainline_regression import fit_arguments as regression_fit_arguments
+    from walker_tools.body._fit_arguments import read_argv_list
+
+    required = ["--left-raw", "l", "--right-raw", "r", "--wilor-left", "wl", "--wilor-right", "wr",
+                "--calibration-dir", "cal", "--regressor", "reg", "--smplh-model", "model", "--output-dir", "out"]
+    path = tmp_path / "args.json"
+    path.write_text(json.dumps(required))
+
+    args, values = preflight_fit_arguments(path)
+    assert values == required
+    assert args.left_raw == Path("l")
+
+    assert regression_fit_arguments(path).fit_policy == "legacy"
+
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps({"not": "a list"}))
+    with pytest.raises(ValueError):
+        read_argv_list(bad)

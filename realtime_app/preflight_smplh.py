@@ -8,15 +8,14 @@ from pathlib import Path
 import pickle
 import sys
 
-from walker_tools.body.fit_smplh_wilor_sequence import build_parser
 from pose_app.smplh_fitting.stages import validate_optimization_options
 
 
 def fit_arguments(path: Path):
-    values = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(values, list) or not all(isinstance(v, str) for v in values):
-        raise ValueError("args JSON must be an array of CLI argument strings")
-    args = build_parser().parse_args(values)
+    from walker_tools.body._fit_arguments import parse_fit_argv, read_argv_list
+
+    values = read_argv_list(path)
+    args = parse_fit_argv(values)
     validate_optimization_options(args)
     return args, values
 
