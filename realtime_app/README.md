@@ -38,15 +38,18 @@ body.fit_smplh_wilor_sequence默认--fit-policy reliability；tools/run_smplh_re
 
 该节只记录历史reference25完整冷启动结果，不再代表当前身体选择。当前选择已切换到上面的448帧二维鱼眼重投影主线；reference25仍作为可复现历史对照保留。通用求解器省略参数的兼容默认不能冒充任一冻结结果。
 
-复现读取选择清单的显式参数，输出改到新的不存在目录；以下只替换输出，其他原输入/冷启动预算全部保留：
+历史reference25复现必须读取历史360帧自身的参数，不能读取当前`mainline_selection`（那是可靠性448帧选择）。旧`fit_args`省略`--fit-policy`，而通用求解器当前默认已切换为`reliability`，因此历史复现显式补回`legacy`：
 
 ```powershell
-$selectedBody = (Get-Content realtime_app/configs/current_mainline.json -Raw | ConvertFrom-Json).mainline_selection.body
-$fitArgs = [string[]](Get-Content $selectedBody.reproduction_arguments -Raw | ConvertFrom-Json)
+# 历史360帧 reference25：读取历史自身的fit_args，再显式补回legacy策略。
+$historical = 'research_records/engineering_validation/G20261005_old_capture_reference25_v1/runs/reference25/fit_args.json'
+$fitArgs = [string[]](Get-Content $historical -Raw | ConvertFrom-Json)
 $fitArgs += @('--fit-policy', 'legacy')
 $fitArgs[[Array]::IndexOf($fitArgs, '--output-dir') + 1] = 'research_records/engineering_validation/reference25_new_run/fit'
 & ./.venv-cuda/Scripts/python.exe -B realtime_app/run_tool.py body.fit_smplh_wilor_sequence @fitArgs
 ```
+
+当前reliability复现则读取`mainline_selection.body.reproduction_arguments`，不追加`legacy`；两套配置不得混用。
 
 最新主线可视化入口：`build_current_mainline_view.py --output <新目录>`（本地Python从仓库根调用）。它读取当前选择的二维重投影身体，重新计算三角化、重放mainline→supported_stop_fixed_lag，并生成完整自包含body.html；不重拟合身体。随后用`validate_current_mainline_view.py --view <目录>`核对网格/点/严格踝拖尾/相机/助步器与新变换。已验证页面路径保存在current_mainline.json/mainline_selection.visualization。
 
