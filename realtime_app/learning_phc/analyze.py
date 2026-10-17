@@ -14,7 +14,7 @@ from .reference import BODY_PARENTS
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy
 from pose_app.smpl_coco_observation import _install_legacy_smpl_pickle_compatibility
 from pose_app.body_observations import load_ordered_predictions as _load_predictions
-from tools.plot_body_joint_motion_curves import three_point_derivatives
+from pose_app.lower_limb_kinematics import three_point_derivatives
 
 ROOT = Path(__file__).resolve().parents[2]
 

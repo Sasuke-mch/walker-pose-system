@@ -7,6 +7,32 @@ from typing import Any
 import numpy as np
 
 
+def three_point_derivatives(time_s: np.ndarray, points_m: np.ndarray,
+                            valid: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Local quadratic interpolation on irregular times; endpoints stay NaN.
+
+    An interior derivative exists only if all three consecutive samples are
+    valid. Velocity is the derivative at the middle time, and acceleration is
+    the second derivative of that same three-point interpolating quadratic.
+    Missing or invalid samples propagate: a sample truly absent from the input
+    stays ``NaN`` and any triple containing an invalid point stays unset.
+    """
+    velocity = np.full_like(points_m, np.nan, dtype=np.float64)
+    acceleration = np.full_like(points_m, np.nan, dtype=np.float64)
+    if len(time_s) < 3:
+        return velocity, acceleration
+    before = np.diff(time_s)[:-1, None, None]
+    after = np.diff(time_s)[1:, None, None]
+    left_slope = (points_m[1:-1] - points_m[:-2]) / before
+    right_slope = (points_m[2:] - points_m[1:-1]) / after
+    usable = (valid[:-2] & valid[1:-1] & valid[2:])[..., None]
+    velocity[1:-1] = np.where(usable, (after * left_slope + before * right_slope) /
+                              (before + after), np.nan)
+    acceleration[1:-1] = np.where(usable, 2 * (right_slope - left_slope) /
+                                  (before + after), np.nan)
+    return velocity, acceleration
+
+
 DISTANCE_METRICS = (
     "left_thigh_length_mm",
     "right_thigh_length_mm",

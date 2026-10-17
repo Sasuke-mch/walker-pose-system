@@ -12,6 +12,7 @@ from pose_app.lower_limb_kinematics import (  # noqa: E402
     derive_frame_kinematics,
     derive_kinematics,
     summarize_kinematics,
+    three_point_derivatives,
 )
 
 
@@ -109,6 +110,39 @@ class LowerLimbKinematicsTests(unittest.TestCase):
             left_knee["unavailable_reasons"],
             {"missing_or_rejected:left_ankle": 1},
         )
+
+
+class ThreePointDerivativeTests(unittest.TestCase):
+    def test_irregular_quadratic_recovers_exact_derivatives(self):
+        time = np.array([0.0, 0.3, 1.1, 1.4, 2.5])
+        points = np.zeros((5, 1, 3))
+        points[:, 0, 0] = 2.0 * time ** 2 + 3.0 * time
+        valid = np.ones((5, 1), bool)
+        velocity, acceleration = three_point_derivatives(time, points, valid)
+        self.assertTrue(np.all(np.isnan(velocity[0])))
+        self.assertTrue(np.all(np.isnan(velocity[-1])))
+        self.assertTrue(np.all(np.isnan(acceleration[[0, -1]])))
+        np.testing.assert_allclose(velocity[1:-1, 0, 0], 4.0 * time[1:-1] + 3.0, atol=1e-9)
+        np.testing.assert_allclose(acceleration[1:-1, 0, 0], 4.0, atol=1e-9)
+
+    def test_invalid_middle_sample_breaks_the_triple(self):
+        time = np.array([0.0, 1.0, 2.0, 3.0])
+        points = np.zeros((4, 1, 3))
+        points[:, 0, 0] = np.arange(4, dtype=float)
+        valid = np.ones((4, 1), bool)
+        velocity, _ = three_point_derivatives(time, points, valid)
+        self.assertTrue(np.all(np.isfinite(velocity[1:3])))
+        valid[2, 0] = False
+        velocity, acceleration = three_point_derivatives(time, points, valid)
+        self.assertTrue(np.all(np.isnan(velocity[1:3])))
+        self.assertTrue(np.all(np.isnan(acceleration[1:3])))
+
+    def test_fewer_than_three_frames_is_all_nan(self):
+        time = np.array([0.0, 1.0])
+        points = np.zeros((2, 1, 3))
+        velocity, acceleration = three_point_derivatives(time, points, np.ones((2, 1), bool))
+        self.assertTrue(np.all(np.isnan(velocity)))
+        self.assertTrue(np.all(np.isnan(acceleration)))
 
 
 if __name__ == "__main__":

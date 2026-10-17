@@ -15,7 +15,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 from .body import PhysicsBody
 from .data import load_real
 from .environment import PixelTrackingEnv, make_synthetic, pixel_controller
-from tools.plot_body_joint_motion_curves import three_point_derivatives
+from pose_app.lower_limb_kinematics import three_point_derivatives
 
 
 def serial(value):

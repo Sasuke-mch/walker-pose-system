@@ -10,8 +10,14 @@ import argparse
 import csv
 import json
 from pathlib import Path
+import sys
 
 import numpy as np
+
+APP = Path(__file__).resolve().parents[1]
+if str(APP) not in sys.path:
+    sys.path.insert(0, str(APP))
+from pose_app.lower_limb_kinematics import three_point_derivatives  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,30 +31,6 @@ GROUPS = (("左臂", (5, 7, 9), ("肩", "肘", "腕")),
           ("右臂", (6, 8, 10), ("肩", "肘", "腕")),
           ("左腿", (11, 13, 15), ("髋", "膝", "踝")),
           ("右腿", (12, 14, 16), ("髋", "膝", "踝")))
-
-
-def three_point_derivatives(time_s: np.ndarray, points_m: np.ndarray,
-                            valid: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Local quadratic interpolation on irregular times; endpoints stay NaN.
-
-    An interior derivative exists only if all three consecutive samples are
-    valid. Velocity is the derivative at the middle time, and acceleration is
-    the second derivative of that same three-point interpolating quadratic.
-    """
-    velocity = np.full_like(points_m, np.nan, dtype=np.float64)
-    acceleration = np.full_like(points_m, np.nan, dtype=np.float64)
-    if len(time_s) < 3:
-        return velocity, acceleration
-    before = np.diff(time_s)[:-1, None, None]
-    after = np.diff(time_s)[1:, None, None]
-    left_slope = (points_m[1:-1] - points_m[:-2]) / before
-    right_slope = (points_m[2:] - points_m[1:-1]) / after
-    usable = (valid[:-2] & valid[1:-1] & valid[2:])[..., None]
-    velocity[1:-1] = np.where(usable, (after * left_slope + before * right_slope) /
-                              (before + after), np.nan)
-    acceleration[1:-1] = np.where(usable, 2 * (right_slope - left_slope) /
-                                  (before + after), np.nan)
-    return velocity, acceleration
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
