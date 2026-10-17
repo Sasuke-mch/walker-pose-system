@@ -438,7 +438,7 @@ primary WiLoR使用现有PMPose身体腕关联；另报告Sapiens2关联及唯�
 
 连续窗口候选：同一场景入口使用 `--scene-profile joint_stage_window`；独立审查使用 `scene.audit_stage_handoff --joint-window`。最终实验为joint_window_gated；速度变化改善但落地闭合和实时耗时未通过，保留离线候选级别。完整残差定义与门见阶段实现文档。
 
-正式选择读取 `current_mainline.json/mainline_selection`：360帧PMPose身体候选、strict3031点及baseline场景。`mainline`仅为场景配置别名，实际参数与`baseline`完全一致，不把任何候选开关打开。源图像、标定、地面和严格JSONL必须由同次实验提供；完整命令在`G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review_command.json`，重放时仅把scene-profile改为mainline，并把output改到未存在目录。绝不覆盖冻结输出。
+历史360帧场景复现（2026-10-04，360帧PMPose身体候选、strict3031点及baseline场景）：完整命令在`G20261003_repositioned360_manual_v1/stage_landing_recovery_v1/baseline_profile_review_command.json`，重放时仅把scene-profile改为mainline，并把output改到未存在目录。`mainline`仅为场景配置别名，实际参数与`baseline`完全一致，不把任何候选开关打开。源图像、标定、地面和严格JSONL必须由同次实验提供。当前`mainline_selection`已切换为448帧可靠性二维回投影身体（见上），该历史段落不代表当前身体选择。绝不覆盖冻结输出。
 
 身体参数复现使用360帧自己的`pmpose/fit_command.json`；该命令关闭人工腕项。本文前述冷启动回归和消融命令专用于448帧冻结对照，不能自动改用360帧manifest。WiLoR仅提供局部手指旋转先验，不提供米制腕平移；身体共享beta与逐帧姿态求解之后才应用当前场景变换。
 
