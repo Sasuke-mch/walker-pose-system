@@ -21,6 +21,7 @@
   "body.run_rl_physics_tracking": "run_rl_physics_tracking.py",
   "body.run_sapiens_cold_smplh": "run_sapiens_cold_smplh.py",
   "body.run_sapiens_smplh": "run_sapiens_smplh.py",
+  "body.run_smplh_contact_route": "run_smplh_contact_route.py",
   "body.summarize_stage_c_gradient_audit": "summarize_stage_c_gradient_audit.py",
   "body.summarize_v6_validation": "summarize_v6_validation.py",
   "calibration.calibrate_cam0_compare": "calibrate_cam0_compare.py",

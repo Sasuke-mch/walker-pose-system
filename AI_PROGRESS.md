@@ -1,5 +1,20 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-17 高优先级独立路线：自动微分＋接触＋25mm鞋高，完整448已完成
+
+用户决定不再固定唯一身体主线，各方法按独立路线保存配置、结果和证据。当前 `smplh_causal_autograd_contact` 设为高优先级；其他路线优先级按各自协议保留。本次只跑这一条，不追加FD/无接触/局部旋转或权重扫描。`current_mainline.json` 的 `route_management/method_routes` 记录现行规则；旧 `mainline_selection` 仅兼容既有批量重投影方法。
+
+共用 `pose_app/foot_ground_reference.py::SHOE_HEIGHT_M=0.025`：裸模型足底/前掌贴地目标25mm，原5mm容差的防下穿下界20mm，真实地面仍Z=0；不将踝/脚跟标志点压到25mm。NumPy/Torch残差、表面损失、world内外可行性/支撑分支、constructed脚部状态及新运行统计已同步；历史数组不回写。现有固定体型、髋映射、VPoser0.75、q/v/a及15步MAP预算保持，目标Jacobian使用自动微分；原关节点数值导数保留。状态仍为左相机系，场景固定延迟和离线标签不构成即时端到端因果系统。全片1..447持续防下穿，首帧原初始化保留并评价；贴地标签仍仅右35..47、左49..61共26足帧，不凭脚高补标签。
+
+唯一入口 `realtime_app/tools/run_smplh_contact_route.py`（也注册 `run_tool.py body.run_smplh_contact_route`）。结果目录 `research_records/engineering_validation/G20261014_smplh_motion448_v1/hip_pose_repair_20261016/foot_direction_20261016/autograd_contact_shoe25_full448_20261017`，保存协议、全部448逐帧状态/拒绝、q/v/a/P及模型参数、足底/前掌高度、summary和view。新计算同源448 strict并重放Stage/地面，未读旧动态；实际初姿NumPy/Torch目标最大差2.2737367544323206e-13。
+
+单次448完成，用时1745.86s，448/448可用、1段/无重启。10752原始双目身体槽全部有限，median/P95 19.066/56.807px；髋1792槽29.546/68.411px，非髋8960槽17.165/50.973px。26支撑足帧相对25mm绝对误差median/P95 6.891/23.137mm，17/26在±10mm内；896足帧中597低于20mm、221低于参考地面0，最低-15.809mm。447更新仅70收敛、377未收敛；实际可发布导数396/5376槽，全部状态保留。六个留出toe帧24方向槽median/max 5.995/24.317deg。
+
+**接触/收敛工程检查未通过，高优先级保留。** 320等帧数值收敛仍低于鞋高下界，因此问题不能全部归因迭代预算；有限权重软损失允许牺牲脚高来换其他目标。不得把feasible_unconverged称为鞋高可行，或将本次称为物理一致性已解决；本次不继续改权重/换路线/重跑。
+
+view/index.html已在真实浏览器打开并保留55帧：6890顶点/13776真实面/41328索引项、同源黑色有限骨架与拒绝叉、真实助步器/双相机/固定XY地面；绝对脚高、25mm净高和20mm下界一致。保存参数回算COCO/native最大差均2.384185791015625e-7m。实际检查55的鞋高文本与左右原图、35→36播放、267跳转、447边界、侧视/默认视角，console error0；截图view/preview_frame55.jpg。114项相关测试及4子检查、Python编译、新入口完整Ruff/旧相关代码E9/F、JS语法和命令分发help通过。只提交本次代码、既有文档增量和必要小JSON；其他既有改动保留，大型数组/网页/图片留本地，不推送。方法见算法5.27。
+
+
 ## 2026-10-17 最小参数化助步器动力学资产：离线生成，未加载、未仿真
 
 按`dispatch/plan-20261017-rl-walker-foundation.md`只做第一阶段：把既有助步器canonical粗几何转换为单link、多collision、自由根候选URDF，只做CPU离线检查。结论仅为`asset_generated_unvalidated`，没有在Isaac Gym加载、没有受力验证、没有进入任何实际场景。

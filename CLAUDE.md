@@ -1,5 +1,10 @@
 # Walker Pose System - Claude 工作指南
 
+## 2026-10-17 用户路线决定
+
+不固定唯一身体主线，方法按独立路线管理。当前高优先级 `smplh_causal_autograd_contact` 使用自动微分＋前掌方向＋接触，入口 `realtime_app/tools/run_smplh_contact_route.py`，单次完整448；不自动增加FD/无接触/局部旋转对照。裸模型足底以真实地面上方25 mm为鞋高参考，5 mm容差下界20 mm，物理地面保持Z=0。路线与优先级读取 `current_mainline.json/route_management,method_routes`；旧 `mainline_selection` 只是批量路线兼容字段。历史决定按日期解释，最新结果看 `AI_PROGRESS.md`。
+
+
 ## 2026-10-13 SMPL-H拟合方法更新
 
 通用拟合与二维实验入口默认使用--fit-policy reliability，修正置信度归约、SO(3)根锚及接触阶段身体观测保持项。已保存360 reference25和448结果仍来自legacy，未重算；冻结profile保留legacy，直接重放历史argv须显式补--fit-policy legacy。公式、输入支持、统计校准及物理证据边界见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第28节，进度见AI_PROGRESS.md；下方历史分数下限0.6不代表新方法。

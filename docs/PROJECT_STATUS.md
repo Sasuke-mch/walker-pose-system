@@ -1,5 +1,10 @@
 # Project status
 
+## 2026-10-17 独立路线管理
+
+当前高优先级：`smplh_causal_autograd_contact`，自动微分＋前掌方向＋接触，完整448入口 `realtime_app/tools/run_smplh_contact_route.py`。身体方法不再以唯一“主线”决定研究资格；批量重投影、因果跟踪、物理方法分别保存结果和结论。裸模型足底鞋高参考25 mm，真实地面Z=0；配置见 `realtime_app/configs/current_mainline.json/route_management,method_routes`，运行结果见根 `AI_PROGRESS.md`。
+
+
 ## 2026-10-14 Flow采样去除内部重复同步
 
 公开输入校验保留，内部已知合法的Euler时间一次构造，避免每步GPU标量等待；八步F0标量读取17→1，局部采样中位14.77→12.83ms，约减少13.1%。整链交错对照尚不支持稳定提速：几何149.81→146.24ms，F0为40.15→41.69ms；详细不利结果与波动也保留。网络/完整几何/输入绑定不变，相关值/梯度及拒绝检查通过。实现、测量及边界见MODEL_ARCHITECTURE第33节、MODEL_RESULTS第48节和AI_PROGRESS；iMF训练目标仍未接入。

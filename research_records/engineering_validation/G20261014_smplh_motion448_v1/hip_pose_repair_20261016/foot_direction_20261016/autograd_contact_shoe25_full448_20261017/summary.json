@@ -1,0 +1,102 @@
+{
+  "all448": {
+    "body": {
+      "total_slots": 10752,
+      "finite_slots": 10752,
+      "median": 19.06592144542872,
+      "p95": 56.807058439615254,
+      "max": 147.0614656576312
+    },
+    "hip": {
+      "total_slots": 1792,
+      "finite_slots": 1792,
+      "median": 29.546497146118597,
+      "p95": 68.41068810136026,
+      "max": 140.77909354620468
+    },
+    "nonhip": {
+      "total_slots": 8960,
+      "finite_slots": 8960,
+      "median": 17.165050937098698,
+      "p95": 50.97273972975994,
+      "max": 147.0614656576312
+    }
+  },
+  "primary35_61": {
+    "body": {
+      "total_slots": 648,
+      "finite_slots": 648,
+      "median": 19.224601803851932,
+      "p95": 73.73795359723604,
+      "max": 128.49667239878238
+    },
+    "hip": {
+      "total_slots": 108,
+      "finite_slots": 108,
+      "median": 30.042246249838414,
+      "p95": 73.8905054896756,
+      "max": 84.87818530559903
+    },
+    "nonhip": {
+      "total_slots": 540,
+      "finite_slots": 540,
+      "median": 17.102253708171325,
+      "p95": 73.40396861726985,
+      "max": 128.49667239878238
+    }
+  },
+  "available_frames": 448,
+  "frames": 448,
+  "solver_status": {
+    "not_run": 1,
+    "feasible_unconverged": 377,
+    "converged": 70
+  },
+  "derivative_valid_slots": 396,
+  "derivative_total_slots": 5376,
+  "segments": 1,
+  "sole_height_mm": {
+    "total_slots": 896,
+    "finite_slots": 896,
+    "median": 11.221898517137008,
+    "p95": 38.6243519301612,
+    "max": 59.312623577130964
+  },
+  "sole_clearance_mm": {
+    "total_slots": 896,
+    "finite_slots": 896,
+    "median": -13.778101482862994,
+    "p95": 13.624351930161197,
+    "max": 34.312623577130964
+  },
+  "sole_min_height_mm": -15.809326380995415,
+  "below_shoe_tolerance_foot_frames": 597,
+  "nonfinite_foot_frames": 0,
+  "below_physical_floor_foot_frames": 221,
+  "support_abs_error_mm": {
+    "total_slots": 26,
+    "finite_slots": 26,
+    "median": 6.891312563059138,
+    "p95": 23.13700928218509,
+    "max": 25.007437103379182
+  },
+  "support_within10mm_slots": 17,
+  "withheld_direction_deg": {
+    "total_slots": 24,
+    "finite_slots": 24,
+    "median": 5.9946590552602,
+    "p95": 18.602021524129285,
+    "max": 24.317410660947655
+  },
+  "engineering_checks": {
+    "all448_available": true,
+    "no_restarts": true,
+    "sole_within_5mm_of_shoe_lower_bound": false,
+    "all_labeled_support_within10mm": false,
+    "all_updated_frames_converged": false
+  },
+  "all_engineering_checks_passed": false,
+  "limits": "Same-source engineering diagnostics only. Soft penalties do not guarantee geometric feasibility. Ground is Stage/ankle anchored;26 offline forefoot support hypotheses, not independent contact truth. Research priority is not an accuracy certification.",
+  "runtime_s": 1745.8579444999996,
+  "decision": "Requested single full448 replay completed. Retain high research priority; shoe-height/contact and convergence checks failed. No additional variants or weight search were run."
+}

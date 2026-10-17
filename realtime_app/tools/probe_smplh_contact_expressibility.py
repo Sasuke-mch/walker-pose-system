@@ -198,7 +198,7 @@ def run():
         'static_objective': 'same radial25px Huber/sigma8 body and eligible toe-direction; original contact residuals unchanged; no temporal or VPoser prior in EITHER chart',
         'toe_withheld': HELDOUT, 'fit_direction_only_frames': [40, 55],
         'solver': {'method': 'scipy least_squares trf', 'maximum_evaluations': 60, 'finite_difference_step': .001, 'gtol': .05, 'ftol': 1e-4, 'xtol': 1e-4, 'x_scale': 'jac', 'bounds': 'none, static mathematical diagnostic'},
-        'candidate_gate': 'At every selected frame contact halves support-ball gap, raw hip/nonhip median/P95 <=1.05 saved reference, sole >=-5mm, direction median<=max(3deg,baseline*1.1) and max<=baseline+2deg, gradient optimality<=.05; no claiming feasible from solver success alone.',
+        'candidate_gate': 'At every selected frame contact halves support-ball gap from25mm, raw hip/nonhip median/P95 <=1.05 saved reference, sole >=20mm, direction median<=max(3deg,baseline*1.1) and max<=baseline+2deg, gradient optimality<=.05; no claiming feasible from solver success alone.',
         'stop': 'One static factorial study, no parameter grid, no trajectory substitution. A failed or nonphysical chart is not promoted; a local success alone cannot establish temporal tracking.',
         'limits': 'Removing priors makes this a permissive geometry/solver diagnostic. SO3 knees can exploit implausible axes; all joint changes retained. Rank/one optimizer cannot prove global VPoser feasibility. Ground and contact hypotheses remain non-independent.'}
     save(DEST / 'protocol.json', protocol)

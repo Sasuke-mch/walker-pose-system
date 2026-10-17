@@ -1,5 +1,12 @@
 # Walker Pose System
 
+## 2026-10-17 路线管理与鞋高基准
+
+身体方法分路线管理，不再固定唯一“主线”。当前高优先级为 `smplh_causal_autograd_contact`：自动微分的因果 SMPL-H q/v/a 跟踪，保留原始双目身体像素、前掌方向和冻结髋观察映射，启用脚部接触；完整448入口为 `.venv-cuda/Scripts/python.exe realtime_app/tools/run_smplh_contact_route.py`。批量重投影和物理跟踪保留各自证据，不在本次展开对照。
+
+裸模型足底参考统一为地面上方25 mm（鞋高）；地面仍Z=0，接触目标25 mm，5 mm容差下界20 mm。路线配置见 `realtime_app/configs/current_mainline.json` 的 `route_management/method_routes`；旧 `mainline_selection` 仅兼容历史批量路线。最新运行状态见 `AI_PROGRESS.md`，详细方法见算法文档5.27。
+
+
 ## 2026-10-13 SMPL-H拟合方法更新
 
 通用拟合与二维实验入口默认使用--fit-policy reliability，修正置信度归约、SO(3)根锚及接触阶段身体观测保持项。已保存360 reference25和448结果仍来自legacy，未重算；冻结profile保留legacy，直接重放历史argv须显式补--fit-policy legacy。公式、输入支持、统计校准及物理证据边界见docs/CURRENT_SMPLH_ALGORITHM_20261002.md第28节，进度见AI_PROGRESS.md；下方历史分数下限0.6不代表新方法。

@@ -1,5 +1,56 @@
 {
-  "schema": "walker_current_route_v1",
+  "schema": "walker_method_routes_v2",
+  "route_management": {
+    "policy": "Methods are independent routes with their own inputs, results and evidence. There is no permanently privileged body mainline.",
+    "decision_date": "2026-10-17",
+    "current_work_route": "smplh_causal_autograd_contact",
+    "high_priority_routes": [
+      "smplh_causal_autograd_contact"
+    ],
+    "other_route_priorities": "Preserved by each route's own protocol; this task does not demote another method.",
+    "foot_ground_reference_m": 0.025,
+    "reference_scope": "Bare SMPL sole height, not ankle/heel landmark height; physical floor remains Z=0. Contact target25mm, existing5mm tolerance gives20mm lower bound.",
+    "legacy_fields": "mainline_selection and scene-profile mainline are compatibility selectors for specific saved methods. They do not overrule route priority or certify superiority."
+  },
+  "method_routes": {
+    "smplh_causal_autograd_contact": {
+      "name": "SMPL-H causal autograd with direction and shoe-height contact",
+      "priority": "high",
+      "status": "completed_full448_engineering_checks_failed",
+      "entry": "realtime_app/tools/run_smplh_contact_route.py",
+      "command_id": "body.run_smplh_contact_route",
+      "jacobian": "autograd",
+      "contact_enabled": true,
+      "foot_ground_reference_m": 0.025,
+      "state": "translation3, rootSO3 tangent3, VPoser32; q/v/a and114x114 covariance",
+      "observations": "raw stereo12 body joints plus valid transverse forefoot direction; frozen virtual hip observation map",
+      "objective": "body pixels + forefoot direction + motion prediction + latent prior + normalized unilateral sole + labeled robust ball attachment",
+      "frames": 448,
+      "result": "research_records/engineering_validation/G20261014_smplh_motion448_v1/hip_pose_repair_20261016/foot_direction_20261016/autograd_contact_shoe25_full448_20261017/result.npz",
+      "protocol": "research_records/engineering_validation/G20261014_smplh_motion448_v1/hip_pose_repair_20261016/foot_direction_20261016/autograd_contact_shoe25_full448_20261017/protocol.json",
+      "summary": "research_records/engineering_validation/G20261014_smplh_motion448_v1/hip_pose_repair_20261016/foot_direction_20261016/autograd_contact_shoe25_full448_20261017/summary.json",
+      "viewer": "research_records/engineering_validation/G20261014_smplh_motion448_v1/hip_pose_repair_20261016/foot_direction_20261016/autograd_contact_shoe25_full448_20261017/view/index.html",
+      "evidence": "engineering route; research priority is independent of physical/contact/3D validation",
+      "derivative_scope": "MAP objective uses autograd; existing numerical derivatives for joint reporting retained",
+      "completed_frames": 448,
+      "engineering_checks_passed": false
+    },
+    "smplh_batch_reprojection": {
+      "name": "SMPL-H batch raw-fisheye reprojection",
+      "priority": "unchanged",
+      "selection_reference": "mainline_selection",
+      "status": "completed_engineering_result",
+      "entry": "realtime_app/build_current_mainline_view.py",
+      "new_runs_foot_ground_reference_m": 0.025,
+      "historical_results_rewritten": false
+    },
+    "physics_tracking": {
+      "name": "Physics tracking methods",
+      "priority": "unchanged",
+      "records": "research_records/engineering_validation/G20261015_phc_pretrained448_v1",
+      "status": "separate_method_evidence_preserved_not_run_in_this_task"
+    }
+  },
   "frames": 448,
   "frame_ids": "0..447",
   "body_candidate": {
@@ -106,7 +157,7 @@
     "acceptance_scope": "Engineering algorithm promotion for declared supported-stop captures; 448-frame evidence retained, no claim of new 360-frame or live-device validation.",
     "previous_default_profile": "baseline"
   },
-  "legacy_fields_scope": "Top-level frames/body_candidate/matched_control/frozen_scalar_options remain the historical 448-frame cold-start comparison metadata. The active body and scene choice is mainline_selection; historical fields do not override it.",
+  "legacy_fields_scope": "Top-level frames/body_candidate/matched_control/frozen_scalar_options remain historical cold-start metadata. mainline_selection selects the saved batch-reprojection method for compatibility. route_management/method_routes define independent methods and current priorities; scene_route retains the shared scene profile.",
   "mainline_selection": {
     "dataset": "research_records\\engineering_validation\\G20261013_reliability448_view_v1",
     "frames": 448,

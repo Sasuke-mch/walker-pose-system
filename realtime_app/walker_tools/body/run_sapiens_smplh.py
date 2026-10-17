@@ -18,6 +18,7 @@ import subprocess
 import sys
 
 import numpy as np
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 
 ROOT = _tool_project_root
 
@@ -125,12 +126,12 @@ def main():
     assert all(np.isfinite(z[k]).all() for k in ('vertices','predicted_coco','vposer_latent','body_rotation_matrices'))
     initial = summary['checkpoints']['initial'];final = list(summary['checkpoints'].values())[-1]
     gates = dict(observations=excess<=10.002,wrists=all(v['p95']<=10 for v in final['wrist_error_mm'].values()),
-                 feet=all(v>=-3 for v in final['sole_minimum_z_mm'].values()),
+                 feet=all(v>=SHOE_HEIGHT_M*1000-3 for v in final['sole_minimum_z_mm'].values()),
                  leg_temporal=final['terms']['leg_ground_acceleration']<=initial['terms']['leg_ground_acceleration'],
                  hands=all(r['passed_geometry_proxy'] for r in audit['records']))
     write(output/'assessment.json',dict(frames=448,finite=True,vertices_shape=list(z['vertices'].shape),faces_shape=list(z['faces'].shape),
         maximum_observation_regression_mm=excess,checkpoints=summary['checkpoints'],hand_geometry=audit['summary'],
-        gates=gates,passed=all(gates.values()),accepted_for_main_fit=False,
+        gates=gates,passed=all(gates.values()),accepted_for_main_fit=False,foot_ground_reference_m=SHOE_HEIGHT_M,
         boundary='Rendering completion is not physical or external 2D/3D accuracy validation.'))
     print(json.dumps(gates),flush=True)
 

@@ -1,0 +1,99 @@
+{
+  "route_id": "smplh_causal_autograd_contact",
+  "priority": "high",
+  "command": [
+    "D:\\my_works\\walker_pose_system\\.venv-cuda\\Scripts\\python.exe",
+    "D:\\my_works\\walker_pose_system\\realtime_app\\tools\\run_smplh_contact_route.py"
+  ],
+  "frame_range": [
+    0,
+    447
+  ],
+  "jacobian": "autograd",
+  "contact_enabled": true,
+  "foot_ground_reference_m": 0.025,
+  "physical_floor_z_m": 0.0,
+  "contact": {
+    "lower_bound_m": 0.02,
+    "tolerance_m": 0.005,
+    "penetration_scale_m": 0.005,
+    "height_target_m": 0.025,
+    "height_scale_m": 0.01,
+    "anti_penetration_frames": [
+      1,
+      447
+    ],
+    "frame0": "saved initialization; evaluated, not silently shifted",
+    "support_intervals_inclusive": {
+      "right_ball": [
+        35,
+        47
+      ],
+      "left_ball": [
+        49,
+        61
+      ]
+    },
+    "unlabeled_frames": "no attachment label inferred; anti-penetration remains enabled",
+    "surface_sets": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20260927_wilor_smplh_full448_v1\\contact_surface_sets_smplh_v1\\contact_vertex_sets.json",
+    "slip": "no new slip term"
+  },
+  "method": "38D translation/root-SO3/VPoser q/v/a +114D covariance; real dt; raw stereo body pixels; transverse forefoot direction; fixed virtual hip map after10;15-iteration MAP; one pixel/pose information update, contact curvature excluded",
+  "derivative_scope": "Automatic MAP pixel/direction/contact Jacobians. Existing numerical point/time derivatives for reporting remain unchanged.",
+  "heldout_toe_frames": [
+    35,
+    47,
+    61,
+    267,
+    335,
+    412
+  ],
+  "success": "Report availability, all raw pixel slots, sole>=20mm, labeled ball within25+/-10mm, convergence and unavailable derivatives on all448. A failed check stays failed; no prerequisite prefix gate blocks the user-authorized full replay.",
+  "stop": "One complete448 run of this route; no controls, weight sweep, smoothing or post-solve foot translation.",
+  "limits": "25mm is user-specified shoe thickness, not estimated calibration. Offline reviewed labels only. Research priority does not certify accuracy/contact.",
+  "configuration": {
+    "min_score": 0.2,
+    "pixel_sigma_px": 8.0,
+    "huber_px": 25.0,
+    "max_stereo_epipolar_px": 35.0,
+    "min_observed_joints": 4,
+    "max_prediction_s": 0.1,
+    "derivative_warmup_s": 0.15,
+    "max_position_std_m": 0.1,
+    "max_derivative_reprojection_px": 25.0,
+    "translation_jerk_density": 0.25,
+    "rotation_jerk_density": 1.0,
+    "latent_jerk_density": 4.0,
+    "max_translation_correction_m": 0.08,
+    "max_root_correction_rad": 0.12,
+    "max_latent_correction_norm": 1.2,
+    "latent_prior_sigma": 0.75,
+    "max_abs_latent": 6.0,
+    "derivative_step_s": 0.01
+  },
+  "iterated_map_configuration": {
+    "maximum_iterations": 15,
+    "gradient_tolerance": 0.05,
+    "objective_tolerance": 0.001,
+    "step_tolerance": 0.001,
+    "maximum_line_search_steps": 12,
+    "condition_accepted_iterate": true
+  },
+  "source_body_run": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\first_frame_sapiens_20261015\\replay_selected_init\\map_sigma075",
+  "hip_calibration_result": {
+    "alpha": 0.36213313641862127,
+    "nfev": 6,
+    "cost": 931.1644581107552,
+    "optimality": 0.0017329076999620181,
+    "all_later_frames_excluded_from_calibration": true,
+    "regressor_row_sum": [
+      1.0,
+      1.0
+    ],
+    "thigh_fraction": 0.10941253220794421
+  },
+  "fresh_scene": "D:\\my_works\\walker_pose_system\\research_records\\engineering_validation\\G20261014_smplh_motion448_v1\\hip_pose_repair_20261016\\foot_direction_20261016\\autograd_contact_shoe25_full448_20261017\\scene_input\\scene\\scene_transforms.npz",
+  "real_pose_objective_max_difference": 2.2737367544323206e-13,
+  "state_coordinate_frame": "current_left_camera",
+  "causality_scope": "Recursive body state; scene has fixed lag and support labels are offline, not an immediate end-to-end causal contact system."
+}

@@ -39,9 +39,10 @@ def add_observations(payload, metadata, target):
     source = read_json(Path(read_json(OUT / 'toe_direction_prefix/protocol.json')['source_body_run']) / 'run_parameters.json')
     body[0] = np.asarray(read_json(Path(source['first_frame_observations']))['keypoints'])
     payload['observedPixels'] = finite(body[ids, ..., :2])
-    toes = np.full((62, 2, 4, 2), np.nan)
+    count = max(ids)+1
+    toes = np.full((count, 2, 4, 2), np.nan)
     for view, (side, rotation) in enumerate([('left', 'ccw90'), ('right', 'cw90')]):
-        for i, line in enumerate((DETECTOR / f'{side}_sapiens_raw.jsonl').read_text(encoding='utf-8').splitlines()[:62]):
+        for i, line in enumerate((DETECTOR / f'{side}_sapiens_raw.jsonl').read_text(encoding='utf-8').splitlines()[:count]):
             row = json.loads(line)
             if row['pair_id'] != i or row['file_name'] != f'pair_{i:04d}.png':
                 raise ValueError('Toe/raw source identities differ')
@@ -66,7 +67,7 @@ def model_extras(entry, result, ids, shared, cal, details):
     toe_camera = np.einsum('tji,tkj->tki', rotation, mesh_world[:, TOE_VERTICES]-translation[:, None])
     entry['toePixels'] = finite(project(toe_camera, cal))
     ball_mm = np.stack([mesh_world[:, SURFACE[indices], 2].min(axis=1)*1000 for indices in BALL], axis=1)
-    labels = support_labels()
+    labels = support_labels(max(ids)+1)
     entry['contactInfo'] = [f"支撑假设 L/R：{labels[i].astype(int).tolist()}；ball最低 L/R：{ball_mm[k, 0]:.2f} / {ball_mm[k, 1]:.2f} mm\n{details[k]}" for k, i in enumerate(ids)]
     entry['sourceResult'] = result
 
@@ -81,6 +82,9 @@ def write_page(payload, metadata, target, static):
     style = '.projections{position:absolute;right:12px;bottom:12px;z-index:3;background:#fffef7f5;border:1px solid #bbc5be;border-radius:6px;max-width:min(650px,52vw)}.scene:has(.projections[open])>#scene{width:46%}.projections>summary{padding:8px}.projections>div{padding:8px}.projections p{font-size:11px;margin:4px 0}.imagePair{display:flex;gap:5px}.imagePair canvas{width:50%;height:auto;max-height:60vh;object-fit:contain;background:#fff}nav{display:flex;gap:10px;font-size:12px}nav a{color:#355f52}'
     html = html.replace('</style>', style + '</style>').replace('修正后候选', '工程对照，保留未通过结果')
     nav = '<nav><a href="../sequences/index.html?frame=55">62帧序列</a><a href="../matched/index.html?frame=55">同先验静态</a><a href="../expressibility/index.html?frame=55">局部旋转诊断</a></nav>'
+    if payload.get('singleRoute'):
+        nav = ''
+        html = html.replace('工程对照，保留未通过结果', '自动微分＋接触，鞋高25mm')
     html = html.replace('<h1>人体运动</h1>', '<h1>接触试验</h1>'+nav)
     (target / 'index.html').write_text(html, encoding='utf-8')
     (target / 'viewer.js').write_text((templates / 'smplh_minimal_view.js').read_text(encoding='utf-8'), encoding='utf-8')

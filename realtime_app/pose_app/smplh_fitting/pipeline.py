@@ -741,6 +741,7 @@ def run_fit(args, observer=None, runtime_observer=None) -> int:
                         hand_points_right=final_hand_r.detach().cpu().numpy(), **weight_details, **contact_diag)
     (args.output_dir / "fit_summary.json").write_text(json.dumps({
         "fit_policy": getattr(args, "fit_policy", "legacy"),
+        "foot_ground_reference_m": surface_contact.SHOE_HEIGHT_M,
         "observation_weighting": {
             "reduction": "fixed_original_slots" if reliability else "historical_self_normalized",
             "score_semantics": "detector_reliability_not_calibrated_probability_or_precision",

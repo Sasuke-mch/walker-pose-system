@@ -16,6 +16,7 @@ APP = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP))
 
 from pose_app.fisheye_camera import load_stereo_fisheye  # noqa: E402
+from pose_app.foot_ground_reference import SHOE_HEIGHT_M
 from pose_app.smplh_motion_tracker import SMPLHMotionConfig, SMPLHMotionTracker, SMPLHObservationMap  # noqa: E402
 from pose_app.smplh_first_frame_labels import apply_first_frame_labels, apply_first_frame_observations, refine_first_frame_2d  # noqa: E402
 from pose_app.body_observations import load_ordered_predictions as _load_predictions  # noqa: E402
@@ -139,7 +140,8 @@ def run(args) -> dict:
                   "coordinate_frame": "current_left_camera" if scene_data is None else "stage_conditioned_fixed_ground"}
     if scene_data is not None:
         parameters.update(world_state_available=True, scene_role="stage_conditioned_world_estimation",
-                          ground_configuration=asdict(tracker.ground_config), surface_sets=str(args.surface_sets.resolve()))
+                          ground_configuration=asdict(tracker.ground_config), surface_sets=str(args.surface_sets.resolve()),
+                          foot_ground_reference_m=SHOE_HEIGHT_M)
     if optimizer_config is not None:
         parameters["source"].append("realtime_app/pose_app/smplh_iterated_motion_tracker.py")
     (args.output / "run_parameters.json").write_text(json.dumps(parameters, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -280,7 +282,7 @@ def run(args) -> dict:
             ground_constraint_policy=args.ground_constraint_policy,
             model_storage_frame="current_left_camera",
             observation_term="raw_fisheye_stereo_2d_body_data_plus_explicit_stage_conditioned_ground_priors;no_3d_body_measurements",
-            ground_configuration=asdict(tracker.ground_config),
+            ground_configuration=asdict(tracker.ground_config), foot_ground_reference_m=SHOE_HEIGHT_M,
             constraint_status_counts=dict(Counter(c["status"] for c in constraint_rows)),
             constraint_satisfied_frames=sum(c.get("constraint_satisfied") is True for c in constraint_rows),
             stage2_frames=int(moving.sum()), stage2_constraint_satisfied_frames=sum(c.get("constraint_satisfied") is True and c["stage2"] for c in constraint_rows),
@@ -288,7 +290,7 @@ def run(args) -> dict:
             stage2_sole_max_displacement_mm=_stats(np.array([c.get("sole_max_displacement_m") or [np.nan]*2 for c in constraint_rows])[moving]*1000))
         summary["limits"] = ["Stage camera transforms already use triangulated ankle anchors and stop-support assumptions; contact agreement is circular engineering consistency, not independent world accuracy.",
              "Scene uses fixed-lag output nominally0.5s and is not immediate causal output.",
-             "Controlled walking assumption: at least one candidate sole within5mm of ground; both only during all declared Stage2 frames.",
+             "Controlled walking assumption: at least one candidate sole within5mm of25mm shoe-height reference; both only during declared Stage2 frames. Physical floor remains Z=0.",
              "Whole54-point sole surface and heel ball use episode anchors after feasible contact; transitions retain anchors until Stage1.",
              "Solver uses0.2mm interior margin; output physical5/10mm bounds allow only1micrometre numerical tolerance; active-set covariance and derivative conditioning are local approximations.",
              "No independent metric position/velocity/acceleration or physical contact truth; rejected/failed output remains recorded."]

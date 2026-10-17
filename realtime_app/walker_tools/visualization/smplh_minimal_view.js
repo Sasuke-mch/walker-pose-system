@@ -99,7 +99,7 @@
       }
     }
     if($('model').checked)for(let j=0;j<17;j++)dot(point(model,j),'#087970',2.4);
-    if($('sole').checked)for(let j=0;j<d.soleCount;j++){const p=point(sole,j,fi,d.soleCount);dot(p,p[2]<0?'#d31425':'#6f7526',1.3);}
+    if($('sole').checked)for(let j=0;j<d.soleCount;j++){const p=point(sole,j,fi,d.soleCount),ref=(m.soleReferenceMm||0)/1000;dot(p,p[2]<ref-(ref?0.005:0)?'#d31425':'#6f7526',1.3);}
     canvas.dataset.audit=JSON.stringify({frame:frameId(),sampleIndex:fi,frames:d.frames,static:!!d.static,variant:m.name,meshVariant:m.name,
       meshVertices:6890,meshFaces:d.faces.length,meshIndexEntries:d.faces.length*3,meshVisible:$('mesh').checked,
       rawEdges,modelPoints:$('model').checked?17:0,displayMap:'X,-Y,Z',interpolation:false,smoothing:false,
@@ -117,7 +117,7 @@
     const rejected=d.accepted[fi].flatMap((ok,j)=>ok?[]:[`${names[j]}：${d.rawReasons[fi][j]}`]);
     $('quality').textContent=`${m.label||'修正后'} · 原始帧 ${frameId()}${d.static?'；仅有 '+d.frameIds.join('/')+' 帧':''}\n${stage}\n地面变换：${d.pose[fi]}；${d.poseReason[fi]||'无拒绝原因'}\n`+
       `${solver}；${m.reason[fi][0]||'—'}\n回投中位：${number(median(m.errors[fi].flat()))} px；髋 ${number(median(m.errors[fi].flatMap(v=>v.slice(6,8))))} px\n`+
-      `足底最低 L / R：${m.soleHeight[fi].map(number).join(' / ')} mm\n${m.contactInfo?m.contactInfo[fi]+'\n':''}严格观测：${d.accepted[fi].filter(Boolean).length}/17\n${rejected.join('\n')}\n${m.landmarkDefinition[fi]}`;
+      `足底最低 L / R：${m.soleHeight[fi].map(number).join(' / ')} mm\n${m.soleReferenceMm?'鞋高目标：'+m.soleReferenceMm+' mm；允许下界：'+(m.soleReferenceMm-5)+' mm\n相对鞋高 L / R：'+m.soleClearance[fi].map(number).join(' / ')+' mm\n':''}${m.contactInfo?m.contactInfo[fi]+'\n':''}严格观测：${d.accepted[fi].filter(Boolean).length}/17\n${rejected.join('\n')}\n${m.landmarkDefinition[fi]}`;
   }
   function draw(){drawScene();drawInfo();drawImages();}
   function setFrame(value){fi=Math.max(0,Math.min(d.frames-1,Math.round(value)));playing=false;$('play').textContent='播放';draw();}
