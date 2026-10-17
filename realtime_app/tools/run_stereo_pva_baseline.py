@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-import csv
 from dataclasses import asdict
 import json
 from pathlib import Path
@@ -21,6 +20,7 @@ APP = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP))
 
 from pose_app.body_observations import load_ordered_predictions  # noqa: E402
+from pose_app.replay_pair_timing import load_capture_pair_times  # noqa: E402
 from pose_app.fisheye_camera import load_stereo_fisheye  # noqa: E402
 from pose_app.stereo_pva_tracker import StereoPVAConfig, StereoPVATracker  # noqa: E402
 
@@ -31,32 +31,9 @@ JOINT_NAMES = ("left_shoulder", "right_shoulder", "left_elbow", "right_elbow",
                "right_knee", "left_ankle", "right_ankle")
 
 
-def _read_capture_times(input_pairs: Path, count: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, Path]:
-    with (input_pairs / "selection_manifest.csv").open(encoding="utf-8-sig", newline="") as stream:
-        selection = list(csv.DictReader(stream))
-    if len(selection) != count or [int(row["sequence_index"]) for row in selection] != list(range(count)):
-        raise ValueError("selection manifest does not match prediction frame count")
-    metadata = json.loads((input_pairs / "metadata.json").read_text(encoding="utf-8"))
-    capture_path = Path(metadata["source_session"]) / "stereo_pairs.csv"
-    capture_metadata = json.loads((capture_path.parent / "metadata.json").read_text(encoding="utf-8"))
-    if capture_metadata["timestamp_type"] != "host_read_return_perf_counter_ns":
-        raise ValueError("unexpected capture timestamp definition")
-    with capture_path.open(encoding="utf-8-sig", newline="") as stream:
-        capture = list(csv.DictReader(stream))
-    left_ns, right_ns, pair_ids = [], [], []
-    for row in selection:
-        source = capture[int(row["source_pair_index"])]
-        if any(row[f"{side}_frame_id"] != source[f"{side}_frame_id"] for side in ("left", "right")):
-            raise ValueError("selected frame does not match capture identity")
-        left_ns.append(int(source["left_host_return_timestamp_ns"]))
-        right_ns.append(int(source["right_host_return_timestamp_ns"]))
-        pair_ids.append(int(source["pair_id"]))
-    left, right = np.asarray(left_ns, dtype=np.int64), np.asarray(right_ns, dtype=np.int64)
-    if np.any(np.diff(left) <= 0) or np.any(np.diff(right) <= 0):
-        raise ValueError("host-return timestamps must increase strictly")
-    # Subtract the integer origin before float conversion to preserve ns differences.
-    times = (left + right - int(left[0] + right[0])) / 2e9
-    return times, (right - left) / 1e6, np.asarray(pair_ids), capture_path
+# Historical name retained for existing callers and flat imports; the single
+# implementation lives in pose_app.replay_pair_timing.load_capture_pair_times.
+_read_capture_times = load_capture_pair_times
 
 
 # Historical name retained for existing callers and flat imports; the single

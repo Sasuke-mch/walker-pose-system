@@ -22,7 +22,8 @@ from pose_app.fisheye_camera import fisheye_project_numpy, load_stereo_fisheye
 from pose_app.smplh_ground_constraints import load_sole_vertex_indices
 from pose_app.smplh_motion_tracker import SMPLHObservationMap
 from pose_app.body_observations import load_ordered_predictions as _load_predictions
-from run_stereo_pva_baseline import JOINT_NAMES, _read_capture_times
+from pose_app.replay_pair_timing import load_capture_pair_times as _read_capture_times
+from run_stereo_pva_baseline import JOINT_NAMES
 
 
 def main():

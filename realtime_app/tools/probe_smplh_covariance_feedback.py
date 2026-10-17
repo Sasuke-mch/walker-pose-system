@@ -18,7 +18,7 @@ from pose_app.smplh_iterated_motion_tracker import (
 )
 from pose_app.smplh_motion_tracker import SMPLHMotionConfig, SMPLHObservationMap
 from pose_app.body_observations import load_ordered_predictions as _load_predictions
-from run_stereo_pva_baseline import _read_capture_times
+from pose_app.replay_pair_timing import load_capture_pair_times as _read_capture_times
 
 
 def main():

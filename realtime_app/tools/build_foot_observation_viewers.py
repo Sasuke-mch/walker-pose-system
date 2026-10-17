@@ -16,7 +16,7 @@ from pose_app.fisheye_camera import load_stereo_fisheye
 from pose_app.smplh_ground_constraints import load_sole_vertex_indices
 from pose_app.smplh_motion_tracker import SMPLHObservationMap
 from probe_smplh_foot_observations import OUT, REPAIR, ROOT
-from run_stereo_pva_baseline import _read_capture_times
+from pose_app.replay_pair_timing import load_capture_pair_times as _read_capture_times
 
 
 def export(run, title, rejection, shared, *, target=None, result_override=None, rows_override=None, frame_ids=None, write_page=True):

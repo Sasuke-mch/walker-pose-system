@@ -21,7 +21,8 @@ from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy  
 from pose_app.triangulation import triangulate_matches  # noqa: E402
 from walker_tools.stereo.evaluate_offline_stereo_predictions import _records, _result  # noqa: E402
 from pose_app.body_observations import load_ordered_predictions as _load_predictions  # noqa: E402
-from run_stereo_pva_baseline import _read_capture_times, JOINT_NAMES  # noqa: E402
+from pose_app.replay_pair_timing import load_capture_pair_times as _read_capture_times  # noqa: E402
+from run_stereo_pva_baseline import JOINT_NAMES  # noqa: E402
 
 
 def save(path, data):

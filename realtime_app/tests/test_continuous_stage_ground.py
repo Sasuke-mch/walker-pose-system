@@ -1,3 +1,4 @@
+import csv
 import json
 import tempfile
 import unittest
@@ -186,6 +187,54 @@ class ContinuousTests(unittest.TestCase):
         self.assertAlmostEqual(values[0][1] - values[0][0], 0.01)
         with self.assertRaises(ValueError):
             load_pair_timing(path, 2)
+
+    def test_capture_pair_times_preserve_nanosecond_skew_and_reject_identity(self):
+        from pose_app.replay_pair_timing import load_capture_pair_times
+
+        capture = self.root / "capture"
+        capture.mkdir()
+        (capture / "metadata.json").write_text(
+            json.dumps({"timestamp_type": "host_read_return_perf_counter_ns"})
+        )
+        pairs = [
+            {
+                "pair_id": i,
+                "left_frame_id": 10 + i,
+                "right_frame_id": 20 + i,
+                "left_host_return_timestamp_ns": 5_000_000_000 + i * 50_000_000,
+                "right_host_return_timestamp_ns": 5_010_000_000 + i * 50_000_000,
+            }
+            for i in range(3)
+        ]
+        with (capture / "stereo_pairs.csv").open("w", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=list(pairs[0]))
+            writer.writeheader()
+            writer.writerows(pairs)
+        manifest = [
+            {"sequence_index": i, "source_pair_index": i, "left_frame_id": 10 + i,
+             "right_frame_id": 20 + i}
+            for i in range(3)
+        ]
+        manifest_path = self.root / "selection_manifest.csv"
+
+        def write_manifest(rows):
+            with manifest_path.open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=["sequence_index", "source_pair_index",
+                                                            "left_frame_id", "right_frame_id"])
+                writer.writeheader()
+                writer.writerows(rows)
+
+        write_manifest(manifest)
+        (self.root / "metadata.json").write_text(json.dumps({"source_session": str(capture)}))
+        times, skew, pair_ids, capture_path = load_capture_pair_times(self.root, 3)
+        self.assertEqual(capture_path, capture / "stereo_pairs.csv")
+        self.assertAlmostEqual(times[1] - times[0], 0.05)
+        self.assertAlmostEqual(skew[0], 10.0)
+        self.assertEqual(pair_ids.tolist(), [0, 1, 2])
+        manifest[1]["left_frame_id"] = 999
+        write_manifest(manifest)
+        with self.assertRaisesRegex(ValueError, "identity"):
+            load_capture_pair_times(self.root, 3)
 
     def test_metric_background_pose_and_withheld_failure(self):
         rng = np.random.default_rng(71)

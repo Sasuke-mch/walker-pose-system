@@ -19,9 +19,9 @@ from pose_app.fisheye_camera import load_stereo_fisheye  # noqa: E402
 from pose_app.smplh_motion_tracker import SMPLHMotionConfig, SMPLHMotionTracker, SMPLHObservationMap  # noqa: E402
 from pose_app.smplh_first_frame_labels import apply_first_frame_labels, apply_first_frame_observations, refine_first_frame_2d  # noqa: E402
 from pose_app.body_observations import load_ordered_predictions as _load_predictions  # noqa: E402
+from pose_app.replay_pair_timing import load_capture_pair_times as _read_capture_times  # noqa: E402
 from run_stereo_pva_baseline import (  # noqa: E402
-    JOINT_INDICES, JOINT_NAMES, _json_array, _plot_curves,
-    _read_capture_times, _stats,
+    JOINT_INDICES, JOINT_NAMES, _json_array, _plot_curves, _stats,
 )
 
 
