@@ -13,7 +13,7 @@ import numpy as np
 APP = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(APP), str(APP / 'tools')]
 from build_foot_observation_viewers import export
-from build_free_skeleton_comparison_viewer import finite, prepare_scene, save
+from walker_tools.visualization._scene_export import finite, prepare_scene, save
 from pose_app.rotation import model_to_raw_point
 from probe_smplh_foot_observations import (
     DETECTOR,

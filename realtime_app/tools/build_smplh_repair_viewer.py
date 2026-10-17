@@ -10,7 +10,10 @@ from collections import Counter
 from pathlib import Path
 
 import numpy as np
-from build_free_skeleton_comparison_viewer import (
+
+_BOOTSTRAP = Path(__file__).resolve().parents[1]
+sys.path[:0] = [str(_BOOTSTRAP), str(_BOOTSTRAP / 'tools')]
+from walker_tools.visualization._scene_export import (  # noqa: E402
     APP,
     REPO,
     finite,

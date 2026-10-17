@@ -11,7 +11,7 @@ import numpy as np
 
 APP = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(APP), str(APP / 'tools')]
-from build_free_skeleton_comparison_viewer import finite, packed, prepare_scene, save
+from walker_tools.visualization._scene_export import finite, packed, prepare_scene, save
 from pose_app.fisheye_camera import load_stereo_fisheye
 from pose_app.smplh_ground_constraints import load_sole_vertex_indices
 from pose_app.smplh_motion_tracker import SMPLHObservationMap
