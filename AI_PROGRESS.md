@@ -1,5 +1,19 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-17 最小参数化助步器动力学资产：离线生成，未加载、未仿真
+
+按`dispatch/plan-20261017-rl-walker-foundation.md`只做第一阶段：把既有助步器canonical粗几何转换为单link、多collision、自由根候选URDF，只做CPU离线检查。结论仅为`asset_generated_unvalidated`，没有在Isaac Gym加载、没有受力验证、没有进入任何实际场景。
+
+新增`realtime_app/learning_phc/walker_asset.py`（纯NumPy/标准库，不import仿真）与`realtime_app/tests/test_phc_walker_asset.py`；未扩`run_tests.py`。产物：`research_records/engineering_validation/G20261015_phc_pretrained448_v1/walker_foundation_20261017/synthetic_fixture_asset_v1/{walker.urdf,asset_metadata.json}`（新目录，拒绝覆盖）。新资产1 link、0 joint、9杆4垫共13碰撞体，无world/fixed joint、无球体、无重复手柄段、无`front_top_center`碰撞球。
+
+canonical核对：用当前`build_coarse_frame(WalkerDimensions(...))`按源`dimensions_mm`重建，15节点名与坐标一致（atol 1e-6mm）、`edges`/`handle_segments`/`foot_nodes`完全相同，含“人体left柄对应名称含right的杆”的安装约定；mm→m只转换一次。缓存只作诊断（`used=false`）：`nodes_initial_ground_mm`与`nodes_left_camera_mm`对14个canonical节点残差0.0mm，唯一非零是语义锚`front_top_center`165.343mm——缓存在该锚点使用手柄高度838.389mm，canonical前横杆为673.046mm；该锚点不参与构造，缓存未改零、未参与生成。
+
+参数：mass 4.0kg、COM [0,0,0.42]m、绕COM惯量[0.25,0.2,0.15,0,0,0]kg·m²、管半径0.01m、脚垫半径0.02m、高度0.02m全部标记`kind=synthetic_fixture`（具名合成检查值，不是实物参数，也未按实心密度反推真实质量）；几何与左相机安装仍为历史`estimated`拟合。`contains_synthetic_fixture=true`。杆件碰撞外尺寸0.470×0.320×0.828m，含脚垫外尺寸0.490×0.340×0.848m（脚垫底面z=0），不把canonical 450mm当最终碰撞外宽。左相机固定安装由拟合的`T_C_from_W`正确求逆得到`T_W_from_C`；右光心只有左相机系位置，完整右外参保持unknown。缓存`C_obs`与后续仿真`C_sim`不混用。
+
+旧Gym接口只读查询（WSL Ubuntu-22.04本地Preview4，未import）：`docs/api/python/{gym_py,struct_py}.html`与`programming/assets.html`给出`load_asset(self, sim, rootpath, filename, options=None) -> Asset`、`AssetOptions.fix_base_link`（导入时固定基座）、`AssetOptions.override_com`/`override_inertia`（用几何重算并覆盖原资产值，默认False即“importers will use the values given in the original assets”）、`AssetOptions.density`（无质量/惯量数据时的默认密度）、`get_actor_rigid_body_properties(env, actor) -> List[RigidBodyProperties]`（含`mass`/`com`/`inertia`，`inertia`为相对质心的张量）和`set_actor_rigid_body_properties(..., recomputeInertia=False)`。本地可读材料未确认：asset级刚体质量/惯量读回（无`get_asset_rigid_body_properties`，`struct_py.html`无`AssetRigidBodyProperties`），已有的是`get_asset_rigid_body_count/name`与`get_asset_dof_properties`。因此“URDF惯量被加载器保留”只有文档级说明，未加载验证。
+
+执行边界：5项离线单测`Ran 5 tests / OK`；一次合成资产生成完成且生成目录只含`walker.urdf`和`asset_metadata.json`，`simulator_loaded=false`、`inertia_readback_verified=false`。Gym import/create_sim/simulate=0，模型推理=0，训练=0，448新回放=0。下一步是单独加载该自由助步器、读回质量与惯量并验证被动物理，本阶段不执行。
+
 ## 2026-10-16 接触试验可视化完成：四组62帧、同先验三帧与局部旋转五帧分别查看
 
 按根规范及walker-visualization技能，新增build_contact_experiment_viewers.py。foot_direction_20261016/contact_visualization_20261016下sequences为原方向/FD软接触/自动无接触/自动软接触四组真实62帧同帧切换；matched为40/55/61独立同prior原方向及三解；expressibility为35/40/47/55/61独立latent/SO(3)四诊断+基线。静态页禁播，不造连续轨迹或回填原序列。三页共享同frame0取景，保留原图双目回投/下肢放大、接触标签、足底小标记、未收敛及未通过原因。

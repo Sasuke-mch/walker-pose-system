@@ -223,3 +223,19 @@ $env:PYTHONPATH='realtime_app'
 验证：原9项及新增旋转目标和同基点回归共11项通过，Ruff E9/F及编译通过。analysis_feedback/comparison.png实际检查，图上所有曲线为原采样值、缺失保留，无平滑/后吸附；没有新三维页面或替换旧最好结果页面。当前任务没有独立3D/接触/泛化真值，所有改善或退化仅限同检测器/同场景条件下的工程证据。
 
 阶段决定：本轮完成一个被反例证明的实现修复，未获得新的整体姿态精度提升；保留匹配骨架PHC，二维反馈/旋转伺服默认关闭，正式人体主线不变。停止“冻结PHC后再补一个伺服”的局部扩展。后续研究应以Mimic2DM/PhysHMR的直接图像条件与联合训练为机制参考，先落实适合现有双鱼眼的观测/动作/训练数据和独立评价，再训练单一控制策略；该学习路线尚未实现，不能把本轮解析GN修补算作新RL网络或论文级创新。
+## 2026-10-17 task-01：最小参数化助步器动力学资产（离线生成、未加载）
+
+本区块属于`dispatch/plan-20261017-rl-walker-foundation.md`第一阶段，只在既有448实验根下新增独立子目录，不改本实验任何既有输入、输出、协议或结论。目标是把助步器canonical粗几何转成单link、多collision、自由根候选URDF并做CPU离线检查；结论仅为`asset_generated_unvalidated`，不是“静态助步器”、不是“Gym已加载”、不是受力或实际场景验证，也没有替换或提升本实验任何历史结果。
+
+产物：`research_records/engineering_validation/G20261015_phc_pretrained448_v1/walker_foundation_20261017/synthetic_fixture_asset_v1/walker.urdf`与同目录`asset_metadata.json`（新目录，已存在时拒绝覆盖，未建v2）。代码：`realtime_app/learning_phc/walker_asset.py`（离线生成，不import仿真）、`realtime_app/tests/test_phc_walker_asset.py`（5项离线单测，未扩`run_tests.py`）。输入仍为`research_records/engineering_validation/G20260918_offline_walker_frame_evidence_v1/coarse_complete_model_v2_camera_rail/coarse_walker_model.json`，源文件未被重写。
+
+测试：`PYTHONPATH=realtime_app`，`.venv-phc/Scripts/python.exe -m unittest discover -s realtime_app/tests -p test_phc_walker_asset.py -v`，实际`Ran 5 tests`、`OK`。测试只用内存/临时合成数据，不import Gym、不调用模型、不写实验目录。
+
+几何：用当前`pose_app.parametric_walker_model.build_coarse_frame(WalkerDimensions(...))`按源`dimensions_mm`重建并与canonical逐项比对，15节点名与坐标（atol 1e-6mm）、`edges`、`handle_segments`、`foot_nodes`全部一致，保留安装约定“人体left柄对应名称含right的杆”，mm→m只转换一次；`front_top_center`只作语义锚，未加碰撞球，手柄段未重复添加。URDF为1 link、0 joint、9杆4垫共13 collision，无world/fixed joint、无球体。缓存只诊断（`used=false`，未改成零、未参与构造）：`nodes_initial_ground_mm`/`nodes_left_camera_mm`对14个canonical节点残差0.0mm，唯一非零为语义锚`front_top_center`165.343mm（缓存在该锚点取手柄高度838.389mm，canonical前横杆673.046mm）。杆件碰撞外尺寸0.470×0.320×0.828m；含脚垫全部碰撞外尺寸0.490×0.340×0.848m，脚垫底面z=0、脚垫沿+Z、竖管自foot+pad_height开始；不把canonical 450mm当最终碰撞外宽，未缩放节点迎合标称。左相机为拟合`T_C_from_W`的正确求逆`T_W_from_C`；右手只有左相机系光心位置，完整右相机朝向保持unknown。缓存`C_obs`与后续`C_sim`不混用。
+
+参数：mass 4.0kg、COM [0,0,0.42]m、绕COM惯量[0.25,0.2,0.15,0,0,0]kg·m²、管半径0.01m、脚垫半径0.02m、脚垫高度0.02m全部为具名`kind=synthetic_fixture`合成检查值（`contains_synthetic_fixture=true`），不是实物参数，未按实心碰撞体密度反推真实质量；几何与左相机安装仍为历史`estimated`拟合，没有整片资产“真实已标定”结论。实测缺失：助步器质量/重心/惯量、管径与壁厚、脚垫尺寸/材料/摩擦、相机安装外参、被试体重与使用高度。每项在metadata保留`value`/`unit`/`kind`/`source`；惯量6项顺序`Ixx,Iyy,Izz,Ixy,Ixz,Iyz`、绕COM、walker轴表达、URDF惯性原点为COM且rpy=0，并校验正定与主惯量三角关系。
+
+旧Gym接口（WSL Ubuntu-22.04 `/home/itachi/walker-phc/isaacgym`，只读，未import、未加载）：本地Preview4文档`docs/api/python/gym_py.html`、`docs/api/python/struct_py.html`、`docs/programming/assets.html`给出`load_asset(self, sim, rootpath, filename, options=None) -> Asset`、`AssetOptions.fix_base_link`（导入时固定基座）、`AssetOptions.override_com`/`override_inertia`（用几何重算COM/惯量并覆盖原资产值，默认False即importers沿用原资产值）、`AssetOptions.density`、`get_actor_rigid_body_properties(env, actor) -> List[RigidBodyProperties]`（`mass`/`com`/`inertia`，inertia相对质心）与`set_actor_rigid_body_properties(..., recomputeInertia=False)`。本地可读材料未确认asset级刚体质量/惯量读回：无`get_asset_rigid_body_properties`，`struct_py.html`无`AssetRigidBodyProperties`，可用的是`get_asset_rigid_body_count/name`、`get_asset_dof_properties`、`examples/asset_info.py`。因此“URDF惯量会被加载器保留”只有文档级说明，本轮未加载验证。
+
+执行边界：`simulator_loaded=false`、`inertia_readback_verified=false`；Gym import/create_sim/simulate=0，模型推理=0，训练=0，448新回放=0，未启动WSL物理栈，未接抓握、未改reset、未恢复BC/DAgger/PPO。下一步（单独加载该自由助步器、读回质量与惯量并验证被动物理）不在本轮执行。
+
