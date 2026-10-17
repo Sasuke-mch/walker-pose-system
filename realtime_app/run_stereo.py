@@ -19,7 +19,7 @@ from pose_app.config import load_config
 from pose_app.docker_service import DockerPoseService
 from pose_app.geometry_input import count_out_of_raw_image_bounds
 from pose_app.http_client import PMPosePipelineClient, PoseServiceClient
-from tools.build_continuous_foot_inclusive_roi import RULE
+from pose_app.person_roi import RULE
 from pose_app.local_perspective import LocalPerspectiveModelInput
 from pose_app.lower_limb_live_status import LowerLimbLiveStatusWriter
 from pose_app.lower_limb_pipeline import build_lower_limb_pipeline
