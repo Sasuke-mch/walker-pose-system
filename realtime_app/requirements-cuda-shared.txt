@@ -4,7 +4,7 @@
 # xtcocotools is intentionally omitted: its Windows/Python 3.12 build in the
 # upstream WiLoR requirements is broken because the sdist misses _mask.c.
 numpy==1.26.4
--r requirements-camera-identity.txt
+cv2-enumerate-cameras==1.3.3; platform_system == "Windows"
 opencv-python
 pyrender
 pytorch-lightning
