@@ -5,10 +5,15 @@ regression reader (``check_mainline_regression.fit_arguments``) and the
 resource preflight reader (``preflight_smplh.fit_arguments``):
 
 - reading a JSON array of CLI argument strings, and
-- parsing it with the fitter's own ``build_parser`` while turning argparse's
-  ``SystemExit`` into a ``ValueError``.
+- parsing it with the fitter's own ``build_parser``.
 
-It deliberately does **not** append ``--fit-policy legacy``, trim leading
+``parse_fit_argv`` deliberately keeps argparse's original behaviour: on invalid
+options it lets ``SystemExit`` propagate, so a CLI that calls it exits with
+argparse's own code (2 for usage errors) and message. Translating that
+``SystemExit`` into a ``ValueError`` is part of the **historical regression
+adapter** contract (``resolve_saved_fit_command``), not of the shared parser.
+
+It also deliberately does **not** append ``--fit-policy legacy``, trim leading
 program tokens, reject duplicate options, or validate optimization ranges; those
 remain in the respective adapters, whose public names and return values are
 unchanged. The parser import stays lazy so importing this module never loads
@@ -33,27 +38,21 @@ def read_argv_list(path: Path | str) -> list[str]:
 
 
 def parse_fit_argv(values: list[str]):
-    """Parse a fitter argv list into an argparse ``Namespace``.
-
-    ``argparse`` exits the process on malformed options; that ``SystemExit`` is
-    converted to a ``ValueError`` so callers can report it instead of aborting.
-    """
+    """Parse options while retaining argparse's original exit behavior."""
     from walker_tools.body.fit_smplh_wilor_sequence import build_parser
 
-    try:
-        return build_parser().parse_args(values)
-    except SystemExit as error:
-        raise ValueError("invalid saved fit command") from error
+    return build_parser().parse_args(values)
 
 
 def resolve_saved_fit_command(path):
     """Read and resolve a saved fitter command into an argparse ``Namespace``.
 
-    Shared by the frozen regression reader and the mainline export. Accepts both
-    a historical ``fit_command.json`` (with leading program tokens) and an
-    options-only argv list; defaults a missing ``--fit-policy`` to ``legacy``;
-    and rejects duplicate options. It requires ``--left-raw`` so an unrelated
-    argv list cannot be silently accepted.
+    Historical regression adapter. Accepts both a historical
+    ``fit_command.json`` (with leading program tokens) and an options-only argv
+    list; defaults a missing ``--fit-policy`` to ``legacy``; and rejects
+    duplicate options. It requires ``--left-raw`` so an unrelated argv list
+    cannot be silently accepted. Unlike the shared parser, it converts a
+    malformed-option ``SystemExit`` into a ``ValueError``.
     """
     values = read_argv_list(path)
     if "--left-raw" not in values:
@@ -64,4 +63,7 @@ def resolve_saved_fit_command(path):
         values.extend(["--fit-policy", "legacy"])
     if any(value.startswith("--") and values.count(value) != 1 for value in values):
         raise ValueError("duplicate options in command")
-    return parse_fit_argv(values)
+    try:
+        return parse_fit_argv(values)
+    except SystemExit as error:
+        raise ValueError("invalid saved fit command") from error

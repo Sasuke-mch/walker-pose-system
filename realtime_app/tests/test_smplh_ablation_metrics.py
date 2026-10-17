@@ -109,3 +109,29 @@ def test_preflight_and_regression_share_one_argv_reader(tmp_path):
     bad.write_text(json.dumps({"not": "a list"}))
     with pytest.raises(ValueError):
         read_argv_list(bad)
+
+
+def _required_fit_options():
+    return ["--left-raw", "l", "--right-raw", "r", "--wilor-left", "wl", "--wilor-right", "wr",
+            "--calibration-dir", "cal", "--regressor", "reg", "--smplh-model", "model", "--output-dir", "out"]
+
+
+def test_preflight_illegal_option_keeps_argparse_exit_code_two(tmp_path):
+    import json
+    from preflight_smplh import fit_arguments as preflight_fit_arguments
+
+    path = tmp_path / "args.json"
+    path.write_text(json.dumps([*_required_fit_options(), "--no-such-fit-option", "x"]))
+    with pytest.raises(SystemExit) as exit_info:
+        preflight_fit_arguments(path)
+    assert exit_info.value.code == 2
+
+
+def test_regression_converts_illegal_option_exit_into_value_error(tmp_path):
+    import json
+    from check_mainline_regression import fit_arguments as regression_fit_arguments
+
+    path = tmp_path / "command.json"
+    path.write_text(json.dumps(["python", "script", *_required_fit_options(), "--no-such-fit-option", "x"]))
+    with pytest.raises(ValueError, match="invalid saved fit command"):
+        regression_fit_arguments(path)
