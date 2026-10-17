@@ -1,5 +1,12 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-17 自动微分接触路线：448帧速度与加速度曲线
+
+按用户要求，以autograd_contact_shoe25_full448_20261017的result.npz、protocol.json、trajectory.jsonl和原初始化/冻结资产，新增realtime_app/tools/plot_smplh_contact_derivatives.py；沿原输出的±0.01s模型报告公式，将保存的38维q/v/a状态换算为12个COCO观察点的三维速度/加速度。没有重新优化、对相邻视频位置差分、平滑、插值或裁掉尖峰；第11帧起复用该运行的虚拟髋映射。逐帧复现观察点与保存值最大差0m，448帧导数均有限、无重启，时间0~16.035239s。
+
+同运行motion_curves目录保存joint_derivatives.npz及lower_limb_velocity_acceleration.png/.svg：白底黑灰连续折线，髋/膝/踝分行，速度幅值与加速度幅值分列，左右实/虚线，小圆点标记原导数有效性门。左/右有效帧数分别髋15/8、膝23/10、踝61/65，分母每侧448；全曲线含未收敛帧，不代表已通过门的连续输出或地面系真实速度。下肢最大速度1.09809m/s、最大加速度49.30534m/s²，尖峰原样保留；其坐标含义是当前左相机下的模型状态导数，不能仅旋转即当作地面系导数。代码编译、单文件ruff和实际成图检查通过。
+
+
 ## 2026-10-17 高优先级独立路线：自动微分＋接触＋25mm鞋高，完整448已完成
 
 用户决定不再固定唯一身体主线，各方法按独立路线保存配置、结果和证据。当前 `smplh_causal_autograd_contact` 设为高优先级；其他路线优先级按各自协议保留。本次只跑这一条，不追加FD/无接触/局部旋转或权重扫描。`current_mainline.json` 的 `route_management/method_routes` 记录现行规则；旧 `mainline_selection` 仅兼容既有批量重投影方法。
