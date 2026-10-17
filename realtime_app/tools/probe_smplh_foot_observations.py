@@ -24,7 +24,8 @@ from pose_app.smplh_iterated_motion_tracker import (
 )
 from pose_app.smplh_motion_tracker import SMPLHMotionConfig, SMPLHObservationMap
 from probe_smplh_orientation import REPAIR, ROOT, metrics, project, save
-from run_stereo_pva_baseline import _load_predictions, _read_capture_times
+from pose_app.body_observations import load_ordered_predictions as _load_predictions
+from run_stereo_pva_baseline import _read_capture_times
 
 OUT = REPAIR / 'foot_direction_20261016'
 DETECTOR = ROOT.parent / 'G20261002_sapiens2_body_mainline448_v2'

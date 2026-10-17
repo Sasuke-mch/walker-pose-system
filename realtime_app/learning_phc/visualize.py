@@ -16,7 +16,7 @@ import numpy as np
 from pose_app.calibration import StereoCalibration
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy
 from pose_app.triangulation import triangulate_matches
-from tools.run_stereo_pva_baseline import _load_predictions
+from pose_app.body_observations import load_ordered_predictions as _load_predictions
 from walker_tools.stereo.evaluate_offline_stereo_predictions import _records, _result
 from walker_tools.visualization.build_grasp_body_canvas_viewer import (
     build_canvas_page, encode, recorded_strict_gate,

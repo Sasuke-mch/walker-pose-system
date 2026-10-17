@@ -15,7 +15,8 @@ APP = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(APP), str(APP / 'tools')]
 from pose_app.fisheye_camera import load_stereo_fisheye  # noqa: E402
 from pose_app.stereo_pva_tracker import StereoPVATracker, StereoPVAConfig  # noqa: E402
-from run_stereo_pva_baseline import _load_predictions, _read_capture_times, JOINT_NAMES  # noqa: E402
+from pose_app.body_observations import load_ordered_predictions as _load_predictions  # noqa: E402
+from run_stereo_pva_baseline import _read_capture_times, JOINT_NAMES  # noqa: E402
 
 
 def stats(values):

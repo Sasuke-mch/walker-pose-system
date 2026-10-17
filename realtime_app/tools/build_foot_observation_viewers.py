@@ -86,7 +86,7 @@ def export(run, title, rejection, shared, *, target=None, result_override=None, 
     # Existing comparison pixels are camera pixels; geometry below uses only this
     # task's newly replayed Stage/ground. No old ground or webpage mesh is read.
     from probe_smplh_foot_observations import project
-    from run_stereo_pva_baseline import _load_predictions
+    from pose_app.body_observations import load_ordered_predictions as _load_predictions
     cal = load_stereo_fisheye(inp['calibration_dir'])
     observed = np.stack([_load_predictions(Path(inp[f'{s}_predictions']), s) for s in ['left', 'right']], axis=1)
     observed[0] = np.asarray(json.loads(Path(p['first_frame_observations']).read_text(encoding='utf-8'))['keypoints'])

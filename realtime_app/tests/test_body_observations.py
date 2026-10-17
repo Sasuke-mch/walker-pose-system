@@ -36,6 +36,40 @@ def test_reader_keeps_invalid_shape_failure(tmp_path):
         observations.raw_side(path, "left")
 
 
+def test_ordered_reader_preserves_order_single_person_and_raw_fisheye(tmp_path):
+    points = np.arange(17 * 3, dtype=float).reshape(17, 3)
+    path = tmp_path / "raw.json"
+    path.write_text(json.dumps({"images": [
+        {"image_id": 0, "keypoints": [points.tolist()]},
+        {"image_id": 1, "keypoints": [(points + 1000.0).tolist()]},
+    ]}))
+    result = observations.load_ordered_predictions(path, "left")
+    assert result.shape == (2, 17, 3)
+    assert result.dtype == np.float64
+    rows = observations.raw_side(path, "left")
+    np.testing.assert_equal(result[0], rows[0])
+    np.testing.assert_equal(result[1], rows[1])
+
+
+def test_ordered_reader_rejects_multi_person_and_gapped_ids(tmp_path):
+    points = np.zeros((17, 3))
+    multi = tmp_path / "multi.json"
+    multi.write_text(json.dumps({"images": [
+        {"image_id": 0, "keypoints": [points.tolist(), points.tolist()]}]}))
+    with pytest.raises(ValueError):
+        observations.load_ordered_predictions(multi, "left")
+    gapped = tmp_path / "gapped.json"
+    gapped.write_text(json.dumps({"images": [
+        {"image_id": 2, "keypoints": [points.tolist()]}]}))
+    with pytest.raises(ValueError):
+        observations.load_ordered_predictions(gapped, "left")
+
+
+def test_baseline_cli_reexports_shared_reader_without_a_copy():
+    from tools import run_stereo_pva_baseline as baseline
+    assert baseline._load_predictions is observations.load_ordered_predictions
+
+
 def test_soft_triangulation_retains_weights_masks_rejections_and_units():
     cal = SimpleNamespace(K0=np.array([[800., 0., 960.], [0., 800., 540.], [0., 0., 1.]]),
                           K1=np.array([[800., 0., 960.], [0., 800., 540.], [0., 0., 1.]]),

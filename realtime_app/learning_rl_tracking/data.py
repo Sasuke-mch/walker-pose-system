@@ -7,7 +7,8 @@ from pathlib import Path
 import numpy as np
 
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy
-from tools.run_stereo_pva_baseline import _load_predictions, _read_capture_times
+from pose_app.body_observations import load_ordered_predictions as _load_predictions
+from tools.run_stereo_pva_baseline import _read_capture_times
 
 JOINTS = np.arange(5, 17)
 ROOT = Path(__file__).resolve().parents[2]

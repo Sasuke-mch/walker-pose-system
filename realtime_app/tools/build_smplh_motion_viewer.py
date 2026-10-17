@@ -19,7 +19,7 @@ sys.path[:0] = [str(APP), str(APP / 'tools')]
 
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy  # noqa: E402
 from pose_app.smplh_first_frame_labels import apply_first_frame_labels, apply_first_frame_observations  # noqa: E402
-from run_stereo_pva_baseline import _load_predictions  # noqa: E402
+from pose_app.body_observations import load_ordered_predictions as _load_predictions  # noqa: E402
 from walker_tools.visualization.build_grasp_body_canvas_viewer import (  # noqa: E402
     build_canvas_page, encode, recorded_strict_gate, validate_frame_ids,
 )

@@ -25,7 +25,8 @@ from pose_app.smplh_iterated_motion_tracker import (
     SMPLHIteratedMotionTracker,
 )
 from pose_app.smplh_motion_tracker import SMPLHMotionConfig, SMPLHObservationMap
-from run_stereo_pva_baseline import _load_predictions, _read_capture_times
+from pose_app.body_observations import load_ordered_predictions as _load_predictions
+from run_stereo_pva_baseline import _read_capture_times
 
 ROOT = APP.parent / 'research_records/engineering_validation/G20261014_smplh_motion448_v1'
 REPAIR = ROOT / 'hip_pose_repair_20261016'

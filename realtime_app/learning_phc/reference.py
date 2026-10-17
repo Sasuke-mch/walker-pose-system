@@ -143,7 +143,7 @@ def prepare(source, scene, xml, output, match_shape=False):
                       camera_rotation=rotation, camera_translation_m=translation,
                       stage=world['stage'].astype(str))
         parameters=json.loads(source.with_name('run_parameters.json').read_text(encoding='utf-8'))
-        from tools.run_stereo_pva_baseline import _load_predictions
+        from pose_app.body_observations import load_ordered_predictions as _load_predictions
         from pose_app.fisheye_camera import load_stereo_fisheye
         observations=np.stack([_load_predictions(Path(parameters['inputs'][side+'_predictions']),side)
                                for side in ('left','right')],1)[:,:,5:17]

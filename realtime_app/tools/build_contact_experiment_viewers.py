@@ -33,7 +33,7 @@ def read_json(path):
 
 
 def add_observations(payload, metadata, target):
-    from run_stereo_pva_baseline import _load_predictions
+    from pose_app.body_observations import load_ordered_predictions as _load_predictions
     inputs, ids = metadata['raw_inputs'], payload['frameIds']
     body = np.stack([_load_predictions(Path(inputs[f'{side}_predictions']), side) for side in ['left', 'right']], axis=1)
     source = read_json(Path(read_json(OUT / 'toe_direction_prefix/protocol.json')['source_body_run']) / 'run_parameters.json')

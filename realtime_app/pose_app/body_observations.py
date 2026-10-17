@@ -19,7 +19,25 @@ import numpy as np
 
 from pose_app.fisheye_camera import fisheye_project_numpy
 
-__all__ = ["raw_side", "raw_triangulate"]
+__all__ = ["raw_side", "raw_triangulate", "load_ordered_predictions"]
+
+def load_ordered_predictions(path: Path, side: str) -> np.ndarray:
+    """Read one pre-associated person per ordered frame from raw predictions.
+
+    This is the observation reader shared by the causal stereo baseline, the
+    PHC/RL consumers and the viewers. It is deliberately separate from the
+    strict live stereo gate and from :func:`raw_triangulate`. The exported file
+    must hold a single pre-associated person per frame with ``image_id`` values
+    contiguous from zero; the COCO-17 rows are mapped back to the original
+    fisheye pixel convention by :func:`raw_side`. No interpolation, padding or
+    frame dropping is performed here.
+    """
+    exported = json.loads(path.read_text(encoding="utf-8"))
+    ids = [int(row["image_id"]) for row in exported["images"]]
+    if ids != list(range(len(ids))) or any(len(row["keypoints"]) != 1 for row in exported["images"]):
+        raise ValueError("expected one pre-associated person per frame and ordered IDs from zero")
+    rows = raw_side(path, side)
+    return np.asarray([rows[i] for i in ids], dtype=np.float64)
 
 def raw_side(path: Path, side: str):
     obj=json.loads(path.read_text(encoding="utf-8"))

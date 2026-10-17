@@ -12,7 +12,7 @@ from .analyze import load_model, stats
 from .contract import SMPL_INDICES
 from .policy import observation_v7, recovery_reference
 from pose_app.fisheye_camera import load_stereo_fisheye, fisheye_project_numpy
-from tools.run_stereo_pva_baseline import _load_predictions
+from pose_app.body_observations import load_ordered_predictions as _load_predictions
 
 ROOT = Path(__file__).resolve().parents[2]
 

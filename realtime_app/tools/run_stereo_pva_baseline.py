@@ -20,7 +20,7 @@ import numpy as np
 APP = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(APP))
 
-from pose_app.body_observations import raw_side  # noqa: E402
+from pose_app.body_observations import load_ordered_predictions  # noqa: E402
 from pose_app.fisheye_camera import load_stereo_fisheye  # noqa: E402
 from pose_app.stereo_pva_tracker import StereoPVAConfig, StereoPVATracker  # noqa: E402
 
@@ -59,13 +59,9 @@ def _read_capture_times(input_pairs: Path, count: int) -> tuple[np.ndarray, np.n
     return times, (right - left) / 1e6, np.asarray(pair_ids), capture_path
 
 
-def _load_predictions(path: Path, side: str) -> np.ndarray:
-    exported = json.loads(path.read_text(encoding="utf-8"))
-    ids = [int(row["image_id"]) for row in exported["images"]]
-    if ids != list(range(len(ids))) or any(len(row["keypoints"]) != 1 for row in exported["images"]):
-        raise ValueError("expected one pre-associated person per frame and ordered IDs from zero")
-    rows = raw_side(path, side)
-    return np.asarray([rows[i] for i in ids], dtype=np.float64)
+# Historical name retained for existing callers and flat imports; the single
+# implementation lives in pose_app.body_observations.load_ordered_predictions.
+_load_predictions = load_ordered_predictions
 
 
 def _load_initial_fit(path: Path) -> np.ndarray:
