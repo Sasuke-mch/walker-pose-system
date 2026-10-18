@@ -52,8 +52,19 @@ class AutogradContactTracker(ContactTracker):
             coco = torch.cat((coco, vertices[:, TOE_VERTICES].to(dtype)), dim=1)
         points = coco[:, 5:21 if self.solve_with_feet else 17]
         right = points@tensor(self.cal.R_cam0_to_cam1).T+tensor(self.cal.T_cam0_to_cam1_mm)/1000
-        projected = torch.stack((fisheye_project_torch(points, self.cal.K0, self.cal.D0),
-                                 fisheye_project_torch(right, self.cal.K1, self.cal.D1)), dim=1)
+        projection_domain_valid = bool(
+            torch.isfinite(points).all()
+            and torch.isfinite(right).all()
+            and (points[..., 2] > 1e-4).all()
+            and (right[..., 2] > 1e-4).all()
+        )
+        if projection_domain_valid:
+            projected = torch.stack((fisheye_project_torch(points, self.cal.K0, self.cal.D0),
+                                     fisheye_project_torch(right, self.cal.K1, self.cal.D1)), dim=1)
+            projection_domain_valid = bool(torch.isfinite(projected).all())
+        if not projection_domain_valid:
+            projected = torch.full((1, 2, points.shape[1], 2), torch.nan,
+                                   dtype=dtype, device=device)
         if self.solve_with_feet and self.observation_mode == 'direction':
             toe = projected[:, :, 12:].reshape(1, 2, 2, 2, 2)
             vector = toe[..., 1, :]-toe[..., 0, :]

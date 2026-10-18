@@ -52,6 +52,11 @@ def statistics(values):
             'max': float(valid.max()) if valid.size else None}
 
 
+def finite_min_mm(values):
+    valid = np.asarray(values)[np.isfinite(values)]
+    return float(valid.min()*1000) if valid.size else None
+
+
 def analyze(arrays, rows, body, toes, calibration):
     errors = np.linalg.norm(project(arrays['predicted_coco'][:, 5:17], calibration)-body[..., :2], axis=-1)
     report = {}
@@ -65,17 +70,20 @@ def analyze(arrays, rows, body, toes, calibration):
         derivative_valid_slots=int(sum(row['derivative_count'] for row in rows)),
         derivative_total_slots=12*len(rows), segments=len(np.unique(arrays['segment_id'])),
         sole_height_mm=statistics(arrays['sole_min_m']*1000), sole_clearance_mm=statistics(clearance*1000),
-        sole_min_height_mm=float(np.nanmin(arrays['sole_min_m'])*1000),
-        below_shoe_tolerance_foot_frames=int((clearance < -.005).sum()),
-        nonfinite_foot_frames=int((~np.isfinite(clearance)).sum()),
-        below_physical_floor_foot_frames=int((arrays['sole_min_m'] < 0).sum()),
+        sole_min_height_mm=finite_min_mm(arrays['sole_min_m']),
+        below_shoe_tolerance_slots=int((clearance < -.005).sum()),
+        below_shoe_tolerance_frames=int((clearance < -.005).any(axis=1).sum()),
+        nonfinite_foot_slots=int((~np.isfinite(clearance)).sum()),
+        nonfinite_foot_frames=int((~np.isfinite(clearance)).any(axis=1).sum()),
+        below_physical_floor_slots=int((arrays['sole_min_m'] < 0).sum()),
+        below_physical_floor_frames=int((arrays['sole_min_m'] < 0).any(axis=1).sum()),
         support_abs_error_mm=statistics(abs(arrays['support_ball_height_m'][labels]-SHOE_HEIGHT_M)*1000),
         support_within10mm_slots=int((abs(arrays['support_ball_height_m'][labels]-SHOE_HEIGHT_M) <= .010).sum()))
     heldout = HELDOUT+EXTENSION_HELDOUT
     report['withheld_direction_deg'] = statistics(direction_error(project(arrays['toe_m'][heldout], calibration), toes[heldout, ..., :2]))
     report['engineering_checks'] = {'all448_available': report['available_frames'] == 448,
         'no_restarts': report['segments'] == 1,
-        'sole_within_5mm_of_shoe_lower_bound': report['below_shoe_tolerance_foot_frames'] == 0 and report['nonfinite_foot_frames'] == 0,
+        'sole_within_5mm_of_shoe_lower_bound': report['below_shoe_tolerance_slots'] == 0 and report['nonfinite_foot_slots'] == 0,
         'all_labeled_support_within10mm': report['support_within10mm_slots'] == int(labels.sum()),
         'all_updated_frames_converged': all(row['optimizer']['status'] == 'converged' for row in rows[1:])}
     report['all_engineering_checks_passed'] = all(report['engineering_checks'].values())
@@ -187,10 +195,19 @@ def run(dest):
             row = {'frame': frame, 'status': result['status'], 'optimizer': result['iterated_update'],
                 'contact_active': frame > 0, 'support_ball': labels[frame].tolist(), 'sole_min_mm': finite(sole*1000),
                 'sole_clearance_mm': finite((sole-SHOE_HEIGHT_M)*1000),
+                'contact_diagnostic_computed': True,
+                'contact_used_in_optimizer': bool(frame > 0 and result['iterated_update'].get('status') not in
+                    ('not_run', 'insufficient_joint_support')),
                 'contact_final_cost': finite([.5*np.sum(residual[:len(SURFACE)]**2), .5*np.sum(residual[len(SURFACE):]**2)]),
                 'body_used': result['used_views'].tolist(), 'body_reason': result['view_reason'].tolist(),
                 'toe_used': getattr(tracker, 'foot_used', np.zeros((2, 4), bool)).tolist(),
                 'toe_reason': getattr(tracker, 'foot_reason', np.full((2, 4), 'initial_not_reused', dtype=object)).tolist(),
+                'derivative_valid': result['derivative_valid'].tolist(),
+                'derivative_reason': result['derivative_reason'].tolist(),
+                'joint_status': result['joint_status'].tolist(),
+                'position_std_m': finite(result['position_std_m']),
+                'joint_observation_age_s': finite(result['joint_observation_age_s']),
+                'prediction_rejection': result['prediction_rejection'],
                 'derivative_count': int(result['derivative_valid'].sum())}
             rows.append(row)
             stream.write(json.dumps(row, ensure_ascii=False, allow_nan=False)+'\n'); stream.flush()

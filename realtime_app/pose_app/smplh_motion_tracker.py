@@ -376,6 +376,23 @@ class SMPLHMotionTracker:
             joint_status[:] = "expired"
             points[:] = np.nan
             data["vertices_m"][:] = np.nan
+            data["joints_m"][:] = np.nan
+            data["coco_m"][:] = np.nan
+            data["body_rotations"][:] = np.nan
+        projected_pixels = None if not available else pixels[0]
+        translation = self.pose.translation_m.copy()
+        root_rotation = self.pose.root_rotation.copy()
+        latent = self.pose.latent.copy()
+        generalized_velocity = self.velocity.copy()
+        generalized_acceleration = self.acceleration.copy()
+        covariance_diag = np.diag(self.covariance).copy()
+        if not available:
+            translation[:] = np.nan
+            root_rotation[:] = np.nan
+            latent[:] = np.nan
+            generalized_velocity[:] = np.nan
+            generalized_acceleration[:] = np.nan
+            covariance_diag[:] = np.nan
         return {"status": status, "joint_status": joint_status, "used_views": used.copy(),
                 "view_reason": reasons, "segment_id": self.segment, "pose_available": available,
                 "position_mm": points * 1000, "velocity_mm_s": velocity * 1000,
@@ -383,10 +400,10 @@ class SMPLHMotionTracker:
                 "derivative_reason": derivative_reason,
                 "raw_velocity_mm_s": raw_velocity*1000, "raw_acceleration_mm_s2": raw_acceleration*1000,
                 "position_std_m": sigma, "joint_observation_age_s": age,
-                "projected_pixels": None if pixels is None else pixels[0],
-                "translation_m": self.pose.translation_m.copy(), "root_rotation": self.pose.root_rotation.copy(),
-                "vposer_latent": self.pose.latent.copy(), "generalized_velocity": self.velocity.copy(),
-                "generalized_acceleration": self.acceleration.copy(), "covariance_diag": np.diag(self.covariance).copy(),
+                "projected_pixels": projected_pixels,
+                "translation_m": translation, "root_rotation": root_rotation,
+                "vposer_latent": latent, "generalized_velocity": generalized_velocity,
+                "generalized_acceleration": generalized_acceleration, "covariance_diag": covariance_diag,
                 "update_scale": self.update_scale,
                 "prediction_rejection": self.prediction_rejection,
                 "vertices_m": data["vertices_m"][0], "joints_m": data["joints_m"][0],

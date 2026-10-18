@@ -31,6 +31,18 @@ class IteratedMotionTests(unittest.TestCase):
         self.assertFalse(used.any())
         self.assertEqual(status, "insufficient_joint_support")
 
+    def test_expired_frame_does_not_reuse_previous_optimizer_status(self):
+        tr = iterated()
+        pixels = observation(tr)
+        tr.step(0., pixels[0], pixels[1])
+        updated = tr.step(.03, pixels[0], pixels[1])
+        self.assertEqual(updated["iterated_update"]["status"], "converged")
+        missing = np.full((12, 3), np.nan)
+        expired = tr.step(.2, missing, missing)
+        self.assertEqual(expired["status"], "expired")
+        self.assertEqual(expired["iterated_update"],
+                         {"status": "not_run", "reason": "tracker_expired"})
+
     def test_engineering_residual_changes_pose_without_adding_covariance_information(self):
         class HeightRegularizedTracker(SMPLHIteratedMotionTracker):
             def _engineering_residuals(self, data):

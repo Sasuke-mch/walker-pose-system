@@ -274,6 +274,11 @@ class SMPLHIteratedMotionTracker(SMPLHMotionTracker):
     def _output(self, now, status, used, reasons, observed_pixels=None):
         previous_good_fit = self.last_joint_good_fit.copy()
         output = super()._output(now, status, used, reasons, observed_pixels)
+        if status == "expired":
+            # The base tracker can return before _update() after a long loss or
+            # an out-of-domain prediction. Do not expose the previous frame's
+            # optimizer result as if this expired frame had been solved.
+            self.optimizer_diagnostic = {"status": "not_run", "reason": "tracker_expired"}
         output["iterated_update"] = dict(self.optimizer_diagnostic)
         if not self.derivative_estimate_converged:
             self.last_joint_good_fit[:] = previous_good_fit

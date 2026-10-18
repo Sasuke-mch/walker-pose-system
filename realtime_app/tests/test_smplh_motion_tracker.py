@@ -104,6 +104,20 @@ class SMPLHMotionTests(unittest.TestCase):
         np.testing.assert_array_equal(restored["generalized_velocity"], np.zeros(7))
         self.assertFalse(restored["derivative_valid"].any())
 
+    def test_expired_output_hides_public_model_state(self):
+        tr = tracker()
+        px = observation(tr)
+        tr.step(0., px[0], px[1])
+        missing = np.full((12, 3), np.nan)
+        result = tr.step(.2, missing, missing)
+        self.assertEqual(result["status"], "expired")
+        self.assertFalse(result["pose_available"])
+        for key in ("coco_m", "joints_m", "body_rotations", "translation_m",
+                    "root_rotation", "vposer_latent", "generalized_velocity",
+                    "generalized_acceleration", "covariance_diag"):
+            self.assertTrue(np.isnan(result[key]).all(), key)
+        self.assertIsNone(result["projected_pixels"])
+
     def test_out_of_domain_prediction_expires_without_current_pixels(self):
         tr = tracker(SMPLHMotionConfig(max_abs_latent=1.))
         px = observation(tr)
