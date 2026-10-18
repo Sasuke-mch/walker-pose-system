@@ -45,220 +45,141 @@
 
 目录职责不表示验收等级。research_records保存原协议/输出，configs保存可复用参数，pose_app保存算法，walker_tools保存CLI和编排，tools保留兼容入口。历史结果不搬移、不覆盖。下文较早的阶段结论只作背景，当前身份以本节、AI_PROGRESS和实验协议为准。
 
-面向助步器场景的人体姿态估计与实时可视化研究代码。
+面向助步器场景的双鱼眼人体姿态估计、双目三维、动态地面和交互可视化研究代码。
 
-当前两阶段识别、Stage 2完整SE(3)、实时入口、离线复现顺序和结论边界见 [当前Stage与动态地面主线](docs/CURRENT_STAGE_GROUND_PIPELINE.md)。
+## 当前应先阅读的文档
+
+- `AGENTS.md`：持久工作规则和当前冻结约束。
+- 版本管理以 `AGENTS.md` 的“Git 版本管理”条款为准：每项已验证的修复、迭代或更新均须独立提交本地 Git，且不得混入已有改动。
+- `AI_PROGRESS.md`：最新实验状态、停止条件和主线决策。
+- `VISUALIZATION_PIPELINE.md`：人体、地面、相机、助步器可视化的唯一规范。
+- `docs/CURRENT_STAGE_GROUND_PIPELINE.md`：Stage 1/2 与动态地面主线。
+- `docs/PROJECT_STATUS.md`：当前状态索引，不再复制历史实验细节。
+- `CLAUDE.md`：文档权威顺序、项目概览和协作规则。
+
+如果这些文档与旧实验报告或旧日志冲突，以 `AGENTS.md`、`AI_PROGRESS.md` 和当前实验目录协议为准。旧实验记录保留用于追溯，不代表当前规则。
 
 完整测试必须使用应用README中的requirements-dev安装流程；旧基础依赖仅覆盖实时基础模块，不能用于完整测试。
 
-## 当前完成情况
-
-### 已完成
-
-- YOLO26x-pose 端到端二维人体姿态估计
-- YOLO26x 检测 + PMPose 两阶段姿态估计
-- 视频、图片序列和摄像头输入
-- 顺序处理模式
-- 模拟实时模式：只保留最新帧，主动丢弃过期帧
-- 可视化视频、逐帧 JSONL 和运行统计输出
-- YOLO26x-pose、PMPose、ProbPose、BBoxMaskPose、Sapiens2 的速度与精度实验
-- OCHuman 和 MOT17 场景测试
-
-### 已完成的双目基线与实验管理
-
-- 双鱼眼相机 ChArUco 标定、相机身份注册和真实采集配对回放
-- 基于真实 CSV 配对关系的双目人体关联、鱼眼三角化和重投影检查
-- B0 正式基线，以及局部虚拟视角和模型输入去畸变两项消融
-- 原始采集、正式实验、筛选实验、工程验证和退役资产的本地归档
-- 固定 60 对新采集鱼眼图像上的单侧下肢二维一致性筛选与风险复核
-- Sapiens2 原始 308 点中的脚踝、大脚趾、小脚趾和脚跟候选点导出工具
-
-### 当前研究边界
-
-- 当前主线优先级已调整为“先完成端到端技术链，再做针对性优化”：从现有严格三角化结果继续接下肢时序接口、固定坐标、基础运动学、步态候选和统一输出；相机架、近距投影和门限优化暂缓。
-- 端到端 T1–T5 软件链已完成：一次双目运行可在同一结果目录内自动写出严格三角化、固定六关节轨迹、基础运动学、受状态保护的坐标归一和非接触运动学转折点候选；运行过程中还会逐对追加仅下游消费的在线下肢状态，并在现有双目预览/标注视频中显示该状态。真实助步器/地面坐标仍待硬件锁定、静态参考采集与显式残差条件的证据验收；当前输出不代表步态参数，也未完成现场实时验收。
-- 提供不接触设备的 `preflight_stereo_lower_limb_pipeline.py`：检查本机模型路径、端口配置、标定和相机注册格式，并生成硬件就绪后的建议运行命令；它不替代相机、Docker、GPU 或物理坐标验收。
-- B0 是当前正式基线；局部虚拟视角的收益极小且显著降速，模型输入去畸变为负结果。
-- 在冻结 M2 单人 C3 比较中，PMPose 是当前髋、膝、踝的工程二维基线：其对项目规定的 Sapiens2 操作性参考一致性高于 ProbPose；这不是外部真实准确率排名。
-- Sapiens2-308 可提供脚踝、大脚趾、小脚趾和脚跟候选点。正向图像中必须先确保人体框覆盖脚部；当前正向 YOLO 框在中近距离可能截断双脚。
-- Sapiens2 的脚跟是解剖点，不等于鞋底接触点；脚趾和脚跟尚未经过独立人工标注验证，不能直接计算步态事件。
-- 尚未建立严格的真实 3D 真值精度评估；有效 3D 点数不能直接表述为精度提升。
-- 步态周期、步频、关节角度、对称性分析和助步器端部署仍待后续验证。
-
-### 地面、时序与助步器研究状态（2026-09-13）
-
-- 地面候选链已经按“二维语义候选 → 严格双目对应与三角化 → 平面拟合 → 分区一致性拒绝门”贯通，并在同一 12 对 people_1 帧上比较了 SGBM、IGEV、DynamicStereo 与稠密 RANSAC、稀疏分块 RANSAC、软权重 IRLS。IGEV 的内部平面证据最强，SGBM 更快，DynamicStereo 未通过分区一致性门；这些结果都不是物理地面精度。
-- 时序方法已经测试：一次人工锚点传播、固定间隔人工重锚、光流辅助的当前帧语义一致性，以及依赖静态背景相对位姿的局部平面传播接口。光流传播掩膜不进入当前帧几何，只提供附加一致性；VO 因缺少逐帧助步器排除区和静态背景米制对应而失败关闭。
-- 已形成 `3 匹配器 × 3 平面拟合器 × 3 时序状态` 的 27 组合矩阵。9 个直接帧组合可做内部证据比较，9 个光流组合是模块组合估算，9 个 VO 组合不可用；尚无端到端组合墙钟实测。
-- Mask2Former 当前接口单图完整语义前端 P50 为 614.468 ms，24/24 张在线输出与缓存掩膜逐像素一致。已有组合表把单图时延只加一次到双目链，具体组合总时延需按左右图对重新汇总后才能引用；当前方案不满足实时闭环的定性结论不变。
-- 助步器稠密点云、骨架引导三维线段和短窗时序共识均已有实现。现有自动助步器掩膜的对象身份未通过视觉审计，因此三维结果仍是“输入掩膜所覆盖区域的结构候选”，不能称助步器重构成功；下一门是左右成对助步器语义参考。
-- `run_stereo.py --enable-stage-walker` 两阶段识别已更新为v2：左右可靠视图保运动融合、相机附着结构排除、5帧累计运动、人体相机补偿、双脚局部背景残差和阶段投票。people_1 448对最终回放为Stage 1/Stage 2/Transition/Warmup 214/115/114/5，并呈现6组视觉上基本合理的交替循环；支路平均/P95为17.268/24.694 ms。无阶段真值或助步器类别真值，不能报告准确率，现场端到端实时性仍待验收。
-- 可选 `--dynamic-ground-full-se3` 在 Stage 2 启用左右鱼眼背景旋转独立估计与共识，并以严格脚补足 XYZ 平移；小运动时以单位视线旋转 RANSAC 回退。针对无轮支架式助步器，新增最多2帧 Stage 2 证据缺口迟滞、按未更新帧数扩展的恢复门、受历史预测约束的单脚降级、最多4帧落架过渡求解及确认落稳后的高度/俯仰/横滚支撑重锚。同因果448帧回放的 Stage 2 更新为101/115，过渡段另更新22帧，第一段有效抬架0068--0081为200.6 mm；相机高度范围692.887--746.512 mm，支路中位/P95为11.361/29.041 ms。推荐视频直接绘制当前帧双目点、实线且无显示平滑。该功能仍无外部轨迹真值与物理现场端到端验收，不能称六自由度真实精度。
-
-## 仓库结构
+## 系统主链
 
 ```text
-walker-pose-system/
-├─ realtime_app/          单路实时姿态与双目三角化基线程序
-├─ sequence_pipeline/     多模型图片序列实验与评估程序
-├─ benchmarks/
-│  ├─ speed/              速度汇总
-│  ├─ accuracy/           精度汇总
-│  └─ qualitative/        少量定性结果
-├─ docs/                  项目状态与工程说明
-├─ third_party/           第三方依赖说明
-└─ .gitignore
+双鱼眼采集
+→ 2D 姿态
+→ 左右人物关联
+→ 原始鱼眼三角化
+→ 下肢 T1–T5
+→ Stage 1/2 与地面变换
+→ 运动学和接触候选
+→ 三维可视化
 ```
 
-## 实时程序数据流
+当前系统分为三层：
 
-### YOLO26x-pose
+- `realtime_app/`：单路姿态、双目采集/回放、鱼眼三角化、动态地面和下游输出。
+- `sequence_pipeline/`：在独立 Docker 环境中顺序运行多个二维姿态模型并保存统一实验输出。
+- `research_records/`：保存正式实验、工程验证、筛选结果、失败证据和实验注册表。
 
-```text
-图像/视频/摄像头
-→ YOLO26x-pose
-→ 人体框与 COCO 17 关键点
-→ 骨架绘制
-→ annotated.mp4 / results.jsonl / summary.json
-```
+公开查看器位于 `docs/walker-viewer/`，不需要 Python 后端；它只读取公开运动数据，不反向修改算法结果。
 
-### YOLO26x + PMPose
+## 当前基线与结论边界
 
-```text
-图像/视频/摄像头
-→ YOLO26x 人体检测
-→ 矩形人体 mask
-→ PMPose-b
-→ COCO 17 关键点
-→ 骨架绘制
-→ annotated.mp4 / results.jsonl / summary.json
-```
+- 相机物理身份由 PnP `instance_id` 注册表解析，不能长期硬编码 Windows OpenCV 数字索引；校准角色为 `cam0=LEFT`、`cam1=RIGHT`。
+- 模型输入可以按当前协议转正，但二维点进入几何前必须回到原始鱼眼像素；双目计算使用正式鱼眼标定。
+- 早期严格双目/下肢工程二维基线为 PMPose；当前离线身体候选与对照身份见本文件开头。Sapiens2 的旧操作性参考角色不构成独立真值。
+- 严格三角化使用固定质量门、`max_matches=1`，并保留逐帧、逐点失败原因；无门限或时间补全结果只能作诊断/显示。
+- DA3 只用于逐帧图像空间的 ROI/遮挡诊断，不能作为米制深度、标定、人物关联、关键点筛选或三角化依据。
+- Stage 1/2、动态地面、助步器结构和接触输出目前都是工程候选；没有外部轨迹、阶段、对象身份或物理接触真值时，不得声称真实精度、触地、支撑、步态或生产通过。
+- SMPL/SMPL-X 结果必须按实验阶段门解释。平滑、重投影、有效点数、模型网格或接触代理都不能替代独立三维真值。
 
-## 环境要求
+### 早期普通SMPL路线与手部旁路
 
-主机端：
+早期普通 SMPL 路线及手部旁路如下；当前离线身体采用 **SMPL-H（6890 个顶点）**，详见开头导航：
 
-- Windows 11
-- Python 3.11 或更高版本
-- Docker Desktop
-- NVIDIA GPU 与可用的 Docker GPU 支持
+- `realtime_app/pose_app/smpl_coco_observation.py` 使用官方 SMPL 网格和固定的 `17 x 6890` `J_regressor_coco.npy`，将 COCO-17 二维观测映射到 SMPL 顶点。
+- `third_party/WiLoR/` 和 `third_party/InterWild/` 仅作为可选的人手估计旁路。它们使用 MANO 手部模型（778 个顶点），不能替换 SMPL，也不能把 MANO 参数直接拼接到 SMPL body pose 或 beta。
+- 手部结果只有在完成手腕/前臂关联、原始鱼眼像素回映、左右视角质量门和坐标标定后，才允许成为三角化或后续优化的输入；在此之前统一标记为 `model_local_unaccepted`。
 
-Python 依赖：
+本地部署状态（不代表已完成正式实验）：
 
-```powershell
-pip install -r .\realtime_app\requirements.txt
-```
+| 后端 | 代码 | 权重/检测器 | MANO 文件 | 当前状态 |
+|---|---|---|---|---|
+| WiLoR | `third_party/WiLoR` | `pretrained_models/wilor_final.ckpt`、`detector.pt` | `mano_data/models/MANO_LEFT.pkl`、`MANO_RIGHT.pkl`、`SMPLH_male.pkl` | 共用 CUDA 环境预检通过；拟合使用双 MANO PCA |
+| InterWild | `third_party/InterWild` | `demo/snapshot_6.pth` | `common/utils/human_model_files/mano/MANO_RIGHT.pkl`、`MANO_LEFT.pkl` | 权重完整；Windows 环境还缺 `pytorch3d` |
 
-第三方模型工程和权重不包含在本仓库中。参见：
+两者的输入都是经过审计的 RGB 手部/人体裁剪图，不应直接把正式实验原始帧静默送入官方 demo。输出均包含手部二维/三维或网格与 MANO 参数，但模型局部三维不能直接当作项目米制坐标。项目侧统一协议由 `realtime_app/pose_app/hand_pose_provider.py` 提供：它只负责资产预检、命令构造和结果字段约定，不在当前阶段自动改变 SMPL 主链。
 
-```text
-third_party/README.md
-```
-
-## 配置
-
-复制示例配置：
-
-```powershell
-Copy-Item .\realtime_app\config.example.json .\realtime_app\config.json
-Copy-Item .\realtime_app\camera_registry.example.json .\realtime_app\camera_registry.json
-```
-
-然后修改 `config.json` 中的本地路径，并在 `camera_registry.json` 填入已标定
-相机的 Windows PnP `instance_id`。两个文件均已被 `.gitignore` 排除，不会提交到 GitHub。
-
-## 环境检查
+运行不加载大模型的资产预检：
 
 ```powershell
 cd .\realtime_app
+..\.venv-cuda\Scripts\python.exe tools\hand_model_preflight.py all
+```
+
+当前共用环境为仓库根目录 `.venv-cuda`，使用 CUDA 版 PyTorch 和 RTX 5070 Ti。它已经服务 SMPL 主线和 WiLoR；InterWild 权重已就位，但官方代码还依赖 `pytorch3d`，该包在当前 Windows/Python 3.12 环境没有可直接安装的 wheel，因此不能把 InterWild 标记为可运行。官方 WiLoR 依赖中的 `xtcocotools` 在 Windows/Python 3.12 下构建失败，但 WiLoR demo 和本项目预检不导入它，因此暂不安装，失败证据保留在环境安装日志中。
+
+可复现依赖清单见 `realtime_app/requirements-cuda-shared.txt`；CUDA PyTorch 必须先从 `cu128` 索引安装。
+
+环境接入分三层：
+
+1. `smpl_coco_observation.load_smpl_male(..., device="cuda")` 将官方 6890 顶点 SMPL 放到 GPU；`regress_coco17_torch` 把回归矩阵放到顶点所在设备，避免 CPU/GPU 往返。
+2. WiLoR 推理使用有序的 `left_ccw90` / `right_cw90` 图像目录；进入模型前分别逆旋转回原始鱼眼方向，官方 `project_full_img` 的二维输出再按原始图像宽高投影。`make_wilor_observation` 要求 `Nx2` 点在 `raw_fisheye` 像素坐标内，不做裁剪、不做静默旋转回映；越界直接拒绝。全序列审计脚本见 `realtime_app/tools/run_wilor_sequence.py`。
+3. `hand_pose_provider.py` 只构造官方 demo 命令、检查权重和依赖，并把三维结果标为 `model_local_unaccepted`；它不替换 SMPL，也不绕过原始鱼眼坐标和双目质量门。
+4. 正式接入前必须用审计裁剪图完成单图推理，保存原始输出、失败原因、输入裁剪变换和回映后的二维坐标；通过后才能设计手腕/前臂关联适配器。
+
+CUDA 接入的 CPU 对照检查已经完成：同一随机 SMPL 参数下，CPU/CUDA 顶点最大绝对差约 `3.6e-7 m`，COCO-17 回归最大绝对差约 `2.4e-7 m`。这只证明数值前向一致性，不代表姿态精度提升或正式实验结果。
+
+## 快速开始
+
+### 实时程序
+
+```powershell
+cd .\realtime_app
+pip install -r .\requirements.txt
+python -B .\run_validation.py
 python .\check_environment.py --model all
 ```
 
-## 运行示例
-
-YOLO26x-pose 图片序列：
-
-```powershell
-python .\run.py --model yolo26x_pose --images "D:\path\to\images" --source-fps 14
-```
-
-YOLO26x + PMPose 图片序列：
-
-```powershell
-python .\run.py --model pmpose --images "D:\path\to\images" --source-fps 14
-```
-
-模拟实时处理：
-
-```powershell
-python .\run.py --model pmpose --images "D:\path\to\images" --source-fps 14 --simulate-realtime
-```
-
-摄像头：
+单路 2D：
 
 ```powershell
 python .\run.py --model yolo26x_pose --camera 0
 ```
 
-双摄像头三角化（使用已验证的鱼眼标定文件）：
+双目回放或实时运行必须使用物理注册表和真实标定文件：
 
 ```powershell
-python .\run_stereo.py --model yolo26x_pose --camera-registry .\camera_registry.json --calibration .\calibration\results\stereo_fisheye.json
+python .\run_stereo.py `
+  --model yolo26x_pose `
+  --camera-registry .\camera_registry.json `
+  --calibration .\calibration\results\stereo_fisheye.json
 ```
 
-详细说明：`realtime_app/docs/STEREO_TRIANGULATION.md`。
+正式双摄采集前应先阅读 `realtime_app/README.md` 和 `realtime_app/docs/STEREO_TRIANGULATION.md`，再运行 `tools/camera_probe.py` 和采集预检。
 
-## 测试
+### 多模型图片序列
 
 ```powershell
-cd .\realtime_app
-python -B .\run_validation.py
+cd .\sequence_pipeline
+python .\run_sequence.py list
+python .\run_sequence.py check --models all --no-docker
 ```
 
-## 输出
+该程序只负责“图片序列 → 多模型二维输出”，不负责跨帧跟踪、左右同步、三角化、三维关键点或步态分析。
 
-每次运行生成独立目录：
+## 配置和数据边界
 
-```text
-annotated.mp4
-results.jsonl
-runtime.log
-summary.json
-docker_logs/
-```
+第三方源码、权重、原始采集、视频、JSONL、设备绑定和大型实验资产不随公开仓库提交。配置应从示例文件复制，并在本机填写路径和物理相机身份。
 
-## 当前主线（2026-09-02）
+每个正式实验应至少保留：
 
-- 采集端以标定角色 `cam0=LEFT`、`cam1=RIGHT` 为准；正向模型输入固定为左图逆时针旋转 90°、右图顺时针旋转 90°，三角化始终回到原始鱼眼像素和标定参数。
-- 下肢二维对照以 Sapiens2 经视觉核对后的结果作为工程伪标签参考。连续扩大人体框能减少近距离脚部被框截断的情况，PMPose、ProbPose 与 Sapiens2 的连续可视化和几何回放已固定保存于本地研究档案。
-- 近距离单侧二维脚点可见，但左右关联后的完整下肢三维链仍不连续；后续重点是关联、重投影和下肢结构的逐帧诊断，而不是继续扩展检测框。
-- DA3 已在原始鱼眼图上验证可提供相对深度层次和遮挡诊断信息。D1 仅将每对同步原始鱼眼图的 DA3 输出用于安全扩展图像 ROI；其相对冻结 C3 的 60 对保存预测几何回放未通过候选替代条件（下肢有效点净减 5，未筛选共同点残差未改善），因此不作为姿态输入替代方案。
-- C3/D1 几何重放固定为左逆时针 90°、右顺时针 90°回到原始鱼眼坐标、`max_matches=1`。裁剪外推至原始图像范围外的点只保留在二维审计，不裁剪也不送入关联或三角化。
-- DA3 不是米制深度，也不替代鱼眼标定、左右匹配、人物关联或三角化。历史“DA3 选择性去畸变”原型混用了转正图、原始鱼眼深度和标定映射，并复用了代表帧深度，未产生有效的姿态或几何评估；它不属于可用预处理链路。
-- 后续主线不再扩展 DA3。冻结单人二维比较中，每张图以最高 detector bbox score 选取唯一人体，额外框仅作 false-positive 审计；Sapiens2-0.4B 是项目规定的二维操作性参考，PMPose-b 与 ProbPose-s 对其一次性比较，Sapiens2 不参与自身评分。该规则不构成外部二维或三维真值。
+- `EXPERIMENT.md`
+- `VALIDATION_PROTOCOL.md`（如适用）
+- `run_metadata.json`
+- `command.txt`
+- 机器可读结果和失败原因
 
-## 已知限制
-
-- 当前实时程序只接入 YOLO26x-pose 和 YOLO26x + PMPose。
-- PMPose 当前使用由检测框生成的矩形 mask，不等同于真实人体分割 mask。
-- MOT17 没有人体关键点真值，只用于连续多人场景、稳定性和速度测试。
-- 原单路程序只输出二维姿态；双目入口已输出真实采集回放上的三角化基线，但尚未完成严格的真实 3D 精度验证。
-- 模型权重、数据集和 Docker 镜像需要用户自行准备。
-
-## 第三方项目与引用
-
-本仓库不重新分发第三方模型权重和完整第三方源码。使用前请阅读各第三方项目的许可证和使用限制。
-
-详见 `third_party/README.md`。
-
-版本管理以 `AGENTS.md` 的“Git 版本管理”条款为准：每项已验证的修复、迭代或更新均须独立提交本地 Git，且不得混入已有改动。
-
-## WiLoR 与 SMPL-H 资产
-
-- WiLoR 手部链使用 `MANO_LEFT.pkl`、`MANO_RIGHT.pkl` 和 `SMPLH_male.pkl`；SMPL-H 拟合显式使用双 MANO PCA 资产。
-- 该链路输出仍属于 WiLoR 模型派生观测的工程候选，不能解释为独立手部真值或真实握持结论。
-
-
+实验可追溯性使用输入路径、数据范围、代码文件、参数、输出路径和结论边界，不写 Git 哈希。
 
 
 ## 离线拟合复现

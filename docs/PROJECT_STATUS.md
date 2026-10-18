@@ -118,47 +118,40 @@ RTX5070Ti Laptop实测当前448帧/560步reliability拟合：一次完整solver�
 
 当前C300/兼容C30配置已入源码，通用smplh_fit.example.json仍是自备资源示例；它没有本实验人工腕，不能称为冻结复现。详细安装、命令、输入资源和评价工具范围只在 ../realtime_app/README.md 维护。
 
-Last reviewed: 2026-08-30
+本文件不再复制逐次实验结果或长期工作规则，避免与根目录文档产生冲突。
 
-## What is verified
+## 当前权威来源
 
-- The realtime application accepts camera, video, side-by-side video, and recorded stereo-capture replay inputs.
-- Two fisheye cameras have a ChArUco stereo calibration at 1920 × 1080. The calibrated coordinate system is `left_camera` and the length unit is mm.
-- Live capture records host-side `VideoCapture.read()` return timestamps and produces an explicit one-to-one `stereo_pairs.csv`; formal replay restores that pairing rather than matching equal AVI frame numbers.
-- The runtime supports camera-identity resolution, rotation normalization, person association, fisheye triangulation, positive-depth checks, and reprojection-error rejection.
-- The former 45-test check is historical. Current public verification uses `python -B realtime_app/run_validation.py`; CI runs the same entry on Python 3.11 and 3.12.
-- A targeted visual review cleared all 12 Sapiens2 target-selection ambiguity flags in the fixed 120-image single-view set. Two left-camera images have missing lower-body references and are explicitly excluded.
-- The original Sapiens2-308 outputs contain ankle, big-toe, small-toe, and heel landmarks. These have been restored to raw fisheye pixels for all 120 images; 118 images have all eight foot points above the current 0.25 engineering threshold.
-- A matched-crop control shows that upright Sapiens2-308 input retains the same 118/120 complete-foot coverage when the input person box contains the feet. The current failure is the upright YOLO box coverage, not a demonstrated pose-head orientation failure.
+- 长期工作规则：[`../AGENTS.md`](../AGENTS.md)
+- 最新实验状态与停止条件：[`../AI_PROGRESS.md`](../AI_PROGRESS.md)
+- 可视化规范：[`../VISUALIZATION_PIPELINE.md`](../VISUALIZATION_PIPELINE.md)
+- Stage 1/2 与动态地面：[`CURRENT_STAGE_GROUND_PIPELINE.md`](CURRENT_STAGE_GROUND_PIPELINE.md)
+- 实验记录规则：[`../research_records/registry/EXPERIMENT_RECORDING_POLICY.md`](../research_records/registry/EXPERIMENT_RECORDING_POLICY.md)
+- 多模型图片序列调度：[`../sequence_pipeline/README.md`](../sequence_pipeline/README.md)
+- 实时双目程序：[`../realtime_app/README.md`](../realtime_app/README.md)
 
-## Formal replay baseline
+## 当前项目概览
 
-The authoritative experiment registry is `research_records/registry/experiment_registry.csv`; raw assets and rendered outputs are deliberately local-only.
+项目主链为：
 
-| Experiment | Input | Change from B0 | Result |
-| --- | --- | --- | --- |
-| E20260827-B0 | R20260826-01 approach, 389 true CSV pairs | Baseline | 15.3368 valid 3D points/pair; 3.216 FPS |
-| E20260827-L1 | Same 389 pairs | Strict local virtual perspective | 15.3933 valid 3D points/pair; 0.920 FPS; not a useful trade-off |
-| E20260827-U1 | Same 389 pairs | Model-input fisheye undistortion | 9.1003 valid 3D points/pair; negative result |
+```text
+双鱼眼采集
+→ 2D 姿态
+→ 人物关联
+→ 鱼眼三角化
+→ 下肢 T1–T5
+→ Stage 1/2 与地面变换
+→ 运动学/接触候选
+→ 三维可视化
+```
 
-The timestamp deltas recorded for B0 are host read-return deltas, not camera exposure synchronisation errors.
+当前代码已覆盖实时/回放采集、二维姿态、真实 CSV 配对、鱼眼三角化、下肢后处理、动态地面候选和交互式查看器。各模块的“已实现”不等于真实精度、物理接触或生产验收通过；具体状态以 `AI_PROGRESS.md` 顶部最新条目和对应实验目录为准。
 
-## Evidence limits
+## 阅读规则
 
-- A higher number of valid 3D points is coverage, not proof of greater 3D accuracy.
-- No rigorous external 3D ground-truth evaluation has been completed.
-- M0 is a five-model engineering screen with consistent 60-pair inputs; it is not a real-world 3D accuracy comparison.
-- COCO-17 has ankle points but no toe or heel points. Sapiens2-308 now supplies candidate toe and heel pseudo-labels, but they have not been validated against independent manual labels and do not yet constitute complete foot reconstruction or validated gait events.
-- Local virtual perspective and global model-input undistortion should not be retuned without a new pre-registered ablation and an explicit B0 comparison.
-- Sapiens2 confidence is an internal model score, not a calibrated probability or pixel-error bound. Its heel landmark is anatomical and must not be treated as the ground-contact point without a separate definition and validation.
-
-## Historical next step (2026-08-30; superseded by current navigation)
-
-Build and evaluate a foot-inclusive upright person-box rule using only current-frame information. It must be compared with the A9 matched-crop control before Sapiens2-308 is used for routine foot pseudo-label export. Then freeze the foot-landmark definitions and manually audit a small stratified set of big-toe, small-toe, and heel points before resuming stereo triangulation or gait-event calculations.
-
-## Repository boundaries
-
-The public repository contains source code, test code, portable configuration templates, compact experiment registry metadata, and small qualitative examples. It deliberately excludes model weights, third-party source trees, raw captures, videos, JSONL outputs, and local device bindings. See [`third_party/README.md`](../third_party/README.md) and [`realtime_app/docs/CAMERA_REGISTRY.md`](../realtime_app/docs/CAMERA_REGISTRY.md).
+- 旧版状态表和历史结论继续保存在 `AI_PROGRESS.md` 与 `research_records/` 中，用于追溯，不作为当前规则。
+- 本文件只作为入口索引；新的实验结果应写入对应实验目录和 `AI_PROGRESS.md`，不要在这里追加重复日志。
+- 文档冲突时，以 `AGENTS.md`、`AI_PROGRESS.md` 和当前实验协议为准。
 
 评价入口已支持--sapiens-fit-dir和--pmpose-fit-dir，不指定时保持原冻结目录；新目录必须与--run的场景同源，原控制检查继续保留。冷启动配置拒绝与记录冲突的接触输入、重复参数、零联合预算及非共享/非原生初始化手姿。
 
