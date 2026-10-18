@@ -127,6 +127,7 @@ def main() -> int:
     parser.add_argument("--strict-stereo-jsonl", type=Path, required=True)
     parser.add_argument("--visual-stereo-jsonl", type=Path, required=True)
     parser.add_argument("--handle-axes-jsonl", type=Path)
+    parser.add_argument("--walker-model", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--fps", type=float, default=30.0)
     parser.add_argument("--near-handle-axis-mm", type=float, default=60.0)
@@ -141,6 +142,8 @@ def main() -> int:
     strict_rows = read_jsonl(args.strict_stereo_jsonl)
     visual_rows = read_jsonl(args.visual_stereo_jsonl)
     handle_axis_rows = read_jsonl(args.handle_axes_jsonl) if args.handle_axes_jsonl else None
+    walker_model = json.loads(args.walker_model.read_text(encoding="utf-8-sig")) if args.walker_model else None
+    hand_proximity_threshold_mm = max(args.near_handle_axis_mm, 100.0) if walker_model is not None else args.near_handle_axis_mm
     if not (len(dynamic_rows) == len(strict_rows) == len(visual_rows)):
         raise ValueError("dynamic, strict and visual streams must have identical lengths")
     if handle_axis_rows is not None and len(handle_axis_rows) != len(dynamic_rows):
@@ -150,7 +153,18 @@ def main() -> int:
             raise ValueError("unaligned pair streams")
 
     proxies = None
-    if handle_axis_rows is None:
+    if walker_model is not None:
+        handle_source_record = {
+            "schema_version": "coarse_complete_walker_model_reference_v1",
+            "source_json": str(args.walker_model.resolve()),
+            "coordinate_frame": "fixed left-camera rigid frame",
+            "length_unit": "millimeter",
+            "interpretation": (
+                "Complete coarse topology comes from the product reference; its fixed pose comes from offline "
+                "stereo anchors and the measured initial ground. Hand distance is visual proximity only."
+            ),
+        }
+    elif handle_axis_rows is None:
         proxies = {
             side: fit_wrist_supported_handle_proxy(strict_rows, dynamic_rows, side)
             for side in ("left", "right")
@@ -178,7 +192,7 @@ def main() -> int:
         json.dumps(handle_source_record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
 
-    visual_points, errors_by_frame, handles_by_frame, audits = [], [], [], []
+    visual_points, errors_by_frame, handles_by_frame, walker_by_frame, audits = [], [], [], [], []
     values: dict[str, dict[str, list[float]]] = {
         side: defaultdict(list) for side in ("left", "right")
     }
@@ -227,8 +241,20 @@ def main() -> int:
             value = provenance.get("reprojection_error_mean_px", point.get("reprojection_error_mean_px"))
             if value is not None:
                 errors[index] = float(value)
+        world_walker = {}
         world_handles = {}
-        if handle_axis_row is not None:
+        if walker_model is not None:
+            world_walker = {
+                name: transform(np.asarray(point, dtype=np.float64), dynamic)
+                for name, point in walker_model["nodes_left_camera_mm"].items()
+            }
+            for side, (start_name, end_name) in walker_model["handle_segments"].items():
+                world_handles[side] = {
+                    "start": world_walker[start_name],
+                    "end": world_walker[end_name],
+                    "evidence": {"source": "catalog_topology_plus_offline_rigid_fit"},
+                }
+        elif handle_axis_row is not None:
             if int(handle_axis_row["pair_id"]) != int(dynamic["pair_id"]):
                 raise ValueError("misaligned handle axis pair id")
             for side in ("left", "right"):
@@ -258,7 +284,7 @@ def main() -> int:
                     wrist, world_handles[side]["start"], world_handles[side]["end"]
                 )
                 quality_ok = reprojection is not None and reprojection <= args.maximum_audit_reprojection_error_px
-                state = "near_handle_axis_candidate" if quality_ok and distance <= args.near_handle_axis_mm else "not_supported"
+                state = "near_handle_axis_candidate" if quality_ok and distance <= hand_proximity_threshold_mm else "not_supported"
                 hand = {
                     "status": "diagnostic_candidate", "state": state,
                     "wrist_to_handle_axis_distance_mm": distance,
@@ -268,6 +294,8 @@ def main() -> int:
                     "quality_gate_passed": quality_ok,
                     "handle_geometry_source": world_handles[side]["evidence"].get("source"),
                     "contact_conclusion": (
+                        "visual_proximity_to_fixed_coarse_model_candidate"
+                        if walker_model is not None else
                         "visual_proximity_candidate" if handle_axis_row is not None else "unavailable_not_independent"
                     ),
                     "contact_blocker": (
@@ -307,9 +335,26 @@ def main() -> int:
             str(index): value for index, value in errors.items()
         }
         interaction["per_keypoint_provenance"] = dynamic_provenance
+        if walker_model is not None:
+            foot_heights = {
+                name: float(world_walker[name][2]) for name in walker_model["foot_nodes"]
+            }
+            interaction["walker_ground"] = {
+                "foot_signed_height_mm": foot_heights,
+                "maximum_absolute_foot_height_mm": max(abs(value) for value in foot_heights.values()),
+                "state": (
+                    "all_four_feet_near_ground_candidate"
+                    if max(abs(value) for value in foot_heights.values()) <= 25.0
+                    else "walker_lifted_or_pose_residual"
+                ),
+                "contact_conclusion": "geometric_ground_proximity_candidate_not_load_contact",
+                "dependency": "feet are catalog-model endpoints transformed by the estimated camera ground pose",
+            }
         interaction["interpretation"] = (
             "Current-frame unsmoothed visual geometry. "
             + (
+                "Hand distances use fixed catalog-derived handle segments and are visual proximity candidates only. "
+                if walker_model is not None else
                 "Hand distances use bilateral current-frame image-derived handle axes and are visual proximity candidates only. "
                 if handle_axis_row is not None else
                 "Hand distances use a wrist-supported proxy and are not independent contact evidence. "
@@ -319,6 +364,7 @@ def main() -> int:
         visual_points.append(points)
         errors_by_frame.append(errors)
         handles_by_frame.append(world_handles)
+        walker_by_frame.append(world_walker)
         audits.append(interaction)
 
     audit_path = output / "interaction_distance_records.jsonl"
@@ -330,11 +376,20 @@ def main() -> int:
         handle[key]
         for frame in handles_by_frame for handle in frame.values() for key in ("start", "end")
     ]
+    all_geometry += [point for frame in walker_by_frame for point in frame.values()]
     cloud = np.asarray(all_geometry)
     xlim = tuple((np.percentile(cloud[:, 0], [0.5, 99.5]) + [-220, 220]).tolist())
     ylim = tuple((np.percentile(cloud[:, 1], [0.5, 99.5]) + [-220, 220]).tolist())
     zlim = (min(-80.0, float(np.percentile(cloud[:, 2], 0.5) - 100)), max(1600.0, float(np.percentile(cloud[:, 2], 99.5) + 140)))
     camera_xyz = np.asarray([row["translation_world_from_left_camera_mm"] for row in dynamic_rows])
+    right_camera_xyz = None
+    if walker_model is not None and walker_model.get("camera_centers_left_camera_mm"):
+        right_center_left = np.asarray(
+            walker_model["camera_centers_left_camera_mm"]["right"], dtype=np.float64
+        )
+        right_camera_xyz = np.asarray([
+            transform(right_center_left, row) for row in dynamic_rows
+        ])
     azimuth = choose_azimuth(camera_xyz)
 
     plt.rcParams.update({"font.family": "DejaVu Sans", "axes.edgecolor": "#92989D", "axes.linewidth": 0.7})
@@ -351,8 +406,8 @@ def main() -> int:
         raise RuntimeError("failed to open video writer")
     started = time.perf_counter()
     try:
-        for frame_index, (dynamic, points, errors, handles, audit) in enumerate(
-            zip(dynamic_rows, visual_points, errors_by_frame, handles_by_frame, audits)
+        for frame_index, (dynamic, points, errors, handles, walker, audit) in enumerate(
+            zip(dynamic_rows, visual_points, errors_by_frame, handles_by_frame, walker_by_frame, audits)
         ):
             axis.cla()
             axis.set_axisbelow(True)
@@ -390,11 +445,33 @@ def main() -> int:
                     *point, s=34, color=error_color(errors.get(index)),
                     edgecolors="#202020", linewidths=0.6, depthshade=False, zorder=110,
                 )
+            if walker_model is not None:
+                handle_edges = {tuple(edge) for edge in walker_model["handle_segments"].values()}
+                for start_name, end_name in walker_model["edges"]:
+                    segment = np.vstack((walker[start_name], walker[end_name]))
+                    is_handle = (start_name, end_name) in handle_edges or (end_name, start_name) in handle_edges
+                    axis.plot(
+                        *segment.T,
+                        color="#00A6D6" if not is_handle else "#CC79A7",
+                        linewidth=3.8 if not is_handle else 7.0,
+                        linestyle="-",
+                        solid_capstyle="round",
+                        alpha=0.92,
+                        zorder=72 if not is_handle else 78,
+                    )
+                for foot_name in walker_model["foot_nodes"]:
+                    foot = walker[foot_name]
+                    color = "#009E73" if abs(float(foot[2])) <= 25.0 else "#D55E00"
+                    axis.scatter(*foot, s=48, color=color, depthshade=False, zorder=82)
+                    axis.plot(
+                        [foot[0], foot[0]], [foot[1], foot[1]], [0.0, foot[2]],
+                        color=color, linewidth=1.0, linestyle="-", alpha=0.75, zorder=70,
+                    )
             for side, color in (("left", "#00A6D6"), ("right", "#CC79A7")):
                 if side not in handles:
                     continue
                 hand = audit["hands"][side]
-                if handle_axis_rows is not None and hand.get("state") != "near_handle_axis_candidate":
+                if walker_model is None and handle_axis_rows is not None and hand.get("state") != "near_handle_axis_candidate":
                     continue
                 handle = handles[side]
                 segment = np.vstack((handle["start"], handle["end"]))
@@ -449,11 +526,22 @@ def main() -> int:
             )
             axis.scatter(
                 *current_camera, marker="^", color="#2E8B57",
-                s=45, depthshade=False, zorder=40,
+                s=30, depthshade=False, zorder=40,
             )
+            if right_camera_xyz is not None:
+                current_right_camera = right_camera_xyz[frame_index]
+                baseline = np.vstack((current_camera, current_right_camera))
+                axis.plot(
+                    *baseline.T, color="#5B6573", linewidth=1.0,
+                    linestyle="-", alpha=0.75, zorder=39,
+                )
+                axis.scatter(
+                    *current_right_camera, marker="^", color="#7B61A8",
+                    s=30, depthshade=False, zorder=40,
+                )
             axis.scatter(
                 current_camera[0], current_camera[1], 7.0, marker="^",
-                color="#2E8B57", s=24, depthshade=False, zorder=35,
+                color="#2E8B57", s=18, depthshade=False, zorder=35,
             )
             axis.set(xlim=xlim, ylim=ylim, zlim=zlim, xlabel="Ground X (mm)", ylabel="Ground Y (mm)", zlabel="Height (mm)")
             # Reuse the reference video's native complete-corner coordinate
@@ -467,7 +555,10 @@ def main() -> int:
             axis.tick_params(labelsize=8, pad=1)
             axis.view_init(elev=23, azim=azimuth)
             axis.set_box_aspect((xlim[1] - xlim[0], ylim[1] - ylim[0], zlim[1] - zlim[0]))
-            handle_title = "image-derived handle axes" if handle_axis_rows is not None else "partial handle proxies"
+            handle_title = (
+                "complete coarse walker model" if walker_model is not None else
+                "image-derived handle axes" if handle_axis_rows is not None else "partial handle proxies"
+            )
             axis.set_title(f"Raw current-frame geometry + {handle_title} | pair {dynamic['pair_id']:04d}", fontsize=11.5, pad=13)
             axis.text2D(0.02, 0.965, STAGE_NAMES.get(dynamic["stage"], dynamic["stage"]), transform=axis.transAxes, fontsize=9, fontweight="bold")
             left_hand = audit["hands"]["left"]
@@ -484,7 +575,11 @@ def main() -> int:
             )
             axis.text2D(
                 0.02, 0.890,
-                f"raw ankle height L/R: {value(left_foot, 'ankle_signed_height_above_ground_mm')} / {value(right_foot, 'ankle_signed_height_above_ground_mm')} mm",
+                (
+                    f"walker feet max |z|: {audit['walker_ground']['maximum_absolute_foot_height_mm']:.1f} mm"
+                    if walker_model is not None else
+                    f"raw ankle height L/R: {value(left_foot, 'ankle_signed_height_above_ground_mm')} / {value(right_foot, 'ankle_signed_height_above_ground_mm')} mm"
+                ),
                 transform=axis.transAxes, fontsize=8.3, color="#555555",
             )
             provenance_rows = audit.get("per_keypoint_provenance") or {}
@@ -499,7 +594,8 @@ def main() -> int:
                 0.98, 0.915,
                 "single z=0 ground + side coordinates\n"
                 "ankle projections: blue / orange\n"
-                "camera + ground projection: green\n"
+                "camera centers: left green / right purple\n"
+                "left-camera trail + ground projection: green\n"
                 "point error: green <=5, amber <=10, red >10 px",
                 transform=axis.transAxes, ha="right", va="top", fontsize=6.9, color="#555555",
             )
@@ -526,11 +622,40 @@ def main() -> int:
             },
             "state_counts": dict(states[side]),
         }
+    walker_ground_summary = None
+    if walker_model is not None:
+        maximum_heights = np.asarray(
+            [row["walker_ground"]["maximum_absolute_foot_height_mm"] for row in audits], dtype=np.float64
+        )
+        walker_ground_summary = {
+            "all_four_near_ground_frame_count": int(sum(
+                row["walker_ground"]["state"] == "all_four_feet_near_ground_candidate" for row in audits
+            )),
+            "maximum_absolute_foot_height_median_mm": float(np.median(maximum_heights)),
+            "maximum_absolute_foot_height_p95_mm": float(np.percentile(maximum_heights, 95)),
+            "interpretation": "catalog endpoint proximity to estimated z=0; not force/load contact truth",
+            "per_stage": {
+                stage: {
+                    "frame_count": len(rows),
+                    "near_ground_count": int(sum(
+                        row["walker_ground"]["state"] == "all_four_feet_near_ground_candidate" for row in rows
+                    )),
+                    "maximum_absolute_foot_height_median_mm": float(np.median([
+                        row["walker_ground"]["maximum_absolute_foot_height_mm"] for row in rows
+                    ])),
+                    "maximum_absolute_foot_height_max_mm": float(np.max([
+                        row["walker_ground"]["maximum_absolute_foot_height_mm"] for row in rows
+                    ])),
+                }
+                for stage in sorted({row["stage"] for row in audits})
+                for rows in [[row for row in audits if row["stage"] == stage]]
+            },
+        }
     summary = {
         "schema_version": "raw_visual_handle_interaction_audit_v2",
         "frame_count": len(dynamic_rows), "fps": args.fps, "display_smoothing": "none",
         "line_style": "solid_only", "ground_display": "reference_style_single_z0_ground_with_native_two_wall_corner",
-        "projection_display": "camera_3d_and_ground_projection_plus_left_right_ankle_ground_trails",
+        "projection_display": "stereo_camera_centers_with_left_camera_trail_and_ground_projection_plus_ankle_ground_trails",
         "human_geometry": (
             "current_frame_visual_stereo_transformed_by_exact_realtime_ground_pose"
             if transformed_from_camera_count == len(dynamic_rows) else
@@ -539,16 +664,25 @@ def main() -> int:
         "keypoint_quality_encoding": "per-keypoint reprojection error retained in JSONL and point color",
         "keypoint_provenance": "strict/display source, strict rejection reason, quality flags and pose-use flag retained per point when supplied",
         "partial_handle_geometry": (
-            "current-frame bilateral image-derived stereo axis" if handle_axis_rows is not None
+            "complete coarse catalog topology with fixed offline camera transform" if walker_model is not None
+            else "current-frame bilateral image-derived stereo axis" if handle_axis_rows is not None
             else "wrist-supported proxy; not independent walker reconstruction"
         ),
+        "walker_ground_summary": walker_ground_summary,
         "distance_summary": summary_values,
+        "hand_proximity_threshold_mm": hand_proximity_threshold_mm,
         "hand_contact_conclusion": (
+            "visual proximity candidates to fixed model handles; tactile/load truth unavailable"
+            if walker_model is not None else
             "visual proximity candidates available on frames with bilateral image-derived handle axes; tactile/load truth unavailable"
             if handle_axis_rows is not None else
             "unavailable: proxy is wrist-derived and no independent bilateral handle-pixel/tactile support exists"
         ),
-        "ground_contact_conclusion": "unavailable: COCO ankle is not shoe sole; Stage-2 camera pose uses foot anchors",
+        "ground_contact_conclusion": (
+            "four model-foot geometric proximity available; physical load contact unavailable"
+            if walker_model is not None else
+            "unavailable: COCO ankle is not shoe sole; Stage-2 camera pose uses foot anchors"
+        ),
         "video": str(video_path.resolve()), "interaction_records": str(audit_path.resolve()),
         "render_seconds": time.perf_counter() - started,
     }

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="双目助步器人体运动三维交互可视化">
+  <title>双目助步器人体运动可视化</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>双目助步器人体运动可视化</h1>
+        <p>固定地面坐标 · 当前帧直出 · 无显示平滑</p>
+      </div>
+      <div class="status-row" aria-live="polite">
+        <span id="stage-badge" class="stage-badge">正在载入</span>
+        <span id="frame-label" class="frame-label">0 / 0</span>
+      </div>
+    </header>
+
+    <section class="viewer-layout">
+      <div id="viewport" class="viewport" aria-label="可拖动的三维人体与助步器场景">
+        <div id="loading" class="loading">载入三维运动数据…</div>
+        <div class="view-help">左键旋转 · 右键平移 · 滚轮缩放</div>
+      </div>
+
+      <aside class="side-panel" aria-label="可视化信息与控制">
+        <section>
+          <h2>当前帧</h2>
+          <dl class="metrics">
+            <div><dt>时间</dt><dd id="time-value">0.00 s</dd></div>
+            <div><dt>左腕—扶手</dt><dd id="left-hand-value">—</dd></div>
+            <div><dt>右腕—扶手</dt><dd id="right-hand-value">—</dd></div>
+            <div><dt>四脚最大 |z|</dt><dd id="walker-foot-value">—</dd></div>
+          </dl>
+        </section>
+
+        <section>
+          <h2>视角</h2>
+          <div class="button-grid">
+            <button type="button" data-view="recommended">推荐视角</button>
+            <button type="button" data-view="front">正视</button>
+            <button type="button" data-view="side">侧视</button>
+            <button type="button" data-view="top">俯视</button>
+          </div>
+        </section>
+
+        <section>
+          <h2>显示</h2>
+          <div class="checks">
+            <label><input id="show-human" type="checkbox" checked> 人体骨架</label>
+            <label><input id="show-walker" type="checkbox" checked> 助步器</label>
+            <label><input id="show-cameras" type="checkbox" checked> 双相机</label>
+            <label><input id="show-trails" type="checkbox" checked> 相机与踝轨迹</label>
+            <label><input id="show-ground" type="checkbox" checked> 地面坐标</label>
+          </div>
+        </section>
+
+        <section>
+          <h2>关节数据</h2>
+          <p id="joint-detail" class="joint-detail">点击人体关节点可查看三维坐标、重投影误差和来源。</p>
+        </section>
+
+        <p class="boundary">手—扶手和脚—地面只表示视觉几何接近候选，不代表触觉接触、握力或承重。</p>
+      </aside>
+    </section>
+
+    <footer class="timeline-panel">
+      <button id="play-button" type="button" class="play-button">播放</button>
+      <label class="timeline-label" for="frame-slider">帧</label>
+      <input id="frame-slider" type="range" min="0" max="0" value="0" step="1">
+      <label for="speed-select">速度</label>
+      <select id="speed-select">
+        <option value="0.25">0.25×</option>
+        <option value="0.5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="2">2×</option>
+      </select>
+    </footer>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
