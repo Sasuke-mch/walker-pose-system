@@ -1,0 +1,17 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>人体与自由助步器 · 物理基础回放</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f6f6f2;color:#24352d;font:14px system-ui,"Microsoft YaHei",sans-serif}header{background:white;padding:16px 22px 10px;border-bottom:1px solid #ddd}h1{font-size:21px;margin:0 0 7px}p{margin:5px 0;line-height:1.5}.hint{color:#6c5840}.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:white;padding:10px 22px}button,select{padding:5px 9px;border:1px solid #aab3aa;background:white;border-radius:4px}button{cursor:pointer}#seek{flex:1;min-width:120px}#frame{width:64px}canvas{display:block;width:100%;height:calc(100vh - 365px);min-height:340px;touch-action:none}footer{background:white;border-top:1px solid #ddd;padding:10px 22px;line-height:1.8;font-size:13px}a{color:#167562}#metrics{font-variant-numeric:tabular-nums}.error{color:#a32a25}
+</style>
+<header><h1>人体与自由助步器 · 最新物理基础回放</h1>
+<p><b>绿色：真实 SMPL-H 表面</b>　灰色：自由助步器　紫色：随助步器运动的双相机　红线：两侧握点间隙</p>
+<p class="hint">受控仿真：首帧姿态固定目标，没有新图像输入，也没有策略训练。这不是448帧视频重建；参数尚未实测，外观接近不等于真实承重。</p></header>
+<div class="controls"><select id="run" aria-label="运行结果" disabled></select><button id="play" disabled>播放</button><button id="prev" disabled>上一帧</button><button id="next" disabled>下一帧</button>
+<label>状态 <input id="frame" aria-label="状态编号" type="number" min="0" value="0"></label><span id="total"></span><input id="seek" aria-label="时间轴" type="range" min="0" value="0">
+<select id="rate" aria-label="播放速度"><option value="0.02">0.02倍</option><option value="0.1" selected>0.1倍</option><option value="0.5">0.5倍</option><option value="1">1倍</option></select>
+<select id="view" aria-label="视角"><option value="oblique">斜视</option><option value="front">正视</option><option value="side">侧视</option><option value="top">俯视</option></select><button id="reset">重置视角</button>
+<label><input id="physics" type="checkbox" checked>人体表面</label><label><input id="coco" type="checkbox">模型COCO点</label><label id="target-label" hidden><input id="target" type="checkbox" checked>输入参考骨架</label><label><input id="grips" type="checkbox" checked>握点</label></div>
+<canvas id="scene" aria-label="人体助步器三维回放"></canvas>
+<footer><div id="metrics">加载当前保存状态…</div><div id="status"></div><div>左键拖动旋转 · 右键/Shift拖动平移 · 滚轮缩放 · 空格播放 · 方向键逐帧。按实际物理时间播放；无插帧、平滑或手动贴地。</div>
+<a href="../nonzero_motion_restore_v3/restore_comparison.png" target="_blank">中途恢复完整曲线</a>　<a href="../armature_fixed_control_substeps2_v1/force_timing_diagnosis.png" target="_blank">受力与时基对照</a></footer>
+<script src="viewer.js"></script></html>

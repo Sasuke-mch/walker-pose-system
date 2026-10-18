@@ -114,6 +114,67 @@ def matched_body_xml(source, xml, output):
     tree.write(output,encoding='unicode')
 
 
+def matched_foot_collision_xml(source, xml, inertia_readback, output):
+    """Fit the four foot boxes to frozen SMPL-H rest skin plus shoe thickness.
+
+    This is a collision approximation, not measured footwear. Explicit inertial
+    elements preserve the previous four body masses/COM/tensors; the next PhysX
+    load must verify that the importer actually retained them.
+    """
+    import torch
+    from .analyze import load_model
+    from pose_app.foot_ground_reference import SHOE_HEIGHT_M
+
+    output = Path(output)
+    if output.exists() or output.with_suffix('.json').exists():
+        raise FileExistsError(output)
+    properties = json.loads(Path(inertia_readback).read_text(encoding='utf-8'))['initialization']
+    model = load_model()
+    with np.load(source, allow_pickle=False) as saved:
+        beta = torch.tensor(saved['betas'], dtype=torch.float32)
+    rest = (model.v_template+torch.einsum('bl,vcl->bvc', beta, model.shapedirs)[0]).detach().numpy()
+    joints = (model.J_regressor.detach().numpy()@rest)
+    assignment = model.lbs_weights.argmax(1).detach().numpy()
+    tree, boxes = ET.parse(xml), {}
+    for name in ('L_Ankle', 'L_Toe', 'R_Ankle', 'R_Toe'):
+        index = NAMES.index(name)
+        smpl_index = SMPL_INDICES[index]
+        vertices = np.flatnonzero(assignment == smpl_index)
+        if len(vertices) < 4:
+            raise ValueError('insufficient assigned skin vertices: '+name)
+        local = (rest[vertices]-joints[smpl_index])@BASE_ROTATION.T
+        low, high = local.min(0), local.max(0)
+        low[2] -= SHOE_HEIGHT_M  # foot-local sole normal; the physical floor stays Z=0
+        center, half = (high+low)/2, (high-low)/2
+        body = tree.find(f'.//body[@name="{name}"]')
+        geom = body.find('geom')
+        if geom.get('type') != 'box' or body.find('inertial') is not None:
+            raise ValueError('expected original density-derived foot box: '+name)
+        geom.set('pos', ' '.join(f'{x:.10g}' for x in center))
+        geom.set('size', ' '.join(f'{x:.10g}' for x in half))
+        geom.set('quat', '1 0 0 0')
+        inertia = np.asarray(properties['body_inertia_about_com_kg_m2'][index])
+        if not np.allclose(inertia, np.diag(np.diag(inertia)), atol=1e-10, rtol=0):
+            raise ValueError('this Gym fixture requires body-aligned diagonal foot inertia')
+        ET.SubElement(body, 'inertial', mass=str(properties['body_mass_kg'][index]),
+            pos=' '.join(str(x) for x in properties['body_com_local_m'][index]),
+            diaginertia=' '.join(str(x) for x in np.diag(inertia)))
+        boxes[name] = dict(smpl_joint_index=int(smpl_index), skin_vertex_count=len(vertices),
+            center_m=center.tolist(), half_size_m=half.tolist(),
+            expected_mass_kg=properties['body_mass_kg'][index],
+            expected_com_m=properties['body_com_local_m'][index],
+            expected_inertia_about_com_kg_m2=inertia.tolist())
+    output.parent.mkdir(parents=True, exist_ok=True)
+    tree.write(output, encoding='unicode')
+    metadata = dict(status='foot_collision_asset_generated_unvalidated', source=str(source), xml=str(xml),
+        inertia_readback=str(inertia_readback), boxes=boxes, shoe_thickness_m=SHOE_HEIGHT_M,
+        geometry='dominant-skin-weight rest-shape AABBs; footwear approximated along foot-local -Z',
+        inertia='previous synthetic author body properties explicitly retained; requires PhysX readback',
+        root_shift_m=0., floor_z_m=0., measured_footwear=False)
+    output.with_suffix('.json').write_text(json.dumps(metadata, indent=2), encoding='utf-8')
+    return metadata
+
+
 def prepare(source, scene, xml, output, match_shape=False):
     if output.exists():
         raise FileExistsError(output)
@@ -350,10 +411,16 @@ def main():
     parser.add_argument('--scene', type=Path)
     parser.add_argument('--dynamic-probe',type=Path,help='official standing motion used to initialize known arm motion')
     parser.add_argument('--match-shape',action='store_true',help='match source rest bone offsets, retain collision shapes; isolated geometry contrast')
+    parser.add_argument('--match-foot-collisions', action='store_true', help='frozen-shape foot boxes plus shared shoe thickness; no root/floor shift')
+    parser.add_argument('--inertia-readback', type=Path, help='previous coupled scene results.json, for explicit inertia preservation')
     parser.add_argument('--xml', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    if args.dynamic_probe:
+    if args.match_foot_collisions:
+        if args.source is None or args.inertia_readback is None:
+            parser.error('source and inertia-readback required for foot geometry')
+        print(json.dumps(matched_foot_collision_xml(args.source, args.xml, args.inertia_readback, args.output)))
+    elif args.dynamic_probe:
         dynamic_probe(args.xml,args.dynamic_probe,args.output)
     else:
         if args.source is None or args.scene is None:

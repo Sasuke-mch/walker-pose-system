@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PhysHMR · 官方示例三维回放</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f5f2;color:#202925;font:15px system-ui,"Microsoft YaHei",sans-serif}header{padding:18px 24px 10px;background:#fff;border-bottom:1px solid #ddd}h1{font-size:21px;margin:0 0 7px}p{margin:6px 0;color:#56615c;font-size:13px}.controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 24px;background:white}button,select{padding:6px 13px;border:1px solid #abb5ae;border-radius:5px;background:#fff;color:#202925}button{cursor:pointer}button:disabled{opacity:.5}input[type=range]{flex:1;min-width:160px}label{white-space:nowrap}#scene{display:block;width:100%;height:calc(100vh - 258px);min-height:340px;touch-action:none}footer{padding:8px 24px;background:#fff;border-top:1px solid #ddd;font-size:13px;line-height:1.8}.green{color:#117c64}.orange{color:#b65c17}#metrics{font-variant-numeric:tabular-nums}#status{font-size:12px;color:#59655e}#frame{width:60px;padding:5px}a{color:#276c60}
+</style>
+<header><h1>PhysHMR · 冻结预训练策略 / 官方示例</h1>
+<p><b class="green">绿色：物理输出 SMPL 网格</b>　<b class="orange">橙色：同一时刻的输入参考骨架</b>　固定世界坐标，保留整体偏移。</p>
+<p>这是官方 AIST 的 100 步示例，不是你的 448 帧视频。参考骨架不是独立真值；地面是仿真平面。</p></header>
+<div class="controls"><button id="play" disabled>播放</button><button id="prev" disabled>上一帧</button><button id="next" disabled>下一帧</button>
+<label>帧 <input id="frame" type="number" value="0" min="0" max="99" aria-label="帧编号"></label><span id="total">/ 99</span>
+<input id="seek" type="range" min="0" max="99" value="0" aria-label="时间轴">
+<select id="rate" aria-label="播放速度"><option value="0.5">0.5 倍</option><option value="1" selected>1 倍</option><option value="2">2 倍</option></select>
+<select id="view" aria-label="视角"><option value="oblique">斜视</option><option value="front">正视</option><option value="side">侧视</option><option value="top">俯视</option></select>
+<label><input id="physics" type="checkbox" checked>物理网格</label><label><input id="reference" type="checkbox" checked>参考骨架</label><label><input id="joints" type="checkbox">物理骨架</label><button id="reset">重置视角</button></div>
+<canvas id="scene" aria-label="PhysHMR 三维人体回放"></canvas>
+<footer><div id="metrics">加载同一次运行的数据…</div><div>左键拖动旋转 · 右键 / Shift 拖动平移 · 滚轮缩放 · 空格播放或暂停 · 左右方向键逐帧</div>
+<div id="status">读取数据中…</div></footer>
+<script src="viewer.js"></script></html>
