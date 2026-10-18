@@ -1,5 +1,12 @@
 # 当前导航（2026-10-03）
 
+## 2026-10-18 自动微分接触路线：完整逻辑记录与实验报告备份
+
+按用户要求，核对当前代码、protocol/summary/trajectory及保存数组，在autograd_contact_shoe25_full448_20261017/EXPERIMENT.md补充详细逻辑，更新docs/CURRENT_SMPLH_ALGORITHM_20261002.md第5.27节，并将同内容记录备份为docs/实验报告/自动微分接触路线说明_20261018.md。覆盖输入/全片预校准beta、观察点与原生关节区别、q/v/a与真实dt过程、身体/方向/预测/姿态/两类接触损失、25mm鞋高、MAP与自动微分范围、协方差近似、导数发布门、12关节曲线、全部448失败指标及复现方式。
+
+特别澄清：当前condition_accepted_iterate=true，70收敛和377未收敛接受帧均各更新一次近似P，但未收敛导数不发布；feasible_unconverged不证明接触可行；三个旧max_correction配置未被当前MAP当作硬限幅；70收敛帧中50帧仍至少一脚低于20mm，第320帧足底9.23109/8.91517mm。路线保持高研究优先级，工程检查仍失败。本次仅文档和只读核对，没有重跑模型、调参或改写结果；详细原件与用户要求副本正文一致，导航链接有效。
+
+
 ## 2026-10-17 自动微分接触路线：448帧速度与加速度曲线
 
 按用户要求，以autograd_contact_shoe25_full448_20261017的result.npz、protocol.json、trajectory.jsonl和原初始化/冻结资产，新增realtime_app/tools/plot_smplh_contact_derivatives.py；沿原输出的±0.01s模型报告公式，将保存的38维q/v/a状态换算为12个COCO观察点的三维速度/加速度。没有重新优化、对相邻视频位置差分、平滑、插值或裁掉尖峰；第11帧起复用该运行的虚拟髋映射。逐帧复现观察点与保存值最大差0m，448帧导数均有限、无重启，时间0~16.035239s。
